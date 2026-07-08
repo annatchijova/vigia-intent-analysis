@@ -755,6 +755,40 @@ def _vigia_score(case: dict) -> dict:
         min(0.2, max(0, unique_types - 1) * 0.05), _DETERMINISTIC_INTERNAL_PREC
     )
 
+    # -----------------------------------------------------------------------
+    # R4-3: saturación por DOMINIO DE RECOLECCIÓN — arquitectura de DOS etapas
+    # con la etapa 1 BIT-EXACTA al esquema legacy M2-1:
+    #
+    #   Etapa 1 (SIN CAMBIOS — abajo): mejor-prefijo por TIPO (M2-1). Todos
+    #   los casos existentes del corpus con <=4 artefactos por sub-banda
+    #   producen exactamente el mismo composite que antes de R4-3 — las
+    #   corridas comparativas 3-4 probaron que la cabeza NO puede desviarse:
+    #   el par CAN-018 (MALICE) / CAN-032 (SUSPICION) tiene FORMA idéntica
+    #   (3× memory_process + 1 ip_geolocation) y solo el score calibrado de
+    #   contenido los separa; y CAN-029 (MALICE) depende de que lsass_session
+    #   NO se agrupe con los memory_process del mismo dominio en la cabeza.
+    #
+    #   Etapa 2 (R4-3): decay DE COLA por sub-banda de recolección
+    #   (docs/TAXA_DOMINIOS_RECOLECCION.md, taxonomía v2). Dentro de cada
+    #   sub-banda se rankea por score post-etapa-1; las posiciones 1-4 NO se
+    #   tocan (dos-fuentes + margen legacy) y de la 5ta en adelante el peso
+    #   decae geométrico r^(pos-4). Acá muere el drowning medido en
+    #   docs/BASELINE_TRIPLE_CASTIGO.md: legacy crecía N/2 sin límite
+    #   (+0.0016/log constante — 95 logs irrelevantes movían BREAK-014 de
+    #   SUSPICION 0.2324 a MALICE 0.3867 y 50 logs de raw 0.05 SOLOS
+    #   fabricaban SUSPICION), la cola geométrica converge.
+    #
+    #   EXENTOS de la etapa 2: D5-media/hard (costo por-artefacto: 10
+    #   binarios SON 10 actos de fabricación independientes — FLAREON) y los
+    #   artefactos sin evidence_type (schema narrativo SRL: saturarlos
+    #   aplastaba 14 casos MALICE en la corrida 3; su redundancia la maneja
+    #   la vía semiótica).
+    #
+    #   Monotonicidad (invariante M2-1): la etapa 1 conserva su propia
+    #   garantía; la etapa 2 usa pesos fijos decrecientes por posición sobre
+    #   un ranking ordenado — verificada sobre la grilla de los pins M2 y los
+    #   tests R4-3 (agregar evidencia incriminatoria nunca baja el score).
+    # -----------------------------------------------------------------------
     # M2-1 (Red-Team Round 2): redundancy decay evaluado en el MEJOR PREFIJO
     # por tipo, no sobre el conjunto completo a ciegas. El esquema legacy
     # penalizaba a TODOS los artefactos de un tipo con (count-1)·0.15:
@@ -804,11 +838,65 @@ def _vigia_score(case: dict) -> dict:
         for _pos, _i in enumerate(_ranked):
             adj_scores[_i] = _best_adjs[_pos] if _pos < _best_k else 0.0
 
-    if not adj_scores:
+
+    try:
+        from vigia.tools.caie import (
+            classify_domain as _classify_domain,
+            classify_domain_subband as _classify_subband,
+        )
+    except Exception:
+        def _classify_domain(_t):  # mirror mínimo — fuente de verdad es caie
+            return f"UNKNOWN:{_t}"
+        def _classify_subband(_t):
+            return (f"UNKNOWN:{_t}", "UNKNOWN")
+
+    # r de cola por sub-banda: replicabilidad del canal (CR-002/CR-004).
+    _R43_TAIL_START = 4          # posiciones 1-4 intactas (cabeza legacy)
+    _R43_SUBBAND_DECAY = {
+        "D1a": 0.5, "D1b": 0.7, "D2": 0.7, "D3": 0.7, "D4": 0.7,
+        "D5-soft": 0.5, "D0": 0.5,
+    }
+    _R43_EXEMPT_BANDS = frozenset({"D5-media", "D5-hard"})
+
+    _by_domain: dict[str, list[int]] = {}
+    _by_subband: dict[tuple, list[int]] = {}
+    for _idx, et in enumerate(effective_trusts):
+        _et_str = str(et["evidence_type"])
+        _by_domain.setdefault(_classify_domain(_et_str), []).append(_idx)
+        _by_subband.setdefault(_classify_subband(_et_str), []).append(_idx)
+
+    r43_scores = list(adj_scores)
+    for (_dom, _band), _sb_idxs in _by_subband.items():
+        if _band in _R43_EXEMPT_BANDS or _band == "UNKNOWN" \
+                or _dom.startswith("UNKNOWN:"):
+            continue
+        if len(_sb_idxs) <= _R43_TAIL_START:
+            continue  # sin cola: bit-exacto legacy
+        _r = _R43_SUBBAND_DECAY.get(_band, 0.7)
+        _dranked = sorted(_sb_idxs, key=lambda i: -adj_scores[i])
+        for _pos, _i in enumerate(_dranked):
+            if _pos < _R43_TAIL_START:
+                continue
+            r43_scores[_i] = _dround(
+                adj_scores[_i] * (_r ** (_pos - _R43_TAIL_START + 1)),
+                _DETERMINISTIC_OUTPUT_PREC,
+            )
+
+    # Score por dominio (Noisy-OR intra-dominio sobre los pesos saturados) —
+    # trazabilidad Daubert y entrada del gate B-068 por dominios.
+    r43_domain_scores = {
+        _dom: _dround(
+            1.0 - math.prod(max(0.0, 1.0 - r43_scores[_i]) for _i in _idxs),
+            _DETERMINISTIC_OUTPUT_PREC,
+        )
+        for _dom, _idxs in sorted(_by_domain.items())
+    }
+
+    if not r43_scores:
         composite = 0.0
     else:
         raw_composite = _dround(
-            1.0 - math.prod([max(0.0, 1.0 - s) for s in adj_scores]),
+            1.0 - math.prod([max(0.0, 1.0 - s) for s in r43_scores]),
             _DETERMINISTIC_INTERNAL_PREC,
         )
         composite = _dround(raw_composite * (1.0 + diversity_bonus), _DETERMINISTIC_OUTPUT_PREC)
@@ -1017,18 +1105,102 @@ def _vigia_score(case: dict) -> dict:
             # están en `artifacts` (apartados arriba, semántica V1).
             and _semantic_role(a) != "contextual"
         ]
-        _n_arts  = len(_tech_arts)
-        _n_types = len(set(a.get("evidence_type", "") for a in _tech_arts))
-        if _n_arts >= 4 or _n_types >= 3:
+        # R4-3: el gate cuenta DOMINIOS DE RECOLECCIÓN activos, no tipos ni
+        # artefactos. "Two independent sources" (Daubert) hecho literal: dos
+        # canales cuya fabricación exige actos independientes del atacante.
+        # El esquema previo (n_artifacts >= 4 OR n_types >= 3) era comprable
+        # con volumen de UN solo canal: 4 logs, o 3 tipos de metadata del
+        # mismo filesystem. assurance_context (D0) no corrobora (no es
+        # evidencia de dispositivo); los UNKNOWN:<tipo> cuentan cada uno como
+        # su propio dominio (conservador con evidencia genuinamente nueva).
+        # R4-3 gate v2 — tres ramas, cada una con doctrina propia (la corrida
+        # comparativa 1 mostró que "n_domains>=2" a secas es a la vez más
+        # estricto Y más laxo que el gate viejo: bloqueaba MALICE legítimos
+        # de un canal duro y abría FPs de dos canales con poca masa):
+        #   (1) CROSS-DOMAIN CON MASA: >=2 dominios Y la masa mínima del gate
+        #       legado (n_arts>=4 o n_types>=3) — dos canales independientes
+        #       no eximen de tener evidencia suficiente (REAL-005/case_002
+        #       eran FPs de 2 dominios con 2-3 artefactos).
+        #   (2) MASA DURA: >=3 tipos duros O >=4 artefactos duros
+        #       (spoofability <=0.30) — fabricar objetos de memoria/MFT exige
+        #       compromiso live/Ring-0 real por pieza; nadie "loopea" EPROCESS
+        #       falsos dentro de un dump genuino (VIGIA-CAN-029: 3
+        #       memory_process + 1 lsass_session = 4 duros de un canal).
+        #   (3) COSTO POR-ARTEFACTO: >=4 artefactos D5-hard/media — cada
+        #       binario/documento es un acto de fabricación independiente
+        #       (FLAREON); el volumen ahí SÍ es corroboración.
+        # Un solo canal blando (N logs, N marcadores) no abre ninguna rama.
+        try:
+            from vigia.tools.caie import EVIDENCE_PROFILES as _EPROF
+            def _spoof(_t):
+                _p = _EPROF.get(_t)
+                return _p.spoofability if _p is not None else 1.0
+        except Exception:
+            _HARD_TYPES = frozenset({
+                "memory_process", "lsass_session", "kernel_structure",
+                "usn_journal", "usn_journal_gap", "mft_entry", "prefetch",
+                "timestamp_precision", "cryptographic_hash", "hmac_audit_log",
+                "digital_signature", "hardware_serial", "TPM_attestation",
+            })
+            def _spoof(_t):
+                return 0.1 if _t in _HARD_TYPES else 1.0
+
+        _gate_types = set()
+        _hard_types = set()
+        _n_hard_arts = 0
+        _n_percost = 0
+        _n_gate_arts = 0
+        _dom_arts: dict = {}     # dominio -> n artefactos elegibles
+        _dom_min_spoof: dict = {}  # dominio -> spoofability mínima vista
+        for a, _sig in zip(artifacts, _signal_flags):
+            if not _sig:
+                continue
+            _et_str = str(a.get("evidence_type", ""))
+            if _evidence_role(_et_str) != _ROLE_DEVICE:
+                continue
+            if _semantic_role(a) == "contextual":
+                continue
+            _dom, _band = _classify_subband(_et_str)
+            if _dom == "assurance_context":
+                continue
+            _n_gate_arts += 1
+            _dom_arts[_dom] = _dom_arts.get(_dom, 0) + 1
+            _sp = _spoof(_et_str)
+            if _sp < _dom_min_spoof.get(_dom, 2.0):
+                _dom_min_spoof[_dom] = _sp
+            _gate_types.add(_et_str)
+            if _sp <= 0.30:
+                _hard_types.add(_et_str)
+                _n_hard_arts += 1
+            if _band in ("D5-hard", "D5-media"):
+                _n_percost += 1
+
+        _gate_domains = set(_dom_arts)
+        _n_domains = len(_gate_domains)
+        _branch = None
+        if _n_domains >= 2 and (_n_gate_arts >= 4 or len(_gate_types) >= 3):
+            _branch = f"cross-domain ({_n_domains} domains, {_n_gate_arts} artifacts)"
+        elif len(_hard_types) >= 3 or _n_hard_arts >= 4:
+            _branch = (f"hard-mass ({len(_hard_types)} hard type(s), "
+                       f"{_n_hard_arts} hard artifact(s) w/ spoofability<=0.30)")
+        elif _n_percost >= 4:
+            _branch = f"per-artifact-cost ({_n_percost} D5-hard/media artifacts)"
+
+        if _branch:
             verdict = "MALICE"
-            reason  = f"Intent score {final_score:.4f} exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)"
+            reason  = (
+                f"Intent score {final_score:.4f} exceeds MALICE threshold — "
+                f"corroboration branch: {_branch} (B-068 gate, R4-3 v2)"
+            )
         else:
             verdict = "SUSPICION"
             reason  = (
                 f"Intent score {final_score:.4f} exceeds MALICE threshold but "
-                f"corroboration rests on {_n_arts} technical artifact(s) / "
-                f"{_n_types} technical evidence class(es) — context/narrative "
-                f"classes do not corroborate MALICE (B-068 Daubert gate)"
+                f"no corroboration branch opens ({_n_domains} domain(s), "
+                f"{len(_hard_types)}/{_n_hard_arts} hard class(es)/artifact(s), "
+                f"{_n_percost} per-cost "
+                f"artifact(s)) — volume within a single soft collection "
+                f"domain does not corroborate MALICE (B-068 gate, R4-3 v2)"
             )
         confidence = _dround(min(0.95, final_score * 2.0), 2)
     elif final_score > Fraction(10, 100):  # B-076: 18/100 → 10/100 (ground truth)
@@ -1056,6 +1228,12 @@ def _vigia_score(case: dict) -> dict:
         "reason":                       reason,
         "mean_effective_trust":         mean_effective,
         "composite_base":               _dround(composite, _DETERMINISTIC_OUTPUT_PREC),
+        # R4-3: trazabilidad de la saturación por dominio (Daubert).
+        "r43_domain_scores":            r43_domain_scores,
+        "r43_active_domains":           sorted(
+            _dom for _dom, _s in r43_domain_scores.items()
+            if _s > _M2_MIN_SIGNAL_ADJ and _dom != "assurance_context"
+        ),
         "fracture_malice_boost":        _dround(fracture_malice_boost, _DETERMINISTIC_OUTPUT_PREC),
         "fracture_credibility_penalty": _dround(fracture_credibility_penalty, _DETERMINISTIC_OUTPUT_PREC),
         "diversity_bonus":              _dround(diversity_bonus, _DETERMINISTIC_OUTPUT_PREC),

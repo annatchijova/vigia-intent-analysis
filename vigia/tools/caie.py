@@ -140,27 +140,107 @@ _D_ONE: decimal.Decimal = decimal.Decimal("1")
 # Domain classification layer
 # ---------------------------
 
-_DOMAIN_MAP = {
-    "memory_process": "memory",
-    "memory_dump": "memory",
-    "lsass_session": "memory",
-    "log_entry": "network",
-    "network_artifact": "network",
-    "network_connection": "network",
-    "ip_geolocation": "network",
-    "dns_record": "network",
-    "file_timestamp": "filesystem",
-    "file_hash": "filesystem",
-    "mft_entry": "filesystem",
-    "usn_journal": "filesystem",
-    "registry_key": "filesystem",
-    "TPM_attestation": "hardware",
-    "hmac_audit_log": "hardware",
+# R4-3 (docs/TAXA_DOMINIOS_RECOLECCION.md, taxonomía v2 validada por el
+# colectivo con CR-001..004 de Kimi): dominios de RECOLECCIÓN por modo de
+# fabricación compartido — si un solo acto del atacante puede producir dos
+# artefactos, su corroboración mutua vale menos que la de dos dominios
+# distintos. El mapa v1 era código muerto (0 consumidores) y clasificaba
+# log_entry como "network" — un syslog que habla de red no es telemetría de
+# red: comparte modo de fabricación con cualquier otro log.
+# Formato: evidence_type -> (dominio, sub_banda). Las sub-bandas (D1a/D1b,
+# D5-hard/media/soft) refinan el factor de fabricación INTRA-dominio.
+_DOMAIN_MAP: dict = {
+    # D1 — log_symbolic (texto declarativo; nada estructural que comprometer)
+    "log_entry":                    ("log_symbolic", "D1a"),
+    "event_log":                    ("log_symbolic", "D1a"),
+    "plaintext_credential":         ("log_symbolic", "D1a"),
+    "email_account_creation":       ("log_symbolic", "D1a"),
+    "windows_event_log":            ("log_symbolic", "D1b"),  # EVTX tamper-evident (CR-002)
+    "hmac_audit_log":               ("log_symbolic", "D1b"),
+    # D2 — memory_kernel (compromiso live / Ring-0)
+    "memory_process":               ("memory_kernel", "D2"),
+    "memory_dump":                  ("memory_kernel", "D2"),
+    "lsass_session":                ("memory_kernel", "D2"),
+    "kernel_structure":             ("memory_kernel", "D2"),
+    "memory_os_profile":            ("memory_kernel", "D2"),
+    "keylogger_capture":            ("memory_kernel", "D2"),  # implante vivo (CR-001)
+    # D3 — filesystem_metadata (misma imagen de disco / registro del OS)
+    "file_timestamp":               ("filesystem_metadata", "D3"),
+    "file_hash":                    ("filesystem_metadata", "D3"),
+    "file_metadata":                ("filesystem_metadata", "D3"),
+    "registry_key":                 ("filesystem_metadata", "D3"),
+    "registry_hive":                ("filesystem_metadata", "D3"),
+    "mft_entry":                    ("filesystem_metadata", "D3"),
+    "shimcache":                    ("filesystem_metadata", "D3"),
+    "filesystem_artifact":          ("filesystem_metadata", "D3"),
+    "deleted_file_recovery":        ("filesystem_metadata", "D3"),
+    "disk_image":                   ("filesystem_metadata", "D3"),
+    "usn_journal":                  ("filesystem_metadata", "D3"),
+    "usn_journal_gap":              ("filesystem_metadata", "D3"),
+    "timestamp_precision":          ("filesystem_metadata", "D3"),
+    "prefetch":                     ("filesystem_metadata", "D3"),
+    # D4 — network_telemetry (control del canal en el momento del tráfico)
+    "network_flow":                 ("network_telemetry", "D4"),
+    "network_traffic":              ("network_telemetry", "D4"),
+    "network_capture":              ("network_telemetry", "D4"),
+    "network_artifact":             ("network_telemetry", "D4"),
+    "network_connection":           ("network_telemetry", "D4"),
+    "network_communication_pattern": ("network_telemetry", "D4"),
+    "dns_record":                   ("network_telemetry", "D4"),
+    "ip_geolocation":               ("network_telemetry", "D4"),
+    "user_agent":                   ("network_telemetry", "D4"),
+    "malware_infrastructure":       ("network_telemetry", "D4"),
+    # D5 — content_artifact (fabricación de contenido, costo por-artefacto)
+    "cryptographic_hash":           ("content_artifact", "D5-hard"),
+    "TPM_attestation":              ("content_artifact", "D5-hard"),  # CR-003
+    "digital_signature":            ("content_artifact", "D5-hard"),
+    "hardware_serial":              ("content_artifact", "D5-hard"),
+    "binary":                       ("content_artifact", "D5-media"),
+    "binary_executable":            ("content_artifact", "D5-media"),
+    "pe_executable":                ("content_artifact", "D5-media"),
+    "elf_executable":               ("content_artifact", "D5-media"),
+    "binary_diff":                  ("content_artifact", "D5-media"),
+    "malware_static_analysis":      ("content_artifact", "D5-media"),
+    "document":                     ("content_artifact", "D5-media"),
+    "document_visual":              ("content_artifact", "D5-media"),
+    "document_geometry":            ("content_artifact", "D5-media"),
+    "spreadsheet":                  ("content_artifact", "D5-media"),
+    "file_text":                    ("content_artifact", "D5-media"),
+    "email_content":                ("content_artifact", "D5-media"),
+    "web_artifact":                 ("content_artifact", "D5-media"),
+    "archive":                      ("content_artifact", "D5-media"),
+    "container_zip":                ("content_artifact", "D5-media"),
+    "git_forensics":                ("content_artifact", "D5-media"),
+    "cultural_marker":              ("content_artifact", "D5-soft"),
+    "osint":                        ("content_artifact", "D5-soft"),
+    # D0 — assurance_context (describe la ADQUISICIÓN, no el ataque;
+    # alineado con _EVIDENCE_ROLE de B-070)
+    "acquisition_context":          ("assurance_context", "D0"),
+    "device_acquisition_timeline":  ("assurance_context", "D0"),
+    "behavioral_context":           ("assurance_context", "D0"),
+    "behavioral_profile":           ("assurance_context", "D0"),
+    "outcome_signal":               ("assurance_context", "D0"),
 }
 
 def classify_domain(evidence_type: str) -> str:
-    """Deterministic domain classifier for artifact types."""
-    return _DOMAIN_MAP.get(evidence_type, "UNKNOWN")
+    """Dominio de recolección de un evidence_type (R4-3, taxonomía v2).
+
+    Un tipo desconocido recibe su PROPIO dominio ("UNKNOWN:<tipo>") —
+    conservador: no satura contra otros desconocidos distintos, pero N
+    copias del mismo tipo desconocido sí comparten grupo de saturación."""
+    entry = _DOMAIN_MAP.get(evidence_type)
+    if entry is None:
+        return f"UNKNOWN:{evidence_type}"
+    return entry[0]
+
+
+def classify_domain_subband(evidence_type: str) -> tuple:
+    """(dominio, sub_banda) — las sub-bandas D1a/D1b y D5-hard/media/soft
+    refinan el factor de fabricación intra-dominio (TAXA v2, CR-002/CR-004)."""
+    entry = _DOMAIN_MAP.get(evidence_type)
+    if entry is None:
+        return (f"UNKNOWN:{evidence_type}", "UNKNOWN")
+    return entry
 
 def _dround(value, precision: int = _DETERMINISTIC_INTERNAL_PREC) -> decimal.Decimal:
     """

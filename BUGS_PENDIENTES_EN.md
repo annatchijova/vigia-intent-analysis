@@ -4488,3 +4488,56 @@ Protocol per item: restore tag, red tests first, green suite, corpus
 **Remaining in Grupo B:** B1 (requirements-ci import contract), B2
 (OOV/xfail), B6 (ARTIFACT_TYPE_REGISTRY), B10 (comparator reads sealed
 agent_verdict), C1/C2 from the P0-001 census.
+
+---
+
+## B-088 — R4-3: collection-domain saturation in the EBS scorer [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-07) |
+| **Severity** | P1 — 95 irrelevant logs bought MALICE (same-channel volume drowning) |
+| **File** | `vigia_scorer.py` (stage 2 + B-068 gate v2), `vigia/tools/caie.py` (classify_domain v2 revived) |
+| **Antecedents** | docs/TAXA_DOMINIOS_RECOLECCION.md (taxonomy v2, CR-001..004); docs/BASELINE_TRIPLE_CASTIGO.md (pre-fix curves) |
+| **Design** | Approved by the collective (6 models): Noisy-OR assumes independence; 100 same-type logs are not 100 sources |
+
+**Final architecture (4 comparative runs — the B-069 gate rejected 3 intermediate designs):**
+1. `classify_domain()` revived in caie.py with taxonomy v2 (53 corpus types +
+   6 code-only; sub-bands D1a/D1b, D5-hard/media/soft; it was dead code with
+   `log_entry→"network"`). New `classify_domain_subband()`.
+2. **Stage 1 BIT-EXACT to legacy M2-1** (per-type best-prefix): the runs
+   proved the head cannot deviate — the corpus contains shape-identical twins
+   with opposite labels (CAN-018 MALICE vs CAN-032 SUSPICION: both 3×
+   memory_process + 1 ip_geolocation) separated only by calibrated content
+   score; and CAN-029 requires lsass NOT to merge with memory_process in the
+   head.
+3. **Stage 2 (R4-3): TAIL-only decay per collection sub-band** — positions
+   1-4 untouched, from the 5th on w=r^(pos-4) (D1a/D5-soft/D0 r=0.5;
+   D1b/D2/D3/D4 r=0.7). EXEMPT: D5-media/hard (per-artifact cost: 10 binaries
+   ARE 10 acts — FLAREON) and artifacts without evidence_type (SRL narrative
+   schema; run 3 showed saturating them crushes 14 MALICE cases). M2-1
+   monotonicity preserved (pins green).
+4. **B-068 gate v2 — three doctrinal branches** (run 1 proved bare
+   "≥2 domains" is both stricter AND looser than legacy): cross-domain with
+   mass (≥2 domains AND ≥4 arts or ≥3 types), hard mass (≥3 types or ≥4
+   artifacts with spoofability ≤0.30 — CAN-029), per-artifact cost (≥4
+   D5-hard/media — FLAREON). A single soft channel opens none. Traceability:
+   `r43_domain_scores`/`r43_active_domains` in the result.
+
+**Acceptance criteria (all met):**
+- BREAK-014: MALICE 0.3867/conf 0.77 → **SUSPICION 0.2322/conf 0.46** ✓
+- Post-fix curve FLAT: N=25/50/95 irrelevant logs → constant 0.2322
+  (pre-fix: +0.0016/log up through the MALICE threshold) ✓
+- 95 logs alone: SUSPICION 0.1888 → **NOISE 0.0109** ✓
+- The 96 correct MALICE cases: **0 regressions** ✓
+- Corpus **166 → 167/199** (a SINGLE flip: BREAK-014 to PASS) ✓
+- Suite **1049 passed** (16 new red-first tests in
+  `tests/test_r4_3_domain_saturation.py`) ✓
+
+**Register of designs rejected by the comparative gate (B-069 discipline):**
+uniform r=0.5 (run 1: 153/199, 13 regressions — raw FRS also violates
+monotonicity); two-full + per-sub-band r (run 2: 164/199, 4 new FPs: trio 2.7
+vs legacy 2.1); second-domain qualification by spoofability (run 3: 131/199 —
+crushed SRL narrative and CAN-MALICE cases); positional head (1,0.7,0.4,0.1)
+without best-prefix (run 4: 165/199, the CAN-029/CAN-032 pair crosses). The
+lesson: the head was CALIBRATED; only the tail was the defect.

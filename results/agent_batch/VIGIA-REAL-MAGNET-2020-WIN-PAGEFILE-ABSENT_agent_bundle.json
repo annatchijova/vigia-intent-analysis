@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T19:22:16.310579+00:00",
+  "analysis_timestamp": "2026-07-08T01:36:18.643325+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
-    "end_time": "2026-07-07T19:22:16.310585+00:00",
+    "end_time": "2026-07-08T01:36:18.643334+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
-        "entry_sha256": "d5c83d93f3cd7399024292799e4673dae2890cb1562afe9e951f4a2e7a5b41ba",
+        "entry_sha256": "bea78bbe7615dc9b45537ceddb6209b2a7cfc3be26e1b7ffe3e730cff7eb1f46",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T19:22:16.136831+00:00",
+        "timestamp": "2026-07-08T01:36:18.419120+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
-        "entry_sha256": "35112864ef5a85322449178590fec582a415b67e939eaa7e6759aa5e257d8c49",
+        "entry_sha256": "4227d0e327cad5ecf95c960f908faa5dbd3707f0d84e9cc42790fe0c016ec6a0",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T19:22:16.136970+00:00",
+        "timestamp": "2026-07-08T01:36:18.419335+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
-        "entry_sha256": "8a6f1a302049fb9ca7f218e451e1d03fdcc50ccbb1e471f31dffe2e7772b3f7a",
+        "entry_sha256": "a95ac77bf9726249687dae05453e2cdc5ad409e95443dce52e7eccaa1b917d4a",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "5274035c996b0fac1cc8538fa6d0755dba88742408f74bf7139c3ac0cb36e589"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T19:22:16.137123+00:00",
+        "timestamp": "2026-07-08T01:36:18.419504+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
-        "entry_sha256": "5c1e82ef3bcdc0466bfc865a85d2c4990917793ace9c3732bc73b7eb2b8415f4",
+        "entry_sha256": "5b3ce01553f73d63de7d55943a923b2d808a8b9c2c5a38e87317926da8c1dd15",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T19:22:16.137324+00:00",
+        "timestamp": "2026-07-08T01:36:18.419861+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
-        "entry_sha256": "aaa1daf244a7a436242a72e5ce69c9dac2c15606d818937f6acea23e1799b112",
+        "entry_sha256": "f5249bf1cbe31bdedfae345005ba870159a18094fadfb3a7e4eb5ad28d933a0f",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,7 +95,7 @@
             "expected_verdict": "SUSPICION",
             "resolve": {
               "motor_confidence": "0.95",
-              "motor_reason": "Intent score 0.4800 exceeds MALICE threshold but corroboration rests on 3 technical artifact(s) / 2 technical evidence class(es) \u2014 context/narrative classes do not corroborate MALICE (B-068 Daubert ga",
+              "motor_reason": "Intent score 0.4800 exceeds MALICE threshold but no corroboration branch opens (1 domain(s), 2/3 hard class(es)/artifact(s), 0 per-cost artifact(s)) \u2014 volume within a single soft collection domain doe",
               "motor_score": "0.48",
               "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T19:22:16.310032+00:00",
+        "timestamp": "2026-07-08T01:36:18.642557+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
-        "entry_sha256": "890010c3a8579122959a9367e55ea4be142d58ac2eecc99342d617faa35e4d9d",
+        "entry_sha256": "fbc715e727d39871405f22b56c82829c2cc34f650451c4be1cf2ebbcd6a40780",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T19:22:16.310228+00:00",
+        "timestamp": "2026-07-08T01:36:18.642776+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
-        "entry_sha256": "dcfc8abd634f35c2d19ddac2adbe39da1bf0c1039e47d4b823bb558637667a28",
+        "entry_sha256": "b76810535ac5d0975dbb8b635327bb01b5af8e194f32c102cf23db9a3923b047",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,11 +164,11 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T19:22:16.310496+00:00",
+        "timestamp": "2026-07-08T01:36:18.643224+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T19:22:16.136288+00:00",
+    "start_time": "2026-07-08T01:36:18.418438+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
@@ -196,7 +196,7 @@
       "expected_verdict": "SUSPICION",
       "resolve": {
         "motor_confidence": "0.95",
-        "motor_reason": "Intent score 0.4800 exceeds MALICE threshold but corroboration rests on 3 technical artifact(s) / 2 technical evidence class(es) \u2014 context/narrative classes do not corroborate MALICE (B-068 Daubert ga",
+        "motor_reason": "Intent score 0.4800 exceeds MALICE threshold but no corroboration branch opens (1 domain(s), 2/3 hard class(es)/artifact(s), 0 per-cost artifact(s)) \u2014 volume within a single soft collection domain doe",
         "motor_score": "0.48",
         "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
