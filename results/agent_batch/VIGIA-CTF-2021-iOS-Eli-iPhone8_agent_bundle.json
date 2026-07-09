@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-07T19:22:33.014009+00:00",
+  "analysis_timestamp": "2026-07-08T01:36:38.480084+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-    "end_time": "2026-07-07T19:22:33.014017+00:00",
+    "end_time": "2026-07-08T01:36:38.480095+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "f876a19b97d9cf3f6f6c6b8e3b5e3ec800255e02017e4e18a4cce79132bc73aa",
+        "entry_sha256": "8e64da1ace947f91fb1fb873f0e668c4b4a96d69cc9df8d28c5c93965c0f6851",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T19:22:32.818274+00:00",
+        "timestamp": "2026-07-08T01:36:38.235292+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "7330c3575111c7f152fe824fe8095b85b0a2c634329c97e13ac3e179ae8caf9c",
+        "entry_sha256": "d0b7d053b4d3e676948d80b483daf8e286169300f09fec84bf768edc0e18d8c6",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T19:22:32.818430+00:00",
+        "timestamp": "2026-07-08T01:36:38.235502+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "1eb20e9d11659ad9a453baba632eb2afaeb7fb27fa2dcb355459a193629f77ad",
+        "entry_sha256": "1b98ca0c450ee95c32db6d3213429332b773e1f4903d9796e1f02a27c73ce689",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "3f1a23d51c3312787db4e4fa6977e88d119d0250399e55602019e86bb6d60783"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T19:22:32.818621+00:00",
+        "timestamp": "2026-07-08T01:36:38.235730+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "8ce2d403a611dd3cad4206eeb6accf073cae9106562888f60aa9ca1f48a17806",
+        "entry_sha256": "9d98a308410e0c928bbb3e40e56e7ca04eea46693fb9709b10f28ddaa68421af",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T19:22:32.818855+00:00",
+        "timestamp": "2026-07-08T01:36:38.235969+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "e617949cca7423c3eab45c17546f12da6ab1096e80f7aab75210b644d7c03a6b",
+        "entry_sha256": "762d5e00732ae48a8b2dfe215f3fdc5a078f28ef50803073563ec4fc525fabf6",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,7 +95,7 @@
             "expected_verdict": "UNKNOWN",
             "resolve": {
               "motor_confidence": "0.83",
-              "motor_reason": "Intent score 0.4170 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_reason": "Intent score 0.4170 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (4 domains, 9 artifacts) (B-068 gate, R4-3 v2)",
               "motor_score": "0.417",
               "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T19:22:33.013108+00:00",
+        "timestamp": "2026-07-08T01:36:38.479037+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "74d1df4958c18e801e811736cfa665f5a4b448b2479b5afff6a8f2d3e68f6b72",
+        "entry_sha256": "7ae0cbfac23f76560167133840deb526cf6b876fd6909464f43148c2cb3797d0",
         "inputs_summary": {
           "n_signals": "9"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T19:22:33.013332+00:00",
+        "timestamp": "2026-07-08T01:36:38.479312+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
-        "entry_sha256": "877ad699304a7b468dfeb59eace0833d835b5f341fdd55994daaed65050a1240",
+        "entry_sha256": "9988b932d3b8e8917e6dfeea234de47660c54d523297130b4823294c7cb8efdc",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -180,11 +180,11 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T19:22:33.013721+00:00",
+        "timestamp": "2026-07-08T01:36:38.479747+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T19:22:32.817766+00:00",
+    "start_time": "2026-07-08T01:36:38.234687+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
@@ -236,7 +236,7 @@
       "expected_verdict": "UNKNOWN",
       "resolve": {
         "motor_confidence": "0.83",
-        "motor_reason": "Intent score 0.4170 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_reason": "Intent score 0.4170 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (4 domains, 9 artifacts) (B-068 gate, R4-3 v2)",
         "motor_score": "0.417",
         "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"

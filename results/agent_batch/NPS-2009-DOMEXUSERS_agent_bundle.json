@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T19:22:27.236869+00:00",
+  "analysis_timestamp": "2026-07-08T01:36:31.496512+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "NPS-2009-DOMEXUSERS",
-    "end_time": "2026-07-07T19:22:27.236875+00:00",
+    "end_time": "2026-07-08T01:36:31.496521+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "NPS-2009-DOMEXUSERS",
-        "entry_sha256": "84113238b567617083e694cae39cfc0694c57345d3b92c27a931336d5e049d16",
+        "entry_sha256": "b7eae23856da9bf4bfb5688f417f5331bea0927ce6d3c8e03f3f4712dc764d72",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "NPS-2009-DOMEXUSERS"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T19:22:27.031770+00:00",
+        "timestamp": "2026-07-08T01:36:31.265731+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "NPS-2009-DOMEXUSERS",
-        "entry_sha256": "67a0aea7c347282748182610c37bc2a6ff4eb0a0a42fa210fc7d605d433bb30f",
+        "entry_sha256": "1811dd29c9ebce39601be3abc84b44f115f94b595f26ec9584149bf94f02bc7c",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2009-DOMEXUSERS.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T19:22:27.031975+00:00",
+        "timestamp": "2026-07-08T01:36:31.265900+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "NPS-2009-DOMEXUSERS",
-        "entry_sha256": "b4189ad6d5a1d0fbaa697e9c1d09df48786696fb553413ac4a59aebd66022eb1",
+        "entry_sha256": "ecac6c2a89206f2df3d640ec62cbe7b7ee6d7ade0b0145dd2eda4810261d094b",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2009-DOMEXUSERS.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "0bf53d8efaa76129e0a058047e0902cd38c968948aa5d61d3c3aa129bcff1e52"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T19:22:27.032170+00:00",
+        "timestamp": "2026-07-08T01:36:31.266164+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "NPS-2009-DOMEXUSERS",
-        "entry_sha256": "271754472e2f3c79f779eb4959a856167dc0f7abb1e98856f6e3cfcdb51321e6",
+        "entry_sha256": "ad5461b6b627ebed28b3b68c6543d04641340a0b2818a4d38583acb96bab7e5a",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2009-DOMEXUSERS.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T19:22:27.032442+00:00",
+        "timestamp": "2026-07-08T01:36:31.266415+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "NPS-2009-DOMEXUSERS",
-        "entry_sha256": "2c7728e331506bcb8443e295fdbc3b67daba3c6359e96e698cebdad847d1fc8b",
+        "entry_sha256": "029a005f3ff50539d1c32c0a6151bc11ce712519615b86f863884a1d47a3cbd4",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -82,8 +82,8 @@
         "outputs_summary": {
           "abduction": {
             "best_hypothesis": "SUSPICION_DETECTED",
-            "best_posterior": "8/25",
-            "confidence": "8/25",
+            "best_posterior": "29/100",
+            "confidence": "29/100",
             "is_conclusive": "False",
             "narrative": "Windows XP NTFS forensic corpus published by the Naval Postgraduate School (2009). Simulated domain exercise with two scripted users (domex1/domex2). Image acquired 2008-10-30. Source: realistic.aff. ..."
           },
@@ -94,9 +94,9 @@
             "ebs_adapter_mode": "motor",
             "expected_verdict": "NOISE",
             "resolve": {
-              "motor_confidence": "0.32",
-              "motor_reason": "Significant signal with structural support (score=0.1577)",
-              "motor_score": "0.1577",
+              "motor_confidence": "0.29",
+              "motor_reason": "Significant signal with structural support (score=0.1459)",
+              "motor_score": "0.1459",
               "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T19:22:27.236237+00:00",
+        "timestamp": "2026-07-08T01:36:31.495705+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "NPS-2009-DOMEXUSERS",
-        "entry_sha256": "bc9847f50bf36f94e83f9b057496e7d5dd7860f0a311a260294dfde4c212b1a7",
+        "entry_sha256": "80577e78c899ea0c9236b3c993004c5ffb724f4d8d89f9278d32fd0ee16e9790",
         "inputs_summary": {
           "n_signals": "9"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T19:22:27.236490+00:00",
+        "timestamp": "2026-07-08T01:36:31.496010+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "NPS-2009-DOMEXUSERS",
-        "entry_sha256": "a533fb80144bdeabc0307079609f0c5fde44c89474b94f98c5cf1d328fafdc9a",
+        "entry_sha256": "e830788c26b2d33e106ed357047a1c10878d1f2fbdae36a79c9945e1d830e524",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -180,26 +180,26 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T19:22:27.236777+00:00",
+        "timestamp": "2026-07-08T01:36:31.496417+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T19:22:27.031275+00:00",
+    "start_time": "2026-07-08T01:36:31.265180+00:00",
     "total_entries": 7
   },
   "case_id": "NPS-2009-DOMEXUSERS",
   "evidence_path": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2009-DOMEXUSERS.json",
   "evidence_sha256": "0bf53d8efaa76129e0a058047e0902cd38c968948aa5d61d3c3aa129bcff1e52",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE NPS-2009-DOMEXUSERS ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/NPS-2009-DOMEXUSERS.json\nEvidence SHA-256: 0bf53d8efaa76129e0a058047e0902cd38c968948aa5d61d3c3aa129bcff1e52\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 8/25\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 9 se\u00f1al(es): 9 primaria(s) de ['bash_xml_parse', 'generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: RECYCLER SID-1003 (domex1): Dc3.docx (98=0.18, Windows System Restore: 16 restore point=0.18, domex1 document lifecycle: 4 Office 2007=0.15.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nWindows XP NTFS forensic corpus published by the Naval Postgraduate School (2009). Simulated domain exercise with two scripted users (domex1/domex2). Image acquired 2008-10-30. Source: realistic.aff. fiwalk v0.5.1, TSK 3.0.0. 35313 file objects cataloged. Evidence analyzed via Claude Code MCP (Mode 2) \u2014 this JSON feeds Mode 1 deterministic scorer for sealed bundle generation.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [RECYCLER SID-1003 (domex1): Dc3.docx (9852b, mtime=2008-10-29 16:15:34] z=0.180 conf=0.90 \u2014 \n  [Windows System Restore: 16 restore points (RP1 2008-10-20 21:59 to RP1] z=0.176 conf=0.80 \u2014 \n  [domex1 document lifecycle: 4 Office 2007 files created/sent/deleted in] z=0.153 conf=0.85 \u2014 \n  [domex2 Outlook 2007 email infrastructure: 3 PST files \u2014 Outldomexuser2] z=0.085 conf=0.85 \u2014 \n  [NTUSER.DAT registry hive for domex1 (SID S-1-5-21-842925246-725345543-] z=0.070 conf=0.88 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 9 | Derived: 0 | Total: 9",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE NPS-2009-DOMEXUSERS ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/converted/NPS-2009-DOMEXUSERS.json\nEvidence SHA-256: 0bf53d8efaa76129e0a058047e0902cd38c968948aa5d61d3c3aa129bcff1e52\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 29/100\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 9 se\u00f1al(es): 9 primaria(s) de ['bash_xml_parse', 'generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: RECYCLER SID-1003 (domex1): Dc3.docx (98=0.18, Windows System Restore: 16 restore point=0.18, domex1 document lifecycle: 4 Office 2007=0.15.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nWindows XP NTFS forensic corpus published by the Naval Postgraduate School (2009). Simulated domain exercise with two scripted users (domex1/domex2). Image acquired 2008-10-30. Source: realistic.aff. fiwalk v0.5.1, TSK 3.0.0. 35313 file objects cataloged. Evidence analyzed via Claude Code MCP (Mode 2) \u2014 this JSON feeds Mode 1 deterministic scorer for sealed bundle generation.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [RECYCLER SID-1003 (domex1): Dc3.docx (9852b, mtime=2008-10-29 16:15:34] z=0.180 conf=0.90 \u2014 \n  [Windows System Restore: 16 restore points (RP1 2008-10-20 21:59 to RP1] z=0.176 conf=0.80 \u2014 \n  [domex1 document lifecycle: 4 Office 2007 files created/sent/deleted in] z=0.153 conf=0.85 \u2014 \n  [domex2 Outlook 2007 email infrastructure: 3 PST files \u2014 Outldomexuser2] z=0.085 conf=0.85 \u2014 \n  [NTUSER.DAT registry hive for domex1 (SID S-1-5-21-842925246-725345543-] z=0.070 conf=0.88 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 9 | Derived: 0 | Total: 9",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",
-      "best_posterior": "8/25",
+      "best_posterior": "29/100",
       "confidence": {
         "__fraction__": true,
-        "den": 25,
-        "num": 8
+        "den": 100,
+        "num": 29
       },
       "is_conclusive": false,
       "narrative": "Windows XP NTFS forensic corpus published by the Naval Postgraduate School (2009). Simulated domain exercise with two scripted users (domex1/domex2). Image acquired 2008-10-30. Source: realistic.aff. fiwalk v0.5.1, TSK 3.0.0. 35313 file objects cataloged. Evidence analyzed via Claude Code MCP (Mode 2) \u2014 this JSON feeds Mode 1 deterministic scorer for sealed bundle generation."
@@ -211,9 +211,9 @@
       "ebs_adapter_mode": "motor",
       "expected_verdict": "NOISE",
       "resolve": {
-        "motor_confidence": "0.32",
-        "motor_reason": "Significant signal with structural support (score=0.1577)",
-        "motor_score": "0.1577",
+        "motor_confidence": "0.29",
+        "motor_reason": "Significant signal with structural support (score=0.1459)",
+        "motor_score": "0.1459",
         "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

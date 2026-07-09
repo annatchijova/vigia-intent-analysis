@@ -1,15 +1,15 @@
 {
   "agent_verdict": "NOISE",
-  "analysis_timestamp": "2026-07-07T19:22:27.513532+00:00",
+  "analysis_timestamp": "2026-07-08T01:36:31.826777+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "NPS-2010-EMAILS",
-    "end_time": "2026-07-07T19:22:27.513541+00:00",
+    "end_time": "2026-07-08T01:36:31.826784+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "1fed241f529132bf3910814811d66aae08e74fd2bbefca57ce726a12dc44b991",
+        "entry_sha256": "60ea80ad701a64d014627f44b766a4da2d69c6a88671911a689c315c989b0f71",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "NPS-2010-EMAILS"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T19:22:27.334308+00:00",
+        "timestamp": "2026-07-08T01:36:31.615431+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "5285a2035885c7af36a8846b3e9421d259171103c72f2529c373ac4319f40212",
+        "entry_sha256": "d3467e73047ce756108504c870f50e780fbc64e1d04f73983fedc71baee54b2b",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2010-EMAILS.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T19:22:27.334469+00:00",
+        "timestamp": "2026-07-08T01:36:31.615596+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "e50e1a6bc1843b376d3cb501ce17c1c1047b86317adb154c9c8ae8ad42b12182",
+        "entry_sha256": "164f6b6826222866e3d469407a7eab9d1081018b6d3ac8019d2067229f760957",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2010-EMAILS.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "8b704abd1843a725ec390942ba915dc372a1e6b77a0229f450c059e1d57c2a3a"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T19:22:27.334625+00:00",
+        "timestamp": "2026-07-08T01:36:31.615770+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "6c9490fe139d77bc5a1afbb735a4835dec30cb7d36a3c5c2f60110d1a9720136",
+        "entry_sha256": "73957e9a1aa9ade97e3b1e1115efa3e329d1906e820b50b23aeae292400209b8",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/converted/NPS-2010-EMAILS.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T19:22:27.334847+00:00",
+        "timestamp": "2026-07-08T01:36:31.616027+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "d3d1516ccbec003b6619843c0c2dc7ef2905bcaf8b6775a782952ebe36dd2134",
+        "entry_sha256": "9a6f20e814ac87d71a379d63022d87ceaabe932c5ab4649f2a8a86c4dbd2ae74",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,8 +95,8 @@
             "expected_verdict": "NOISE",
             "resolve": {
               "motor_confidence": "0.99",
-              "motor_reason": "Insufficient evidence of malicious intent (score=0.0130)",
-              "motor_score": "0.013",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0125)",
+              "motor_score": "0.0125",
               "motor_verdict": "NOISE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
             },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T19:22:27.512940+00:00",
+        "timestamp": "2026-07-08T01:36:31.826051+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "0b6830327c45cfdc5a48f8370d00d695b35866ee4b602000943a64da93a8fd84",
+        "entry_sha256": "fcdb8e855e237478e71180f3997d9f6a1b2494b3b67e08bf6296dd873900ed0d",
         "inputs_summary": {
           "n_signals": "6"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T19:22:27.513158+00:00",
+        "timestamp": "2026-07-08T01:36:31.826317+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "NPS-2010-EMAILS",
-        "entry_sha256": "7c32d59de97476c740761c40c6ac38933840ec1c463077080e8f20921bf54b31",
+        "entry_sha256": "d2d7121bdb93f29e5257573355df8b166451b51a32949ad8de219a120ccea2dc",
         "inputs_summary": {
           "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
         },
@@ -180,11 +180,11 @@
           "exit_code": "0"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T19:22:27.513439+00:00",
+        "timestamp": "2026-07-08T01:36:31.826680+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T19:22:27.333766+00:00",
+    "start_time": "2026-07-08T01:36:31.614811+00:00",
     "total_entries": 7
   },
   "case_id": "NPS-2010-EMAILS",
@@ -212,8 +212,8 @@
       "expected_verdict": "NOISE",
       "resolve": {
         "motor_confidence": "0.99",
-        "motor_reason": "Insufficient evidence of malicious intent (score=0.0130)",
-        "motor_score": "0.013",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0125)",
+        "motor_score": "0.0125",
         "motor_verdict": "NOISE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
       },

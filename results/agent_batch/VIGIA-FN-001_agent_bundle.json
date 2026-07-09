@@ -1,15 +1,15 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-07T19:22:05.813170+00:00",
+  "analysis_timestamp": "2026-07-08T01:36:05.896706+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FN-001",
-    "end_time": "2026-07-07T19:22:05.813176+00:00",
+    "end_time": "2026-07-08T01:36:05.896714+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "7c927bb371cb9bde9b179861902135c985eb5e4c3160570061e80cdd80210d02",
+        "entry_sha256": "d106a3f40e9f3efd5272c63314573039e4ec1b6592c5ed349f8d66189fbb34e9",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-FN-001"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T19:22:05.630446+00:00",
+        "timestamp": "2026-07-08T01:36:05.678519+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "beb97651bae86e50f55efc92f458ba6f029a92b42cdb1f03d7c563edc18ae6df",
+        "entry_sha256": "747750889b435f66e6261fbf393f01027ab81059612b1005c3555ab5bb4021b6",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-001.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T19:22:05.630604+00:00",
+        "timestamp": "2026-07-08T01:36:05.678707+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "3b5b11d1a518257e16d56d275c3b8918fb38b06e8dd9be125ccae60b254bbc1b",
+        "entry_sha256": "df8a62ff3a77584872e7333991538baf702522a7bfa09f2720ef41532aad80c4",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-001.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "ae2a516808a81076fb545dc11cd3916b3cc36eb8500ac6fcd79918f3ae042bcf"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T19:22:05.630778+00:00",
+        "timestamp": "2026-07-08T01:36:05.678876+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "3b13387acd0af08ff928063fdbe92945ca5f3ad49669655738ee6122b6a12ef4",
+        "entry_sha256": "728e13113d817e75a7c86624ae9768837dc78c7f25580e9cdd2eaf2d85a079f2",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-001.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T19:22:05.631007+00:00",
+        "timestamp": "2026-07-08T01:36:05.679160+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "90ca14770101b0eb6dd9fe5766faaae9ba1f037be5195f8f58a320c2f34c19f2",
+        "entry_sha256": "15b4c753cae4b292332909de9058842a7de24e66cf3c457ae2f684903c55a107",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,7 +95,7 @@
             "expected_verdict": "MALICE",
             "resolve": {
               "motor_confidence": "0.93",
-              "motor_reason": "Intent score 0.4639 exceeds MALICE threshold but corroboration rests on 3 technical artifact(s) / 2 technical evidence class(es) \u2014 context/narrative classes do not corroborate MALICE (B-068 Daubert ga",
+              "motor_reason": "Intent score 0.4639 exceeds MALICE threshold but no corroboration branch opens (2 domain(s), 1/1 hard class(es)/artifact(s), 0 per-cost artifact(s)) \u2014 volume within a single soft collection domain doe",
               "motor_score": "0.4639",
               "motor_verdict": "SUSPICION",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T19:22:05.812658+00:00",
+        "timestamp": "2026-07-08T01:36:05.896077+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "ff40e0aaddb13e525a3af314c26d3d311fbfec7c8b895d4d0a6356196e539ad2",
+        "entry_sha256": "43e48555948a52b970970825c172a836e3463fb53c173fe2df333c73dfb7f5f6",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T19:22:05.812830+00:00",
+        "timestamp": "2026-07-08T01:36:05.896278+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "f9fc833f22e513f9f2b16692f5b8d2752fcd976cdd8512de2c64511418583451",
+        "entry_sha256": "b9d9f338eb96f6a776db2f7f014d177d5f054b37fa71e1ec83b666191c42d197",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,11 +164,11 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T19:22:05.813092+00:00",
+        "timestamp": "2026-07-08T01:36:05.896593+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T19:22:05.629934+00:00",
+    "start_time": "2026-07-08T01:36:05.677971+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FN-001",
@@ -196,7 +196,7 @@
       "expected_verdict": "MALICE",
       "resolve": {
         "motor_confidence": "0.93",
-        "motor_reason": "Intent score 0.4639 exceeds MALICE threshold but corroboration rests on 3 technical artifact(s) / 2 technical evidence class(es) \u2014 context/narrative classes do not corroborate MALICE (B-068 Daubert ga",
+        "motor_reason": "Intent score 0.4639 exceeds MALICE threshold but no corroboration branch opens (2 domain(s), 1/1 hard class(es)/artifact(s), 0 per-cost artifact(s)) \u2014 volume within a single soft collection domain doe",
         "motor_score": "0.4639",
         "motor_verdict": "SUSPICION",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-07T19:22:55.299075+00:00",
+  "analysis_timestamp": "2026-07-08T01:37:05.320192+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "case_007_insomnio_tactico",
-    "end_time": "2026-07-07T19:22:55.299083+00:00",
+    "end_time": "2026-07-08T01:37:05.320204+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "case_007_insomnio_tactico",
-        "entry_sha256": "ebba024f5658f2a550ee3c99f5d972230b772d8eeb26edfd0331987eb2f38323",
+        "entry_sha256": "f5574882a01342a8b8506b63011e85278db4b36f068fe041f81acad33a916cb9",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "case_007_insomnio_tactico"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T19:22:55.124620+00:00",
+        "timestamp": "2026-07-08T01:37:05.077029+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_007_insomnio_tactico",
-        "entry_sha256": "36409c85e44d7ace1b4e67ee59880096398518120e89bd116c32cbb23d5098d4",
+        "entry_sha256": "eac5bb7b7fb966de044ea524f0377a1d670453b19fa7e4e03c9cf6d1ac3975b2",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/case_007_insomnio_tactico.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T19:22:55.124784+00:00",
+        "timestamp": "2026-07-08T01:37:05.077236+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "case_007_insomnio_tactico",
-        "entry_sha256": "0dae32ade7a8b6ed72de8cabf72714e90e05136bcb04cdf5d61aa5069902ed13",
+        "entry_sha256": "952a0946fd42efaeeee2ccf173ee3f9438958c2f63a67f84ff5629cc099dcc63",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/case_007_insomnio_tactico.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "45c03f2548624dcd540bd8d64181c22bab650c4637dd5d1825111f4480dfa564"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T19:22:55.124937+00:00",
+        "timestamp": "2026-07-08T01:37:05.077425+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "case_007_insomnio_tactico",
-        "entry_sha256": "36b0756dd825c7e392b08d1704cef60ada91e81abc13a7ee52be554f6eb11c19",
+        "entry_sha256": "34bbcee42b42ab530302f438a65d29b46b79ad6a125066d94d1e549631406894",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/case_007_insomnio_tactico.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T19:22:55.125151+00:00",
+        "timestamp": "2026-07-08T01:37:05.077705+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "case_007_insomnio_tactico",
-        "entry_sha256": "b51a1291023b983d8c6c909254331ea0375dcb5bde32b4f784ec076d2564eefc",
+        "entry_sha256": "c245bd78968235763f5bba608d8703b62306dda016b9c97e6809a7429523a32d",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,7 +95,7 @@
             "expected_verdict": "MALICE",
             "resolve": {
               "motor_confidence": "0.95",
-              "motor_reason": "Intent score 0.8622 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_reason": "Intent score 0.8622 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
               "motor_score": "0.8622",
               "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
@@ -138,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T19:22:55.298362+00:00",
+        "timestamp": "2026-07-08T01:37:05.318848+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "case_007_insomnio_tactico",
-        "entry_sha256": "766fe993b56ac44ec2d3d18ac8423b0f6cbc55582a9054907d2bdb75e094668a",
+        "entry_sha256": "d39683f74f962015c52d3a5dcdd869a08731749cbe23444a19c5941f9bcfa31b",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -155,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T19:22:55.298546+00:00",
+        "timestamp": "2026-07-08T01:37:05.319271+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "case_007_insomnio_tactico",
-        "entry_sha256": "1b3c051b3908416278d6103d097b7ba4a34e9dd107468d11e9d6938538fd64f6",
+        "entry_sha256": "e9163f2ef43596278d119e1be8c8c467df31fae592b82f8db2898c5bcff283e2",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,11 +172,11 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T19:22:55.298832+00:00",
+        "timestamp": "2026-07-08T01:37:05.319875+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T19:22:55.124045+00:00",
+    "start_time": "2026-07-08T01:37:05.076429+00:00",
     "total_entries": 7
   },
   "case_id": "case_007_insomnio_tactico",
@@ -228,7 +228,7 @@
       "expected_verdict": "MALICE",
       "resolve": {
         "motor_confidence": "0.95",
-        "motor_reason": "Intent score 0.8622 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_reason": "Intent score 0.8622 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
         "motor_score": "0.8622",
         "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
