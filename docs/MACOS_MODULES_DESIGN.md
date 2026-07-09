@@ -33,10 +33,13 @@ Por tanto los cuatro handlers se diseñan como **dominios emisores de señal pro
 distinto, de modo que un caso macOS multi-artefacto pueda satisfacer el gate Daubert de
 corroboración sin tocar la matemática del scorer.
 
-**Nota sobre la taxonomía solicitada**: el archivo `TAXA_DOMINIOS_RECOLECCION.md`
-**no existe en este repositorio** (verificado con `find -iname` sobre todo el árbol,
-incluidos `governance/`, `data/`, `docs/`, `docs_merged/`, y el historial git de este
-clon). Las taxonomías reales y vigentes contra las que se mapea este diseño son:
+**Nota sobre la taxonomía solicitada** *(actualizada 2026-07-09)*: al momento de la
+investigación original, `TAXA_DOMINIOS_RECOLECCION.md` no existía en este clon (estaba
+solo en la rama `float-census-atomic-writes-dsv61x`, nunca mergeada). Fue recuperado a
+`docs/TAXA_DOMINIOS_RECOLECCION.md` (commit `7a86ce1`) junto con R4-3, que implementa
+esa taxonomía en `_DOMAIN_MAP` / `classify_domain_subband()` (`caie.py`). **La
+verificación de este diseño contra la taxonomía v2 está en §9.** Las demás taxonomías
+vigentes contra las que se mapeó originalmente:
 
 - `EVIDENCE_PROFILES` — registro canónico de `evidence_type` (spoofability, base_weight):
   `vigia/tools/caie.py:246-336`.
@@ -185,7 +188,7 @@ No se necesita ninguna dependencia externa.
 | `evidence_type` canónico | **`web_search`** (spoof 0.45 / weight 0.24, `caie.py:299`) | tipo canónico ya calibrado para historial/búsquedas (lo usa la vía mobile); evita el colapso actual a `app_data` y el `log_entry` (0.85) al que cae el browser Windows |
 | Rol epistémico | `device` (default B-070) | cuenta para el gate MALICE |
 | `corr_group` | `browser_suspicious` (existente) + `antiforensic` para búsquedas de borrado | familias ya definidas en el módulo |
-| Dominio de recolección | actividad de usuario / navegación (familia `browser_suspicious`) | mapeo pendiente contra TAXA_DOMINIOS_RECOLECCION.md si aparece |
+| Dominio de recolección (TAXA v2) | `web_search` **sin entrada en `_DOMAIN_MAP`** → `UNKNOWN:web_search`; dominio correcto por modo de fabricación: **D3** | ver §9.1 — gap pre-existente de toda la banda mobile |
 
 ### 2.4 Esqueleto de `to_signal()`
 
@@ -331,6 +334,10 @@ Ambos rol `device`. Alternativa considerada y descartada por ahora: crear
 spoofability/weight con corpus; reutilizar tipos calibrados es el camino sin riesgo
 (misma decisión que tomó B-060/B-070 al mapear a `app_data`, pero con granularidad).
 
+Dominio de recolección (TAXA v2): ambos sub-dominios caen en **D3
+`filesystem_metadata`** — `registry_key` y `file_metadata` están mapeados
+explícitamente a D3 en `_DOMAIN_MAP` y en TAXA §4. Verificación en §9.1 (✅ coherente).
+
 ### 3.4 Esqueleto de `to_signal()` (señal de persistencia; la de actividad es isomorfa)
 
 ```python
@@ -463,7 +470,7 @@ Valor forense (señales de intencionalidad):
 | `evidence_type` para huecos/purga | **`usn_journal_gap`** (spoof 0.10 / weight 0.38, `caie.py:285`) | la purga es más difícil de fabricar que de ejecutar; ya calibrado |
 | Rol | `device` | — |
 | `corr_group` | `fsevents_activity` (nuevo) para clusters; `antiforensic` para purga/gaps | la purga debe correlacionar con SIP/quarantine-empty existentes |
-| Dominio de recolección | journal de filesystem / anti-forense | — |
+| Dominio de recolección (TAXA v2) | **D3 `filesystem_metadata`** — `usn_journal` y `usn_journal_gap` mapeados explícitamente a D3 (TAXA §4 y `_DOMAIN_MAP`) | ver §9.1 (✅ coherente); ambos son "duros" (spoof ≤0.30) → rama hard-mass del gate |
 
 Invariante 6 de CLAUDE.md aplica directamente: la purga del journal es fractura CAIE y
 **sube** el peso MALICE, no es ruido.
@@ -604,6 +611,11 @@ Decisión a validar en calibración: si Shortcuts emite como `web_search`, un ca
 Safari+Spotlight produce 2 señales del mismo tipo (suma `n_arts`, no `n_types`). Si se
 prefiere maximizar `n_types`, usar `app_data` para Shortcuts. Recomendación: `app_data`
 (más conservador en spoofability y diversifica tipos).
+
+Dominio de recolección (TAXA v2): `file_metadata` (store.db) → **D3** explícito
+(✅ coherente); `app_data` (Shortcuts) → **sin entrada en `_DOMAIN_MAP`**
+(`UNKNOWN:app_data`), mismo gap de banda mobile que `web_search` — dominio correcto por
+modo de fabricación: **D3**. Ver §9.1.
 
 ### 5.4 Esqueleto de `to_signal()`
 
@@ -777,3 +789,123 @@ Safari/Chrome (observables directamente en los DBs del corpus); FSEvents
 DLS1/DLS2 según FSEventsParser (G-C Partners; solo como referencia de layout — GPLv3,
 no copiar código) y el parser fseventsd de plaso (Apache-2.0); Spotlight store.db según
 spotlight_parser (Y. Khatri, MIT) y mac_apt.
+
+---
+
+## 9. Verificación contra TAXA_DOMINIOS_RECOLECCION (2026-07-09)
+
+`docs/TAXA_DOMINIOS_RECOLECCION.md` (taxonomía v2, CR-001..004) fue recuperado
+post-diseño y R4-3 la implementó como código vivo: `_DOMAIN_MAP` +
+`classify_domain()` / `classify_domain_subband()` (`vigia/tools/caie.py:~155-243`),
+consumidos por el decay de cola por sub-banda y por el gate B-068 v2 de tres ramas
+(`vigia_scorer.py:~1133-1229`). Esta sección verifica cada `evidence_type` propuesto
+en §§2-5 contra esa taxonomía. **Veredicto global: el diseño se sostiene sin cambios**
+— 4 de los 6 tipos propuestos son coherentes y explícitos en TAXA; los otros 2
+exponen un gap pre-existente de la taxonomía (no de este diseño), documentado en
+§9.1-b. Una expectativa de §1.4 quedó superada por el gate v2 y se corrige en §9.2.
+
+### 9.1 Tabla de verificación por módulo
+
+| Señal propuesta | evidence_type | TAXA doc §4 | `_DOMAIN_MAP` (código) | ¿Sub-banda correcta según modo de fabricación? |
+|---|---|---|---|---|
+| `macos_browser` (§2) | `web_search` | **no censado** (banda mobile ausente) | **sin entrada** → `UNKNOWN:web_search` / banda `UNKNOWN` | Gap — ver (b). Dominio correcto: **D3** (ver a) |
+| `macos_plist_persistence` (§3) | `registry_key` | D3 explícito (§4: "registry_key (18)") | `("filesystem_metadata", "D3")` | ✅ — la descripción de D3 cita literalmente "reg add" como el acto de fabricación de la capa blanda; un LaunchAgent plist es su análogo macOS exacto (user-space con privilegios) |
+| `macos_plist_activity` (§3) | `file_metadata` | D3 explícito (§4: "file_metadata (29)") | `("filesystem_metadata", "D3")` | ✅ — metadata de disco leída por parser sobre la misma imagen; spoof 0.65 dentro de la banda D3 (0.20–0.70) |
+| `macos_fsevents` (§4) | `usn_journal` / `usn_journal_gap` | D3 explícito (§4: "+ los tipos de código sin uso en corpus: usn_journal, usn_journal_gap…") | `("filesystem_metadata", "D3")` ambos | ✅ — capa DURA de D3 ("MFT/USN… spoofability 0.05… armas anti-timestomp"); FSEvents es el journal análogo en APFS/HFS+. Con spoof 0.20/0.10 ≤ 0.30 ambos cuentan para la rama hard-mass del gate v2 — exactamente el rol doctrinal que §4.3 les asigna |
+| `macos_spotlight` — store.db (§5) | `file_metadata` | D3 explícito | D3 | ✅ — mismo caso que plist_activity |
+| `macos_spotlight` — Shortcuts (§5) | `app_data` | **no censado** (banda mobile ausente) | **sin entrada** → `UNKNOWN:app_data` / `UNKNOWN` | Gap — ver (b). Dominio correcto: **D3** (ver a) |
+
+**(a) Dominio correcto de `web_search`/`app_data` bajo el principio rector de TAXA
+(§1: "quién/qué la produce y qué se necesita comprometer para fabricarla"):**
+un historial de navegador y un plist de Shortcuts son registros estructurados en
+disco, escritos por una app en user-space y leídos por un parser sobre la misma
+imagen — fabricables con privilegios de usuario editando el archivo (un loop puede
+insertar 100 filas en el SQLite: replicabilidad D1/D3, no costo por-artefacto D5).
+Sus spoofability (0.45 / 0.50) caen dentro de la banda D3 (0.20–0.70) y fuera de
+D1a (≥0.85) y D4 (canal de red). No califican como D1b: el criterio de esa
+sub-banda es tamper-evidence del formato (record IDs, checksums EVTX) y ni el
+SQLite de historial ni un plist la tienen. **Propuesta: D3.** No son D4 aunque
+"hablen de" URLs — mismo argumento que TAXA usa contra `log_entry: "network"`
+(el contenido no define el dominio; el canal de fabricación sí).
+
+**(b) Gap pre-existente — la banda mobile completa está fuera de `_DOMAIN_MAP`:**
+TAXA declara "53/53 tipos del corpus + los 6 tipos definidos en `EVIDENCE_PROFILES`
+que el corpus aún no usa. Ningún tipo queda en UNKNOWN" (§4). Pero `EVIDENCE_PROFILES`
+define además la banda mobile calibrada (`caie.py:296-303`): `chat_message`, `sms`,
+`call_log`, `web_search`, `app_data`, `social_media`, `location_data`,
+`contact_data` — **8 tipos sin entrada en `_DOMAIN_MAP`**, censo hecho sobre
+`data/cases/` donde no aparecen. No es una incoherencia introducida por este diseño:
+es el estado actual de TODA la vía mobile (hoy `ios_forensic`/`android_forensic`/
+`macos_forensic`/`google_takeout` emiten `app_data` vía `_EVIDENCE_MAP` y clasifican
+`UNKNOWN:app_data`). Consecuencias operativas hoy:
+
+1. **Exentos del decay de cola R4-3** (el loop de saturación salta banda `UNKNOWN`,
+   `vigia_scorer.py:894-897`): un flood de N señales `web_search` NO satura — el
+   vector drowning de BREAK-014 sigue abierto para la banda mobile. Con los
+   `to_signals()` por dominio propuestos aquí el riesgo es acotado (una señal
+   agregada por navegador, no una por URL), pero el gap existe.
+2. **En el gate v2 cuentan como dominio propio cada uno** (doctrina explícita,
+   comentario `vigia_scorer.py:1139-1140` — "conservador con evidencia genuinamente
+   nueva"): `UNKNOWN:web_search` + `UNKNOWN:app_data` + D3 = 3 dominios. Eso hace el
+   gate cross-domain MÁS fácil de abrir para un caso macOS de un solo disco que si
+   los tipos estuvieran correctamente mapeados a D3 — un sesgo pro-MALICE no
+   intencional que la corrección del gap eliminaría.
+
+**Follow-up recomendado (código, fuera del alcance de este documento — candidato a
+bug nuevo o a incluirse en B-052-P2):** completar `_DOMAIN_MAP` con la banda mobile.
+Propuesta coherente con el principio rector: `web_search`, `app_data`,
+`contact_data`, `call_log`, `sms`, `chat_message` → D3 (registros locales en disco,
+user-space; nota: sms/chat con tamper-evidence de backend serían D1b-analogía, pero
+el artefacto extraído es el DB local); `location_data` → D3 (cache local) o D4 si la
+fuente es telemetría de operador; `social_media` → D4 (registro del lado del
+servicio, no fabricable editando el disco local) o D5-soft si llega como captura
+interpretativa. Cada asignación requiere la corrida comparativa de corpus (misma
+advertencia B-052).
+
+### 9.2 Corrección de expectativa: gate v2 supersede el análisis de §1.4
+
+§1.4 y §0 citan el gate legado "`n_arts >= 4 OR n_types >= 3`" — correcto cuando se
+escribió el diseño, superado por el merge de R4-3: el gate v2 cuenta **dominios de
+recolección**, con tres ramas (`vigia_scorer.py:1206-1212`): (1) cross-domain: ≥2
+dominios Y masa legada (n_arts≥4 o n_types≥3); (2) hard-mass: ≥3 tipos duros o ≥4
+artefactos duros (spoof ≤0.30); (3) costo por-artefacto: ≥4 D5-hard/media.
+
+Implicación para el diseño (con los 6 tipos correctamente mapeados a D3, per §9.1-a):
+**las 5-6 señales macOS de un caso de un solo disco viven todas en D3** → 1 dominio →
+la rama cross-domain NO abre por sí sola. Esto es doctrinalmente correcto según TAXA
+(§1: una sola imagen de disco comprometida = un solo acto de fabricación puede
+producir todos los artefactos blandos), y NO invalida la estrategia de granularidad
+por dominio de este diseño — la emisión de señales separadas sigue siendo necesaria
+para el AbductiveReasoner (≥3 primarias), para el cap mono-fuente (`n_artifacts≥2`) y
+para la trazabilidad por dominio. Pero la ruta a MALICE de un caso macOS queda así:
+
+- **Rama hard-mass**: FSEvents (`usn_journal` 0.20 / `usn_journal_gap` 0.10) es el
+  único de los 4 módulos que aporta tipos duros. Un caso con journal-gap + borrado
+  masivo + (p.ej.) hash criptográfico de un binario aporta 2-3 tipos duros — la purga
+  anti-forense es, correctamente, el camino más corto a MALICE (invariante 6).
+- **Rama cross-domain**: exige evidencia de OTRO canal — telemetría de red (D4),
+  memoria (D2), o contenido D5 (un binario analizado del quarantine, p.ej.
+  `malware_static_analysis` D5-media). Coincide con la doctrina SIFT del repo:
+  macOS-disk-only corrobora SUSPICION; MALICE requiere segundo canal.
+- La escalera z de cada `to_signal()` (§§2-5) no cambia: opera aguas arriba del gate.
+
+Nada de esto exige cambiar los esqueletos ni los `evidence_type` elegidos: la única
+incoherencia real encontrada (banda mobile sin dominio) es un gap del mapa de código,
+pre-existente, y su corrección es un cambio de scorer/CAIE fuera del alcance de este
+documento de diseño.
+
+### 9.3 Resumen
+
+| Tipo propuesto | Dominio TAXA | Estado |
+|---|---|---|
+| `registry_key` | D3 | ✅ coherente (explícito en TAXA §4 y `_DOMAIN_MAP`) |
+| `file_metadata` (×2 usos) | D3 | ✅ coherente (explícito) |
+| `usn_journal` / `usn_journal_gap` | D3 (capa dura) | ✅ coherente (explícito; alimentan rama hard-mass) |
+| `web_search` | hoy `UNKNOWN` — propuesto D3 | ⚠️ gap pre-existente de la banda mobile en `_DOMAIN_MAP` (§9.1-b) |
+| `app_data` | hoy `UNKNOWN` — propuesto D3 | ⚠️ mismo gap (§9.1-b) |
+
+Diseño sin cambios. Dos follow-ups fuera de alcance: (1) completar la banda mobile en
+`_DOMAIN_MAP` (§9.1-b); (2) al implementar B-052-P2, validar con la corrida
+comparativa que las señales macOS D3 no queden dobles-castigadas por decay de cola
+intra-D3 + `noisy_or_correlated` intra-módulo (la misma advertencia de triple castigo
+de TAXA §5.3 aplica una capa más arriba).
