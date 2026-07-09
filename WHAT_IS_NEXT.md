@@ -72,6 +72,17 @@ que ya se cerró desde entonces. La Fase 0 (sorpresas protegidas) y la Fase 1
 
 ### 1.2 Doctrina y calibración (Grupo A / Tanda C — requieren decisión de Anna y/o ground truth)
 
+> **Precondición Tanda C — CONSTRUIDA (2026-07-09).** El dataset de calibración
+> a nivel señal existe: `data/signal_calibration_dataset_20260709.json`
+> (generador `scripts/build_signal_calibration_dataset.py`, hash Daubert, test).
+> Ver `docs/TANDA_C_SIGNAL_CALIBRATION.md`. Resultado medido, honesto:
+> **A4 desbloqueado** (979 señales reales etiquetadas, ambas polaridades — L-033
+> satisfecho para el re-fit de perfiles) pero **A3 sigue bloqueado** (solo 7
+> señales gamma reales, todas MALICE — L-033 NO satisfecho para gamma). El
+> bloqueo de A3 pasó de "no hay dataset" a "faltan ~13+ señales gamma reales con
+> clase benigna": es adquisición de datos (más casos de disco crudo con
+> `event_log` etiquetado), no ingeniería.
+
 En orden de dependencia:
 
 1. **A2 / B-052-P2** — granularidad mobile/macOS: `to_signal()` →
@@ -80,11 +91,16 @@ En orden de dependencia:
    pins de Grupo C (§1.3) — son el arnés de la migración.**
 2. **A5 / B-041b** — CAIE retroalimenta el veredicto: DIFERIDO, se desbloquea
    con A2 (necesita artefactos multi-capa).
-3. **A4 / B-069** — re-fit conjunto perfiles+umbrales con dataset etiquetado
-   (`fit_calibration.py`); la calibración aislada ya fue rechazada por el gate
-   comparativo (70.8→70.4%). Depende de §1.1.2.
-4. **A3 / L-033/L-034** — cadena de atenuación gamma×FRS: no tocar sin ≥20
-   señales reales etiquetadas (regla L-033).
+3. **A4 / B-069** — re-fit conjunto perfiles+umbrales. **Precondición de datos
+   CUMPLIDA** (979 señales EBS etiquetadas en el dataset Tanda C). Próximo paso:
+   re-fit detrás del gate comparativo obligatorio (la calibración aislada ya fue
+   rechazada, 70.8→70.4% — medir de nuevo con el dataset completo; si empeora, NO
+   aplicar).
+4. **A3 / L-033/L-034** — cadena de atenuación gamma×FRS. **SIGUE BLOQUEADO por
+   datos** (solo 7 señales gamma reales, todas MALICE — ver Tanda C §4). No
+   tocar: calibrar con 7 señales de una polaridad violaría L-033. Desbloqueo =
+   más evidencia cruda con `event_log`/`windows_event_log` etiquetada, incluida
+   clase benigna.
 5. **Hueco estructural INTENT del ladder + revisión ABSTAIN/L-012** — decisiones
    abiertas documentadas en `docs/FASE2_DATASET_CALIBRACION.md` §4–§5 (los
    experimentos E2/E3 ya fueron medidos y refutados).
