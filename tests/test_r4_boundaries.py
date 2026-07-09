@@ -70,9 +70,17 @@ class TestMalformedArtifactsShielded:
 class TestR41BestPrefixBitIdentical:
     """R4-1: la optimizacion O(n) del best-prefix debe dar los MISMOS scores
     que se snapshotearon con la implementacion O(n^2) verificada."""
-    # Snapshots tomados de la implementacion correcta (bit-identica, verificada
-    # sobre 20k casos aleatorios). Si cambian, la optimizacion regresiono.
-    EXPECTED = {10: 0.3393, 50: 0.8741, 100: 0.9842}
+    # Snapshots re-capturados 2026-07-09 post-R4-3: el pipeline ahora aplica
+    # decay geometrico de cola por sub-banda (log_entry -> D1a, r=0.5) DESPUES
+    # de la etapa 1, asi que el output pineado incluye ambas etapas. La
+    # bit-identidad de la etapa 1 (R4-1) sigue verificada: neutralizando solo
+    # la cola (classify_domain_subband -> banda UNKNOWN) se recuperan exactos
+    # los snapshots pre-R4-3 {10: 0.3393, 50: 0.8741, 100: 0.9842}. La
+    # convergencia 50 -> 100 (mismo score) es la asintota de la cola
+    # geometrica: un flood de un solo tipo ya no crece sin limite
+    # (docs/BASELINE_TRIPLE_CASTIGO.md). Si cambian, regresiono la etapa 1
+    # (R4-1) o la saturacion (R4-3).
+    EXPECTED = {10: 0.1861, 50: 0.1866, 100: 0.1866}
 
     def test_same_type_flood_scores_match_snapshot(self):
         for n, exp in self.EXPECTED.items():
