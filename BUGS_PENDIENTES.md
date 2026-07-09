@@ -4388,3 +4388,78 @@ spoofability (corrida 3: 131/199 — aplastó narrativos SRL y CAN-MALICE);
 cabeza posicional (1,0.7,0.4,0.1) sin best-prefix (corrida 4: 165/199, el par
 CAN-029/CAN-032 se cruza). La lección: la cabeza estaba CALIBRADA; solo la
 cola era el defecto.
+
+---
+
+## B-092 — Banda mobile de EVIDENCE_PROFILES sin entrada en _DOMAIN_MAP: exenta del decay R4-3 [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-09), aplicado con gate comparativo (patrón B-069) |
+| **Severidad** | P2 — el vector de drowning de BREAK-014 (L-049) seguía abierto para la vía mobile |
+| **Archivo** | `vigia/tools/caie.py` (`_DOMAIN_MAP`), `tests/test_r4_3_domain_saturation.py` |
+| **Antecedentes** | `docs/MACOS_MODULES_DESIGN.md` §9.1-b (donde se detectó y razonó el mapeo); `docs/TAXA_DOMINIOS_RECOLECCION.md` (el censo fue sobre `data/cases/`, donde la banda mobile no aparece — "ningún tipo queda en UNKNOWN" era cierto solo para el corpus) |
+| **Detección** | Re-mapeo del diseño macOS contra TAXA v2: los 8 tipos mobile calibrados en `EVIDENCE_PROFILES` (caie.py: `chat_message`, `sms`, `call_log`, `web_search`, `app_data`, `social_media`, `location_data`, `contact_data`) clasificaban `UNKNOWN:<tipo>` / banda `UNKNOWN` |
+
+**Consecuencias medidas pre-fix (las dos):**
+
+1. **Exentos del decay de cola R4-3** (el loop de saturación salta banda
+   UNKNOWN): flood sintético de `web_search` raw 0.85 → score 0.5454 (N=10),
+   0.9806 (N=50), **0.9900 (N=100)** — crecimiento sin límite, la curva que
+   R4-3 mató para `log_entry`. Peor: **100× web_search de raw 0.05 (ruido
+   puro) FABRICABA SUSPICION 0.3566** — el análogo exacto del hallazgo de
+   BASELINE_TRIPLE_CASTIGO ("50 logs de nada fabricaban SUSPICION").
+2. **Sesgo pro-MALICE en el gate B-068 v2**: cada `UNKNOWN:<tipo>` cuenta como
+   dominio propio — `UNKNOWN:web_search` + `UNKNOWN:app_data` + D3 = 3
+   "dominios" de artefactos que en realidad comparten el mismo canal de
+   fabricación (disco local, user-space), abaratando la rama cross-domain.
+
+**Fix (asignación por modo de fabricación, TAXA §1 — el canal, no el contenido):**
+`web_search`, `app_data`, `contact_data`, `call_log`, `sms`, `chat_message`,
+`location_data` → `("filesystem_metadata", "D3")` — registros locales en disco
+escritos por apps en user-space, fabricables editando el archivo (un loop
+inserta N filas en el SQLite; sin costo por-artefacto ni tamper-evidence).
+`social_media` → `("network_telemetry", "D4")` — registro del lado del
+servicio, no fabricable editando el disco local. Nota `location_data`: el tipo
+cubre el cache local del dispositivo; telemetría de OPERADOR debe tipificarse
+distinto, no reclasificar este tipo.
+
+**Criterios de aceptación (todos cumplidos):**
+- 4 tests rojos-primero (`TestMobileBandDomainMap`): clasificación de los 8
+  tipos, curva plana del flood, ruido puro → NOISE, monotonicidad M2-1 ✓
+- Curva post-fix PLANA: web_search raw 0.85 → 0.3776 / 0.3903 / **0.3903**
+  (N=10/50/100, asíntota r=0.7 de D3); raw 0.05 ×100 → **NOISE 0.0276** ✓
+- **Gate comparativo (B-069) sobre los 199 casos: 0 flips de verdict, 0 flips
+  de score — los 199 resultados son idénticos byte a byte; el pass-rate del
+  corpus queda invariante en 167/199** — predicho (la banda mobile no aparece
+  en el corpus JSON) y verificado con baseline limpio (fix stasheado) vs
+  after. Nota de alcance: precisamente porque el corpus no ejercita la banda,
+  el gate solo prueba NO-regresión; la cobertura positiva del mapeo son los
+  tests sintéticos ✓
+- Suite completa verde ✓
+
+**Alcance restante (no cubierto por este fix — medido, no especulado):**
+
+1. **Engines mobile SIFT**: siguen emitiendo UNA señal agregada tipificada
+   `app_data` vía `_EVIDENCE_MAP` (B-052-P2 pendiente); B-092 solo garantiza
+   que cuando esas señales (o casos EBS mobile futuros) lleguen al scorer,
+   saturen y corroboren por el canal correcto (D3) en vez de por dominios
+   fantasma UNKNOWN.
+2. **Rama hard-mass del gate — `location_data`**: su spoofability calibrada
+   (0.30) está exactamente en el borde `<=0.30` que la rama hard-mass cuenta
+   como tipo duro. Medido post-fix: 4× `location_data` raw 0.85 → **MALICE
+   0.3649** (×100 → MALICE 0.474 — el composite SÍ satura; el gate abre
+   igual). No es regresión (pre-fix daba MALICE con composite mayor), pero el
+   cierre de B-092 es del composite y los dominios fantasma, NO de esta rama.
+   Resolverlo es doctrina de calibración (¿location_data merece 0.30? ¿el
+   borde debe ser estricto?) — requiere su propio gate comparativo.
+3. **Rama cross-domain — mix D3+D4**: 4× `web_search` + 4× `social_media`
+   raw 0.85 → **MALICE 0.5051** (2 dominios reales). Tensión documentada: el
+   propio perfil de `social_media` lo describe como "Social app client cache
+   — editable" (fabricable en disco local), lo que argumentaría D3; el mapeo
+   D4 sigue la doctrina "registro del lado del servicio". Si la calibración
+   futura lo mueve a D3, este vector colapsa a 1 dominio. Decisión de
+   doctrina, requiere su propio gate.
+4. **Ruido puro**: verificado que NO alimenta ninguna rama — 100× raw 0.05 →
+   NOISE para `web_search` (0.0276), `app_data` (0.0251) y `location_data`
+   (0.0356, el tipo duro). Test parametrizado lo pinea.

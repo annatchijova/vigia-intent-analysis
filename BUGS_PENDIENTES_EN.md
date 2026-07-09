@@ -4644,3 +4644,78 @@ vs legacy 2.1); second-domain qualification by spoofability (run 3: 131/199 —
 crushed SRL narrative and CAN-MALICE cases); positional head (1,0.7,0.4,0.1)
 without best-prefix (run 4: 165/199, the CAN-029/CAN-032 pair crosses). The
 lesson: the head was CALIBRATED; only the tail was the defect.
+
+---
+
+## B-092 — EVIDENCE_PROFILES mobile band missing from _DOMAIN_MAP: exempt from R4-3 tail decay [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-09), applied with comparative gate (B-069 pattern) |
+| **Severity** | P2 — the BREAK-014 drowning vector (L-049) remained open for the mobile path |
+| **File** | `vigia/tools/caie.py` (`_DOMAIN_MAP`), `tests/test_r4_3_domain_saturation.py` |
+| **Background** | `docs/MACOS_MODULES_DESIGN.md` §9.1-b (where the gap was detected and the mapping reasoned); `docs/TAXA_DOMINIOS_RECOLECCION.md` (census ran over `data/cases/`, where the mobile band never appears — "no type left in UNKNOWN" held only for the corpus) |
+| **Detection** | Remapping the macOS module design against TAXA v2: the 8 calibrated mobile types in `EVIDENCE_PROFILES` (`chat_message`, `sms`, `call_log`, `web_search`, `app_data`, `social_media`, `location_data`, `contact_data`) classified as `UNKNOWN:<type>` / band `UNKNOWN` |
+
+**Measured pre-fix consequences (both):**
+
+1. **Exempt from the R4-3 tail decay** (the saturation loop skips band
+   UNKNOWN): synthetic `web_search` flood at raw 0.85 → score 0.5454 (N=10),
+   0.9806 (N=50), **0.9900 (N=100)** — unbounded growth, the exact curve R4-3
+   killed for `log_entry`. Worse: **100× web_search at raw 0.05 (pure noise)
+   MANUFACTURED SUSPICION 0.3566** — the exact analogue of the
+   BASELINE_TRIPLE_CASTIGO finding ("50 logs of nothing manufactured
+   SUSPICION").
+2. **Pro-MALICE bias in the B-068 v2 gate**: each `UNKNOWN:<type>` counts as
+   its own domain — `UNKNOWN:web_search` + `UNKNOWN:app_data` + D3 = 3
+   "domains" for artifacts that actually share one fabrication channel (local
+   disk, user-space), cheapening the cross-domain branch.
+
+**Fix (assignment by fabrication mode, TAXA §1 — the channel, not the content):**
+`web_search`, `app_data`, `contact_data`, `call_log`, `sms`, `chat_message`,
+`location_data` → `("filesystem_metadata", "D3")` — local on-disk records
+written by user-space apps, forgeable by editing the file (a loop inserts N
+SQLite rows; no per-artifact cost, no tamper evidence). `social_media` →
+`("network_telemetry", "D4")` — service-side record, not forgeable by editing
+the local disk. `location_data` note: the type covers the device-local cache;
+carrier telemetry must be typed separately, not by reclassifying this type.
+
+**Acceptance criteria (all met):**
+- 4 red-first tests (`TestMobileBandDomainMap`): classification of all 8
+  types, flat flood curve, pure noise → NOISE, M2-1 monotonicity ✓
+- Post-fix curve FLAT: web_search raw 0.85 → 0.3776 / 0.3903 / **0.3903**
+  (N=10/50/100, D3 r=0.7 asymptote); raw 0.05 ×100 → **NOISE 0.0276** ✓
+- **Comparative gate (B-069) over all 199 cases: 0 verdict flips, 0 score
+  flips — all 199 results byte-identical; corpus pass-rate invariant at
+  167/199** — predicted (the mobile band never appears in the JSON corpus)
+  and verified with a clean baseline (fix stashed) vs after-run. Scope note:
+  precisely because the corpus never exercises the band, the gate only
+  proves NON-regression; positive coverage of the mapping comes from the
+  synthetic tests ✓
+- Full suite green ✓
+
+**Remaining scope (not covered by this fix — measured, not speculated):**
+
+1. **Mobile SIFT engines**: still emit ONE aggregated signal typed `app_data`
+   via `_EVIDENCE_MAP` (B-052-P2 pending); B-092 only guarantees that when
+   those signals (or future mobile EBS cases) reach the scorer, they saturate
+   and corroborate through the correct channel (D3) instead of phantom
+   UNKNOWN domains.
+2. **Hard-mass gate branch — `location_data`**: its calibrated spoofability
+   (0.30) sits exactly on the `<=0.30` boundary the hard-mass branch counts
+   as a hard type. Measured post-fix: 4× `location_data` raw 0.85 → **MALICE
+   0.3649** (×100 → MALICE 0.474 — the composite DOES saturate; the gate
+   still opens). Not a regression (pre-fix gave MALICE with a larger
+   composite), but B-092's closure covers the composite and the phantom
+   domains, NOT this branch. Resolving it is calibration doctrine (does
+   location_data deserve 0.30? should the boundary be strict?) — needs its
+   own comparative gate.
+3. **Cross-domain branch — D3+D4 mix**: 4× `web_search` + 4× `social_media`
+   raw 0.85 → **MALICE 0.5051** (2 real domains). Documented tension: the
+   `social_media` profile itself reads "Social app client cache — editable"
+   (locally forgeable), which argues D3; the D4 mapping follows the
+   service-side-record doctrine. If future calibration moves it to D3, this
+   vector collapses to 1 domain. Doctrine decision, needs its own gate.
+4. **Pure noise**: verified it feeds NO branch — 100× raw 0.05 → NOISE for
+   `web_search` (0.0276), `app_data` (0.0251) and `location_data` (0.0356,
+   the hard type). Pinned by a parametrized test.

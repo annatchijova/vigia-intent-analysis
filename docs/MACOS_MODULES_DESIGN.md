@@ -831,7 +831,8 @@ SQLite de historial ni un plist la tienen. **Propuesta: D3.** No son D4 aunque
 **(b) Gap pre-existente — la banda mobile completa está fuera de `_DOMAIN_MAP`:**
 TAXA declara "53/53 tipos del corpus + los 6 tipos definidos en `EVIDENCE_PROFILES`
 que el corpus aún no usa. Ningún tipo queda en UNKNOWN" (§4). Pero `EVIDENCE_PROFILES`
-define además la banda mobile calibrada (`caie.py:296-303`): `chat_message`, `sms`,
+define además la banda mobile calibrada (bloque mobile de `EVIDENCE_PROFILES`,
+`caie.py`): `chat_message`, `sms`,
 `call_log`, `web_search`, `app_data`, `social_media`, `location_data`,
 `contact_data` — **8 tipos sin entrada en `_DOMAIN_MAP`**, censo hecho sobre
 `data/cases/` donde no aparecen. No es una incoherencia introducida por este diseño:
@@ -861,6 +862,20 @@ fuente es telemetría de operador; `social_media` → D4 (registro del lado del
 servicio, no fabricable editando el disco local) o D5-soft si llega como captura
 interpretativa. Cada asignación requiere la corrida comparativa de corpus (misma
 advertencia B-052).
+
+> **CERRADO — B-092 (2026-07-09):** este follow-up se implementó con el protocolo
+> completo (test rojo primero, gate comparativo B-069 sobre los 199 casos: 0 flips
+> de verdict, 0 flips de score — 199/199 resultados idénticos, pass-rate invariante
+> en 167/199). Los 8 tipos mobile tienen entrada en `_DOMAIN_MAP`: los 7 registros
+> locales → D3, `social_media` → D4. Curva post-fix plana (flood web_search raw
+> 0.85: 0.3776 → 0.3903 → 0.3903) y el ruido puro vuelve a NOISE para los tres
+> tipos representativos medidos. Las consecuencias (1) saturación y (2) dominios
+> fantasma quedan eliminadas. **Residuales de gate que B-092 NO cierra** (medidos,
+> ver "Alcance restante" de B-092): `location_data` sigue abriendo la rama
+> hard-mass (spoof 0.30 en el borde ≤0.30 — 4× raw 0.85 → MALICE) y un mix D3+D4
+> (`web_search`+`social_media`) sigue abriendo la rama cross-domain; ambos son
+> doctrina de calibración pendiente, no regresiones. Ver B-092 en
+> `BUGS_PENDIENTES.md` y `tests/test_r4_3_domain_saturation.py::TestMobileBandDomainMap`.
 
 ### 9.2 Corrección de expectativa: gate v2 supersede el análisis de §1.4
 
@@ -901,11 +916,12 @@ documento de diseño.
 | `registry_key` | D3 | ✅ coherente (explícito en TAXA §4 y `_DOMAIN_MAP`) |
 | `file_metadata` (×2 usos) | D3 | ✅ coherente (explícito) |
 | `usn_journal` / `usn_journal_gap` | D3 (capa dura) | ✅ coherente (explícito; alimentan rama hard-mass) |
-| `web_search` | hoy `UNKNOWN` — propuesto D3 | ⚠️ gap pre-existente de la banda mobile en `_DOMAIN_MAP` (§9.1-b) |
-| `app_data` | hoy `UNKNOWN` — propuesto D3 | ⚠️ mismo gap (§9.1-b) |
+| `web_search` | D3 | ✅ coherente — gap §9.1-b **cerrado por B-092** (2026-07-09) |
+| `app_data` | D3 | ✅ coherente — gap §9.1-b **cerrado por B-092** (2026-07-09) |
 
-Diseño sin cambios. Dos follow-ups fuera de alcance: (1) completar la banda mobile en
-`_DOMAIN_MAP` (§9.1-b); (2) al implementar B-052-P2, validar con la corrida
-comparativa que las señales macOS D3 no queden dobles-castigadas por decay de cola
-intra-D3 + `noisy_or_correlated` intra-módulo (la misma advertencia de triple castigo
-de TAXA §5.3 aplica una capa más arriba).
+Diseño sin cambios. Follow-up (1) — completar la banda mobile en `_DOMAIN_MAP` —
+**cerrado por B-092** (ver recuadro en §9.1-b). Queda fuera de alcance el follow-up
+(2): al implementar B-052-P2, validar con la corrida comparativa que las señales
+macOS D3 no queden dobles-castigadas por decay de cola intra-D3 +
+`noisy_or_correlated` intra-módulo (la misma advertencia de triple castigo de TAXA
+§5.3 aplica una capa más arriba).

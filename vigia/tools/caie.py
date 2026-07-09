@@ -179,6 +179,20 @@ _DOMAIN_MAP: dict = {
     "usn_journal_gap":              ("filesystem_metadata", "D3"),
     "timestamp_precision":          ("filesystem_metadata", "D3"),
     "prefetch":                     ("filesystem_metadata", "D3"),
+    # B-092 — banda mobile de EVIDENCE_PROFILES (TAXA no la censó: ausente de
+    # data/cases). Registros locales en disco escritos por apps en user-space,
+    # fabricables editando el archivo (un loop inserta N filas en el SQLite):
+    # canal D3, no D1 (el contenido no define el dominio) ni D5 (sin costo
+    # por-artefacto). location_data: cache local del dispositivo; si un caso
+    # aporta telemetría de OPERADOR debe tipificarse distinto (D4), no
+    # reclasificar este tipo. Ver MACOS_MODULES_DESIGN.md §9.1-b.
+    "web_search":                   ("filesystem_metadata", "D3"),
+    "app_data":                     ("filesystem_metadata", "D3"),
+    "contact_data":                 ("filesystem_metadata", "D3"),
+    "call_log":                     ("filesystem_metadata", "D3"),
+    "sms":                          ("filesystem_metadata", "D3"),
+    "chat_message":                 ("filesystem_metadata", "D3"),
+    "location_data":                ("filesystem_metadata", "D3"),
     # D4 — network_telemetry (control del canal en el momento del tráfico)
     "network_flow":                 ("network_telemetry", "D4"),
     "network_traffic":              ("network_telemetry", "D4"),
@@ -190,6 +204,9 @@ _DOMAIN_MAP: dict = {
     "ip_geolocation":               ("network_telemetry", "D4"),
     "user_agent":                   ("network_telemetry", "D4"),
     "malware_infrastructure":       ("network_telemetry", "D4"),
+    # B-092: registro del lado del servicio — no fabricable editando el disco
+    # local; su fabricación exige controlar la cuenta/plataforma (canal D4).
+    "social_media":                 ("network_telemetry", "D4"),
     # D5 — content_artifact (fabricación de contenido, costo por-artefacto)
     "cryptographic_hash":           ("content_artifact", "D5-hard"),
     "TPM_attestation":              ("content_artifact", "D5-hard"),  # CR-003
