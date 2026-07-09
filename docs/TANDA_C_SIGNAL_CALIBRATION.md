@@ -83,7 +83,42 @@ relevantes y — para `sift_raw` — la anotación gamma. El bloque `coverage`
 declara los flags `L033_ready_for_A4_profiles` y `L033_ready_for_A3_gamma`
 derivados de los conteos (el test los verifica coherentes, no hard-codeados).
 
-## 6. Relación con otros datasets
+## 6. A4 — re-fit de perfiles medido: resultado NEUTRO (no aplicado)
+
+Con el dataset en mano se corrió el experimento A4 (re-fit de los 36 perfiles
+"legacy pin" 0.50/0.20), **sin tocar `caie.py`** — medición por monkeypatch.
+Harness: `scripts/experiment_a4_profile_refit.py` (solo mide, restaura al salir).
+
+**Método:** re-derivar `spoofability` por diagnosticidad (bidireccional: tipos
+enriquecidos en malice bajan, en benigno suben), solo para los 12 tipos legacy
+con ≥5 señales; `base_weight` NO se toca (fue la palanca de inflación de B-069).
+
+**Resultado medido (gate comparativo, 199 casos):**
+
+| Variante | Veredictos movidos | FIXED | BROKEN | Δ PASS |
+|---|---|---|---|---|
+| spoofability realista (K=0.6) | 0 | 0 | 0 | +0 |
+| spoofability extrema (K=5.0) | 0 | 0 | 0 | +0 |
+| control: spoof=0.15 **+ weight=0.30** (inflación B-069) | 1 | 0 | 0 | +0 |
+
+El único veredicto que se mueve en todo el barrido es `OWL-NEXUS5-CASE`
+(NOISE→SUSPICION) bajo inflación de peso, y es **FAIL→FAIL** (expected MALICE:
+sigue mal). El harness SÍ puede mover veredictos (control con peso), así que el
+"0 flips" es real, no un artefacto.
+
+**Conclusión (confirma B-069 con método independiente):** el re-fit de perfiles
+legacy tiene **0 upside de corpus** y la única palanca que mueve algo (subir
+`base_weight`) reproduce la inflación de B-069 sin arreglar nada. Los errores
+restantes del corpus son **estructurales** (L-014 constelación, L-016 colusión,
+umbral MALICE, revisión de etiquetas ABSTAIN), no de calibración de perfiles.
+
+**Recomendación:** NO APLICAR. El valor de A4 es puramente Daubert
+(spoofability principiada vs "legacy pin"), y aun así no cambia ningún veredicto
+— por lo que no justifica el riesgo de re-validar todo el sistema de umbrales.
+El gate comparativo obligatorio (patrón B-069) rechaza el cambio. **Ningún
+cambio de `caie.py` fue sellado.**
+
+## 7. Relación con otros datasets
 
 - `data/calibration_ladder_dataset_20260705.json` — per-**caso** (motor ciego vs
   expected), para el **umbral del ladder** (B-076). Distinto nivel.

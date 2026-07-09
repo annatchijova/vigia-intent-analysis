@@ -91,11 +91,15 @@ En orden de dependencia:
    pins de Grupo C (§1.3) — son el arnés de la migración.**
 2. **A5 / B-041b** — CAIE retroalimenta el veredicto: DIFERIDO, se desbloquea
    con A2 (necesita artefactos multi-capa).
-3. **A4 / B-069** — re-fit conjunto perfiles+umbrales. **Precondición de datos
-   CUMPLIDA** (979 señales EBS etiquetadas en el dataset Tanda C). Próximo paso:
-   re-fit detrás del gate comparativo obligatorio (la calibración aislada ya fue
-   rechazada, 70.8→70.4% — medir de nuevo con el dataset completo; si empeora, NO
-   aplicar).
+3. **A4 / B-069** — re-fit de perfiles. **MEDIDO 2026-07-09: resultado NEUTRO,
+   NO APLICADO.** Con el dataset (979 señales) se corrió el re-fit dataset-driven
+   detrás del gate comparativo (`scripts/experiment_a4_profile_refit.py`, solo
+   mide): **0 flips** (0 fixed / 0 broken) en las variantes realistas; la única
+   palanca que mueve algo (subir `base_weight`) reproduce la inflación de B-069
+   sin arreglar nada. Confirma B-069 con método independiente. `caie.py` NO
+   tocado. Los errores restantes del corpus son estructurales, no de perfiles.
+   Ver `docs/TANDA_C_SIGNAL_CALIBRATION.md` §6. Cerrado como corpus-neutro (valor
+   residual solo Daubert, que tampoco cambia veredictos).
 4. **A3 / L-033/L-034** — cadena de atenuación gamma×FRS. **SIGUE BLOQUEADO por
    datos** (solo 7 señales gamma reales, todas MALICE — ver Tanda C §4). No
    tocar: calibrar con 7 señales de una polaridad violaría L-033. Desbloqueo =

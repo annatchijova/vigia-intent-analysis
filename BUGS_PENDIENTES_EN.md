@@ -3789,6 +3789,33 @@ No code change sealed. `caie.py` reverted to HEAD (`a021a6a`); working tree
 clean. The comparative supporting this decision is archived as a session
 artifact (baseline vs post, 267 cases).
 
+### Re-confirmation with the Tanda C dataset (2026-07-09, independent method)
+
+With the signal-level calibration dataset built (`data/signal_calibration_dataset_20260709.json`,
+979 labeled EBS signals), A4 was re-measured via a **dataset-driven** candidate —
+distinct from B-069's original analogy method. `spoofability` re-derived by
+diagnosticity (bidirectional: types enriched in inculpatory cases move DOWN,
+benign-enriched move UP), `base_weight` untouched. Harness:
+`scripts/experiment_a4_profile_refit.py` (measurement-only, monkeypatch, restores
+on exit — **`caie.py` never modified**).
+
+Measured over 199 corpus cases:
+
+| Variant | verdicts moved | FIXED | BROKEN |
+|---|---|---|---|
+| spoofability realistic (K=0.6) | 0 | 0 | 0 |
+| spoofability extreme (K=5.0) | 0 | 0 | 0 |
+| control: spoof=0.15 **+ weight=0.30** | 1 (FAIL→FAIL) | 0 | 0 |
+
+The harness demonstrably CAN move verdicts (the weight-inflation control moves
+`OWL-NEXUS5-CASE` NOISE→SUSPICION, but expected=MALICE so it stays FAIL→FAIL),
+so the 0-flip result is real, not a no-op bug. **Independent confirmation of
+B-069's conclusion:** legacy-profile re-fit has 0 corpus upside; the only lever
+that moves anything (weight) reproduces the inflation without fixing a case. A4's
+remaining value is Daubert-only (principled spoofability), and even that changes
+no verdict. Reclassified: A4 corpus-neutral, NOT APPLIED. See
+`docs/TANDA_C_SIGNAL_CALIBRATION.md` §6.
+
 ---
 
 ## B-070 — Device/contextual/narrative epistemic role: closes the NGDC-003 FP composite channel (Option C) [RESOLVED]
