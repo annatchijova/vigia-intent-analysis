@@ -211,6 +211,13 @@ runtime.
 
 ### 5.2 Donde el bug descrito SÍ vive: `browser_forensics.py` (ruta Windows)
 
+> **Actualización 2026-07-09 (misma fecha, sesión posterior): APLICADO como
+> B-091** — test rojo primero (`tests/test_browser_wal_visibility.py`),
+> suite 1065 passed, gate comparativo 166/199 → 166/199 con 0 flips
+> (neutralidad estructural: ningún caso del batch rutea un perfil crudo).
+> Detalle en `BUGS_PENDIENTES(_EN).md` B-091. El diseño de abajo se conserva
+> como estaba al momento del análisis.
+
 La conexión que la premisa atribuía a macOS existe textual en
 `vigia/sift/browser_forensics.py:198-203`:
 

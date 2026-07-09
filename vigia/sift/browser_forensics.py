@@ -21,6 +21,7 @@ from typing import Any, Dict, List, Optional, Set
 
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
+from vigia.sift._sql_utils import safe_sqlite_connect
 
 logger = logging.getLogger(__name__)
 
@@ -120,8 +121,11 @@ class BrowserForensicsEngine:
         """
         Parseo real de perfiles Chromium (History) y Firefox (places.sqlite).
 
-        Las bases se abren en modo read-only inmutable (URI mode=ro&immutable=1)
-        — VIGÍA NUNCA modifica la evidencia: sin -wal/-journal, sin locks.
+        Las bases se abren vía safe_sqlite_connect (B-071): copia la familia
+        db + -wal/-shm/-journal a un working dir efímero y abre la COPIA.
+        La evidencia nunca se toca Y el WAL no-checkpointeado SÍ se lee —
+        immutable=1 lo ignoraba (mismo FN cuantificado en Safari/tuck-2019:
+        hasta el 100% de la señal invisible; docs/SAFARI_WAL_FIX_ANALYSIS.md).
         """
         p = Path(profile_path).resolve()
         suspicious: List[Dict[str, Any]] = []
@@ -195,13 +199,17 @@ class BrowserForensicsEngine:
         return candidate if candidate.is_file() else None
 
     @staticmethod
-    def _connect_ro(db_path: Path) -> sqlite3.Connection:
-        """
-        Abre un SQLite en modo read-only inmutable — no crea archivos
-        auxiliares, no toma locks, no modifica la evidencia.
-        """
-        uri = f"file:{db_path}?mode=ro&immutable=1"
-        return sqlite3.connect(uri, uri=True)
+    def _connect_evidence(db_path: Path) -> sqlite3.Connection:
+        """Abre la DB de evidencia vía safe_sqlite_connect (working copy con
+        WAL aplicado, evidencia intacta). Un fallo de apertura a nivel OS
+        (retorno None) se eleva como DatabaseError para que analyze_profile
+        lo marque UNANALYZED — nunca 'perfil limpio'."""
+        conn = safe_sqlite_connect(db_path, "BROWSER", logger)
+        if conn is None:
+            raise sqlite3.DatabaseError(
+                f"cannot open working copy of evidence DB: {db_path}"
+            )
+        return conn
 
     # ── Parsers por navegador ──────────────────────────────────────────────
 
@@ -212,7 +220,7 @@ class BrowserForensicsEngine:
         """
         downloads: List[Dict[str, Any]] = []
         history: List[Dict[str, Any]] = []
-        conn = self._connect_ro(db_path)
+        conn = self._connect_evidence(db_path)
         try:
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
@@ -257,7 +265,7 @@ class BrowserForensicsEngine:
         """
         downloads: List[Dict[str, Any]] = []
         history: List[Dict[str, Any]] = []
-        conn = self._connect_ro(db_path)
+        conn = self._connect_evidence(db_path)
         try:
             conn.row_factory = sqlite3.Row
             cur = conn.cursor()
