@@ -4333,3 +4333,58 @@ también se aplique acá.
 **Aún no aplicado.** Requiere verification-before-patch según la propia
 disciplina de este tracker — esta entrada documenta el hueco, no un bug vivo
 confirmado.
+
+---
+
+## B-091 — R4-3: saturación por dominio de recolección en el scorer EBS [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-07) |
+| **Severidad** | P1 — 95 logs irrelevantes compraban MALICE (drowning por volumen del mismo canal) |
+| **Archivo** | `vigia_scorer.py` (etapa 2 + gate B-068 v2), `vigia/tools/caie.py` (classify_domain v2 revivido) |
+| **Antecedentes** | docs/TAXA_DOMINIOS_RECOLECCION.md (taxonomía v2, CR-001..004); docs/BASELINE_TRIPLE_CASTIGO.md (curvas pre-fix) |
+| **Diseño** | Aprobado por el colectivo (6 modelos): Noisy-OR asume independencia; 100 logs del mismo tipo no son 100 fuentes |
+
+**Arquitectura final (4 corridas comparativas — el gate B-069 rechazó 3 diseños intermedios):**
+1. `classify_domain()` revivido en caie.py con la taxonomía v2 (53 tipos + los
+   6 de código; sub-bandas D1a/D1b, D5-hard/media/soft; era código muerto con
+   `log_entry→"network"`). Nuevo `classify_domain_subband()`.
+2. **Etapa 1 BIT-EXACTA al legacy M2-1** (mejor-prefijo por tipo): las
+   corridas probaron que la cabeza no puede desviarse — el corpus contiene
+   gemelos de FORMA idéntica con etiquetas opuestas (CAN-018 MALICE vs
+   CAN-032 SUSPICION: ambos 3× memory_process + 1 ip_geolocation) que solo el
+   score calibrado separa; y CAN-029 exige que lsass NO se agrupe con
+   memory_process en la cabeza.
+3. **Etapa 2 (R4-3): decay DE COLA por sub-banda** — posiciones 1-4 intactas,
+   de la 5ta en adelante w=r^(pos-4) (D1a/D5-soft/D0 r=0.5; D1b/D2/D3/D4
+   r=0.7). EXENTOS: D5-media/hard (costo por-artefacto: 10 binarios SON 10
+   actos — FLAREON) y artefactos sin evidence_type (schema narrativo SRL; la
+   corrida 3 mostró que saturarlos aplasta 14 MALICE). Monotonicidad M2-1
+   preservada (pins verdes).
+4. **Gate B-068 v2 — tres ramas doctrinales** (la corrida 1 probó que
+   "≥2 dominios" a secas es a la vez más estricto y más laxo que el legacy):
+   cross-domain con masa (≥2 dominios Y ≥4 arts o ≥3 tipos), masa dura
+   (≥3 tipos o ≥4 artefactos con spoofability ≤0.30 — CAN-029), costo
+   por-artefacto (≥4 D5-hard/media — FLAREON). Un canal blando solo no abre
+   ninguna. Trazabilidad: `r43_domain_scores`/`r43_active_domains` en el
+   resultado.
+
+**Criterios de aceptación (todos cumplidos):**
+- BREAK-014: MALICE 0.3867/conf 0.77 → **SUSPICION 0.2322/conf 0.46** ✓
+- Curva post-fix PLANA: N=25/50/95 logs irrelevantes → score 0.2322 constante
+  (pre-fix: +0.0016/log hasta cruzar MALICE) ✓
+- 95 logs solos: SUSPICION 0.1888 → **NOISE 0.0109** ✓
+- Los 96 MALICE correctos: **0 regresiones** ✓
+- Corpus **166 → 167/199** (UN solo flip: BREAK-014 a PASS) ✓
+- Suite **1049 passed** (16 tests nuevos rojos-primero en
+  `tests/test_r4_3_domain_saturation.py`) ✓
+
+**Registro de diseños rechazados por el gate comparativo (disciplina B-069):**
+r=0.5 uniforme (corrida 1: 153/199, 13 regresiones — FRS crudo además viola
+monotonicidad); dos-completos + r por sub-banda (corrida 2: 164/199, 4 FPs
+nuevos: trío 2.7 vs 2.1 legacy); regla de calificación del 2do dominio por
+spoofability (corrida 3: 131/199 — aplastó narrativos SRL y CAN-MALICE);
+cabeza posicional (1,0.7,0.4,0.1) sin best-prefix (corrida 4: 165/199, el par
+CAN-029/CAN-032 se cruza). La lección: la cabeza estaba CALIBRADA; solo la
+cola era el defecto.

@@ -1,15 +1,15 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-07T19:22:46.245490+00:00",
+  "analysis_timestamp": "2026-07-08T01:36:54.902514+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-CAN-023",
-    "end_time": "2026-07-07T19:22:46.245499+00:00",
+    "end_time": "2026-07-08T01:36:54.902530+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-CAN-023",
-        "entry_sha256": "4218e2ecca2b6416bb07f412fe93a59e63b9af9a613c809c5d148d08f15d5afb",
+        "entry_sha256": "f5ee9384665e9dbde1effb9ab17a666e0b6d77257c3cf700076ded0884e2a7ea",
         "inputs_summary": {
           "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
           "case_id": "VIGIA-CAN-023"
@@ -21,13 +21,13 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-07T19:22:46.060195+00:00",
+        "timestamp": "2026-07-08T01:36:54.657014+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-023",
-        "entry_sha256": "057be8ab5fe76a4e082f87d99d038f8569f629fe4726f104fdba994bbf88d016",
+        "entry_sha256": "ea4319eef25e1f33e178879a624e932fb3c630c7c42d845775c8d606c3bdd170",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-023.json"
         },
@@ -35,13 +35,13 @@
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-07T19:22:46.060384+00:00",
+        "timestamp": "2026-07-08T01:36:54.657195+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-CAN-023",
-        "entry_sha256": "46d79c48884a7cd138c1acfaafbaf4e9ddaa0ab00b8c6c422ba7996e090f21e1",
+        "entry_sha256": "c54875b9191864ca82905ada04750ffeb58292269dc3d03a6b9a298f6b25438f",
         "inputs_summary": {
           "path": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-023.json"
         },
@@ -51,13 +51,13 @@
           "sha256": "7349184cb108eedf9e22700b33e1b8840579058c768ae4848dc6facc92a309cf"
         },
         "seq": 3,
-        "timestamp": "2026-07-07T19:22:46.060558+00:00",
+        "timestamp": "2026-07-08T01:36:54.657403+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-CAN-023",
-        "entry_sha256": "e6ca4ee19c51c12b2d1dbcdfdc1c52342fcf107c66954add1e3e96fbcaffd351",
+        "entry_sha256": "0ccad53cb5a80c2ced503f87712db3af8c562d6972ce55758023bff93594e088",
         "inputs_summary": {
           "evidence": "/home/user/vigia-intent-analysis/data/cases/consolidated_canonical/VIGIA-CAN-023.json",
           "iteration": "0",
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-07T19:22:46.060773+00:00",
+        "timestamp": "2026-07-08T01:36:54.657660+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-CAN-023",
-        "entry_sha256": "3d8d836091cc260238644f0fcf7ad7dc5116a5a024188495e9a0781f8ba4817f",
+        "entry_sha256": "be71f0c0e0f645742875f038bb02b2bdf76057c20914ed132203e3dcfc7641e5",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -95,7 +95,7 @@
             "expected_verdict": "MALICE",
             "resolve": {
               "motor_confidence": "0.7",
-              "motor_reason": "Intent score 0.3517 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+              "motor_reason": "Intent score 0.3517 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
               "motor_score": "0.3517",
               "motor_verdict": "MALICE",
               "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
@@ -138,13 +138,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-07T19:22:46.244689+00:00",
+        "timestamp": "2026-07-08T01:36:54.901295+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-CAN-023",
-        "entry_sha256": "011182ca1b0c2a0c42bc0e3e4d41ef6c28f3da9b7ede8d4993d61ba0e7e78221",
+        "entry_sha256": "03c50dd030568cb996dc92906c01bee70c38ef8fde054ac8ceb4610830ca32a4",
         "inputs_summary": {
           "n_signals": "4"
         },
@@ -155,13 +155,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-07T19:22:46.244889+00:00",
+        "timestamp": "2026-07-08T01:36:54.901619+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-CAN-023",
-        "entry_sha256": "9aabc7a368e080cb06b2b6a74de669fa5daa20c43f6c66216ed2eecb4849d1a3",
+        "entry_sha256": "edce8bbcdc83be47d3a21ac6af99a21f53fde6c3668e89714447f675f476d26a",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -172,11 +172,11 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-07T19:22:46.245216+00:00",
+        "timestamp": "2026-07-08T01:36:54.902021+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-07T19:22:46.059696+00:00",
+    "start_time": "2026-07-08T01:36:54.656482+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-CAN-023",
@@ -228,7 +228,7 @@
       "expected_verdict": "MALICE",
       "resolve": {
         "motor_confidence": "0.7",
-        "motor_reason": "Intent score 0.3517 exceeds MALICE threshold (P2+acq_assurance scale, threshold=0.33)",
+        "motor_reason": "Intent score 0.3517 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
         "motor_score": "0.3517",
         "motor_verdict": "MALICE",
         "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
