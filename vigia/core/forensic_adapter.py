@@ -80,6 +80,11 @@ _LAYER_MAP = {
     "usb": EvidenceLayer.REGISTRY, "browser": EvidenceLayer.DISK_MFT,
     "shellbag": EvidenceLayer.REGISTRY, "amcache": EvidenceLayer.DISK_MFT,
     "event_log": EvidenceLayer.REGISTRY, "unknown": EvidenceLayer.DISK_MFT,
+    # B-096/B6: el EventLogCorrelator emite artifact_type="windows_event_log"
+    # (señal primaria), no "event_log" — sin esta clave caía a DISK_MFT (4/10)
+    # en vez de REGISTRY (6/10), sub-ponderando el log de eventos de Windows en
+    # la capa abductiva del path on-disk. Tratamiento idéntico a "event_log".
+    "windows_event_log": EvidenceLayer.REGISTRY,
     # B-066/B-060: tipos mobile — bases SQLite en disco → DISK_MFT explícito
     # (antes caían al mismo default en silencio; ahora es una decisión).
     "chat_message": EvidenceLayer.DISK_MFT, "sms": EvidenceLayer.DISK_MFT,
@@ -137,6 +142,8 @@ _ONTOLOGY_MAP = {
     "usb": OntologicalLevel.TECHNIQUE, "browser": OntologicalLevel.TECHNIQUE,
     "shellbag": OntologicalLevel.TECHNIQUE, "amcache": OntologicalLevel.TECHNIQUE,
     "event_log": OntologicalLevel.TECHNIQUE, "unknown": OntologicalLevel.TECHNIQUE,
+    # B-096/B6: par de "windows_event_log" en _LAYER_MAP — mismo nivel que event_log.
+    "windows_event_log": OntologicalLevel.TECHNIQUE,
     # B-066/B-060: mobile — contenido de comunicación/ubicación es TACTIC
     # (qué hizo el actor); storage genérico de app es TECHNIQUE.
     "chat_message": OntologicalLevel.TACTIC, "sms": OntologicalLevel.TACTIC,

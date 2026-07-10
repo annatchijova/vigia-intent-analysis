@@ -4672,3 +4672,55 @@ gates ni doctrina de corroboración.
 **Higiene adjunta (B11):** removido `tests/test_audit_no_default_key (1).py`,
 duplicado byte-idéntico de `tests/test_audit_no_default_key.py` (artefacto de
 copia con sufijo " (1)") — los 12 tests corrían dos veces.
+
+---
+
+## B-096 — `windows_event_log` ausente de `_LAYER_MAP`/`_ONTOLOGY_MAP`: la señal primaria de event log cae a DISK_MFT en vez de REGISTRY [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-10 (cierra B6 del Grupo B; enforcement del acoplamiento B-060) |
+| **Severidad** | P2 |
+| **Archivo** | `vigia/core/forensic_adapter.py` (`_LAYER_MAP`, `_ONTOLOGY_MAP`) |
+| **Detectado en** | B6 — test de consistencia de mapas de tipos (`docs/B6_ARTIFACT_TYPE_REGISTRY_DESIGN.md`) |
+
+**Descripción:** el `EventLogCorrelator` emite una señal **primaria** con
+`metadata["artifact_type"] = "windows_event_log"`
+(`vigia/sift/sift_orchestrator.py:472`), pero `_LAYER_MAP`/`_ONTOLOGY_MAP` solo
+contenían la clave `"event_log"`. Sin la clave, `signal_to_abductive_record`
+hacía `_LAYER_MAP.get("windows_event_log", DISK_MFT)` → **DISK_MFT (peso 4/10)**
+cuando el tratamiento consistente con `"event_log"` es **REGISTRY (6/10)**.
+`abductive_reasoner_v2.py:396` usa `weight = LAYER_EPISTEMIC_WEIGHT[art.layer]`,
+así que un log de eventos de Windows quedaba sub-ponderado ~33% en la capa
+abductiva del path on-disk. Es la clase exacta de deriva silenciosa que B-060
+(Lente 7/8) describió: dos namespaces de mapas (`artifact_type` y
+`evidence_type`), varios mapas, y un tipo no cubierto degrada al peor default.
+
+**Método abductivo:** el test de enforcement B6 (variante «test que falle si un
+`artifact_type` emitido no está en todos los mapas», propuesta original de
+B-060) enumeró por scan estático los tipos que los motores emiten y comparó
+contra los mapas. De 7 tipos no mapeados, 6 son derivados z=0 / latentes
+(inocuos, grandfathered con justificación); `windows_event_log` era el único
+**activo** — señal primaria con z libre.
+
+**Blast radius:**
+- **Corpus JSON (motor): inerte.** Ningún artefacto del corpus (0/259) setea
+  `metadata.artifact_type`; el bridge puebla `evidence_type` pero no
+  `artifact_type`, así que toda señal del motor cae a `"unknown"→DISK_MFT`,
+  invariante al agregar la clave. **Gate comparativo (run_all_agent, baseline
+  stasheado vs fix): 0 flips en 291 bundles** (verdict/n_primary/n_unanalyzed).
+- **Path on-disk (SIFT orquestador): corregido.** Única ruta donde el gap estaba
+  activo; sin caso on-disk de event log en el corpus, se cubre por unit test
+  end-to-end (`signal_to_abductive_record` → `layer == REGISTRY`).
+
+**Fix (2026-07-10):** agregar `"windows_event_log"` a `_LAYER_MAP` (→ `REGISTRY`)
+y `_ONTOLOGY_MAP` (→ `TECHNIQUE`), idéntico a `"event_log"`. Cambio puramente
+aditivo (no modifica ninguna clave existente).
+
+**Enforcement (B6):** `tests/test_b6_artifact_type_map_consistency.py` (10 tests):
+`_LAYER_MAP`≡`_ONTOLOGY_MAP`; cierre de `_EVIDENCE_MAP` en
+`EVIDENCE_PROFILES`∩`_DOMAIN_MAP`; todo `artifact_type`/`evidence_type` emitido
+mapeado o grandfathered con justificación; honestidad del grandfather (sin
+entradas muertas ni ya-mapeadas). Un motor nuevo que emita un tipo no cubierto
+ahora rompe el test en vez de degradar en silencio. No cierra el acoplamiento
+estructural (siguen los dos namespaces); cierra la deriva silenciosa.

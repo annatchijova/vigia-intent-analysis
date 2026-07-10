@@ -4925,3 +4925,54 @@ doctrine touched.
 **Attached hygiene (B11):** removed `tests/test_audit_no_default_key (1).py`, a
 byte-identical duplicate of `tests/test_audit_no_default_key.py` (a " (1)" copy
 artifact) whose 12 tests ran twice.
+
+---
+
+## B-096 — `windows_event_log` missing from `_LAYER_MAP`/`_ONTOLOGY_MAP`: the primary event-log signal falls to DISK_MFT instead of REGISTRY [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-10 (closes Grupo B item B6; enforcement of the B-060 coupling) |
+| **Severity** | P2 |
+| **File** | `vigia/core/forensic_adapter.py` (`_LAYER_MAP`, `_ONTOLOGY_MAP`) |
+| **Detected in** | B6 — type-map consistency test (`docs/B6_ARTIFACT_TYPE_REGISTRY_DESIGN.md`) |
+
+**Description:** the `EventLogCorrelator` emits a **primary** signal with
+`metadata["artifact_type"] = "windows_event_log"`
+(`vigia/sift/sift_orchestrator.py:472`), but `_LAYER_MAP`/`_ONTOLOGY_MAP` only
+carried the key `"event_log"`. Without the key, `signal_to_abductive_record`
+did `_LAYER_MAP.get("windows_event_log", DISK_MFT)` → **DISK_MFT (weight 4/10)**
+when the treatment consistent with `"event_log"` is **REGISTRY (6/10)**.
+`abductive_reasoner_v2.py:396` uses `weight = LAYER_EPISTEMIC_WEIGHT[art.layer]`,
+so a Windows event log was under-weighted ~33% in the abductive layer of the
+on-disk path — exactly the silent-drift class B-060 (Lens 7/8) described: two
+map namespaces (`artifact_type` and `evidence_type`), several maps, and an
+uncovered type degrading to the worst default.
+
+**Abductive method:** the B6 enforcement test (the "test that fails if an emitted
+`artifact_type` is not in all maps" variant B-060 originally proposed) statically
+enumerated the types engines emit and diffed them against the maps. Of 7 unmapped
+types, 6 are derived z=0 / latent (harmless, grandfathered with justification);
+`windows_event_log` was the only **active** one — a primary signal with free z.
+
+**Blast radius:**
+- **Corpus JSON (motor): inert.** No corpus artifact (0/259) sets
+  `metadata.artifact_type`; the bridge populates `evidence_type` but not
+  `artifact_type`, so every motor signal falls to `"unknown"→DISK_MFT`, invariant
+  under adding the key. **Comparative gate (run_all_agent, stashed baseline vs
+  fix): 0 flips across 291 bundles** (verdict/n_primary/n_unanalyzed).
+- **On-disk path (SIFT orchestrator): corrected.** The only route where the gap
+  was active; with no on-disk event-log corpus case, it is covered by an
+  end-to-end unit test (`signal_to_abductive_record` → `layer == REGISTRY`).
+
+**Fix (2026-07-10):** add `"windows_event_log"` to `_LAYER_MAP` (→ `REGISTRY`)
+and `_ONTOLOGY_MAP` (→ `TECHNIQUE`), identical to `"event_log"`. Purely additive
+(no existing key modified).
+
+**Enforcement (B6):** `tests/test_b6_artifact_type_map_consistency.py` (10 tests):
+`_LAYER_MAP`≡`_ONTOLOGY_MAP`; `_EVIDENCE_MAP` closure into
+`EVIDENCE_PROFILES`∩`_DOMAIN_MAP`; every emitted `artifact_type`/`evidence_type`
+mapped or grandfathered with justification; grandfather honesty (no dead / no
+already-mapped entries). A new engine emitting an uncovered type now breaks the
+test instead of degrading silently. Does not close the structural coupling (two
+namespaces remain); closes the silent drift.
