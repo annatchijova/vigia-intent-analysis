@@ -297,8 +297,8 @@ se procesó, o el resultado del procesamiento no llega al veredicto/narrativa.
 | **N10** | **P1** | Orden de operaciones en `_generate_narrative`: el override L-036 muta la hipótesis DESPUÉS de serializar "MAIN HYPOTHESIS" y "PEIRCEAN NARRATIVE" | Narrativa y veredicto sellado divergen dentro del mismo bundle (§1.3) — el gap de presentación reportado | `vigia_agent.py:760-775` vs `:850-866` |
 | **N11** | **P2** | `MetabolicProfiler` y `BehavioralFingerprint` requieren `event_stream`, pero el agente nunca lo genera y el shim re-mapea `event_stream→event_logs` | Dos motores engine muertos en modo agente (sin marca de "no corrió") | shim `:175-177`, `vigia/sift:592-625` |
 | **N12** | **P2** | Adaptador vol3 con 0 señales: narrativa "Suspicious activity — requires human review" con hipótesis benigna | Narrativa contradice el veredicto (observado en DC-MEM-003) | shim `:650-660` |
-| **N13** | **P2** | `sans_compliance.accuracy_validation` exige clave `tool` en cada señal, pero las señales de los adaptadores del shim (vol3, EBS-JSON, mobile) usan `source` | Flag de compliance falso-negativo en bundles de adaptador | `vigia_agent.py:936-942` |
-| **N14** | **P2** | `_to_signal_safe` devuelve None ante cualquier excepción de `to_signal()` — la señal se pierde con un log y nada más | Igual que N7 pero en la conversión resultado→señal | `vigia/sift:267-275` |
+| **N13** | **P2** | `sans_compliance.accuracy_validation` exige clave `tool` en cada señal, pero las señales de los adaptadores del shim (vol3, EBS-JSON, mobile) usan `source` | Flag de compliance falso-negativo en bundles de adaptador — **cerrado (B-088): F8 acepta ambos, helper `_accuracy_validation` pineado** | `vigia_agent.py:936-942` |
+| **N14** | **P2** | `_to_signal_safe` devuelve None ante cualquier excepción de `to_signal()` — la señal se pierde con un log y nada más | Igual que N7 pero en la conversión resultado→señal — **cerrado (B-089): conversiones primarias emiten `*_UNANALYZED`; derivadas solo contador F8. Camino shim mobile también cerrado (2026-07-10): `_unanalyzed_marker` en los 4 adaptadores + `results.unanalyzed_artifacts` en la rama mobile-only y el merge** | `vigia/sift:267-275` |
 | **N15** | **P1** | **Cero tests** ejercitan `AbductiveReasoner.reason()` (grep sobre `tests/` y `vigia/tests/`: 0 archivos) | Por eso N1 (un crash del 100%) vivió en producción sellando bundles; cualquier fix futuro tampoco tiene red | — |
 
 ### 3.2 Gaps de la auditoría anterior (estado verificado hoy)
@@ -318,7 +318,7 @@ actual qué sigue abierto y qué interactúa con la narrativa:
 | P2-A (atenuación gamma×FRS) | ⏳ diferido (L-033) | Alimenta N1: si nada supera z>1.5, H1 también viola INVARIANTE 4 |
 | P2-B (gate ≥3 señales) | vigente por diseño | N4 lo puentea con señales derivadas (en la dirección opuesta) |
 | P2-C (fuga `expected_verdict`) | ⏳ retenida deliberadamente | E9: además de la fuga, ese adaptador ni siquiera genera narrativa propia |
-| P2-E (timeline timestamps=0) | ⏳ abierto | UNIFIED_TIMELINE emite igual una señal derivada que cuenta para N4 |
+| P2-E (timeline timestamps=0) | ✅ cerrado (B-090, 2026-07-10) | Verificado: la señal se emite pero F5 la marca `derived` y no cuenta para los gates — reproducción y pins en `TestB090EmptyTimelineExcludedFromGates` |
 
 ### 3.3 Correlación con el corpus (`AUDIT_NARRATIVAS_20260702.md`)
 

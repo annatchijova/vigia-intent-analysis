@@ -467,3 +467,274 @@ class TestB052MobileNarrative:
         assert ab["best_hypothesis"] == "MOBILE_EVIDENCE_ANALYZED"
         assert ab["is_conclusive"] is False
         assert ab["best_posterior"] == "8/25"  # 1.6/5 — igual que pre-P1
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# B-088 / B-089 / B-090 — hallazgos huérfanos de AUDITORIA_PIPELINE_ROBUSTEZ
+# (N13, N14, P2-E) verificados contra HEAD 2026-07-10.
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestB088AccuracyValidationSourceAlias:
+    """B-088 (N13): los adaptadores del shim (vol3, EBS-JSON, mobile) emiten
+    `source` en lugar de `tool`; el flag sans_compliance.accuracy_validation
+    debe aceptar ambos (F8). Pin de regresión — el fix ya estaba en HEAD;
+    este test lo fija para que no se revierta."""
+
+    def test_accepts_source_alias(self):
+        from vigia_agent import _accuracy_validation
+        assert _accuracy_validation(
+            [{"source": "vol3_adapter", "z_score": 1.2}]) is True
+
+    def test_accepts_native_tool_field(self):
+        from vigia_agent import _accuracy_validation
+        assert _accuracy_validation(
+            [{"tool": "MEMORY_FORENSICS", "z_score": 0.0}]) is True
+
+    def test_mixed_adapter_and_native_signals(self):
+        from vigia_agent import _accuracy_validation
+        assert _accuracy_validation(
+            [{"source": "ebs_json", "z_score": 0.4},
+             {"tool": "BROWSER_FORENSICS", "z_score": 1.1}]) is True
+
+    def test_fails_closed_without_tool_or_zscore(self):
+        from vigia_agent import _accuracy_validation
+        assert _accuracy_validation([]) is False
+        assert _accuracy_validation([{"z_score": 1.2}]) is False
+        assert _accuracy_validation([{"source": "x"}]) is False
+
+
+class TestB089ToSignalCrashVisible:
+    """B-089 (N14): una excepción en to_signal() no puede hacer desaparecer
+    el artefacto en silencio. F8 ya contabilizaba el drop en pipeline_meta;
+    el fix completo emite además la señal sintética *_UNANALYZED (mismo
+    mecanismo F7) para que el artefacto entre en n_unanalyzed_artifacts y
+    en la sección de la narrativa. Test escrito ROJO contra el HEAD que
+    retornaba None a secas."""
+
+    class _Boom:
+        def to_signal(self):
+            raise RuntimeError("kaputt")
+
+    def _orch(self):
+        from vigia.sift.sift_orchestrator import SIFTOrchestrator
+        return SIFTOrchestrator(case_id="B089-TEST")
+
+    def test_crash_yields_unanalyzed_signal_not_none(self):
+        orch = self._orch()
+        sig = orch._to_signal_safe(self._Boom(), "memory")
+        assert sig is not None, (
+            "to_signal() crash devolvió None — el artefacto desaparece "
+            "del bundle sin marca unanalyzed (B-089/N14)"
+        )
+        assert sig.metadata.get("unanalyzed") is True
+        assert sig.metadata.get("signal_class") == "derived"
+        assert sig.z_score == 0.0 and sig.confidence == 0.0
+        assert sig.tool_name == "MEMORY_UNANALYZED"
+
+    def test_crash_still_counts_in_signal_drops(self):
+        # F8 se conserva: ambos mecanismos, contador + señal visible.
+        orch = self._orch()
+        orch._to_signal_safe(self._Boom(), "registry")
+        assert any("registry" in d for d in orch._signal_drops)
+
+    def test_unanalyzed_signal_never_counts_as_primary(self):
+        # La señal sintética no puede inflar el gate <3 (invariante F5/F7).
+        from vigia_agent import _is_primary_signal
+        orch = self._orch()
+        sig = orch._to_signal_safe(self._Boom(), "memory")
+        assert _is_primary_signal({"metadata": sig.metadata}) is False
+
+    def test_healthy_result_path_unchanged(self):
+        orch = self._orch()
+        healthy = type("R", (), {"to_signal": lambda self: _sig(
+            "MEMORY_FORENSICS", 2.0, artifact_type="memory")})()
+        sig = orch._to_signal_safe(healthy, "memory")
+        assert sig is not None and sig.tool_name == "MEMORY_FORENSICS"
+        assert not sig.metadata.get("unanalyzed")
+        assert orch._signal_drops == []
+
+    def test_derived_conversion_crash_does_not_emit_stub(self):
+        # Doctrina F7: los crashes de motores DERIVADOS (síntesis sobre
+        # señales ya emitidas) no marcan artefactos sin analizar — "falló
+        # una síntesis" no es "evidencia sin analizar" y no puede degradar
+        # NOISE→ABSTAIN. El drop sí se contabiliza (F8).
+        orch = self._orch()
+        for engine in ("timeline", "resonance", "metabolic",
+                       "behavioral", "patterns", "adversarial"):
+            assert orch._to_signal_safe(self._Boom(), engine) is None, engine
+        assert len(orch._signal_drops) == 6
+
+
+class TestB090EmptyTimelineExcludedFromGates:
+    """B-090 (P2-E): UNIFIED_TIMELINE emite señal derivada aun con
+    timestamps=0. Verificado contra HEAD: la señal SÍ se emite (z=0), pero
+    el wiring la marca signal_class=derived (F5) y _is_primary_signal la
+    excluye del gate <3 y del override L-036. Cerrado como RESUELTO-por-F5;
+    este pin reproduce el caso exacto de la auditoría para que el tag no se
+    pierda en el wiring."""
+
+    def _empty_timeline_signal(self):
+        from vigia.sift.unified_timeline_engine import UnifiedTimelineEngine
+        from vigia.sift.sift_orchestrator import SIFTOrchestrator
+        sigs = [_sig("MEMORY_FORENSICS", 2.0), _sig("BROWSER_FORENSICS", 1.0)]
+        tl = UnifiedTimelineEngine().build_timeline(sigs)  # sin timestamps
+        return SIFTOrchestrator._mark_derived(tl.to_signal())
+
+    def test_empty_timeline_is_emitted_but_derived(self):
+        sig = self._empty_timeline_signal()
+        assert sig is not None
+        assert sig.metadata.get("signal_class") == "derived"
+
+    def test_empty_timeline_never_counts_as_primary(self):
+        from vigia_agent import _is_primary_signal
+        sig = self._empty_timeline_signal()
+        assert _is_primary_signal({"metadata": sig.metadata}) is False
+
+    def test_counterfactual_without_f5_tag_would_count(self):
+        # Documenta POR QUÉ el tag es imprescindible: sin él, la timeline
+        # vacía contaría como primaria (el hueco que P2-E temía).
+        from vigia_agent import _is_primary_signal
+        assert _is_primary_signal(
+            {"metadata": {"artifact_type": "timeline"}}) is True
+
+    def test_signal_stats_gate_excludes_empty_timeline(self):
+        # Gate real: 2 primarias + timeline vacía derivada = n_primary 2 (<3).
+        sig = self._empty_timeline_signal()
+        results = {"signals": [
+            _sig_dict("MEMORY_FORENSICS", 2.0),
+            _sig_dict("BROWSER_FORENSICS", 1.0),
+            {"tool": "UNIFIED_TIMELINE", "z_score": sig.z_score,
+             "metadata": sig.metadata},
+        ]}
+        n_primary, _ = _signal_stats(results)
+        assert n_primary == 2
+
+    def test_none_metadata_signal_does_not_crash_timeline(self):
+        # B-093 (hallazgo adyacente en la reproducción de B-090):
+        # metadata=None es legal en SignalOutput; sin el guard, UNA señal sin
+        # metadata crasheaba build_timeline entero y el wiring tragaba el
+        # error — la timeline desaparecía del bundle en silencio. Test
+        # escrito ROJO contra el engine sin guard.
+        from vigia.sift.unified_timeline_engine import UnifiedTimelineEngine
+        sigs = [
+            SignalOutput(tool_name="MEMORY_FORENSICS", value=0.4,
+                         z_score=2.0, confidence=0.7, metadata=None),
+            _sig("BROWSER_FORENSICS", 1.0, artifact_type="browser"),
+        ]
+        tl = UnifiedTimelineEngine().build_timeline(sigs)
+        sig = tl.to_signal()
+        assert sig is not None
+        assert sig.metadata.get("total_events") == 2
+
+
+class TestShimMobileUnanalyzed:
+    """B-089 alcance restante (N14, superficie shim): un crash de un analyzer
+    mobile en /sift_orchestrator.py::_analyze_mobile hacía desaparecer TODA la
+    evidencia mobile sin marca — el caso caía al orquestador real con 0
+    señales y sellaba n_unanalyzed_artifacts=0 (medido pre-fix: verdict
+    UNDETERMINED, "0 artefactos sin analizar" con el 100% de la evidencia sin
+    analizar). Tests escritos ROJOS contra el shim log-only.
+
+    Doctrina: el marcador es dict (formato de señal del shim), z=0,
+    unanalyzed=True, signal_class=derived — visible en el bundle y en
+    n_unanalyzed_artifacts, invisible para los gates. El veredicto NO cambia
+    (ABSTAIN en ambos mundos); cambia la trazabilidad de la pérdida (§5.3).
+    """
+
+    def _shim(self):
+        import importlib, sift_orchestrator as shim_mod
+        return shim_mod.SIFTOrchestrator(case_id="N14-SHIM-TEST")
+
+    def _crash_macos(self):
+        from unittest.mock import patch
+        return patch(
+            "vigia.sift.macos_forensics.MacOSForensicsAnalyzer.analyze",
+            side_effect=RuntimeError("kaputt"),
+        )
+
+    def test_mobile_crash_emits_unanalyzed_marker(self):
+        with self._crash_macos():
+            r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        markers = [s for s in r.get("signals", [])
+                   if (s.get("metadata") or {}).get("unanalyzed")]
+        assert markers, (
+            "crash del analyzer macOS no dejó marcador — la evidencia "
+            "mobile desapareció del bundle (N14 superficie shim)"
+        )
+        m = markers[0]
+        assert m["tool"] == "MACOS_UNANALYZED"
+        assert m["z_score"] == 0.0
+        assert m["metadata"]["signal_class"] == "derived"
+        assert "kaputt" in m["metadata"]["error"]
+
+    def test_mobile_crash_counts_in_signal_stats(self):
+        # El marcador debe llegar a n_unanalyzed_artifacts vía la misma vía
+        # que el orquestador real (results.unanalyzed_artifacts).
+        with self._crash_macos():
+            r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        n_primary, n_unanalyzed = _signal_stats(r)
+        assert n_primary == 0
+        assert n_unanalyzed >= 1, (
+            f"n_unanalyzed={n_unanalyzed} — el bundle vuelve a afirmar '0 "
+            f"artefactos sin analizar' con toda la evidencia sin analizar"
+        )
+
+    def test_mobile_crash_verdict_stays_abstain(self):
+        # Invariante del fix: NO cambia el veredicto (era ABSTAIN vía
+        # UNDETERMINED con 0 señales; sigue ABSTAIN) — solo la trazabilidad.
+        with self._crash_macos():
+            r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        n_primary, n_unanalyzed = _signal_stats(r)
+        v = classify_agent_verdict(r.get("abduction", {}), n_primary, n_unanalyzed)
+        assert v == "ABSTAIN"
+
+    def test_mobile_crash_narrative_mentions_loss(self):
+        with self._crash_macos():
+            r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        narrative = str(r.get("abduction", {}).get("narrative", ""))
+        assert "[FIRSTNESS-LOSS]" in narrative, (
+            "la narrativa no menciona la pérdida de evidencia mobile"
+        )
+        # Sin contradicción clase N12: el marcador NO puede contarse como
+        # señal extraída ni listarse como engine que analizó.
+        assert "0 señales mobile analizadas" in narrative
+        assert "engines: MACOS_UNANALYZED" not in narrative
+
+    def test_healthy_mobile_has_no_marker(self):
+        r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        markers = [s for s in r.get("signals", [])
+                   if (s.get("metadata") or {}).get("unanalyzed")]
+        assert markers == []
+        n_primary, n_unanalyzed = _signal_stats(r)
+        assert n_primary == 1 and n_unanalyzed == 0
+
+    def test_mixed_path_merge_carries_marker(self, tmp_path):
+        # Camino mixto: EBS-JSON + crash mobile → el marcador sobrevive el
+        # merge y n_unanalyzed lo ve.
+        import json as _json
+        case = {"case_id": "N14-MIX", "artifacts": [{
+            "artifact_id": "A1", "evidence_type": "log_entry",
+            "source_tool": "t", "description": "d", "raw_score": 0.4,
+            "prior_trust": 0.8, "timestamp": "2026-01-01T00:00:00Z",
+            "provenance_chain": ["acq"], "metadata": {},
+        }]}
+        p = tmp_path / "case.json"
+        p.write_text(_json.dumps(case))
+        with self._crash_macos():
+            r = self._shim().analyze(
+                log_path=str(p), macos_evidence_path="cases/tuck-2019-macos")
+        markers = [s for s in r.get("signals", [])
+                   if (s.get("metadata") or {}).get("unanalyzed")]
+        assert markers and markers[0]["tool"] == "MACOS_UNANALYZED"
+        _, n_unanalyzed = _signal_stats(r)
+        assert n_unanalyzed >= 1
+
+    def test_marker_never_triggers_mobile_escalation(self):
+        # z=0: el marcador no puede disparar la escalación del merge (>3).
+        import sift_orchestrator as shim_mod
+        marker = shim_mod._unanalyzed_marker("macos", RuntimeError("x"))
+        base = {"signals": [], "abduction": {"best_hypothesis": "NO_ANOMALY_DETECTED"},
+                "pipeline_meta": {}}
+        merged = shim_mod.SIFTOrchestrator._merge_mobile_signals(base, [marker])
+        assert merged["abduction"]["best_hypothesis"] == "NO_ANOMALY_DETECTED"
+        assert "mobile_escalation" not in merged["abduction"]

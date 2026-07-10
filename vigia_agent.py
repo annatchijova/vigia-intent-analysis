@@ -101,6 +101,24 @@ def _is_primary_signal(s: Any) -> bool:
     return meta.get("signal_class") != "derived" and not meta.get("unanalyzed")
 
 
+def _accuracy_validation(signals: Any) -> bool:
+    """
+    F8 (N13, B-088): flag sans_compliance.accuracy_validation. Los adaptadores
+    del shim (vol3, EBS-JSON, mobile) etiquetan la herramienta como `source`
+    mientras los módulos SIFT nativos emiten `tool` — se aceptan ambos para no
+    producir un falso negativo de compliance en bundles de camino adaptador.
+    Fail-closed: sin señales, o cualquier señal sin herramienta o sin z_score,
+    el flag es False.
+    """
+    return bool(
+        signals
+        and all(
+            (s.get("tool") or s.get("source")) and s.get("z_score") is not None
+            for s in signals
+        )
+    )
+
+
 def _signal_stats(results: Dict[str, Any]) -> Tuple[int, int]:
     """
     Retorna (n_primary_signals, n_unanalyzed_artifacts) de un resultado de
@@ -157,10 +175,20 @@ def classify_agent_verdict(
     """
     hyp = str(abduction.get("best_hypothesis") or "").upper()
 
+    # §9.4-LIM (enforcement firmado 2026-07-10): techo de veredicto declarado
+    # por el productor de la abducción (hoy: shim mobile-only cuando la
+    # evidencia fuerte está TODA confinada al canal D3 — sin triangulación,
+    # la multiplicidad de dominios lógicos no es corroboración independiente).
+    # Solo CAPEA hacia abajo (MALICE/INTENT → SUSPICION); nunca eleva un
+    # ABSTAIN/NOISE. Campo ausente o valor no reconocido → byte-idéntico al
+    # comportamiento previo (fail-safe). SUSPICION comparte EXIT_INTENT (3),
+    # contrato documentado "3=intent/suspicion" — el cap no des-alerta.
+    _ceiling = str(abduction.get("verdict_ceiling") or "").upper()
+
     if "MALICIOUS" in hyp or "CRITICAL" in hyp or "OVERRIDE" in hyp:
-        return "MALICE"
+        return "SUSPICION" if _ceiling == "SUSPICION" else "MALICE"
     if "INTENT" in hyp or "SUSPICION" in hyp:
-        return "INTENT"
+        return "SUSPICION" if _ceiling == "SUSPICION" else "INTENT"
     # B-058 FIX (auditoría de invariantes 2026-07-03): match por SUBSTRING,
     # no solo exacto. El adaptador EBS emite "ABSTAIN_DETECTED" (expected==
     # ABSTAIN), que NO estaba en ABSTAIN_HYPOTHESES → caía a NOISE (exit 0):
@@ -186,12 +214,18 @@ def classify_agent_verdict(
 _VERDICT_EXIT = {
     "MALICE":  EXIT_MALICE,
     "INTENT":  EXIT_INTENT,
+    # §9.4-LIM: SUSPICION comparte el exit de INTENT — el contrato documentado
+    # ya dice "3=intent/suspicion". Sin entrada explícita caería al fallback
+    # EXIT_ABSTAIN (4): un downgrade de alerting que el cap NO debe causar.
+    "SUSPICION": EXIT_INTENT,
     "ABSTAIN": EXIT_ABSTAIN,
     "NOISE":   EXIT_NOISE,
 }
 _VERDICT_LABEL = {
     "MALICE":  "EVIL FOUND",
     "INTENT":  "INTENT/SUSPICION DETECTED",
+    "SUSPICION": "SUSPICION DETECTED (verdict ceiling §9.4-LIM — D3-only, "
+                 "sin triangulación; se recomienda segunda fuente D2/D4/D5)",
     "ABSTAIN": "ABSTAIN — could not determine (insufficient/unanalyzed evidence)",
     "NOISE":   "NO EVIL DETECTED",
 }
@@ -948,6 +982,16 @@ class VIGIAAgent:
                     f" CAIE: {_caie_summary.get('verdict')} "
                     f"({_caie_summary.get('fractures_detected', 0)} fractura(s))."
                 )
+            elif _caie_summary.get("source") == "motor_live_caie":
+                # B-094: la CAIE viva del scorer no produce un verdict CAIE
+                # separado, pero SUS fracturas movieron el veredicto — la
+                # SECONDNESS debe decirlo, no afirmar "sin desviación".
+                _nf = _caie_summary.get("fractures_detected", 0)
+                _fb = _caie_summary.get("fracture_malice_boost", "0")
+                secondness += (
+                    f" CAIE (viva): {_nf} fractura(s) cross-artefacto "
+                    f"contribuyeron al veredicto (boost +{_fb})."
+                )
             elif _caie_status == "ERROR":
                 secondness += " CAIE: ERROR — correlación cross-artefacto no disponible."
         narrative_parts.append(secondness)
@@ -999,7 +1043,28 @@ class VIGIAAgent:
         # its output in results["results"]["caie"].  Until this fix, the
         # agent never read it — fractures were computed but invisible.
         caie = inner.get("caie", {}) if isinstance(inner, dict) else {}
-        if caie and caie.get("status") == "OK":
+        if caie and caie.get("status") == "OK" and caie.get("source") == "motor_live_caie":
+            # B-094: CAIE viva del scorer (path motor). Fiel: reporta fracturas
+            # + boost, sin fabricar structural_verdict/composite que el scorer
+            # no computó por separado.
+            narrative_parts.append("--- CAIE (Cross-Artifact Incongruence Engine — motor) ---")
+            narrative_parts.append(
+                f"  Fractures: {caie.get('fractures_detected', 0)} "
+                f"| Malice boost aplicado: +{caie.get('fracture_malice_boost', '0')}"
+            )
+            for f in caie.get("fractures", []):
+                _ftype = f.get("type", "?")
+                _sev = f.get("severity", "?")
+                _interp = str(f.get("interpretation", ""))[:120]
+                _ttp = f.get("ttp_id", "")
+                _ttp_tag = f" [{_ttp}]" if _ttp else ""
+                narrative_parts.append(
+                    f"  Fracture: {_ftype} severity={_sev}{_ttp_tag} — {_interp}"
+                )
+            if caie.get("daubert_note"):
+                narrative_parts.append(f"  {caie['daubert_note'][:200]}")
+            narrative_parts.append("")
+        elif caie and caie.get("status") == "OK":
             n_fractures = caie.get("fractures_detected", 0)
             caie_verdict = caie.get("verdict", "NOISE")
             composite = caie.get("composite_score", "0")
@@ -1111,7 +1176,7 @@ class VIGIAAgent:
                     "Individual z-scores below threshold. Full signal review "
                     "recommended. Alert floored (B-028/B-065)."
                 )
-        elif _final_verdict == "INTENT" and alert.startswith("LOW"):
+        elif _final_verdict in ("INTENT", "SUSPICION") and alert.startswith("LOW"):
             alert = (
                 "MEDIUM — INTENT verdict with individual z-scores below "
                 "threshold. Alert floored (B-028/B-065): an intent finding "
@@ -1199,15 +1264,8 @@ class VIGIAAgent:
             "sans_compliance": {
                 # FIX P1-5: real verifications instead of hardcoded True flags
                 "self_correction": self.iteration > 0 or len(self.corrections_applied) > 0,
-                # F8 (N13): los adaptadores del shim (vol3, EBS-JSON, mobile)
-                # etiquetan la herramienta como "source" — aceptar ambos.
-                "accuracy_validation": bool(
-                    results.get("signals")
-                    and all(
-                        (s.get("tool") or s.get("source"))
-                        and s.get("z_score") is not None
-                        for s in results.get("signals", [])
-                    )
+                "accuracy_validation": _accuracy_validation(
+                    results.get("signals", [])
                 ),
                 "analytical_reasoning": bool(
                     results.get("abduction", {}).get("narrative")

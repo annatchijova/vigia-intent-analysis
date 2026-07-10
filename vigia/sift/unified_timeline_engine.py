@@ -90,10 +90,13 @@ class UnifiedTimelineEngine:
         for signal in signals:
             ts = self._extract_timestamp(signal)
             entity = self._extract_entity(signal)
+            # B-093: mismo guard isinstance que _extract_timestamp/_entity —
+            # metadata no-dict (no solo None) tampoco puede crashear el loop.
+            meta = signal.metadata if isinstance(signal.metadata, dict) else {}
 
             event = TimelineEvent(
                 timestamp=ts,
-                source=signal.metadata.get("artifact_type", "unknown"),
+                source=meta.get("artifact_type", "unknown"),
                 event_type=signal.tool_name,
                 description=f"{signal.tool_name}: z={signal.z_score}",
                 entity_id=entity,
@@ -126,19 +129,23 @@ class UnifiedTimelineEngine:
 
     def _extract_timestamp(self, signal: SignalOutput) -> int:
         """Extrae timestamp de la metadata del signal."""
-        meta = signal.metadata
+        # B-093: metadata=None es legal en SignalOutput (default del contrato
+        # EBS v1) — sin el guard, UNA señal sin metadata crasheaba
+        # build_timeline entero y el wiring tragaba el error: la timeline
+        # desaparecía del bundle en silencio.
+        meta = signal.metadata if isinstance(signal.metadata, dict) else {}
         ts_str = meta.get("timestamp", meta.get("last_execution", "1970-01-01T00:00:00Z"))
         try:
             return _parse_iso_timestamp(ts_str)
         except ValueError:
             # FIX P2: Timestamp inválido no detiene el pipeline
-            if hasattr(signal, 'metadata'):
+            if isinstance(signal.metadata, dict):
                 signal.metadata["timestamp_invalid"] = True
             return 0
 
     def _extract_entity(self, signal: SignalOutput) -> str:
         """Extrae identificador de entidad del signal."""
-        meta = signal.metadata
+        meta = signal.metadata if isinstance(signal.metadata, dict) else {}
         pid = meta.get("pid", meta.get("PID", 0))
         if pid:
             return f"pid:{pid}"

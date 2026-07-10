@@ -30,7 +30,7 @@ import json
 
 import pytest
 
-from vigia.tools.caie import classify_domain
+from vigia.tools.caie import classify_domain, classify_domain_subband
 from vigia_scorer import _vigia_score
 
 
@@ -239,3 +239,95 @@ class TestMonotonicityPreserved:
         r = _score(_case(arts))
         doms = r.get("r43_domain_scores", {})
         assert len([d for d, s in doms.items() if float(s) > 0]) == 3
+
+
+# ── 5. B-092 — banda mobile en _DOMAIN_MAP (gap §9.1-b de MACOS_MODULES_DESIGN) ─
+
+class TestMobileBandDomainMap:
+    """B-092: los 8 tipos mobile de EVIDENCE_PROFILES no tenían entrada en
+    _DOMAIN_MAP — quedaban en banda UNKNOWN, EXENTOS del decay de cola R4-3.
+    El vector de drowning de BREAK-014 seguía abierto para la vía mobile:
+    medido pre-fix, 100× web_search raw 0.85 daba 0.9900 (crecimiento sin
+    límite) y 100× web_search raw 0.05 FABRICABA SUSPICION 0.3566 con ruido
+    puro. Tests escritos ROJOS contra el mapa sin la banda.
+
+    Asignación (MACOS_MODULES_DESIGN §9.1-b, principio rector TAXA §1 — el
+    canal de fabricación, no el contenido): registros locales en disco
+    editables en user-space → D3; social_media es registro del lado del
+    servicio (no fabricable editando el disco local) → D4.
+
+    Alcance: B-092 garantiza la saturación del COMPOSITE y la eliminación de
+    dominios fantasma. NO cierra las ramas del gate B-068 que no dependen del
+    dominio: location_data (spoofability 0.30, en el borde <=0.30) sigue
+    contando como tipo duro para la rama hard-mass, y un mix D3+D4
+    (web_search + social_media) sigue abriendo la rama cross-domain — ambos
+    residuales medidos y documentados en B-092 (BUGS_PENDIENTES)."""
+
+    MOBILE_D3 = ("web_search", "app_data", "contact_data", "call_log",
+                 "sms", "chat_message", "location_data")
+
+    def test_mobile_band_has_domain_entries(self):
+        for et in self.MOBILE_D3:
+            dom, band = classify_domain_subband(et)
+            assert (dom, band) == ("filesystem_metadata", "D3"), (
+                f"{et}: {(dom, band)} — banda mobile sin dominio (B-092)"
+            )
+        assert classify_domain_subband("social_media") == \
+            ("network_telemetry", "D4")
+
+    def test_every_profiled_type_has_domain_entry(self):
+        # Guard de deriva (causa raíz de B-092): un tipo calibrado en
+        # EVIDENCE_PROFILES pero ausente de _DOMAIN_MAP cae a banda UNKNOWN
+        # → exento de saturación + dominio fantasma en el gate. Este guard
+        # convierte la próxima omisión en un test rojo en vez de un vector
+        # abierto. "default" es el único exento legítimo (fallback interno,
+        # no un evidence_type real emitido por casos).
+        from vigia.tools.caie import EVIDENCE_PROFILES, _DOMAIN_MAP
+        unmapped = sorted(t for t in EVIDENCE_PROFILES if t not in _DOMAIN_MAP)
+        assert unmapped == ["default"], (
+            f"tipos calibrados sin dominio de recolección (re-abre B-092): "
+            f"{[t for t in unmapped if t != 'default']}"
+        )
+
+    def test_web_search_flood_saturates_like_break014(self):
+        # Curva plana: la cola más allá de la posición 10 no puede aportar
+        # casi nada (pre-fix: s100 - s10 = +0.4446, crecimiento libre).
+        def flood(n, raw):
+            return [_art("web_search", raw=raw, aid=f"W{i}") for i in range(n)]
+        s10 = float(_score(_case(flood(10, 0.85)))["score"])
+        s50 = float(_score(_case(flood(50, 0.85)))["score"])
+        s100 = float(_score(_case(flood(100, 0.85)))["score"])
+        assert s100 - s10 < 0.10, (
+            f"cola 10→100 aporta {s100 - s10:.4f} — web_search no satura"
+        )
+        assert s100 - s50 < 0.005, (
+            f"cola 50→100 aporta {s100 - s50:.4f} — sin asíntota"
+        )
+
+    @pytest.mark.parametrize("etype", ["web_search", "app_data", "location_data"])
+    def test_pure_mobile_noise_cannot_buy_suspicion(self, etype):
+        # Análogo exacto de test_pure_noise_volume_cannot_buy_suspicion:
+        # 100 artefactos de raw 0.05 sin uno solo decisivo. Pre-fix,
+        # web_search daba SUSPICION 0.3566 fabricada por volumen.
+        # location_data cubre el tipo DURO de la banda (spoof 0.30): el
+        # ruido puro tampoco alimenta la rama hard-mass del gate.
+        noise = [_art(etype, raw=0.05, aid=f"N{i}") for i in range(100)]
+        r = _score(_case(noise))
+        assert r["verdict"] == "NOISE", (
+            f"100 {etype} de raw 0.05: {r['verdict']} "
+            f"score={r['score']} — ruido mobile compra SUSPICION"
+        )
+
+    def test_monotonicity_preserved_for_mobile(self):
+        # M2-1 sobre la banda nueva: agregar evidencia mobile incriminatoria
+        # (cada vez más débil) nunca baja el score.
+        base = [_art("web_search", raw=0.6, aid="M0")]
+        s_prev = float(_score(_case(copy.deepcopy(base)))["score"])
+        for i, raw in enumerate([0.5, 0.3, 0.1, 0.05], start=1):
+            base.append(_art("web_search", raw=raw, aid=f"M{i}"))
+            s = float(_score(_case(copy.deepcopy(base)))["score"])
+            assert s >= s_prev - 1e-9, (
+                f"agregar web_search #{i} (raw={raw}) bajó el score: "
+                f"{s_prev} → {s}"
+            )
+            s_prev = s

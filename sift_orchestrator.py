@@ -94,6 +94,72 @@ if not Path(_VOL3).exists():
     _VOL3 = "vol3"
 
 
+def _unanalyzed_marker(engine: str, error: Exception) -> Dict[str, Any]:
+    """
+    B-089 (N14, superficie shim): marcador de artefacto mobile NO ANALIZADO
+    cuando su analyzer crashea — el equivalente dict del `_unanalyzed_signal`
+    F7 del orquestador real. z=0 y signal_class=derived: no cuenta para
+    gates ni escalación del merge; solo hace visible la pérdida (0 hallazgos
+    sobre evidencia no analizada NO es evidencia de benignidad).
+    """
+    return {
+        "tool": f"{engine.upper()}_UNANALYZED",
+        "z_score": 0.0,
+        "confidence": 0.0,
+        "value": 0.0,
+        "metadata": {
+            "artifact_type": engine,
+            "unanalyzed": True,
+            "signal_class": "derived",
+            "error": f"{type(error).__name__}: {error}"[:200],
+        },
+    }
+
+
+def _motor_caie_summary(motor: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    B-094: traduce la CAIE viva del scorer (_vigia_score) al shape que la
+    narrativa del agente consume en `results["caie"]` — el mismo canal que
+    B-041a abrió para la CAIE del orquestador. Sin esto, un veredicto no-NOISE
+    causado por una fractura queda sin explicación en la narrativa sellada
+    (anti-patrón Daubert). Devuelve None si el motor no reportó fracturas
+    (nada que surfacear; la narrativa no inventa un bloque CAIE vacío).
+
+    Fiel a lo que el scorer computó: NO fabrica un structural_verdict ni un
+    composite CAIE separado (el scorer aplica un boost al composite global, no
+    corre el veredicto estructural completo del orquestador). Reporta las
+    fracturas reales y el boost aplicado.
+    """
+    if not isinstance(motor, dict):
+        return None
+    details = motor.get("caie_fracture_details") or []
+    n = int(motor.get("caie_fractures", 0) or 0)
+    if n <= 0 and not details:
+        return None
+    boost = motor.get("fracture_malice_boost", 0.0)
+    fractures = [
+        {
+            "type": f.get("fracture_type", "?"),
+            "severity": f.get("severity", "?"),
+            "interpretation": f.get("interpretation", ""),
+            "ttp_id": f.get("ttp_id", ""),
+        }
+        for f in details if isinstance(f, dict)
+    ]
+    return {
+        "status": "OK",
+        "source": "motor_live_caie",
+        "fractures_detected": n,
+        "fractures": fractures,
+        "fracture_malice_boost": str(boost),
+        "daubert_note": (
+            f"{n} fractura(s) CAIE viva(s) contribuyeron al veredicto "
+            f"(boost +{boost} aplicado al composite del scorer). "
+            f"Fuente: vigia_scorer._vigia_score (B-094)."
+        ),
+    }
+
+
 def _mobile_hypothesis(mobile_signals: List[Dict[str, Any]]) -> tuple:
     """
     F6 (AUDITORIA_PIPELINE_ROBUSTEZ, N5): deriva la hipótesis mobile de los
@@ -132,6 +198,67 @@ def _mobile_hypothesis(mobile_signals: List[Dict[str, Any]]) -> tuple:
         hypothesis = "MOBILE_EVIDENCE_ANALYZED"
     is_conclusive = max_z > Fraction(3, 1)
     return hypothesis, max_z, is_conclusive, n_critical
+
+
+# §9.4-LIM (decisión sellada 2026-07-10, opción (ii) pura + extensión de
+# narrativa): texto doctrinal EXACTO para la clase D3_RICH_NO_TRIANGULATION.
+_D3_TRIANGULATION_NOTE = (
+    "[§9.4-LIM] SUSPICION — evidencia de filesystem robusta y multi-vector, "
+    "pero confinada a un único canal físico (D3). El motor NO puede confirmar "
+    "MALICE sin una segunda fuente independiente (memoria, red, o contenido). "
+    "Se recomienda triangulación manual urgente antes de descartar el caso."
+)
+
+
+def _mobile_suspicion_class(mobile_signals: List[Dict[str, Any]],
+                            max_z: Fraction) -> str:
+    """
+    §9.4-LIM: clasifica la situación probatoria de la ruta mobile-only en dos
+    clases que hoy son indistinguibles para el analista humano:
+
+      "GENERIC"                  — poca evidencia / ambigüedad real.
+      "D3_RICH_NO_TRIANGULATION" — anomalías fuertes pero TODAS confinadas al
+                                   canal físico D3 (filesystem local); por
+                                   doctrina (ii) el motor no puede escalar sin
+                                   una segunda fuente independiente (D2/D4/D5).
+
+    Regla exacta (docs/B052_P2_DESIGN.md §10):
+      cond2 := >=1 señal analizada (unanalyzed no cuenta)
+               AND todas las analizadas resuelven dominio D3
+                   (evidence_type|artifact_type → _EVIDENCE_MAP → _DOMAIN_MAP)
+               AND max_z > 3   (mismo umbral crítico que _mobile_hypothesis)
+               AND >=2 finding_types distintos (unión sobre señales)
+
+    Fail-closed: dominio no resoluble o mapas no importables → GENERIC.
+    SOLO clasifica — no toca hypothesis, score ni veredicto (narrativa +
+    pipeline_meta; gate comparativo 0 flips pineado en tests).
+    """
+    try:
+        from vigia.core.forensic_adapter import _EVIDENCE_MAP
+        from vigia.tools.caie import _DOMAIN_MAP
+    except Exception:
+        return "GENERIC"
+
+    analyzed = [s for s in mobile_signals
+                if not (s.get("metadata") or {}).get("unanalyzed")]
+    if not analyzed or max_z <= Fraction(3, 1):
+        return "GENERIC"
+
+    finding_types: set = set()
+    for s in analyzed:
+        meta = s.get("metadata") or {}
+        ev = meta.get("evidence_type")
+        if not ev:
+            at = str(meta.get("artifact_type", "")).lower()
+            ev = _EVIDENCE_MAP.get(at)
+        domain = _DOMAIN_MAP.get(str(ev).lower()) if ev else None
+        if not domain or domain[1] != "D3":
+            return "GENERIC"
+        finding_types.update(str(t) for t in (meta.get("finding_types") or []))
+
+    if len(finding_types) < 2:
+        return "GENERIC"
+    return "D3_RICH_NO_TRIANGULATION"
 
 
 class SIFTOrchestrator:
@@ -203,8 +330,27 @@ class SIFTOrchestrator:
             # fija MOBILE_EVIDENCE_ANALYZED clasificaba NOISE aunque hubiera
             # hallazgos z>3. Narrativa Peircean de 3 capas (F4).
             hypothesis, max_z, is_conclusive, n_critical = _mobile_hypothesis(mobile_signals)
-            _engines = sorted({str(s.get("tool", "?")) for s in mobile_signals})
+            # B-089: los marcadores *_UNANALYZED no son engines que analizaron
+            # — el inventario FIRSTNESS lista solo señales reales; la pérdida
+            # va en [FIRSTNESS-LOSS] (contradicción clase N12 si se mezclan).
+            _engines = sorted({
+                str(s.get("tool", "?")) for s in mobile_signals
+                if not (s.get("metadata") or {}).get("unanalyzed")
+            })
             _posterior = min(max_z / Fraction(5, 1), Fraction(99, 100))
+            # B-089 (N14 shim): artefactos mobile cuyo analyzer crasheó —
+            # visibles en results.unanalyzed_artifacts (misma vía que el
+            # orquestador real) para que _signal_stats/narrativa los vean.
+            _unanalyzed_types = sorted({
+                str((s.get("metadata") or {}).get("artifact_type",
+                                                  s.get("tool", "?")))
+                for s in mobile_signals
+                if (s.get("metadata") or {}).get("unanalyzed")
+            })
+            _n_analyzed = len(mobile_signals) - sum(
+                1 for s in mobile_signals
+                if (s.get("metadata") or {}).get("unanalyzed")
+            )
 
             # B-052 P1 (AUDITORIA_MACOS_NARRATIVA.md §4): FIRSTNESS con el
             # detalle real de hallazgos por engine (los metadata ya lo traen),
@@ -223,6 +369,37 @@ class SIFTOrchestrator:
                     _bit += f" [{', '.join(str(t) for t in _ftypes[:4])}]"
                 _finding_bits.append(_bit)
 
+            # §9.4-LIM: clase de SUSPICION — narrativa + pipeline_meta, y
+            # (enforcement firmado 2026-07-10) techo de veredicto: cuando la
+            # evidencia fuerte está TODA confinada a D3, el veredicto sellado
+            # se capea en SUSPICION vía abduction.verdict_ceiling (el cap lo
+            # aplica classify_agent_verdict, el camino único de sellado). La
+            # hipótesis cruda del engine NO se falsea — patrón REFUTATION
+            # GATE: autocorrección pre-emisión, documentada en la narrativa.
+            _susp_class = _mobile_suspicion_class(mobile_signals, max_z)
+            _ceiling_fields: Dict[str, Any] = {}
+            _gate_log = ""
+            if (_susp_class == "D3_RICH_NO_TRIANGULATION"
+                    and hypothesis in ("INTENT_DETECTED",
+                                       "MALICIOUS_INTENT_DETECTED")):
+                _ceiling_fields = {
+                    "verdict_ceiling": "SUSPICION",
+                    "verdict_ceiling_reason": (
+                        "§9.4-LIM: evidencia fuerte confinada al canal D3 "
+                        "(sin triangulación D2/D4/D5) — techo doctrinal "
+                        "SUSPICION (L-051)."
+                    ),
+                }
+                _gate_log = (
+                    "\nREFUTATION GATE LOG — §9.4-LIM\n"
+                    f"  Candidato : {hypothesis} (max_z={float(max_z):.2f})\n"
+                    "  Gate      : techo D3-only sin triangulación "
+                    "(verdict_ceiling=SUSPICION, L-051)\n"
+                    "  Resultado : candidato CAPEADO pre-emisión → el "
+                    "veredicto sellado es SUSPICION. La hipótesis cruda se "
+                    "preserva arriba; el LLM no puede anular este gate."
+                )
+
             result = {
                 "case_id": self.case_id,
                 "signals": mobile_signals,
@@ -232,12 +409,20 @@ class SIFTOrchestrator:
                     "confidence": str(_posterior),
                     "best_posterior": str(_posterior),
                     "narrative": (
-                        f"[FIRSTNESS] Mobile forensic evidence analyzed: "
-                        f"{len(mobile_signals)} signal(s) extracted "
-                        f"(engines: {', '.join(_engines)})."
+                        (f"[FIRSTNESS] Mobile forensic evidence analyzed: "
+                           f"{_n_analyzed} signal(s) extracted "
+                           f"(engines: {', '.join(_engines)})."
+                           if _n_analyzed else
+                           "[FIRSTNESS] 0 señales mobile analizadas.")
                         + (f" Hallazgos: {'; '.join(_finding_bits)}."
                            if _finding_bits else "") + "\n"
-                        f"[SECONDNESS] Max z-score: "
+                        + (f"[FIRSTNESS-LOSS] {len(_unanalyzed_types)} "
+                           f"artefacto(s) mobile NO analizado(s) — analyzer "
+                           f"crasheó: {', '.join(_unanalyzed_types)}. 0 "
+                           f"hallazgos sobre evidencia no analizada NO es "
+                           f"evidencia de benignidad.\n"
+                           if _unanalyzed_types else "")
+                        + f"[SECONDNESS] Max z-score: "
                         f"{float(max_z):.2f}; señales críticas (z>3): {n_critical}.\n"
                         f"[THIRDNESS] Hipótesis: {hypothesis}. "
                         + ("Anomalía estructural en evidencia mobile — revisión prioritaria."
@@ -252,16 +437,30 @@ class SIFTOrchestrator:
                         "Esto es una limitación de diseño documentada "
                         "(B-052, AUDITORIA_MACOS_NARRATIVA.md), no un error "
                         "de pipeline."
+                        + ("\n" + _D3_TRIANGULATION_NOTE
+                           if _susp_class == "D3_RICH_NO_TRIANGULATION" else "")
+                        + _gate_log
                     ),
+                    **_ceiling_fields,
                 },
+                "results": (
+                    {"unanalyzed_artifacts": _unanalyzed_types}
+                    if _unanalyzed_types else {}
+                ),
                 "pipeline_meta": {
                     "source": "mobile_forensics_adapter",
                     "n_mobile_signals": len(mobile_signals),
+                    "n_mobile_unanalyzed": len(_unanalyzed_types),
                     "n_total_signals": len(mobile_signals),
                     "max_mobile_z": str(max_z),
                     # B-052 P1: estado del razonador explícito y consultable —
                     # distingue "no corrió por diseño" de "corrió y falló".
                     "abductive_reasoner": "NOT_RUN_MOBILE_SINGLE_SOURCE",
+                    # §9.4-LIM: GENERIC | D3_RICH_NO_TRIANGULATION — consultable
+                    # por el analista sin parsear la narrativa.
+                    "suspicion_class": _susp_class,
+                    # enforcement del techo (True solo cuando el cap se declaró)
+                    "s94_lim_enforced": bool(_ceiling_fields),
                 },
             }
             return result
@@ -417,6 +616,7 @@ class SIFTOrchestrator:
                     )
             except Exception as e:
                 logger.error("[SIFT_SHIM] AndroidForensicsAnalyzer failed: %s", e)
+                signals.append(_unanalyzed_marker("android", e))
 
         ios_path = kwargs.get("ios_evidence_path")
         # B-048 precedence: if the same directory also matched macOS strong
@@ -456,6 +656,7 @@ class SIFTOrchestrator:
                     )
             except Exception as e:
                 logger.error("[SIFT_SHIM] iOSForensicsAnalyzer failed: %s", e)
+                signals.append(_unanalyzed_marker("ios", e))
 
         # B-046: Google Takeout forensics
         takeout_path = kwargs.get("takeout_evidence_path")
@@ -485,6 +686,7 @@ class SIFTOrchestrator:
                     )
             except Exception as e:
                 logger.error("[SIFT_SHIM] GoogleTakeoutForensicsAnalyzer failed: %s", e)
+                signals.append(_unanalyzed_marker("takeout", e))
 
         # B-048: macOS forensics
         macos_path = kwargs.get("macos_evidence_path")
@@ -514,6 +716,7 @@ class SIFTOrchestrator:
                     )
             except Exception as e:
                 logger.error("[SIFT_SHIM] MacOSForensicsAnalyzer failed: %s", e)
+                signals.append(_unanalyzed_marker("macos", e))
 
         return signals
 
@@ -538,6 +741,27 @@ class SIFTOrchestrator:
         if "n_total_signals" in meta:
             meta["n_total_signals"] = meta["n_total_signals"] + len(mobile_signals)
         result["pipeline_meta"] = meta
+
+        # B-089 (N14 shim): los marcadores *_UNANALYZED del camino mobile
+        # entran a results.unanalyzed_artifacts del resultado base — la vía
+        # que _signal_stats/narrativa consumen (misma forma que el
+        # orquestador real: lista ordenada de artifact_type).
+        _mob_unanalyzed = sorted({
+            str((s.get("metadata") or {}).get("artifact_type",
+                                              s.get("tool", "?")))
+            for s in mobile_signals
+            if (s.get("metadata") or {}).get("unanalyzed")
+        })
+        if _mob_unanalyzed:
+            inner = result.get("results")
+            if not isinstance(inner, dict):
+                inner = {}
+                result["results"] = inner
+            existing_unanalyzed = inner.get("unanalyzed_artifacts") or []
+            inner["unanalyzed_artifacts"] = sorted(
+                set(existing_unanalyzed) | set(_mob_unanalyzed)
+            )
+            meta["n_mobile_unanalyzed"] = len(_mob_unanalyzed)
 
         hypothesis, max_z, _concl, n_critical = _mobile_hypothesis(mobile_signals)
         abduction = result.get("abduction")
@@ -681,6 +905,8 @@ class SIFTOrchestrator:
             "confidence": confidence,
             "is_conclusive": is_conclusive,
             "resolve_meta": resolve_meta,
+            # B-094: CAIE viva del scorer — se surfacéa en el bundle/narrativa.
+            "caie_summary": _motor_caie_summary(motor),
         }
 
     def _analyze_ebs_json(self, json_path: str) -> Dict[str, Any]:
@@ -780,7 +1006,11 @@ class SIFTOrchestrator:
         }
         if resolve_meta is not None:
             pipeline_meta["resolve"] = resolve_meta
-        return {
+        # B-094: surfacear la CAIE viva del scorer en results["caie"] — el
+        # canal que vigia_agent._generate_narrative consume (inner.get("caie")).
+        # Solo en modo motor y solo si hubo fracturas (el helper devuelve None
+        # si no hay nada que explicar).
+        _out: Dict[str, Any] = {
             "case_id": case_id, "signals": signals,
             "abduction": {
                 "best_hypothesis": hypothesis,
@@ -791,6 +1021,10 @@ class SIFTOrchestrator:
             },
             "pipeline_meta": pipeline_meta,
         }
+        _caie_summary = resolved.get("caie_summary") if mode == "motor" and resolved else None
+        if _caie_summary:
+            _out["results"] = {"caie": _caie_summary}
+        return _out
 
     def _analyze_memory_vol3(self, memory_path: str) -> Dict[str, Any]:
         """Análisis de memoria con Volatility3 — no requiere rip.pl."""

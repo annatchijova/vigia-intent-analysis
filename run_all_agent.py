@@ -148,6 +148,17 @@ def extract_verdict_from_bundle(bundle_path: Path) -> str:
     }
     try:
         data = json.loads(bundle_path.read_text())
+        # 0. B10 (B-058): el campo top-level `agent_verdict` es el veredicto
+        #    SELLADO — la salida de classify_agent_verdict, el camino único que
+        #    sella el bundle y decide el exit (CLAUDE.md). Es POST-gate: cuando la
+        #    auto-correccion pre-emision de VIGIA ajusta el veredicto del reasoner,
+        #    `agent_verdict` y `best_hypothesis` (pre-gate) divergen. Leerlo directo
+        #    evita re-derivar el equivocado. Solo se acepta si es un veredicto
+        #    canonico conocido; cualquier otra cosa (None, legacy, vocabulario
+        #    futuro) cae a la heuristica de abajo, preservando la compatibilidad.
+        sealed = data.get("agent_verdict")
+        if isinstance(sealed, str) and sealed in _MAP:
+            return _MAP[sealed]
         # 1. Campo verdict directo (audit_trail entry)
         for entry in data.get("audit_trail", {}).get("entries", []):
             if entry.get("action") == "AGENT_EXIT":

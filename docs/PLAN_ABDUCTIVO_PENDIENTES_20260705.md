@@ -93,11 +93,11 @@ estanca en ambas direcciones). Cada verificación cita `archivo:línea`.
 | B3 | B-016 residual | portar detector de magic-number/stderr a `memory_forensics.py` (motor V4) — verificado ausente | 1 h |
 | B4 | B-018 residual | `VIGIA_VOL3_TIMEOUT` env var + escalado por tamaño, registrado en `pipeline_meta` — verificado ausente | 1-2 h |
 | B5 | B-059 | módulo único `vigia/core/enfsi.py` (~40 líneas) — verificado inexistente; 3 implementaciones divergen | 2 h + decisión de escala |
-| B6 | B-060 (fase registro) | `ARTIFACT_TYPE_REGISTRY` único o test que falle si un `artifact_type` no está en todos los mapas — verificado inexistente | 2 h |
+| B6 | B-060 (fase registro) | `ARTIFACT_TYPE_REGISTRY` único o test que falle si un `artifact_type` no está en todos los mapas — verificado inexistente | 2 h — **RESUELTO 2026-07-10** (variante test de enforcement; `tests/test_b6_artifact_type_map_consistency.py`. Cazó y cerró un gap ACTIVO: `windows_event_log`→DISK_MFT en vez de REGISTRY. Ver B-096 + `docs/B6_ARTIFACT_TYPE_REGISTRY_DESIGN.md`; gate 0 flips/291) |
 | B7 | B-061 | unificar clamp vs rechazo de `confidence` en ambas rutas | 1 h |
 | B8 | A-1 | verificador de `daubert_record_hash` (hoy se crea y nunca se verifica) o documentar como anchor manual | 1-2 h |
 | B9 | A-2 | `deactivate_honey_token` / expiry — verificado inexistente | 1 h |
-| B10 | B-058 recomendación | comparador de `run_all_agent.py` lee `agent_verdict` sellado, no re-deriva | 1 h |
+| B10 | B-058 recomendación | comparador de `run_all_agent.py` lee `agent_verdict` sellado, no re-deriva | 1 h — **RESUELTO 2026-07-10** (`extract_verdict_from_bundle` + `run_llm_cases._fallback_verdict` leen el sellado; 60/209 bundles del corpus divergían, 0 tras el fix; ver B-095 en BUGS_PENDIENTES.md) |
 | B11 | Higiene de trackers (S-4) | cerrar B-017 (campo), B-040; actualizar AUDITORIA_REDTEAM (cuerpo vs updates); matices NPS exec summary + NARCOS `is_conclusive`; TDUNGAN bundle huérfano; `.sha256` faltantes en `srl2018/` | 1-2 h |
 
 ### Grupo C — Cobertura de test mobile (AUDITORIA_COBERTURA_MOBILE_SIFT)

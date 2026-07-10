@@ -13,8 +13,8 @@
 
 De las cuatro familias objetivo, hoy solo Safari History está parcialmente cubierta por
 `vigia/sift/macos_forensics.py`; plists solo en su subconjunto de persistencia
-(LaunchAgents/Daemons + login items); FSEvents es un TODO comentado
-(`macos_forensics.py:346-350`); Spotlight aparece como marker (`.Spotlight-V100`,
+(LaunchAgents/Daemons + login items); FSEvents **ya implementado** (2026-07-10, `vigia/sift/fsevents_parser.py` +
+`_analyze_fsevents`, ver §4); Spotlight aparece como marker (`.Spotlight-V100`,
 `macos_forensics.py:103`) pero **no existe ningún método de análisis**; y Chrome-en-macOS
 está **excluido explícitamente** (`macos_forensics.py:303-305`, `if "Safari" not in str(db): continue`).
 
@@ -305,7 +305,7 @@ Cobertura actual vs objetivo:
 | LaunchAgents/LaunchDaemons | ✅ `_analyze_launch_plists` (`:865-948`) | mantener |
 | `com.apple.loginitems.plist` | ✅ `_analyze_loginitems_plists` (`:950-983`) | mantener |
 | `SystemVersion.plist`, `nvram.plist` (SIP) | ✅ | mantener |
-| `Bookmarks.plist` / `LastSession.plist` (Safari) | ❌ (en el corpus quedaron QUARANTINED, ver §6) | bplist plano + NSKeyedArchiver |
+| `Bookmarks.plist` / `LastSession.plist` (Safari) | ✅ **IMPLEMENTADO: Safari plists (2026-07-10)** — bplist plano; NSKeyedArchiver degrada honesto | `_analyze_safari_plists` |
 | Recent items `*.sfl2` | ❌ | NSKeyedArchiver → rutas de documentos recientes |
 | `com.apple.TimeMachine.plist` | ❌ | **exclusiones de backup = anti-forense** (T1490-adyacente) |
 | `com.apple.Bluetooth.plist`, `com.apple.airport.preferences.plist` | ❌ | dispositivos emparejados / redes conocidas (correlación) |
@@ -418,6 +418,22 @@ La lógica de detección de LaunchAgents ya existe y se **migra** (no se duplica
 ---
 
 ## 4. Módulo 3 — FSEvents
+
+> **ESTADO: IMPLEMENTADO (2026-07-10).** Parser autocontenido en
+> `vigia/sift/fsevents_parser.py` (DLS1/DLS2, gzip, techo S5, degradación
+> honesta ante DLS3/corrupción) cableado en `macos_forensics._analyze_fsevents`.
+> Detecciones: borrado masivo (`ANTIFORENSIC_FSEVENTS_MASS_DELETION`,
+> T1070.004), purga de papelera (`ANTIFORENSIC_FSEVENTS_TRASH_PURGE`, T1485),
+> rutas sospechosas (`FSEVENTS_SUSPICIOUS_PATH`, T1564). Los dos primeros usan
+> corr_group `antiforensic` (listos como dominio B-052-P2). NO se implementa
+> detección de gap por secuencia de event_id (los IDs no son contiguos — sería
+> overclaim). 18 tests (`test_fsevents_parser.py`), 0 flips de corpus (0 casos
+> macOS rutean al engine), tuck-2019 sin cambio (no tiene `.fseventsd`).
+> **Nota de calibración pendiente (doctrina, no incluida):** un borrado masivo
+> FSEvents standalone queda en z=1.2 en la escalera agregada actual (mismo
+> trato que `ANTIFORENSIC_QUARANTINE_EMPTY`); darle una rama propia es una
+> decisión de recalibración acoplada a B-052-P2, no tomada aquí.
+
 
 ### 4.1 Formato del artefacto real
 
@@ -559,6 +575,14 @@ nunca mágica inline.
 ---
 
 ## 5. Módulo 4 — Spotlight metadata
+
+> **ESTADO: IMPLEMENTADO (2026-07-10, Fase 1).** `_analyze_spotlight`:
+> `com.apple.spotlight.Shortcuts[.v3]` (consultas tecleadas → findings
+> `SPOTLIGHT_SUSPICIOUS_QUERY` [corr_group spotlight_intent] /
+> `ANTIFORENSIC_SPOTLIGHT_QUERY` [antiforensic]); `store.db` (.Spotlight-V100)
+> se registra PRESENTE pero NO analizado (Fase 1 — binario propietario; nota
+> honesta '0 hallazgos aquí NO es benignidad'). Fase 2 (store.db via
+> spotlight_parser gated) pendiente. 7 tests (`test_macos_spotlight.py`).
 
 ### 5.1 Formato del artefacto real
 
@@ -831,7 +855,8 @@ SQLite de historial ni un plist la tienen. **Propuesta: D3.** No son D4 aunque
 **(b) Gap pre-existente — la banda mobile completa está fuera de `_DOMAIN_MAP`:**
 TAXA declara "53/53 tipos del corpus + los 6 tipos definidos en `EVIDENCE_PROFILES`
 que el corpus aún no usa. Ningún tipo queda en UNKNOWN" (§4). Pero `EVIDENCE_PROFILES`
-define además la banda mobile calibrada (`caie.py:296-303`): `chat_message`, `sms`,
+define además la banda mobile calibrada (bloque mobile de `EVIDENCE_PROFILES`,
+`caie.py`): `chat_message`, `sms`,
 `call_log`, `web_search`, `app_data`, `social_media`, `location_data`,
 `contact_data` — **8 tipos sin entrada en `_DOMAIN_MAP`**, censo hecho sobre
 `data/cases/` donde no aparecen. No es una incoherencia introducida por este diseño:
@@ -861,6 +886,20 @@ fuente es telemetría de operador; `social_media` → D4 (registro del lado del
 servicio, no fabricable editando el disco local) o D5-soft si llega como captura
 interpretativa. Cada asignación requiere la corrida comparativa de corpus (misma
 advertencia B-052).
+
+> **CERRADO — B-092 (2026-07-09):** este follow-up se implementó con el protocolo
+> completo (test rojo primero, gate comparativo B-069 sobre los 199 casos: 0 flips
+> de verdict, 0 flips de score — 199/199 resultados idénticos, pass-rate invariante
+> en 167/199). Los 8 tipos mobile tienen entrada en `_DOMAIN_MAP`: los 7 registros
+> locales → D3, `social_media` → D4. Curva post-fix plana (flood web_search raw
+> 0.85: 0.3776 → 0.3903 → 0.3903) y el ruido puro vuelve a NOISE para los tres
+> tipos representativos medidos. Las consecuencias (1) saturación y (2) dominios
+> fantasma quedan eliminadas. **Residuales de gate que B-092 NO cierra** (medidos,
+> ver "Alcance restante" de B-092): `location_data` sigue abriendo la rama
+> hard-mass (spoof 0.30 en el borde ≤0.30 — 4× raw 0.85 → MALICE) y un mix D3+D4
+> (`web_search`+`social_media`) sigue abriendo la rama cross-domain; ambos son
+> doctrina de calibración pendiente, no regresiones. Ver B-092 en
+> `BUGS_PENDIENTES.md` y `tests/test_r4_3_domain_saturation.py::TestMobileBandDomainMap`.
 
 ### 9.2 Corrección de expectativa: gate v2 supersede el análisis de §1.4
 
@@ -901,11 +940,12 @@ documento de diseño.
 | `registry_key` | D3 | ✅ coherente (explícito en TAXA §4 y `_DOMAIN_MAP`) |
 | `file_metadata` (×2 usos) | D3 | ✅ coherente (explícito) |
 | `usn_journal` / `usn_journal_gap` | D3 (capa dura) | ✅ coherente (explícito; alimentan rama hard-mass) |
-| `web_search` | hoy `UNKNOWN` — propuesto D3 | ⚠️ gap pre-existente de la banda mobile en `_DOMAIN_MAP` (§9.1-b) |
-| `app_data` | hoy `UNKNOWN` — propuesto D3 | ⚠️ mismo gap (§9.1-b) |
+| `web_search` | D3 | ✅ coherente — gap §9.1-b **cerrado por B-092** (2026-07-09) |
+| `app_data` | D3 | ✅ coherente — gap §9.1-b **cerrado por B-092** (2026-07-09) |
 
-Diseño sin cambios. Dos follow-ups fuera de alcance: (1) completar la banda mobile en
-`_DOMAIN_MAP` (§9.1-b); (2) al implementar B-052-P2, validar con la corrida
-comparativa que las señales macOS D3 no queden dobles-castigadas por decay de cola
-intra-D3 + `noisy_or_correlated` intra-módulo (la misma advertencia de triple castigo
-de TAXA §5.3 aplica una capa más arriba).
+Diseño sin cambios. Follow-up (1) — completar la banda mobile en `_DOMAIN_MAP` —
+**cerrado por B-092** (ver recuadro en §9.1-b). Queda fuera de alcance el follow-up
+(2): al implementar B-052-P2, validar con la corrida comparativa que las señales
+macOS D3 no queden dobles-castigadas por decay de cola intra-D3 +
+`noisy_or_correlated` intra-módulo (la misma advertencia de triple castigo de TAXA
+§5.3 aplica una capa más arriba).

@@ -2501,7 +2501,7 @@ This pre-existing trust_decay is correct behaviour (not a bug).
 
 ---
 
-## B-041 — CAIE output not surfaced in vigia_agent.py narrative [PARTIAL FIX]
+## B-041 — CAIE output not surfaced in vigia_agent.py narrative [RESOLVED: B-041a applied; B-041b superseded by B-075/B-076]
 
 **Date:** 2026-06-30
 **Severity:** Medium
@@ -2521,14 +2521,41 @@ The result is stored in `results["caie"]` and IS returned in the dict. The real 
 surfaces verdict, structural verdict, composite score, per-fracture details (type, severity,
 golden rule / structural tags), and Daubert note.
 
-**Automatic INTENT→MALICE upgrade (B-041b) — DEFERRED:** Audit on MAGNET-2020-WINDOWS and
-MAGNET-2022-WINDOWS shows CAIE produces INCONCLUSIVE with 0 fractures — all artifacts are
-single-layer (`log_entry`), no cross-layer fractures possible. CDL downgrades to INCONCLUSIVE
-(coverage 16.7%). Automatic upgrade would be dead code until the pipeline produces multi-layer
-artifacts (memory_process, prefetch, kernel_structure in addition to log_entry).
+### Re-verification 2026-07-10 (abductive method) — B-041b SUPERSEDED by B-075/B-076
 
-**Files touched:** `vigia_agent.py` — `_generate_narrative()` (CAIE reading added)
-**Tests:** 188 passed, 6 xfailed, 0 regressions.
+B-041b was diagnosed against the OLD path where CAIE ran in
+`sift_orchestrator.run_full_analysis` AFTER abduction, its result parked in
+`results["caie"]` without feeding the verdict. B-075/B-076 (later) made the
+label-blind scorer `vigia_scorer._vigia_score` the authoritative verdict
+source, and THAT scorer already couples fractures to the verdict pre-emission.
+Layers separated (daubert):
+
+- **OBSERVATION (reproducible induction, `tests/test_b041b_fracture_feedback.py`):**
+  the scorer recomputes CAIE live (B1, `vigia_scorer.py:611`) and applies
+  `fracture_malice_boost` (up to +0.5) to the composite at `vigia_scorer.py:1053`.
+  Measured: a pair identical except for a `TEMPORAL_CAUSALITY_VIOLATION` →
+  control NOISE 0.0701 / boost 0.0 vs fractured SUSPICION 0.5058 / boost 0.45.
+  On an already-corroborated base (≥4 hard): score 0.7828 → **0.99** with the
+  same fracture. `MALICIOUS_FRACTURE_TYPES` (`vigia_scorer.py:956`) include
+  FALSE_FLAG_PATTERN, TCV, CRYPTOGRAPHIC_INCONSISTENCY, MFT_ENTRY_ANOMALY,
+  USN_JOURNAL_GAP.
+- **INFERENCE:** the mechanism B-041b asked for exists, in a better form
+  (continuous, deterministic, pre-emission) than the discrete INTENT→MALICE
+  upgrade proposed.
+- **"Dead code" REFUTED:** on the real multi-layer corpus (NPS-2009, NGDC-001,
+  NROMANOFF) CAIE emits **0 fractures** — but that is correct (none contain
+  fabrication artifacts), not a dead mechanism: it fires on genuine violations
+  (induction above). Absence-on-corpus ≠ broken-mechanism.
+- **B-041a** (CAIE visible in narrative): applied (above). **B-041b** (fracture
+  → verdict): superseded. B-041 closes; the `[PARTIAL FIX]` label was stale.
+
+Scope not covered (possible follow-up, NOT part of B-041): the
+`sift_orchestrator` CAIE (narrative) and the scorer's live CAIE (verdict) are
+computed separately — if they diverged, the narrative could surface fractures
+the verdict did not consume (N12-class incongruence). Not verified here.
+
+**Files touched:** `vigia_agent.py` — `_generate_narrative()` (CAIE reading added, B-041a);
+`tests/test_b041b_fracture_feedback.py` — B-041b closure pin (2026-07-10).
 
 ---
 
@@ -3213,11 +3240,11 @@ Clamp the argument to `±LOG_LR_EXP_CAP = 700.0` before `math.exp`:
 
 ---
 
-## B-052 — Mobile/macOS engines: single aggregated signal bypasses the AbductiveReasoner [P1 FIXED / P2 PENDING]
+## B-052 — Mobile/macOS engines: single aggregated signal bypasses the AbductiveReasoner [P1 FIXED / P2 CLOSED BY DOCTRINE — NOT ADOPTED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | P1 (honest narrative) FIXED — 2026-07-03; P2 (granularity) PENDING |
+| **Status** | P1 (honest narrative) FIXED — 2026-07-03; **P2 CLOSED 2026-07-10 — NOT ADOPTED per sealed decision §9.4 (pure option (ii), collective + Anna's signature)**: the logical-domain split manufactures corroboration — all macOS domains are D3, the same physical channel. SUSPICION is the doctrinal ceiling for D3-only cases (**L-051 / §9.4-LIM**). The split implementation remains as historical record on branch `claude/b052-p2-domain-signals-xk5ecq` (`c5c8d38`+`a74d360`, **DO NOT MERGE**); `densidad_causal_D3` discarded by pre-registered experiment (r=0.9185, fail-closed grey zone). Implemented mitigation: `suspicion_class` (GENERIC \| D3_RICH_NO_TRIANGULATION) in narrative + pipeline_meta, text only (`docs/B052_P2_DESIGN.md` §10; 12 tests). |
 | **Severity** | MEDIUM — the v2 engine's Peircean narrative is unreachable for mobile evidence by design |
 | **Files** | `sift_orchestrator.py` (shim, mobile-only route); P2: `vigia/sift/{macos,ios,android,google_takeout}_forensics.py` |
 | **Detected** | `AUDITORIA_MACOS_NARRATIVA.md` (2026-07-03) |
@@ -4491,7 +4518,7 @@ agent_verdict), C1/C2 from the P0-001 census.
 
 ---
 
-## B-088 — `sans_compliance.accuracy_validation` requires key `tool`, shim adapters emit `source` [PENDING]
+## B-088 — `sans_compliance.accuracy_validation` requires key `tool`, shim adapters emit `source` [RESOLVED — already fixed by F8, verified and pinned]
 
 | Field | Value |
 |-------|-------|
@@ -4518,13 +4545,21 @@ with the SIFT-native modules before the compliance check runs. Needs a
 decision on which field name is canonical before patching (avoid re-opening a
 B-060-style adapter-mapping inconsistency).
 
-**Not yet applied.** Audit-before-patch not yet re-run against current HEAD;
-line numbers above are from the 2026-07-03 audit and should be re-verified
-before fixing.
+**Resolution (2026-07-10):** the audit-before-patch against HEAD found the
+fix ALREADY applied (F8): the expression accepted
+`(s.get("tool") or s.get("source"))` with the comment "F8 (N13) — accept
+both". This entry was stale relative to the code. Closed with protocol: the
+inline expression was extracted into the `_accuracy_validation()` helper
+(behavior-preserving, fail-closed on no signals or missing z_score) and pinned
+with 4 regression tests (`TestB088AccuracyValidationSourceAlias`). Surface
+verification on Mode 1: all 199 corpus bundles emit the correct flag (198
+True; 1 pre-existing legitimate False, identical in baseline). Comparative
+gate: 0 flips across verdict, score, accuracy_validation, n_primary,
+n_unanalyzed and n_total.
 
 ---
 
-## B-089 — `_to_signal_safe` silently drops signals on any `to_signal()` exception, no `unanalyzed` mark [PENDING]
+## B-089 — `_to_signal_safe` silently drops signals on any `to_signal()` exception, no `unanalyzed` mark [RESOLVED]
 
 | Field | Value |
 |-------|-------|
@@ -4552,11 +4587,46 @@ signal (same mechanism F7 already built for engine crashes) instead of
 returning bare `None`, so the artifact is visible in
 `unanalyzed_artifacts`/the narrative's "ARTEFACTOS NO ANALIZADOS" section.
 
-**Not yet applied.** Audit-before-patch not yet re-run against current HEAD.
+**Resolution (2026-07-10):** the audit against HEAD found a PARTIAL fix
+landed after the audit (F8: the drop is counted in
+`results["signal_conversion_drops"]` + `pipeline_meta`), but the central hole
+remained: `return None` → no `*_UNANALYZED` signal, so the artifact never
+entered `n_unanalyzed_artifacts` or the narrative. Fix applied exactly as this
+entry proposed: on a `to_signal()` exception, `_to_signal_safe` emits
+`self._unanalyzed_signal(method_name, ...)` (the F7 mechanism: z=0, conf=0,
+`unanalyzed=True`, `signal_class=derived` — invisible to the gates, visible in
+the bundle) and KEEPS the F8 counter. **Doctrinal distinction** (found by the
+code review of this very fix): the stub is emitted ONLY for PRIMARY engine
+conversions; DERIVED conversions (metabolic/resonance/behavioral/patterns/
+timeline/adversarial) keep the F8 counter without a stub — F7 never marked
+derived-engine crashes, and "a synthesis failed" is not "evidence left
+unanalyzed": a derived stub would degrade NOISE→ABSTAIN with no real evidence
+loss. Red-first tests (`TestB089ToSignalCrashVisible`, 5 tests: signal
+emitted, drop counted, never primary, healthy path untouched, derived without
+stub). Comparative gate over 199 cases: 0 flips across all 6 compared fields
+(the corpus produces no conversion crashes — the fix only changes failure
+behavior).
+
+**Remaining scope — CLOSED (2026-07-10, same protocol):** the root shim's
+mobile adapters (`/sift_orchestrator.py::_analyze_mobile`) now emit
+`_unanalyzed_marker(engine, e)` in their 4 `except` blocks (F7-shaped dict:
+z=0, `unanalyzed=True`, `signal_class=derived`). Measured pre-fix: an
+analyzer crash with mobile-only evidence fell through to the real
+orchestrator with 0 signals and sealed `UNDETERMINED` with
+**`n_unanalyzed_artifacts: 0`** — the bundle claimed "0 unanalyzed artifacts"
+with 100% of the evidence unanalyzed. Post-fix: the mobile-only branch
+exposes `results.unanalyzed_artifacts` (the same path `_signal_stats`
+consumes), the narrative adds `[FIRSTNESS-LOSS]`, and `_merge_mobile_signals`
+carries the markers into the base result on the mixed path. **The verdict
+does NOT change** (ABSTAIN in both worlds — verified via
+`classify_agent_verdict`); what changes is loss traceability (§5.3). The z=0
+marker cannot trigger the merge escalation (threshold >3, pinned by test).
+7 red-first tests (`TestShimMobileUnanalyzed`). Comparative gate over 199
+cases: 0 flips across verdict/score/n_primary/n_unanalyzed/n_total.
 
 ---
 
-## B-090 — UNIFIED_TIMELINE emits a derived signal even when `timestamps=0` [PENDING]
+## B-090 — UNIFIED_TIMELINE emits a derived signal even when `timestamps=0` [RESOLVED — by F5, verified with reproduction]
 
 | Field | Value |
 |-------|-------|
@@ -4589,8 +4659,44 @@ zero-timestamp case. If the derived tag already excludes it, close as
 RESOLVED-by-F5 and update this entry. If not, gate `UNIFIED_TIMELINE` signal
 emission on `timestamps>0`, or ensure the `derived` tag is applied here too.
 
-**Not yet applied.** Needs verification-before-patch per this tracker's own
-discipline — this entry documents the gap, not a confirmed live bug.
+**Resolution (2026-07-10):** re-verified against HEAD with the exact
+reproduction this entry required (signals WITHOUT timestamps →
+`build_timeline` → `to_signal`): the signal IS emitted (z=0,
+`total_events>0`), but the wiring (`sift_orchestrator.py`, `_mark_derived` at
+the engine hookup) tags it `signal_class=derived` and `_is_primary_signal`
+excludes it from the `<3` gate and the L-036 override — the counterfactual
+without the tag returns `True` (the exact hole P2-E feared). **Closed as
+RESOLVED-by-F5**, pinned with 4 dedicated tests (+1 shared with B-093) in
+`TestB090EmptyTimelineExcludedFromGates`, including the real gate via
+`_signal_stats` (2 primaries + empty timeline = n_primary 2).
+
+Adjacent finding during the reproduction → **B-093** (`metadata=None` crashed
+`build_timeline`; the timeline silently vanished from the bundle).
+
+---
+
+## B-093 — `UnifiedTimelineEngine` crashes on `metadata=None` and the timeline silently vanishes from the bundle [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-10), red test first |
+| **Severity** | P3 — robustness; the timeline signal is derived (no verdict impact), but its loss was silent |
+| **File** | `vigia/sift/unified_timeline_engine.py` (`_extract_timestamp`, `_extract_entity`, `build_timeline`) |
+| **Detected** | B-090 reproduction (2026-07-10) — the empty-timeline test crashed on a legal signal |
+
+**Description:** `metadata=None` is the legal default of the `SignalOutput`
+contract (EBS v1), but `_extract_timestamp` / `_extract_entity` /
+`build_timeline` did `signal.metadata.get(...)` without a guard →
+`AttributeError`. The orchestrator wiring wraps `build_timeline` in a
+log-only `try/except`: ONE signal without metadata made the ENTIRE timeline
+vanish from the bundle with no mark — the same silent-loss class as N7/N14,
+one level up.
+
+**Fix:** `isinstance(signal.metadata, dict)` guard at the three access points
+(default `{}`). No behavior change for signals with metadata. Red test first
+(`TestB090EmptyTimelineExcludedFromGates::test_none_metadata_signal_does_not_crash_timeline`).
+Comparative gate over 199 cases: 0 flips (no corpus signal reaches the engine
+without metadata; the fix only covers the failure case).
 
 ---
 
@@ -4694,3 +4800,228 @@ last module on the legacy connection.
   JSON-encoded narratives — none routes a raw browser profile with a WAL
   sidecar, so this path cannot move the corpus either way. The discriminating
   evidence for the fix is the red test, per the same standard as B-071.
+---
+
+## B-093 — EVIDENCE_PROFILES mobile band missing from _DOMAIN_MAP: exempt from R4-3 tail decay [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-09), applied with comparative gate (B-069 pattern) |
+| **Severity** | P2 — the BREAK-014 drowning vector (L-049) remained open for the mobile path |
+| **File** | `vigia/tools/caie.py` (`_DOMAIN_MAP`), `tests/test_r4_3_domain_saturation.py` |
+| **Background** | `docs/MACOS_MODULES_DESIGN.md` §9.1-b (where the gap was detected and the mapping reasoned); `docs/TAXA_DOMINIOS_RECOLECCION.md` (census ran over `data/cases/`, where the mobile band never appears — "no type left in UNKNOWN" held only for the corpus) |
+| **Detection** | Remapping the macOS module design against TAXA v2: the 8 calibrated mobile types in `EVIDENCE_PROFILES` (`chat_message`, `sms`, `call_log`, `web_search`, `app_data`, `social_media`, `location_data`, `contact_data`) classified as `UNKNOWN:<type>` / band `UNKNOWN` |
+
+**Measured pre-fix consequences (both):**
+
+1. **Exempt from the R4-3 tail decay** (the saturation loop skips band
+   UNKNOWN): synthetic `web_search` flood at raw 0.85 → score 0.5454 (N=10),
+   0.9806 (N=50), **0.9900 (N=100)** — unbounded growth, the exact curve R4-3
+   killed for `log_entry`. Worse: **100× web_search at raw 0.05 (pure noise)
+   MANUFACTURED SUSPICION 0.3566** — the exact analogue of the
+   BASELINE_TRIPLE_CASTIGO finding ("50 logs of nothing manufactured
+   SUSPICION").
+2. **Pro-MALICE bias in the B-068 v2 gate**: each `UNKNOWN:<type>` counts as
+   its own domain — `UNKNOWN:web_search` + `UNKNOWN:app_data` + D3 = 3
+   "domains" for artifacts that actually share one fabrication channel (local
+   disk, user-space), cheapening the cross-domain branch.
+
+**Fix (assignment by fabrication mode, TAXA §1 — the channel, not the content):**
+`web_search`, `app_data`, `contact_data`, `call_log`, `sms`, `chat_message`,
+`location_data` → `("filesystem_metadata", "D3")` — local on-disk records
+written by user-space apps, forgeable by editing the file (a loop inserts N
+SQLite rows; no per-artifact cost, no tamper evidence). `social_media` →
+`("network_telemetry", "D4")` — service-side record, not forgeable by editing
+the local disk. `location_data` note: the type covers the device-local cache;
+carrier telemetry must be typed separately, not by reclassifying this type.
+
+**Acceptance criteria (all met):**
+- 4 red-first tests (`TestMobileBandDomainMap`): classification of all 8
+  types, flat flood curve, pure noise → NOISE, M2-1 monotonicity ✓
+- Post-fix curve FLAT: web_search raw 0.85 → 0.3776 / 0.3903 / **0.3903**
+  (N=10/50/100, D3 r=0.7 asymptote); raw 0.05 ×100 → **NOISE 0.0276** ✓
+- **Comparative gate (B-069) over all 199 cases: 0 verdict flips, 0 score
+  flips — all 199 results byte-identical; corpus pass-rate invariant at
+  167/199** — predicted (the mobile band never appears in the JSON corpus)
+  and verified with a clean baseline (fix stashed) vs after-run. Scope note:
+  precisely because the corpus never exercises the band, the gate only
+  proves NON-regression; positive coverage of the mapping comes from the
+  synthetic tests ✓
+- Full suite green ✓
+
+**Remaining scope (not covered by this fix — measured, not speculated):**
+
+1. **Mobile SIFT engines**: still emit ONE aggregated signal typed `app_data`
+   via `_EVIDENCE_MAP` (B-052-P2 pending); B-092 only guarantees that when
+   those signals (or future mobile EBS cases) reach the scorer, they saturate
+   and corroborate through the correct channel (D3) instead of phantom
+   UNKNOWN domains.
+2. **Hard-mass gate branch — `location_data`**: its calibrated spoofability
+   (0.30) sits exactly on the `<=0.30` boundary the hard-mass branch counts
+   as a hard type. Measured post-fix: 4× `location_data` raw 0.85 → **MALICE
+   0.3649** (×100 → MALICE 0.474 — the composite DOES saturate; the gate
+   still opens). Not a regression (pre-fix gave MALICE with a larger
+   composite), but B-092's closure covers the composite and the phantom
+   domains, NOT this branch. Resolving it is calibration doctrine (does
+   location_data deserve 0.30? should the boundary be strict?) — needs its
+   own comparative gate.
+3. **Cross-domain branch — D3+D4 mix**: 4× `web_search` + 4× `social_media`
+   raw 0.85 → **MALICE 0.5051** (2 real domains). Documented tension: the
+   `social_media` profile itself reads "Social app client cache — editable"
+   (locally forgeable), which argues D3; the D4 mapping follows the
+   service-side-record doctrine. If future calibration moves it to D3, this
+   vector collapses to 1 domain. Doctrine decision, needs its own gate.
+4. **Pure noise**: verified it feeds NO branch — 100× raw 0.05 → NOISE for
+   `web_search` (0.0276), `app_data` (0.0251) and `location_data` (0.0356,
+   the hard type). Pinned by a parametrized test.
+
+---
+
+## B-094 — Motor-path CAIE fractures move the verdict but are invisible in the sealed narrative [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-10), red test first + comparative gate |
+| **Severity** | P1 — Daubert anti-pattern: non-NOISE verdict with no explanation in the sealed bundle |
+| **File** | `vigia_scorer.py` (returns `caie_fracture_details`), `sift_orchestrator.py` (`_motor_caie_summary`, `_resolve_hypothesis`, `_analyze_ebs_json`), `vigia_agent.py` (`_generate_narrative`) |
+| **Detected** | B-041 closure (2026-07-10): red-team of the N12 divergence hypothesis between the orchestrator CAIE (narrative) and the scorer's live CAIE (verdict) |
+
+**Description (abductive + red-team method):** B-041a surfaced the ORCHESTRATOR
+CAIE (`results["caie"]`, disk/mixed path). But the MOTOR path (JSON/EBS, Mode 1
+default since B-075) runs its own live CAIE in `_vigia_score`, applies
+`fracture_malice_boost` to the composite, then **discarded all fracture info**:
+`_analyze_ebs_json` returned no `results["caie"]` and did not propagate
+`caie_fractures`/`fracture_malice_boost`.
+
+**Differential induction (CONFIRMED, `tests/test_b041b_fracture_feedback.py::TestB094...`):**
+a 2-artifact case where a `TEMPORAL_CAUSALITY_VIOLATION` is the ONLY path to
+non-NOISE:
+- WITH fracture → **INTENT**; WITHOUT (temporal order reversed) → **NOISE**.
+- Both bundles pre-fix: `caie_fractures`/`fracture_malice_boost` **absent**;
+  SECONDNESS **identical**: "no primary signal exceeds z>2 — no structural
+  deviation against baseline". The INTENT bundle did not explain its own cause —
+  the anti-pattern CLAUDE.md explicitly forbids ("MALICE without exact math is
+  divination").
+
+**Fix (visibility ONLY — the verdict already used the fracture):**
+1. `_vigia_score` returns `caie_fracture_details` (type/severity/interpretation/
+   ttp list) in addition to the count.
+2. `_motor_caie_summary()` translates the live CAIE into the shape the
+   narrative consumes (`inner["caie"]`, B-041a's channel), faithfully: reports
+   fractures + boost, does NOT fabricate a structural_verdict/composite the
+   scorer never computed.
+3. `_analyze_ebs_json` (motor mode, if fractures fired) exposes
+   `results["caie"]`; `_generate_narrative` renders it in SECONDNESS and a
+   `--- CAIE (motor) ---` block with fractures and their TTPs.
+
+**E2E verification (Mode 1):** the INTENT bundle now shows "CAIE (live): 1
+fracture(s) contributed to the verdict (boost +0.45)" and lists the TCV with
+severity=1.0, TTP T1070.006 and interpretation.
+
+**Comparative gate (B-069), 199 cases, clean baseline (fix stashed): 0 flips
+in verdict/score/n_primary/n_unanalyzed — 167/199 invariant.** The corpus emits
+0 fractures (no fabrication artifacts), so the fix is inert on it and only
+activates the narrative when a real fracture fires. 8 tests
+(`TestB094MotorPathSurfacesFractures` + E2E narrative pins). Suite 1150 passed.
+
+**Scope note:** the other arm of the N12 divergence (do the orchestrator CAIE
+and the scorer CAIE agree on the disk/mixed path?) is not exercised by the
+current corpus (all cases go through the JSON motor path) — not verified.
+
+---
+
+## B-095 — The batch comparator re-derives the verdict from `best_hypothesis` (pre-gate) instead of reading the sealed `agent_verdict` (post-gate) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-10 (closes Grupo B item B10, recommendation B-058) |
+| **Severity** | P2 |
+| **File** | `run_all_agent.py` (`extract_verdict_from_bundle`); `run_llm_cases.py` (`_fallback_verdict`) |
+| **Detected in** | `docs/PLAN_ABDUCTIVO_PENDIENTES_20260705.md` §Grupo B, item B10 |
+
+**Description:** both corpus comparators derived a sealed bundle's verdict by
+reading `pipeline_results.abduction.best_hypothesis` (or the audit_trail
+`AGENT_EXIT`) and mapping it via a table + prefix matching. Both are **pre-gate**
+— the reasoner's raw output. The top-level `agent_verdict` field is the
+**post-gate** verdict: the output of `classify_agent_verdict`, "the single path
+that seals agent_verdict and decides the exit" (CLAUDE.md). When VIGÍA's
+pre-emission self-correction adjusts the reasoner verdict (e.g. the corroboration
+gate lifts SUSPICION→INTENT, or drops to ABSTAIN on signal count), the two
+sources diverge and the comparator reports the wrong one.
+
+**Abductive method:**
+- *Hypothesis:* comparator re-derives pre-gate ⇒ divergence whenever the gate moves the verdict.
+- *Deduction:* a bundle with `agent_verdict="INTENT"` and `best_hypothesis="SUSPICION_DETECTED"` must report INTENT (real shape of `VIGIA-FN-001`).
+- *Induction:* measured over `results/agent_batch/` — **60 of 209 sealed bundles diverged** (dominant `sealed=INTENT → comparator=SUSPICION`; also `sealed=ABSTAIN/NOISE → comparator=UNKNOWN`). ~29% of VIGÍA's own verdicts misreported by the harness.
+
+**Forensic implication:** the pass/fail-vs-`expected_verdict` report printed by
+the batch runner was wrong for ~29% of cases — masking real detector hits and
+misses behind a heuristic derivation that did not match what VIGÍA actually
+sealed and exited on.
+
+**Fix (2026-07-10):** both comparators read the sealed `agent_verdict` first and
+accept it only if it is a known canonical verdict; anything else (None, legacy
+bundle without the field, future vocabulary) falls back to the previous
+heuristic, preserving byte-for-byte compatibility with the 82/291 legacy
+un-sealed bundles.
+
+**Verification:** red test first (`tests/test_b10_comparator_reads_sealed_verdict.py`,
+14 tests). E2E over the real corpus: **60 → 0 divergences** across the 209 sealed
+bundles; 82 legacy untouched. Full suite green. Product diff: +11 lines in
+`run_all_agent.py`, +7 in `run_llm_cases.py`; no scoring, gates, or corroboration
+doctrine touched.
+
+**Attached hygiene (B11):** removed `tests/test_audit_no_default_key (1).py`, a
+byte-identical duplicate of `tests/test_audit_no_default_key.py` (a " (1)" copy
+artifact) whose 12 tests ran twice.
+
+---
+
+## B-096 — `windows_event_log` missing from `_LAYER_MAP`/`_ONTOLOGY_MAP`: the primary event-log signal falls to DISK_MFT instead of REGISTRY [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-10 (closes Grupo B item B6; enforcement of the B-060 coupling) |
+| **Severity** | P2 |
+| **File** | `vigia/core/forensic_adapter.py` (`_LAYER_MAP`, `_ONTOLOGY_MAP`) |
+| **Detected in** | B6 — type-map consistency test (`docs/B6_ARTIFACT_TYPE_REGISTRY_DESIGN.md`) |
+
+**Description:** the `EventLogCorrelator` emits a **primary** signal with
+`metadata["artifact_type"] = "windows_event_log"`
+(`vigia/sift/sift_orchestrator.py:472`), but `_LAYER_MAP`/`_ONTOLOGY_MAP` only
+carried the key `"event_log"`. Without the key, `signal_to_abductive_record`
+did `_LAYER_MAP.get("windows_event_log", DISK_MFT)` → **DISK_MFT (weight 4/10)**
+when the treatment consistent with `"event_log"` is **REGISTRY (6/10)**.
+`abductive_reasoner_v2.py:396` uses `weight = LAYER_EPISTEMIC_WEIGHT[art.layer]`,
+so a Windows event log was under-weighted ~33% in the abductive layer of the
+on-disk path — exactly the silent-drift class B-060 (Lens 7/8) described: two
+map namespaces (`artifact_type` and `evidence_type`), several maps, and an
+uncovered type degrading to the worst default.
+
+**Abductive method:** the B6 enforcement test (the "test that fails if an emitted
+`artifact_type` is not in all maps" variant B-060 originally proposed) statically
+enumerated the types engines emit and diffed them against the maps. Of 7 unmapped
+types, 6 are derived z=0 / latent (harmless, grandfathered with justification);
+`windows_event_log` was the only **active** one — a primary signal with free z.
+
+**Blast radius:**
+- **Corpus JSON (motor): inert.** No corpus artifact (0/259) sets
+  `metadata.artifact_type`; the bridge populates `evidence_type` but not
+  `artifact_type`, so every motor signal falls to `"unknown"→DISK_MFT`, invariant
+  under adding the key. **Comparative gate (run_all_agent, stashed baseline vs
+  fix): 0 flips across 291 bundles** (verdict/n_primary/n_unanalyzed).
+- **On-disk path (SIFT orchestrator): corrected.** The only route where the gap
+  was active; with no on-disk event-log corpus case, it is covered by an
+  end-to-end unit test (`signal_to_abductive_record` → `layer == REGISTRY`).
+
+**Fix (2026-07-10):** add `"windows_event_log"` to `_LAYER_MAP` (→ `REGISTRY`)
+and `_ONTOLOGY_MAP` (→ `TECHNIQUE`), identical to `"event_log"`. Purely additive
+(no existing key modified).
+
+**Enforcement (B6):** `tests/test_b6_artifact_type_map_consistency.py` (10 tests):
+`_LAYER_MAP`≡`_ONTOLOGY_MAP`; `_EVIDENCE_MAP` closure into
+`EVIDENCE_PROFILES`∩`_DOMAIN_MAP`; every emitted `artifact_type`/`evidence_type`
+mapped or grandfathered with justification; grandfather honesty (no dead / no
+already-mapped entries). A new engine emitting an uncovered type now breaks the
+test instead of degrading silently. Does not close the structural coupling (two
+namespaces remain); closes the silent drift.

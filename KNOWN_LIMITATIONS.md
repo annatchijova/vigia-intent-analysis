@@ -849,7 +849,7 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-046 | Scorer non-monotonicity (M2-1/M2-2) | vigia_scorer.py | **RESOLVED** (B-081) |
 | L-047 | Bundle canonicalization v1 type collisions (Canon v2) | core/canonicalize.py | **RESOLVED** (B-082/R3-2) |
 | L-048 | Tool-log chain tail truncation (chain_tip_sha256) | core/tool_log_chain.py | **RESOLVED** (R3-5) |
-| L-049 | Spoofable-type flood saturates to MALICE (R4-3) | vigia_scorer.py | Documented (needs calibration doctrine) |
+| L-049 | Spoofable-type flood saturates to MALICE (R4-3) | vigia_scorer.py | Mitigated (B-091 tail decay + gate v2; mobile-band residual closed by B-092) |
 | L-050 | Non-finite fail-closed on value/z_score/confidence × 4 impls | ebs_v1.py, signal_contract.py | **RESOLVED** (B-083/B-083b) |
 | L-051 | Formal specification of arbitration contract (Axiom A1) — renumbered from shared L-029 | Scoring/CAIE precedence | [OPEN] — design gap, not a bug |
 | L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
@@ -1899,6 +1899,26 @@ random cases), R4-2 (no scorer-level artifact cap; per-artifact CAIE instantiati
 dominates cost — documented recommendation), R4-4 (`None`/non-dict `case` crashed with
 `AttributeError` → **FIXED** with a fail-loud `ERROR` guard).
 
+**Update 2026-07-07 (B-091 / R4-3):** the recommendation above was implemented as the
+per-collection-domain tail decay + the three-branch B-068 v2 gate (see B-091 in
+BUGS_PENDIENTES). The flood curve for every type mapped in `_DOMAIN_MAP` is now flat
+(`log_entry` ×10/50/100 → 0.1861/0.1866/0.1866) and a homogeneous soft-class flood can
+no longer open any MALICE branch.
+
+**Update 2026-07-09 (B-092) — mobile-band residual CLOSED:** the 8 mobile types of
+`EVIDENCE_PROFILES` (`chat_message`, `sms`, `call_log`, `web_search`, `app_data`,
+`social_media`, `location_data`, `contact_data`) had no `_DOMAIN_MAP` entry → band
+UNKNOWN → exempt from the tail decay, leaving this exact flood vector open for the
+mobile path (measured: 100× `web_search` raw 0.85 → 0.9900; 100× raw 0.05 pure noise
+manufactured SUSPICION 0.3566). Fixed by mapping the local-record types to D3 and
+`social_media` to D4; comparative gate over the 199-case corpus: 0 verdict flips,
+0 score flips (mobile band absent from the JSON corpus). Residuals B-092 does NOT
+close (measured, recorded in the B-092 entry): `location_data` (spoofability 0.30,
+on the `<=0.30` boundary) still opens the hard-mass gate branch (4× raw 0.85 →
+MALICE), and a D3+D4 mix (`web_search`+`social_media`) still opens the
+cross-domain branch — both calibration-doctrine questions, not regressions. See
+B-092 and `docs/MACOS_MODULES_DESIGN.md` §9.1-b.
+
 ---
 
 ## L-050 — Non-Finite (NaN / ±inf) Silently Admitted as Maximum-Severity Signal [RESOLVED]
@@ -1935,3 +1955,42 @@ verified by blocking Pydantic at import). Suite green, corpus 166/199, 0 verdict
 value is maximally incriminating." Fail-closed (reject the corrupt signal loudly) is the
 only defensible behavior — a silently-substituted `5.0` z-score is a fabricated CRITICAL
 finding with no evidentiary basis.
+
+---
+
+## L-051 — §9.4-LIM: SUSPICION es el techo doctrinal para casos macOS/mobile D3-only (decisión sellada, opción (ii) pura)
+
+**Sellado 2026-07-10 (colectivo + firma de Anna; ver `docs/B052_P2_DESIGN.md` §10).**
+
+Un caso cuya evidencia proviene únicamente del canal físico D3 (filesystem
+local del propio dispositivo — TODOS los dominios lógicos macOS/mobile:
+browser, antiforensic, persistence, quarantine, apps, fsevents, spotlight)
+no puede escalar más allá de SUSPICION por doctrina: los "múltiples dominios"
+comparten el mismo canal de fabricación, así que su multiplicidad NO
+constituye corroboración independiente. Quien controla el disco controla
+todas esas fuentes a la vez.
+
+- El split por dominios lógicos (B-052-P2) fue implementado, medido y
+  **rechazado** — rama `claude/b052-p2-domain-signals-xk5ecq`, NO mergeada,
+  preservada como registro.
+- La métrica alternativa `densidad_causal_D3` fue descartada por experimento
+  pre-registrado (Pearson r=0.9185 vs z, zona gris fail-closed).
+- Mitigación implementada (solo narrativa + `pipeline_meta`): la clase
+  `suspicion_class = D3_RICH_NO_TRIANGULATION` distingue en el bundle el
+  SUSPICION "evidencia fuerte confinada a D3, triangulación manual urgente"
+  del SUSPICION genérico (poca evidencia). Regla exacta y tests en
+  `docs/B052_P2_DESIGN.md` §10.2.
+- **Techo ENFORCED (firmado y aplicado 2026-07-10):** cuando la condición
+  D3-rico-sin-triangulación se cumple, el shim declara
+  `abduction.verdict_ceiling = "SUSPICION"` y `classify_agent_verdict` (el
+  camino único de sellado) capea MALICE/INTENT → **SUSPICION** pre-emisión
+  (patrón REFUTATION GATE: la hipótesis cruda del engine se preserva y el
+  gate queda logueado en la narrativa; el LLM no puede anularlo). SUSPICION
+  entra al espacio de veredictos sellados compartiendo `EXIT_INTENT`
+  (contrato documentado "3=intent/suspicion") y el piso de alerta de INTENT
+  — el cap no des-alerta. Gate comparativo del enforcement: 0 flips en 291
+  bundles, corpus 167/199 idéntico, output del runner byte-idéntico.
+
+**Criterio de cierre:** engines de canal D2/D4 para evidencia mobile
+(memoria/red del dispositivo), o validación con corpus real ≥50 casos
+macOS/mobile etiquetados.
