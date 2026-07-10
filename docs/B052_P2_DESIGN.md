@@ -166,6 +166,19 @@ cross-dominio**:
 - iOS `n_enc≥3 & data_min & hacking → 3.4` (apps Y pim Y browser)
 - Takeout `root_tool & susp_search & loc_gap → 3.0` (apps Y browser Y location)
 
+**MEDICIÓN CONCRETA (2026-07-10, `tests/test_macos_multidomain_integration.py`):**
+tras implementar los parsers FSEvents/Safari-plists/Spotlight (esta sesión), un
+caso macOS RICO (Safari exploit + bookmark exploit + FSEvents borrado masivo +
+Spotlight anti-forense + LaunchAgent en /tmp) produce **3 dominios distintos**
+(`browser_suspicious`, `antiforensic`, `persistence`) y el `to_signal()`
+agregado alcanza **z=3.8** — por la rama cross-dominio `exploit & antiforensic`.
+Esto CUANTIFICA D1: la Opción 1 (z por dominio ≤ techo individual) **bajaría ese
+3.8** porque solo `browser` llega a >3 solo (exploit 3.5); `antiforensic` y
+`persistence` standalone quedan en ~1.2. El split, sin recalibrar, cambiaría un
+caso que hoy es INTENT/MALICE (z=3.8) a uno donde el reasoner recibe 3 primarias
+pero ninguna crítica → probable SUSPICION. **Este es el trade-off exacto de D1,
+ahora con número.** El fixture es el test de aceptación de B-052-P2 (§8.3).
+
 **INFERENCIA (riesgo portante):** ninguna señal de un solo dominio puede
 observar dos dominios a la vez. Splitear **destruye el tope de cada escalera**.
 El único dominio que alcanza z>3 por sí solo hoy es `browser` (rama exploit
@@ -301,7 +314,11 @@ mobile). La validación real, en orden:
    verde SIN cambios (prueba que el split no tocó la señal agregada).
 2. **tuck-2019-macos:** medir before/after. Predicción (OBSERVACIÓN §0.3): sigue
    ABSTAIN (1 dominio) — el split NO lo cambia. Documentarlo como esperado.
-3. **Casos sintéticos multi-dominio:** construir fixtures mobile con ≥3
+3. **Casos sintéticos multi-dominio (YA CONSTRUIDO para macOS):**
+   `tests/test_macos_multidomain_integration.py` compone Safari+FSEvents+
+   Spotlight+persistencia → 3 dominios, z agregado 3.8. Es el test de
+   aceptación listo para B-052-P2. Falta el equivalente para iOS/Android.
+   Construir fixtures mobile con ≥3
    corr_groups poblados (p.ej. macOS con browser + antiforensic + persistence)
    y verificar: (a) `to_signals()` emite N señales, (b) el reasoner corre
    (no `NOT_RUN_MOBILE_SINGLE_SOURCE`), (c) el veredicto sube de ABSTAIN a
