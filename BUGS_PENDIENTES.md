@@ -4623,3 +4623,52 @@ inerte sobre él y solo activa la narrativa cuando una fractura real dispara.
 **Nota de alcance:** el otro brazo de la divergencia N12 (¿la CAIE del
 orquestador y la del scorer coinciden en el path disk/mixed?) no se ejercita
 en el corpus actual (todos van por el path motor JSON) — no verificado.
+
+---
+
+## B-095 — El comparador batch re-deriva el veredicto desde `best_hypothesis` (pre-gate) en vez de leer `agent_verdict` sellado (post-gate) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-10 (cierra B10 del Grupo B, recomendación B-058) |
+| **Severidad** | P2 |
+| **Archivo** | `run_all_agent.py` (`extract_verdict_from_bundle`); `run_llm_cases.py` (`_fallback_verdict`) |
+| **Detectado en** | `docs/PLAN_ABDUCTIVO_PENDIENTES_20260705.md` §Grupo B, ítem B10 |
+
+**Descripción:** los dos comparadores de corpus derivaban el veredicto de un
+bundle sellado leyendo `pipeline_results.abduction.best_hypothesis` (o el
+`AGENT_EXIT` del audit_trail) y mapeándolo con una tabla + prefix matching.
+Ambas fuentes son **pre-gate**: son la salida cruda del reasoner. El campo
+top-level `agent_verdict` es el veredicto **post-gate** — la salida de
+`classify_agent_verdict`, "el mismo camino único que sella agent_verdict y
+decide el exit" (CLAUDE.md). Cuando la auto-corrección pre-emisión de VIGÍA
+ajusta el veredicto del reasoner (p.ej. el gate de corroboración sube
+SUSPICION→INTENT, o baja a ABSTAIN por conteo de señales), las dos fuentes
+divergen y el comparador reporta el equivocado.
+
+**Método abductivo:**
+- *Hipótesis:* comparador re-deriva pre-gate ⇒ divergencia cuando el gate mueve el veredicto.
+- *Deducción:* un bundle con `agent_verdict="INTENT"` y `best_hypothesis="SUSPICION_DETECTED"` debe reportarse INTENT (forma real de `VIGIA-FN-001`).
+- *Inducción:* medido sobre `results/agent_batch/` — **60 de 209 bundles sellados divergían** (dominante `sealed=INTENT → comparador=SUSPICION`; también `sealed=ABSTAIN/NOISE → comparador=UNKNOWN`). ~29% de los veredictos propios de VIGÍA mal reportados por el harness.
+
+**Implicación forense:** el informe pass/fail-vs-`expected_verdict` que imprime
+el runner batch estaba mal para ~29% de los casos — enmascarando aciertos y
+fallos reales del detector detrás de una derivación heurística que no coincidía
+con lo que VIGÍA efectivamente selló y por lo que decidió el exit code.
+
+**Fix (2026-07-10):** ambos comparadores leen primero `agent_verdict` sellado y
+solo lo aceptan si es un veredicto canónico conocido; cualquier otra cosa
+(None, bundle legacy sin el campo, vocabulario futuro) cae a la heurística
+previa, preservando la compatibilidad byte a byte con los 82/291 bundles legacy
+sin sellar.
+
+**Verificación:** red test primero (`tests/test_b10_comparator_reads_sealed_verdict.py`,
+14 tests: divergencia sellado/pre-gate + invariante legacy + segunda ubicación
+`_fallback_verdict`). E2E sobre el corpus real: **60 → 0 divergencias** en los
+209 sellados; 82 legacy intactos. Suite completa verde. `git diff` de producto:
++11 líneas en `run_all_agent.py`, +7 en `run_llm_cases.py`; sin tocar scoring,
+gates ni doctrina de corroboración.
+
+**Higiene adjunta (B11):** removido `tests/test_audit_no_default_key (1).py`,
+duplicado byte-idéntico de `tests/test_audit_no_default_key.py` (artefacto de
+copia con sufijo " (1)") — los 12 tests corrían dos veces.

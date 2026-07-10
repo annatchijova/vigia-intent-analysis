@@ -70,6 +70,14 @@ def _fallback_verdict(case_id: str) -> str:
         return "UNKNOWN"
     try:
         d = json.loads(bf.read_text())
+        # B10 (B-058): preferir el veredicto SELLADO (post-gate, agent_verdict)
+        # sobre best_hypothesis (pre-gate). Cuando el gate ajusta el veredicto del
+        # reasoner ambos divergen; leer el sellado evita reportar el pre-gate.
+        # Mismo criterio que run_all_agent.extract_verdict_from_bundle. Solo se
+        # toma si es un veredicto conocido; si no, cae a best_hypothesis (legacy).
+        sealed = d.get("agent_verdict")
+        if isinstance(sealed, str) and str(sealed).upper() in _HYP_MAP:
+            return _normalize(sealed)
         bh = d.get("pipeline_results", {}).get("abduction", {}).get("best_hypothesis", "UNKNOWN")
         return _normalize(bh)
     except Exception:

@@ -97,7 +97,7 @@ estanca en ambas direcciones). Cada verificación cita `archivo:línea`.
 | B7 | B-061 | unificar clamp vs rechazo de `confidence` en ambas rutas | 1 h |
 | B8 | A-1 | verificador de `daubert_record_hash` (hoy se crea y nunca se verifica) o documentar como anchor manual | 1-2 h |
 | B9 | A-2 | `deactivate_honey_token` / expiry — verificado inexistente | 1 h |
-| B10 | B-058 recomendación | comparador de `run_all_agent.py` lee `agent_verdict` sellado, no re-deriva | 1 h |
+| B10 | B-058 recomendación | comparador de `run_all_agent.py` lee `agent_verdict` sellado, no re-deriva | 1 h — **RESUELTO 2026-07-10** (`extract_verdict_from_bundle` + `run_llm_cases._fallback_verdict` leen el sellado; 60/209 bundles del corpus divergían, 0 tras el fix; ver B-095 en BUGS_PENDIENTES.md) |
 | B11 | Higiene de trackers (S-4) | cerrar B-017 (campo), B-040; actualizar AUDITORIA_REDTEAM (cuerpo vs updates); matices NPS exec summary + NARCOS `is_conclusive`; TDUNGAN bundle huérfano; `.sha256` faltantes en `srl2018/` | 1-2 h |
 
 ### Grupo C — Cobertura de test mobile (AUDITORIA_COBERTURA_MOBILE_SIFT)
