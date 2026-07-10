@@ -175,10 +175,20 @@ def classify_agent_verdict(
     """
     hyp = str(abduction.get("best_hypothesis") or "").upper()
 
+    # §9.4-LIM (enforcement firmado 2026-07-10): techo de veredicto declarado
+    # por el productor de la abducción (hoy: shim mobile-only cuando la
+    # evidencia fuerte está TODA confinada al canal D3 — sin triangulación,
+    # la multiplicidad de dominios lógicos no es corroboración independiente).
+    # Solo CAPEA hacia abajo (MALICE/INTENT → SUSPICION); nunca eleva un
+    # ABSTAIN/NOISE. Campo ausente o valor no reconocido → byte-idéntico al
+    # comportamiento previo (fail-safe). SUSPICION comparte EXIT_INTENT (3),
+    # contrato documentado "3=intent/suspicion" — el cap no des-alerta.
+    _ceiling = str(abduction.get("verdict_ceiling") or "").upper()
+
     if "MALICIOUS" in hyp or "CRITICAL" in hyp or "OVERRIDE" in hyp:
-        return "MALICE"
+        return "SUSPICION" if _ceiling == "SUSPICION" else "MALICE"
     if "INTENT" in hyp or "SUSPICION" in hyp:
-        return "INTENT"
+        return "SUSPICION" if _ceiling == "SUSPICION" else "INTENT"
     # B-058 FIX (auditoría de invariantes 2026-07-03): match por SUBSTRING,
     # no solo exacto. El adaptador EBS emite "ABSTAIN_DETECTED" (expected==
     # ABSTAIN), que NO estaba en ABSTAIN_HYPOTHESES → caía a NOISE (exit 0):
@@ -204,12 +214,18 @@ def classify_agent_verdict(
 _VERDICT_EXIT = {
     "MALICE":  EXIT_MALICE,
     "INTENT":  EXIT_INTENT,
+    # §9.4-LIM: SUSPICION comparte el exit de INTENT — el contrato documentado
+    # ya dice "3=intent/suspicion". Sin entrada explícita caería al fallback
+    # EXIT_ABSTAIN (4): un downgrade de alerting que el cap NO debe causar.
+    "SUSPICION": EXIT_INTENT,
     "ABSTAIN": EXIT_ABSTAIN,
     "NOISE":   EXIT_NOISE,
 }
 _VERDICT_LABEL = {
     "MALICE":  "EVIL FOUND",
     "INTENT":  "INTENT/SUSPICION DETECTED",
+    "SUSPICION": "SUSPICION DETECTED (verdict ceiling §9.4-LIM — D3-only, "
+                 "sin triangulación; se recomienda segunda fuente D2/D4/D5)",
     "ABSTAIN": "ABSTAIN — could not determine (insufficient/unanalyzed evidence)",
     "NOISE":   "NO EVIL DETECTED",
 }
@@ -1160,7 +1176,7 @@ class VIGIAAgent:
                     "Individual z-scores below threshold. Full signal review "
                     "recommended. Alert floored (B-028/B-065)."
                 )
-        elif _final_verdict == "INTENT" and alert.startswith("LOW"):
+        elif _final_verdict in ("INTENT", "SUSPICION") and alert.startswith("LOW"):
             alert = (
                 "MEDIUM — INTENT verdict with individual z-scores below "
                 "threshold. Alert floored (B-028/B-065): an intent finding "

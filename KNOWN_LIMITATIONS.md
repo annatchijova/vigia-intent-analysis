@@ -1980,10 +1980,16 @@ todas esas fuentes a la vez.
   SUSPICION "evidencia fuerte confinada a D3, triangulación manual urgente"
   del SUSPICION genérico (poca evidencia). Regla exacta y tests en
   `docs/B052_P2_DESIGN.md` §10.2.
-- **Discrepancia conocida:** el camino de veredicto actual de la ruta
-  mobile-only puede sellar INTENT para un caso D3-rico (medido; ver §10.1).
-  El enforcement del techo SUSPICION mueve veredictos y requiere firma
-  aparte — hasta entonces el techo es doctrinal, no mecánico.
+- **Techo ENFORCED (firmado y aplicado 2026-07-10):** cuando la condición
+  D3-rico-sin-triangulación se cumple, el shim declara
+  `abduction.verdict_ceiling = "SUSPICION"` y `classify_agent_verdict` (el
+  camino único de sellado) capea MALICE/INTENT → **SUSPICION** pre-emisión
+  (patrón REFUTATION GATE: la hipótesis cruda del engine se preserva y el
+  gate queda logueado en la narrativa; el LLM no puede anularlo). SUSPICION
+  entra al espacio de veredictos sellados compartiendo `EXIT_INTENT`
+  (contrato documentado "3=intent/suspicion") y el piso de alerta de INTENT
+  — el cap no des-alerta. Gate comparativo del enforcement: 0 flips en 291
+  bundles, corpus 167/199 idéntico, output del runner byte-idéntico.
 
 **Criterio de cierre:** engines de canal D2/D4 para evidencia mobile
 (memoria/red del dispositivo), o validación con corpus real ≥50 casos

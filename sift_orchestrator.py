@@ -369,9 +369,36 @@ class SIFTOrchestrator:
                     _bit += f" [{', '.join(str(t) for t in _ftypes[:4])}]"
                 _finding_bits.append(_bit)
 
-            # §9.4-LIM: clase de SUSPICION — narrativa + pipeline_meta
-            # únicamente; NO cambia hypothesis/score/veredicto.
+            # §9.4-LIM: clase de SUSPICION — narrativa + pipeline_meta, y
+            # (enforcement firmado 2026-07-10) techo de veredicto: cuando la
+            # evidencia fuerte está TODA confinada a D3, el veredicto sellado
+            # se capea en SUSPICION vía abduction.verdict_ceiling (el cap lo
+            # aplica classify_agent_verdict, el camino único de sellado). La
+            # hipótesis cruda del engine NO se falsea — patrón REFUTATION
+            # GATE: autocorrección pre-emisión, documentada en la narrativa.
             _susp_class = _mobile_suspicion_class(mobile_signals, max_z)
+            _ceiling_fields: Dict[str, Any] = {}
+            _gate_log = ""
+            if (_susp_class == "D3_RICH_NO_TRIANGULATION"
+                    and hypothesis in ("INTENT_DETECTED",
+                                       "MALICIOUS_INTENT_DETECTED")):
+                _ceiling_fields = {
+                    "verdict_ceiling": "SUSPICION",
+                    "verdict_ceiling_reason": (
+                        "§9.4-LIM: evidencia fuerte confinada al canal D3 "
+                        "(sin triangulación D2/D4/D5) — techo doctrinal "
+                        "SUSPICION (L-051)."
+                    ),
+                }
+                _gate_log = (
+                    "\nREFUTATION GATE LOG — §9.4-LIM\n"
+                    f"  Candidato : {hypothesis} (max_z={float(max_z):.2f})\n"
+                    "  Gate      : techo D3-only sin triangulación "
+                    "(verdict_ceiling=SUSPICION, L-051)\n"
+                    "  Resultado : candidato CAPEADO pre-emisión → el "
+                    "veredicto sellado es SUSPICION. La hipótesis cruda se "
+                    "preserva arriba; el LLM no puede anular este gate."
+                )
 
             result = {
                 "case_id": self.case_id,
@@ -412,7 +439,9 @@ class SIFTOrchestrator:
                         "de pipeline."
                         + ("\n" + _D3_TRIANGULATION_NOTE
                            if _susp_class == "D3_RICH_NO_TRIANGULATION" else "")
+                        + _gate_log
                     ),
+                    **_ceiling_fields,
                 },
                 "results": (
                     {"unanalyzed_artifacts": _unanalyzed_types}
@@ -430,6 +459,8 @@ class SIFTOrchestrator:
                     # §9.4-LIM: GENERIC | D3_RICH_NO_TRIANGULATION — consultable
                     # por el analista sin parsear la narrativa.
                     "suspicion_class": _susp_class,
+                    # enforcement del techo (True solo cuando el cap se declaró)
+                    "s94_lim_enforced": bool(_ceiling_fields),
                 },
             }
             return result

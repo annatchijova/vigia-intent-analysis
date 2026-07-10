@@ -139,21 +139,37 @@ class TestD3RichNoTriangulation:
             assert frag in narr, f"falta en narrativa: {frag!r}"
         assert "§9.4-LIM" in narr
 
-    def test_verdict_and_score_unchanged(self, tmp_path):
-        """INVARIANTE: la extensión es narrativa pura. Pin del comportamiento
-        sellado MEDIDO pre-extensión (2026-07-10, esta rama): hypothesis
-        INTENT_DETECTED, max_z 19/5, is_conclusive True, verdict INTENT.
-        (La discrepancia INTENT vs techo SUSPICION de doctrina (ii) está
-        documentada en §9.4-LIM — su enforcement requiere firma aparte;
-        este cambio NO la corrige ni la empeora.)"""
+    def test_ceiling_enforced_seals_suspicion(self, tmp_path):
+        """ENFORCEMENT §9.4-LIM (firmado 2026-07-10 'mañana'): el caso D3-rico
+        sella SUSPICION, no INTENT. La hipótesis cruda del engine se preserva
+        (INTENT_DETECTED — lectura honesta pre-gate); el techo se aplica en
+        classify_agent_verdict vía abduction.verdict_ceiling, patrón
+        REFUTATION GATE (autocorrección pre-emisión, no revisión narrativa)."""
         from vigia_agent import classify_agent_verdict, _signal_stats
         r = _analyze(_rich_d3(tmp_path))
         ab = r.get("abduction", {})
+        # la lectura cruda del engine NO se falsea:
         assert ab.get("best_hypothesis") == "INTENT_DETECTED"
         assert r.get("pipeline_meta", {}).get("max_mobile_z") == "19/5"
-        assert ab.get("is_conclusive") is True
+        # el techo viaja en la abducción y el veredicto sellado lo respeta:
+        assert ab.get("verdict_ceiling") == "SUSPICION"
         n_p, n_u = _signal_stats(r)
-        assert classify_agent_verdict(ab, n_p, n_u) == "INTENT"
+        assert classify_agent_verdict(ab, n_p, n_u) == "SUSPICION"
+
+    def test_gate_log_in_narrative(self, tmp_path):
+        """El cap queda documentado en la narrativa (patrón REFUTATION GATE
+        LOG): candidato, gate aplicado y resultado."""
+        r = _analyze(_rich_d3(tmp_path))
+        narr = r.get("abduction", {}).get("narrative", "")
+        assert "REFUTATION GATE" in narr
+        assert "INTENT_DETECTED" in narr and "SUSPICION" in narr
+
+    def test_suspicion_exit_code_is_intent_tier(self):
+        """SUSPICION comparte EXIT_INTENT (3) — contrato documentado
+        '3=intent/suspicion'; el cap NO des-alerta a exit 0/4."""
+        from vigia_agent import _VERDICT_EXIT, _VERDICT_LABEL, EXIT_INTENT
+        assert _VERDICT_EXIT.get("SUSPICION") == EXIT_INTENT
+        assert "SUSPICION" in _VERDICT_LABEL
 
 
 # ── SUSPICION genérico: sin el texto adicional ──────────────────────────────
@@ -227,3 +243,39 @@ class TestSuspicionClassRule:
         sigs = [self._sig(3.8, ["A"]),
                 self._sig(2.0, ["B"], artifact_type="ios_forensic")]
         assert self._cls(sigs) == "D3_RICH_NO_TRIANGULATION"
+
+
+class TestVerdictCeilingUnit:
+    """Unidad del mecanismo genérico de techo en classify_agent_verdict:
+    solo capea hacia abajo (MALICE/INTENT→SUSPICION), nunca eleva, y en
+    ausencia del campo el comportamiento es byte-idéntico al previo."""
+
+    def _classify(self, hyp, ceiling=None, n=3, conclusive=True):
+        from vigia_agent import classify_agent_verdict
+        ab = {"best_hypothesis": hyp, "is_conclusive": conclusive}
+        if ceiling:
+            ab["verdict_ceiling"] = ceiling
+        return classify_agent_verdict(ab, n, 0)
+
+    def test_caps_intent(self):
+        assert self._classify("INTENT_DETECTED", "SUSPICION") == "SUSPICION"
+
+    def test_caps_malice(self):
+        # doctrina: D3-only no escala más allá de SUSPICION — tampoco a MALICE
+        # (caso multi-dispositivo D3-only, ≥2 críticos)
+        assert self._classify("MALICIOUS_INTENT_DETECTED", "SUSPICION") == "SUSPICION"
+
+    def test_never_lifts_abstain(self):
+        assert self._classify("MOBILE_EVIDENCE_ANALYZED", "SUSPICION",
+                              n=1, conclusive=False) == "ABSTAIN"
+
+    def test_never_lifts_noise(self):
+        assert self._classify("NO_SEMIOTIC_ANOMALY_DETECTED", "SUSPICION") == "NOISE"
+
+    def test_absent_field_unchanged(self):
+        assert self._classify("INTENT_DETECTED", None) == "INTENT"
+        assert self._classify("MALICIOUS_INTENT_DETECTED", None) == "MALICE"
+
+    def test_unknown_ceiling_value_ignored(self):
+        # fail-safe: un valor de techo no reconocido no altera nada
+        assert self._classify("INTENT_DETECTED", "BANANA") == "INTENT"

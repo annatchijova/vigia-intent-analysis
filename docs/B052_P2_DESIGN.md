@@ -370,16 +370,40 @@ la multiplicidad de dominios D3 no constituye corroboración independiente.
 mobile (memoria/red del dispositivo), o validación con corpus real ≥50 casos
 macOS/mobile etiquetados.
 
-**Discrepancia observada (medida 2026-07-10, pre-extensión):** el pipeline
-actual de la ruta mobile-only sella **INTENT** para el fixture D3-rico
+**Discrepancia observada (medida 2026-07-10, pre-extensión) — RESUELTA:** el
+pipeline de la ruta mobile-only sellaba **INTENT** para el fixture D3-rico
 (`_mobile_hypothesis` F6: max_z=3.8 → INTENT_DETECTED, is_conclusive=True →
-`classify_agent_verdict` → INTENT con n_primary=1). Es decir, el techo
-SUSPICION de la doctrina (ii) **no está enforced hoy** en el camino del
-veredicto. El mandato de esta tarea fue explícito ("NO tocar el reasoner ni
-el scorer — únicamente narrativa"), así que esta discrepancia queda
-**documentada y pineada** (test `test_verdict_and_score_unchanged`), y su
-enforcement — capar `_mobile_hypothesis`/`classify` a SUSPICION cuando la
-evidencia es D3-only — **requiere firma aparte** porque SÍ mueve veredictos.
+`classify_agent_verdict` → INTENT con n_primary=1) — el techo SUSPICION de
+la doctrina (ii) no estaba enforced en el camino del veredicto.
+
+**ENFORCEMENT (firmado y aplicado 2026-07-10 "mañana"):**
+- Hallazgo de la investigación: `classify_agent_verdict` tenía un espacio de
+  4 veredictos y colapsaba `"SUSPICION" in hyp → INTENT` — capear la
+  *hipótesis* (sketch original) habría sido inerte. El cambio mínimo real:
+  introducir el veredicto sellado **SUSPICION** (5º de la escala documentada
+  en CLAUDE.md) vía un mecanismo genérico de techo.
+- Implementación: cuando cond2 (§10.2) se cumple y la hipótesis es
+  INTENT/MALICIOUS, el shim declara `abduction.verdict_ceiling="SUSPICION"`
+  (+ razón + REFUTATION GATE LOG en narrativa +
+  `pipeline_meta.s94_lim_enforced`). `classify_agent_verdict` aplica el
+  techo pre-emisión: MALICE/INTENT → SUSPICION; **nunca eleva** ABSTAIN/
+  NOISE; campo ausente o valor desconocido → byte-idéntico (fail-safe).
+  La hipótesis cruda del engine NO se falsea.
+- Alerting preservado: `_VERDICT_EXIT["SUSPICION"] = EXIT_INTENT` (contrato
+  documentado "3=intent/suspicion"; sin entrada explícita caería al fallback
+  EXIT_ABSTAIN) y el piso de alerta B-065 de INTENT se extiende a SUSPICION.
+- Gate comparativo (el más sensible de la sesión): **0 flips en 291
+  bundles; corpus 167/199 idéntico en ambos mundos; output del runner
+  byte-idéntico salvo timing** (el ceiling solo se declara en la ruta
+  mobile-only, que 0 casos del corpus ejercitan). Fixture D3-rico:
+  INTENT → **SUSPICION** (el cambio buscado). vpn-solo y débil-multi:
+  sin cambio (ABSTAIN).
+- Observación registrada (fuera de alcance): ~10 fallos pre-existentes del
+  corpus son `agent=INTENT exp=SUSPICION` del path motor — el colapso
+  SUSPICION→INTENT de classify les cuesta accuracy. El nuevo veredicto
+  SUSPICION abre la puerta a recuperarlos (dejar que el motor SUSPICION
+  selle SUSPICION), pero eso mueve ~10 veredictos reales y es una decisión
+  doctrinal separada que requiere firma.
 
 ### 10.2 Extensión aprobada — dos clases de SUSPICION en el output
 
