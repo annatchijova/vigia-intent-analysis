@@ -305,7 +305,7 @@ Cobertura actual vs objetivo:
 | LaunchAgents/LaunchDaemons | ✅ `_analyze_launch_plists` (`:865-948`) | mantener |
 | `com.apple.loginitems.plist` | ✅ `_analyze_loginitems_plists` (`:950-983`) | mantener |
 | `SystemVersion.plist`, `nvram.plist` (SIP) | ✅ | mantener |
-| `Bookmarks.plist` / `LastSession.plist` (Safari) | ❌ (en el corpus quedaron QUARANTINED, ver §6) | bplist plano + NSKeyedArchiver |
+| `Bookmarks.plist` / `LastSession.plist` (Safari) | ✅ **IMPLEMENTADO: Safari plists (2026-07-10)** — bplist plano; NSKeyedArchiver degrada honesto | `_analyze_safari_plists` |
 | Recent items `*.sfl2` | ❌ | NSKeyedArchiver → rutas de documentos recientes |
 | `com.apple.TimeMachine.plist` | ❌ | **exclusiones de backup = anti-forense** (T1490-adyacente) |
 | `com.apple.Bluetooth.plist`, `com.apple.airport.preferences.plist` | ❌ | dispositivos emparejados / redes conocidas (correlación) |
@@ -575,6 +575,14 @@ nunca mágica inline.
 ---
 
 ## 5. Módulo 4 — Spotlight metadata
+
+> **ESTADO: IMPLEMENTADO (2026-07-10, Fase 1).** `_analyze_spotlight`:
+> `com.apple.spotlight.Shortcuts[.v3]` (consultas tecleadas → findings
+> `SPOTLIGHT_SUSPICIOUS_QUERY` [corr_group spotlight_intent] /
+> `ANTIFORENSIC_SPOTLIGHT_QUERY` [antiforensic]); `store.db` (.Spotlight-V100)
+> se registra PRESENTE pero NO analizado (Fase 1 — binario propietario; nota
+> honesta '0 hallazgos aquí NO es benignidad'). Fase 2 (store.db via
+> spotlight_parser gated) pendiente. 7 tests (`test_macos_spotlight.py`).
 
 ### 5.1 Formato del artefacto real
 

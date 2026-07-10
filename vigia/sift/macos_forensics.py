@@ -321,6 +321,15 @@ class MacOSForensicsAnalyzer:
                 logger.error("[MACOS] Safari analysis failed: %s", e)
                 result.analysis_notes.append(f"Safari parse error: {e}")
 
+        # 2b. Safari satellite plists — Bookmarks.plist / LastSession.plist
+        # (MACOS_MODULES_DESIGN §3.1). URLs guardadas/pestañas abiertas: un
+        # exploit BOOKMARKEADO es tan significativo como uno visitado.
+        try:
+            self._analyze_safari_plists(evidence_path, result)
+        except Exception as e:
+            logger.error("[MACOS] Safari plist analysis failed: %s", e)
+            result.analysis_notes.append(f"Safari plist error: {e}")
+
         # 3. Quarantine events (Gatekeeper download tracking)
         for db in self._safe_rglob(
             evidence_path,
@@ -361,6 +370,14 @@ class MacOSForensicsAnalyzer:
         except Exception as e:
             logger.error("[MACOS] FSEvents analysis failed: %s", e)
             result.analysis_notes.append(f"FSEvents analysis error: {e}")
+
+        # 8b. Spotlight — Shortcuts (intención de búsqueda del usuario) + store.db
+        # presencia (Fase 1: store.db binario no se parsea, MACOS_MODULES_DESIGN §5).
+        try:
+            self._analyze_spotlight(evidence_path, result)
+        except Exception as e:
+            logger.error("[MACOS] Spotlight analysis failed: %s", e)
+            result.analysis_notes.append(f"Spotlight analysis error: {e}")
 
         # 9. OPSEC assessment
         self._assess_opsec(result)
@@ -668,6 +685,146 @@ class MacOSForensicsAnalyzer:
                         break
         finally:
             conn.close()
+
+    # ── Safari satellite plists ─────────────────────────────────────────────
+
+    @staticmethod
+    def _safari_scoped_plists(base: Path, name: str, limit: int = 3) -> List[Path]:
+        """Busca `name` bajo rutas que contengan 'Safari', filtrando ANTES de
+        capear (code-review): usar _safe_rglob(limit) + post-filtro dejaba que
+        decoys `Bookmarks.plist` fuera de Safari, ordenados antes, evicten el
+        real (falso negativo plantable). Lazy: O(limit) memoria."""
+        import itertools
+        matches = (
+            p for p in base.rglob(name)
+            if "Safari" in str(p) and p.is_file() and not p.is_symlink()
+        )
+        return list(itertools.islice(matches, limit))
+
+    @staticmethod
+    def _iter_bookmark_leaves(node, out, seen=None, depth=0):
+        """Recorre el árbol Bookmarks.plist y acumula (url, title) de las hojas
+        (WebBookmarkTypeLeaf).
+
+        Guard code-review: un bplist puede compartir referencias (DAG) — el
+        loader de plistlib devuelve el MISMO objeto para refs repetidas. Sin
+        deduplicar por id(), un DAG malicioso (cada nodo apunta N veces al
+        siguiente) se recorre como árbol y explota exponencial (2000^depth)
+        antes de tocar el guard de profundidad. El set `seen` de id() lo
+        convierte en un recorrido O(nodos únicos). `_FSEVENTS`-style cap total
+        como cinturón adicional."""
+        if seen is None:
+            seen = set()
+        if depth > 30 or not isinstance(node, dict):
+            return
+        nid = id(node)
+        if nid in seen:
+            return  # ref compartida ya visitada — no re-descender (anti-bomba)
+        seen.add(nid)
+        if len(seen) > 200000 or len(out) > 50000:
+            return  # cap total de trabajo/hojas
+        if node.get("WebBookmarkType") == "WebBookmarkTypeLeaf":
+            url = str(node.get("URLString", ""))
+            title = str((node.get("URIDictionary") or {}).get("title", ""))
+            if url:
+                out.append((url, title))
+        children = node.get("Children")
+        if isinstance(children, list):
+            for ch in children:
+                MacOSForensicsAnalyzer._iter_bookmark_leaves(
+                    ch, out, seen, depth + 1)
+
+    def _match_safari_url(self, url, title, source, result):
+        """Aplica los mismos catálogos que _analyze_safari a un par url/title
+        de un plist satélite. Emite findings SAFARI_* en browser_suspicious y
+        ANTIFORENSIC_SEARCH en antiforensic — integran a la misma escalera."""
+        combined = f"{url[:500]} {title[:200]}"  # ReDoS guard
+        for pattern, severity, mitre in SUSPICIOUS_SEARCH_PATTERNS:
+            if re.search(pattern, combined):
+                finding_type = (
+                    "SAFARI_EXPLOIT_RESEARCH"
+                    if severity >= Fraction(80, 100)
+                    else "SAFARI_SUSPICIOUS"
+                )
+                self._findings.append(MacOSFinding(
+                    finding_type=finding_type,
+                    severity=severity,
+                    description=f"Safari {source} matches suspicious pattern",
+                    evidence=(
+                        f"URL: {url[:150]}"
+                        + ("[truncated]" if len(url) > 150 else "")
+                        + f" | Title: {title[:100]} | src: {source}"
+                    ),
+                    mitre_technique=mitre,
+                    rule_ref=f"MACOS-SAFARI-{source.upper()}-SUSP",
+                    corr_group="browser_suspicious",
+                ))
+                break
+        for pattern, severity, mitre in ANTIFORENSIC_SEARCH_PATTERNS:
+            if re.search(pattern, combined):
+                self._findings.append(MacOSFinding(
+                    finding_type="ANTIFORENSIC_SEARCH",
+                    severity=severity,
+                    description=f"Safari {source} matches anti-forensic pattern",
+                    evidence=f"URL: {url[:150]} | src: {source}",
+                    mitre_technique=mitre,
+                    rule_ref=f"MACOS-SAFARI-{source.upper()}-ANTIFORENSIC",
+                    corr_group="antiforensic",
+                ))
+                break
+
+    def _analyze_safari_plists(
+        self, evidence_path: Path, result: MacOSAnalysisResult
+    ) -> None:
+        """Analiza Bookmarks.plist (URLs guardadas) y LastSession.plist
+        (pestañas abiertas en la última sesión). Ambos son bplist plano en
+        Safari moderno; `_safe_plist_load` aplica el techo S5. NSKeyedArchiver
+        (Safari muy antiguo) se degrada honesto: `plistlib` devolvería el grafo
+        crudo con `$archiver` — se omite con nota en vez de mal-interpretarlo."""
+        n_bookmarks = 0
+        for bm_path in self._safari_scoped_plists(
+                evidence_path, "Bookmarks.plist", limit=3):
+            plist = self._safe_plist_load(bm_path)
+            if not isinstance(plist, dict):
+                continue
+            if plist.get("$archiver"):
+                result.analysis_notes.append(
+                    f"Bookmarks.plist {bm_path.name}: NSKeyedArchiver no "
+                    f"desreferenciado — omitido (degradación honesta)"
+                )
+                continue
+            leaves = []
+            self._iter_bookmark_leaves(plist, leaves)
+            n_bookmarks += len(leaves)
+            for url, title in leaves:
+                self._match_safari_url(url, title, "bookmark", result)
+
+        n_tabs = 0
+        for ls_path in self._safari_scoped_plists(
+                evidence_path, "LastSession.plist", limit=3):
+            plist = self._safe_plist_load(ls_path)
+            if not isinstance(plist, dict):
+                continue
+            windows = plist.get("SessionWindows")
+            if not isinstance(windows, list):
+                continue
+            for win in windows[:100]:
+                if not isinstance(win, dict):
+                    continue
+                for tab in (win.get("TabStates") or [])[:200]:
+                    if not isinstance(tab, dict):
+                        continue
+                    url = str(tab.get("TabURL", ""))
+                    title = str(tab.get("TabTitle", ""))
+                    if not url:
+                        continue
+                    n_tabs += 1
+                    self._match_safari_url(url, title, "session", result)
+
+        if n_bookmarks or n_tabs:
+            result.analysis_notes.append(
+                f"Safari plists: {n_bookmarks} bookmark(s), {n_tabs} session tab(s)"
+            )
 
     # ── Quarantine Events ──────────────────────────────────────────────────
 
@@ -1097,6 +1254,91 @@ class MacOSForensicsAnalyzer:
                     rule_ref="MACOS-FSEVENTS-SUSPICIOUS-PATH",
                     corr_group="fsevents_activity",
                 ))
+
+    # ── Spotlight ───────────────────────────────────────────────────────────
+
+    # Nombres de la plist de shortcuts (varía por versión de macOS).
+    _SPOTLIGHT_SHORTCUTS = (
+        "com.apple.spotlight.Shortcuts",
+        "com.apple.spotlight.Shortcuts.v3",
+    )
+
+    def _analyze_spotlight(
+        self, evidence_path: Path, result: MacOSAnalysisResult
+    ) -> None:
+        """Analiza Spotlight (MACOS_MODULES_DESIGN §5).
+
+        Fase 1 (sin dependencias):
+        - `com.apple.spotlight.Shortcuts[.v3]` (plist): las CLAVES son las
+          consultas TECLEADAS por el usuario — intención pura, equivalente a
+          keyword_search_terms del navegador. Se matchean contra los mismos
+          catálogos suspicious/anti-forense.
+        - `.Spotlight-V100` / `store.db`: formato binario propietario
+          multi-versión. NO se parsea en Fase 1 — se registra presencia (nota
+          honesta: "presente, no analizado" ≠ "no hay nada"). Fase 2 sería una
+          dependencia opcional (spotlight_parser) gated por env.
+        """
+        # 1. Shortcuts — consultas tecleadas
+        n_queries = 0
+        for name in self._SPOTLIGHT_SHORTCUTS:
+            for sc in self._safe_rglob(evidence_path, name, limit=3):
+                plist = self._safe_plist_load(sc)
+                if not isinstance(plist, dict):
+                    continue
+                for query in list(plist.keys())[:2000]:
+                    q = str(query)
+                    if not q or q.startswith("$"):  # $archiver/$objects — skip
+                        continue
+                    n_queries += 1
+                    self._match_spotlight_query(q, result)
+
+        # 2. store.db — presencia sin parseo (Fase 1)
+        store_present = False
+        for _sv in evidence_path.rglob(".Spotlight-V100"):
+            if _sv.is_dir() and not _sv.is_symlink():
+                store_present = True
+                break
+        if store_present:
+            result.analysis_notes.append(
+                "Spotlight store.db (.Spotlight-V100) presente pero NO analizado "
+                "(Fase 1: formato binario propietario — requiere parser dedicado, "
+                "MACOS_MODULES_DESIGN §5.2). 0 hallazgos aquí NO es benignidad."
+            )
+        if n_queries:
+            result.analysis_notes.append(
+                f"Spotlight Shortcuts: {n_queries} consulta(s) analizada(s)"
+            )
+
+    def _match_spotlight_query(self, query: str, result: MacOSAnalysisResult) -> None:
+        """Matchea una consulta Spotlight contra los catálogos. Anti-forense →
+        finding ANTIFORENSIC_SPOTLIGHT_QUERY (prefijo ANTIFORENSIC → alimenta
+        has_antiforensic_finding); suspicious → SPOTLIGHT_SUSPICIOUS_QUERY
+        (corr_group spotlight_intent, dominio B-052-P2)."""
+        combined = query[:500]  # ReDoS guard
+        for pattern, severity, mitre in ANTIFORENSIC_SEARCH_PATTERNS:
+            if re.search(pattern, combined):
+                self._findings.append(MacOSFinding(
+                    finding_type="ANTIFORENSIC_SPOTLIGHT_QUERY",
+                    severity=severity,
+                    description="Spotlight query matches anti-forensic pattern",
+                    evidence=f"Query: {query[:150]}",
+                    mitre_technique=mitre,
+                    rule_ref="MACOS-SPOTLIGHT-ANTIFORENSIC",
+                    corr_group="antiforensic",
+                ))
+                return
+        for pattern, severity, mitre in SUSPICIOUS_SEARCH_PATTERNS:
+            if re.search(pattern, combined):
+                self._findings.append(MacOSFinding(
+                    finding_type="SPOTLIGHT_SUSPICIOUS_QUERY",
+                    severity=severity,
+                    description="Spotlight query matches suspicious pattern",
+                    evidence=f"Query: {query[:150]}",
+                    mitre_technique=mitre,
+                    rule_ref="MACOS-SPOTLIGHT-SUSP",
+                    corr_group="spotlight_intent",
+                ))
+                return
 
     # ── OPSEC Assessment ───────────────────────────────────────────────────
 
