@@ -1,0 +1,42 @@
+{
+  "case_id": "VIGIA-LINUX-008",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:25:00Z",
+  "cronos_trace_id": "ee9354b6-62cc-4b77-8c4d-e3a24e459849",
+  "verdict": "MALICE",
+  "confidence": "88/100",
+  "note": "confidence_expected: 88. Exact match. Multi-actor attribution ambiguity acknowledged — host is MALICE-compromised but individual actor identities and inter-actor relationships require additional network telemetry for full resolution.",
+  "peircean_analysis": {
+    "firstness": "Host: compromised Linux server. Actor A: cryptominer at /tmp/.cache/kworker running as root, crontab restart every 1 minute, Monero pool 185.130.44[.]207:4444. CPU oscillation pattern: 100% for 45 seconds, baseline for 255 seconds, repeating. Actor B: 7 crontab entries to IRC botnet C2 147.45.41[.]25:80 (port 80, IRC protocol misidentified by firewall), earnfm.com and repocket.com (residential proxy networks). Actor C (Codex/investigator): bash_history commands generating forensic noise. 9 total persistence entries decompose as: 1 Actor A (miner restart), 7 Actor B (botnet persistence), 1 Codex (investigator artifact). Credential exfiltration and Codex audit accessed /etc/passwd and /etc/shadow within a 61-second window, same PIDs separable by attribution.",
+    "secondness": "The CPU oscillation pattern (45s on / 255s off) is a MULTI_ACTOR_ATTRIBUTION_CHALLENGE diagnostic signal. A single cryptominer with no competition runs at sustained high CPU. The 45-second ceiling followed by forced return to baseline is consistent with a competing process (Actor B watchdog) detecting and killing Actor A's miner, which Actor A's 1-minute crontab then restarts. This cycle produces the observed oscillation. A single actor would not have components killing its own processes — the oscillation fingerprints two independent actors on the same host.",
+    "thirdness": "The host is triple-compromised: Actor A established a Monero miner with aggressive crontab persistence; Actor B established an IRC botnet foothold with residential proxy network enrollment (earnfm/repocket = bandwidth harvesting); Actor C is investigator tooling introducing additional forensic noise. The actors appear unaware of each other — Actor B's watchdog killing Actor A's miner is competitive behavior, not coordination. The 61-second window where credential file access occurs (Codex audit + Actor B exfiltration) is separable via PID attribution but creates genuine investigative ambiguity. This is MALICE: multiple independent threat actors with active concealment, persistence, and exfiltration."
+  },
+  "hypotheses": {
+    "H1_multi_actor_compromise": "Two independent threat actors (A: cryptominer, B: botnet+proxy) compromised the host, with Actor B's watchdog periodically terminating Actor A's miner, producing the CPU oscillation signature.",
+    "H2_single_actor_staged": "A single actor deployed multiple tools with deliberate staging to simulate multi-actor attribution as a false flag.",
+    "H3_legitimate_operations": "The processes are legitimate monitoring/testing tools deployed by the system owner."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H3: Some organizations deploy mining tools for internal compute resource monetization. Residential proxy enrollment could be a legitimate VPN service test.",
+    "test_result": "H3 FULLY REFUTED: (A) Monero pool 185.130.44[.]207:4444 is an external, publicly-known mining pool — legitimate internal compute monetization would use internal infrastructure. (B) earnfm.com and repocket.com are third-party bandwidth monetization services that require agreement to their terms — no legitimate enterprise would enroll production servers without documented consent. (C) 9 persistence entries with no ITSM/change management documentation contradicts authorized deployment. H2 is not refuted but is less parsimonious than H1 — the inter-actor competitive behavior (watchdog killing miner) is unnecessary complexity for a deliberate false flag by a single actor.",
+    "refutation_outcome": "H3 REFUTED. H1 preferred over H2 by parsimony. MALICE confirmed."
+  },
+  "devil_advocate": "The 61-second window overlap between Codex investigator commands and Actor B credential file access creates genuine uncertainty about whether the credential access was investigator-initiated or attacker-initiated. If the credential exfiltration was Codex-generated, Actor B's profile reduces to persistence-only (botnet + residential proxy), which is still MALICE but without confirmed data theft. Full PID attribution via process accounting logs would resolve this.",
+  "caie_fracture": "MULTI_ACTOR_ATTRIBUTION_CHALLENGE (severity 0.65) — two independent actors + investigator tooling create attribution ambiguity. CPU oscillation is the key diagnostic that separates this from single-actor cases.",
+  "evidence_anchors": [
+    "PROC-001: /tmp/.cache/kworker, Monero pool 185.130.44[.]207:4444, Actor A miner",
+    "PROC-002: 7 crontab IRC botnet entries to 147.45.41[.]25:80, earnfm/repocket enrollment, Actor B",
+    "TIMING-001: CPU oscillation 45s@100% / 255s@baseline — multi-actor diagnostic pattern",
+    "PERSIST-001: 9 total entries (1 Actor A, 7 Actor B, 1 Codex), no ITSM documentation",
+    "CRED-001: /etc/passwd + /etc/shadow accessed in 61s window, PID attribution needed"
+  ],
+  "mitre_ttps": [
+    "T1496 (Resource Hijacking — Monero cryptomining, Actor A)",
+    "T1053.003 (Cron — persistence, both actors)",
+    "T1090 (Proxy — residential proxy network enrollment, Actor B)",
+    "T1003 (OS Credential Dumping — /etc/shadow access, Actor B suspected)",
+    "T1219 (Remote Access Software — IRC C2, Actor B)"
+  ],
+  "carnegie_pattern": "Multi-actor interference — competing threat actors create noise that obscures each other's TTPs, making forensic attribution harder than single-actor cases",
+  "known_limitations": "PID attribution for 61-second credential access window requires process accounting logs not in available evidence. Inter-actor relationship (independent vs coordinated) cannot be determined without C2 infrastructure analysis. Entry vector for either actor not identified. Codex investigator commands introduce additional timeline noise."
+}

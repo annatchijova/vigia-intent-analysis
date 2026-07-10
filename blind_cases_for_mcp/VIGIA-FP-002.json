@@ -1,0 +1,127 @@
+{
+  "case_id": "VIGIA-FP-002",
+  "case_name": "The Process That Screams Exfiltration",
+  "description": "Legitimate backup script, documented in Change Management, approved by CISO. Copies 500GB to external storage overnight. Tool is rsync, destination is an approved cloud provider. Everything is documented.",
+  "abstention_risk": "low",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 85,
+  "artifacts": [
+    {
+      "artifact_id": "fp002_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-06-15T03:00:00Z",
+      "raw_score": 0.88,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:fp002net01"
+      ],
+      "description": "500GB transferred to external IP 198.51.100.77 over 4 hours",
+      "metadata": {
+        "source_ip": "10.0.8.44",
+        "dest_ip": "198.51.100.77",
+        "bytes": 536870912000,
+        "tool": "rsync",
+        "port": 22,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:576291ac8d587b94f1546a1febed6aa78f214b3d34c367fb7bdbc30b6fab6c20",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-FP-002_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "fp002_02",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_change_management",
+      "timestamp": "2026-06-10T10:00:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:fp002chg02"
+      ],
+      "description": "CAB-2026-0610: Approval for nightly backup to cloud storage 198.51.100.77",
+      "metadata": {
+        "change_id": "CAB-2026-0610",
+        "approver": "ciso@corp.com",
+        "requester": "backup_ops",
+        "scope": "500GB nightly backup",
+        "valid_until": "2026-12-31",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:576291ac8d587b94f1546a1febed6aa78f214b3d34c367fb7bdbc30b6fab6c20",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-FP-002_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "semantic_role": "exculpatory"
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "AUTHORIZED_EXFILTRATION_PATTERN",
+      "severity": 0.1,
+      "interpretation": "Pattern identical to exfiltration but with documented authorisation approved by CISO.",
+      "artifact_a": "fp002_01",
+      "artifact_b": "fp002_02"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "500GB transferred to external IP overnight",
+    "secondness": "CISO-approved change, legitimate tool (rsync), authorised destination, complete documentation",
+    "thirdness": "Organisational habit of approved nightly cloud backups"
+  },
+  "devil_advocate": "500GB transferred to an external IP overnight is the textbook definition of data exfiltration.",
+  "source_dataset": "VIGÍA Synthetic Corpus — False Positive Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "False positive test: technically identical pattern to exfiltration. The only difference is the authorisation context. If VIGÍA does not consult Change Management, it will fire a false positive.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_FP_FN_AMB.json",
+    "source_origin": "synthetic_vigia_collective"
+  },
+  "_expected_verdict_correction_note": "Corregido de 'BENIGN' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente.",
+  "signals": [
+    {
+      "artifact_id": "fp002_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      },
+      "description": "500GB transferred to external IP 198.51.100.77 over 4 hours",
+      "evidence_type": "memory_process",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 22
+      }
+    },
+    {
+      "artifact_id": "fp002_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "CAB-2026-0610: Approval for nightly backup to cloud storage 198.51.100.77",
+      "evidence_type": "log_entry",
+      "source": "sift_change_management",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FP-002_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  },
+  "schema_version": 1
+}

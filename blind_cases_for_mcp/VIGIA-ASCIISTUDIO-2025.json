@@ -1,0 +1,127 @@
+{
+  "case_id": "VIGIA-ASCIISTUDIO-2025",
+  "case_name": "AsciiStudio-master — Open-source Java ASCII art animation GUI application",
+  "schema_version": 1,
+  "description": "ZIP archive AsciiStudio-master.zip (SHA-256: 812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967) containing a Java GUI application for ASCII art animation. Contents: build.xml (Ant build system), Java source files, sample GIF animations (butterfly, jellyfish, parakeet, lightning), LICENSE (MIT-style), README.md, Changelog.txt, Screenshot.jpg (1.7MB). Dated 2025-04-07. Consistent with a legitimate open-source software project hosted on a public repository platform (GitHub archive naming convention: '-master' suffix). No executable payloads, no obfuscation, no network indicators.",
+  "expected_confidence": 0.95,
+  "peirce_chain": {
+    "firstness": "ZIP archive with '-master' suffix (GitHub archive convention) containing Java source files, Ant build descriptor (build.xml), MIT license, README, Changelog, sample GIF assets, and a screenshot. Dated 2025-04-07.",
+    "secondness": "All structural elements are consistent with an open-source Java project distributed via GitHub. The '-master' suffix is the canonical GitHub 'Download ZIP' naming convention. Presence of LICENSE, README, Changelog, and screenshot is a hallmark of a publicly distributed OSS project. GIF assets are sample inputs for the animation tool. Screenshot.jpg (1.7MB) is within normal range for a UI screenshot with high resolution. No executable JARs without source, no obfuscated strings, no network-facing code indicators.",
+    "thirdness": "No deliberate malicious pattern identified. Artifact is consistent with legitimate open-source Java software — an ASCII art animation GUI tool distributed under a MIT-style license."
+  },
+  "devil_advocate": "N/A — verdict is NOISE. Refutation protocol not required for NOISE verdicts. No anomaly requiring adversarial explanation was identified.",
+  "artifacts": [
+    {
+      "artifact_id": "ASCII-ART-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2025-04-07T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967"
+      ],
+      "description": "AsciiStudio-master.zip — container archive. GitHub 'Download ZIP' naming convention ('-master' suffix). Contains Java GUI application source, Ant build, MIT license, README, Changelog, GIF samples, Screenshot.jpg. No anomalies.",
+      "metadata": {
+        "filename": "AsciiStudio-master.zip",
+        "file_date": "2025-04-07",
+        "container_format": "ZIP",
+        "naming_convention": "GitHub archive (branch: master)",
+        "build_system": "Apache Ant (build.xml)",
+        "primary_language": "Java",
+        "license": "MIT-style",
+        "sample_assets": [
+          "butterfly.gif",
+          "jellyfish.gif",
+          "parakeet.gif",
+          "lightning.gif"
+        ],
+        "screenshot_size_bytes": 1782579,
+        "acquisition_tool": "generate_forensic_hash (vigia MCP)",
+        "acquisition_hash": "sha256:812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "ASCII-ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "list_files",
+      "timestamp": "2025-04-07T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967"
+      ],
+      "description": "Directory listing of AsciiStudio-master/: build.xml, source Java files, GIF assets (butterfly, jellyfish, parakeet, lightning), LICENSE, README.md, Changelog.txt, Screenshot.jpg. All files consistent with a standard open-source GUI application project layout.",
+      "metadata": {
+        "directory": "AsciiStudio-master/",
+        "key_files": [
+          "build.xml",
+          "README.md",
+          "Changelog.txt",
+          "LICENSE",
+          "Screenshot.jpg"
+        ],
+        "asset_types": [
+          "Java source (.java)",
+          "GIF animations (.gif)",
+          "Build descriptor (.xml)",
+          "Documentation (.md, .txt)"
+        ],
+        "executable_payloads": "none",
+        "obfuscated_content": "none detected",
+        "acquisition_tool": "list_files (vigia MCP)",
+        "acquisition_hash": "sha256:812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "caie_fractures": [],
+  "source_dataset": "VIGÍA Real Evidence Corpus — Open-Source Software",
+  "source_origin": "github_archive",
+  "_expected_verdict_correction_note": "Corregido de 'NOISE' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente.",
+  "signals": [
+    {
+      "artifact_id": "ASCII-ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "AsciiStudio-master.zip — container archive. GitHub 'Download ZIP' naming convention ('-master' suffix). Contains Java GUI application source, Ant build, MIT license, README, Changelog, GIF samples, Sc",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "ASCII-ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Directory listing of AsciiStudio-master/: build.xml, source Java files, GIF assets (butterfly, jellyfish, parakeet, lightning), LICENSE, README.md, Changelog.txt, Screenshot.jpg. All files consistent ",
+      "evidence_type": "log_entry",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-ASCIISTUDIO-2025_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  }
+}

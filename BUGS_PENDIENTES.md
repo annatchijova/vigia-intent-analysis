@@ -4495,10 +4495,61 @@ spoofability (corrida 3: 131/199 — aplastó narrativos SRL y CAN-MALICE);
 cabeza posicional (1,0.7,0.4,0.1) sin best-prefix (corrida 4: 165/199, el par
 CAN-029/CAN-032 se cruza). La lección: la cabeza estaba CALIBRADA; solo la
 cola era el defecto.
+---
+
+## B-092 — browser_forensics ignoraba el WAL de SQLite (`immutable=1`): rows solo-WAL de Chromium/Firefox invisibles [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-09, test rojo primero, suite 1065 passed, gate comparativo 166/199 → 166/199 con 0 flips (neutralidad estructural, ver abajo) |
+| **Severidad** | P1 — clase de falso negativo: hasta el 100% de la señal de un perfil puede vivir solo en un `-wal` no checkpointeado |
+| **Archivo** | `vigia/sift/browser_forensics.py` (`_connect_ro` → `_connect_evidence` vía `safe_sqlite_connect`, helper B-071) |
+| **Detectado** | `docs/SAFARI_WAL_FIX_ANALYSIS.md` §5.2 — la auditoría del hallazgo WAL de Safari localizó acá la conexión legacy superviviente |
+| **Tag de restauración** | `pre-b071-browser-wal-20260709-202353` |
+
+### Descripción
+
+`_connect_ro` abría las DBs de evidencia con `mode=ro&immutable=1`, que
+nunca lee el sidecar `-wal`. Una `History` de Chromium o `places.sqlite` de
+Firefox en modo WAL con transacciones sin checkpoint (estado normal de una
+máquina viva al adquirirla) se leía como si esos rows no existieran — la
+misma clase de falso negativo cuantificada sobre el artefacto macOS real
+(`cases/tuck-2019-macos`): 48/198 URLs y 23/23 findings vivían solo en el
+WAL, es decir el 100% de la señal de ese artefacto. macOS/iOS/Android ya
+usaban el helper B-071; browser_forensics (ruta Windows Chrome/Edge/Firefox)
+era el último módulo en la conexión legacy.
+
+### Fix aplicado
+
+- `_connect_ro` borrado; el nuevo `_connect_evidence` delega en
+  `safe_sqlite_connect(db, "BROWSER", logger)` (working copy + familia
+  completa de sidecars + WAL aplicado; evidencia intacta).
+- El retorno `None` (fallo de apertura/copia a nivel OS) eleva
+  `sqlite3.DatabaseError` para que `analyze_profile` marque el perfil
+  `UNANALYZED_ARTIFACT` — nunca "limpio con 0 hallazgos" (patrón N7/N8).
+- Docstring de `analyze_profile` actualizado (prometía `immutable=1`).
+
+### Validación
+
+- **Rojo primero:** `tests/test_browser_wal_visibility.py` (5 tests) —
+  fixtures WAL de laboratorio (declaradas como tales): rows de
+  downloads+urls (Chromium) y moz_places (Firefox) escritos solo al `-wal`
+  (writer abierto, misma receta que `test_b071_sqlite_readonly.py`).
+  Pre-fix: 3 fallaron exactamente en el FN (perfil reportado limpio).
+  Post-fix: 5/5 verdes, familia de evidencia verificada intacta por hash.
+- Suite: 1065 passed, 7 xfailed, 0 fallos (tests/ + vigia/tests/, e2e
+  excluido — depende del sandbox).
+- **Gate comparativo (ambos brazos corridos localmente):** baseline en el
+  tag de restauración 166/199; post-fix 166/199; diff por caso: 0 fixed,
+  0 broken, 0 movimientos de veredicto. La neutralidad es estructural, no
+  suerte: los 199 casos del batch son narrativas JSON — ninguno rutea un
+  perfil de navegador crudo con sidecar WAL, así que esta ruta no puede
+  mover el corpus en ningún sentido. La evidencia discriminante del fix es
+  el test rojo, mismo estándar que B-071.
 
 ---
 
-## B-092 — Banda mobile de EVIDENCE_PROFILES sin entrada en _DOMAIN_MAP: exenta del decay R4-3 [RESUELTO]
+## B-093 — Banda mobile de EVIDENCE_PROFILES sin entrada en _DOMAIN_MAP: exenta del decay R4-3 [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|

@@ -1,17 +1,17 @@
 {
   "agent_verdict": "MALICE",
-  "analysis_timestamp": "2026-07-08T01:36:09.270933+00:00",
+  "analysis_timestamp": "2026-07-09T21:55:33.739370+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-LINUX-004",
-    "end_time": "2026-07-08T01:36:09.270943+00:00",
+    "end_time": "2026-07-09T21:55:33.739377+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-LINUX-004",
-        "entry_sha256": "1b13ae0d7b2016e265299b7a34f59b269c3fc65f890dd952211d4ec2ddf0c5a7",
+        "entry_sha256": "67e3acb2f352686de63225ea82703f23531663837c1414cf8e59887030cdf2da",
         "inputs_summary": {
-          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-LINUX-004"
         },
         "iteration": 0,
@@ -21,29 +21,29 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-08T01:36:09.053232+00:00",
+        "timestamp": "2026-07-09T21:55:33.381416+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-004",
-        "entry_sha256": "4c49905ed065cf878a95c037c00674eef637573bfb278561938dbeb7b0a9b499",
+        "entry_sha256": "9bf4c43448fc533bf0233e55cb5969783abe2f5ba1154b177fd989c59e57f36e",
         "inputs_summary": {
-          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-LINUX-004.json"
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-004.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-08T01:36:09.053470+00:00",
+        "timestamp": "2026-07-09T21:55:33.381499+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-LINUX-004",
-        "entry_sha256": "1b167619255ff3135b3ce1e37c3b9fa1490bd7e13d162329d86d1bca0ac3144b",
+        "entry_sha256": "960d4c4655fd1f393cb370803ad31fcf852ec64c3570ac9cf61fd60c90e1ddc0",
         "inputs_summary": {
-          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-LINUX-004.json"
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-004.json"
         },
         "iteration": 0,
         "note": "Evidence verified: 1754f936be139ac3...",
@@ -51,15 +51,15 @@
           "sha256": "1754f936be139ac3d38815b7208a1275b515d06610841abdaa7156cfae4ec213"
         },
         "seq": 3,
-        "timestamp": "2026-07-08T01:36:09.053688+00:00",
+        "timestamp": "2026-07-09T21:55:33.381601+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-LINUX-004",
-        "entry_sha256": "2723ab1f8ce562dc08debb30507207546e2833710084d6620e8c1a784dd73c7b",
+        "entry_sha256": "154697c36740299c30c5a77a45a279c0d58e96413458154724ca6a122c93c750",
         "inputs_summary": {
-          "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-LINUX-004.json",
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-004.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-08T01:36:09.053974+00:00",
+        "timestamp": "2026-07-09T21:55:33.381715+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-LINUX-004",
-        "entry_sha256": "decc71ac56862b96a167ed71a70577dccaf194e038818f8748b70e2f82abdf78",
+        "entry_sha256": "1b8c7a93ef7fe4b77003d32c82ca402f1dee74a0f5a0fb68c253f4dac5566588",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -146,13 +146,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-08T01:36:09.270027+00:00",
+        "timestamp": "2026-07-09T21:55:33.738809+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-LINUX-004",
-        "entry_sha256": "d81de11ee39bc9b5de2655cf6c896397988de9a5ccab899b091c689ec36388aa",
+        "entry_sha256": "ec1c6d018cb41251f2b11cc7cdc3c6e9dbf9ee50ecbe01bf964f4d9c2cd64c4b",
         "inputs_summary": {
           "n_signals": "5"
         },
@@ -163,13 +163,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-08T01:36:09.270272+00:00",
+        "timestamp": "2026-07-09T21:55:33.738946+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-LINUX-004",
-        "entry_sha256": "a45dd7f1261a8938b69299adcf4e7c29777d26362f487db35f44a1ba867502c8",
+        "entry_sha256": "c42f16e5af38638d66e1fe40d64df68ffc24242a0e1461e5b3aa9e0476131b5e",
         "inputs_summary": {
           "verdict": "MALICIOUS_INTENT_DETECTED"
         },
@@ -180,18 +180,18 @@
           "exit_code": "1"
         },
         "seq": 7,
-        "timestamp": "2026-07-08T01:36:09.270668+00:00",
+        "timestamp": "2026-07-09T21:55:33.739185+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-08T01:36:09.052665+00:00",
+    "start_time": "2026-07-09T21:55:33.381203+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-LINUX-004",
-  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-LINUX-004.json",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-004.json",
   "evidence_sha256": "1754f936be139ac3d38815b7208a1275b515d06610841abdaa7156cfae4ec213",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-004 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-LINUX-004.json\nEvidence SHA-256: 1754f936be139ac3d38815b7208a1275b515d06610841abdaa7156cfae4ec213\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_file_integrity', 'sift_memory_forensics', 'sift_static_analysis', 'sift_virustotal_analysis'], 0 derivada(s)/no-analizada(s). Top z: Static analysis of the extracted LKM roo=0.89, Binary named 'cron' uploaded to VirusTot=0.84, Two memory-resident executables detected=0.78.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA loadable kernel module (LKM) rootkit dubbed PUMAKIT was discovered during routine VirusTotal threat hunting on 2024-09-04 with 0/N detections. The malware's dropper binary is named 'cron' to impersonate the legitimate cron daemon. Its multi-stage architecture includes a dropper, two memory-resident executables (/memfd:tgt and /memfd:wpn), an LKM rootkit module using ftrace to hook 18 syscalls, and a userland rootkit SO. It abuses the rmdir() syscall as a privilege escalation channel \u2014 a techni\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Static analysis of the extracted LKM rootkit module reveals ftrace-bas] z=0.893 conf=0.93 \u2014 \n  [Binary named 'cron' uploaded to VirusTotal on 2024-09-04 with 0 detect] z=0.837 conf=0.91 \u2014 \n  [Two memory-resident executables detected: /memfd:tgt and /memfd:wpn. T] z=0.783 conf=0.88 \u2014 \n  [Network analysis of the rootkit's C2 communication module reveals encr] z=0.783 conf=0.90 \u2014 \n  [String analysis of the unpacked rootkit module reveals developer-embed] z=0.731 conf=0.87 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-004 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-004.json\nEvidence SHA-256: 1754f936be139ac3d38815b7208a1275b515d06610841abdaa7156cfae4ec213\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_file_integrity', 'sift_memory_forensics', 'sift_static_analysis', 'sift_virustotal_analysis'], 0 derivada(s)/no-analizada(s). Top z: Static analysis of the extracted LKM roo=0.89, Binary named 'cron' uploaded to VirusTot=0.84, Two memory-resident executables detected=0.78.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA loadable kernel module (LKM) rootkit dubbed PUMAKIT was discovered during routine VirusTotal threat hunting on 2024-09-04 with 0/N detections. The malware's dropper binary is named 'cron' to impersonate the legitimate cron daemon. Its multi-stage architecture includes a dropper, two memory-resident executables (/memfd:tgt and /memfd:wpn), an LKM rootkit module using ftrace to hook 18 syscalls, and a userland rootkit SO. It abuses the rmdir() syscall as a privilege escalation channel \u2014 a techni\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Static analysis of the extracted LKM rootkit module reveals ftrace-bas] z=0.893 conf=0.93 \u2014 \n  [Binary named 'cron' uploaded to VirusTotal on 2024-09-04 with 0 detect] z=0.837 conf=0.91 \u2014 \n  [Two memory-resident executables detected: /memfd:tgt and /memfd:wpn. T] z=0.783 conf=0.88 \u2014 \n  [Network analysis of the rootkit's C2 communication module reveals encr] z=0.783 conf=0.90 \u2014 \n  [String analysis of the unpacked rootkit module reveals developer-embed] z=0.731 conf=0.87 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "MALICIOUS_INTENT_DETECTED",

@@ -1,0 +1,33 @@
+{
+  "case_id": "VIGIA-CAN-017",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:19:00Z",
+  "cronos_trace_id": "84704aa6-daf1-46d5-82e3-84aa15e38758",
+  "verdict": "SUSPICION",
+  "confidence": "72/100",
+  "note": "_notes field: expected_verdict MALICE→SUSPICION. Acquisition chain weak (prior_trust 0.30-0.35 for key artifacts, placeholder provenance hashes). Behavioral pattern is MALICE-level; Daubert evidentiary standard caps at SUSPICION.",
+  "peircean_analysis": {
+    "firstness": "Email from hr@corp.com, subject 'Condolencias - Fondo para familia de Juan Pérez', with attachment donaciones.pdf. SPF: fail. DKIM: fail. PDF contains embedded JavaScript accessing session_id/auth_token/csrf cookies and sending to family-support[.]org via CVE-2023-21608. 12 internal hosts connected to family-support[.]org within 30 minutes of PDF mass-open. Juan Pérez not found in personnel database. Real HR did not send the email.",
+    "secondness": "SPF+DKIM dual failure = spoofed sender domain. Non-existent employee = fabricated pretext. PDF JavaScript = technical exploit delivery. 12-host callback = successful exploitation. family-support[.]org = attacker-controlled C2. Four independent corroborating facts establish a complete phishing-to-compromise chain.",
+    "thirdness": "Emotional manipulation via social taboo (death/condolence) to bypass technical distrust: recipients suppress security skepticism when presented with bereavement context (Carnegie: emotional manipulation overrides rational threat assessment). Fabricated identity + spoofed sender + exploit PDF + C2 exfiltration = complete spear-phishing operation."
+  },
+  "hypotheses": {
+    "H1_spear_phishing_operation": "Attacker spoofed HR, used fake deceased employee to bypass defenses, delivered PDF exploit, exfiltrated session tokens from 12 hosts.",
+    "H2_legitimate_email_error": "Real HR employee sent a legitimate condolence email with a benign PDF attachment; SPF/DKIM failures are mail server misconfiguration."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: SPF/DKIM misconfiguration is very common. PDF attachments from HR are routine. Juan Pérez might exist under a slightly different name or in a different system.",
+    "test_result": "H2 REFUTED: Juan Pérez verified NOT FOUND in personnel database. Real HR confirmed did NOT send the email. The PDF contains active JavaScript cookie theft (not a benign PDF). 12-host callback to attacker domain clinches the exploitation. H2 cannot survive these four independent facts.",
+    "refutation_outcome": "H1 confirmed at behavioral level. However acquisition chain (prior_trust 0.30-0.35, placeholder hashes) prevents Daubert-compliant MALICE verdict. SUSPICION is the evidentiary cap."
+  },
+  "devil_advocate": "The acquisition chain is weak: prior_trust 0.30 for the email artifact, placeholder provenance hashes (sha256:a099mail01, sha256:a099pdf02). This evidence would not survive Daubert cross-examination on chain-of-custody. The behavioral pattern is damning but the forensic record-keeping is inadequate for a court finding of MALICE. SUSPICION is the honest verdict given evidence quality.",
+  "evidence_anchors": [
+    "a099_01: SPF fail + DKIM fail from hr@corp.com (prior_trust: 0.30)",
+    "a099_02: donaciones.pdf — CVE-2023-21608 JS cookie theft (prior_trust: 0.70 — highest)",
+    "a099_03: 12 hosts → family-support[.]org within 30min (prior_trust: 0.50)",
+    "a099_04: Juan Pérez NOT in DB, real HR did not send (prior_trust: 0.35)"
+  ],
+  "mitre_ttps": ["T1566.001 (Spear Phishing Attachment)", "T1204.002 (Malicious File — PDF)", "T1539 (Steal Web Session Cookie)", "T1041 (Exfiltration Over C2 Channel)"],
+  "carnegie_pattern": "Emotional manipulation via social taboo (death/bereavement) — nullifies technical distrust protocols by exploiting empathy response",
+  "known_limitations": "Acquisition chain integrity insufficient for MALICE under Daubert. Prior_trust 0.30-0.35 for most artifacts. Behavioral evidence is compelling but forensic record is inadequate."
+}

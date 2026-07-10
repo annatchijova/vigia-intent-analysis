@@ -1,0 +1,224 @@
+{
+  "case_id": "VIGIA-LINUX-006",
+  "case_name": "Huntress Actor-A — Opportunistic Cryptominer (Low Sophistication)",
+  "schema_version": "1.1",
+  "description": "On a Linux endpoint compromised via CVE-2025-55182 (React2Shell, CVSS 10.0), Actor A deployed a Monero cryptominer as /var/tmp/systemd-logind, impersonating the legitimate systemd-logind daemon. The miner connected to a private pool at 62.60.246[.]210:443 and ran persistently since boot. The endpoint user noticed loud fan noise and used OpenAI Codex to attempt remediation; Codex silenced the fans but failed to remove the miner. This case isolates Actor A's signals from the concurrent Actor B/C activity on the same host.",
+  "abstention_risk": "low",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 93,
+  "artifacts": [
+    {
+      "artifact_id": "linux006_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_process_monitor",
+      "timestamp": "2025-03-19T10:00:00Z",
+      "raw_score": 0.89,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:linux006_systemd_logind_process"
+      ],
+      "description": "Process /var/tmp/systemd-logind running as root with sustained 100% CPU utilization on all available cores. The legitimate systemd-logind binary resides at /usr/lib/systemd/systemd-logind; the malicious binary is at /var/tmp/, a world-writable temporary directory. The process name impersonates the system login manager. Parent process is crond, indicating persistence via cron job. The binary is stripped and statically linked (4.2MB), inconsistent with the dynamically linked legitimate systemd-logind (~200KB).",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — process telemetry",
+        "acquisition_hash": "sha256:linux006_01_huntress_edr_20250319",
+        "acquisition_timestamp": "2025-03-19T10:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts",
+        "malicious_path": "/var/tmp/systemd-logind",
+        "legitimate_path": "/usr/lib/systemd/systemd-logind",
+        "cpu_utilization": "100% all cores",
+        "parent_process": "crond",
+        "binary_size_bytes": 4200000,
+        "legitimate_binary_size_bytes": 200000,
+        "statically_linked": true
+      }
+    },
+    {
+      "artifact_id": "linux006_02",
+      "evidence_type": "network_capture",
+      "source_tool": "sift_network_forensics",
+      "timestamp": "2025-03-19T10:05:00Z",
+      "raw_score": 0.86,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:linux006_mining_pool_connection"
+      ],
+      "description": "Network connection from /var/tmp/systemd-logind to 62.60.246[.]210:443 over TLS. The destination IP is a known Monero mining pool infrastructure node. The connection has been established since system boot (14 days continuous). Traffic pattern shows periodic stratum protocol exchanges consistent with XMRIG mining pool communication: small upstream packets (share submissions) and periodic downstream packets (new job assignments).",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — network telemetry",
+        "acquisition_hash": "sha256:linux006_02_huntress_network_20250319",
+        "acquisition_timestamp": "2025-03-19T10:05:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts",
+        "destination_ip": "62.60.246.210",
+        "destination_port": 443,
+        "protocol": "TLS (stratum mining protocol)",
+        "connection_duration_days": 14,
+        "mining_type": "Monero (XMR)",
+        "traffic_pattern": "XMRIG stratum protocol"
+      }
+    },
+    {
+      "artifact_id": "linux006_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2025-03-19T10:10:00Z",
+      "raw_score": 0.78,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:linux006_cron_persistence"
+      ],
+      "description": "Root crontab contains entry: '*/5 * * * * /var/tmp/systemd-logind --config /var/tmp/.config/miner.json >/dev/null 2>&1'. The cron entry restarts the miner every 5 minutes if not running. The config file /var/tmp/.config/miner.json contains the mining pool URL, wallet address, and worker name. The crontab was last modified at 2025-03-05 03:22 UTC, 14 days before detection, consistent with the initial compromise date.",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — crontab enumeration",
+        "acquisition_hash": "sha256:linux006_03_huntress_cron_20250319",
+        "acquisition_timestamp": "2025-03-19T10:10:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts",
+        "cron_entry": "*/5 * * * * /var/tmp/systemd-logind --config /var/tmp/.config/miner.json >/dev/null 2>&1",
+        "crontab_modified": "2025-03-05T03:22:00Z",
+        "persistence_mechanism": "root crontab",
+        "config_path": "/var/tmp/.config/miner.json"
+      }
+    },
+    {
+      "artifact_id": "linux006_04",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_linux_forensics",
+      "timestamp": "2025-03-19T12:00:00Z",
+      "raw_score": 0.45,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "sha256:linux006_codex_interference"
+      ],
+      "description": "Bash history and process telemetry show OpenAI Codex-generated commands executed by the legitimate user between 2025-03-19 08:00 and 12:00 UTC. Commands include: 'sudo systemctl stop systemd-logind' (stopped the LEGITIMATE daemon, not the miner), 'sudo cpufreq-set -g powersave' (reduced fan noise without addressing the cause), and 'sudo kill -9 $(pgrep -f logind)' (killed both the legitimate and malicious process, but cron restarted the miner within 5 minutes). The Codex-generated commands created forensic noise by modifying system state and generating EDR alerts that resembled attacker tradecraft.",
+      "metadata": {
+        "acquisition_tool": "Huntress EDR agent — command telemetry + bash_history",
+        "acquisition_hash": "sha256:linux006_04_huntress_codex_20250319",
+        "acquisition_timestamp": "2025-03-19T12:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "Huntress SOC analysts",
+        "codex_commands_executed": true,
+        "legitimate_daemon_stopped": true,
+        "miner_killed_but_restarted": true,
+        "forensic_noise_generated": true,
+        "prior_trust_note": "lower trust due to AI-generated command interference with system state"
+      }
+    }
+  ],
+  "temporal_violations": [
+    {
+      "type": "PATH_IDENTITY_COLLISION",
+      "description": "The legitimate systemd-logind resides at /usr/lib/systemd/systemd-logind. The malicious binary resides at /var/tmp/systemd-logind. Both share the process name 'systemd-logind' in ps output but have completely different paths, sizes, and link types. The path collision is deliberate: /var/tmp/ is world-writable and not monitored by package integrity tools, while the name impersonates a system-critical daemon.",
+      "severity": 0.85,
+      "delta_seconds": 0,
+      "cause": {
+        "artifact_id": "linux006_01"
+      },
+      "effect": {
+        "artifact_id": "linux006_04",
+        "detail": "Codex killed the legitimate daemon by process name instead of path"
+      }
+    }
+  ],
+  "caie_fractures": [
+    {
+      "fracture_type": "PROCESS_PATH_ANOMALY",
+      "severity": 0.89,
+      "interpretation": "System daemon running from /var/tmp/ instead of /usr/lib/systemd/. No legitimate systemd component runs from a world-writable temporary directory. The path anomaly combined with 100% CPU and mining pool connection is conclusive for unauthorized cryptomining.",
+      "artifact_a": "linux006_01",
+      "artifact_b": "linux006_02",
+      "ttp_id": "T1496"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Binary named systemd-logind in /var/tmp/ with 100% CPU utilization. Network connection to known mining pool. Root crontab persistence. Codex-generated commands creating forensic noise.",
+    "secondness": "The legitimate systemd-logind path is /usr/lib/systemd/; the malicious path is /var/tmp/. Binary characteristics (size, linking) are inconsistent with the legitimate daemon. Network destination is a Monero mining pool. Crontab modification predates detection by 14 days, consistent with initial compromise via React2Shell.",
+    "thirdness": "Actor A is an opportunistic cryptominer with low operational sophistication: single persistence mechanism (crontab), no anti-forensics, no lateral movement, no credential theft. The naming impersonation is the sole evasion technique. The Codex interference is an unexpected complication: the AI remediation created additional forensic noise without addressing the root cause, demonstrating the limitations of AI-assisted incident response."
+  },
+  "devil_advocate": "The /var/tmp/systemd-logind binary could be a legitimate debugging or testing copy of the systemd login manager placed there by the system administrator. The mining pool connection could be legitimate research or authorized mining.",
+  "source_dataset": "Huntress Linux Incident — OpenAI Codex Twist, April 2025",
+  "source_origin": "public_incident_report",
+  "source_url": "https://www.huntress.com/blog/codex-part-one",
+  "notes": "POST-HACKATHON — Linux corpus expansion. Actor A isolated from multi-actor incident. Key differentiator vs Actor B (LINUX-007): low sophistication (single persistence, no anti-forensics, no credential theft). The Codex interference artifact (linux006_04) tests VIGÍA's ability to separate legitimate AI-generated noise from attacker signals.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-26T00:00:00Z",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA-LINUX-CORPUS.json",
+    "source_origin": "public_incident_report",
+    "corpus_tag": "POST-HACKATHON"
+  },
+  "signals": [
+    {
+      "artifact_id": "linux006_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "Process /var/tmp/systemd-logind running as root with sustained 100% CPU utilization on all available cores. The legitimate systemd-logind binary resides at /usr/lib/systemd/systemd-logind; the malicio",
+      "evidence_type": "memory_process",
+      "source": "sift_process_monitor",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 801
+      }
+    },
+    {
+      "artifact_id": "linux006_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "Network connection from /var/tmp/systemd-logind to 62.60.246[.]210:443 over TLS. The destination IP is a known Monero mining pool infrastructure node. The connection has been established since system ",
+      "evidence_type": "network_capture",
+      "source": "sift_network_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 473
+      }
+    },
+    {
+      "artifact_id": "linux006_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "Root crontab contains entry: '*/5 * * * * /var/tmp/systemd-logind --config /var/tmp/.config/miner.json >/dev/null 2>&1'. The cron entry restarts the miner every 5 minutes if not running. The config fi",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 663
+      }
+    },
+    {
+      "artifact_id": "linux006_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "description": "Bash history and process telemetry show OpenAI Codex-generated commands executed by the legitimate user between 2025-03-19 08:00 and 12:00 UTC. Commands include: 'sudo systemctl stop systemd-logind' (",
+      "evidence_type": "log_entry",
+      "source": "sift_linux_forensics",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 117
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-LINUX-006_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  }
+}

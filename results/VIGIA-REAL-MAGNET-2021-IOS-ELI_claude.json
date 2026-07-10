@@ -1,0 +1,32 @@
+{
+  "case_id": "VIGIA-REAL-MAGNET-2021-IOS-ELI",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:11:00Z",
+  "cronos_trace_id": "81f2f82f-a31c-47d8-a4a5-89798e968e28",
+  "verdict": "INTENT",
+  "confidence": "72/100",
+  "peircean_analysis": {
+    "firstness": "iPhone 8 forensic extraction. Wickr installed with ID eflatt610, configured with Psiphon proxy (4 S3 server URLs for server list). Signal and Snapchat also installed (auth codes via SMS in Feb-Mar 2021). TikTok present. Wickr app content absent — no messages, no contacts DB. Device hash documented.",
+    "secondness": "Wickr+Psiphon combination is double-layer obfuscation: Wickr provides end-to-end encryption; Psiphon routes the already-encrypted traffic through an anti-censorship VPN infrastructure, making network monitoring at ISP/carrier level impossible. The combination serves no legitimate purpose that Wickr alone would not provide, unless the goal is to defeat both content inspection AND network metadata analysis simultaneously. Absence of Wickr content is consistent with deliberate deletion or auto-destroy configuration.",
+    "thirdness": "Systematic forensic evasion: multiple non-recoverable communication channels (Wickr, Signal, Snapchat) ensure no single forensic extraction yields full picture. Psiphon proxy adds network-level obfuscation on top of already-encrypted channel. Content elimination across all apps ensures no residual evidence. Pattern is deliberate counter-forensic architecture, not incidental privacy use."
+  },
+  "hypotheses": {
+    "H1_systematic_evasion": "Deliberate forensic counter-measure architecture: multiple ephemeral channels + double-layer network obfuscation + content deletion.",
+    "H2_legitimate_privacy": "Privacy-conscious user (journalist, lawyer, activist) using best-practice secure communication tools. Psiphon for censorship circumvention. Wickr auto-destroy default."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "All apps individually have legitimate use. Signal is recommended by security experts. Snapchat is mainstream. Wickr is used by enterprises and legal professionals. Psiphon is used for censorship circumvention worldwide. No content available to assess subject matter.",
+    "test_result": "H2 PARTIALLY SURVIVES. The combination is suspicious but not exclusively criminal. Without knowing communication content or subject matter, MALICE cannot be established. The pattern is consistent with both criminal evasion AND sophisticated legitimate privacy use.",
+    "refutation_outcome": "H1 survives as primary hypothesis due to specificity of Psiphon-routing-Wickr combination and systematic multi-channel approach. But H2 cannot be fully excluded. INTENT (not MALICE) is the defensible verdict."
+  },
+  "devil_advocate": "Every app on this device has a legitimate purpose. Wickr is used by security-conscious enterprises. Signal is the gold standard for secure messaging. Psiphon is used by journalists and dissidents worldwide. Wickr's auto-destroy means absent messages are normal, not deleted. A journalist in a hostile environment would legitimately use all these tools simultaneously. Without communication content, attributing criminal intent is speculation.",
+  "evidence_anchors": [
+    "ELI-IOS-A01: SMS invitation to Wickr with WickrID eflatt610",
+    "ELI-IOS-A02: Wickr pushConfig.plist — Psiphon proxy with 4 S3 server URLs",
+    "ELI-IOS-A03: Signal + Snapchat + TikTok + Wickr all installed",
+    "ELI-IOS-A04: Wickr content absent — no messages, no contacts DB"
+  ],
+  "mitre_ttps": ["T1078 (Valid Accounts)", "T1573 (Encrypted Channel)", "T1048 (Exfiltration Over Alternative Protocol)"],
+  "carnegie_pattern": "Evasion — deliberate selection of channels designed to defeat forensic recovery",
+  "known_limitations": "No message content available. Cannot determine subject matter of communications. H2 (legitimate privacy) survives without content evidence. WickrID eflatt610 not cross-referenced to subject identity in this case file."
+}

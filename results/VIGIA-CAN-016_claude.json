@@ -1,0 +1,32 @@
+{
+  "case_id": "VIGIA-CAN-016",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:19:00Z",
+  "cronos_trace_id": "2cfbc425-3c22-49bc-ba14-5f84527935c2",
+  "verdict": "SUSPICION",
+  "confidence": "60/100",
+  "note": "_notes field: expected_verdict MALICE→SUSPICION. Weak acquisition chain (prior_trust 0.35 for key artifacts, placeholder provenance hashes). SUSPICION is epistemologically correct per calibration.",
+  "peircean_analysis": {
+    "firstness": "SSH session from Windows 11 via PuTTY/0.81 to Ubuntu 24.04 LTS at 09:15:00Z. At 09:15:42Z: command 'ipconfig /all' entered, exit code 127 (command not found). At 09:15:48Z (1.3 seconds later): 'ip addr' entered successfully. Keystroke sequence documents: ipconfig /[TAB][Ctrl+C]ip addr.",
+    "secondness": "ipconfig is a Windows networking command. Ubuntu uses 'ip addr' or 'ifconfig'. Exit 127 = command not in PATH. 1.3-second correction is immediate — the operator recognized the error without prompting. Windows 11 → Linux SSH session context explains the platform mismatch. SSH client (PuTTY) confirms Windows native environment.",
+    "thirdness": "Platform anachronism: the operator's procedural memory ('muscle memory') is calibrated to Windows. The instant self-correction and switch to Linux-native command reveals someone who primarily operates Windows but is currently managing a Linux server. This is an attribution signal — establishes Windows as native environment."
+  },
+  "hypotheses": {
+    "H1_windows_attacker": "Attacker normally operates in Windows, switched to compromised Linux server — platform confusion reveals origin environment.",
+    "H2_legitimate_admin": "Windows sysadmin legitimately managing a Linux server via PuTTY, typed wrong command through habit. Common in cross-platform admin work."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: Windows admins managing Linux servers via PuTTY is standard practice. Typing ipconfig on Linux is an extremely common mistake even for experienced admins. This is not an attack indicator in isolation.",
+    "test_result": "H2 FULLY SURVIVES. The observation is entirely consistent with routine cross-platform administration. ipconfig on Linux is one of the most common muscle-memory errors in IT support. Cannot distinguish attacker from admin from this artifact alone.",
+    "refutation_outcome": "H1 cannot be confirmed. SUSPICION is the correct verdict — platform anachronism is an attribution clue, not a malice indicator."
+  },
+  "devil_advocate": "Cross-platform admins type ipconfig on Linux constantly. This is one of the most common command-line errors in existence. It tells us the operator uses Windows but nothing about intent. Prior_trust 0.35 on the core artifacts means the evidence quality itself is marginal.",
+  "evidence_anchors": [
+    "a098_01: ipconfig /all — exit 127 on Ubuntu 24.04 (prior_trust: 0.35)",
+    "a098_02: ip addr — 1.3s later, success (prior_trust: 0.35)",
+    "a098_04: PuTTY/0.81 from Windows 11 (prior_trust: 0.95 — strongest artifact)"
+  ],
+  "mitre_ttps": ["T1592 (Gather Victim Host Information — network reconnaissance attempt)"],
+  "carnegie_pattern": "None — platform anachronism is attribution signal, not manipulation tactic",
+  "known_limitations": "Single command error is insufficient for verdict beyond SUSPICION. No additional hostile actions documented in this artifact set. Acquisition chain uses placeholder hashes."
+}

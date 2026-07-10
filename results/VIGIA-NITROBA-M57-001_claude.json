@@ -1,0 +1,32 @@
+{
+  "case_id": "VIGIA-NITROBA-M57-001",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:07:00Z",
+  "cronos_trace_id": "744d9730-39d2-4ee3-94c1-792d16b10e71",
+  "verdict": "SUSPICION",
+  "confidence": "68/100 (capped to 60/100 by Cronos diversity ceiling)",
+  "peircean_analysis": {
+    "firstness": "Network capture (nitroba.pcap, 56MB, July 21-22 2008) contains two devices on a residential LAN: 192.168.1.64 (Mac OS X, Safari) logged into Gmail as mylady.ixchel@gmail.com; 192.168.15.4 (Windows XP) running AOL AIM client for account m57jean. SIP VoIP adapter with 617 (Boston/Cambridge MA) phone number. AIM SyncML sync shows 0 contact changes — routine background keepalive.",
+    "secondness": "The AIM account m57jean directly maps to Jean Tanaka at M57 Patents company (m57.biz). The Gmail account is a personal identity at the same residential LAN. Co-temporal activity (same 1-hour window) on different devices on the same residential network establishes that both accounts were active in the same household. PHD Comics browsing and 617 area code are consistent with M57 employee profile in Cambridge MA. Baseline deviation: corporate account and personal pseudonymous account co-located on same LAN is atypical when one party is under investigation.",
+    "thirdness": "The structural pattern is dual identity maintenance — corporate persona (m57jean) and personal pseudonymous persona (mylady.ixchel) operating from the same residential location. This is consistent with an insider using a personal channel to maintain separation from corporate traceability. However, two-device / two-OS configuration could equally represent two household members."
+  },
+  "hypotheses": {
+    "H1_primary": "Jean Tanaka uses both personal Gmail and corporate AIM from same residence — dual identity enabling personal channel use.",
+    "H2_rival": "Two separate household members: one using corporate AIM, one using personal Gmail. Co-location is incidental."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "Different household members using different devices. The residential LAN in a Cambridge academic household plausibly contains multiple researchers/students.",
+    "test_result": "H2 CANNOT BE EXCLUDED with this evidence alone. No direct communication between the two accounts is observed. No sensitive data transfer visible. The capture shows only routine sync and browsing.",
+    "refutation_outcome": "Partial — H1 is plausible and consistent but not proven. H2 survives. SUSPICION is the defensible cap."
+  },
+  "devil_advocate": "Different household members is a fully viable explanation. The 0 contact changes in AIM sync is consistent with routine background process, not active malicious communication. The PHD Comics browsing could belong to any academic in the household, not specifically Jean. VoIP adapter may pre-date current occupant.",
+  "evidence_anchors": [
+    "NITROBA-ART-002: Gmail session cookie gmailchat=mylady.ixchel@gmail.com/984626 on 192.168.1.64",
+    "NITROBA-ART-003: AIM SyncML POST /m57jean on 192.168.15.4",
+    "NITROBA-ART-004: SIP registration 617-876-6111 (Boston/Cambridge MA)",
+    "NITROBA-ART-005: PHD Comics browsing — academic researcher profile"
+  ],
+  "mitre_ttps": ["T1078 (Valid Accounts — dual identity)", "T1102 (Web Service — personal Gmail)"],
+  "carnegie_pattern": "Dual identity maintenance — persona separation between corporate (m57jean) and personal (mylady.ixchel) channels on same residential network",
+  "known_limitations": "No direct evidence of data exfiltration in this capture. Attribution requires corroboration from additional sources (email content, file access logs). H2 (multiple household members) cannot be excluded."
+}

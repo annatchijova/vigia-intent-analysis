@@ -1,0 +1,183 @@
+{
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "a098_01",
+      "description": "Failed command: 'ipconfig /all' in Ubuntu 24.04 bash. Exit code 127: command not found.",
+      "evidence_type": "memory_process",
+      "metadata": {
+        "command": "ipconfig /all",
+        "error": "command not found",
+        "exit_code": 127,
+        "os": "Ubuntu 24.04 LTS",
+        "process_creation_time": "2026-04-18T05:42:00Z",
+        "shell": "bash",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:2c0ea6c1301319a72972e80966d45a4f0fe5b9ed76cf0770d164014e659e942f",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-016_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a098cmd01"
+      ],
+      "raw_score": 0.92,
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-21T09:15:42Z"
+    },
+    {
+      "artifact_id": "a098_02",
+      "description": "Correction 1.3 seconds later: 'ip addr'. Native Linux command.",
+      "evidence_type": "memory_process",
+      "metadata": {
+        "command": "ip addr",
+        "exit_code": 0,
+        "platform_contamination": "Windows->Linux",
+        "prev_command": "ipconfig /all",
+        "time_delta_sec": 1.3,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:2c0ea6c1301319a72972e80966d45a4f0fe5b9ed76cf0770d164014e659e942f",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-016_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a098cmd02"
+      ],
+      "raw_score": 0.92,
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-21T09:15:48Z"
+    },
+    {
+      "artifact_id": "a098_03",
+      "description": "Keystroke sequence: 'ipconfig' space '/' TAB (failed autocomplete) Ctrl+C 'ip addr'.",
+      "evidence_type": "log_entry",
+      "metadata": {
+        "network_log_time": "2026-04-18T05:47:00Z",
+        "sequence": "ipconfig /\t\u0003ip addr",
+        "session_id": "ssh-098",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:2c0ea6c1301319a72972e80966d45a4f0fe5b9ed76cf0770d164014e659e942f",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-016_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a098key03"
+      ],
+      "raw_score": 0.11,
+      "source_tool": "sift_keylogger",
+      "timestamp": "2026-01-21T09:15:42Z"
+    },
+    {
+      "artifact_id": "a098_04",
+      "description": "SSH session from Windows 11 (PuTTY/0.81) connected to Ubuntu 24.04 Linux server.",
+      "evidence_type": "memory_process",
+      "metadata": {
+        "client_os": "Windows 11",
+        "server_os": "Ubuntu 24.04",
+        "terminal": "PuTTY/0.81",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:2c0ea6c1301319a72972e80966d45a4f0fe5b9ed76cf0770d164014e659e942f",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-016_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a098mem04"
+      ],
+      "raw_score": 0.87,
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-21T09:15:00Z"
+    }
+  ],
+  "case_id": "case_098_anacronismo_plataforma",
+  "description": "User types 'ipconfig /all' on an Ubuntu 24.04 LTS server. Fails with 'command not found'. Corrects to 'ip addr' 1.3 seconds later. Cross-platform muscle memory contamination reveals a Windows origin environment.",
+  "name": "The Platform Anachronism",
+  "notes": "Physical anachronism of the operator's mind: translation from native OS.",
+  "peirce_chain": {
+    "firstness": "Windows command 'ipconfig' on a Linux server, corrected immediately.",
+    "secondness": "Muscle memory contamination error: the operator 'thinks in Windows' but operates in Linux.",
+    "thirdness": "Habit of blindly translating commands from the native OS, revealing the origin environment."
+  },
+  "signals": [
+    {
+      "artifact_id": "a098_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Failed command: 'ipconfig /all' in Ubuntu 24.04 bash. Exit code 127: command not found.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a098_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Correction 1.3 seconds later: 'ip addr'. Native Linux command.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a098_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "Keystroke sequence: 'ipconfig' space '/' TAB (failed autocomplete) Ctrl+C 'ip addr'.",
+      "evidence_type": "log_entry",
+      "source": "sift_keylogger",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 11
+      }
+    },
+    {
+      "artifact_id": "a098_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "SSH session from Windows 11 (PuTTY/0.81) connected to Ubuntu 24.04 Linux server.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 1653
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-016_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  },
+  "schema_version": 1,
+  "case_name": "case_098_anacronismo_plataforma"
+}

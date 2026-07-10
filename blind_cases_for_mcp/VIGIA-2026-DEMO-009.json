@@ -1,0 +1,213 @@
+{
+  "case_id": "VIGIA-2026-DEMO-009",
+  "name": "Operation Insomnia",
+  "description": "A financial analyst with strictly daytime hours accesses confidential documents at 3 AM on a Sunday. The system authenticates her correctly. VIGÍA must detect that the Firstness (valid login) contradicts the Secondness (temporally impossible context for this user).",
+  "artifacts": [
+    {
+      "artifact_id": "LOG-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_LOG-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_LOG-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "2026-04-12 03:17:44 USER:mrodriguez@empresa.es ACTION:LOGIN IP:177.52.88.31 RESULT:OK\n2026-04-12 03:17:51 USER:mrodriguez@empresa.es ACTION:DOCUMENT_ACCESS DOC:informe_fusion_Q2_CONFIDENCIAL.xlsx RESU",
+      "metadata": {
+        "original_type": "access_log",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "María Rodríguez works 09:00 to 18:00 per HR — she has never accessed the system between 22:00 and 07:00 in 847 days of history",
+          "The session lasted exactly 91 seconds — she downloaded 60MB of highly confidential documents in under 2 minutes",
+          "Sunday at 3 AM — outside any documented urgent work pattern",
+          "The two documents downloaded are exactly the most valuable for a competitor: merger plan and payroll"
+        ],
+        "content_preview": "2026-04-12 03:17:44 USER:mrodriguez@empresa.es ACTION:LOGIN IP:177.52.88.31 RESULT:OK\n2026-04-12 03:",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_LOG-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "LOG-002",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_LOG-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_LOG-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "STATISTICAL SUMMARY — user mrodriguez@empresa.es (last 90 days):\nTotal sessions: 847\nTypical hours: 08:47 - 18:23 (mean)\nAccess outside business hours: 0\nWeekend access: 3 (all between 10:00 and 14:00",
+      "metadata": {
+        "original_type": "access_history_reference",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "847 sessions without a single nighttime access — statistical probability of legitimate 3 AM access: < 0.001%",
+          "91-second session vs 47-minute mean — behavior 31 times faster than normal pattern",
+          "60MB downloaded vs historical mean of 4.1MB — 14 times her usual volume in a fraction of the time",
+          "Had never downloaded a merger document — access to a completely new document category"
+        ],
+        "content_preview": "STATISTICAL SUMMARY — user mrodriguez@empresa.es (last 90 days):\nTotal sessions: 847\nTypical hours: ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_LOG-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "NET-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_NET-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_NET-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "03:17:44 SOURCE:177.52.88.31 DEST:10.0.0.45:443 PROTOCOL:HTTPS BYTES_IN:1240 BYTES_OUT:63291488\n03:19:15 CONNECTION_CLOSED duration:91s\n03:19:22 SOURCE:177.52.88.31 DEST:104.21.58.92:443 PROTOCOL:HTTP",
+      "metadata": {
+        "original_type": "network_flow",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "IP 177.52.88.31 does not correspond to María's usual IP (192.168.1.45 from the corporate network or 88.12.44.67 from her registered home address)",
+          "Immediately after logout, the same IP transferred 63MB to 104.21.58.92 — an unauthorized non-corporate cloud storage server",
+          "The 63MB transfer matches exactly the size of the two downloaded documents",
+          "IP 104.21.58.92 belongs to an anonymous storage provider not authorized by the company"
+        ],
+        "content_preview": "03:17:44 SOURCE:177.52.88.31 DEST:10.0.0.45:443 PROTOCOL:HTTPS BYTES_IN:1240 BYTES_OUT:63291488\n03:1",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_NET-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "CTX-001",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_CTX-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_CTX-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "María Rodríguez — Senior Financial Analyst\nEmployment status: Active\nPending notification: Termination letter prepared for Monday 2026-04-14 (confidential HR information)\nBuilding physical access on 2",
+      "metadata": {
+        "original_type": "user_context",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "María was not physically in the building at 3 AM — remote access from an unknown IP",
+          "A termination letter is prepared for Monday — someone with access to HR information could have alerted her",
+          "The corporate phone being off suggests that someone WHO DID know about the termination accessed using her credentials",
+          "Alternative: María was alerted about the termination and acted on her own — in both cases the credentials were used in an unauthorized manner"
+        ],
+        "content_preview": "María Rodríguez — Senior Financial Analyst\nEmployment status: Active\nPending notification: Terminati",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_CTX-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_confidence": 0.75,
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "MALICE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": ""
+  },
+  "signals": [
+    {
+      "artifact_id": "LOG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "2026-04-12 03:17:44 USER:mrodriguez@empresa.es ACTION:LOGIN IP:177.52.88.31 RESULT:OK\n2026-04-12 03:17:51 USER:mrodriguez@empresa.es ACTION:DOCUMENT_ACCESS DOC:informe_fusion_Q2_CONFIDENCIAL.xlsx RESU",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    },
+    {
+      "artifact_id": "LOG-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "STATISTICAL SUMMARY — user mrodriguez@empresa.es (last 90 days):\nTotal sessions: 847\nTypical hours: 08:47 - 18:23 (mean)\nAccess outside business hours: 0\nWeekend access: 3 (all between 10:00 and 14:00",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    },
+    {
+      "artifact_id": "NET-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "03:17:44 SOURCE:177.52.88.31 DEST:10.0.0.45:443 PROTOCOL:HTTPS BYTES_IN:1240 BYTES_OUT:63291488\n03:19:15 CONNECTION_CLOSED duration:91s\n03:19:22 SOURCE:177.52.88.31 DEST:104.21.58.92:443 PROTOCOL:HTTP",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    },
+    {
+      "artifact_id": "CTX-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "María Rodríguez — Senior Financial Analyst\nEmployment status: Active\nPending notification: Termination letter prepared for Monday 2026-04-14 (confidential HR information)\nBuilding physical access on 2",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 289
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-2026-DEMO-009_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  },
+  "schema_version": 1,
+  "case_name": "VIGIA-2026-DEMO-009"
+}

@@ -2,9 +2,11 @@
 vigia/sift/macos_forensics.py
 
 macOS forensic artifact analyzer for VIGÍA.
-Parses SQLite databases (Safari History.db, QuarantineEventsV2, KnowledgeC.db,
-TCC.db), plist files, and filesystem artifacts from macOS disk images
-(E01, dd, APFS snapshots) or logical extractions.
+Parses SQLite databases (Safari History.db, QuarantineEventsV2), plist files
+(LaunchAgents/LaunchDaemons, login items, SystemVersion, nvram), and app
+bundle artifacts from macOS disk-image mounts or logical extractions.
+KnowledgeC.db, TCC.db and FSEvents are NOT parsed yet — marked TODO in
+analyze() (see also docs/MACOS_MODULES_DESIGN.md).
 
 Architecture: deterministic Fraction arithmetic throughout verdict path.
 No floats in scoring. LLM never touches verdict.
@@ -303,7 +305,7 @@ class MacOSForensicsAnalyzer:
                 "No macOS-specific artifacts found. Directory may not contain macOS evidence."
             )
 
-        # 1. System identification — version, hostname, owner
+        # 1. System identification — macOS version (hostname/owner pending)
         self._identify_system(evidence_path, result)
 
         # 1b. SIP status (B-074) — emit SIP_DISABLED from a real check so the
@@ -448,15 +450,20 @@ class MacOSForensicsAnalyzer:
 
     @staticmethod
     def _safe_sqlite_connect(db_path: Path) -> Optional[sqlite3.Connection]:
-        """Open SQLite evidence read-only + immutable (B-071 → _sql_utils).
+        """Open SQLite evidence via safe_sqlite_connect (B-071 → _sql_utils):
+        copies the db + -wal/-shm/-journal family to an ephemeral working dir
+        and opens the COPY, so non-checkpointed WAL rows ARE read (immutable=1
+        ignored them — the FN quantified in docs/SAFARI_WAL_FIX_ANALYSIS.md).
         Never writes to evidence, never creates an empty DB on a missing path."""
         return safe_sqlite_connect(db_path, "MACOS", logger)
 
     # ── System Identification ──────────────────────────────────────────────
 
     def _identify_system(self, evidence_path: Path, result: MacOSAnalysisResult) -> None:
-        """Extract macOS version, hostname, and owner from SystemVersion.plist
-        and other system artifacts. plistlib.load() autodetects binary/XML."""
+        """Extract the macOS version from SystemVersion.plist.
+        plistlib.load() autodetects binary/XML. hostname and owner_name are
+        NOT extracted yet — the result fields exist but stay empty (honest
+        gap; no macOS artifact for them is parsed today)."""
         for sv in self._safe_rglob(evidence_path, "SystemVersion.plist", limit=2):
             try:
                 with open(sv, "rb") as f:
@@ -987,7 +994,9 @@ class MacOSForensicsAnalyzer:
 
     # ── Plist Analysis ─────────────────────────────────────────────────────
 
-    # Forensically interesting plist filenames → (description, what to look for)
+    # Forensically interesting plist filenames → description. Reference
+    # catalog only — NOT consumed by any analyzer yet (the analyzed plists
+    # are LaunchAgents/LaunchDaemons and com.apple.loginitems.plist).
     _INTERESTING_PLISTS = {
         "com.apple.loginitems.plist": "Login items — programs launched at user login",
         "com.apple.recentitems.plist": "Recent items — recently opened files/apps/servers",
@@ -1003,10 +1012,11 @@ class MacOSForensicsAnalyzer:
     ) -> None:
         """Scan for forensically relevant plist files.
 
-        Covers three categories:
+        Covers two categories:
         1. LaunchAgents/LaunchDaemons — persistence mechanisms (T1543.001)
         2. Login items — user-level persistence (T1547.015)
-        3. Recent items — user activity footprint
+        Recent items (com.apple.recentitems.plist) are NOT analyzed yet —
+        listed in _INTERESTING_PLISTS as a pending reference only.
         """
         self._analyze_launch_plists(evidence_path, result)
         self._analyze_loginitems_plists(evidence_path, result)

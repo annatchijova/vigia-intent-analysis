@@ -1,0 +1,36 @@
+{
+  "case_id": "VIGIA-FN-002",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:35:00Z",
+  "cronos_trace_id": "5988aedf-eed8-467e-a1e8-bcfb7f01dfe4",
+  "verdict": "MALICE",
+  "confidence": "76/100",
+  "note": "confidence_expected: 78. Near match (2-point delta). abstention_risk: high — a VIGÍA that only validates binary signatures and traffic protocols would miss this (technically everything is legitimate). The MALICE verdict rests on: (A) MISSING_AUTHORIZATION CAIE fracture (no change ticket), (B) 100GB exfiltration volume far exceeding typical backup scope, and (C) the attacker's deliberate choice of a legitimate tool as a concealment technique — the technical legitimacy of the tool IS the anti-forensic technique.",
+  "peircean_analysis": {
+    "firstness": "2026-06-14: Veeam Agent installed on server 10.0.8.44, installer: system_admin, no change ticket in change management. 2026-06-15 02:00: veeam_agent.exe running, signed by Veeam Software, valid certificate. 02:30: 100GB (107,374,182,400 bytes) transferred to 198.51.100.77 on port 443 via veeam. No forensic errors, no altered timestamps, no suspicious process names.",
+    "secondness": "The legitimate Veeam binary and valid certificate are surface-layer signals. The operative anomalies are: (A) No change management ticket for the installation — all software deployments to production servers require ITSM change tickets; this one has none. (B) 100GB in a single backup cycle to an unregistered destination IP is outside normal backup profiles — corporate Veeam deployments point to registered, managed storage destinations, not arbitrary IPs. (C) The installation was done at 02:00 (early morning) by 'system_admin' — a generic account, not a tracked individual. Three independent operational anomalies accompany technically clean artifacts.",
+    "thirdness": "This is a Living-off-the-Land (LOTL) exfiltration technique: the attacker installed a legitimate, signed backup tool and configured it to send data to an attacker-controlled cloud instance. The technical legitimacy of the tool (signed binary, valid certificate, standard protocol port 443) is itself the concealment technique — it makes the data transfer indistinguishable from legitimate backup traffic at the packet level. The lack of a change ticket is deliberate: an attacker who controls the system_admin account installs the tool without creating a paper trail. The 100GB volume suggests full data-store exfiltration, not a test run. This is MALICE: active concealment via legitimate tooling."
+  },
+  "hypotheses": {
+    "H1_lotl_exfiltration": "Attacker used stolen system_admin credentials to install legitimate Veeam Agent and configured it to send 100GB to an attacker-controlled cloud instance, exploiting the tool's legitimacy to evade detection.",
+    "H2_legitimate_backup_no_ticket": "A legitimate sysadmin installed Veeam for an authorized backup operation but forgot to create the change ticket. The destination IP is a legitimate corporate cloud backup endpoint."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: Change ticket omissions do occur, especially for emergency or unplanned backup configurations. Veeam to cloud storage is a standard backup pattern.",
+    "test_result": "H2 WEAKENED: (A) 100GB is a large backup for a single unplanned operation — legitimate emergency backups are scoped to critical files, not full data-store volumes. (B) 198.51.100.77 is not in the 198.51.100.0/24 TEST-NET-2 RFC 5737 range (documentation range) but an actual IP — whether it's a known corporate backup endpoint cannot be determined from the artifact alone. (C) A legitimate sysadmin who omits a change ticket for a 100GB transfer would still be traceable by user identity — 'system_admin' as the installer identity is suspicious (generic account, no individual attribution). H2 is plausible but does not account for all three anomalies simultaneously.",
+    "refutation_outcome": "H2 weakened but not fully refuted. MALICE by CAIE fracture + LOTL pattern. 2-point confidence delta from expected reflects residual H2 uncertainty."
+  },
+  "devil_advocate": "The binary is signed by Veeam Software. The traffic is indistinguishable from real backup traffic. Backups to cloud storage at 02:00 are normal maintenance windows. A sysadmin who forgot to open a change ticket is a mundane compliance failure. Without knowing whether 198.51.100.77 is a corporate backup endpoint, 100GB could be a legitimate full-server backup.",
+  "caie_fracture": "MISSING_AUTHORIZATION (severity 0.85) — legitimate tool, no change ticket. Technical legitimacy does not imply operational authorization.",
+  "evidence_anchors": [
+    "fn002_01: veeam_agent.exe signed/valid, install date 2026-06-14, installer=system_admin (prior_trust 0.95)",
+    "fn002_02: 100GB to 198.51.100.77:443 via veeam (prior_trust 0.2)",
+    "fn002_03: NO change ticket for Veeam install on 10.0.8.44 (prior_trust 0.3)"
+  ],
+  "mitre_ttps": [
+    "T1072 (Software Deployment Tools — legitimate backup agent as exfiltration vector)",
+    "T1048 (Exfiltration Over Alternative Protocol — Veeam backup protocol for data theft)"
+  ],
+  "carnegie_pattern": "Technical legitimacy exploitation — leveraging trusted tool signatures to conceal unauthorized data transfer",
+  "known_limitations": "abstention_risk: high. Destination IP 198.51.100.77 not confirmed as attacker-controlled vs legitimate corporate endpoint. fn002_02 prior_trust 0.2 limits network artifact confidence. System_admin identity is generic — individual attribution requires additional log analysis."
+}

@@ -1,0 +1,141 @@
+{
+  "case_id": "FP-CULTURAL-CLEAN-001",
+  "name": "Clean Foreign Machine — Native Russian Configuration, No Incident",
+  "description": "A developer in Torzhok. Cyrillic filenames, RU keyboard, UTC+3 timezone. Memory, LSASS and kernel are clean. There was NO incident. The cultural markers are native configuration, not planted bait. This is the discriminating negative case for FALSE_FLAG_PATTERN: high cultural markers + clean system must NOT be MALICE. The absence of a malicious event is not evidence of a staged one.",
+  "artifacts": [
+    {
+      "artifact_id": "cultural_clean_001",
+      "evidence_type": "cultural_marker",
+      "source_tool": "infer_intent",
+      "timestamp": "2026-04-10T12:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:cultural_clean_chain_001"
+      ],
+      "description": "Cyrillic filename: 'отчет_финансы.docx'. Keyboard layout: RU. Timezone: UTC+3. Comments in Russian. Native developer configuration.",
+      "metadata": {
+        "cyrillic_filenames": 3,
+        "keyboard_layout_detected": "RU",
+        "timezone_offset": "+03:00",
+        "language_confidence": 0.91,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:44534290f74e3e57c6b6ff51f40147edd0b1aa7aa16b26ec3f7a7ba35fe67578",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/FP-CULTURAL-CLEAN-001_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "technical_clean_001",
+      "evidence_type": "memory_process",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T12:00:10Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:mem_clean_001",
+        "sha256:mem_clean_002"
+      ],
+      "description": "Memory: No process injection. No kernel anomalies. Clean system state.",
+      "metadata": {
+        "injections_detected": 0,
+        "kernel_anomalies": 0,
+        "suspicious_handles": 0,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:44534290f74e3e57c6b6ff51f40147edd0b1aa7aa16b26ec3f7a7ba35fe67578",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/FP-CULTURAL-CLEAN-001_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "technical_clean_002",
+      "evidence_type": "lsass_session",
+      "source_tool": "list_processes",
+      "timestamp": "2026-04-10T12:00:12Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:lsass_clean_001"
+      ],
+      "description": "LSASS: No credential dumping. Normal session count.",
+      "metadata": {
+        "sessions": 2,
+        "anomalies": 0,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:44534290f74e3e57c6b6ff51f40147edd0b1aa7aa16b26ec3f7a7ba35fe67578",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/FP-CULTURAL-CLEAN-001_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [],
+  "expected_confidence": 0.15,
+  "peirce_chain": {
+    "firstness": "Cyrillic filenames, RU keyboard, UTC+3 — all present.",
+    "secondness": "Memory, LSASS, kernel — all clean. There is no malicious event to attribute.",
+    "thirdness": "Most parsimonious explanation (Eco's razor): this is a Russian developer's machine. No staging, no flag. Russian is spoken in many places; configuration is not intent."
+  },
+  "demo_quote": "VIGÍA does not accuse someone for writing in Russian. Without a real malicious event, there is no attribution to falsify.",
+  "signals": [
+    {
+      "artifact_id": "cultural_clean_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Cyrillic filename: 'отчет_финансы.docx'. Keyboard layout: RU. Timezone: UTC+3. Comments in Russian. Native developer configuration.",
+      "evidence_type": "cultural_marker",
+      "source": "infer_intent",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 51
+      }
+    },
+    {
+      "artifact_id": "technical_clean_001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Memory: No process injection. No kernel anomalies. Clean system state.",
+      "evidence_type": "memory_process",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "technical_clean_002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "LSASS: No credential dumping. Normal session count.",
+      "evidence_type": "lsass_session",
+      "source": "list_processes",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/FP-CULTURAL-CLEAN-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  },
+  "schema_version": 1,
+  "case_name": "FP-CULTURAL-CLEAN-001"
+}

@@ -1,0 +1,193 @@
+{
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
+  "analyst_notes": "Multi-source case. The key is that no single source is conclusive in isolation — the correlation between the three is what proves coordinated fabrication.",
+  "artifacts": [
+    {
+      "artifact_id": "DOC-001",
+      "content": {
+        "conclusion": "No irregularities were detected in the Q1 2026 period. Accounting records are consistent with declared operations.",
+        "declared_author": "Dra. Patricia Goldstein — Grant & Associates Auditores",
+        "declared_date": "April 8, 2026",
+        "pages": 47,
+        "signature_present": true,
+        "title": "Q1 2026 Financial Audit Report"
+      },
+      "forensic_anomalies": [
+        "The author in metadata is 'jmartinez' — an internal employee of Corporación Nexus, not an external auditor",
+        "The template 'Informe_interno_v3.dotx' belongs to Nexus S.A., not to Grant & Associates",
+        "Creation date: 2026-04-10 02:14 — two days AFTER the date declared in the document",
+        "Modification at 02:47 in the early morning — unusual hours for legitimate office work",
+        "The 'company' field in metadata says 'Corporación Nexus S.A.' — an external auditing firm would never have that company in their metadata",
+        "The digital signature of Dra. Goldstein is an inserted PNG image, not a real cryptographic signature"
+      ],
+      "metadata_forense": {
+        "author_metadata": "jmartinez",
+        "company_metadata": "Corporación Nexus S.A.",
+        "creation_date": "2026-04-10T02:14:33Z",
+        "last_modified_by": "jmartinez",
+        "modification_date": "2026-04-10T02:47:19Z",
+        "pdf_creator": "Microsoft Word 2019",
+        "pdf_producer": "Microsoft Word 2019",
+        "template": "Informe_interno_v3.dotx"
+      },
+      "source": "Informe_Auditoria_Q1_2026.pdf — received by email on 2026-04-10",
+      "timestamp_declarado": "2026-04-08T14:30:00Z",
+      "type": "pdf_document"
+    },
+    {
+      "artifact_id": "LOG-001",
+      "content": "2026-01-15 09:23:11 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100023441 AMOUNT:45000.00 ACCOUNT:6210 APPROVED:yes\n2026-01-15 09:23:45 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100023442 AMOUNT:45000.00 ACCOUNT:6210 APPROVED:yes\n2026-02-03 11:15:22 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100024891 AMOUNT:89750.00 ACCOUNT:6210 APPROVED:yes\n2026-03-22 14:44:08 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100026103 AMOUNT:112000.00 ACCOUNT:6210 APPROVED:yes",
+      "forensic_anomalies": [
+        "DOC IDs have huge gaps: 100023441, 100023442, 100024891, 100026103 — thousands of intermediate transactions are missing that would exist in normal operation",
+        "All four entries show exactly the same user (finanzas01) and the same account (6210) — suspiciously uniform",
+        "The APPROVED field is always 'yes' — real operations have rejections, reversals, corrections",
+        "Timestamps have seconds but no milliseconds — real SAP records with millisecond precision",
+        "Account 6210 is 'Consulting Expenses' — unusual concentration of payments in a single category",
+        "This log was exported on 2026-04-10 — the same day the report was created according to metadata"
+      ],
+      "source": "SAP ERP — FI module audit trail, exported on 2026-04-10",
+      "timestamp_declarado": "2026-Q1",
+      "type": "accounting_system_log"
+    },
+    {
+      "artifact_id": "IMG-001",
+      "content": {
+        "declared_content": "Screenshot of SAP financial dashboard showing Q1 2026 balances in green, no alerts",
+        "dimensions": "1920x1080",
+        "file_size_kb": 847,
+        "format": "PNG"
+      },
+      "forensic_anomalies": [
+        "Processed with Adobe Photoshop — a legitimate screenshot does not go through Photoshop",
+        "Created at 01:58 on April 10 — 16 minutes before the PDF creation, in the early morning",
+        "ELA detects edited region exactly where the financial totals are",
+        "Inconsistent antialiasing in the numbers — the figures were taken from another source and inserted",
+        "The dashboard shows 'All OK' but the image was constructed, not captured"
+      ],
+      "source": "dashboard_financiero_Q1.png — attached to the report",
+      "timestamp_declarado": "2026-04-07T16:30:00Z",
+      "type": "screenshot_dashboard",
+      "visual_forensic_analysis": {
+        "compression_artifacts": "The numbers region shows a different JPEG compression level than the rest of the image — indicates that region was edited separately and reinserted",
+        "ela_analysis": "Error Level Analysis reveals differential compression in the region of financial figures (approximate coordinates 450-890px horizontal, 320-650px vertical)",
+        "font_inconsistency": "Numbers in the altered region use different subpixel antialiasing than the rest of the dashboard — suggests they originate from a different screen or resolution",
+        "metadata": {
+          "camera_make": null,
+          "creation_time": "2026-04-10T01:58:44Z",
+          "gps": null,
+          "software": "Adobe Photoshop 2025"
+        },
+        "shadow_inconsistency": "UI element shadows in the edited region have a light direction 3° different from the rest — impossible in a real screenshot"
+      }
+    },
+    {
+      "artifact_id": "META-001",
+      "content": "From: p.goldstein@grant-associates.com\nTo: directorio@nexus-corp.com\nSubject: Q1 2026 Audit Report\nDate: Thu, 10 Apr 2026 09:15:22 -0300\nMessage-ID: <20260410091522.4821@grant-associates.com>\nX-Originating-IP: 186.123.45.67\nX-Mailer: Microsoft Outlook 16.0\nReceived: from mail.nexus-corp.com (10.0.0.25) by exchange.nexus-corp.com",
+      "forensic_anomalies": [
+        "X-Originating-IP 186.123.45.67 is an Argentine IP address — Grant & Associates is headquartered in Spain according to their official website",
+        "The email was sent from mail.nexus-corp.com (Nexus INTERNAL server) before passing through Exchange — the email originated inside the corporate network, not from an external auditor",
+        "The domain grant-associates.com was registered on 2026-03-28 — 13 days before the report, a newly created domain to simulate the auditing firm",
+        "X-Mailer: Microsoft Outlook 16.0 — Grant & Associates uses Gmail according to their verified prior communications"
+      ],
+      "source": "Headers of the email delivering the report — Exchange server",
+      "timestamp_declarado": "2026-04-10T09:15:00Z",
+      "type": "email_headers"
+    }
+  ],
+  "case_id": "VIGIA-2026-DEMO-008",
+  "case_name": "Operation Three Mirrors",
+  "description": "A company receives an external audit report concluding there were no accounting irregularities. The report is accompanied by system logs and a screenshot of the financial dashboard. VIGÍA must correlate three independent sources to detect that all three were manipulated with the same objective.",
+  "expected_hypothesis": "coordinated_evidence_fabrication",
+  "ground_truth": {
+    "actual_attacker": "jmartinez — internal financial controller of Corporación Nexus S.A.",
+    "actual_objective": "conceal embezzlement of approximately 291,750 USD through fictitious payments to shell consultancies registered under account 6210",
+    "cover_up_method": "fabrication of a false audit report, manipulation of SAP export, composition of an altered screenshot",
+    "exfiltration_occurred": false,
+    "mitre_actual": {
+      "T1027": "Obfuscated Files — image processed in Photoshop to conceal alteration",
+      "T1036.006": "Space after Filename — impersonation of external auditing firm",
+      "T1565.001": "Stored Data Manipulation — alteration of SAP logs and metadata"
+    },
+    "real_damage": "291,750 USD diverted in Q1 2026"
+  },
+  "peirce_expected": {
+    "firstness": "Clean audit report, SAP logs with no alerts, financial dashboard in green. Superficially everything in order.",
+    "secondness": "PDF metadata reveals internal author. SAP log with impossible gaps and degraded timestamps. Image processed in Photoshop with positive ELA in the figures region. All three artifacts were created the same early morning of April 10.",
+    "thirdness": "The temporal coordination between the three artifacts — PDF created at 02:14, image at 01:58, log exported on the same day — reveals an evidence fabrication operation executed in a single nighttime session. The author knew which documents were needed to convince the board but did not understand that metadata tells its own story."
+  },
+  "signals": [
+    {
+      "artifact_id": "DOC-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "LOG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "IMG-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    },
+    {
+      "artifact_id": "META-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "",
+      "evidence_type": "unknown",
+      "source": "unknown",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/case_008_multi_source_fraud_demo_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  },
+  "schema_version": 1
+}

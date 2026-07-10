@@ -1,0 +1,104 @@
+{
+  "case_id": "VIGIA-REAL-MAGNET-2022-ANDROID",
+  "case_name": "Magnet CTF 2022 Android — Rafael Shell Google Pixel 3",
+  "description": "Android data partition image. Rafael Shell (rafaelshell24@gmail.com), Google Pixel 3 rooted with Magisk v23000, Champlain College Burlington VT, Log4Shell vCenter research. Full disk encryption active with keymaster key blob. Bluetooth config and recovery artifacts present. Wire app bookmarks and Bumble chat with Discord handle exchange indicate OPSEC-aware communication patterns.",
+  "schema_version": "ebs_v1",
+  "cross_case_correlation": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL — same actor, same TTPs",
+  "artifacts": [
+    {
+      "artifact_id": "AND2022-A01",
+      "evidence_type": "file_metadata",
+      "description": "data/unencrypted/key/ directory contains: keymaster_key_blob, encrypted_key, secdiscardable, stretching, version. Full Android FDE active. Content inaccessible without hardware-backed keymaster key from original device.",
+      "raw_score": 0.3,
+      "prior_trust": 0.8,
+      "source_tool": "filesystem_analysis",
+      "timestamp": "2022-01-01T00:00:00Z",
+      "provenance_chain": [
+        "tar_extraction",
+        "magnet_ctf_2022"
+      ],
+      "metadata": {
+        "acquisition_tool": "android_backup",
+        "acquisition_hash": "magnet_ctf_2022_android",
+        "acquisition_timestamp": "2022-01-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "MAGNET-CTF-2022",
+        "encryption": "FDE_keymaster",
+        "forensic_note": "ABSTAIN — content inaccessible without device key. Structure confirms encryption active."
+      }
+    },
+    {
+      "artifact_id": "AND2022-A02",
+      "evidence_type": "file_metadata",
+      "description": "data/misc/bluedroid/bt_config.bak present — Bluetooth pairing history recoverable. data/misc/recovery/ contains build fingerprint. Metadata artifacts accessible despite FDE.",
+      "raw_score": 0.25,
+      "prior_trust": 0.8,
+      "source_tool": "filesystem_analysis",
+      "timestamp": "2022-01-01T00:00:00Z",
+      "provenance_chain": [
+        "tar_extraction",
+        "magnet_ctf_2022"
+      ],
+      "metadata": {
+        "acquisition_tool": "android_backup",
+        "acquisition_hash": "magnet_ctf_2022_android",
+        "acquisition_timestamp": "2022-01-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "MAGNET-CTF-2022"
+      }
+    },
+    {
+      "artifact_id": "AND2022-A03",
+      "evidence_type": "cultural_marker",
+      "description": "Log4Shell CVE-2021-44228 bookmark/search against VMware vCenter. Indicates active research into critical RCE vulnerability targeting enterprise infrastructure. Correlates with Linux Rafael case where Log4Shell was exploited.",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "source_tool": "browser_analysis",
+      "timestamp": "2022-01-01T00:00:00Z",
+      "provenance_chain": [
+        "tar_extraction",
+        "magnet_ctf_2022",
+        "browser_history_extraction"
+      ],
+      "metadata": {
+        "acquisition_tool": "android_backup",
+        "acquisition_hash": "magnet_ctf_2022_android",
+        "acquisition_timestamp": "2022-01-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "MAGNET-CTF-2022",
+        "cve": "CVE-2021-44228",
+        "target_system": "VMware vCenter",
+        "cross_case_ref": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL"
+      }
+    },
+    {
+      "artifact_id": "AND2022-A04",
+      "evidence_type": "log_entry",
+      "description": "Wire app 7 bookmarks + Bumble chat with Discord handle exchange (PostMaster#9650/DesertBusDriver#9827). Encrypted messaging app usage combined with pseudonymous handle exchange across platforms indicates OPSEC-aware communication patterns.",
+      "raw_score": 0.65,
+      "prior_trust": 0.8,
+      "source_tool": "app_analysis",
+      "timestamp": "2022-01-01T00:00:00Z",
+      "provenance_chain": [
+        "tar_extraction",
+        "magnet_ctf_2022",
+        "app_data_extraction"
+      ],
+      "metadata": {
+        "acquisition_tool": "android_backup",
+        "acquisition_hash": "magnet_ctf_2022_android",
+        "acquisition_timestamp": "2022-01-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "MAGNET-CTF-2022",
+        "apps_detected": [
+          "Wire",
+          "Bumble"
+        ],
+        "discord_handles": [
+          "PostMaster#9650",
+          "DesertBusDriver#9827"
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "case_id": "VIGIA-PAGINA-WEB-PAPA-2026",
+  "case_name": "Página web para papá — Personal family React web application",
+  "schema_version": 1,
+  "description": "ZIP archive 'Página web para papá.zip' (SHA-256: 166dc64e978a53aef82993fe7132f64ba0b825c92c7cc194dec2dd4e3059b9df) containing a React web application dated 2026-06-26. Contents: Admin-Categorias.dc.html, Catalogo.dc.html, Foro*.dc.html (forum pages), Inicio.dc.html, Publicacion.dc.html, Publicar.dc.html, support.js (34KB), uploads/AdminCategorias.jsx, CatalogoPage.jsx, HomePage.jsx, ListingDetalle.jsx, NuevoListing.jsx, .thumbnail (2KB). The project name 'para papá' (Spanish: 'for dad') indicates a personal gift project. The file structure (JSX components, HTML pages, support JS) is consistent with a React-based marketplace or forum web application built as a personal project. No executable payloads, no network C2 indicators, no obfuscation.",
+  "expected_confidence": 0.95,
+  "peirce_chain": {
+    "firstness": "ZIP archive named 'Página web para papá.zip' containing React JSX components, HTML pages with '.dc.html' extension, support.js (34KB), and a .thumbnail file. Dated 2026-06-26. Page names suggest a marketplace/forum: Catalogo, Foro, Inicio, Publicacion, Publicar, AdminCategorias.",
+    "secondness": "The project name in Spanish ('para papá' = 'for dad') is a personal dedication pattern, not an operational codename. The JSX component names (CatalogoPage, HomePage, ListingDetalle, NuevoListing) map to a standard small-scale marketplace/listing web application. The '.dc.html' extension may indicate a design/component export format. support.js at 34KB is consistent with a bundled utility library. The .thumbnail file (2KB) is likely a project preview image. All structural elements are consistent with a personal web development project. No hardcoded credentials, no obfuscated scripts, no C2 patterns.",
+    "thirdness": "No deliberate malicious pattern identified. Artifact is consistent with legitimate personal software — a React-based web application built as a personal gift or family project."
+  },
+  "devil_advocate": "N/A — verdict is NOISE. Refutation protocol not required for NOISE verdicts. No anomaly requiring adversarial explanation was identified.",
+  "artifacts": [
+    {
+      "artifact_id": "PAPA-ART-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-26T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:166dc64e978a53aef82993fe7132f64ba0b825c92c7cc194dec2dd4e3059b9df"
+      ],
+      "description": "Página web para papá.zip — personal family React web application. Contains JSX components, HTML pages, support.js (34KB), .thumbnail (2KB). Dated 2026-06-26. No forensic anomalies.",
+      "metadata": {
+        "filename": "Página web para papá.zip",
+        "file_date": "2026-06-26",
+        "container_format": "ZIP",
+        "project_dedication": "para papá (personal gift/family project)",
+        "primary_technology": "React (JSX)",
+        "html_pages": [
+          "Admin-Categorias.dc.html",
+          "Catalogo.dc.html",
+          "Foro*.dc.html",
+          "Inicio.dc.html",
+          "Publicacion.dc.html",
+          "Publicar.dc.html"
+        ],
+        "jsx_components": [
+          "AdminCategorias.jsx",
+          "CatalogoPage.jsx",
+          "HomePage.jsx",
+          "ListingDetalle.jsx",
+          "NuevoListing.jsx"
+        ],
+        "support_js_size_bytes": 34816,
+        "thumbnail_size_bytes": 2048,
+        "application_type": "marketplace/forum web app",
+        "acquisition_tool": "generate_forensic_hash (vigia MCP)",
+        "acquisition_hash": "sha256:166dc64e978a53aef82993fe7132f64ba0b825c92c7cc194dec2dd4e3059b9df",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    },
+    {
+      "artifact_id": "PAPA-ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "list_files",
+      "timestamp": "2026-06-26T00:00:00Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:166dc64e978a53aef82993fe7132f64ba0b825c92c7cc194dec2dd4e3059b9df"
+      ],
+      "description": "Directory structure: root HTML pages (.dc.html format), uploads/ subdirectory with JSX components, support.js utility, .thumbnail preview. Component names (Catalogo, HomePage, ListingDetalle, NuevoListing) indicate a small personal marketplace or community listing site.",
+      "metadata": {
+        "root_files": [
+          "Admin-Categorias.dc.html",
+          "Catalogo.dc.html",
+          "Inicio.dc.html",
+          "Publicacion.dc.html",
+          "Publicar.dc.html",
+          "support.js",
+          ".thumbnail"
+        ],
+        "uploads_directory": [
+          "AdminCategorias.jsx",
+          "CatalogoPage.jsx",
+          "HomePage.jsx",
+          "ListingDetalle.jsx",
+          "NuevoListing.jsx"
+        ],
+        "credentials_exposed": false,
+        "obfuscated_content": "none detected",
+        "c2_indicators": "none",
+        "acquisition_tool": "list_files (vigia MCP)",
+        "acquisition_hash": "sha256:166dc64e978a53aef82993fe7132f64ba0b825c92c7cc194dec2dd4e3059b9df",
+        "acquisition_timestamp": "2026-06-30T16:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "VIGIA-MCP-CLAUDE-CODE"
+      }
+    }
+  ],
+  "caie_fractures": [],
+  "source_dataset": "VIGÍA Real Evidence Corpus — Personal Projects",
+  "source_origin": "personal_archive",
+  "_expected_verdict_correction_note": "Corregido de 'NOISE' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente.",
+  "signals": [
+    {
+      "artifact_id": "PAPA-ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Página web para papá.zip — personal family React web application. Contains JSX components, HTML pages, support.js (34KB), .thumbnail (2KB). Dated 2026-06-26. No forensic anomalies.",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "PAPA-ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Directory structure: root HTML pages (.dc.html format), uploads/ subdirectory with JSX components, support.js utility, .thumbnail preview. Component names (Catalogo, HomePage, ListingDetalle, NuevoLis",
+      "evidence_type": "log_entry",
+      "source": "list_files",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 19
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-PAGINA-WEB-PAPA-2026_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 2
+  }
+}

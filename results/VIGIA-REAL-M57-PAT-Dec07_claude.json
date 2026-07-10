@@ -1,0 +1,30 @@
+{
+  "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:09:00Z",
+  "cronos_trace_id": "4d60d043-4dea-4eb9-8608-2c39216f5633",
+  "verdict": "NOISE",
+  "confidence": "82/100",
+  "peircean_analysis": {
+    "firstness": "soffice.bin (OpenOffice, PID 1608) active. cmd.exe (PID 1860) spawned mdd_1.3.exe (PID 2784) at 2009-12-08T00:22:05Z. Full AVG antivirus suite running (avgwdsvc, avgnsx, avgemc, avgrsx, avgchsvx, avgcsrvx). No other anomalous processes.",
+    "secondness": "mdd_1.3.exe is ManTech Memory DD — a standard forensic memory acquisition tool. Its presence via cmd.exe at 00:22Z is the investigator performing capture, not Pat's malicious act. AVG running normally. OpenOffice = routine office work. Case description explicitly states 'No exfiltration indicators this day.'",
+    "thirdness": "This is a clean baseline snapshot. The only notable process is the forensic acquisition tool, which belongs to the examiner side of the investigation. Pat's machine shows standard office work activity."
+  },
+  "hypotheses": {
+    "H1_pat_suspicious": "Pat performing suspicious activity on Dec-07 consistent with insider threat.",
+    "H2_baseline_clean": "Dec-07 is a clean baseline day — mdd is investigator acquisition, processes are normal."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "Clean work day. mdd_1.3.exe is well-known forensic tool run by examiner. Case explicitly states no exfiltration.",
+    "test_result": "H1 has no supporting evidence in this artifact set. H2 is fully consistent with all observations.",
+    "refutation_outcome": "H1 REFUTED. NOISE verdict stands."
+  },
+  "devil_advocate": "Pat is flagged as insider threat suspect. Any artifact could be part of a pattern across multiple days. But this single-day snapshot shows nothing suspicious — the burden of proof requires positive indicators, not suspicion-by-association.",
+  "evidence_anchors": [
+    "M57-PAT-D07-A01: mdd_1.3.exe (forensic memory acquisition tool) spawned by cmd.exe",
+    "M57-PAT-D07-A02: Full AVG suite active, no suspicious processes"
+  ],
+  "mitre_ttps": [],
+  "carnegie_pattern": "None detected",
+  "known_limitations": "Single-day baseline view. Pat's insider threat status is contextual — this case does not capture the exfiltration day. Cross-day correlation required for full assessment."
+}

@@ -1,17 +1,17 @@
 {
   "agent_verdict": "INTENT",
-  "analysis_timestamp": "2026-07-08T01:36:05.896706+00:00",
+  "analysis_timestamp": "2026-07-09T21:55:29.203002+00:00",
   "audit_trail": {
     "agent_version": "1.0.0-SANS-2026",
     "case_id": "VIGIA-FN-001",
-    "end_time": "2026-07-08T01:36:05.896714+00:00",
+    "end_time": "2026-07-09T21:55:29.203008+00:00",
     "entries": [
       {
         "action": "AGENT_INITIALIZED",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "d106a3f40e9f3efd5272c63314573039e4ec1b6592c5ed349f8d66189fbb34e9",
+        "entry_sha256": "347338d938e3adcc1163aa352447ecef1c248353c2f27250e3ff6af3bda9c437",
         "inputs_summary": {
-          "agent_file": "/home/user/vigia-intent-analysis/vigia_agent.py",
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
           "case_id": "VIGIA-FN-001"
         },
         "iteration": 0,
@@ -21,29 +21,29 @@
           "agent_version": "1.0.0-SANS-2026"
         },
         "seq": 1,
-        "timestamp": "2026-07-08T01:36:05.678519+00:00",
+        "timestamp": "2026-07-09T21:55:28.830034+00:00",
         "tool": "vigia_agent"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "747750889b435f66e6261fbf393f01027ab81059612b1005c3555ab5bb4021b6",
+        "entry_sha256": "7c92a086de3320b9827935ef758f840edcf734ffcee048a6ba338304e434b616",
         "inputs_summary": {
-          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-001.json"
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json"
         },
         "iteration": 0,
         "note": "Computing SHA-256 of original evidence",
         "outputs_summary": {},
         "seq": 2,
-        "timestamp": "2026-07-08T01:36:05.678707+00:00",
+        "timestamp": "2026-07-09T21:55:28.830153+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "EVIDENCE_INTEGRITY_CHECK",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "df8a62ff3a77584872e7333991538baf702522a7bfa09f2720ef41532aad80c4",
+        "entry_sha256": "0d47f689a795e30c8b22bb74fb7818dcf46bd4e5981787171f6dfcb6e4d18d03",
         "inputs_summary": {
-          "path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-001.json"
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json"
         },
         "iteration": 0,
         "note": "Evidence verified: ae2a516808a81076...",
@@ -51,15 +51,15 @@
           "sha256": "ae2a516808a81076fb545dc11cd3916b3cc36eb8500ac6fcd79918f3ae042bcf"
         },
         "seq": 3,
-        "timestamp": "2026-07-08T01:36:05.678876+00:00",
+        "timestamp": "2026-07-09T21:55:28.830252+00:00",
         "tool": "sha256_hasher"
       },
       {
         "action": "PIPELINE_EXECUTE",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "728e13113d817e75a7c86624ae9768837dc78c7f25580e9cdd2eaf2d85a079f2",
+        "entry_sha256": "5a8295a18f87631d23644f9f2a1ccffd2f137a26f83d2172598535af4bb2d646",
         "inputs_summary": {
-          "evidence": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-001.json",
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json",
           "iteration": "0",
           "params": {}
         },
@@ -67,13 +67,13 @@
         "note": "Executing pipeline \u2014 iteration 0",
         "outputs_summary": {},
         "seq": 4,
-        "timestamp": "2026-07-08T01:36:05.679160+00:00",
+        "timestamp": "2026-07-09T21:55:28.830356+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "PIPELINE_COMPLETE",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "15b4c753cae4b292332909de9058842a7de24e66cf3c457ae2f684903c55a107",
+        "entry_sha256": "6c27218c84d4c4adada84f86004cee3058dad6fa1a50fdbefe19273f009392b2",
         "inputs_summary": {
           "iteration": "0"
         },
@@ -130,13 +130,13 @@
           ]
         },
         "seq": 5,
-        "timestamp": "2026-07-08T01:36:05.896077+00:00",
+        "timestamp": "2026-07-09T21:55:29.202640+00:00",
         "tool": "vigia_pipeline"
       },
       {
         "action": "CONTRADICTION_CHECK",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "43e48555948a52b970970825c172a836e3463fb53c173fe2df333c73dfb7f5f6",
+        "entry_sha256": "5318ab0f382e08910d91021c7d25281dedd82b0bc9a765b7a7134e0f2f35d442",
         "inputs_summary": {
           "n_signals": "3"
         },
@@ -147,13 +147,13 @@
           "threshold": "2"
         },
         "seq": 6,
-        "timestamp": "2026-07-08T01:36:05.896278+00:00",
+        "timestamp": "2026-07-09T21:55:29.202756+00:00",
         "tool": "contradiction_detector"
       },
       {
         "action": "AGENT_EXIT",
         "case_id": "VIGIA-FN-001",
-        "entry_sha256": "b9d9f338eb96f6a776db2f7f014d177d5f054b37fa71e1ec83b666191c42d197",
+        "entry_sha256": "980d7102caff588ddf879851b45bc8f604c126c6d686abed102ef8fa3465133d",
         "inputs_summary": {
           "verdict": "SUSPICION_DETECTED"
         },
@@ -164,18 +164,18 @@
           "exit_code": "3"
         },
         "seq": 7,
-        "timestamp": "2026-07-08T01:36:05.896593+00:00",
+        "timestamp": "2026-07-09T21:55:29.202949+00:00",
         "tool": "vigia_agent"
       }
     ],
-    "start_time": "2026-07-08T01:36:05.677971+00:00",
+    "start_time": "2026-07-09T21:55:28.829815+00:00",
     "total_entries": 7
   },
   "case_id": "VIGIA-FN-001",
-  "evidence_path": "/home/user/vigia-intent-analysis/data/cases/VIGIA-FN-001.json",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json",
   "evidence_sha256": "ae2a516808a81076fb545dc11cd3916b3cc36eb8500ac6fcd79918f3ae042bcf",
   "iterations_executed": 1,
-  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FN-001 ===\nEvidence: /home/user/vigia-intent-analysis/data/cases/VIGIA-FN-001.json\nEvidence SHA-256: ae2a516808a81076fb545dc11cd3916b3cc36eb8500ac6fcd79918f3ae042bcf\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 93/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_azure_ad', 'sift_hr_system', 'sift_netflow'], 0 derivada(s)/no-analizada(s). Top z: marketing_user registered vacation from =0.08, Successful login by marketing_user=0.04, Google Drive connection with 500MB uploa=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAttacker using stolen credentials from a marketing employee. Logs in during business hours (09:30), uses common tools (PowerShell, RDP, SMB), browses client files, compresses 500MB and uploads to personal Google Drive. No errors, no anomalous tools, no timestomping. The real employee was on vacation.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [marketing_user registered vacation from 2026-06-15 to 2026-06-30] z=0.076 conf=0.95 \u2014 \n  [Successful login by marketing_user] z=0.045 conf=0.90 \u2014 \n  [Google Drive connection with 500MB uploaded from marketing_user workst] z=0.030 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FN-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FN-001.json\nEvidence SHA-256: ae2a516808a81076fb545dc11cd3916b3cc36eb8500ac6fcd79918f3ae042bcf\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 93/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_azure_ad', 'sift_hr_system', 'sift_netflow'], 0 derivada(s)/no-analizada(s). Top z: marketing_user registered vacation from =0.08, Successful login by marketing_user=0.04, Google Drive connection with 500MB uploa=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAttacker using stolen credentials from a marketing employee. Logs in during business hours (09:30), uses common tools (PowerShell, RDP, SMB), browses client files, compresses 500MB and uploads to personal Google Drive. No errors, no anomalous tools, no timestomping. The real employee was on vacation.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [marketing_user registered vacation from 2026-06-15 to 2026-06-30] z=0.076 conf=0.95 \u2014 \n  [Successful login by marketing_user] z=0.045 conf=0.90 \u2014 \n  [Google Drive connection with 500MB uploaded from marketing_user workst] z=0.030 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 INTENT verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent finding cannot present as LOW.\nReconciliation: verdict INTENT rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
   "pipeline_results": {
     "abduction": {
       "best_hypothesis": "SUSPICION_DETECTED",

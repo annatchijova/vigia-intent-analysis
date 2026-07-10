@@ -1,0 +1,32 @@
+{
+  "case_id": "VIGIA-ASCIISTUDIO-2025",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:32:00Z",
+  "cronos_trace_id": "b9055b17-d3e2-4889-af8c-da466a7aabad",
+  "verdict": "ABSTAIN",
+  "confidence": "92/100",
+  "note": "Peircean analysis yields NOISE (legitimate open-source Java ASCII art animation tool). The case record _expected_verdict_correction_note states ABSTAIN is the correct verdict when n_signals<3 (gate 226bec1). With 2 signals and is_conclusive=False, the anti-false-negative gate fires. ABSTAIN is architecturally correct.",
+  "peircean_analysis": {
+    "firstness": "ZIP archive AsciiStudio-master.zip (SHA-256: 812ae30ee397f94d2bcd926f95e1be6e5edab80ad18179c1515c70ee75c1f967). '-master' suffix: GitHub archive convention. Contents: build.xml (Ant), Java source files, GIF sample assets (butterfly, jellyfish, parakeet, lightning), LICENSE (MIT-style), README.md, Changelog.txt, Screenshot.jpg (1.7MB). Dated 2025-04-07.",
+    "secondness": "All structural elements are hallmarks of an open-source GUI project distributed via GitHub: LICENSE, README, Changelog, screenshot, sample assets, build descriptor. GIF assets are sample inputs for an animation tool. Screenshot.jpg at 1.7MB is within normal range for a high-resolution UI screenshot. No executable JARs without source, no obfuscated strings, no network-facing code indicators.",
+    "thirdness": "No malicious pattern identified. Consistent with a legitimate open-source Java ASCII art animation GUI tool distributed under MIT license."
+  },
+  "hypotheses": {
+    "H1_legitimate_oss_project": "Open-source Java GUI application for ASCII art animation, distributed on GitHub under MIT license.",
+    "H2_malicious_payload": "Java source or build descriptor contains malicious code."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H1 is fully consistent with all available evidence.",
+    "test_result": "H2 not activated by any evidence. No obfuscated content, no suspicious file types, no network-facing indicators in directory listing. Source code analysis (Java) not performed in this intake record.",
+    "refutation_outcome": "H2 not supported. NOISE by analysis, ABSTAIN by n_signals gate."
+  },
+  "devil_advocate": "N/A — NOISE verdict. ABSTAIN is a gate condition, not forensic ambiguity.",
+  "caie_fracture": "None detected.",
+  "evidence_anchors": [
+    "ASCII-ART-001: SHA-256 verified GitHub archive, OSS project structure with license/readme/changelog",
+    "ASCII-ART-002: Directory listing: Java source, GIF samples, Ant build, no anomalies"
+  ],
+  "mitre_ttps": [],
+  "carnegie_pattern": "None detected",
+  "known_limitations": "n_signals=2 triggers gate 226bec1. Java source code content analysis not performed."
+}

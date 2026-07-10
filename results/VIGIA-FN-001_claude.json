@@ -1,0 +1,36 @@
+{
+  "case_id": "VIGIA-FN-001",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:35:00Z",
+  "cronos_trace_id": "3b9a893f-b148-4446-8336-ea79a5e2c0b2",
+  "verdict": "MALICE",
+  "confidence": "80/100",
+  "note": "confidence_expected: 82. Near match (2-point delta within normal calibration variance). abstention_risk: high — a VIGÍA implementation that does not cross-reference non-technical systems (HR) would miss this entirely. The entire anomaly is the CAIE fracture TEMPORAL_IDENTITY_VIOLATION: user is simultaneously logged in and on approved vacation. All technical indicators look legitimate.",
+  "peircean_analysis": {
+    "firstness": "2026-06-15 09:30: Login by marketing_user@corp.com from 190.12.88.7 (Buenos Aires), MFA approved. 2026-06-15 14:00: 500MB upload to 142.250.185.78 (Google Drive) via rclone from workstation 10.0.4.22. HR record: marketing_user on approved vacation 2026-06-15 through 2026-06-30 (approved by manager_marketing). Login date = vacation start date. Tools used: PowerShell, RDP, SMB (all common, legitimate). No errors, no timestomping, no anomalous processes.",
+    "secondness": "marketing_user cannot simultaneously be logging in from Buenos Aires at 09:30 on the first day of an approved two-week vacation while accessing client files and uploading 500MB to Google Drive. The HR vacation record has prior_trust 0.95 (high confidence). The CAIE fracture TEMPORAL_IDENTITY_VIOLATION at severity 0.95 identifies this as the operative anomaly. Legitimate vacation scenarios where an employee accesses corporate resources exist (checking email briefly), but: (A) 500MB upload via rclone goes beyond casual access, (B) rclone is not a standard corporate tool for brief email checks, (C) 500MB = systematic data collection, not a quick lookup.",
+    "thirdness": "Credential theft and use during the account holder's vacation. The attacker (or stolen credential user) deliberately accessed corporate systems on the first day of vacation, knowing that: (A) the legitimate user would be unable to notice unusual activity (on vacation, away from corporate systems), (B) the account's behavior on that day would appear fully legitimate (valid MFA, business hours, common tools), (C) the 15-day vacation window provided extended access before detection. The rclone tool and 500MB upload indicate pre-planned systematic exfiltration, not opportunistic browsing. This is MALICE: active concealment of the credential theft exploiting the vacation timing window."
+  },
+  "hypotheses": {
+    "H1_credential_theft_during_vacation": "Marketing_user credentials stolen and used by attacker on day 1 of vacation, exploiting the user's absence to avoid detection. 500MB rclone upload = systematic data exfiltration.",
+    "H2_legitimate_emergency_access": "Marketing_user, despite being on vacation, logged in remotely to address an urgent work matter, used rclone to create a personal backup of work files before an extended absence."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: Employees on vacation sometimes check in remotely for urgent matters. Cloud backup of work files is a common personal productivity practice. Buenos Aires login could reflect the user's vacation travel destination.",
+    "test_result": "H2 SIGNIFICANTLY WEAKENED: (A) 500MB via rclone goes far beyond casual check-in — this volume and tool choice is consistent with systematic data collection. (B) rclone is a CLI synchronization tool, not a user-friendly cloud backup — its use requires deliberate configuration, not casual access. (C) If the user was in Buenos Aires on vacation and logged in legitimately, there should be a prior communication to the manager about the access — no such record is referenced. (D) The upload destination (personal Google Drive rather than corporate storage) indicates data leaving the corporate sphere. H2 is not fully refuted (vacation access does occur), but does not explain the full evidence pattern.",
+    "refutation_outcome": "H2 weakened but not impossible. MALICE preferred by CAIE fracture severity (0.95) and rclone/volume profile. confidence_expected: 82 reflects residual H2 uncertainty."
+  },
+  "devil_advocate": "There are no technical errors. Everything is completely normal technically: valid credentials, MFA approved, business hours, legitimate tools, standard IPs. The only anomaly requires consulting the HR system. Without that cross-reference, this case returns NOISE. Even with HR data: legitimate vacation emergency access cannot be mathematically excluded. The 2-point confidence delta from expected (80 vs 82) reflects this residual uncertainty.",
+  "caie_fracture": "TEMPORAL_IDENTITY_VIOLATION (severity 0.95) — logged in and on approved vacation simultaneously. Primary anomaly indicator.",
+  "evidence_anchors": [
+    "fn001_01: Login 09:30 2026-06-15, Buenos Aires IP, MFA approved (prior_trust 0.9)",
+    "fn001_02: 500MB rclone upload to Google Drive at 14:00 same day (prior_trust 0.2)",
+    "fn001_03: HR record — vacation approved 2026-06-15 to 2026-06-30 (prior_trust 0.95)"
+  ],
+  "mitre_ttps": [
+    "T1078 (Valid Accounts — stolen credentials used during account owner's vacation)",
+    "T1048 (Exfiltration Over Alternative Protocol — rclone to personal Google Drive)"
+  ],
+  "carnegie_pattern": "Timing exploitation — vacation period chosen deliberately to maximize dwell time before detection",
+  "known_limitations": "abstention_risk: high. fn001_02 (rclone traffic) has prior_trust 0.2 (low confidence in network telemetry attribution). Credential theft vs. authorized vacation access cannot be distinguished without MFA device location or direct HR confirmation of the employee's awareness of the login."
+}

@@ -1,0 +1,81 @@
+{
+  "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+  "case_name": "Magnet CTF 2020 Windows Memory — Pagefile Absent, pslist Empty",
+  "description": "Windows 10 64-bit memory dump. windows.pslist returns 0 processes while windows.psscan finds 20. Classic EPROCESS doubly-linked list unlink rootkit technique. iexplore.exe running as Wow64 (32-bit on 64-bit). FTK Imager active during capture.",
+  "schema_version": "ebs_v1",
+  "artifacts": [
+    {
+      "artifact_id": "WIN2020-A01",
+      "evidence_type": "kernel_structure",
+      "description": "windows.pslist returns 0 processes. windows.psscan finds 20 processes including chrome.exe, slack.exe, WINWORD.EXE, iexplore.exe. Delta confirms EPROCESS doubly-linked list manipulation — rootkit unlinked all processes from the active process list.",
+      "raw_score": 0.95,
+      "prior_trust": 0.92,
+      "source_tool": "volatility",
+      "timestamp": "2020-04-20T23:17:00Z",
+      "provenance_chain": [
+        "sift_volatility3_analysis",
+        "magnet_ctf_2020"
+      ],
+      "metadata": {
+        "acquisition_tool": "ftk_imager",
+        "acquisition_hash": "magnet_ctf_2020_memdump001",
+        "acquisition_timestamp": "2020-04-20T23:19:17Z",
+        "write_blocker_used": true,
+        "examiner_id": "MAGNET-CTF-2020",
+        "mitre": [
+          "T1014"
+        ],
+        "pslist_count": 0,
+        "psscan_count": 20
+      }
+    },
+    {
+      "artifact_id": "WIN2020-A02",
+      "evidence_type": "memory_process",
+      "description": "iexplore.exe PID 4480 running as Wow64=True (32-bit process on 64-bit OS). Classic technique to evade 64-bit memory scanners and AV. Parent: chrome.exe PID 3384. Spawned at 23:18:35Z.",
+      "raw_score": 0.8,
+      "prior_trust": 0.88,
+      "source_tool": "volatility",
+      "timestamp": "2020-04-20T23:18:35Z",
+      "provenance_chain": [
+        "sift_volatility3_analysis",
+        "magnet_ctf_2020"
+      ],
+      "metadata": {
+        "acquisition_tool": "ftk_imager",
+        "acquisition_hash": "magnet_ctf_2020_memdump001",
+        "acquisition_timestamp": "2020-04-20T23:19:17Z",
+        "write_blocker_used": true,
+        "examiner_id": "MAGNET-CTF-2020",
+        "mitre": [
+          "T1055.012"
+        ],
+        "pid": 4480,
+        "wow64": true
+      }
+    },
+    {
+      "artifact_id": "WIN2020-A03",
+      "evidence_type": "memory_process",
+      "description": "FTK Imager.exe PID 4332 active during memory capture — confirms forensic acquisition in progress. Chrome connecting to 172.253.63.188:443 (Google) and 13.35.82.x:443 (CloudFront/AWS). No malicious C2 detected in netscan.",
+      "raw_score": 0.6,
+      "prior_trust": 0.85,
+      "source_tool": "volatility",
+      "timestamp": "2020-04-20T23:19:17Z",
+      "provenance_chain": [
+        "sift_volatility3_analysis",
+        "magnet_ctf_2020"
+      ],
+      "metadata": {
+        "acquisition_tool": "ftk_imager",
+        "acquisition_hash": "magnet_ctf_2020_memdump001",
+        "acquisition_timestamp": "2020-04-20T23:19:17Z",
+        "write_blocker_used": true,
+        "examiner_id": "MAGNET-CTF-2020",
+        "mitre": [
+          "T1070.004"
+        ]
+      }
+    }
+  ]
+}

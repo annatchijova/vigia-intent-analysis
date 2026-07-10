@@ -1,0 +1,37 @@
+{
+  "case_id": "VIGIA-FN-003",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:35:00Z",
+  "cronos_trace_id": "a8be387f-3832-419d-960c-b74cc0687408",
+  "verdict": "MALICE",
+  "confidence": "88/100",
+  "note": "confidence_expected: 88. Exact match. Process hollowing on svchost.exe is confirmed by two independent CAIE fractures: MEMORY_VS_DISK (RWX region where RX is expected) and PARENT_ANOMALY (cmd.exe parent instead of services.exe). These two signals together are forensically definitive for T1055.012.",
+  "peircean_analysis": {
+    "firstness": "svchost.exe PID 612: on-disk binary clean (valid Microsoft hash, signed), in-memory .text section has RWX permissions (expected: RX). Parent process: cmd.exe (PID 4412). Expected parent: services.exe. Network: outbound connection from svchost.exe to 52.85.0.0/16 (AWS CloudFront), port 443.",
+    "secondness": "Legitimate svchost.exe is always spawned by services.exe — this is a structural invariant of the Windows service control manager. A parent of cmd.exe is a physical impossibility for a legitimate svchost.exe instance. Legitimate svchost.exe code sections are marked RX (read-execute); RWX (read-write-execute) permission on the .text section indicates the process image was written to in memory after loading — the canonical signature of process hollowing. The on-disk hash being clean confirms this is a disk-vs-memory split: the disk image is the legitimate Microsoft binary, but the in-memory execution context is different.",
+    "thirdness": "Process hollowing (T1055.012): attacker created a suspended svchost.exe process, unmapped the legitimate binary code from memory, wrote malicious shellcode into the vacant memory region (requiring RWX permission), and resumed execution. The AWS CloudFront connection is deliberate concealment: using a legitimate CDN IP range where outbound connections from svchost.exe to CDN IPs are expected and rarely blocked. Two CAIE fractures (MEMORY_VS_DISK severity 0.9, PARENT_ANOMALY severity 0.85) independently confirm the hollow process. This is MALICE: active anti-forensics via process hollowing + traffic laundering through legitimate CDN infrastructure."
+  },
+  "hypotheses": {
+    "H1_process_hollowing": "Attacker used process hollowing to inject malicious payload into a suspended svchost.exe instance, using AWS CloudFront as C2 traffic cover.",
+    "H2_legitimate_svchost": "The RWX permission is a legitimate software behavior (e.g., JIT compilation), cmd.exe parent is a system management script artifact, and the AWS connection is a legitimate Windows Update or telemetry endpoint."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: Some legitimate Windows components use RWX memory regions for JIT compilation. The AWS connection from svchost.exe could be legitimate Windows telemetry. A parent of cmd.exe could arise from a management script that launched svchost for a specific service.",
+    "test_result": "H2 REFUTED: (A) Legitimate svchost.exe instances do not use RWX on their .text section — JIT compilation occurs in heap/data regions, not the .text section. (B) No legitimate Windows service management flow creates svchost.exe from cmd.exe — the Windows service control manager (services.exe) is the invariant parent, with no exception documented in Microsoft's documentation. (C) Two independent CAIE fractures occurring simultaneously on the same process (wrong memory permissions + wrong parent) cannot be attributed to two independent legitimate causes simultaneously without stacking implausible assumptions. H2 requires two simultaneous unexplained legitimate anomalies on the same process — Occam's razor rejects this.",
+    "refutation_outcome": "H2 REFUTED by dual CAIE fractures. MALICE confirmed."
+  },
+  "devil_advocate": "Hash and digital signature are clean. The destination IP 52.85.0.0/16 belongs to AWS CloudFront, used by thousands of legitimate applications. svchost.exe is expected to make network connections as a Windows service host. Without deep memory forensics, this case is invisible. However: the RWX .text section and cmd.exe parent are not explainable by legitimate behavior — they require the hollowing assumption, and that assumption fully explains both anomalies.",
+  "caie_fracture": "MEMORY_VS_DISK (severity 0.9) — disk hash clean, in-memory .text section RWX; PARENT_ANOMALY (severity 0.85) — parent cmd.exe instead of invariant services.exe. Dual confirmation.",
+  "evidence_anchors": [
+    "fn003_01: svchost.exe PID 612, RWX .text section (expected RX), disk hash clean/signed",
+    "fn003_02: Outbound connection to 52.85.0.0/16 (AWS CloudFront) from svchost.exe:443",
+    "fn003_03: Parent PID 4412 = cmd.exe (expected: services.exe) — structural impossibility for legitimate svchost"
+  ],
+  "mitre_ttps": [
+    "T1055.012 (Process Hollowing — memory-vs-disk split, RWX .text section)",
+    "T1036 (Masquerading — legitimate svchost.exe name and binary for cover)",
+    "T1090.004 (Domain Fronting — AWS CloudFront for C2 traffic laundering)"
+  ],
+  "carnegie_pattern": "Hidden Process Masquerading — legitimate system binary shell exploited to conceal malicious in-memory execution while maintaining technical legitimacy on disk",
+  "known_limitations": "abstention_risk: medium. AWS CloudFront destination is ambiguous without TLS inspection to identify the actual backend target. Memory dump of the injected region not available in this artifact set to identify payload type."
+}

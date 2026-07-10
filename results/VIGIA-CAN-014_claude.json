@@ -1,0 +1,34 @@
+{
+  "case_id": "VIGIA-CAN-014",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:16:00Z",
+  "cronos_trace_id": "3c55df22-a0d2-43aa-89b5-4f4897e28e4a",
+  "verdict": "SUSPICION",
+  "confidence": "70/100",
+  "note": "_notes field in source explicitly states expected_verdict downgraded MALICE→SUSPICION due to weak acquisition assurance. Daubert evidentiary standard honored.",
+  "peircean_analysis": {
+    "firstness": "50 identical 'ALERTA: Intruso detectado en servidor X' alerts sent via Telegram/Duo to admin in 8-second window at 14:22:10Z. Admin responds at 14:22:45Z: 'I'm overwhelmed, disable MFA for 5 minutes.' MFA disabled at 14:23:00Z for 300 seconds. During that window: 3 successful logins from IPs 185.220.101.42, 91.243.44.11, 45.142.212.18. Concurrent SSH brute-force from same 3 IPs at 2.1s/IP cadence (1523 total attempts). Brute-force does not stop after MFA window.",
+    "secondness": "50 identical alerts in 8 seconds is not a genuine threat notification pattern — genuine multi-vector attacks produce varied alerts. Identical text at machine cadence is alert flooding. Disabling MFA does not stop network intrusion — it removes an authentication barrier. The 3 successful logins precisely during the MFA-disabled window, from IPs already conducting brute-force, is causal — the MFA disable was the attack goal, not a response to it. 2.1s cadence is below human reaction time — automated attack infrastructure.",
+    "thirdness": "Cognitive-DoS social engineering: flood admin with false urgency to induce security degradation. Classic 'sensory saturation' attack — the attacker creates conditions where the defender's rational response (disable MFA to respond faster) is exactly the attacker's objective. Carnegie: authority exploitation (framing as urgent operational necessity) + scarcity pressure (5-minute window)."
+  },
+  "hypotheses": {
+    "H1_social_engineering_attack": "Attacker flooded alerts to induce MFA disable, enabling 3 successful logins. Coordinated automated attack.",
+    "H2_genuine_incident": "Real intrusion triggered alerts. Admin legitimately disabled MFA to respond faster. Attacker logins coincidental timing."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2 (genuine incident): 50 identical alerts could theoretically reflect a misconfigured monitoring system producing duplicate notifications. The admin's response is rational under genuine alert overload. The attacker logins might have exploited a window that opened for other reasons.",
+    "test_result": "H2 REFUTED: 50 identical alert texts at machine cadence is not genuine monitoring output — no monitoring system produces 50 copies of the same string in 8 seconds from legitimate events. The login-during-MFA-window correlation is causal, not coincidental. However: prior_trust 0.30-0.35 on acquisition chain, non-standard provenance hashes — MALICE requires higher acquisition assurance.",
+    "refutation_outcome": "H1 is the correct explanation but acquisition quality caps at SUSPICION per Daubert gate. Pattern is MALICE-level; evidence quality is SUSPICION-level."
+  },
+  "devil_advocate": "Acquisition chain uses placeholder hashes (sha256:a096mfa01) rather than real SHA-256 values. prior_trust 0.30-0.35 is very low — this evidence would not pass Daubert scrutiny in court. The attack narrative is compelling but the underlying data quality means we are reading an incident description, not verified forensic evidence. _notes confirms calibrated verdict is SUSPICION.",
+  "evidence_anchors": [
+    "a096_01: 50 identical alerts in 8s window (prior_trust: 0.35)",
+    "a096_02: Admin MFA disable request (prior_trust: 0.30)",
+    "a096_03: 3 successful attacker logins during MFA window (prior_trust: 0.45)",
+    "a096_04: SSH brute-force at 2.1s cadence, 1523 attempts (prior_trust: 0.90 — highest trust artifact)"
+  ],
+  "caie_fracture": "COGNITIVE_DOS (severity 0.97): sensory saturation to force security degradation. Disabling MFA does not solve network attack — it IS the attack goal.",
+  "mitre_ttps": ["T1566 (Phishing — social engineering)", "T1110 (Brute Force)", "T1078 (Valid Accounts — MFA bypass)", "T1498 (Network Denial of Service — alert flooding)"],
+  "carnegie_pattern": "Sensory saturation + false urgency + authority framing ('block the IPs') to induce security control degradation",
+  "known_limitations": "Acquisition chain uses non-authentic provenance hashes. prior_trust 0.30-0.35 fails Daubert standard. Pattern analysis yields MALICE-level confidence but evidentiary quality forces SUSPICION cap."
+}

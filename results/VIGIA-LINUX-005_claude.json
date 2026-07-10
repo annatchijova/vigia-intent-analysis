@@ -1,0 +1,34 @@
+{
+  "case_id": "VIGIA-LINUX-005",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:21:00Z",
+  "cronos_trace_id": "1be3a89f-1e16-4627-9f4f-9de687319fe9",
+  "verdict": "NOISE",
+  "confidence": "75/100",
+  "note": "abstention_risk: high. confidence_expected: 55. The case is designed as an epistemic boundary test. Surface signals suggest SUSPICION; completed investigation resolves to NOISE. I rate NOISE because the investigation is complete: legitimate provenance is verified, static analysis excludes all PUMAKIT-distinguishing signals.",
+  "peircean_analysis": {
+    "firstness": "Binary at /opt/services/cron, entropy 7.4/8.0, size 1.8MB, UPX-packed, not in dpkg/rpm, created 2024-09-10 02:17 UTC. Process: running as deploy/UID 1001 (non-root) under supervisord, CPU 0.1%, RSS 12MB, no anomalous network, no child processes, running since boot. Deployment records: Ansible playbook deployed custom Go task scheduler at 02:15 UTC same day, binary built from internal repo with -ldflags='-s -w' + UPX, pipeline documented in wiki for 8 months. Static analysis: Go 1.22, stdlib imports only (net/http, time, os, encoding/json), no syscall hooking, no kernel module loading, no memfd_create, no privilege escalation, no C2, HTTP task scheduler on localhost:8080.",
+    "secondness": "Surface profile (high entropy, UPX, 'cron' naming, /opt path, no package manager) matches PUMAKIT dropper characteristics. However: the PUMAKIT-distinguishing signals that separate it from legitimate binaries are ALL absent: no LKM loading, no rmdir() abuse, no memfd executables, no syscall hooking, no root privileges. The deployment records provide verified provenance: same-day Ansible deployment at 02:15 (2 minutes before creation timestamp 02:17 = pipeline execution time). Wiki documentation with 8-month history predates the suspicious-looking creation date.",
+    "thirdness": "The 'cron' naming is explained by function: the team built a custom task scheduler and named it after what it does. High entropy + UPX are explained by Go compilation flags (-ldflags='-s -w' = stripped, then UPX for size reduction) — a common deployment optimization. The /opt/services/ path is legitimate for custom service binaries. The absence from package manager is expected for internally built binaries deployed via Ansible. All PUMAKIT-distinguishing signals absent; all surface anomalies explained by verified legitimate provenance."
+  },
+  "hypotheses": {
+    "H1_legitimate_deployment": "Binary is a legitimate custom Go task scheduler deployed via documented Ansible pipeline. High entropy and UPX are deployment optimizations.",
+    "H2_pumakit_variant": "Binary is a PUMAKIT or PUMAKIT-like rootkit using the 'cron' name for process masquerading. Early deployment stage before kernel module activation."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H1 is the affirmative hypothesis here. The devil's advocate is H2.",
+    "test_result": "H2 REFUTED by static analysis: Go import table shows stdlib only — Go binaries cannot implement syscall-level functionality without non-standard imports. Ansible deployment records with 8-month history would require compromising the pipeline + wiki + DevOps lead testimony to fabricate. The 'early stage before activation' argument requires speculative future activation with no present indicators.",
+    "refutation_outcome": "H1 confirmed. NOISE is the correct verdict. Investigation is complete."
+  },
+  "devil_advocate": "The 'cron' binary could be a novel PUMAKIT variant that hides its kernel module loading within standard Go imports via reflection or runtime manipulation. The Ansible records could have been backdated. The DevOps lead could be the attacker. However: these hypotheses require stacking multiple unverified assumptions. Ockham's razor: the simplest explanation (legitimate Go task scheduler as documented) accounts for all observations without additional assumptions.",
+  "caie_fracture": "NAMING_AMBIGUITY (severity 0.45) — naming anomaly ambiguous without kernel-level corroboration. Resolved to NOISE by static analysis + deployment records.",
+  "evidence_anchors": [
+    "linux005_01: cron binary, entropy 7.4, UPX, not in package manager (surface-level SUSPICION trigger)",
+    "linux005_02: process running non-root, no anomalous network, 0.1% CPU (behavioral normal)",
+    "linux005_03: Ansible deployment 02:15 UTC, 8-month pipeline history, wiki-documented",
+    "linux005_04: Go 1.22 stdlib only, no syscall/memfd/kernel/C2 — all PUMAKIT signals absent"
+  ],
+  "mitre_ttps": [],
+  "carnegie_pattern": "None detected — naming ambiguity resolved to legitimate deployment",
+  "known_limitations": "abstention_risk: high per case design. confidence_expected: 55. Early-stage activation hypothesis cannot be mathematically excluded but has no present indicators. Binary functionality matches documentation exactly."
+}
