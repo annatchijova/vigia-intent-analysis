@@ -4888,3 +4888,76 @@ revisión caso por caso posterior (decisión de Anna: sin urgencia, backlog):
   D2 rala. Nota: los tres casos FP/FN diseñados y el guard H-02 de
   FP-CULTURAL van al backlog normal sin urgencia (decisión 2026-07-10).
 
+### Re-verificación 2026-07-10 (sesión posterior, misma tarde) — gap de sincronización `main` detectado y cerrado
+
+Anna reprodujo el colapso SUSPICION→INTENT con evidencia de volumen sobre
+los 199 casos (line-level: `vigia_agent.py:188-189` antes del fix) y lo
+reportó como "confirmado". Investigación: el fix YA estaba aplicado y
+committeado (`2d7a909`) — pero **solo en la rama de trabajo
+`claude/macos-modules-design-xk5ecq`**, nunca mergeado a `main`. La
+reproducción de Anna corrió contra `main`, que seguía en `841650e`
+(pre-fix) — confirmado línea por línea (`git show origin/main:vigia_agent.py`
+mostraba el `if "INTENT" in hyp or "SUSPICION" in hyp: ... else "INTENT"`
+original). No es una regresión del fix: es que el fix nunca había llegado a
+la rama que se estaba probando.
+
+**Re-validación completa desde cero (no se asumió el resultado previo):**
+- Strings exactos del motor re-verificados en código (no supuestos):
+  `MALICIOUS_INTENT_DETECTED`, `INTENT_DETECTED`, `SUSPICION_DETECTED`
+  (`sift_orchestrator.py:29-30,192-196`) — los tres mutuamente excluyentes;
+  la rama `"INTENT" in hyp` y la rama `"SUSPICION" in hyp` del fix no se
+  solapan en la práctica.
+- R4-1 snapshots bit-identical: 10/10 verde, valores intactos.
+- `run_all_agent.py` fresco sobre los 199: **167/199 PASS** (autoritativo,
+  leído de `_batch_summary.json`, no de log truncado). Los ~30 casos
+  listados por Anna (CAN-014/016/017/032, LINUX-005, NGDC-003,
+  NITROBA-M57-001, REAL-005, SET630-001, BREAK_001/003/004/006/007/008/009/
+  010, KIWI_001/002, case_002, case_008, REAL-M57-JO/PAT-Dec07, REAL-NFURY)
+  **ya no aparecen en la lista de 32 fallos** — todos sellan SUSPICION.
+- Honestidad sobre el punto 3 del pedido ("0 flips en los que ya estaban
+  bien"): la medición real da **3**, no 0 — TIMELINE, JESS, JESS-KEYCHAIN
+  (exp=INTENT, motor=SUSPICION) pasaban por accidente del colapso viejo;
+  ya documentados arriba, no son casos nuevos. Se reporta el número real,
+  no el esperado.
+- Suite completa (`pytest tests/ vigia/tests/ -q --no-cov
+  --ignore=tests/integration`): **1242 passed, 6 xfailed, 1 xpassed**.
+
+**Cierre del gap:** `main` fast-forwardeado a `54e3cb6` (incluye B-097 +
+corrección de etiqueta OWL-NEXUS5) y pusheado. La rama de trabajo y `main`
+quedan sincronizadas — evita que este malentendido se repita.
+
+### Casos FP/FN diseñados para fallar — categorización para decidir tratamiento (NO accionado, solo análisis)
+
+Revisando los `audit_note` de cada caso (no solo la lista), se separan en
+clases con implicaciones distintas para "cómo resolverlo":
+
+1. **Requieren un canal de evidencia que VIGÍA nunca tuvo (fuera de alcance,
+   no bug):** `VIGIA-FN-001` (exige consultar sistemas de RRHH — ausencia del
+   empleado), `VIGIA-FN-002` y `VIGIA-FP-002`/`VIGIA-FP-003` (exigen contexto
+   de autorización/Change Management — un sistema ITSM externo que VIGÍA no
+   integra). Ningún fix de código los cierra sin agregar una fuente de datos
+   completamente nueva — son candidatos a entrada en KNOWN_LIMITATIONS.md
+   como límite de alcance permanente, no a "arreglo".
+2. **Tensión de calibración ya documentada (L-016) o su gemela:**
+   `VIGIA-BREAK-012` (consenso ponderado por confiabilidad de canal vs
+   mayoría — L-016) y `VIGIA-BREAK-015` (evidencia "abrumadora" para un
+   humano pero `prior_trust` bajo la capa por el gate de corroboración
+   Daubert). Resolverlos significa retocar el ladder del scorer o el gate de
+   corroboración — cambio de scorer, no de hoy; candidato a L-0XX nuevo
+   (BREAK-015) que documente la tensión explícitamente en vez de dejarlo
+   como un fallo mudo.
+3. **Gap de motor real y cerrable (distinto en naturaleza de 1):**
+   `VIGIA-FN-003` exige análisis de memoria profundo (regiones RWX,
+   parent-process-mismatch) que el motor no ejecuta hoy — a diferencia de 1,
+   esto NO requiere una fuente de datos externa nueva, sería extender un
+   engine que ya existe. Candidato genuino a backlog de ingeniería (no de
+   doctrina).
+4. **Guard H-02 (FP-CULTURAL ×2):** ya rastreado por separado, sin cambio de
+   estado hoy.
+
+Recomendación (para decisión de Anna, no aplicada): documentar 1 y 2 en
+KNOWN_LIMITATIONS.md/L-0XX (honestidad Daubert — "el sistema no puede, y por
+qué" es más defendible que un fallo silencioso repetido en cada corrida del
+corpus), dejar 3 en el backlog de motor separado de la doctrina de scoring,
+y mantener 4 donde está.
+
