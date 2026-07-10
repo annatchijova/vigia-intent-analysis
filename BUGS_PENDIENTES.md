@@ -4778,7 +4778,7 @@ estructural (siguen los dos namespaces); cierra la deriva silenciosa.
 
 ---
 
-## B-097 — Path motor: colapso SUSPICION→INTENT en el sellado. Fix INTENTADO, RECHAZADO por el gate pre-registrado [NO APLICADO — gate negativo]
+## B-097 — Path motor: colapso SUSPICION→INTENT en el sellado [APLICADO 2026-07-10 — firma Anna, triple fuente]
 
 | Campo | Valor |
 |-------|-------|
@@ -4848,6 +4848,43 @@ del agente):
   (c) revisar las 3 etiquetas (¿INTENT o SUSPICION?) — ground-truth, firma
       requerida.
 
-Hasta esa decisión: el colapso persiste (documentado), los sentinelas
-`xfail(strict=True)` lo mantienen visible, y la métrica honesta de referencia
-es **140/199**.
+Hasta esa decisión: el colapso persistía (documentado), los sentinelas
+`xfail(strict=True)` lo mantenían visible, y la métrica honesta de referencia
+era **140/199** (pre-merge de main 2026-07-10; el merge movió el baseline).
+
+**ACTUALIZACIÓN 2026-07-10 (mismo día, sesión posterior) — APLICADO con firma.**
+Anna firmó la aplicación del fix, superando la regla pre-registrada original,
+sobre la base de validación por TRIPLE FUENTE independiente en los 33 casos:
+(1) etiqueta ground-truth = SUSPICION en los 30 recuperados; (2) banda interna
+del motor = SUSPICION (0.10<score≤0.33, B-076) — el motor calculaba bien, solo
+el sellado colapsaba; (3) batch ciego Claude Code + Cronos (46 casos,
+2026-07-10) confirmó SUSPICION en la enorme mayoría. Además: SUSPICION recibe
+exit code PROPIO (5) — hasta hoy compartía el 3 con INTENT ("3=intent/
+suspicion"), confuso para consumidores; INTENT conserva el 3 (contrato
+histórico; grep confirmó cero consumidores externos de códigos específicos).
+Los sentinelas xfail se convirtieron en guardas de regresión normales.
+Invariante R4-1 verificado explícitamente post-fix: snapshots bit-identical
+{10:0.1861, 50:0.1866, 100:0.1866} intactos. Los 3 casos expuestos
+(TIMELINE/JESS/JESS-KEYCHAIN, pasaban por accidente del colapso) quedan como
+fallos honestos pendientes de corrección de datos (conversión sub-tipificada,
+docs/B097_ROOT_CAUSE_ANALYSIS.md §5b). Gate del día en la entrada del commit.
+
+### Divergencias del batch ciego (46 casos) — pendientes de revisión manual, NO accionadas
+
+El contraste ciego Claude+Cronos dejó 7 divergencias que se ANOTAN para
+revisión caso por caso posterior (decisión de Anna: sin urgencia, backlog):
+- **VIGIA-REAL-MAGNET-2021-IOS-ELI** y **VIGIA-REAL-MAGNET-2022-ANDROID**:
+  Claude ciego = INTENT, coincide con el agente CONTRA la etiqueta SUSPICION —
+  candidatos a revisión de etiqueta (misma clase que OWL-NEXUS5).
+- **VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT**: Claude = MALICE vs gate de
+  corroboración que capea (score 0.48, mono-canal D2). Conflicto legítimo
+  Claude vs doctrina (ii) — la doctrina gana hoy; revisar si el caso amerita
+  excepción de canal duro.
+- **VIGIA-2026-DEMO-008**: Claude = MALICE vs etiqueta SUSPICION (Claude más
+  severo que etiqueta y motor).
+- **VIGIA-LINUX-005**, **VIGIA-REAL-M57-JO-Dec07**, **VIGIA-REAL-M57-PAT-Dec07**:
+  Claude = NOISE vs etiqueta SUSPICION — acá la banda interna del motor
+  (SUSPICION) le gana a Claude; probable sub-lectura del LLM sobre evidencia
+  D2 rala. Nota: los tres casos FP/FN diseñados y el guard H-02 de
+  FP-CULTURAL van al backlog normal sin urgencia (decisión 2026-07-10).
+

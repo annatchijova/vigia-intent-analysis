@@ -52,10 +52,19 @@ class TestVerdictClassification:
         )
         assert v == "MALICE" and _VERDICT_EXIT[v] == EXIT_MALICE
 
-    @pytest.mark.parametrize("hyp", ["INTENT_DETECTED", "SUSPICION_DETECTED"])
-    def test_intent_is_exit_3(self, hyp):
-        v = classify_agent_verdict({"best_hypothesis": hyp}, 4)
+    def test_intent_is_exit_3(self):
+        v = classify_agent_verdict({"best_hypothesis": "INTENT_DETECTED"}, 4)
         assert v == "INTENT" and _VERDICT_EXIT[v] == EXIT_INTENT
+
+    def test_suspicion_is_exit_5(self):
+        # B-097 (APLICADO 2026-07-10): SUSPICION_DETECTED ya NO colapsa a
+        # INTENT — sella SUSPICION con exit PROPIO (5). La versión previa de
+        # este test pineaba el colapso (exit 3 compartido "intent/suspicion").
+        # El invariante de este archivo se preserva: SUSPICION es detección
+        # (exit != 0 y != 4), nunca un benigno silencioso.
+        from vigia_agent import EXIT_SUSPICION
+        v = classify_agent_verdict({"best_hypothesis": "SUSPICION_DETECTED"}, 4)
+        assert v == "SUSPICION" and _VERDICT_EXIT[v] == EXIT_SUSPICION == 5
 
     def test_clean_with_enough_signals_is_noise(self):
         v = classify_agent_verdict(

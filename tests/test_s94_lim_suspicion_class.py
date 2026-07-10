@@ -164,11 +164,14 @@ class TestD3RichNoTriangulation:
         assert "REFUTATION GATE" in narr
         assert "INTENT_DETECTED" in narr and "SUSPICION" in narr
 
-    def test_suspicion_exit_code_is_intent_tier(self):
-        """SUSPICION comparte EXIT_INTENT (3) — contrato documentado
-        '3=intent/suspicion'; el cap NO des-alerta a exit 0/4."""
-        from vigia_agent import _VERDICT_EXIT, _VERDICT_LABEL, EXIT_INTENT
-        assert _VERDICT_EXIT.get("SUSPICION") == EXIT_INTENT
+    def test_suspicion_exit_code_is_detection_tier(self):
+        """SUSPICION tiene exit PROPIO (5, B-097 — antes compartía el 3 de
+        INTENT). Lo que el cap §9.4-LIM NO debe causar: des-alertar a un
+        código no-detección (0=NOISE / 4=ABSTAIN) o al fallback."""
+        from vigia_agent import (_VERDICT_EXIT, _VERDICT_LABEL,
+                                 EXIT_SUSPICION, EXIT_NOISE, EXIT_ABSTAIN)
+        assert _VERDICT_EXIT.get("SUSPICION") == EXIT_SUSPICION == 5
+        assert _VERDICT_EXIT["SUSPICION"] not in (EXIT_NOISE, EXIT_ABSTAIN)
         assert "SUSPICION" in _VERDICT_LABEL
 
 

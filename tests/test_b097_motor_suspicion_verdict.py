@@ -11,17 +11,19 @@ alerta) — el colapso ya no tiene razón de ser.
 Fix candidato (mínimo, label-blind): en classify_agent_verdict, hipótesis con
 SUSPICION (sin INTENT/MALICIOUS) sella "SUSPICION" directamente.
 
-VEREDICTO DEL GATE (regla pre-registrada de Anna: aplicar solo si fixed>=1
-AND broken==0 sobre los 199): medido autoritativo fixed=30, broken=3 →
-**NO APLICADO** (fail-closed; el fix fue implementado, medido y REVERTIDO).
-Los 3 broken (expected=INTENT, motor=SUSPICION) hoy pasan GRACIAS al colapso.
-Baseline honesto post-B10: 140/199; con el fix sería 167/199 (neto +27).
-Ver BUGS_PENDIENTES B-097 [NO APLICADO] para los números completos.
+HISTORIA DEL GATE: la regla pre-registrada original (fixed>=1 AND broken==0)
+midió fixed=30/broken=3 → NO APLICADO fail-closed. Al día siguiente
+(2026-07-10) Anna FIRMÓ la aplicación con validación por triple fuente
+independiente sobre los 33 casos: (1) etiqueta ground-truth = SUSPICION en
+los 30 recuperados; (2) banda interna del motor (0.10<score<=0.33 = banda
+SUSPICION de B-076) — el motor calculaba bien, solo el sellado colapsaba;
+(3) batch ciego Claude Code + Cronos (46 casos) confirmó SUSPICION. Los 3
+expuestos (expected=INTENT, motor=SUSPICION — pasaban por accidente del
+colapso) quedan como fallos honestos pendientes de revisión de datos
+(conversión sub-tipificada, ver docs/B097_ROOT_CAUSE_ANALYSIS.md).
 
-Los tests del colapso quedan como SENTINELAS xfail(strict=True) — mismo
-patrón que BUG-NLP-002: el defecto sigue visible; si un fix futuro los hace
-pasar, el xfail truena (XPASS) y obliga a retirar el marker junto con el
-cierre del tracker y un nuevo gate.
+Estos tests son ahora la GUARDA DE REGRESIÓN del fix aplicado (eran
+sentinelas xfail(strict=True) mientras estuvo NO APLICADO).
 
 Los tests E2E usan casos REALES del corpus identificados en la investigación.
 """
@@ -54,13 +56,6 @@ def _seal(case_rel: str) -> tuple:
 
 
 class TestMotorSuspicionSealsSuspicion:
-    @pytest.mark.xfail(
-        strict=True,
-        reason="B-097 [NO APLICADO — gate negativo fixed=30/broken=3]: el "
-        "colapso SUSPICION→INTENT del path motor sigue presente por decisión "
-        "del gate pre-registrado. Si esto pasa (XPASS), se aplicó un fix: "
-        "retirar el marker, cerrar B-097 y re-correr el gate de 199.",
-    )
     @pytest.mark.parametrize("case_rel", REAL_CASES)
     def test_motor_suspicion_case_seals_suspicion(self, case_rel):
         hyp, verdict = _seal(case_rel)
@@ -78,13 +73,20 @@ class TestUnitNoCollapse:
         return classify_agent_verdict(
             {"best_hypothesis": hyp, "is_conclusive": True}, 3, 0)
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="B-097 [NO APLICADO]: SUSPICION_DETECTED todavía se sella "
-        "INTENT (colapso). Sentinela — ver el marker de la clase E2E.",
-    )
     def test_suspicion_detected_seals_suspicion(self):
         assert self._classify("SUSPICION_DETECTED") == "SUSPICION"
+
+    def test_suspicion_has_own_exit_code_5(self):
+        """El exit code de SUSPICION es PROPIO (5) — hasta B-097 compartía el
+        3 con INTENT, confuso para consumidores del exit. INTENT conserva el
+        3 (contrato histórico: todo exit 3 sellado hasta hoy era familia
+        INTENT)."""
+        from vigia_agent import _VERDICT_EXIT, EXIT_SUSPICION, EXIT_INTENT
+        assert EXIT_SUSPICION == 5
+        assert _VERDICT_EXIT["SUSPICION"] == EXIT_SUSPICION
+        assert _VERDICT_EXIT["INTENT"] == EXIT_INTENT == 3
+        # y ningún otro veredicto comparte el 5
+        assert [k for k, v in _VERDICT_EXIT.items() if v == 5] == ["SUSPICION"]
 
     def test_intent_detected_still_intent(self):
         assert self._classify("INTENT_DETECTED") == "INTENT"

@@ -53,12 +53,21 @@ CONTRADICTION_THRESHOLD = 2           # int: minimum contradictions to trigger r
 CONFIDENCE_FLOOR = Fraction(3, 10)    # Minimum MCA threshold for conclusive verdict
 
 # ── Verdict classification ────────────────────────────────────────────────────
-# Exit codes (documented): 0=no evil, 1=evil, 2=error, 3=intent/suspicion, 4=ABSTAIN
-EXIT_NOISE   = 0
-EXIT_MALICE  = 1
-EXIT_ERROR   = 2
-EXIT_INTENT  = 3
-EXIT_ABSTAIN = 4
+# Exit codes (documented): 0=no evil, 1=evil, 2=error, 3=intent, 4=ABSTAIN,
+# 5=suspicion. Hasta 2026-07-10 el 3 era compartido "intent/suspicion"
+# (SUSPICION no era un veredicto sellado); con B-097 aplicado, SUSPICION es
+# veredicto de primera clase y recibe código PROPIO (5) — compartir código
+# entre dos veredictos distintos era confuso para cualquier consumidor del
+# exit. Se asignó el código NUEVO al veredicto NUEVO: INTENT conserva el 3
+# (contrato histórico — todo bundle sellado hasta hoy con exit 3 era familia
+# INTENT); ningún consumidor externo de códigos específicos existe en el
+# árbol (grep 2026-07-10: solo vigia_agent + tests).
+EXIT_NOISE     = 0
+EXIT_MALICE    = 1
+EXIT_ERROR     = 2
+EXIT_INTENT    = 3
+EXIT_ABSTAIN   = 4
+EXIT_SUSPICION = 5
 
 # Hypotheses that mean "could not analyze / indeterminate" — these must map to
 # ABSTAIN, NOT to benign. Convertir un error de extracción o una dependencia
@@ -181,14 +190,27 @@ def classify_agent_verdict(
     # la multiplicidad de dominios lógicos no es corroboración independiente).
     # Solo CAPEA hacia abajo (MALICE/INTENT → SUSPICION); nunca eleva un
     # ABSTAIN/NOISE. Campo ausente o valor no reconocido → byte-idéntico al
-    # comportamiento previo (fail-safe). SUSPICION comparte EXIT_INTENT (3),
-    # contrato documentado "3=intent/suspicion" — el cap no des-alerta.
+    # comportamiento previo (fail-safe).
     _ceiling = str(abduction.get("verdict_ceiling") or "").upper()
 
     if "MALICIOUS" in hyp or "CRITICAL" in hyp or "OVERRIDE" in hyp:
         return "SUSPICION" if _ceiling == "SUSPICION" else "MALICE"
-    if "INTENT" in hyp or "SUSPICION" in hyp:
+    if "INTENT" in hyp:
         return "SUSPICION" if _ceiling == "SUSPICION" else "INTENT"
+    # B-097 (APLICADO 2026-07-10, firma Anna — supersede el NO APLICADO del
+    # gate del día anterior): una hipótesis SUSPICION sella SUSPICION — ya NO
+    # se sube a INTENT. El colapso histórico existía porque SUSPICION no era
+    # un veredicto sellado; desde §9.4-LIM lo es (exit propio, piso de alerta
+    # MEDIUM). Validado por triple fuente independiente sobre los 33 casos
+    # afectados: (1) etiqueta ground-truth = SUSPICION en los 30 recuperados;
+    # (2) banda interna del motor (0.10<score<=0.33 = SUSPICION, B-076) — el
+    # motor calculaba bien, solo el sellado colapsaba; (3) batch ciego Claude
+    # Code + Cronos (46 casos, 2026-07-10) confirma SUSPICION. Label-blind
+    # (B-075/B-076): mueve TODOS los casos con hipótesis SUSPICION, coincidan
+    # o no con su expected_verdict (gate medido: 30 recuperados, 3 expuestos
+    # — los 3 pasaban por accidente del colapso; ver B-097 en BUGS_PENDIENTES).
+    if "SUSPICION" in hyp:
+        return "SUSPICION"
     # B-058 FIX (auditoría de invariantes 2026-07-03): match por SUBSTRING,
     # no solo exacto. El adaptador EBS emite "ABSTAIN_DETECTED" (expected==
     # ABSTAIN), que NO estaba en ABSTAIN_HYPOTHESES → caía a NOISE (exit 0):
@@ -214,18 +236,19 @@ def classify_agent_verdict(
 _VERDICT_EXIT = {
     "MALICE":  EXIT_MALICE,
     "INTENT":  EXIT_INTENT,
-    # §9.4-LIM: SUSPICION comparte el exit de INTENT — el contrato documentado
-    # ya dice "3=intent/suspicion". Sin entrada explícita caería al fallback
-    # EXIT_ABSTAIN (4): un downgrade de alerting que el cap NO debe causar.
-    "SUSPICION": EXIT_INTENT,
+    # B-097: SUSPICION es veredicto de primera clase con exit PROPIO (5).
+    # Sin entrada explícita caería al fallback EXIT_ABSTAIN (4).
+    "SUSPICION": EXIT_SUSPICION,
     "ABSTAIN": EXIT_ABSTAIN,
     "NOISE":   EXIT_NOISE,
 }
 _VERDICT_LABEL = {
     "MALICE":  "EVIL FOUND",
-    "INTENT":  "INTENT/SUSPICION DETECTED",
-    "SUSPICION": "SUSPICION DETECTED (verdict ceiling §9.4-LIM — D3-only, "
-                 "sin triangulación; se recomienda segunda fuente D2/D4/D5)",
+    "INTENT":  "INTENT DETECTED",
+    # B-097: alcanzable por el path motor (banda 0.10<score<=0.33 o gate de
+    # corroboración) y por el techo §9.4-LIM (D3-only sin triangulación).
+    "SUSPICION": "SUSPICION DETECTED (structural anomaly — no corroboration "
+                 "for INTENT/MALICE)",
     "ABSTAIN": "ABSTAIN — could not determine (insufficient/unanalyzed evidence)",
     "NOISE":   "NO EVIL DETECTED",
 }
@@ -1968,7 +1991,7 @@ Exit codes:
     # Print narrative
     print("\n" + bundle.get("narrative", "[No narrative]"))
 
-    # Documented exit code — 0=no evil, 1=evil, 2=error, 3=intent/suspicion, 4=ABSTAIN
+    # Documented exit code — 0=no evil, 1=evil, 2=error, 3=intent, 4=ABSTAIN, 5=suspicion (B-097)
     exit_code = _VERDICT_EXIT.get(agent_verdict, EXIT_ABSTAIN)
     _exit_label = _VERDICT_LABEL.get(agent_verdict, agent_verdict)
     logger.info("[AGENT] Exit code: %d (%s)", exit_code, _exit_label)

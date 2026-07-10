@@ -5028,7 +5028,7 @@ namespaces remain); closes the silent drift.
 
 ---
 
-## B-097 — Motor path: SUSPICION→INTENT collapse at sealing. Fix ATTEMPTED, REJECTED by the pre-registered gate [NOT APPLIED — negative gate]
+## B-097 — Motor path: SUSPICION→INTENT collapse at sealing [APPLIED 2026-07-10 — Anna's signature, triple source]
 
 | Field | Value |
 |-------|-------|
@@ -5097,6 +5097,37 @@ Unblock options (doctrine/ground-truth decisions, not the agent's):
   (c) review the 3 labels (INTENT or SUSPICION?) — ground truth, signature
       required.
 
-Until that decision: the collapse persists (documented), the
-`xfail(strict=True)` sentinels keep it visible, and the honest reference
-metric is **140/199**.
+Until that decision: the collapse persisted (documented), the
+`xfail(strict=True)` sentinels kept it visible, and the honest reference
+metric was **140/199** (pre-merge of main 2026-07-10; the merge moved the
+baseline).
+
+**UPDATE 2026-07-10 (same day, later session) — APPLIED with signature.**
+Anna signed the application of the fix, superseding the original
+pre-registered rule, based on TRIPLE independent source validation over the
+33 cases: (1) ground-truth label = SUSPICION on the 30 recovered; (2) the
+motor's internal band = SUSPICION (0.10<score≤0.33, B-076) — the motor
+computed correctly, only sealing collapsed; (3) blind Claude Code + Cronos
+batch (46 cases, 2026-07-10) confirmed SUSPICION on the vast majority.
+Additionally: SUSPICION gets its OWN exit code (5) — it shared 3 with INTENT
+until today; INTENT keeps 3 (historic contract; grep confirmed zero external
+consumers of specific codes). The xfail sentinels became regular regression
+guards. R4-1 invariant explicitly verified post-fix: bit-identical snapshots
+intact. The 3 exposed cases (TIMELINE/JESS/JESS-KEYCHAIN, passing by accident
+of the collapse) remain as honest failures pending data fixes (under-typed
+conversion, docs/B097_ROOT_CAUSE_ANALYSIS.md §5b).
+
+### Blind-batch divergences (46 cases) — pending manual review, NOT actioned
+
+Seven divergences from the blind Claude+Cronos contrast are RECORDED for
+later case-by-case review (Anna's decision: no urgency, normal backlog):
+ELI and MAGNET-2022-ANDROID (blind Claude = INTENT, agrees with the agent
+AGAINST the SUSPICION label — label-review candidates, same class as
+OWL-NEXUS5); PAGEFILE-ABSENT (Claude = MALICE vs the corroboration gate's
+cap at 0.48, single D2 channel — legitimate Claude-vs-doctrine-(ii) conflict,
+doctrine wins today); DEMO-008 (Claude = MALICE vs label SUSPICION);
+LINUX-005, M57-JO-Dec07, M57-PAT-Dec07 (Claude = NOISE vs label SUSPICION —
+here the motor's internal band beats Claude). The designed FP/FN break cases
+and the H-02 guard (FP-CULTURAL) go to the normal backlog without urgency
+(decision 2026-07-10).
+
