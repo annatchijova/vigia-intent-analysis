@@ -43,6 +43,18 @@ _COREDATA_EPOCH_OFFSET = 978307200
 # QuarantineEvents) miden KB. 8 MiB es holgado por ordenes de magnitud.
 _PLIST_MAX_BYTES = 8 * 1024 * 1024
 
+# FSEvents (MACOS_MODULES_DESIGN §4): umbral de "borrado masivo" — N eventos
+# Removed sobre rutas de usuario en la ventana del journal. Es un parametro de
+# calibracion documentado, no un valor magico inline. Conservador: solo se
+# marca cluster ANTI-FORENSE por encima del umbral; por debajo, actividad.
+_FSEVENTS_MASS_DELETION_MIN = 25
+# Rutas cuya aparicion en FSEvents es senal de intencion anti-forense.
+_FSEVENTS_TRASH_RE = re.compile(r"(?:^|/)\.Trash(?:es)?(?:/|$)", re.IGNORECASE)
+_FSEVENTS_SUSPICIOUS_PATH_RE = re.compile(
+    r"(?i)(?:/private)?/(?:var/)?tmp/|/\.[^/]+/|/Users/Shared/|"
+    r"srm|bleachbit|cleanmymac|onyx", re.IGNORECASE
+)
+
 # ──────────────────────────────────────────────────────────────────────────────
 # CATALOGS — severity in Fraction, MITRE TTP, description
 # Ordered by severity DESCENDING so break-on-first-match gets highest severity
@@ -343,11 +355,12 @@ class MacOSForensicsAnalyzer:
             logger.error("[MACOS] Plist analysis failed: %s", e)
             result.analysis_notes.append(f"Plist analysis error: {e}")
 
-        # 8. FSEvents — filesystem event journal
-        # TODO: implement _analyze_fsevents (binary format, requires dedicated
-        #       parser — consider python-fsevents or manual struct.unpack;
-        #       look for file deletion clusters, .Trash patterns, timestamp gaps)
-        # self._analyze_fsevents(evidence_path, result)
+        # 8. FSEvents — filesystem event journal (vigia.sift.fsevents_parser)
+        try:
+            self._analyze_fsevents(evidence_path, result)
+        except Exception as e:
+            logger.error("[MACOS] FSEvents analysis failed: %s", e)
+            result.analysis_notes.append(f"FSEvents analysis error: {e}")
 
         # 9. OPSEC assessment
         self._assess_opsec(result)
@@ -981,6 +994,109 @@ class MacOSForensicsAnalyzer:
                         rule_ref="MACOS-PERSIST-LOGIN-HIDDEN",
                         corr_group="persistence",
                     ))
+
+    # ── FSEvents ────────────────────────────────────────────────────────────
+
+    def _analyze_fsevents(
+        self, evidence_path: Path, result: MacOSAnalysisResult
+    ) -> None:
+        """Analiza el journal FSEvents (`/.fseventsd/`) via
+        vigia.sift.fsevents_parser.
+
+        Detecciones (solo lo bien acordado — sin overclaim Daubert):
+        - Borrado masivo: >= _FSEVENTS_MASS_DELETION_MIN eventos Removed
+          (anti-forense; MITRE T1070.004).
+        - Purga de papelera: Removed sobre .Trash/.Trashes (T1485).
+        - Rutas sospechosas: /tmp, ocultas, o nombres de herramientas
+          anti-forenses (srm/bleachbit/…) en el journal (T1564).
+
+        FSEvents NO tiene timestamp por registro — los findings llevan
+        timestamp=0 y acotan el tiempo por rango en `evidence`. La detección de
+        "gap del journal" por secuencia de event_id NO se implementa: los
+        event_id no son necesariamente contiguos, así que un salto no prueba
+        purga (evita un falso positivo estructural).
+        """
+        from vigia.sift.fsevents_parser import parse_fseventsd_dir
+
+        # `.fseventsd` es un DIRECTORIO — _safe_rglob filtra a is_file(), así que
+        # se busca con rglob nativo (mismo patrón de filtrado de symlinks
+        # per-item que analyze()). Cap a 5 volúmenes.
+        fsdirs = [
+            p for p in evidence_path.rglob(".fseventsd")
+            if p.is_dir() and not p.is_symlink()
+        ][:5]
+        if not fsdirs:
+            return
+
+        for fsdir in fsdirs:
+            parsed = parse_fseventsd_dir(fsdir)
+            for note in parsed.notes:
+                result.analysis_notes.append(f"FSEvents ({fsdir.name}): {note}")
+            if parsed.unsupported_pages:
+                result.analysis_notes.append(
+                    f"FSEvents: {parsed.unsupported_pages} página(s) de versión "
+                    f"no soportada (posible DLS3) — cobertura parcial"
+                )
+            if not parsed.events:
+                continue
+
+            removed = [e for e in parsed.events if e.is_removed]
+            trash_removed = [
+                e for e in removed if _FSEVENTS_TRASH_RE.search(e.path)
+            ]
+            suspicious = [
+                e for e in parsed.events
+                if _FSEVENTS_SUSPICIOUS_PATH_RE.search(e.path)
+            ]
+
+            _id_lo = min((e.event_id for e in parsed.events), default=0)
+            _id_hi = max((e.event_id for e in parsed.events), default=0)
+            _range = f"event_id {_id_lo}–{_id_hi}, {len(parsed.events)} evento(s)"
+
+            if len(removed) >= _FSEVENTS_MASS_DELETION_MIN:
+                self._findings.append(MacOSFinding(
+                    finding_type="ANTIFORENSIC_FSEVENTS_MASS_DELETION",
+                    severity=Fraction(65, 100),
+                    description=(
+                        f"Borrado masivo en FSEvents: {len(removed)} eventos "
+                        f"Removed (umbral {_FSEVENTS_MASS_DELETION_MIN})"
+                    ),
+                    evidence=f"{len(removed)} Removed | {_range} | store={parsed.store_uuid}",
+                    mitre_technique="T1070.004",
+                    rule_ref="MACOS-FSEVENTS-MASS-DELETION",
+                    corr_group="antiforensic",
+                ))
+
+            if trash_removed:
+                self._findings.append(MacOSFinding(
+                    finding_type="ANTIFORENSIC_FSEVENTS_TRASH_PURGE",
+                    severity=Fraction(55, 100),
+                    description=(
+                        f"Purga de papelera en FSEvents: {len(trash_removed)} "
+                        f"evento(s) Removed sobre .Trash"
+                    ),
+                    evidence=(
+                        f"{trash_removed[0].path[:150]} (+{len(trash_removed)-1} más) "
+                        f"| {_range}"
+                    ),
+                    mitre_technique="T1485",
+                    rule_ref="MACOS-FSEVENTS-TRASH-PURGE",
+                    corr_group="antiforensic",
+                ))
+
+            if suspicious:
+                self._findings.append(MacOSFinding(
+                    finding_type="FSEVENTS_SUSPICIOUS_PATH",
+                    severity=Fraction(40, 100),
+                    description=(
+                        f"FSEvents sobre rutas sospechosas: {len(suspicious)} "
+                        f"evento(s) (tmp/ocultas/herramientas anti-forenses)"
+                    ),
+                    evidence=f"{suspicious[0].path[:150]} | {_range}",
+                    mitre_technique="T1564.001",
+                    rule_ref="MACOS-FSEVENTS-SUSPICIOUS-PATH",
+                    corr_group="fsevents_activity",
+                ))
 
     # ── OPSEC Assessment ───────────────────────────────────────────────────
 

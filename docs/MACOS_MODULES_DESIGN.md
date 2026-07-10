@@ -13,8 +13,8 @@
 
 De las cuatro familias objetivo, hoy solo Safari History está parcialmente cubierta por
 `vigia/sift/macos_forensics.py`; plists solo en su subconjunto de persistencia
-(LaunchAgents/Daemons + login items); FSEvents es un TODO comentado
-(`macos_forensics.py:346-350`); Spotlight aparece como marker (`.Spotlight-V100`,
+(LaunchAgents/Daemons + login items); FSEvents **ya implementado** (2026-07-10, `vigia/sift/fsevents_parser.py` +
+`_analyze_fsevents`, ver §4); Spotlight aparece como marker (`.Spotlight-V100`,
 `macos_forensics.py:103`) pero **no existe ningún método de análisis**; y Chrome-en-macOS
 está **excluido explícitamente** (`macos_forensics.py:303-305`, `if "Safari" not in str(db): continue`).
 
@@ -418,6 +418,22 @@ La lógica de detección de LaunchAgents ya existe y se **migra** (no se duplica
 ---
 
 ## 4. Módulo 3 — FSEvents
+
+> **ESTADO: IMPLEMENTADO (2026-07-10).** Parser autocontenido en
+> `vigia/sift/fsevents_parser.py` (DLS1/DLS2, gzip, techo S5, degradación
+> honesta ante DLS3/corrupción) cableado en `macos_forensics._analyze_fsevents`.
+> Detecciones: borrado masivo (`ANTIFORENSIC_FSEVENTS_MASS_DELETION`,
+> T1070.004), purga de papelera (`ANTIFORENSIC_FSEVENTS_TRASH_PURGE`, T1485),
+> rutas sospechosas (`FSEVENTS_SUSPICIOUS_PATH`, T1564). Los dos primeros usan
+> corr_group `antiforensic` (listos como dominio B-052-P2). NO se implementa
+> detección de gap por secuencia de event_id (los IDs no son contiguos — sería
+> overclaim). 18 tests (`test_fsevents_parser.py`), 0 flips de corpus (0 casos
+> macOS rutean al engine), tuck-2019 sin cambio (no tiene `.fseventsd`).
+> **Nota de calibración pendiente (doctrina, no incluida):** un borrado masivo
+> FSEvents standalone queda en z=1.2 en la escalera agregada actual (mismo
+> trato que `ANTIFORENSIC_QUARANTINE_EMPTY`); darle una rama propia es una
+> decisión de recalibración acoplada a B-052-P2, no tomada aquí.
+
 
 ### 4.1 Formato del artefacto real
 
