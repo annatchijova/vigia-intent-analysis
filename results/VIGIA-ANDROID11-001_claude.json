@@ -1,0 +1,32 @@
+{
+  "case_id": "VIGIA-ANDROID11-001",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:30:00Z",
+  "cronos_trace_id": "ea90a46f-6309-4c62-bf96-617a2a896a58",
+  "verdict": "ABSTAIN",
+  "confidence": "90/100",
+  "note": "abstention_risk: high. confidence_expected: 30. This is an intake-only record. The outer archive hash is established (SHA-256: abb27d4c..., 10.94GB), but the inner archive 'Android 11 Image with Documentation.zip' (10.97GB) has not been extracted and analyzed due to size constraints (~22GB extraction space required). No forensic content has been examined. ABSTAIN is the only epistemically honest verdict for an unextracted forensic image.",
+  "peircean_analysis": {
+    "firstness": "Outer archive android_11.zip: SHA-256 abb27d4c5a57692d192a7619d179749abbd916d985d9fb4b10455d96d34d44a7, 10,944,907,975 bytes (10.94GB). Inner archive: 'Android 11/Android 11 Image with Documentation.zip', 10,973,972,708 bytes (10.97GB). File date: 2022-09-04. Origin: Digital Forensics Challenge public dataset.",
+    "secondness": "Android 11 was released September 2020 (API 30). The 2022-09-04 acquisition date is consistent with a forensics challenge dataset acquired approximately 2 years after OS release. The 10.97GB size is consistent with a full Android device image including documentation. Chain of custody is established for the outer archive.",
+    "thirdness": "Cannot infer any pattern from unextracted content. The acquisition date and archive structure are consistent with a legitimate forensics challenge dataset. All verdict possibilities (NOISE through MALICE) remain open pending extraction and content analysis."
+  },
+  "hypotheses": {
+    "H1_forensics_challenge_dataset": "Legitimate Android 11 forensics challenge dataset from a public competition. Image contains a scenario designed for training investigators.",
+    "H2_real_device_with_evidence": "Real Android 11 device image containing actual evidence of malicious activity."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "Both H1 and H2 are equally unverifiable without extraction. ABSTAIN is mandatory.",
+    "test_result": "No test possible without extraction.",
+    "refutation_outcome": "Cannot perform refutation. ABSTAIN."
+  },
+  "devil_advocate": "N/A — ABSTAIN verdict. Refutation protocol not applicable when no content has been analyzed.",
+  "caie_fracture": "None identified — no content analyzed.",
+  "evidence_anchors": [
+    "ANDROID11-ART-001: Outer archive SHA-256 verified, chain of custody established for intake",
+    "ANDROID11-ART-002: Inner archive identified (directory listing only), extraction pending"
+  ],
+  "mitre_ttps": [],
+  "carnegie_pattern": "None identified — no content analyzed",
+  "known_limitations": "Full extraction requires ~22GB disk space and extended processing time. Analysis pending. All forensic content of the Android device image is unexamined. confidence_expected: 30 per case design (abstention test)."
+}

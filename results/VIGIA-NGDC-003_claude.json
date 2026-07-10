@@ -1,0 +1,38 @@
+{
+  "case_id": "VIGIA-NGDC-003",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:25:00Z",
+  "cronos_trace_id": "a7ec3e74-8143-42b7-ac3d-3a9ba0bfcca0",
+  "verdict": "SUSPICION",
+  "confidence": "65/100",
+  "note": "confidence_expected: 67. Near match. The technical profile is unambiguously surveillance malware (LogKext Daemon). The intent classification is genuinely contested: parental monitoring of a minor (H1, legally defensible) vs spousal surveillance during divorce proceedings (H2, legally problematic). Both hypotheses explain all artifacts without internal contradiction. SUSPICION is the epistemically honest verdict.",
+  "peircean_analysis": {
+    "firstness": "Tracy's MacBook Air. LogKext Daemon running as root, installed to /Library/StartupItems/ with LaunchDaemon plist for persistence. Keylogger captures all keystrokes. Postfix cron job: hourly email exfiltration to joe.sum.twelve@gmail.com. Evidence: 12 captured sessions in /var/log/logkext/. Session distribution: 1 session with Terry-attributable content (15-year-old child), 11 sessions with Tracy-attributable content (wife). Prosocial outcome: Tracy-captured session revealed criminal conspiracy (drug trafficking coordination); Joe reported this to law enforcement.",
+    "secondness": "LogKext is a known covert surveillance tool — it installs as a root daemon, logs all keystrokes silently, and exfiltrates automatically. The installation in /Library/StartupItems/ provides persistence across reboots. The 1:11 session distribution (Terry:Tracy) contradicts Joe's stated purpose of monitoring the minor child. Legitimate parental monitoring software is typically configured to monitor the child's account, not the parent's account. The exfiltration destination (personal Gmail) rather than a parental control dashboard also contradicts commercial parental monitoring deployment.",
+    "thirdness": "Two credible, mutually exclusive interpretations exist, and the available evidence cannot distinguish between them. (H1) Joe installed LogKext primarily to monitor Terry's online activity, Tracy's device was incidentally captured when Terry used it, and the 1:11 ratio reflects Tracy using the family Mac more than Terry does — not targeting. The criminal conspiracy discovery is consistent with legitimate parental concern that fortuitously captured adult criminal activity. (H2) Joe installed LogKext to surveil Tracy during divorce proceedings, named Terry as justification, and the 1:11 distribution reflects the actual target. In H1, the prosocial outcome is incidental; in H2, the divorce leverage was the primary objective. Both hypotheses are internally consistent with all available artifacts."
+  },
+  "hypotheses": {
+    "H1_parental_monitoring": "Joe installed LogKext legitimately to monitor 15-year-old Terry's computer activity. Tracy's sessions were incidentally captured due to shared device use. Criminal conspiracy discovery is a fortuitous byproduct.",
+    "H2_spousal_surveillance": "Joe installed LogKext to surveil Tracy during divorce proceedings. Terry was cited as justification. The 1:11 capture ratio reflects actual targeting."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H1: Parental monitoring of a minor child via keylogger is legal in most jurisdictions when the parent owns the device and the child is under 18. Joe's stated purpose was monitoring Terry.",
+    "test_result": "H1 NOT REFUTED — but not confirmed either. The 1:11 session distribution weakens H1 but does not eliminate it (Tracy may simply use the MacBook Air more than Terry). The personal Gmail exfiltration destination is unusual for legitimate parental monitoring but not impossible for a non-technical user. H2 NOT REFUTED — the distribution and divorce context provide circumstantial support but no direct evidence of surveillance intent. Neither hypothesis contains an internal contradiction that allows clean refutation.",
+    "refutation_outcome": "Both hypotheses survive. SUSPICION is the correct verdict. INTENT or MALICE would require either: (a) evidence that Joe specifically targeted Tracy's sessions (e.g., account-level filtering), or (b) evidence that the criminal conspiracy was used as divorce leverage rather than reported to law enforcement."
+  },
+  "devil_advocate": "The prosocial outcome (criminal conspiracy reported to law enforcement) is the strongest argument that Joe's intent was legitimate — if the goal was divorce leverage, reporting criminals to police is counterproductive to that objective. This is the strongest evidence for H1.",
+  "caie_fracture": "None detected — the ambiguity is genuine, not evidence of staging or concealment.",
+  "evidence_anchors": [
+    "PROC-001: LogKext Daemon root, /Library/StartupItems/, Postfix hourly cron to joe.sum.twelve@gmail.com",
+    "LOG-001: 12 sessions, 1 Terry-attributable, 11 Tracy-attributable",
+    "CTX-001: Divorce proceedings ongoing, stated purpose parental monitoring of Terry (15yo)",
+    "OUTCOME-001: Tracy session revealed criminal conspiracy; Joe reported to law enforcement"
+  ],
+  "mitre_ttps": [
+    "T1056.001 (Keylogging — LogKext Daemon)",
+    "T1053 (Scheduled Task — hourly Postfix cron)",
+    "T1048 (Exfiltration Over Alternative Protocol — email to personal Gmail)"
+  ],
+  "carnegie_pattern": "None clearly established — intent ambiguity prevents Carnegie classification. If H2 is correct: authority exploitation (parent/spouse role to justify surveillance). If H1 is correct: no manipulation.",
+  "known_limitations": "Session attribution relies on content analysis — cannot confirm device ownership per session without login records. Whether criminal conspiracy reporting was contemporaneous with discovery or post-divorce-proceedings cannot be determined from available artifacts. Joe's subjective intent is not recoverable from technical evidence alone. confidence_expected: 67 per case design."
+}

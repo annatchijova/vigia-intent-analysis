@@ -1,0 +1,149 @@
+{
+  "case_id": "VIGIA-SET68I-001",
+  "case_name": "Sony Ericsson T68i 'Ingebjorg' — Forensic Flash Image Analysis (2005)",
+  "source_dataset": "Champlain College Digital Forensics Challenge — Mobile Phone Corpus",
+  "source_origin": "public_dataset",
+  "abstention_risk": "medium",
+  "confidence_expected": 40,
+  "carnegie_pattern_expected": null,
+  "description": "Forensic image of Sony Ericsson T68i internal flash memory (file ingebjorg.bin, 8388608 bytes, SHA-256: df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d). File date 2005-03-29. Filename 'ingebjorg.bin' indicates device ownership — 'Ingebjorg' is a Norwegian female given name (variant: Ingeborg), strongly suggesting the handset belonged to a Scandinavian female user. String analysis reveals firmware layer with GSM stack processes and image format error handlers (JPEG, GIF, BMP, EBM, PNG, WBMP). Image handling module present with full Base64 codec string. Pattern sequences (AAAAAA, BBBBBB, repeating N._ patterns) consistent with initialization test data. No user-generated content (SMS text, contact names, call logs, calendar entries, image data) was recoverable from the examined binary sections. ABSTAIN verdict: device identity established via filename, but no actionable user data recovered for forensic analysis.",
+  "devil_advocate": "N/A — verdict is ABSTAIN, refutation protocol not required.",
+  "artifacts": [
+    {
+      "artifact_id": "SET68I-ART-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-28T16:39:02.047000Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:5f772d5010bc4266b3b4548a71cfc91a2293ef0f2795a90e0e3a36ac2524353f (SE_T68i.zip)",
+        "sha256:df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d (ingebjorg.bin)"
+      ],
+      "acquisition_tool": "zip extraction + sha256sum",
+      "acquisition_hash": "df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d",
+      "acquisition_timestamp": "2026-06-28T16:39:02Z",
+      "description": "Sony Ericsson T68i flash image. SHA-256 verified. Size 8388608 bytes (8MB). File date 2005-03-29. Zip container verified at intake.",
+      "metadata": {
+        "device": "Sony Ericsson T68i",
+        "file_name": "ingebjorg.bin",
+        "device_owner_identifier": "Ingebjorg (Norwegian female given name — device provenance marker)",
+        "file_type": "Flash memory image — firmware + user partition",
+        "file_date": "2005-03-29",
+        "size_bytes": 8388608,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:a6389706484c9d3211d861ce262fae907bb3c75557a8131f002407b483d0120f",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-SET68I-001_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "SET68I-ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "read_evidence",
+      "timestamp": "2026-06-28T16:40:00Z",
+      "raw_score": 0.1,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "sha256:df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d"
+      ],
+      "description": "String analysis reveals firmware components: (1) Image format error handler strings — DEFAULT ERROR STRING, MEMORY NOT AVAILABLE, NOT A JPEG FILE, NOT A GIF FILE, NOT A BMP FILE, NOT A EBM FILE (Sony proprietary format), NOT A PNG FILE, NOT A WBMP FILE, BITMAP FILE IS CORRUPT, BITMAP FILE DATA IS CORRUPT, JPEG ERROR — indicating firmware image display module. (2) Base64 codec alphabet: ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/= — standard Base64 table, expected in multimedia capable firmware. (3) GSM stack process table identical to SE P800 variant (T68i uses same Symbian/Green Hills RTOS core). (4) Pattern sequences: AAAAAA, BBBBBB, repeating N._. and E+F+G+ patterns — hardware initialization test patterns. (5) IDLE state string — power management indication. No user data recovered.",
+      "metadata": {
+        "firmware_modules": [
+          "Image display module (JPEG/GIF/BMP/EBM/PNG/WBMP)",
+          "Base64 codec",
+          "GSM protocol stack",
+          "Hardware initialization test suite"
+        ],
+        "user_content_found": false,
+        "device_owner": "Ingebjorg (from filename)",
+        "nationality_indicator": "Norwegian (given name etymology)",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:a6389706484c9d3211d861ce262fae907bb3c75557a8131f002407b483d0120f",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-SET68I-001_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "SET68I-ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "search_pattern",
+      "timestamp": "2026-06-28T16:41:00Z",
+      "raw_score": 0.15,
+      "prior_trust": 0.6,
+      "provenance_chain": [
+        "sha256:df9aa8809f752434fc4028196b890c28a75924eaec2fbd586538450e2995c71d"
+      ],
+      "description": "Culturally significant filename: 'ingebjorg.bin' — Ingebjorg/Ingeborg is a traditional Norwegian/Swedish female name (from Old Norse: Ing + bjorg, meaning 'Ing's protection'). Combined with Nokia 6230's Norwegian WAP cache (same challenge corpus), this establishes consistent Scandinavian/Norwegian provenance for this forensic challenge set. The filename likely reflects the forensic tool's output when acquiring the device, using the owner's name as the output filename.",
+      "metadata": {
+        "filename_cultural_significance": "Norwegian female given name — establishes device owner nationality context",
+        "corpus_connection": "Same challenge corpus as Nokia 6230 Norwegian WAP case (VIGIA-NOKIA6230-001)",
+        "acquisition_naming_convention": "Forensic tool output named after device owner (standard DCFL/Cellebrite practice)",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:a6389706484c9d3211d861ce262fae907bb3c75557a8131f002407b483d0120f",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-SET68I-001_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    }
+  ],
+  "signals": [
+    {
+      "artifact_id": "SET68I-ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Sony Ericsson T68i flash image. SHA-256 verified. Size 8388608 bytes (8MB). File date 2005-03-29. Zip container verified at intake.",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "SET68I-ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 3
+      },
+      "description": "String analysis reveals firmware components: (1) Image format error handler strings — DEFAULT ERROR STRING, MEMORY NOT AVAILABLE, NOT A JPEG FILE, NOT A GIF FILE, NOT A BMP FILE, NOT A EBM FILE (Sony ",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 3
+      }
+    },
+    {
+      "artifact_id": "SET68I-ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "description": "Culturally significant filename: 'ingebjorg.bin' — Ingebjorg/Ingeborg is a traditional Norwegian/Swedish female name (from Old Norse: Ing + bjorg, meaning 'Ing's protection'). Combined with Nokia 6230",
+      "evidence_type": "log_entry",
+      "source": "search_pattern",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 9
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-SET68I-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  },
+  "schema_version": 1
+}

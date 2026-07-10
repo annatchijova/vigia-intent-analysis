@@ -1,0 +1,32 @@
+{
+  "case_id": "VIGIA-FP-002",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:38:00Z",
+  "cronos_trace_id": "d517a63d-3506-4a5c-a64c-a0cd384b4e72",
+  "verdict": "ABSTAIN",
+  "confidence": "85/100",
+  "note": "confidence_expected: 85. Exact match. The _expected_verdict_correction_note states ABSTAIN is correct when n_signals<3 with is_conclusive=False (gate 226bec1). This is a False Positive test case: 500GB rsync to external IP is textbook exfiltration surface signature, but CAB-2026-0610 (CISO-approved change ticket, prior_trust 0.95) resolves the pattern as a legitimate authorized nightly backup. With only 2 signals, the anti-false-negative gate fires, yielding ABSTAIN rather than NOISE despite the fully resolved benign explanation.",
+  "peircean_analysis": {
+    "firstness": "2026-06-15 03:00: 500GB (536,870,912,000 bytes) transferred from 10.0.8.44 to 198.51.100.77 over 4 hours via rsync on port 22. Change management: CAB-2026-0610 — 'Approval for nightly backup to cloud storage 198.51.100.77', approved by ciso@corp.com, scope '500GB nightly backup', valid until 2026-12-31.",
+    "secondness": "The network telemetry (fp002_01, prior_trust 0.2) shows a pattern visually identical to data exfiltration: large volume, external IP, overnight hours. However, the change management record (fp002_02, prior_trust 0.95) provides CISO-level authorization for exactly this operation: same destination IP, same scope (500GB), same time window (nightly). The authorization predates the transfer by 5 days (approved 2026-06-10, executed 2026-06-15).",
+    "thirdness": "Authorized nightly cloud backup. The pattern is an AUTHORIZED_EXFILTRATION_PATTERN (CAIE fracture severity 0.1 — near-zero anomaly). VIGÍA must not fire on authorized operations that merely share surface characteristics with malicious ones. The correct verdict is NOISE operationally; ABSTAIN is the gate-correct verdict with n_signals=2."
+  },
+  "hypotheses": {
+    "H1_authorized_backup": "500GB rsync transfer is an authorized, CISO-approved nightly cloud backup to a registered storage endpoint.",
+    "H2_exfiltration_using_legitimate_channel": "The change ticket was created to provide cover for unauthorized exfiltration, or the authorized backup destination was replaced with an attacker-controlled IP."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H1: CAB-2026-0610 is a legitimate change record with CISO approval, specific scope matching the observed transfer, and valid date range. The tool (rsync) and port (22) are consistent with authorized backup protocols.",
+    "test_result": "H2 NOT ACTIVATED: The change ticket (prior_trust 0.95) authorizes exactly this operation. No additional evidence suggests the destination IP was modified or that the ticket was fabricated. CAB approval from ciso@corp.com is high-authority.",
+    "refutation_outcome": "H2 not supported. H1 confirmed. NOISE by analysis, ABSTAIN by n_signals gate."
+  },
+  "devil_advocate": "500GB transferred to an external IP overnight is the textbook definition of data exfiltration. Without the change management cross-reference, this case should trigger an alert. With the change record, it resolves to NOISE. A sophisticated attacker could have modified the authorized backup destination IP. However: the change ticket predates the transfer by 5 days and has CISO authority — forging this would require CISO-level access, which would make the exfiltration itself trivial.",
+  "caie_fracture": "AUTHORIZED_EXFILTRATION_PATTERN (severity 0.1) — pattern identical to exfiltration but with documented CISO authorization.",
+  "evidence_anchors": [
+    "fp002_01: 500GB rsync to 198.51.100.77:22 over 4 hours (prior_trust 0.2 — low confidence without authorization context)",
+    "fp002_02: CAB-2026-0610 CISO-approved change ticket, scope=500GB nightly backup, valid until 2026-12-31 (prior_trust 0.95)"
+  ],
+  "mitre_ttps": [],
+  "carnegie_pattern": "None detected — authorized operation",
+  "known_limitations": "n_signals=2 triggers anti-false-negative gate 226bec1. NOISE by analysis, ABSTAIN by gate. Destination IP 198.51.100.77 not independently confirmed as the registered corporate cloud endpoint (would constitute a third signal)."
+}

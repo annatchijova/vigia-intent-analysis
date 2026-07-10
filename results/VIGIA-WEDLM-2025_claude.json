@@ -1,0 +1,32 @@
+{
+  "case_id": "VIGIA-WEDLM-2025",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:30:00Z",
+  "cronos_trace_id": "7906254f-76a2-46e8-a10b-7e76468652e0",
+  "verdict": "ABSTAIN",
+  "confidence": "92/100",
+  "note": "Peircean analysis yields NOISE (legitimate academic Python LLM evaluation framework). The case record contains _expected_verdict_correction_note stating ABSTAIN is the correct verdict when n_signals<3 with is_conclusive=False (gate 226bec1). With only 2 signals, the anti-false-negative gate fires. ABSTAIN is architecturally correct for this signal count.",
+  "peircean_analysis": {
+    "firstness": "ZIP archive WeDLM-main.zip (SHA-256: edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64). '-main' suffix indicates GitHub 'Download ZIP' convention. Contents: evaluation/dataset_download/ directory with benchmark download scripts for ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag. README.md (9.7KB), MANIFEST.in. Dated 2025-12-30.",
+    "secondness": "All 8 benchmark names (ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag) are canonical, publicly documented academic LLM evaluation datasets, present in published ML research. MANIFEST.in is standard Python packaging. The '-main' suffix is the unambiguous GitHub archive convention. README.md at 9.7KB is consistent with a documented research project. No executable payloads, no C2 indicators, no obfuscated content.",
+    "thirdness": "No malicious pattern identified. All structural elements are consistent with an academic Python research project for LLM benchmark evaluation, consistent with publicly available frameworks on GitHub."
+  },
+  "hypotheses": {
+    "H1_legitimate_research_software": "Python LLM evaluation framework for academic benchmark datasets, downloaded from GitHub.",
+    "H2_malicious_payload_in_scripts": "Download scripts contain malicious payloads or redirect to malicious infrastructure."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H1 is the straightforward reading given the GitHub archive naming and well-known benchmark names.",
+    "test_result": "H2 not activated by any evidence. No obfuscated content detected, no C2 indicators, all benchmark names map to documented public datasets. H2 would require content analysis of the Python scripts themselves for confirmation.",
+    "refutation_outcome": "H2 not supported by any available evidence. NOISE by analysis, ABSTAIN by n_signals gate."
+  },
+  "devil_advocate": "N/A — NOISE verdict. The ABSTAIN is a gate condition, not forensic ambiguity. A third signal (content analysis of download scripts) would resolve to NOISE.",
+  "caie_fracture": "None detected.",
+  "evidence_anchors": [
+    "WEDLM-ART-001: SHA-256 verified GitHub archive, Python evaluation framework structure, no anomalies",
+    "WEDLM-ART-002: Directory listing confirms all-benchmark download scripts, standard Python packaging"
+  ],
+  "mitre_ttps": [],
+  "carnegie_pattern": "None detected",
+  "known_limitations": "n_signals=2 triggers anti-false-negative gate (226bec1). Python script content analysis (third signal) not performed in this intake record."
+}

@@ -1,0 +1,36 @@
+{
+  "case_id": "VIGIA-REAL-005",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:38:00Z",
+  "cronos_trace_id": "96359a16-c098-4afa-8cb6-76df8b7eb779",
+  "verdict": "SUSPICION",
+  "confidence": "72/100",
+  "note": "confidence_expected: 88. Delta of 16 points. My lower confidence reflects that the encrypted content itself is unavailable — I can establish structural evidence for concealment but cannot confirm what is being concealed. The confidence_expected: 88 likely reflects a case where the full investigation (including decryption) produces INTENT/MALICE. From the structural evidence available here, SUSPICION is the epistemically honest verdict. Carnegie pattern: Concealment.",
+  "peircean_analysis": {
+    "firstness": "Jane's machine: AES-encrypted README file in Documents directory (no password available, possible unencrypted version in cache). Downloads directory: 'keys' file encrypted with GPG/PGP public/private key. BitLocker volume named 'R2D2' — full disk encryption active, recovery key location unknown. Three distinct cryptographic mechanisms applied simultaneously.",
+    "secondness": "Ordinary personal data security hygiene applies a consistent encryption scheme. Jane applied three different cryptographic mechanisms to different files/volumes simultaneously: (A) AES (symmetric) for a README-named file — unusual for a documentation file, which would normally be unencrypted; (B) GPG/PGP (asymmetric) for a 'keys' file — asymmetric encryption requires prior key exchange with a communication partner, implying a pre-arranged covert channel; (C) BitLocker volume with an obfuscated name ('R2D2' instead of a functional label) — the obfuscated volume name suggests the content is being hidden from casual observation. The combination of all three is beyond standard personal security hygiene.",
+    "thirdness": "The GPG/PGP usage is the most significant structural signal: asymmetric encryption requires advance coordination with another party (key exchange). This means Jane has an established encrypted communication channel with at least one external party. The 'README' name for an AES-encrypted file in Documents is deliberate misdirection — a README should be human-readable documentation, not an encrypted binary. The R2D2 volume name is an obfuscation attempt. The pattern is consistent with deliberate, structured covert communication — but without the encrypted content, the subject matter and intent remain unknown."
+  },
+  "hypotheses": {
+    "H1_covert_communication_data_theft": "Jane is using multi-layer encryption to conceal communication with an external party (possibly a competitor or unauthorized recipient) while leaking confidential information.",
+    "H2_legitimate_security_professional": "Jane is a security professional applying rigorous personal data protection: AES for local files, GPG for sensitive communications, BitLocker for full-disk protection. All methods are legitimate."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: Security professionals do use multiple encryption methods. The company may have no encryption policy prohibiting this. Asymmetric GPG communication could be with a legitimate business partner. BitLocker is a standard Windows encryption feature.",
+    "test_result": "H2 NOT REFUTED from available artifacts: The use of multiple encryption methods is consistent with security professional behavior. Without decrypting the content, the nature of the communications cannot be determined. However, H2 is weakened by: (A) the README name for an encrypted file is deliberate misdirection (a genuine README is never encrypted); (B) the R2D2 volume name is non-functional (professional BitLocker deployments use descriptive volume labels). These naming choices suggest concealment beyond ordinary security hygiene.",
+    "refutation_outcome": "H2 not refuted. SUSPICION is the correct bounded verdict pending content analysis."
+  },
+  "devil_advocate": "Jane is a security professional applying good personal data protection practices and the company has no policy against encryption. All three cryptographic mechanisms are legitimate tools. Encrypting personal files is a recommended security practice. The volume name 'R2D2' could be a personal/humorous choice with no concealment intent.",
+  "caie_fracture": "None formally identified in the case metadata. Structural analysis suggests concealment by naming conventions (README for encrypted binary, R2D2 for volume).",
+  "evidence_anchors": [
+    "ART-001: AES-encrypted README in Documents (misdirection by naming), GPG keys file in Downloads",
+    "ART-002: BitLocker 'R2D2' volume — obfuscated name, full disk encryption",
+    "ART-003: GPG/PGP asymmetric keys — implies prior key exchange with unknown party"
+  ],
+  "mitre_ttps": [
+    "T1027 (Obfuscated Files — AES, GPG, BitLocker applied to conceal content)",
+    "T1048 (Exfiltration Over Alternative Protocol — GPG-encrypted communication channel, suspected)"
+  ],
+  "carnegie_pattern": "Concealment — systematic multi-layer encryption with obfuscated naming conventions",
+  "known_limitations": "Encrypted content unavailable — confirms structural concealment pattern but not the subject matter or recipient identity. This is the critical gap between SUSPICION and INTENT. The 16-point delta from confidence_expected: 88 reflects that the full investigation (including decryption) presumably establishes the actual nature of communications. abstention_risk: medium."
+}

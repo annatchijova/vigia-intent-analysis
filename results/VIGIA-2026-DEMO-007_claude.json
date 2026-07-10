@@ -1,0 +1,33 @@
+{
+  "case_id": "VIGIA-2026-DEMO-007",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:21:00Z",
+  "cronos_trace_id": "e91be5e7-bc46-46f4-8fab-dcbdafb20842",
+  "verdict": "MALICE",
+  "confidence": "90/100",
+  "peircean_analysis": {
+    "firstness": "auth.log last recorded entry at 17:38; file inode mtime 23:47 (touched 6h later). VIM editor signature in file slack space. PID 2891 recorded at 17:30 < PID 2934 at 16:15 (physically impossible — PID sequence is monotonically increasing). NetFlow shows two SSH sessions at 23:41 and 23:47 from 10.0.0.15 NOT appearing in auth.log. Session 1: 2.1MB in 84s. Session 2: 64 bytes in 17s. Kernel audit log: pg_dump executed at 23:41:15 as auid=1001/uid=0 against rrhh_empleados.db (847 employees, salary + banking). No ITSM change ticket.",
+    "secondness": "System logs cannot be edited with VIM — they are written by the kernel logging daemon. PID regression is physically impossible in a running Linux kernel. The six-hour gap between last log entry and inode mtime is the editing window. The NetFlow sessions at 23:41/23:47 exactly fill the auth.log gap. Session 1 duration/size is consistent with pg_dump of an HR database. Session 2 duration/size is consistent with running vim and saving a modified log file. The combination of missing PIDs + VIM signature + inode timing + NetFlow sessions = log fabrication to cover two SSH sessions.",
+    "thirdness": "Sysadmin Carlos M. (10.0.0.15) conducted unauthorized pg_dump of the HR employee database at 23:41, then at 23:47 manually edited auth.log to delete both SSH sessions. The log editing used vim (root privileges required to write to syslog-owned file). The PID regression in the edited log is a fabrication artifact — the attacker did not maintain PID sequence consistency. Anti-forensics applied post-exfiltration to deny presence. This is MALICE: active exfiltration + deliberate log tampering to conceal."
+  },
+  "hypotheses": {
+    "H1_sysadmin_exfiltration_coverup": "Carlos M. exfiltrated HR database then edited auth.log to delete his session records. Log editing introduced impossible PID sequence and VIM signature artifacts.",
+    "H2_legitimate_maintenance": "Authorized maintenance by Carlos M. at 23:41, log modification was a system administrator correcting a corrupt log entry, pg_dump was a scheduled backup."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: Sysadmin authorized maintenance. pg_dump could be a late-night backup. Log modification could be correcting a corrupt entry.",
+    "test_result": "H2 FULLY REFUTED: (A) PID 2891 < PID 2934 is a physical impossibility — cannot occur in normal system operation, only in manually edited text. (B) VIM signature in slack space proves a text editor was used on a system log — never legitimate. (C) No ITSM change ticket means no authorized maintenance window. (D) NetFlow records two sessions that auth.log has deliberately erased. Four independent contradictions refute H2.",
+    "refutation_outcome": "H2 REFUTED. MALICE confirmed. original_verdict agrees."
+  },
+  "devil_advocate": "Carlos M. could have been performing emergency authorized maintenance without creating an ITSM ticket (happens in genuine emergencies). The pg_dump could be a legitimate backup to a new destination. However: the PID regression proves manual log editing — no legitimate maintenance requires tampering with process ID sequences in system logs. The VIM signature clinches it.",
+  "evidence_anchors": [
+    "LOG-001: PID 2891 < PID 2934 (monotonicity violation — manual editing artifact)",
+    "LOG-001: Missing sudo/cron entries that appear every other day",
+    "LOG-002: VIM signature in auth.log slack space + inode mtime 23:47",
+    "LOG-003: Two SSH sessions at 23:41/23:47 from 10.0.0.15 absent from auth.log (NetFlow corroboration)",
+    "META-001: pg_dump of rrhh_empleados.db at 23:41:15, auid=1001/uid=0, no ITSM ticket"
+  ],
+  "mitre_ttps": ["T1003 (OS Credential Dumping — pg_dump of HR data)", "T1070.002 (Indicator Removal — clear Linux logs)", "T1078 (Valid Accounts — sysadmin credentials)", "T1548 (Abuse Elevation Control — root via auid=1001)"],
+  "carnegie_pattern": "Authority abuse — legitimate sysadmin access weaponized for unauthorized data extraction + anti-forensic log tampering",
+  "known_limitations": "Identity of Carlos M. from IP attribution. Could theoretically be credential theft from 10.0.0.15. Physical network access confirmation not documented."
+}

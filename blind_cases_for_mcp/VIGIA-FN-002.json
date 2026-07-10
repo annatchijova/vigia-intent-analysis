@@ -1,0 +1,165 @@
+{
+  "case_id": "VIGIA-FN-002",
+  "case_name": "The Attacker's Backup",
+  "description": "Attacker installs a legitimate backup agent (Veeam) with a valid licence, configured to send data to a cloud instance they rented. The tool is legitimate, signed, and the traffic is indistinguishable from real backups.",
+  "abstention_risk": "high",
+  "carnegie_pattern_expected": null,
+  "confidence_expected": 78,
+  "artifacts": [
+    {
+      "artifact_id": "fn002_01",
+      "evidence_type": "memory_process",
+      "source_tool": "sift_process_list",
+      "timestamp": "2026-06-15T02:00:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:fn002proc01"
+      ],
+      "description": "veeam_agent.exe running with valid certificate",
+      "metadata": {
+        "process": "veeam_agent.exe",
+        "signed": true,
+        "signer": "Veeam Software",
+        "install_date": "2026-06-14",
+        "installer": "system_admin",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:bfde227f9c006266614f25ed28dee1dcae6e593a28986ef6b6c9d75b22a17075",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-FN-002_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "fn002_02",
+      "evidence_type": "ip_geolocation",
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-06-15T02:30:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.2,
+      "provenance_chain": [
+        "sha256:fn002net02"
+      ],
+      "description": "Backup traffic to 198.51.100.77 on port 443",
+      "metadata": {
+        "source_ip": "10.0.8.44",
+        "dest_ip": "198.51.100.77",
+        "bytes": 107374182400,
+        "tool": "veeam",
+        "port": 443,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:bfde227f9c006266614f25ed28dee1dcae6e593a28986ef6b6c9d75b22a17075",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-FN-002_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "fn002_03",
+      "evidence_type": "log_entry",
+      "source_tool": "sift_change_management",
+      "timestamp": "2026-06-14T09:00:00Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:fn002chg03"
+      ],
+      "description": "NO change ticket found for Veeam installation on server 10.0.8.44",
+      "metadata": {
+        "server": "10.0.8.44",
+        "software": "Veeam Agent",
+        "change_ticket_found": false,
+        "expected_approver": "backup_ops",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:bfde227f9c006266614f25ed28dee1dcae6e593a28986ef6b6c9d75b22a17075",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-FN-002_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "fracture_type": "MISSING_AUTHORIZATION",
+      "severity": 0.85,
+      "interpretation": "Legitimate tool but installed without a change ticket. Technical legitimacy does not imply operational legitimacy.",
+      "artifact_a": "fn002_01",
+      "artifact_b": "fn002_03",
+      "ttp_id": "T1072"
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "Legitimate backup agent, signed, normal traffic",
+    "secondness": "No change ticket for the installation. The tool is technically legitimate but its presence is not authorised",
+    "thirdness": "Attacker habit of using legitimate tools as exfiltration vectors, trusting that technical legitimacy conceals the lack of operational authorisation"
+  },
+  "devil_advocate": "The binary is signed by Veeam Software, the traffic looks like standard backup traffic, and backups to cloud storage are normal business practice.",
+  "source_dataset": "VIGÍA Synthetic Corpus — False Negative Suite",
+  "source_origin": "synthetic_vigia_collective",
+  "notes": "False negative test: everything is technically legitimate. The only anomaly is the absence of authorisation. If VIGÍA only checks hashes and signatures, it will return BENIGN.",
+  "_consolidation": {
+    "consolidated_at": "2026-06-05T04:27:39.816083+00:00",
+    "parser_version": "2.4",
+    "schema_version": "1.1",
+    "source_file": "VIGIA_FP_FN_AMB.json",
+    "source_origin": "synthetic_vigia_collective"
+  },
+  "signals": [
+    {
+      "artifact_id": "fn002_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "veeam_agent.exe running with valid certificate",
+      "evidence_type": "memory_process",
+      "source": "sift_process_list",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "fn002_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      },
+      "description": "Backup traffic to 198.51.100.77 on port 443",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 1
+      }
+    },
+    {
+      "artifact_id": "fn002_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "NO change ticket found for Veeam installation on server 10.0.8.44",
+      "evidence_type": "log_entry",
+      "source": "sift_change_management",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 3
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-FN-002_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  },
+  "schema_version": 1
+}

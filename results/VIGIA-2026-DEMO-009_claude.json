@@ -1,0 +1,32 @@
+{
+  "case_id": "VIGIA-2026-DEMO-009",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:21:00Z",
+  "cronos_trace_id": "ddbd22af-5ec0-427c-a79c-5f0d6d73d3ca",
+  "verdict": "MALICE",
+  "confidence": "88/100",
+  "peircean_analysis": {
+    "firstness": "2026-04-12 (Sunday) 03:17:44: Login as mrodriguez@empresa.es from IP 177.52.88.31. Documents downloaded: informe_fusion_Q2_CONFIDENCIAL.xlsx, nómina_empleados_2026.xlsx (60MB total). Session: 91 seconds. Post-logout: 63MB HTTPS to 104.21.58.92 (unauthorized anonymous storage). User history: 847 sessions, 0 accesses between 22:00-07:00, mean session duration 47 minutes, mean download 4.1MB. Termination letter prepared for Monday 2026-04-14. Building physical access: absent (remote from 177.52.88.31). Corporate phone: off.",
+    "secondness": "847-session history with zero nighttime accesses establishes a rigid behavioral baseline. The observed session violates it on every dimension simultaneously: wrong time (03:17 Sunday), wrong duration (91s vs 47min mean = 31x compression), wrong volume (60MB vs 4.1MB = 14x normal), wrong documents (merger plan + payroll = highest-value, never accessed before), wrong IP (neither corporate nor registered home address), immediate exfiltration to unauthorized cloud storage. Any one of these deviations is suspicious; all seven simultaneously occurring is impossible to attribute to coincidence.",
+    "thirdness": "Two credible interpretations exist: (A) María was tipped off about Monday termination, acted herself to extract maximum value before access revocation; (B) Attacker obtained María's credentials and used the termination timing/access rights to exfiltrate high-value data before IT discovered the account. In BOTH cases: the credentials were used in a deliberate, targeted, pre-meditated data theft against the most valuable documents. Both scenarios constitute MALICE — the distinction is whether the authorized account owner or a third party executed it."
+  },
+  "hypotheses": {
+    "H1_credential_theft_or_insider": "María's credentials used (by her or a third party) for deliberate exfiltration of highest-value documents, exploiting imminent access revocation window.",
+    "H2_legitimate_emergency": "María accessed documents at 3AM for a legitimate urgent business reason — merger plan needed for an early Sunday meeting, authorized remote access."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: Executives sometimes require after-hours access for genuine business needs. Merger transactions can create emergency Sunday access requirements.",
+    "test_result": "H2 FULLY REFUTED: (A) IP 177.52.88.31 ≠ registered home or corporate IP — unrecognized source. (B) Immediate post-logout exfiltration to anonymous cloud storage (104.21.58.92) has no legitimate business explanation. (C) 91-second session duration is physically inconsistent with reading/reviewing documents for legitimate business use. (D) 847-session zero-nighttime baseline with no exceptions in 2+ years eliminates 'habitual emergency access' as explanation.",
+    "refutation_outcome": "H2 REFUTED. MALICE confirmed. Original_verdict agrees."
+  },
+  "devil_advocate": "The pending termination letter explains the motive for María to act, but it does not prove she did. The unknown IP could be a VPN or travel. A trusted colleague could have warned her. However: the unauthorized cloud storage destination and sub-2-minute session targeting the two highest-value documents are independent of whether the actor is María or a third party — both point to deliberate, targeted pre-meditated theft.",
+  "evidence_anchors": [
+    "LOG-001: 03:17:44 Sunday login, 91s session, merger+payroll documents, IP 177.52.88.31",
+    "LOG-002: 847 sessions, 0 nighttime accesses, mean 47min/4.1MB — seven-sigma deviation",
+    "NET-001: 63MB exfiltration to 104.21.58.92 immediately post-logout (matches documents exactly)",
+    "CTX-001: Pending termination letter Monday, building access absent, corporate phone off"
+  ],
+  "mitre_ttps": ["T1078 (Valid Accounts — credentials used after-hours)", "T1048 (Exfiltration Over Alternative Protocol — HTTPS to cloud storage)", "T1530 (Data from Cloud Storage Object)"],
+  "carnegie_pattern": "Urgency exploitation — acted under time pressure of imminent credential revocation (termination Monday)",
+  "known_limitations": "Cannot definitively determine whether María herself or a credential thief performed the access. Two scenarios both yield MALICE verdict. Physical location of María at 03:17 not confirmed."
+}

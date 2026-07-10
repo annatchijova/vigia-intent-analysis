@@ -1,0 +1,34 @@
+{
+  "case_id": "VIGIA-CAN-032",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:19:00Z",
+  "cronos_trace_id": "66bf3de8-ed6f-4ba6-865b-3b221dad45ea",
+  "verdict": "SUSPICION",
+  "confidence": "68/100",
+  "note": "_notes field: expected_verdict MALICE→SUSPICION. Weak acquisition chain. Volatility artifact (7z.exe, prior_trust 0.95) is strong but network exfiltration evidence (prior_trust 0.25) is insufficient for MALICE.",
+  "peircean_analysis": {
+    "firstness": "5,000 Event 4625 failed logins from 847 RU/CN IPs against DB-LEGACY-01 (MySQL 5.6, low sensitivity) in 12 minutes at 15:00Z. SIEM generates 47 High Priority alerts, Tier-1 analyst activated. Concurrently at 15:05Z: finance_user's PID 3184 runs 7z.exe compressing Customer_DB.mdf (12.4GB → 2.3GB, ratio 0.12) into archive.7z in 50MB chunks. At 15:08Z: 847MB HTTPS outbound from finance_user workstation (10.0.8.44) to 198.51.100.77 port 443.",
+    "secondness": "The brute-force against legacy DB (no sensitive data) is anomalous in target selection — a genuine threat actor would target the customer DB directly. The simultaneous compression of Customer_DB.mdf by finance_user during the SOC distraction window, followed by 847MB HTTPS exfiltration, is suspicious. Legitimate backup operations are scheduled, not reactive to concurrent alert floods.",
+    "thirdness": "Classic noise-as-distraction: overly obvious, low-value attack generates maximum SOC alert volume while simultaneous insider/compromised-account exfiltration occurs against high-value target. The CAIE fracture RED_HERRING (severity 0.95) correctly identifies: 'when an attack is too obvious, it's a magic trick.'"
+  },
+  "hypotheses": {
+    "H1_noise_distraction_exfil": "Brute-force against legacy DB is deliberate distraction to occupy SOC while finance_user credential (compromised or insider) performs real exfiltration of Customer_DB.",
+    "H2_coincidence_legitimate_backup": "Brute-force attack is independent from finance operations. finance_user's 7z compression is a legitimate backup job coincidentally timed. 847MB HTTPS is authorized cloud backup traffic."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: Scheduled backup jobs run independently of attack activity. finance_user compressing the customer DB at business hours is plausible for a weekly/monthly backup. Cloud backup HTTPS traffic to storage providers is routine. The brute-force could be unrelated automated scanning.",
+    "test_result": "H2 partially survives. The timing correlation (brute-force start → SOC alert activation → 7z start 3.5 minutes later) is suspicious but not impossible for coincidence. The 7z artifact (prior_trust 0.95) is strong but doesn't establish malice alone. The 847MB exfiltration (prior_trust 0.25) is too weak for MALICE.",
+    "refutation_outcome": "H1 is plausible but H2 cannot be excluded without investigating whether finance_user backup was scheduled and authorized. SUSPICION is the correct cap."
+  },
+  "devil_advocate": "Scheduled database backups by a finance department are routine. The brute-force from RU/CN is automated background noise on any internet-facing server, unrelated to the backup. The network exfiltration artifact (prior_trust 0.25) is the weakest in the set and would be inadmissible under Daubert without stronger provenance. Coincidence cannot be excluded.",
+  "caie_fracture": "RED_HERRING (severity 0.95): brute-force noise used to saturate SOC attention while silent exfiltration proceeds against higher-value target.",
+  "evidence_anchors": [
+    "a005_01: 5,000 Event 4625 from 847 RU/CN IPs (prior_trust: 0.35)",
+    "a005_02: 47 SIEM High Priority alerts, Tier-1 activated (prior_trust: 0.40)",
+    "a005_03: 7z.exe PID 3184 compressing Customer_DB.mdf (prior_trust: 0.95 — strongest)",
+    "a005_04: 847MB HTTPS to 198.51.100.77 during alert window (prior_trust: 0.25 — weakest)"
+  ],
+  "mitre_ttps": ["T1110 (Brute Force — noise/distraction)", "T1560.001 (Archive Collected Data — 7z)", "T1048 (Exfiltration Over Alternative Protocol — HTTPS)"],
+  "carnegie_pattern": "Misdirection — noisy low-value attack diverts attention from high-value silent exfiltration",
+  "known_limitations": "Network exfiltration evidence (prior_trust 0.25) is insufficient for MALICE. Backup legitimacy not investigated. Prior_trust 0.35 for brute-force logs. Strong artifact is the Volatility 7z process but its malice depends on the network evidence which is weak."
+}

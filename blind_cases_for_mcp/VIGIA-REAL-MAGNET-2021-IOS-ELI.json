@@ -1,0 +1,102 @@
+{
+  "case_id": "VIGIA-REAL-MAGNET-2021-IOS-ELI",
+  "case_name": "Magnet CTF 2021 iOS — Eli iPhone 8 Communication Evasion",
+  "description": "iPhone 8 forensic extraction. Systematic communication evasion pattern: Wickr with Psiphon proxy (double-layer obfuscation), Signal, Snapchat. WickrID eflatt610 documented via SMS. Device WickrID hash 282295af9e2a2d892890d0b4a937d774041dcd37. App content deleted.",
+  "schema_version": "ebs_v1",
+  "artifacts": [
+    {
+      "artifact_id": "ELI-IOS-A01",
+      "evidence_type": "cultural_marker",
+      "description": "SMS 2021-03-03: invitation to Wickr from +15713106012 with WickrID eflatt610. Wickr is ephemeral encrypted messaging app used to evade forensic recovery.",
+      "raw_score": 0.75,
+      "prior_trust": 0.85,
+      "source_tool": "sqlite3_sms_db",
+      "timestamp": "2021-03-03T15:33:31Z",
+      "provenance_chain": [
+        "ios_filesystem_extraction",
+        "magnet_ctf_2021"
+      ],
+      "metadata": {
+        "mitre": [
+          "T1078"
+        ],
+        "carnegie_tactic": "evasion",
+        "wickr_id": "eflatt610",
+        "acquisition_tool": "cellebrite_ufed",
+        "acquisition_hash": "518e8d766f9b3e76db216f35fdb6b0604e50f61b",
+        "acquisition_timestamp": "2021-03-14T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "MAGNET-CTF-2021"
+      }
+    },
+    {
+      "artifact_id": "ELI-IOS-A02",
+      "evidence_type": "log_entry",
+      "description": "Wickr pushConfig.plist: Psiphon proxy configured with 4 S3 server list URLs. Double-layer obfuscation: encrypted Wickr traffic routed through anti-censorship proxy infrastructure.",
+      "raw_score": 0.82,
+      "prior_trust": 0.9,
+      "source_tool": "plist_analysis",
+      "timestamp": "2021-03-07T18:13:45Z",
+      "provenance_chain": [
+        "ios_filesystem_extraction",
+        "magnet_ctf_2021"
+      ],
+      "metadata": {
+        "psiphon_endpoint": "s3.amazonaws.com/psiphon/web/h861-azv0-6p98/server_list_compressed",
+        "acquisition_tool": "cellebrite_ufed",
+        "acquisition_hash": "518e8d766f9b3e76db216f35fdb6b0604e50f61b",
+        "acquisition_timestamp": "2021-03-14T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "MAGNET-CTF-2021"
+      }
+    },
+    {
+      "artifact_id": "ELI-IOS-A03",
+      "evidence_type": "cultural_marker",
+      "description": "Multiple ephemeral/encrypted apps active: Signal (code SMS 2021-02-16), Snapchat (code SMS 2021-02-16), TikTok (code SMS 2021-02-20), Wickr (installed with iCloud sync). Pattern of systematic use of non-recoverable communication channels.",
+      "raw_score": 0.7,
+      "prior_trust": 0.85,
+      "source_tool": "sqlite3_sms_db",
+      "timestamp": "2021-02-16T02:57:12Z",
+      "provenance_chain": [
+        "ios_filesystem_extraction",
+        "magnet_ctf_2021"
+      ],
+      "metadata": {
+        "apps": [
+          "Signal",
+          "Snapchat",
+          "TikTok",
+          "Wickr"
+        ],
+        "carnegie_tactic": "authority_transfer",
+        "acquisition_tool": "cellebrite_ufed",
+        "acquisition_hash": "518e8d766f9b3e76db216f35fdb6b0604e50f61b",
+        "acquisition_timestamp": "2021-03-14T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "MAGNET-CTF-2021"
+      }
+    },
+    {
+      "artifact_id": "ELI-IOS-A04",
+      "evidence_type": "file_metadata",
+      "description": "Wickr device hash 282295af9e2a2d892890d0b4a937d774041dcd37, UUID 98A0FD30-6F3B-4938-8F48-A3756592EB22. App content absent — no messages, no contacts database. Consistent with deliberate deletion or auto-destroy enabled.",
+      "raw_score": 0.65,
+      "prior_trust": 0.85,
+      "source_tool": "plist_analysis",
+      "timestamp": "2021-03-07T18:13:45Z",
+      "provenance_chain": [
+        "ios_filesystem_extraction",
+        "magnet_ctf_2021"
+      ],
+      "metadata": {
+        "wickr_device_hash": "282295af9e2a2d892890d0b4a937d774041dcd37",
+        "acquisition_tool": "cellebrite_ufed",
+        "acquisition_hash": "518e8d766f9b3e76db216f35fdb6b0604e50f61b",
+        "acquisition_timestamp": "2021-03-14T00:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "MAGNET-CTF-2021"
+      }
+    }
+  ]
+}

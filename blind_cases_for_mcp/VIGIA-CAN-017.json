@@ -1,0 +1,190 @@
+{
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "a099_01",
+      "description": "Email from hr@corp.com: 'Condolences - Fund for Juan Pérez's family'. SPF: fail. DKIM: fail.",
+      "evidence_type": "memory_process",
+      "metadata": {
+        "dkim_result": "fail",
+        "eco_taboo": true,
+        "has_attachment": true,
+        "process_creation_time": "2026-04-19T21:56:00Z",
+        "sender": "hr@corp.com",
+        "spf_result": "fail",
+        "subject": "Condolencias - Fondo para familia de Juan Pérez",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:1d45afd176a675d1d7eac9115a8fb4748cfcbbb49795d1fe3ca70c97d5edaca5",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-017_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.3,
+      "provenance_chain": [
+        "sha256:a099mail01"
+      ],
+      "raw_score": 0.92,
+      "source_tool": "sift_mail_gateway",
+      "timestamp": "2026-01-21T11:30:15Z"
+    },
+    {
+      "artifact_id": "a099_02",
+      "description": "Attached PDF: embedded JavaScript that accesses session cookies (session_id, auth_token, csrf) and sends them to an external domain.",
+      "evidence_type": "memory_process",
+      "metadata": {
+        "callback_domain": "family-support[.]org",
+        "exploit_used": "CVE-2023-21608",
+        "filename": "donaciones.pdf",
+        "javascript": true,
+        "target_cookies": [
+          "session_id",
+          "auth_token",
+          "csrf"
+        ],
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:1d45afd176a675d1d7eac9115a8fb4748cfcbbb49795d1fe3ca70c97d5edaca5",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-017_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:a099pdf02"
+      ],
+      "raw_score": 0.92,
+      "source_tool": "sift_file_audit",
+      "timestamp": "2026-01-21T11:32:40Z"
+    },
+    {
+      "artifact_id": "a099_03",
+      "description": "HTTPS connection to family-support[.]org from 12 internal hosts within 30 minutes of mass PDF opening.",
+      "evidence_type": "dns_record",
+      "metadata": {
+        "connections": 12,
+        "domain": "family-support[.]org",
+        "network_log_time": "2026-04-19T22:01:00Z",
+        "payload_size_avg": 2048,
+        "time_window": "30m",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:1d45afd176a675d1d7eac9115a8fb4748cfcbbb49795d1fe3ca70c97d5edaca5",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-017_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.5,
+      "provenance_chain": [
+        "sha256:a099dns03"
+      ],
+      "raw_score": 0.85,
+      "source_tool": "sift_pcap",
+      "timestamp": "2026-01-21T12:00:00Z"
+    },
+    {
+      "artifact_id": "a099_04",
+      "description": "Verification: real HR did not send the email. 'Juan Pérez' does not exist in the active personnel database.",
+      "evidence_type": "memory_process",
+      "metadata": {
+        "employee_status": "NOT_FOUND",
+        "hr_sent_mail": false,
+        "hr_system_query": "Juan Pérez",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:1d45afd176a675d1d7eac9115a8fb4748cfcbbb49795d1fe3ca70c97d5edaca5",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-017_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a099rrhh04"
+      ],
+      "raw_score": 0.93,
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-21T11:45:00Z"
+    }
+  ],
+  "case_id": "case_099_troyano_emocional",
+  "description": "HR email: 'Due to the passing of a colleague, we are collecting funds. See attached PDF'. The employee does not exist in the database. SPF/DKIM fail. PDF contains JavaScript that steals browser session tokens. 12 hosts compromised.",
+  "name": "The Emotional Trojan",
+  "notes": "Eco: the sign of death is the ultimate semantic barrier.",
+  "peirce_chain": {
+    "firstness": "Condolence email with donation PDF from HR.",
+    "secondness": "Employee does not exist. SPF/DKIM fail. PDF steals tokens. 12 hosts compromised.",
+    "thirdness": "Habit of using social taboo (death) to nullify technical distrust protocols."
+  },
+  "signals": [
+    {
+      "artifact_id": "a099_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "description": "Email from hr@corp.com: 'Condolences - Fund for Juan Pérez's family'. SPF: fail. DKIM: fail.",
+      "evidence_type": "memory_process",
+      "source": "sift_mail_gateway",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 69
+      }
+    },
+    {
+      "artifact_id": "a099_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 7
+      },
+      "description": "Attached PDF: embedded JavaScript that accesses session cookies (session_id, auth_token, csrf) and sends them to an external domain.",
+      "evidence_type": "memory_process",
+      "source": "sift_file_audit",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a099_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 2,
+        "num": 1
+      },
+      "description": "HTTPS connection to family-support[.]org from 12 internal hosts within 30 minutes of mass PDF opening.",
+      "evidence_type": "dns_record",
+      "source": "sift_pcap",
+      "z_score": {
+        "__fraction__": true,
+        "den": 40,
+        "num": 17
+      }
+    },
+    {
+      "artifact_id": "a099_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "Verification: real HR did not send the email. 'Juan Pérez' does not exist in the active personnel database.",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 2000,
+        "num": 651
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-017_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  },
+  "schema_version": 1,
+  "case_name": "case_099_troyano_emocional"
+}

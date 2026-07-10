@@ -1,0 +1,31 @@
+{
+  "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:11:00Z",
+  "cronos_trace_id": "f098880b-f90e-4a55-8f28-cf9b9d6351ae",
+  "verdict": "MALICE",
+  "confidence": "88/100",
+  "peircean_analysis": {
+    "firstness": "windows.pslist returns 0 processes. windows.psscan finds 20 processes (chrome, slack, WINWORD, iexplore, etc). iexplore.exe PID 4480 running as Wow64=True, parent chrome.exe PID 3384, spawned at 23:18:35Z. FTK Imager active during capture. Chrome connecting to Google/CloudFront only in netscan.",
+    "secondness": "pslist=0 vs psscan=20 is a 20-process EPROCESS DKOM discrepancy. There is no benign explanation for this delta — Windows kernel should never present an empty process list to Volatility pslist while 20 processes are physically present in memory (found by psscan pool tag scan). iexplore.exe spawned by chrome.exe is anomalous: IE's valid parents are explorer.exe or itself. Wow64 on a 64-bit OS for a process that need not run in 32-bit mode is a known evasion technique against 64-bit AV/EDR hooks.",
+    "thirdness": "Two independent anti-forensic techniques: (1) DKOM kernel rootkit unlinking all EPROCESS entries from the doubly-linked list to render pslist blind; (2) process masquerading via iexplore.exe with Chrome parent and Wow64 mode to evade 64-bit scanners. This is deliberate, technically sophisticated concealment — MALICE."
+  },
+  "hypotheses": {
+    "H1_dkom_rootkit": "Active DKOM kernel rootkit + process masquerading. Deliberate anti-forensic concealment.",
+    "H2_ctf_synthetic": "Magnet CTF 2020 planted artifact — synthetic challenge scenario, not real malice."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "CTF challenge artifact — rootkit was deliberately planted for the competition. No malicious C2 found in netscan.",
+    "test_result": "H2 partially survives (CTF context is real), but the forensic analysis conclusion is valid regardless: the rootkit technique is present and correctly identified. No C2 in netscan is noted but does not negate kernel-level concealment.",
+    "refutation_outcome": "H1 survives. MALICE verdict stands. The absence of C2 is a limitation, not a refutation — a rootkit without visible C2 may have already completed its mission or may use encrypted/non-obvious channels."
+  },
+  "devil_advocate": "Magnet CTF 2020 is a known public challenge — all evidence is synthetic by design. No malicious C2 detected in netscan. Chrome traffic goes to Google/CloudFront only. The 'attacker' in this scenario is the CTF designer, not a real threat actor. However, the forensic technique identification (DKOM + Wow64 masquerade) is valid and would apply equally to a real-world scenario.",
+  "evidence_anchors": [
+    "WIN2020-A01: pslist=0 vs psscan=20 (EPROCESS DKOM) — MITRE T1014",
+    "WIN2020-A02: iexplore.exe Wow64=True, parent chrome.exe — MITRE T1055.012",
+    "WIN2020-A03: FTK Imager active during capture, Chrome to Google/CloudFront only"
+  ],
+  "mitre_ttps": ["T1014 (Rootkit — DKOM EPROCESS unlink)", "T1055.012 (Process Injection — Process Hollowing/Wow64)", "T1070.004 (Indicator Removal)"],
+  "carnegie_pattern": "Authority transfer — iexplore.exe borrows legitimacy of trusted browser process name to avoid scrutiny",
+  "known_limitations": "No C2 in netscan — rootkit payload and exfiltration method unknown. CTF synthetic scenario context acknowledged."
+}

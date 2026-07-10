@@ -1,0 +1,171 @@
+{
+  "case_id": "VIGIA-BEN-012",
+  "name": "El Kernel Thread Huérfano — Proceso Legítimo del SO",
+  "description": "Proceso kworker/0:1H aparece sin parent en pslist. Es un kernel worker thread de Linux, normal en sistemas con I/O intensivo, documentado en kernel.org y presente en todas las distribuciones.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.7,
+      "prior_trust": 0.7,
+      "provenance_chain": [
+        "sha256:legacy_ART-001"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-001",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot time | pslist shows NO parent (expected for kernel threads)",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "FIRSTNESS",
+        "forensic_anomalies": [
+          "Proceso sin parent visible en pslist",
+          "Nombre no descriptivo (kworker)"
+        ],
+        "content_preview": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot ",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-001",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "memory_process",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.85,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:legacy_ART-002"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-002",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status: PPid: 2 | /proc/7/comm: kworker/0:1H | Kernel doc: 'Workqueue mechanism for deferred work'",
+      "metadata": {
+        "original_type": "process_list",
+        "peirce_layer": "SECONDNESS",
+        "forensic_anomalies": [
+          "Parent existe en espacio de kernel (no visible en pslist de usuario)",
+          "Documentación oficial del kernel confirma propósito"
+        ],
+        "content_preview": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status:",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-002",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      },
+      "semantic_role": "exculpatory"
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "log_entry",
+      "source_tool": "legacy_converter",
+      "timestamp": "2026-04-10T10:00:00Z",
+      "raw_score": 0.95,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:legacy_ART-003"
+      ],
+      "acquisition_tool": "legacy_converter_v1",
+      "acquisition_hash": "sha256:legacy_ART-003",
+      "acquisition_timestamp": "2026-04-10T10:00:00Z",
+      "description": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads present | No anomalous network connections | No file descriptors to suspicious files",
+      "metadata": {
+        "original_type": "bash_history",
+        "peirce_layer": "THIRDNESS",
+        "forensic_anomalies": [
+          "Múltiples kworker threads presentes (normal)",
+          "Sin conexiones de red ni archivos sospechosos"
+        ],
+        "content_preview": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads prese",
+        "acquisition_tool": "legacy_converter_v1",
+        "acquisition_hash": "sha256:legacy_ART-003",
+        "acquisition_timestamp": "2026-04-10T10:00:00Z",
+        "write_blocker_used": true,
+        "examiner_id": "legacy_converter"
+      },
+      "semantic_role": "exculpatory"
+    }
+  ],
+  "temporal_violations": [],
+  "expected_confidence": 93,
+  "metadata": {
+    "converted_from": "legacy_v1",
+    "original_verdict": "NOISE",
+    "abstention_risk": "bajo",
+    "carnegie_pattern": null
+  },
+  "signals": [
+    {
+      "artifact_id": "ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "num": 7,
+        "den": 10
+      },
+      "description": "PID: 7 | Name: kworker/0:1H | PPID: 2 (kthreadd) | User: root | CPU: 0.0% | MEM: 0.0% | Start: boot time | pslist shows NO parent (expected for kernel threads)",
+      "evidence_type": "memory_process",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "num": 49,
+        "den": 100
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "num": 17,
+        "den": 20
+      },
+      "description": "Parent in kernel space: kthreadd (PID 2) | All kernel threads children of kthreadd | /proc/7/status: PPid: 2 | /proc/7/comm: kworker/0:1H | Kernel doc: 'Workqueue mechanism for deferred work'",
+      "evidence_type": "memory_process",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "num": 289,
+        "den": 400
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "num": 9,
+        "den": 10
+      },
+      "description": "System: Ubuntu 22.04 LTS | Kernel: 5.15.0-generic | Uptime: 45 days | 12 other kworker threads present | No anomalous network connections | No file descriptors to suspicious files",
+      "evidence_type": "log_entry",
+      "source": "legacy_converter",
+      "z_score": {
+        "__fraction__": true,
+        "num": 171,
+        "den": 200
+      }
+    }
+  ],
+  "_migration_note": {
+    "history": [
+      {
+        "date": "2026-07-06",
+        "source": "results/agent_batch/VIGIA-BEN-012_agent_bundle.json",
+        "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+        "n_signals": 3
+      },
+      {
+        "date": "2026-07-06",
+        "action": "TANDA 4 (H1c, AUDITORIA_FUGA_INDIRECTA): de-reducción x0.25",
+        "detail": "raw_score y prior_trust restaurados a los valores del conversor SIN el bloque is_benign (fuga de etiqueta persistida); signals recomputadas con la misma fórmula del adaptador (z = raw*prior)."
+      }
+    ]
+  },
+  "schema_version": 1,
+  "case_name": "VIGIA-BEN-012"
+}

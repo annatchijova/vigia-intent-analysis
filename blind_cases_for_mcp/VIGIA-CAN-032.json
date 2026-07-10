@@ -1,0 +1,200 @@
+{
+  "_notes": [
+    "expected_verdict: MALICE→SUSPICION post-fix description/acquisition_assurance (cdeb32f). Sin acquisition metadata, evidencia blanda queda en SUSPICION. SUSPICION es epistemológicamente correcto para este esquema."
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "a005_01",
+      "description": "5,000 Event 4625 in 12 minutes from 847 IPs geolocated in RU/CN toward DB-LEGACY-01 (MySQL 5.6, no sensitive data).",
+      "evidence_type": "memory_process",
+      "metadata": {
+        "count": 5000,
+        "event_id": 4625,
+        "process_creation_time": "2026-04-29T06:54:00Z",
+        "source_countries": [
+          "RU",
+          "CN"
+        ],
+        "target": "DB-LEGACY-01",
+        "target_sensitivity": "low",
+        "time_window_min": 12,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:d418233e5916d90b4f057ab4c3c30f763299faee3c1b855c15d989b64836e798",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-032_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.35,
+      "provenance_chain": [
+        "sha256:a005log01"
+      ],
+      "raw_score": 0.92,
+      "source_tool": "sift_syslog",
+      "timestamp": "2026-01-14T15:00:00Z"
+    },
+    {
+      "artifact_id": "a005_02",
+      "description": "SIEM generates 47 'Brute Force — High Priority' alerts. Tier-1 analyst assigned. Response SLA activated.",
+      "evidence_type": "memory_process",
+      "metadata": {
+        "assigned_analyst": "tier1_003",
+        "priority": "high",
+        "response_sla_min": 15,
+        "siem_alerts": 47,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:d418233e5916d90b4f057ab4c3c30f763299faee3c1b855c15d989b64836e798",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-032_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.4,
+      "provenance_chain": [
+        "sha256:a005siem02"
+      ],
+      "raw_score": 0.92,
+      "source_tool": "sift_siem",
+      "timestamp": "2026-01-14T15:02:00Z"
+    },
+    {
+      "artifact_id": "a005_03",
+      "description": "7z.exe under finance_user session compressing Customer_DB.mdf in 50MB chunks. Compression ratio 0.12.",
+      "evidence_type": "memory_process",
+      "metadata": {
+        "compressed_size_gb": 2.3,
+        "original_size_gb": 12.4,
+        "output": "archive.7z",
+        "pid": 3184,
+        "target_file": "Customer_DB.mdf",
+        "tool": "7z.exe",
+        "user": "finance_user",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:d418233e5916d90b4f057ab4c3c30f763299faee3c1b855c15d989b64836e798",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-032_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:a005mem03"
+      ],
+      "raw_score": 0.88,
+      "source_tool": "sift_volatility",
+      "timestamp": "2026-01-14T15:05:30Z"
+    },
+    {
+      "artifact_id": "a005_04",
+      "description": "847MB HTTPS outbound traffic from finance_user workstation to a cloud storage IP during the 'fire' window.",
+      "evidence_type": "ip_geolocation",
+      "metadata": {
+        "bytes_out": 889192448,
+        "dest_ip": "198.51.100.77",
+        "network_log_time": "2026-04-29T06:59:00Z",
+        "port": 443,
+        "protocol": "HTTPS",
+        "source_ip": "10.0.8.44",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:d418233e5916d90b4f057ab4c3c30f763299faee3c1b855c15d989b64836e798",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-CAN-032_agent_bundle.json.",
+        "write_blocker_used": false
+      },
+      "prior_trust": 0.25,
+      "provenance_chain": [
+        "sha256:a005net04"
+      ],
+      "raw_score": 0.8,
+      "source_tool": "sift_netflow",
+      "timestamp": "2026-01-14T15:08:00Z"
+    }
+  ],
+  "caie_fractures": [
+    {
+      "description": "Noise asymmetry: overly noisy attack is a magic trick to hide silent exfiltration.",
+      "severity": 0.95,
+      "type": "RED_HERRING"
+    }
+  ],
+  "case_id": "case_005_ruido_blanco_distractor",
+  "description": "5,000 failed login alerts from RU/CN toward an irrelevant legacy DB saturate the SOC. Simultaneously, a user with legitimate credentials compresses 12GB of the customer DB with 7z and exfiltrates 847MB over HTTPS.",
+  "name": "The Distractor White Noise",
+  "notes": "Noise asymmetry: when an attack is too obvious, it's a magic trick.",
+  "peirce_chain": {
+    "firstness": "5,000 noisy and obvious failed logins from RU/CN.",
+    "secondness": "SOC diverted to legacy DB. Silent concurrent compression of Customer_DB. 847MB exfiltration.",
+    "thirdness": "Habit of using an overly obvious attack as a magic trick: evaluate the silence around the noise."
+  },
+  "signals": [
+    {
+      "artifact_id": "a005_01",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "description": "5,000 Event 4625 in 12 minutes from 847 IPs geolocated in RU/CN toward DB-LEGACY-01 (MySQL 5.6, no sensitive data).",
+      "evidence_type": "memory_process",
+      "source": "sift_syslog",
+      "z_score": {
+        "__fraction__": true,
+        "den": 500,
+        "num": 161
+      }
+    },
+    {
+      "artifact_id": "a005_02",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "description": "SIEM generates 47 'Brute Force — High Priority' alerts. Tier-1 analyst assigned. Response SLA activated.",
+      "evidence_type": "memory_process",
+      "source": "sift_siem",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 46
+      }
+    },
+    {
+      "artifact_id": "a005_03",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "7z.exe under finance_user session compressing Customer_DB.mdf in 50MB chunks. Compression ratio 0.12.",
+      "evidence_type": "memory_process",
+      "source": "sift_volatility",
+      "z_score": {
+        "__fraction__": true,
+        "den": 250,
+        "num": 209
+      }
+    },
+    {
+      "artifact_id": "a005_04",
+      "confidence": {
+        "__fraction__": true,
+        "den": 4,
+        "num": 1
+      },
+      "description": "847MB HTTPS outbound traffic from finance_user workstation to a cloud storage IP during the 'fire' window.",
+      "evidence_type": "ip_geolocation",
+      "source": "sift_netflow",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 1
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-CAN-032_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 4
+  },
+  "schema_version": 1,
+  "case_name": "case_005_ruido_blanco_distractor"
+}

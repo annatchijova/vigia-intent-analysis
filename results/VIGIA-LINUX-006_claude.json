@@ -1,0 +1,39 @@
+{
+  "case_id": "VIGIA-LINUX-006",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-10T17:25:00Z",
+  "cronos_trace_id": "5ecb100c-ab75-498f-bc70-b1cbb02c24f9",
+  "verdict": "MALICE",
+  "confidence": "90/100",
+  "note": "confidence_expected: 93. High agreement. The delta is the CAIE fracture RED_HERRING from Codex commands — forensic noise created by investigator tooling complicates clean isolation but does not diminish the verdict.",
+  "peircean_analysis": {
+    "firstness": "Process `/var/tmp/systemd-logind` at sustained 100% CPU, 4.2MB statically-linked ELF binary. Outbound connection to 62.60.246[.]210:443 (Monero mining pool) continuous for 14 days. Root crontab: `*/5 * * * * /var/tmp/.x/systemd-logind` — restarts binary every 5 minutes. Binary hash: d3adbe3f... (not matching legitimate systemd binary). Codex-generated commands in bash_history include `systemctl stop systemd-logind` (stopped legitimate daemon, not miner). Process created: 2025-03-17 02:31 UTC.",
+    "secondness": "Legitimate `systemd-logind` resides at `/usr/lib/systemd/systemd-logind`, is dynamically linked (~200KB), and connects to local Unix sockets — never to external IPs. `/var/tmp/` is a world-writable staging directory, not a system binary location. A 4.2MB statically-linked binary impersonating a system daemon at that path, with sustained external mining pool connectivity, violates every structural expectation simultaneously. The 14-day continuous connection and 5-minute crontab persistence confirm the actor established long-term dwell time.",
+    "thirdness": "The attacker deployed a Monero cryptominer using a process masquerade (systemd-logind name), a staging path typical of drive-by Linux compromises (/var/tmp/), static linking to eliminate library dependencies that would reveal imports, and crontab persistence for resilience. The Codex commands in bash_history constitute a RED_HERRING CAIE fracture — the investigator's own tooling stopped the legitimate `systemd-logind` daemon rather than the miner, adding noise to the timeline. This is MALICE: active concealment (system daemon name + /var/tmp/ hiding) with multi-layer persistence."
+  },
+  "hypotheses": {
+    "H1_cryptominer_masquerade": "Threat actor deployed a Monero miner disguised as systemd-logind in /var/tmp/ with crontab persistence, active for 14+ days.",
+    "H2_legitimate_process": "The binary is a legitimate custom systemd component compiled statically for a containerized environment, and the external IP is a misconfigured update endpoint."
+  },
+  "refutation_protocol": {
+    "benign_hypothesis": "H2: Some embedded or container environments ship custom static systemd builds. The connection could be a monitoring agent to an internal IP range that happens to overlap with known mining pools.",
+    "test_result": "H2 FULLY REFUTED: (A) /var/tmp/ is never a valid location for system binaries — any legitimate static systemd build would reside in /usr/lib/ or /usr/bin/. (B) 62.60.246[.]210:443 is an unambiguous Monero mining pool endpoint, not an internal monitoring range. (C) 14 days continuous operation with no service management record contradicts legitimate deployment. (D) The crontab restart rule every 5 minutes has no legitimate equivalent for a system daemon — service managers (systemd, init) handle process resurrection, not raw crontab. Four independent refutations.",
+    "refutation_outcome": "H2 REFUTED. MALICE confirmed."
+  },
+  "devil_advocate": "The Codex commands complicate clean attribution — an investigator's `systemctl stop systemd-logind` command that killed the legitimate daemon rather than the miner introduces ambiguity about whether the system behavior observed was pre-existing or investigator-induced. However: the binary path, size, mining pool connectivity, and crontab persistence are all pre-Codex artifacts independent of investigator actions. The mining activity itself is unambiguous.",
+  "caie_fracture": "RED_HERRING (severity 0.35) — Codex investigator commands created forensic noise by stopping the legitimate systemd-logind daemon. This does not affect the verdict but introduces timeline ambiguity.",
+  "evidence_anchors": [
+    "PROC-001: /var/tmp/systemd-logind, 4.2MB static ELF, 100% CPU sustained, not in /usr/lib/systemd/",
+    "NET-001: 62.60.246[.]210:443 (Monero pool), 14 days continuous, 843MB outbound",
+    "PERSIST-001: root crontab */5 restarts binary from /var/tmp/.x/ staging directory",
+    "CODEX-001: bash_history systemctl stop systemd-logind (stopped legitimate daemon, RED_HERRING)"
+  ],
+  "mitre_ttps": [
+    "T1036.005 (Masquerading — match legitimate name)",
+    "T1053.003 (Cron — persistence via crontab)",
+    "T1496 (Resource Hijacking — Monero cryptomining)",
+    "T1027 (Obfuscated Files — static linking to hide imports)"
+  ],
+  "carnegie_pattern": "Authority borrowing — systemd-logind name exploits analyst familiarity with legitimate system processes to suppress scrutiny",
+  "known_limitations": "Codex investigator commands introduced timeline noise. Entry vector not identified in available artifacts. Whether additional actor TTPs exist beyond the cryptominer module is unknown."
+}

@@ -1,0 +1,155 @@
+{
+  "case_id": "VIGIA-SEP800-001",
+  "case_name": "Sony Ericsson P800 — MCU Firmware Image Analysis (2004)",
+  "source_dataset": "Champlain College Digital Forensics Challenge — Mobile Phone Corpus",
+  "source_origin": "public_dataset",
+  "abstention_risk": "high",
+  "confidence_expected": 30,
+  "carnegie_pattern_expected": null,
+  "description": "Forensic image of Sony Ericsson P800 MCU (microcontroller unit) flash memory (file mcu.bin, 4194304 bytes, SHA-256: 2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34). File date 2004-09-21. Examination reveals this is a Sony Ericsson GSM protocol stack firmware binary. The file contains the device's baseband firmware: GSM radio stack processes (FrameTick, SIMRX, LH_RX, LH_TX, LLC, RLC, MPH), SIM management (UICC, SIMTOOL), data processes (SNDCP, PPP, RLPH), phonebook/PB management, and voicemail (VoiceNote). String analysis reveals only internal process name table and GSM stack identifiers. No user-generated content (SMS, contacts, call log, emails, images) was found accessible in this memory region. This is the MCU firmware layer, not the user data partition. ABSTAIN verdict: the artifact is structurally valid firmware, but contains no user data from which forensic intent can be inferred.",
+  "devil_advocate": "N/A — verdict is ABSTAIN, refutation protocol not required.",
+  "artifacts": [
+    {
+      "artifact_id": "SEP800-ART-001",
+      "evidence_type": "file_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-28T16:39:01.254202Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:d5250d7b6ae82827ca89db0fe462eb8ae65690955a10e605cdc0c27fd942ac95 (SE_P800.zip)",
+        "sha256:2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34 (mcu.bin)"
+      ],
+      "acquisition_tool": "zip extraction + sha256sum",
+      "acquisition_hash": "2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34",
+      "acquisition_timestamp": "2026-06-28T16:39:01Z",
+      "description": "Sony Ericsson P800 MCU firmware image. SHA-256 verified. Size 4194304 bytes (4MB). File date 2004-09-21. Zip container verified at intake.",
+      "metadata": {
+        "device": "Sony Ericsson P800",
+        "file_name": "mcu.bin",
+        "file_type": "MCU firmware binary — GSM baseband protocol stack",
+        "file_date": "2004-09-21",
+        "size_bytes": 4194304,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:85b8c93e25ebbeca32c2f701b71a4afaa5ef107315534959eea30ea3c9a2d875",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-SEP800-001_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "SEP800-ART-002",
+      "evidence_type": "log_entry",
+      "source_tool": "read_evidence",
+      "timestamp": "2026-06-28T16:40:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "sha256:2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34"
+      ],
+      "description": "String analysis of mcu.bin reveals: GSM stack process table (FrameTick_High_Priority_Process, HW_ADC_Done_Process, SIMRX_Process, LH_RX_Process, LLC_Process, RLC_Uplink_Process, MPH_Process, CB_Process, MM_Process, GCC_Process, SM_Process, etc.), SIM/UICC management (SIMTOOL_Process, UICC_Process), data stack (SNDCP_Process, PPP_Process, RLPH_Process), audio (HW_SpeechEncoderDecoder_Process, VoiceNote_Process), and maintenance processes (GDFS_Server_Process, GDFS_Write_Process, GDFS_Erase_Process). DATA_LINKHANDLER present (GPRS data). No user content (contacts, SMS, call log, calendar) detected in string extraction. Firmware layer only.",
+      "metadata": {
+        "content_type": "GSM firmware — process table",
+        "user_data_found": false,
+        "process_categories": [
+          "GSM radio stack",
+          "SIM/UICC management",
+          "GPRS data stack",
+          "Audio codec",
+          "GDFS flash management"
+        ],
+        "special_processes": [
+          "DATA_LINKHANDLER",
+          "GDFS_ServerProcess",
+          "GDFS_WriteProcess",
+          "GDFS_EraseProcess"
+        ],
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:85b8c93e25ebbeca32c2f701b71a4afaa5ef107315534959eea30ea3c9a2d875",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-SEP800-001_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "SEP800-ART-003",
+      "evidence_type": "file_hash",
+      "source_tool": "calculate_shannon_entropy",
+      "timestamp": "2026-06-28T16:44:00Z",
+      "raw_score": 0.1,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "sha256:2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34"
+      ],
+      "description": "Binary firmware analysis. Mixed binary data (ARM/RISC machine code) and ASCII process name strings. Binary regions consistent with compiled firmware code. No isolated high-entropy blocks suggesting embedded encrypted payloads. No executable shell code injection patterns. No user-partition data structures detected.",
+      "metadata": {
+        "content_type": "ARM firmware binary",
+        "encrypted_blocks": false,
+        "user_partition": false,
+        "forensic_conclusion": "Artifact is device firmware only — no user-generated evidence available for analysis",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:85b8c93e25ebbeca32c2f701b71a4afaa5ef107315534959eea30ea3c9a2d875",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/VIGIA-SEP800-001_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    }
+  ],
+  "signals": [
+    {
+      "artifact_id": "SEP800-ART-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "Sony Ericsson P800 MCU firmware image. SHA-256 verified. Size 4194304 bytes (4MB). File date 2004-09-21. Zip container verified at intake.",
+      "evidence_type": "file_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "SEP800-ART-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "String analysis of mcu.bin reveals: GSM stack process table (FrameTick_High_Priority_Process, HW_ADC_Done_Process, SIMRX_Process, LH_RX_Process, LLC_Process, RLC_Uplink_Process, MPH_Process, CB_Proces",
+      "evidence_type": "log_entry",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 1
+      }
+    },
+    {
+      "artifact_id": "SEP800-ART-003",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Binary firmware analysis. Mixed binary data (ARM/RISC machine code) and ASCII process name strings. Binary regions consistent with compiled firmware code. No isolated high-entropy blocks suggesting em",
+      "evidence_type": "file_hash",
+      "source": "calculate_shannon_entropy",
+      "z_score": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 2
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/VIGIA-SEP800-001_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 3
+  },
+  "schema_version": 1
+}
