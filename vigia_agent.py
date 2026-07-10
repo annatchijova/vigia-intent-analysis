@@ -101,6 +101,24 @@ def _is_primary_signal(s: Any) -> bool:
     return meta.get("signal_class") != "derived" and not meta.get("unanalyzed")
 
 
+def _accuracy_validation(signals: Any) -> bool:
+    """
+    F8 (N13, B-088): flag sans_compliance.accuracy_validation. Los adaptadores
+    del shim (vol3, EBS-JSON, mobile) etiquetan la herramienta como `source`
+    mientras los módulos SIFT nativos emiten `tool` — se aceptan ambos para no
+    producir un falso negativo de compliance en bundles de camino adaptador.
+    Fail-closed: sin señales, o cualquier señal sin herramienta o sin z_score,
+    el flag es False.
+    """
+    return bool(
+        signals
+        and all(
+            (s.get("tool") or s.get("source")) and s.get("z_score") is not None
+            for s in signals
+        )
+    )
+
+
 def _signal_stats(results: Dict[str, Any]) -> Tuple[int, int]:
     """
     Retorna (n_primary_signals, n_unanalyzed_artifacts) de un resultado de
@@ -1199,15 +1217,8 @@ class VIGIAAgent:
             "sans_compliance": {
                 # FIX P1-5: real verifications instead of hardcoded True flags
                 "self_correction": self.iteration > 0 or len(self.corrections_applied) > 0,
-                # F8 (N13): los adaptadores del shim (vol3, EBS-JSON, mobile)
-                # etiquetan la herramienta como "source" — aceptar ambos.
-                "accuracy_validation": bool(
-                    results.get("signals")
-                    and all(
-                        (s.get("tool") or s.get("source"))
-                        and s.get("z_score") is not None
-                        for s in results.get("signals", [])
-                    )
+                "accuracy_validation": _accuracy_validation(
+                    results.get("signals", [])
                 ),
                 "analytical_reasoning": bool(
                     results.get("abduction", {}).get("narrative")

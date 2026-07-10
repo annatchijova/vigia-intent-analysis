@@ -4491,7 +4491,7 @@ agent_verdict), C1/C2 from the P0-001 census.
 
 ---
 
-## B-088 — `sans_compliance.accuracy_validation` requires key `tool`, shim adapters emit `source` [PENDING]
+## B-088 — `sans_compliance.accuracy_validation` requires key `tool`, shim adapters emit `source` [RESOLVED — already fixed by F8, verified and pinned]
 
 | Field | Value |
 |-------|-------|
@@ -4518,13 +4518,21 @@ with the SIFT-native modules before the compliance check runs. Needs a
 decision on which field name is canonical before patching (avoid re-opening a
 B-060-style adapter-mapping inconsistency).
 
-**Not yet applied.** Audit-before-patch not yet re-run against current HEAD;
-line numbers above are from the 2026-07-03 audit and should be re-verified
-before fixing.
+**Resolution (2026-07-10):** the audit-before-patch against HEAD found the
+fix ALREADY applied (F8): the expression accepted
+`(s.get("tool") or s.get("source"))` with the comment "F8 (N13) — accept
+both". This entry was stale relative to the code. Closed with protocol: the
+inline expression was extracted into the `_accuracy_validation()` helper
+(behavior-preserving, fail-closed on no signals or missing z_score) and pinned
+with 4 regression tests (`TestB088AccuracyValidationSourceAlias`). Surface
+verification on Mode 1: all 199 corpus bundles emit the correct flag (198
+True; 1 pre-existing legitimate False, identical in baseline). Comparative
+gate: 0 flips across verdict, score, accuracy_validation, n_primary,
+n_unanalyzed and n_total.
 
 ---
 
-## B-089 — `_to_signal_safe` silently drops signals on any `to_signal()` exception, no `unanalyzed` mark [PENDING]
+## B-089 — `_to_signal_safe` silently drops signals on any `to_signal()` exception, no `unanalyzed` mark [RESOLVED]
 
 | Field | Value |
 |-------|-------|
@@ -4552,11 +4560,37 @@ signal (same mechanism F7 already built for engine crashes) instead of
 returning bare `None`, so the artifact is visible in
 `unanalyzed_artifacts`/the narrative's "ARTEFACTOS NO ANALIZADOS" section.
 
-**Not yet applied.** Audit-before-patch not yet re-run against current HEAD.
+**Resolution (2026-07-10):** the audit against HEAD found a PARTIAL fix
+landed after the audit (F8: the drop is counted in
+`results["signal_conversion_drops"]` + `pipeline_meta`), but the central hole
+remained: `return None` → no `*_UNANALYZED` signal, so the artifact never
+entered `n_unanalyzed_artifacts` or the narrative. Fix applied exactly as this
+entry proposed: on a `to_signal()` exception, `_to_signal_safe` emits
+`self._unanalyzed_signal(method_name, ...)` (the F7 mechanism: z=0, conf=0,
+`unanalyzed=True`, `signal_class=derived` — invisible to the gates, visible in
+the bundle) and KEEPS the F8 counter. **Doctrinal distinction** (found by the
+code review of this very fix): the stub is emitted ONLY for PRIMARY engine
+conversions; DERIVED conversions (metabolic/resonance/behavioral/patterns/
+timeline/adversarial) keep the F8 counter without a stub — F7 never marked
+derived-engine crashes, and "a synthesis failed" is not "evidence left
+unanalyzed": a derived stub would degrade NOISE→ABSTAIN with no real evidence
+loss. Red-first tests (`TestB089ToSignalCrashVisible`, 5 tests: signal
+emitted, drop counted, never primary, healthy path untouched, derived without
+stub). Comparative gate over 199 cases: 0 flips across all 6 compared fields
+(the corpus produces no conversion crashes — the fix only changes failure
+behavior).
+
+**Remaining scope:** the root shim's mobile adapters
+(`/sift_orchestrator.py::_analyze_mobile` — android/ios/takeout/macos) call
+`result.to_signal()` directly inside a log-only `try/except`: the N14 hole
+remains open on that surface. Closing it requires deciding how a stub
+interacts with `_mobile_hypothesis`/the mobile-only branch (B-052) — explicit
+follow-up, not included here to avoid changing mobile semantics without its
+own gate.
 
 ---
 
-## B-090 — UNIFIED_TIMELINE emits a derived signal even when `timestamps=0` [PENDING]
+## B-090 — UNIFIED_TIMELINE emits a derived signal even when `timestamps=0` [RESOLVED — by F5, verified with reproduction]
 
 | Field | Value |
 |-------|-------|
@@ -4589,8 +4623,44 @@ zero-timestamp case. If the derived tag already excludes it, close as
 RESOLVED-by-F5 and update this entry. If not, gate `UNIFIED_TIMELINE` signal
 emission on `timestamps>0`, or ensure the `derived` tag is applied here too.
 
-**Not yet applied.** Needs verification-before-patch per this tracker's own
-discipline — this entry documents the gap, not a confirmed live bug.
+**Resolution (2026-07-10):** re-verified against HEAD with the exact
+reproduction this entry required (signals WITHOUT timestamps →
+`build_timeline` → `to_signal`): the signal IS emitted (z=0,
+`total_events>0`), but the wiring (`sift_orchestrator.py`, `_mark_derived` at
+the engine hookup) tags it `signal_class=derived` and `_is_primary_signal`
+excludes it from the `<3` gate and the L-036 override — the counterfactual
+without the tag returns `True` (the exact hole P2-E feared). **Closed as
+RESOLVED-by-F5**, pinned with 4 dedicated tests (+1 shared with B-093) in
+`TestB090EmptyTimelineExcludedFromGates`, including the real gate via
+`_signal_stats` (2 primaries + empty timeline = n_primary 2).
+
+Adjacent finding during the reproduction → **B-093** (`metadata=None` crashed
+`build_timeline`; the timeline silently vanished from the bundle).
+
+---
+
+## B-093 — `UnifiedTimelineEngine` crashes on `metadata=None` and the timeline silently vanishes from the bundle [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-10), red test first |
+| **Severity** | P3 — robustness; the timeline signal is derived (no verdict impact), but its loss was silent |
+| **File** | `vigia/sift/unified_timeline_engine.py` (`_extract_timestamp`, `_extract_entity`, `build_timeline`) |
+| **Detected** | B-090 reproduction (2026-07-10) — the empty-timeline test crashed on a legal signal |
+
+**Description:** `metadata=None` is the legal default of the `SignalOutput`
+contract (EBS v1), but `_extract_timestamp` / `_extract_entity` /
+`build_timeline` did `signal.metadata.get(...)` without a guard →
+`AttributeError`. The orchestrator wiring wraps `build_timeline` in a
+log-only `try/except`: ONE signal without metadata made the ENTIRE timeline
+vanish from the bundle with no mark — the same silent-loss class as N7/N14,
+one level up.
+
+**Fix:** `isinstance(signal.metadata, dict)` guard at the three access points
+(default `{}`). No behavior change for signals with metadata. Red test first
+(`TestB090EmptyTimelineExcludedFromGates::test_none_metadata_signal_does_not_crash_timeline`).
+Comparative gate over 199 cases: 0 flips (no corpus signal reaches the engine
+without metadata; the fix only covers the failure case).
 
 ---
 

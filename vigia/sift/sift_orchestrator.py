@@ -308,6 +308,15 @@ class SIFTOrchestrator:
             logger.error("PathGuard safe_read REJECT %s: %s", path_str, e)
             return None
 
+    # B-089: conversiones de motores DERIVADOS — sus crashes de to_signal()
+    # se contabilizan (F8) pero NO emiten stub *_UNANALYZED (ver except abajo).
+    # Debe coincidir con los method_name de las conexiones bajo "ENGINE
+    # MOTORES" y "UNIFIED TIMELINE" en run_full_analysis.
+    _DERIVED_CONVERSIONS = frozenset(
+        {"metabolic", "resonance", "behavioral", "patterns",
+         "timeline", "adversarial"}
+    )
+
     def _to_signal_safe(self, result, method_name: str) -> Optional[SignalOutput]:
         """Convierte un resultado a SignalOutput, loggea errores."""
         try:
@@ -318,7 +327,20 @@ class SIFTOrchestrator:
             logger.error("Error en to_signal de %s: %s", method_name, e)
             # F8 (N14): el drop se contabiliza — pipeline_meta lo expone.
             self._signal_drops.append(f"{method_name}: {type(e).__name__}: {e}")
-            return None
+            # B-089 (N14): un artefacto PRIMARIO cuya conversión crashea debe
+            # quedar visible como *_UNANALYZED (mecanismo F7) — entra en
+            # n_unanalyzed_artifacts y en la narrativa, y puede degradar
+            # NOISE→ABSTAIN. Las conversiones DERIVADAS (síntesis sobre
+            # señales ya emitidas) quedan fuera: F7 nunca marcó sus crashes
+            # de motor, y "falló una síntesis" no es "evidencia sin analizar"
+            # — un stub derivado degradaría el veredicto sin pérdida de
+            # evidencia real.
+            if method_name in self._DERIVED_CONVERSIONS:
+                return None
+            return self._unanalyzed_signal(
+                method_name, method_name,
+                f"to_signal: {type(e).__name__}: {e}",
+            )
 
     @staticmethod
     def _unanalyzed_signal(engine: str, artifact_type: str, error: str) -> SignalOutput:

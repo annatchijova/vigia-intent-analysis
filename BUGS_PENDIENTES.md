@@ -4223,7 +4223,7 @@ sellado), C1/C2 del censo P0-001.
 
 ---
 
-## B-088 — `sans_compliance.accuracy_validation` exige clave `tool`, los adaptadores del shim emiten `source` [PENDIENTE]
+## B-088 — `sans_compliance.accuracy_validation` exige clave `tool`, los adaptadores del shim emiten `source` [RESUELTO — ya corregido por F8, verificado y pineado]
 
 | Campo | Valor |
 |-------|-------|
@@ -4253,13 +4253,20 @@ el chequeo de compliance. Requiere decidir cuál nombre de campo es canónico
 antes de parchear (evitar reabrir una inconsistencia de mapeo de adaptador
 estilo B-060).
 
-**Aún no aplicado.** El audit-before-patch no se re-corrió contra el HEAD
-actual; los números de línea de arriba son de la auditoría del 2026-07-03 y
-deben re-verificarse antes de aplicar el fix.
+**Resolución (2026-07-10):** el audit-before-patch contra HEAD encontró el
+fix YA aplicado (F8): la expresión aceptaba `(s.get("tool") or s.get("source"))`
+con el comentario "F8 (N13) — aceptar ambos". Esta entrada estaba desactualizada
+respecto del código. Cierre con protocolo: la expresión inline se extrajo al
+helper `_accuracy_validation()` (behavior-preserving, fail-closed sin señales o
+sin z_score) y se pineó con 4 tests de regresión
+(`TestB088AccuracyValidationSourceAlias`). Verificado en superficie Mode 1: los
+199 bundles del corpus emiten el flag correcto (198 True; 1 False pre-existente
+y legítimo, idéntico en baseline). Gate comparativo: 0 flips en verdict, score,
+accuracy_validation, n_primary, n_unanalyzed y n_total.
 
 ---
 
-## B-089 — `_to_signal_safe` descarta señales silenciosamente ante cualquier excepción de `to_signal()`, sin marca `unanalyzed` [PENDIENTE]
+## B-089 — `_to_signal_safe` descarta señales silenciosamente ante cualquier excepción de `to_signal()`, sin marca `unanalyzed` [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
@@ -4290,12 +4297,37 @@ de motor) en lugar de retornar `None` a secas, para que el artefacto sea
 visible en `unanalyzed_artifacts`/la sección "ARTEFACTOS NO ANALIZADOS" de la
 narrativa.
 
-**Aún no aplicado.** El audit-before-patch no se re-corrió contra el HEAD
-actual.
+**Resolución (2026-07-10):** el audit contra HEAD encontró un fix PARCIAL
+posterior a la auditoría (F8: el drop se contabiliza en
+`results["signal_conversion_drops"]` + `pipeline_meta`), pero el hueco central
+seguía: `return None` → sin señal `*_UNANALYZED`, el artefacto no entraba en
+`n_unanalyzed_artifacts` ni en la narrativa. Fix aplicado exactamente como
+proponía esta entrada: ante excepción de `to_signal()`, `_to_signal_safe` emite
+`self._unanalyzed_signal(method_name, ...)` (mecanismo F7: z=0, conf=0,
+`unanalyzed=True`, `signal_class=derived` — invisible para los gates, visible
+en el bundle) y CONSERVA el contador F8. **Distinción doctrinal** (hallazgo del
+code-review de este mismo fix): el stub se emite SOLO para conversiones de
+motores PRIMARIOS; las conversiones DERIVADAS (metabolic/resonance/behavioral/
+patterns/timeline/adversarial) mantienen el contador F8 sin stub — F7 nunca
+marcó crashes de motores derivados, y "falló una síntesis" no es "evidencia sin
+analizar": un stub derivado degradaría NOISE→ABSTAIN sin pérdida de evidencia
+real. Tests rojos primero (`TestB089ToSignalCrashVisible`, 5 tests: señal
+emitida, drop contado, nunca primaria, camino sano intacto, derivadas sin
+stub). Gate comparativo 199 casos: 0 flips en los 6 campos comparados (el
+corpus no produce crashes de conversión — el fix solo cambia el comportamiento
+ante fallas).
+
+**Alcance restante:** los adaptadores mobile del shim raíz
+(`/sift_orchestrator.py::_analyze_mobile` — android/ios/takeout/macos) llaman
+`result.to_signal()` directo en un `try/except` que solo loggea: el hueco N14
+sigue abierto en esa superficie. Cerrarlo requiere decidir cómo interactúa un
+stub con `_mobile_hypothesis`/la rama mobile-only (B-052) — follow-up
+explícito, no incluido acá para no cambiar la semántica mobile sin su propio
+gate.
 
 ---
 
-## B-090 — UNIFIED_TIMELINE emite señal derivada aun con `timestamps=0` [PENDIENTE]
+## B-090 — UNIFIED_TIMELINE emite señal derivada aun con `timestamps=0` [RESUELTO — por F5, verificado con reproducción]
 
 | Campo | Valor |
 |-------|-------|
@@ -4330,9 +4362,44 @@ RESUELTO-por-F5 y actualizar esta entrada. Si no, condicionar la emisión de
 señal de `UNIFIED_TIMELINE` a `timestamps>0`, o asegurar que el tag `derived`
 también se aplique acá.
 
-**Aún no aplicado.** Requiere verification-before-patch según la propia
-disciplina de este tracker — esta entrada documenta el hueco, no un bug vivo
-confirmado.
+**Resolución (2026-07-10):** re-verificación contra HEAD con la reproducción
+que esta entrada exigía (señales SIN timestamp → `build_timeline` →
+`to_signal`): la señal SÍ se emite (z=0, `total_events>0`), pero el wiring
+(`sift_orchestrator.py`, `_mark_derived` en la conexión del motor) la etiqueta
+`signal_class=derived` y `_is_primary_signal` la excluye del gate `<3` y del
+override L-036 — el contrafáctico sin tag daría `True` (el hueco que P2-E
+temía). **Cerrado como RESUELTO-por-F5**, pineado con 4 tests dedicados (+1 compartido con B-093) en
+`TestB090EmptyTimelineExcludedFromGates`, incluido el gate real vía
+`_signal_stats` (2 primarias + timeline vacía = n_primary 2).
+
+Hallazgo adyacente durante la reproducción → **B-093** (metadata=None
+crasheaba `build_timeline`; la timeline desaparecía del bundle en silencio).
+
+---
+
+## B-093 — `UnifiedTimelineEngine` crashea con `metadata=None` y la timeline desaparece del bundle en silencio [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-10), test rojo primero |
+| **Severidad** | P3 — robustez; la señal timeline es derivada (no afecta veredicto), pero su pérdida era silenciosa |
+| **Archivo** | `vigia/sift/unified_timeline_engine.py` (`_extract_timestamp`, `_extract_entity`, `build_timeline`) |
+| **Detectado en** | Reproducción de B-090 (2026-07-10) — el test de timeline vacía crasheó con una señal legal |
+
+**Descripción:** `metadata=None` es el default legal del contrato
+`SignalOutput` (EBS v1), pero `_extract_timestamp` / `_extract_entity` /
+`build_timeline` hacían `signal.metadata.get(...)` sin guard →
+`AttributeError`. El wiring del orquestador envuelve `build_timeline` en
+`try/except` que solo loggea: UNA señal sin metadata hacía desaparecer la
+timeline ENTERA del bundle sin marca alguna — la misma clase de pérdida
+silenciosa que N7/N14, un nivel más arriba.
+
+**Fix:** guard `isinstance(signal.metadata, dict)` en los tres puntos de
+acceso (default `{}`). Sin cambio de comportamiento para señales con
+metadata. Test rojo primero
+(`TestB090EmptyTimelineExcludedFromGates::test_none_metadata_signal_does_not_crash_timeline`).
+Gate comparativo 199 casos: 0 flips (ninguna señal del corpus llega sin
+metadata al motor; el fix solo cubre el caso de falla).
 
 ---
 

@@ -467,3 +467,161 @@ class TestB052MobileNarrative:
         assert ab["best_hypothesis"] == "MOBILE_EVIDENCE_ANALYZED"
         assert ab["is_conclusive"] is False
         assert ab["best_posterior"] == "8/25"  # 1.6/5 — igual que pre-P1
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# B-088 / B-089 / B-090 — hallazgos huérfanos de AUDITORIA_PIPELINE_ROBUSTEZ
+# (N13, N14, P2-E) verificados contra HEAD 2026-07-10.
+# ─────────────────────────────────────────────────────────────────────────────
+
+class TestB088AccuracyValidationSourceAlias:
+    """B-088 (N13): los adaptadores del shim (vol3, EBS-JSON, mobile) emiten
+    `source` en lugar de `tool`; el flag sans_compliance.accuracy_validation
+    debe aceptar ambos (F8). Pin de regresión — el fix ya estaba en HEAD;
+    este test lo fija para que no se revierta."""
+
+    def test_accepts_source_alias(self):
+        from vigia_agent import _accuracy_validation
+        assert _accuracy_validation(
+            [{"source": "vol3_adapter", "z_score": 1.2}]) is True
+
+    def test_accepts_native_tool_field(self):
+        from vigia_agent import _accuracy_validation
+        assert _accuracy_validation(
+            [{"tool": "MEMORY_FORENSICS", "z_score": 0.0}]) is True
+
+    def test_mixed_adapter_and_native_signals(self):
+        from vigia_agent import _accuracy_validation
+        assert _accuracy_validation(
+            [{"source": "ebs_json", "z_score": 0.4},
+             {"tool": "BROWSER_FORENSICS", "z_score": 1.1}]) is True
+
+    def test_fails_closed_without_tool_or_zscore(self):
+        from vigia_agent import _accuracy_validation
+        assert _accuracy_validation([]) is False
+        assert _accuracy_validation([{"z_score": 1.2}]) is False
+        assert _accuracy_validation([{"source": "x"}]) is False
+
+
+class TestB089ToSignalCrashVisible:
+    """B-089 (N14): una excepción en to_signal() no puede hacer desaparecer
+    el artefacto en silencio. F8 ya contabilizaba el drop en pipeline_meta;
+    el fix completo emite además la señal sintética *_UNANALYZED (mismo
+    mecanismo F7) para que el artefacto entre en n_unanalyzed_artifacts y
+    en la sección de la narrativa. Test escrito ROJO contra el HEAD que
+    retornaba None a secas."""
+
+    class _Boom:
+        def to_signal(self):
+            raise RuntimeError("kaputt")
+
+    def _orch(self):
+        from vigia.sift.sift_orchestrator import SIFTOrchestrator
+        return SIFTOrchestrator(case_id="B089-TEST")
+
+    def test_crash_yields_unanalyzed_signal_not_none(self):
+        orch = self._orch()
+        sig = orch._to_signal_safe(self._Boom(), "memory")
+        assert sig is not None, (
+            "to_signal() crash devolvió None — el artefacto desaparece "
+            "del bundle sin marca unanalyzed (B-089/N14)"
+        )
+        assert sig.metadata.get("unanalyzed") is True
+        assert sig.metadata.get("signal_class") == "derived"
+        assert sig.z_score == 0.0 and sig.confidence == 0.0
+        assert sig.tool_name == "MEMORY_UNANALYZED"
+
+    def test_crash_still_counts_in_signal_drops(self):
+        # F8 se conserva: ambos mecanismos, contador + señal visible.
+        orch = self._orch()
+        orch._to_signal_safe(self._Boom(), "registry")
+        assert any("registry" in d for d in orch._signal_drops)
+
+    def test_unanalyzed_signal_never_counts_as_primary(self):
+        # La señal sintética no puede inflar el gate <3 (invariante F5/F7).
+        from vigia_agent import _is_primary_signal
+        orch = self._orch()
+        sig = orch._to_signal_safe(self._Boom(), "memory")
+        assert _is_primary_signal({"metadata": sig.metadata}) is False
+
+    def test_healthy_result_path_unchanged(self):
+        orch = self._orch()
+        healthy = type("R", (), {"to_signal": lambda self: _sig(
+            "MEMORY_FORENSICS", 2.0, artifact_type="memory")})()
+        sig = orch._to_signal_safe(healthy, "memory")
+        assert sig is not None and sig.tool_name == "MEMORY_FORENSICS"
+        assert not sig.metadata.get("unanalyzed")
+        assert orch._signal_drops == []
+
+    def test_derived_conversion_crash_does_not_emit_stub(self):
+        # Doctrina F7: los crashes de motores DERIVADOS (síntesis sobre
+        # señales ya emitidas) no marcan artefactos sin analizar — "falló
+        # una síntesis" no es "evidencia sin analizar" y no puede degradar
+        # NOISE→ABSTAIN. El drop sí se contabiliza (F8).
+        orch = self._orch()
+        for engine in ("timeline", "resonance", "metabolic",
+                       "behavioral", "patterns", "adversarial"):
+            assert orch._to_signal_safe(self._Boom(), engine) is None, engine
+        assert len(orch._signal_drops) == 6
+
+
+class TestB090EmptyTimelineExcludedFromGates:
+    """B-090 (P2-E): UNIFIED_TIMELINE emite señal derivada aun con
+    timestamps=0. Verificado contra HEAD: la señal SÍ se emite (z=0), pero
+    el wiring la marca signal_class=derived (F5) y _is_primary_signal la
+    excluye del gate <3 y del override L-036. Cerrado como RESUELTO-por-F5;
+    este pin reproduce el caso exacto de la auditoría para que el tag no se
+    pierda en el wiring."""
+
+    def _empty_timeline_signal(self):
+        from vigia.sift.unified_timeline_engine import UnifiedTimelineEngine
+        from vigia.sift.sift_orchestrator import SIFTOrchestrator
+        sigs = [_sig("MEMORY_FORENSICS", 2.0), _sig("BROWSER_FORENSICS", 1.0)]
+        tl = UnifiedTimelineEngine().build_timeline(sigs)  # sin timestamps
+        return SIFTOrchestrator._mark_derived(tl.to_signal())
+
+    def test_empty_timeline_is_emitted_but_derived(self):
+        sig = self._empty_timeline_signal()
+        assert sig is not None
+        assert sig.metadata.get("signal_class") == "derived"
+
+    def test_empty_timeline_never_counts_as_primary(self):
+        from vigia_agent import _is_primary_signal
+        sig = self._empty_timeline_signal()
+        assert _is_primary_signal({"metadata": sig.metadata}) is False
+
+    def test_counterfactual_without_f5_tag_would_count(self):
+        # Documenta POR QUÉ el tag es imprescindible: sin él, la timeline
+        # vacía contaría como primaria (el hueco que P2-E temía).
+        from vigia_agent import _is_primary_signal
+        assert _is_primary_signal(
+            {"metadata": {"artifact_type": "timeline"}}) is True
+
+    def test_signal_stats_gate_excludes_empty_timeline(self):
+        # Gate real: 2 primarias + timeline vacía derivada = n_primary 2 (<3).
+        sig = self._empty_timeline_signal()
+        results = {"signals": [
+            _sig_dict("MEMORY_FORENSICS", 2.0),
+            _sig_dict("BROWSER_FORENSICS", 1.0),
+            {"tool": "UNIFIED_TIMELINE", "z_score": sig.z_score,
+             "metadata": sig.metadata},
+        ]}
+        n_primary, _ = _signal_stats(results)
+        assert n_primary == 2
+
+    def test_none_metadata_signal_does_not_crash_timeline(self):
+        # B-093 (hallazgo adyacente en la reproducción de B-090):
+        # metadata=None es legal en SignalOutput; sin el guard, UNA señal sin
+        # metadata crasheaba build_timeline entero y el wiring tragaba el
+        # error — la timeline desaparecía del bundle en silencio. Test
+        # escrito ROJO contra el engine sin guard.
+        from vigia.sift.unified_timeline_engine import UnifiedTimelineEngine
+        sigs = [
+            SignalOutput(tool_name="MEMORY_FORENSICS", value=0.4,
+                         z_score=2.0, confidence=0.7, metadata=None),
+            _sig("BROWSER_FORENSICS", 1.0, artifact_type="browser"),
+        ]
+        tl = UnifiedTimelineEngine().build_timeline(sigs)
+        sig = tl.to_signal()
+        assert sig is not None
+        assert sig.metadata.get("total_events") == 2
