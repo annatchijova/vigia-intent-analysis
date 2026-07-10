@@ -2501,7 +2501,7 @@ This pre-existing trust_decay is correct behaviour (not a bug).
 
 ---
 
-## B-041 — CAIE output not surfaced in vigia_agent.py narrative [PARTIAL FIX]
+## B-041 — CAIE output not surfaced in vigia_agent.py narrative [RESOLVED: B-041a applied; B-041b superseded by B-075/B-076]
 
 **Date:** 2026-06-30
 **Severity:** Medium
@@ -2521,14 +2521,41 @@ The result is stored in `results["caie"]` and IS returned in the dict. The real 
 surfaces verdict, structural verdict, composite score, per-fracture details (type, severity,
 golden rule / structural tags), and Daubert note.
 
-**Automatic INTENT→MALICE upgrade (B-041b) — DEFERRED:** Audit on MAGNET-2020-WINDOWS and
-MAGNET-2022-WINDOWS shows CAIE produces INCONCLUSIVE with 0 fractures — all artifacts are
-single-layer (`log_entry`), no cross-layer fractures possible. CDL downgrades to INCONCLUSIVE
-(coverage 16.7%). Automatic upgrade would be dead code until the pipeline produces multi-layer
-artifacts (memory_process, prefetch, kernel_structure in addition to log_entry).
+### Re-verification 2026-07-10 (abductive method) — B-041b SUPERSEDED by B-075/B-076
 
-**Files touched:** `vigia_agent.py` — `_generate_narrative()` (CAIE reading added)
-**Tests:** 188 passed, 6 xfailed, 0 regressions.
+B-041b was diagnosed against the OLD path where CAIE ran in
+`sift_orchestrator.run_full_analysis` AFTER abduction, its result parked in
+`results["caie"]` without feeding the verdict. B-075/B-076 (later) made the
+label-blind scorer `vigia_scorer._vigia_score` the authoritative verdict
+source, and THAT scorer already couples fractures to the verdict pre-emission.
+Layers separated (daubert):
+
+- **OBSERVATION (reproducible induction, `tests/test_b041b_fracture_feedback.py`):**
+  the scorer recomputes CAIE live (B1, `vigia_scorer.py:611`) and applies
+  `fracture_malice_boost` (up to +0.5) to the composite at `vigia_scorer.py:1053`.
+  Measured: a pair identical except for a `TEMPORAL_CAUSALITY_VIOLATION` →
+  control NOISE 0.0701 / boost 0.0 vs fractured SUSPICION 0.5058 / boost 0.45.
+  On an already-corroborated base (≥4 hard): score 0.7828 → **0.99** with the
+  same fracture. `MALICIOUS_FRACTURE_TYPES` (`vigia_scorer.py:956`) include
+  FALSE_FLAG_PATTERN, TCV, CRYPTOGRAPHIC_INCONSISTENCY, MFT_ENTRY_ANOMALY,
+  USN_JOURNAL_GAP.
+- **INFERENCE:** the mechanism B-041b asked for exists, in a better form
+  (continuous, deterministic, pre-emission) than the discrete INTENT→MALICE
+  upgrade proposed.
+- **"Dead code" REFUTED:** on the real multi-layer corpus (NPS-2009, NGDC-001,
+  NROMANOFF) CAIE emits **0 fractures** — but that is correct (none contain
+  fabrication artifacts), not a dead mechanism: it fires on genuine violations
+  (induction above). Absence-on-corpus ≠ broken-mechanism.
+- **B-041a** (CAIE visible in narrative): applied (above). **B-041b** (fracture
+  → verdict): superseded. B-041 closes; the `[PARTIAL FIX]` label was stale.
+
+Scope not covered (possible follow-up, NOT part of B-041): the
+`sift_orchestrator` CAIE (narrative) and the scorer's live CAIE (verdict) are
+computed separately — if they diverged, the narrative could surface fractures
+the verdict did not consume (N12-class incongruence). Not verified here.
+
+**Files touched:** `vigia_agent.py` — `_generate_narrative()` (CAIE reading added, B-041a);
+`tests/test_b041b_fracture_feedback.py` — B-041b closure pin (2026-07-10).
 
 ---
 

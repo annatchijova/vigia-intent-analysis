@@ -2378,7 +2378,7 @@ de acquisition metadata. Este trust_decay preexistente es comportamiento correct
 
 ---
 
-## B-041 — CAIE output no expuesto en vigia_agent.py narrative [PARTIAL FIX]
+## B-041 — CAIE output no expuesto en vigia_agent.py narrative [RESUELTO: B-041a aplicado; B-041b superado por B-075/B-076]
 
 **Fecha**: 2026-06-30
 **Severidad**: Media
@@ -2413,13 +2413,45 @@ CAIE produce INCONCLUSIVE con 0 fractures en ambos casos:
 3. CDL downgrade a INCONCLUSIVE por coverage 16.7% (1/6 capas)
 4. Composite score 0.0027 (NOISE probabilístico)
 
-**Conclusión**: el upgrade automático sería dead code con la metadata actual. Se
-requiere primero que `ForensicAdapter` propague acquisition metadata desde los
-signals, y/o que el pipeline produzca artefactos de múltiples capas epistémicas
-(memory_process, prefetch, kernel_structure además de log_entry).
+**Conclusión (original, 2026-06-30)**: el upgrade automático sería dead code con la
+metadata actual. Se requiere primero que `ForensicAdapter` propague acquisition
+metadata desde los signals, y/o que el pipeline produzca artefactos de múltiples
+capas epistémicas (memory_process, prefetch, kernel_structure además de log_entry).
+
+### Re-verificación 2026-07-10 (método abductivo) — B-041b SUPERADO por B-075/B-076
+
+El diagnóstico de B-041b se hizo contra el path VIEJO donde CAIE corría en
+`sift_orchestrator.run_full_analysis` DESPUÉS de la abducción y su resultado
+quedaba en `results["caie"]` sin retroalimentar el veredicto. B-075/B-076
+(posteriores) hicieron del scorer label-blind `vigia_scorer._vigia_score` la
+fuente autoritativa del veredicto, y ESE scorer **ya** acopla las fracturas al
+veredicto pre-emisión. Separando capas (daubert):
+
+- **OBSERVACIÓN (inducción reproducible, `tests/test_b041b_fracture_feedback.py`):**
+  el scorer recomputa CAIE en vivo (B1, `vigia_scorer.py:611`) y aplica
+  `fracture_malice_boost` (hasta +0.5) al composite en `vigia_scorer.py:1053`.
+  Medido: par idéntico salvo una `TEMPORAL_CAUSALITY_VIOLATION` → control NOISE
+  0.0701 / boost 0.0 vs fracturado SUSPICION 0.5058 / boost 0.45. Sobre una base
+  ya corroborada (≥4 duros): score 0.7828 → **0.99** con la misma fractura. Las
+  `MALICIOUS_FRACTURE_TYPES` (`vigia_scorer.py:956`) incluyen FALSE_FLAG_PATTERN,
+  TCV, CRYPTOGRAPHIC_INCONSISTENCY, MFT_ENTRY_ANOMALY, USN_JOURNAL_GAP.
+- **INFERENCIA:** el mecanismo que B-041b pedía existe, en forma mejor (continua,
+  determinista, pre-emisión) que el upgrade discreto INTENT→MALICE propuesto.
+- **REFUTACIÓN de "dead code":** sobre el corpus multi-capa real (NPS-2009,
+  NGDC-001, NROMANOFF) CAIE emite **0 fracturas** — pero eso es correcto
+  (ninguno tiene artefactos de fabricación), no mecanismo muerto: dispara sobre
+  violaciones genuinas (inducción arriba). Ausencia-en-corpus ≠ mecanismo-roto.
+- **B-041a** (CAIE visible en narrativa): aplicado (arriba). **B-041b** (fractura
+  → veredicto): superado. B-041 se cierra; el `[PARTIAL FIX]` era stale.
+
+Alcance no cubierto (posible follow-up, NO parte de B-041): la CAIE de
+`sift_orchestrator` (narrativa) y la CAIE viva del scorer (veredicto) se
+computan por separado — si divergieran, la narrativa podría exponer fracturas
+que el veredicto no consumió (incongruencia clase N12). No verificado acá.
 
 ### Archivos tocados
-- `vigia_agent.py` — `_generate_narrative()` (añadida lectura de CAIE)
+- `vigia_agent.py` — `_generate_narrative()` (añadida lectura de CAIE) [B-041a]
+- `tests/test_b041b_fracture_feedback.py` — pin de la clausura B-041b [2026-07-10]
 
 ---
 
