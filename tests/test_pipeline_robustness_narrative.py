@@ -625,3 +625,116 @@ class TestB090EmptyTimelineExcludedFromGates:
         sig = tl.to_signal()
         assert sig is not None
         assert sig.metadata.get("total_events") == 2
+
+
+class TestShimMobileUnanalyzed:
+    """B-089 alcance restante (N14, superficie shim): un crash de un analyzer
+    mobile en /sift_orchestrator.py::_analyze_mobile hacía desaparecer TODA la
+    evidencia mobile sin marca — el caso caía al orquestador real con 0
+    señales y sellaba n_unanalyzed_artifacts=0 (medido pre-fix: verdict
+    UNDETERMINED, "0 artefactos sin analizar" con el 100% de la evidencia sin
+    analizar). Tests escritos ROJOS contra el shim log-only.
+
+    Doctrina: el marcador es dict (formato de señal del shim), z=0,
+    unanalyzed=True, signal_class=derived — visible en el bundle y en
+    n_unanalyzed_artifacts, invisible para los gates. El veredicto NO cambia
+    (ABSTAIN en ambos mundos); cambia la trazabilidad de la pérdida (§5.3).
+    """
+
+    def _shim(self):
+        import importlib, sift_orchestrator as shim_mod
+        return shim_mod.SIFTOrchestrator(case_id="N14-SHIM-TEST")
+
+    def _crash_macos(self):
+        from unittest.mock import patch
+        return patch(
+            "vigia.sift.macos_forensics.MacOSForensicsAnalyzer.analyze",
+            side_effect=RuntimeError("kaputt"),
+        )
+
+    def test_mobile_crash_emits_unanalyzed_marker(self):
+        with self._crash_macos():
+            r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        markers = [s for s in r.get("signals", [])
+                   if (s.get("metadata") or {}).get("unanalyzed")]
+        assert markers, (
+            "crash del analyzer macOS no dejó marcador — la evidencia "
+            "mobile desapareció del bundle (N14 superficie shim)"
+        )
+        m = markers[0]
+        assert m["tool"] == "MACOS_UNANALYZED"
+        assert m["z_score"] == 0.0
+        assert m["metadata"]["signal_class"] == "derived"
+        assert "kaputt" in m["metadata"]["error"]
+
+    def test_mobile_crash_counts_in_signal_stats(self):
+        # El marcador debe llegar a n_unanalyzed_artifacts vía la misma vía
+        # que el orquestador real (results.unanalyzed_artifacts).
+        with self._crash_macos():
+            r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        n_primary, n_unanalyzed = _signal_stats(r)
+        assert n_primary == 0
+        assert n_unanalyzed >= 1, (
+            f"n_unanalyzed={n_unanalyzed} — el bundle vuelve a afirmar '0 "
+            f"artefactos sin analizar' con toda la evidencia sin analizar"
+        )
+
+    def test_mobile_crash_verdict_stays_abstain(self):
+        # Invariante del fix: NO cambia el veredicto (era ABSTAIN vía
+        # UNDETERMINED con 0 señales; sigue ABSTAIN) — solo la trazabilidad.
+        with self._crash_macos():
+            r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        n_primary, n_unanalyzed = _signal_stats(r)
+        v = classify_agent_verdict(r.get("abduction", {}), n_primary, n_unanalyzed)
+        assert v == "ABSTAIN"
+
+    def test_mobile_crash_narrative_mentions_loss(self):
+        with self._crash_macos():
+            r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        narrative = str(r.get("abduction", {}).get("narrative", ""))
+        assert "[FIRSTNESS-LOSS]" in narrative, (
+            "la narrativa no menciona la pérdida de evidencia mobile"
+        )
+        # Sin contradicción clase N12: el marcador NO puede contarse como
+        # señal extraída ni listarse como engine que analizó.
+        assert "0 señales mobile analizadas" in narrative
+        assert "engines: MACOS_UNANALYZED" not in narrative
+
+    def test_healthy_mobile_has_no_marker(self):
+        r = self._shim().analyze(macos_evidence_path="cases/tuck-2019-macos")
+        markers = [s for s in r.get("signals", [])
+                   if (s.get("metadata") or {}).get("unanalyzed")]
+        assert markers == []
+        n_primary, n_unanalyzed = _signal_stats(r)
+        assert n_primary == 1 and n_unanalyzed == 0
+
+    def test_mixed_path_merge_carries_marker(self, tmp_path):
+        # Camino mixto: EBS-JSON + crash mobile → el marcador sobrevive el
+        # merge y n_unanalyzed lo ve.
+        import json as _json
+        case = {"case_id": "N14-MIX", "artifacts": [{
+            "artifact_id": "A1", "evidence_type": "log_entry",
+            "source_tool": "t", "description": "d", "raw_score": 0.4,
+            "prior_trust": 0.8, "timestamp": "2026-01-01T00:00:00Z",
+            "provenance_chain": ["acq"], "metadata": {},
+        }]}
+        p = tmp_path / "case.json"
+        p.write_text(_json.dumps(case))
+        with self._crash_macos():
+            r = self._shim().analyze(
+                log_path=str(p), macos_evidence_path="cases/tuck-2019-macos")
+        markers = [s for s in r.get("signals", [])
+                   if (s.get("metadata") or {}).get("unanalyzed")]
+        assert markers and markers[0]["tool"] == "MACOS_UNANALYZED"
+        _, n_unanalyzed = _signal_stats(r)
+        assert n_unanalyzed >= 1
+
+    def test_marker_never_triggers_mobile_escalation(self):
+        # z=0: el marcador no puede disparar la escalación del merge (>3).
+        import sift_orchestrator as shim_mod
+        marker = shim_mod._unanalyzed_marker("macos", RuntimeError("x"))
+        base = {"signals": [], "abduction": {"best_hypothesis": "NO_ANOMALY_DETECTED"},
+                "pipeline_meta": {}}
+        merged = shim_mod.SIFTOrchestrator._merge_mobile_signals(base, [marker])
+        assert merged["abduction"]["best_hypothesis"] == "NO_ANOMALY_DETECTED"
+        assert "mobile_escalation" not in merged["abduction"]

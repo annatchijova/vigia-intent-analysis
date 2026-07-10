@@ -4580,13 +4580,22 @@ stub). Comparative gate over 199 cases: 0 flips across all 6 compared fields
 (the corpus produces no conversion crashes — the fix only changes failure
 behavior).
 
-**Remaining scope:** the root shim's mobile adapters
-(`/sift_orchestrator.py::_analyze_mobile` — android/ios/takeout/macos) call
-`result.to_signal()` directly inside a log-only `try/except`: the N14 hole
-remains open on that surface. Closing it requires deciding how a stub
-interacts with `_mobile_hypothesis`/the mobile-only branch (B-052) — explicit
-follow-up, not included here to avoid changing mobile semantics without its
-own gate.
+**Remaining scope — CLOSED (2026-07-10, same protocol):** the root shim's
+mobile adapters (`/sift_orchestrator.py::_analyze_mobile`) now emit
+`_unanalyzed_marker(engine, e)` in their 4 `except` blocks (F7-shaped dict:
+z=0, `unanalyzed=True`, `signal_class=derived`). Measured pre-fix: an
+analyzer crash with mobile-only evidence fell through to the real
+orchestrator with 0 signals and sealed `UNDETERMINED` with
+**`n_unanalyzed_artifacts: 0`** — the bundle claimed "0 unanalyzed artifacts"
+with 100% of the evidence unanalyzed. Post-fix: the mobile-only branch
+exposes `results.unanalyzed_artifacts` (the same path `_signal_stats`
+consumes), the narrative adds `[FIRSTNESS-LOSS]`, and `_merge_mobile_signals`
+carries the markers into the base result on the mixed path. **The verdict
+does NOT change** (ABSTAIN in both worlds — verified via
+`classify_agent_verdict`); what changes is loss traceability (§5.3). The z=0
+marker cannot trigger the merge escalation (threshold >3, pinned by test).
+7 red-first tests (`TestShimMobileUnanalyzed`). Comparative gate over 199
+cases: 0 flips across verdict/score/n_primary/n_unanalyzed/n_total.
 
 ---
 

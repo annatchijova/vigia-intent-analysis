@@ -94,6 +94,28 @@ if not Path(_VOL3).exists():
     _VOL3 = "vol3"
 
 
+def _unanalyzed_marker(engine: str, error: Exception) -> Dict[str, Any]:
+    """
+    B-089 (N14, superficie shim): marcador de artefacto mobile NO ANALIZADO
+    cuando su analyzer crashea — el equivalente dict del `_unanalyzed_signal`
+    F7 del orquestador real. z=0 y signal_class=derived: no cuenta para
+    gates ni escalación del merge; solo hace visible la pérdida (0 hallazgos
+    sobre evidencia no analizada NO es evidencia de benignidad).
+    """
+    return {
+        "tool": f"{engine.upper()}_UNANALYZED",
+        "z_score": 0.0,
+        "confidence": 0.0,
+        "value": 0.0,
+        "metadata": {
+            "artifact_type": engine,
+            "unanalyzed": True,
+            "signal_class": "derived",
+            "error": f"{type(error).__name__}: {error}"[:200],
+        },
+    }
+
+
 def _mobile_hypothesis(mobile_signals: List[Dict[str, Any]]) -> tuple:
     """
     F6 (AUDITORIA_PIPELINE_ROBUSTEZ, N5): deriva la hipótesis mobile de los
@@ -203,8 +225,27 @@ class SIFTOrchestrator:
             # fija MOBILE_EVIDENCE_ANALYZED clasificaba NOISE aunque hubiera
             # hallazgos z>3. Narrativa Peircean de 3 capas (F4).
             hypothesis, max_z, is_conclusive, n_critical = _mobile_hypothesis(mobile_signals)
-            _engines = sorted({str(s.get("tool", "?")) for s in mobile_signals})
+            # B-089: los marcadores *_UNANALYZED no son engines que analizaron
+            # — el inventario FIRSTNESS lista solo señales reales; la pérdida
+            # va en [FIRSTNESS-LOSS] (contradicción clase N12 si se mezclan).
+            _engines = sorted({
+                str(s.get("tool", "?")) for s in mobile_signals
+                if not (s.get("metadata") or {}).get("unanalyzed")
+            })
             _posterior = min(max_z / Fraction(5, 1), Fraction(99, 100))
+            # B-089 (N14 shim): artefactos mobile cuyo analyzer crasheó —
+            # visibles en results.unanalyzed_artifacts (misma vía que el
+            # orquestador real) para que _signal_stats/narrativa los vean.
+            _unanalyzed_types = sorted({
+                str((s.get("metadata") or {}).get("artifact_type",
+                                                  s.get("tool", "?")))
+                for s in mobile_signals
+                if (s.get("metadata") or {}).get("unanalyzed")
+            })
+            _n_analyzed = len(mobile_signals) - sum(
+                1 for s in mobile_signals
+                if (s.get("metadata") or {}).get("unanalyzed")
+            )
 
             # B-052 P1 (AUDITORIA_MACOS_NARRATIVA.md §4): FIRSTNESS con el
             # detalle real de hallazgos por engine (los metadata ya lo traen),
@@ -232,12 +273,20 @@ class SIFTOrchestrator:
                     "confidence": str(_posterior),
                     "best_posterior": str(_posterior),
                     "narrative": (
-                        f"[FIRSTNESS] Mobile forensic evidence analyzed: "
-                        f"{len(mobile_signals)} signal(s) extracted "
-                        f"(engines: {', '.join(_engines)})."
+                        (f"[FIRSTNESS] Mobile forensic evidence analyzed: "
+                           f"{_n_analyzed} signal(s) extracted "
+                           f"(engines: {', '.join(_engines)})."
+                           if _n_analyzed else
+                           "[FIRSTNESS] 0 señales mobile analizadas.")
                         + (f" Hallazgos: {'; '.join(_finding_bits)}."
                            if _finding_bits else "") + "\n"
-                        f"[SECONDNESS] Max z-score: "
+                        + (f"[FIRSTNESS-LOSS] {len(_unanalyzed_types)} "
+                           f"artefacto(s) mobile NO analizado(s) — analyzer "
+                           f"crasheó: {', '.join(_unanalyzed_types)}. 0 "
+                           f"hallazgos sobre evidencia no analizada NO es "
+                           f"evidencia de benignidad.\n"
+                           if _unanalyzed_types else "")
+                        + f"[SECONDNESS] Max z-score: "
                         f"{float(max_z):.2f}; señales críticas (z>3): {n_critical}.\n"
                         f"[THIRDNESS] Hipótesis: {hypothesis}. "
                         + ("Anomalía estructural en evidencia mobile — revisión prioritaria."
@@ -254,9 +303,14 @@ class SIFTOrchestrator:
                         "de pipeline."
                     ),
                 },
+                "results": (
+                    {"unanalyzed_artifacts": _unanalyzed_types}
+                    if _unanalyzed_types else {}
+                ),
                 "pipeline_meta": {
                     "source": "mobile_forensics_adapter",
                     "n_mobile_signals": len(mobile_signals),
+                    "n_mobile_unanalyzed": len(_unanalyzed_types),
                     "n_total_signals": len(mobile_signals),
                     "max_mobile_z": str(max_z),
                     # B-052 P1: estado del razonador explícito y consultable —
@@ -417,6 +471,7 @@ class SIFTOrchestrator:
                     )
             except Exception as e:
                 logger.error("[SIFT_SHIM] AndroidForensicsAnalyzer failed: %s", e)
+                signals.append(_unanalyzed_marker("android", e))
 
         ios_path = kwargs.get("ios_evidence_path")
         # B-048 precedence: if the same directory also matched macOS strong
@@ -456,6 +511,7 @@ class SIFTOrchestrator:
                     )
             except Exception as e:
                 logger.error("[SIFT_SHIM] iOSForensicsAnalyzer failed: %s", e)
+                signals.append(_unanalyzed_marker("ios", e))
 
         # B-046: Google Takeout forensics
         takeout_path = kwargs.get("takeout_evidence_path")
@@ -485,6 +541,7 @@ class SIFTOrchestrator:
                     )
             except Exception as e:
                 logger.error("[SIFT_SHIM] GoogleTakeoutForensicsAnalyzer failed: %s", e)
+                signals.append(_unanalyzed_marker("takeout", e))
 
         # B-048: macOS forensics
         macos_path = kwargs.get("macos_evidence_path")
@@ -514,6 +571,7 @@ class SIFTOrchestrator:
                     )
             except Exception as e:
                 logger.error("[SIFT_SHIM] MacOSForensicsAnalyzer failed: %s", e)
+                signals.append(_unanalyzed_marker("macos", e))
 
         return signals
 
@@ -538,6 +596,27 @@ class SIFTOrchestrator:
         if "n_total_signals" in meta:
             meta["n_total_signals"] = meta["n_total_signals"] + len(mobile_signals)
         result["pipeline_meta"] = meta
+
+        # B-089 (N14 shim): los marcadores *_UNANALYZED del camino mobile
+        # entran a results.unanalyzed_artifacts del resultado base — la vía
+        # que _signal_stats/narrativa consumen (misma forma que el
+        # orquestador real: lista ordenada de artifact_type).
+        _mob_unanalyzed = sorted({
+            str((s.get("metadata") or {}).get("artifact_type",
+                                              s.get("tool", "?")))
+            for s in mobile_signals
+            if (s.get("metadata") or {}).get("unanalyzed")
+        })
+        if _mob_unanalyzed:
+            inner = result.get("results")
+            if not isinstance(inner, dict):
+                inner = {}
+                result["results"] = inner
+            existing_unanalyzed = inner.get("unanalyzed_artifacts") or []
+            inner["unanalyzed_artifacts"] = sorted(
+                set(existing_unanalyzed) | set(_mob_unanalyzed)
+            )
+            meta["n_mobile_unanalyzed"] = len(_mob_unanalyzed)
 
         hypothesis, max_z, _concl, n_critical = _mobile_hypothesis(mobile_signals)
         abduction = result.get("abduction")
