@@ -4825,3 +4825,56 @@ carrier telemetry must be typed separately, not by reclassifying this type.
 4. **Pure noise**: verified it feeds NO branch — 100× raw 0.05 → NOISE for
    `web_search` (0.0276), `app_data` (0.0251) and `location_data` (0.0356,
    the hard type). Pinned by a parametrized test.
+
+---
+
+## B-094 — Motor-path CAIE fractures move the verdict but are invisible in the sealed narrative [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — POST HACKATHON (2026-07-10), red test first + comparative gate |
+| **Severity** | P1 — Daubert anti-pattern: non-NOISE verdict with no explanation in the sealed bundle |
+| **File** | `vigia_scorer.py` (returns `caie_fracture_details`), `sift_orchestrator.py` (`_motor_caie_summary`, `_resolve_hypothesis`, `_analyze_ebs_json`), `vigia_agent.py` (`_generate_narrative`) |
+| **Detected** | B-041 closure (2026-07-10): red-team of the N12 divergence hypothesis between the orchestrator CAIE (narrative) and the scorer's live CAIE (verdict) |
+
+**Description (abductive + red-team method):** B-041a surfaced the ORCHESTRATOR
+CAIE (`results["caie"]`, disk/mixed path). But the MOTOR path (JSON/EBS, Mode 1
+default since B-075) runs its own live CAIE in `_vigia_score`, applies
+`fracture_malice_boost` to the composite, then **discarded all fracture info**:
+`_analyze_ebs_json` returned no `results["caie"]` and did not propagate
+`caie_fractures`/`fracture_malice_boost`.
+
+**Differential induction (CONFIRMED, `tests/test_b041b_fracture_feedback.py::TestB094...`):**
+a 2-artifact case where a `TEMPORAL_CAUSALITY_VIOLATION` is the ONLY path to
+non-NOISE:
+- WITH fracture → **INTENT**; WITHOUT (temporal order reversed) → **NOISE**.
+- Both bundles pre-fix: `caie_fractures`/`fracture_malice_boost` **absent**;
+  SECONDNESS **identical**: "no primary signal exceeds z>2 — no structural
+  deviation against baseline". The INTENT bundle did not explain its own cause —
+  the anti-pattern CLAUDE.md explicitly forbids ("MALICE without exact math is
+  divination").
+
+**Fix (visibility ONLY — the verdict already used the fracture):**
+1. `_vigia_score` returns `caie_fracture_details` (type/severity/interpretation/
+   ttp list) in addition to the count.
+2. `_motor_caie_summary()` translates the live CAIE into the shape the
+   narrative consumes (`inner["caie"]`, B-041a's channel), faithfully: reports
+   fractures + boost, does NOT fabricate a structural_verdict/composite the
+   scorer never computed.
+3. `_analyze_ebs_json` (motor mode, if fractures fired) exposes
+   `results["caie"]`; `_generate_narrative` renders it in SECONDNESS and a
+   `--- CAIE (motor) ---` block with fractures and their TTPs.
+
+**E2E verification (Mode 1):** the INTENT bundle now shows "CAIE (live): 1
+fracture(s) contributed to the verdict (boost +0.45)" and lists the TCV with
+severity=1.0, TTP T1070.006 and interpretation.
+
+**Comparative gate (B-069), 199 cases, clean baseline (fix stashed): 0 flips
+in verdict/score/n_primary/n_unanalyzed — 167/199 invariant.** The corpus emits
+0 fractures (no fabrication artifacts), so the fix is inert on it and only
+activates the narrative when a real fracture fires. 8 tests
+(`TestB094MotorPathSurfacesFractures` + E2E narrative pins). Suite 1150 passed.
+
+**Scope note:** the other arm of the N12 divergence (do the orchestrator CAIE
+and the scorer CAIE agree on the disk/mixed path?) is not exercised by the
+current corpus (all cases go through the JSON motor path) — not verified.

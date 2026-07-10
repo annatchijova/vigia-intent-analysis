@@ -966,6 +966,16 @@ class VIGIAAgent:
                     f" CAIE: {_caie_summary.get('verdict')} "
                     f"({_caie_summary.get('fractures_detected', 0)} fractura(s))."
                 )
+            elif _caie_summary.get("source") == "motor_live_caie":
+                # B-094: la CAIE viva del scorer no produce un verdict CAIE
+                # separado, pero SUS fracturas movieron el veredicto — la
+                # SECONDNESS debe decirlo, no afirmar "sin desviación".
+                _nf = _caie_summary.get("fractures_detected", 0)
+                _fb = _caie_summary.get("fracture_malice_boost", "0")
+                secondness += (
+                    f" CAIE (viva): {_nf} fractura(s) cross-artefacto "
+                    f"contribuyeron al veredicto (boost +{_fb})."
+                )
             elif _caie_status == "ERROR":
                 secondness += " CAIE: ERROR — correlación cross-artefacto no disponible."
         narrative_parts.append(secondness)
@@ -1017,7 +1027,28 @@ class VIGIAAgent:
         # its output in results["results"]["caie"].  Until this fix, the
         # agent never read it — fractures were computed but invisible.
         caie = inner.get("caie", {}) if isinstance(inner, dict) else {}
-        if caie and caie.get("status") == "OK":
+        if caie and caie.get("status") == "OK" and caie.get("source") == "motor_live_caie":
+            # B-094: CAIE viva del scorer (path motor). Fiel: reporta fracturas
+            # + boost, sin fabricar structural_verdict/composite que el scorer
+            # no computó por separado.
+            narrative_parts.append("--- CAIE (Cross-Artifact Incongruence Engine — motor) ---")
+            narrative_parts.append(
+                f"  Fractures: {caie.get('fractures_detected', 0)} "
+                f"| Malice boost aplicado: +{caie.get('fracture_malice_boost', '0')}"
+            )
+            for f in caie.get("fractures", []):
+                _ftype = f.get("type", "?")
+                _sev = f.get("severity", "?")
+                _interp = str(f.get("interpretation", ""))[:120]
+                _ttp = f.get("ttp_id", "")
+                _ttp_tag = f" [{_ttp}]" if _ttp else ""
+                narrative_parts.append(
+                    f"  Fracture: {_ftype} severity={_sev}{_ttp_tag} — {_interp}"
+                )
+            if caie.get("daubert_note"):
+                narrative_parts.append(f"  {caie['daubert_note'][:200]}")
+            narrative_parts.append("")
+        elif caie and caie.get("status") == "OK":
             n_fractures = caie.get("fractures_detected", 0)
             caie_verdict = caie.get("verdict", "NOISE")
             composite = caie.get("composite_score", "0")

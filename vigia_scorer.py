@@ -1266,6 +1266,12 @@ def _vigia_score(case: dict) -> dict:
         "effective_trusts":             effective_trusts,
         "temporal_violations":          len(violations),
         "caie_fractures":               len(fractures),
+        # B-094: detalles de fractura (tipo/severidad/interpretación) para que
+        # el path motor pueda SURFACEARLAS en el bundle/narrativa. La fractura
+        # ya movió el veredicto (fracture_malice_boost); exponerla es requisito
+        # Daubert — un veredicto no-NOISE por fractura no puede quedar sin
+        # explicación en la narrativa sellada.
+        "caie_fracture_details":        list(fractures),
         "caie_fractures_source":        _caie_source,
         "peirce_chain":                 case.get("peirce_chain", {}),
         "expected_verdict":             case.get("expected_verdict", "UNKNOWN"),

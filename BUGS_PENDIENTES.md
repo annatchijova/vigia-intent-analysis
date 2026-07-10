@@ -4570,3 +4570,56 @@ distinto, no reclasificar este tipo.
 4. **Ruido puro**: verificado que NO alimenta ninguna rama — 100× raw 0.05 →
    NOISE para `web_search` (0.0276), `app_data` (0.0251) y `location_data`
    (0.0356, el tipo duro). Test parametrizado lo pinea.
+
+---
+
+## B-094 — Las fracturas CAIE del path motor mueven el veredicto pero son invisibles en la narrativa sellada [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — POST HACKATHON (2026-07-10), test rojo primero + gate comparativo |
+| **Severidad** | P1 — anti-patrón Daubert: veredicto no-NOISE sin explicación en el bundle sellado |
+| **Archivo** | `vigia_scorer.py` (retorna `caie_fracture_details`), `sift_orchestrator.py` (`_motor_caie_summary`, `_resolve_hypothesis`, `_analyze_ebs_json`), `vigia_agent.py` (`_generate_narrative`) |
+| **Detectado en** | Cierre de B-041 (2026-07-10): red-team de la hipótesis de divergencia N12 entre la CAIE del orquestador (narrativa) y la CAIE viva del scorer (veredicto) |
+
+**Descripción (método abductivo + red-team):** B-041a expuso la CAIE del
+ORQUESTADOR (`results["caie"]`, path disk/mixed). Pero el path MOTOR (JSON/EBS,
+default de Mode 1 desde B-075) corre su propia CAIE viva en `_vigia_score`,
+aplica `fracture_malice_boost` al composite, y luego **descartaba toda la info
+de fracturas**: `_analyze_ebs_json` no devolvía `results["caie"]` ni propagaba
+`caie_fractures`/`fracture_malice_boost`. Consecuencia sellada.
+
+**Inducción diferencial (CONFIRMADO, `tests/test_b041b_fracture_feedback.py::TestB094...`):**
+un caso de 2 artefactos donde una `TEMPORAL_CAUSALITY_VIOLATION` es la ÚNICA
+vía a no-NOISE:
+- CON fractura → **INTENT**; SIN fractura (orden temporal invertido) → **NOISE**.
+- Ambos bundles pre-fix: `caie_fractures`/`fracture_malice_boost` **ausentes**;
+  SECONDNESS **idéntico**: "Ninguna señal primaria supera z>2 — sin desviación
+  estructural contra baseline". El bundle INTENT no explicaba su propia causa —
+  el anti-patrón que CLAUDE.md prohíbe explícitamente ("MALICE sin explicarlo
+  con matemática exacta es adivinación").
+
+**Fix (SOLO visibilidad — el veredicto ya usaba la fractura):**
+1. `_vigia_score` retorna `caie_fracture_details` (lista tipo/severidad/
+   interpretación/ttp) además del conteo.
+2. `_motor_caie_summary()` traduce la CAIE viva al shape que consume la
+   narrativa (`inner["caie"]`, mismo canal de B-041a), fiel: reporta fracturas
+   + boost, NO fabrica structural_verdict/composite que el scorer no computó.
+3. `_analyze_ebs_json` (modo motor, si hubo fracturas) expone
+   `results["caie"]`; `_generate_narrative` lo renderiza en SECONDNESS y en un
+   bloque `--- CAIE (motor) ---` con las fracturas y sus TTP.
+
+**Verificación E2E (Mode 1):** el bundle INTENT ahora muestra "CAIE (viva): 1
+fractura(s) contribuyeron al veredicto (boost +0.45)" y lista la TCV con
+severity=1.0, TTP T1070.006 e interpretación.
+
+**Gate comparativo (B-069), 199 casos, baseline limpio (fix stasheado):
+0 flips en verdict/score/n_primary/n_unanalyzed — 167/199 invariante.** El
+corpus emite 0 fracturas (sin artefactos de fabricación), así que el fix es
+inerte sobre él y solo activa la narrativa cuando una fractura real dispara.
+8 tests (`TestB094MotorPathSurfacesFractures` + pins E2E de narrativa). Suite
+1150 passed.
+
+**Nota de alcance:** el otro brazo de la divergencia N12 (¿la CAIE del
+orquestador y la del scorer coinciden en el path disk/mixed?) no se ejercita
+en el corpus actual (todos van por el path motor JSON) — no verificado.

@@ -99,3 +99,108 @@ class TestFractureFeedsVerdict:
 def _proc_hard(i, etype="memory_process"):
     return _art(i, etype, 0.85, "2026-03-01T10:00:00Z",
                 {"process_creation_time": "2026-03-01T10:00:00Z"})
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# B-094 — las fracturas del scorer que MUEVEN el veredicto deben ser visibles
+# en el bundle/narrativa del path motor (JSON/EBS, default post-B-075).
+#
+# B-041a expuso la CAIE del ORQUESTADOR (results["caie"], path disk/mixed). El
+# path motor — que es el default de Mode 1 desde B-075 — corre su propia CAIE
+# viva en _vigia_score y aplica fracture_malice_boost, pero descartaba TODA la
+# info de fracturas: caie_fractures/boost ausentes del bundle, y la SECONDNESS
+# de la narrativa afirmaba "sin desviación estructural" aun cuando una fractura
+# volteó NOISE→INTENT. Anti-patrón Daubert explícito (CLAUDE.md): "MALICE sin
+# explicarlo con matemática exacta es adivinación". Tests ROJOS contra ese path.
+# ─────────────────────────────────────────────────────────────────────────────
+
+import json as _json
+import os as _os
+from pathlib import Path as _Path
+
+
+class TestB094MotorPathSurfacesFractures:
+    def _run_motor(self, tmp_path, artifacts, case_id="B094"):
+        import sift_orchestrator as shim
+        case = {"case_id": case_id, "case_name": case_id, "schema_version": 1,
+                "description": "B-094 motor CAIE visibility",
+                "expected_verdict": "UNKNOWN", "artifacts": artifacts}
+        p = tmp_path / f"{case_id}.json"
+        p.write_text(_json.dumps(case))
+        orch = shim.SIFTOrchestrator(case_id=case_id)
+        return orch.analyze(log_path=str(p))
+
+    @staticmethod
+    def _net(ts):
+        return {"artifact_id": "N", "evidence_type": "network_flow",
+                "source_tool": "t", "description": "net", "raw_score": 0.2,
+                "prior_trust": 0.85, "timestamp": ts,
+                "provenance_chain": ["acq"], "metadata": {"network_log_time": ts}}
+
+    @staticmethod
+    def _proc(ts):
+        return {"artifact_id": "P", "evidence_type": "memory_process",
+                "source_tool": "t", "description": "proc", "raw_score": 0.2,
+                "prior_trust": 0.85, "timestamp": ts,
+                "provenance_chain": ["acq"],
+                "metadata": {"process_creation_time": ts}}
+
+    def test_fracture_present_in_result_caie(self, tmp_path):
+        r = self._run_motor(tmp_path, [self._net("2026-03-01T08:00:00Z"),
+                                       self._proc("2026-03-01T10:00:00Z")])
+        inner = r.get("results") or {}
+        caie = inner.get("caie") or {}
+        assert caie.get("status") == "OK", f"CAIE ausente del path motor: {caie}"
+        assert caie.get("fractures_detected", 0) >= 1
+        types = [f.get("type") for f in caie.get("fractures", [])]
+        assert any("TEMPORAL" in str(t) for t in types), types
+        assert float(caie.get("fracture_malice_boost", 0)) > 0.0
+
+    def test_control_no_fracture_no_caie_noise(self, tmp_path):
+        r = self._run_motor(tmp_path, [self._net("2026-03-01T11:00:00Z"),
+                                       self._proc("2026-03-01T10:00:00Z")])
+        inner = r.get("results") or {}
+        caie = inner.get("caie") or {}
+        # Sin fractura: o no hay bloque CAIE, o reporta 0 fracturas — nunca
+        # inventa una.
+        assert caie.get("fractures_detected", 0) == 0
+
+    def test_verdict_unchanged_by_visibility(self, tmp_path):
+        # El fix es SOLO visibilidad: el veredicto ya usaba la fractura.
+        from vigia_agent import classify_agent_verdict, _signal_stats
+        r = self._run_motor(tmp_path, [self._net("2026-03-01T08:00:00Z"),
+                                       self._proc("2026-03-01T10:00:00Z")])
+        n_primary, n_unanalyzed = _signal_stats(r)
+        v = classify_agent_verdict(r.get("abduction", {}), n_primary, n_unanalyzed)
+        assert v in ("INTENT", "MALICE", "SUSPICION")  # fractura → no-NOISE
+        # el marcador de visibilidad no fabrica artefactos no analizados
+        assert n_unanalyzed == 0
+
+    def test_narrative_end_to_end_explains_verdict(self, tmp_path):
+        # Daubert: el bundle no puede sellar un veredicto no-NOISE por fractura
+        # y presentar una narrativa que diga "sin desviación estructural" sin
+        # mención de la fractura. Verifica el path COMPLETO shim→narrativa.
+        from vigia_agent import VIGIAAgent
+        r = self._run_motor(tmp_path, [self._net("2026-03-01T08:00:00Z"),
+                                       self._proc("2026-03-01T10:00:00Z")],
+                            case_id="B094-NARR")
+        agent = VIGIAAgent("B094-NARR", ".")
+        narrative = agent._generate_narrative(r, "a" * 64)
+        assert "TEMPORAL_CAUSALITY_VIOLATION" in narrative, (
+            "la fractura que movió el veredicto no aparece en la narrativa "
+            "sellada (anti-patrón Daubert 'divination')"
+        )
+        assert "boost" in narrative.lower()
+        # SECONDNESS ya no puede afirmar SOLO 'sin desviación' sin la CAIE.
+        sec = [l for l in narrative.split("\n") if "SECONDNESS" in l][0]
+        assert "CAIE" in sec
+
+    def test_narrative_control_no_fracture_line(self, tmp_path):
+        from vigia_agent import VIGIAAgent
+        r = self._run_motor(tmp_path, [self._net("2026-03-01T11:00:00Z"),
+                                       self._proc("2026-03-01T10:00:00Z")],
+                            case_id="B094-CTRL")
+        agent = VIGIAAgent("B094-CTRL", ".")
+        narrative = agent._generate_narrative(r, "a" * 64)
+        assert "TEMPORAL_CAUSALITY_VIOLATION" not in narrative
+        assert "CAIE (viva)" not in narrative

@@ -116,6 +116,50 @@ def _unanalyzed_marker(engine: str, error: Exception) -> Dict[str, Any]:
     }
 
 
+def _motor_caie_summary(motor: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    B-094: traduce la CAIE viva del scorer (_vigia_score) al shape que la
+    narrativa del agente consume en `results["caie"]` — el mismo canal que
+    B-041a abrió para la CAIE del orquestador. Sin esto, un veredicto no-NOISE
+    causado por una fractura queda sin explicación en la narrativa sellada
+    (anti-patrón Daubert). Devuelve None si el motor no reportó fracturas
+    (nada que surfacear; la narrativa no inventa un bloque CAIE vacío).
+
+    Fiel a lo que el scorer computó: NO fabrica un structural_verdict ni un
+    composite CAIE separado (el scorer aplica un boost al composite global, no
+    corre el veredicto estructural completo del orquestador). Reporta las
+    fracturas reales y el boost aplicado.
+    """
+    if not isinstance(motor, dict):
+        return None
+    details = motor.get("caie_fracture_details") or []
+    n = int(motor.get("caie_fractures", 0) or 0)
+    if n <= 0 and not details:
+        return None
+    boost = motor.get("fracture_malice_boost", 0.0)
+    fractures = [
+        {
+            "type": f.get("fracture_type", "?"),
+            "severity": f.get("severity", "?"),
+            "interpretation": f.get("interpretation", ""),
+            "ttp_id": f.get("ttp_id", ""),
+        }
+        for f in details if isinstance(f, dict)
+    ]
+    return {
+        "status": "OK",
+        "source": "motor_live_caie",
+        "fractures_detected": n,
+        "fractures": fractures,
+        "fracture_malice_boost": str(boost),
+        "daubert_note": (
+            f"{n} fractura(s) CAIE viva(s) contribuyeron al veredicto "
+            f"(boost +{boost} aplicado al composite del scorer). "
+            f"Fuente: vigia_scorer._vigia_score (B-094)."
+        ),
+    }
+
+
 def _mobile_hypothesis(mobile_signals: List[Dict[str, Any]]) -> tuple:
     """
     F6 (AUDITORIA_PIPELINE_ROBUSTEZ, N5): deriva la hipótesis mobile de los
@@ -760,6 +804,8 @@ class SIFTOrchestrator:
             "confidence": confidence,
             "is_conclusive": is_conclusive,
             "resolve_meta": resolve_meta,
+            # B-094: CAIE viva del scorer — se surfacéa en el bundle/narrativa.
+            "caie_summary": _motor_caie_summary(motor),
         }
 
     def _analyze_ebs_json(self, json_path: str) -> Dict[str, Any]:
@@ -859,7 +905,11 @@ class SIFTOrchestrator:
         }
         if resolve_meta is not None:
             pipeline_meta["resolve"] = resolve_meta
-        return {
+        # B-094: surfacear la CAIE viva del scorer en results["caie"] — el
+        # canal que vigia_agent._generate_narrative consume (inner.get("caie")).
+        # Solo en modo motor y solo si hubo fracturas (el helper devuelve None
+        # si no hay nada que explicar).
+        _out: Dict[str, Any] = {
             "case_id": case_id, "signals": signals,
             "abduction": {
                 "best_hypothesis": hypothesis,
@@ -870,6 +920,10 @@ class SIFTOrchestrator:
             },
             "pipeline_meta": pipeline_meta,
         }
+        _caie_summary = resolved.get("caie_summary") if mode == "motor" and resolved else None
+        if _caie_summary:
+            _out["results"] = {"caie": _caie_summary}
+        return _out
 
     def _analyze_memory_vol3(self, memory_path: str) -> Dict[str, Any]:
         """Análisis de memoria con Volatility3 — no requiere rip.pl."""
