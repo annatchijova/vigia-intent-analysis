@@ -95,19 +95,64 @@ class TestR41BestPrefixBitIdentical:
         assert r1["score"] == r2["score"]
         assert 0.0 <= r1["score"] <= 0.99
 
+    @staticmethod
+    def _art_isolated(i, etype="log_entry", raw=0.85, prior=0.85):
+        """Variante de _art() SOLO para el guard de timing de abajo — NO usar
+        en tests de score (rompe los snapshots bit-identical de arriba, que
+        dependen de la degradacion de base_trust por metadata de adquisicion
+        ausente via el _art() de modulo).
+
+        CI investigation (2026-07-10): perfilado con cProfile mostro que
+        _art() (metadata={}) hace que CADA Artifact dispare 2 escrituras de
+        auditoria NIST SP 800-86 (ACQUISITION_METADATA_MISSING_CRITICAL +
+        _WARNING, caie.py:733-828) via audit_logger.log_block ->
+        security.py:_write_entry -> posix.fsync(). Ese fsync() dominaba
+        70-95% del wall-clock medido (1.44s de 2.00s a n=700; 3.35s de
+        4.58s a n=1400) — el test media latencia de syscall de disco, NO
+        la complejidad del best-prefix decay que dice guardar. fsync() en
+        storage efimero de CI (ubuntu-latest, GH-hosted) tiene latencia de
+        cola variable e impredecible por causas ajenas a carga de CPU —
+        reproducido: 10x aislado + 10x bajo estres de CPU (oversubscripcion
+        8x en 2 CPUs via taskset) NUNCA superaron ratio 2.5; la falla de CI
+        fue ratio 4.62 (t1=0.86 t2=3.98) — inexplicable por contencion de
+        CPU (que escala t1 y t2 proporcionalmente), consistente con
+        variacion de latencia de fsync no relacionada a CPU.
+
+        Fix (test-only, scorer intacto): metadata de adquisicion completa
+        evita el path de auditoria; ver tambien el cambio de n abajo."""
+        return {
+            "artifact_id": f"A{i}", "evidence_type": etype, "raw_score": raw,
+            "prior_trust": prior, "source_tool": f"t{i}", "description": f"a{i}",
+            "timestamp": f"2026-01-01T10:00:{i % 60:02d}Z",
+            "provenance_chain": ["acq"],
+            "metadata": {
+                "acquisition_tool": "dd", "acquisition_hash": f"sha256:{i:064x}",
+                "acquisition_timestamp": "2026-01-01T09:00:00Z",
+                "examiner_id": "test", "write_blocker_used": True,
+            },
+        }
+
     def test_best_prefix_component_is_subquadratic(self):
         """Guarda de regresion del O(n^2): el TIEMPO del scoring de un flood de
         un solo tipo debe crecer de forma ~lineal, no cuadratica. Se compara el
-        costo incremental n vs 2n. Umbral holgado (x3) para no ser flaky pero
-        atrapar un retorno a O(n^2) (que daria ~x4)."""
+        costo incremental n vs 2n.
+
+        n1/n2 elegidos por debajo de _MAX_ARTIFACTS (caie.py:502, =1000): el
+        test original (700/1400) cruzaba ese umbral DoS entre las dos
+        mediciones, asi que a n=1400 ademas se rechazaban 400 artefactos con
+        SU PROPIA escritura de auditoria (CAIE_ARTIFACT_LIMIT,
+        caie.py:1099-1108) — codigo CUALITATIVAMENTE distinto ejecutado solo
+        en t2, no comparable con t1. Con ambos n del mismo lado del umbral,
+        las dos mediciones ejercitan el mismo camino de codigo (ver
+        docstring de _art_isolated arriba para el detalle completo)."""
         def t(n):
-            arts = [_art(i, "log_entry", 0.85) for i in range(n)]
+            arts = [self._art_isolated(i) for i in range(n)]
             t0 = time.perf_counter()
             _vigia_score({"artifacts": arts})
             return time.perf_counter() - t0
         t(200)  # warmup (CAIE import / caches)
-        t1 = t(700)
-        t2 = t(1400)
+        t1 = t(400)
+        t2 = t(800)
         # x4 seria cuadratico puro; exigimos < x3 (holgado por el costo lineal
         # de CAIE que domina y no crece cuadraticamente).
         assert t2 < t1 * 3.0, f"crecimiento super-lineal sospechoso: {t1:.2f}s -> {t2:.2f}s"
