@@ -282,92 +282,119 @@ would require an ASN/subnet clustering layer before Noisy-OR computation.
 
 ---
 
-### L-016 — Trust-Weighted Consensus Failure
+### L-016 — Trust-Weighted Consensus: No Shared-Provenance Deduplication
 
-**Affects:** `VIGIA-BREAK-012` | **Status:** Real limitation
+**Status:** Real limitation (architectural, code-verified 2026-07-11)
 
-**Description:** Four compromised sources (prior_trust=0.30) with high raw_score
-override one reliable source (prior_trust=0.95) with low raw_score.
-The scorer returns SUSPICION; expected BENIGN.
+> **Nota metodológica (corrección 2026-07-11):** esta entrada listaba antes
+> un `case_id` puntual bajo "Affects" como si fuera evidencia de la
+> limitación. Un caso de prueba (N=1) prueba que ESE caso falla, no la
+> frecuencia ni severidad de la clase general — exactamente la
+> sobregeneralización que la doctrina Daubert de VIGÍA existe para evitar.
+> Reescrita para afirmar solo el hecho arquitectónico verificado en código;
+> el comportamiento empírico sobre el caso puntual vive en "Accuracy by
+> Mode" más abajo, marcado N=1, no generalizable.
 
-**Root cause:** The Noisy-OR composite weights by adjusted_score
-(raw × spoofability × weight × trust) but does not apply the Bayesian
-principle that a shared compromise vector collapses N sources into 1.
-Four servers sharing the same compromised SSH key are one source, not four.
+**Description:** The composite (`vigia_scorer._vigia_score`, Noisy-OR style
+aggregation weighted by `raw_score × (1−spoofability) × weight × trust`)
+treats each artifact as an independent source. No mechanism detects N
+artifacts sharing the same underlying provenance (e.g., the same compromised
+credential or log-forwarding pipeline) and collapses them into one effective
+source before scoring. R4-3's tail decay (`vigia_scorer.py:771+`) dedupes by
+**collection domain** (D1–D5 band) — a different axis; it does not close
+this specific gap (shared-credential/session identity).
 
-**Forensic implication:** An attacker who compromises multiple log sources with
-the same credential can fabricate a false consensus that overrides a single
-clean witness in fallback mode.
+**Root cause (verified against code, 2026-07-11):** no source-deduplication-
+by-shared-provenance function exists in `vigia_scorer.py` or
+`vigia/tools/caie.py`.
 
-**Workaround:** LLM mode correctly identifies the shared compromise vector.
-Scorer fix requires a source deduplication layer keyed on shared provenance.
+**Forensic implication (deductive from the verified mechanism, not an
+empirical rate claim):** if N sources share one compromised credential, the
+composite counts them as N independent corroborating sources rather than 1 —
+*fruit of the poisoned tree* applied to log sources.
 
-**Daubert note:** This is the forensic principle of *fruit of the poisoned tree*
-applied to log sources. Evidence derived from a single compromised channel is one
-piece of evidence regardless of how many records it generates.
+**Workaround:** LLM mode can reason about a shared compromise vector
+contextually (see Accuracy by Mode for the single illustrative case) — this
+is not a substitute for a scorer-level fix.
 
-**LLM mode note (2026-06-14 empirical):** LLM mode also failed BREAK-012
-(escalated to MALICE instead of BENIGN), confirming this limitation persists
-in both modes.
-
----
-
-### L-017 — Corroboration Gate Over-Restriction
-
-**Affects:** `VIGIA-FN-001`, `VIGIA-FN-003`, `VIGIA-BREAK-015` | **Status:** Real limitation
-
-**Description:** The MALICE corroboration gate (`n_artifacts ≥ 4 OR n_types ≥ 3`)
-blocks MALICE even when one or two artifacts are individually conclusive
-(raw_score × prior_trust > 0.80).
-
-Examples:
-- FN-003: fn003_03 (wrong parent process, raw=0.88, trust=0.9) is forensically
-  irrefutable for process hollowing. The gate blocks MALICE because n=3, types=2.
-- BREAK-015: biometric contradiction (raw=0.95, trust=0.85) is independently
-  sufficient. Gate blocks because VPN artifact has trust=0.20.
-
-**Root cause:** The gate was designed to prevent single-artifact MALICE
-(L-008 class failure). It over-corrects by ignoring artifact-level confidence.
-
-**Forensic implication:** High-confidence memory forensics and biometric evidence
-are structurally disadvantaged relative to lower-confidence multi-artifact cases.
-
-**Workaround:** LLM mode applies Peirce Thirdness reasoning that recognizes
-irrefutable individual artifacts. Scorer fix: gate exception for
-`max(raw_score × prior_trust) > 0.80`.
+**Roadmap:** source-deduplication-by-shared-provenance layer keyed on
+`provenance_chain` overlap or shared credential/session id.
 
 ---
 
-### L-018 — Non-Technical Context Opacity
+### L-017 — MALICE Corroboration Gate Has No Single-Artifact-Confidence Exception
 
-**Affects:** `VIGIA-FN-001`, `VIGIA-FN-002` | **Status:** Real limitation
+**Status:** Real limitation (architectural, code-verified 2026-07-11)
 
-**Description:** The scorer cannot reason about the forensic significance of
-absent authorization (no change ticket) or confirmed user absence (HR vacation
-record) when those facts are encoded in low-raw_score artifacts.
+> **Nota metodológica (corrección 2026-07-11):** ídem L-016 — los ejemplos
+> numéricos puntuales (raw/trust de artefactos específicos) se movieron a
+> "Accuracy by Mode", marcados N=2, no generalizables.
 
-- FN-001: HR vacation record (raw=0.08, trust=0.95) makes the authenticated
-  session impossible — but the scorer has no mechanism to make the vacation
-  record *invalidate* the login artifact.
-- FN-002: Absence of a change ticket (raw=0.08, trust=0.30) is the decisive
-  signal — the tool is legitimate but unauthorized. The scorer cannot express
-  "absence of authorization" as a positive malice signal.
+**Description:** The MALICE corroboration gate (`vigia_scorer.py`, R4-3 v2,
+~line 1141) requires one of three branches to open: cross-domain evidence
+with mass (`n_domains≥2` AND `n_artifacts≥4` OR `n_types≥3`), hard-mass
+(`≥3` hard types OR `≥4` hard artifacts, spoofability≤0.30), or per-artifact
+cost (`≥4` D5-hard/media artifacts). **None of the three branches has an
+exception for a single artifact whose individual `raw_score × prior_trust`
+is very high** — a lone, highly confident artifact cannot reach MALICE
+regardless of its evidentiary weight.
 
-**Root cause:** The scoring formula computes `raw_score × (1-spoofability) ×
-weight × trust`. A raw_score of 0.08 on a contextual artifact produces near-zero
-contribution regardless of trust. There is no mechanism for one artifact to
-*contextually transform the interpretation* of another.
+**Root cause:** the gate was designed to block single-artifact MALICE; it
+does not distinguish "single weak artifact" from "single forensically
+decisive artifact."
 
-**Forensic implication:** LOLBAS (Living off the Land) attacks using legitimate
-tools without authorization will systematically under-score in fallback mode.
-Insider threat cases where the only signal is an HR record will return BENIGN.
+**Forensic implication (deductive):** evidence classes typically
+concentrated in one or two artifacts (e.g., memory-forensics process
+hollowing, biometric contradiction) are structurally disadvantaged relative
+to multi-artifact/multi-type cases, independent of per-artifact confidence.
 
-**Workaround:** LLM mode applies the contextual transformation via abductive
-reasoning. Scorer fix requires a contextual invalidation layer — an HR vacation
-record at high trust should trigger an `identity_contradiction` flag that
-multiplies the effective score of co-occurring login artifacts.
+**Workaround:** LLM mode can apply Peircean reasoning that recognizes an
+individually decisive artifact — no equivalent scorer-level exception exists.
 
-**Roadmap:** FW-007 — Contextual Invalidation Layer.
+**Roadmap:** evaluate a `max(raw_score × prior_trust) > threshold` exception
+branch — requires calibration against a labeled corpus (pattern variants,
+not the 2 illustrative cases in Accuracy by Mode) before adoption.
+
+---
+
+### L-018 — No Cross-Artifact Contextual Reinterpretation in the Composite
+
+**Status:** Real limitation (architectural, code-verified 2026-07-11)
+
+> **Nota metodológica (corrección 2026-07-11):** ídem L-016/L-017 — los
+> ejemplos puntuales se movieron a "Accuracy by Mode", marcados N=2, no
+> generalizables. Además se verificó (no se asumió) que el mecanismo ATMS
+> mencionado en el docstring de `vigia_scorer.py` no cierra este gap: ver
+> "Root cause" abajo.
+
+**Description:** the composite scores each artifact independently via
+`raw_score × (1−spoofability) × weight × trust`; there is no mechanism for
+one artifact's content to reinterpret or invalidate another's contribution.
+The closest existing feature, the ATMS-inspired `AssumptionTracker`
+(`vigia/core/integrity_constraints.py`), invalidates **structural**
+assumptions (e.g., triggered by `TEMPORAL_CAUSALITY_VIOLATION`) — verified
+(2026-07-11, grep) that `AssumptionTracker`/`invalidate_assumption` is never
+called from `vigia_scorer.py`: it is not wired into the composite, so it
+does not let a low-`raw_score`-but-high-significance contextual artifact
+(e.g., an HR record, an authorization ticket) transform the interpretation
+of a co-occurring technical artifact.
+
+**Root cause:** no contextual-invalidation layer connects non-technical
+context artifacts to the malice contribution of co-occurring technical
+artifacts in the scoring formula.
+
+**Forensic implication (deductive):** cases whose only distinguishing signal
+is a non-technical fact (confirmed absence via HR record, absence of a
+change ticket) cannot be up-weighted by the composite regardless of that
+fact's forensic decisiveness.
+
+**Workaround:** LLM mode can apply abductive reasoning to perform this
+contextual transformation manually — no scorer-level mechanism exists.
+
+**Roadmap:** FW-007 — contextual invalidation layer wiring non-technical
+context artifacts (HR, authorization/ITSM) into the composite as
+multiplicative modifiers on co-occurring technical artifacts. Requires a
+labeled corpus of pattern variants before calibration — not started.
 
 ---
 
@@ -789,6 +816,24 @@ cases where those limitations apply.
 UNKNOWN/ABSTAIN, which is Daubert-compliant (refusing to assert what cannot be
 proven). The verdicts are conservative, not wrong in the harmful direction.
 
+**Sample-size caveat (added 2026-07-11, applies to FP-001–003, FN-001–003,
+and the BREAK-012/015 rows within BREAK-011–016):** these row counts (N=3,
+N=3, N=6) describe exactly those specific test artifacts — they are
+reproducible single/few-case illustrations of the mechanisms in L-016/L-017/
+L-018, NOT a statistically powered sample of the general pattern class
+(e.g., "authorization-context cases" or "trust-weighted-consensus cases").
+A quantitative failure-rate claim for any of those patterns (e.g., "VIGÍA
+fails on X% of unauthorized-tool cases") would require generating additional
+pattern variants first — same pattern, different parameters (timing,
+volume, channel count, confidence levels). **This is tracked as pending
+work below, not a conclusion already reached.**
+
+**Pending work — pattern-variant corpus (not started):** generate variants
+for L-016 (different channel counts / trust deltas), L-017 (different
+artifact types / confidence levels), L-018 (different absence types —
+HR/ITSM/other), then re-measure per-pattern accuracy before making any rate
+claim in this document.
+
 ### Agent mode (vigia_agent.py, batch run)
 
 | Suite | Cases | Correct | Notes |
@@ -800,6 +845,11 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 ---
 
 ## Summary Table
+
+*L-016/L-017/L-018 (marcadas abajo): "Affects" apuntaba antes a un `case_id`
+puntual como si fuera evidencia de la limitación — corregido 2026-07-11 (ver
+nota metodológica en cada entrada). El ejemplo ilustrativo de un solo caso
+(N=1/2) vive en "Accuracy by Mode", no acá.*
 
 | ID | Description | Affects | Status |
 |----|-------------|---------|--------|
@@ -818,9 +868,9 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 | L-013 | *(gap — entry retired)* | — | — |
 | L-014 | Soft evidence convergence without cross-type fractures | BREAK_003/008/010 | Real limitation |
 | L-015 | Directional signal aggregation blindness | BREAK_011 | Real limitation |
-| L-016 | Trust-weighted consensus failure | BREAK_012 | Real limitation |
-| L-017 | Corroboration gate over-restriction | FN-001/003, BREAK_015 | Real limitation |
-| L-018 | Non-technical context opacity | FN-001/002 | Real limitation |
+| L-016 | Trust-weighted consensus — no shared-provenance dedup | Composite scoring path* | Real limitation |
+| L-017 | Corroboration gate — no single-artifact-confidence exception | Composite scoring path* | Real limitation |
+| L-018 | No cross-artifact contextual reinterpretation | Composite scoring path* | Real limitation |
 | L-019 | FALSE_FLAG_PATTERN on clean foreign-language machines | FP-CULTURAL-CLEAN | **RESOLVED** |
 | L-020 | Claude Code bundle lacks granular audit_trail | Mode 2 bundles | Known limitation |
 | L-021 | Float intermediates in scoring path | vigia_scorer.py, caie.py | **RESOLVED** |
