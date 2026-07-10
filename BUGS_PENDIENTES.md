@@ -4724,3 +4724,79 @@ mapeado o grandfathered con justificación; honestidad del grandfather (sin
 entradas muertas ni ya-mapeadas). Un motor nuevo que emita un tipo no cubierto
 ahora rompe el test en vez de degradar en silencio. No cierra el acoplamiento
 estructural (siguen los dos namespaces); cierra la deriva silenciosa.
+
+---
+
+## B-097 — Path motor: colapso SUSPICION→INTENT en el sellado. Fix INTENTADO, RECHAZADO por el gate pre-registrado [NO APLICADO — gate negativo]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | NO APLICADO — gate pre-registrado (firma Anna: `fixed>=1 AND broken==0`) rechazó el cambio con fixed=30 / **broken=3**. Fix implementado, medido y **revertido**. Sentinelas `xfail(strict=True)` en `tests/test_b097_motor_suspicion_verdict.py`. |
+| **Severidad** | P1 (métrica de corpus y semántica de veredicto) — resultado negativo documentado |
+| **Archivo** | `vigia_agent.py` (`classify_agent_verdict`) — editado y revertido |
+| **Detectado en** | Observación registrada en `docs/B052_P2_DESIGN.md` §10.1 (sesión enforcement §9.4-LIM) |
+| **Tag de restauración** | `pre-session-20260710-141412` |
+
+### Causa raíz (investigada caso por caso, 33/33 uniforme)
+
+El motor (`_vigia_score`) calcula **SUSPICION**; B-075 lo mapea a la hipótesis
+`SUSPICION_DETECTED`; `classify_agent_verdict` la sube a **INTENT**
+(`"SUSPICION" in hyp → INTENT`) porque históricamente SUSPICION no era un
+veredicto sellado. Verificado re-corriendo los 33 casos afectados: TODOS
+tienen `best_hypothesis=SUSPICION_DETECTED`, fuente `ebs_v1_json_adapter`.
+**Ningún caso es de la causa alternativa** (motor calculó INTENT de verdad /
+etiqueta mal puesta) — con la salvedad de los 3 broken (abajo), cuya etiqueta
+INTENT parece correcta y cuyo motor sub-puntúa.
+
+### Hallazgo colateral CRÍTICO — corrección del baseline
+
+El "167/199" reportado como accuracy vigente en sesiones recientes venía del
+`_batch_summary.json` **stale committeado** (restaurado por `git checkout --
+results/` tras los gates), NO de las corridas reales. El baseline honesto
+post-B10 es **140/199**: el comparador pre-B10 "aprobaba" ~30 casos leyendo la
+hipótesis pre-gate (SUSPICION) cuando el veredicto sellado era INTENT — la
+métrica 167 estaba inflada por el bug del comparador que B-095 cerró. B-095 no
+cambió ningún veredicto; volvió la métrica honesta y destapó B-097.
+
+### Qué se intentó y qué midió el gate
+
+Fix mínimo label-blind: en `classify_agent_verdict`, hipótesis con SUSPICION
+(sin INTENT/MALICIOUS) sella `SUSPICION` directamente (posible desde que
+§9.4-LIM introdujo SUSPICION como veredicto sellado con `EXIT_INTENT` y piso
+de alerta MEDIUM).
+
+**Gate autoritativo (run_all_agent completo, before/after, 0 flaky):**
+
+```
+ACCURACY : before 140/199  →  after 167/199   (neto +27)
+FIXED    : 30 (todos exp=SUSPICION, INTENT→SUSPICION)
+BROKEN   : 3  (todos exp=INTENT,    INTENT→SUSPICION):
+             VIGIA-MAGNET-2014-TIMELINE
+             VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN
+             VIGIA-MAGNET-2022-iOS-JESS
+Flips de veredicto totales: 49 (incluye 16 que siguen FAIL pero pasan
+INTENT→SUSPICION, p.ej. exp=MALICE — se alejan de la etiqueta sin cambiar
+pass/fail)
+```
+
+**Regla pre-registrada:** `fixed>=1 AND broken==0 → aplicar; si no NOT
+APPLIED`. broken=3 ≠ 0 → **NO APLICADO** (fail-closed, sin excepciones).
+
+### Los 3 broken — la decisión que queda para Anna
+
+Los 3 casos tienen motor=SUSPICION y etiqueta INTENT con narrativas
+sustanciales (cluster de 4 artefactos + metadata wiped; keychain GrayKey;
+opsec deliberado multi-app). Hoy **pasan gracias al colapso**: el bug los sube
+justo hasta su etiqueta — respuesta correcta por la razón equivocada (el motor
+los sub-puntúa). Un fix label-blind (B-075/B-076, obligatorio) necesariamente
+los mueve. Opciones para desbloquear (decisión de doctrina/ground-truth, no
+del agente):
+  (a) aceptar el neto +27 (relajar la regla broken==0 para este caso),
+  (b) revisar la calibración del motor para esos 3 (que crucen a INTENT por
+      mérito propio) y re-correr el gate,
+  (c) revisar las 3 etiquetas (¿INTENT o SUSPICION?) — ground-truth, firma
+      requerida.
+
+Hasta esa decisión: el colapso persiste (documentado), los sentinelas
+`xfail(strict=True)` lo mantienen visible, y la métrica honesta de referencia
+es **140/199**.

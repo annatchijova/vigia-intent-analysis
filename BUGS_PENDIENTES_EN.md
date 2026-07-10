@@ -4976,3 +4976,78 @@ mapped or grandfathered with justification; grandfather honesty (no dead / no
 already-mapped entries). A new engine emitting an uncovered type now breaks the
 test instead of degrading silently. Does not close the structural coupling (two
 namespaces remain); closes the silent drift.
+
+---
+
+## B-097 — Motor path: SUSPICION→INTENT collapse at sealing. Fix ATTEMPTED, REJECTED by the pre-registered gate [NOT APPLIED — negative gate]
+
+| Field | Value |
+|-------|-------|
+| **Status** | NOT APPLIED — the pre-registered gate (Anna's rule: `fixed>=1 AND broken==0`) rejected the change with fixed=30 / **broken=3**. Fix implemented, measured, and **reverted**. `xfail(strict=True)` sentinels in `tests/test_b097_motor_suspicion_verdict.py`. |
+| **Severity** | P1 (corpus metric and verdict semantics) — documented negative result |
+| **File** | `vigia_agent.py` (`classify_agent_verdict`) — edited and reverted |
+| **Detected in** | Recorded observation in `docs/B052_P2_DESIGN.md` §10.1 (§9.4-LIM enforcement session) |
+| **Restore tag** | `pre-session-20260710-141412` |
+
+### Root cause (investigated case by case, 33/33 uniform)
+
+The motor (`_vigia_score`) computes **SUSPICION**; B-075 maps it to the
+`SUSPICION_DETECTED` hypothesis; `classify_agent_verdict` lifts it to
+**INTENT** (`"SUSPICION" in hyp → INTENT`) because SUSPICION historically was
+not a sealed verdict. Verified by re-running all 33 affected cases: ALL have
+`best_hypothesis=SUSPICION_DETECTED`, source `ebs_v1_json_adapter`. None is
+the alternative cause (motor truly computed INTENT / mislabeled case) — with
+the caveat of the 3 broken below, whose INTENT labels look correct and whose
+motor under-scores.
+
+### CRITICAL collateral finding — baseline correction
+
+The "167/199" reported as current accuracy in recent sessions came from the
+**stale committed** `_batch_summary.json` (restored by `git checkout --
+results/` after gates), NOT from the actual runs. The honest post-B10 baseline
+is **140/199**: the pre-B10 comparator "passed" ~30 cases by reading the
+pre-gate hypothesis (SUSPICION) while the sealed verdict was INTENT — the 167
+metric was inflated by the comparator bug B-095 closed. B-095 changed no
+verdicts; it made the metric honest and exposed B-097.
+
+### What was attempted and what the gate measured
+
+Minimal label-blind fix: in `classify_agent_verdict`, hypotheses containing
+SUSPICION (without INTENT/MALICIOUS) seal `SUSPICION` directly (possible since
+§9.4-LIM introduced SUSPICION as a sealed verdict with `EXIT_INTENT` and
+MEDIUM alert floor).
+
+**Authoritative gate (full run_all_agent, before/after, 0 flaky):**
+
+```
+ACCURACY : before 140/199  →  after 167/199   (net +27)
+FIXED    : 30 (all exp=SUSPICION, INTENT→SUSPICION)
+BROKEN   : 3  (all exp=INTENT,    INTENT→SUSPICION):
+             VIGIA-MAGNET-2014-TIMELINE
+             VIGIA-MAGNET-2022-IOS-JESS-KEYCHAIN
+             VIGIA-MAGNET-2022-iOS-JESS
+Total verdict flips: 49 (includes 16 that remain FAIL but move
+INTENT→SUSPICION, e.g. exp=MALICE — further from the label, pass/fail
+unchanged)
+```
+
+**Pre-registered rule:** `fixed>=1 AND broken==0 → apply; else NOT APPLIED`.
+broken=3 ≠ 0 → **NOT APPLIED** (fail-closed, no exceptions).
+
+### The 3 broken — the decision left for Anna
+
+All 3 have motor=SUSPICION and INTENT labels with substantial narratives
+(4-artifact cluster + wiped metadata; GrayKey keychain; deliberate multi-app
+opsec). Today they **pass thanks to the collapse**: the bug lifts them exactly
+to their label — right answer for the wrong reason (the motor under-scores
+them). A label-blind fix (B-075/B-076, mandatory) necessarily moves them.
+Unblock options (doctrine/ground-truth decisions, not the agent's):
+  (a) accept the net +27 (relax broken==0 for this case),
+  (b) fix motor calibration for those 3 (cross to INTENT on merit) and
+      re-run the gate,
+  (c) review the 3 labels (INTENT or SUSPICION?) — ground truth, signature
+      required.
+
+Until that decision: the collapse persists (documented), the
+`xfail(strict=True)` sentinels keep it visible, and the honest reference
+metric is **140/199**.
