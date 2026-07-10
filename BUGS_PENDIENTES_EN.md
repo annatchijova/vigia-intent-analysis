@@ -3240,11 +3240,11 @@ Clamp the argument to `±LOG_LR_EXP_CAP = 700.0` before `math.exp`:
 
 ---
 
-## B-052 — Mobile/macOS engines: single aggregated signal bypasses the AbductiveReasoner [P1 FIXED / P2 PENDING]
+## B-052 — Mobile/macOS engines: single aggregated signal bypasses the AbductiveReasoner [P1 FIXED / P2 CLOSED BY DOCTRINE — NOT ADOPTED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | P1 (honest narrative) FIXED — 2026-07-03; P2 (granularity) PENDING |
+| **Status** | P1 (honest narrative) FIXED — 2026-07-03; **P2 CLOSED 2026-07-10 — NOT ADOPTED per sealed decision §9.4 (pure option (ii), collective + Anna's signature)**: the logical-domain split manufactures corroboration — all macOS domains are D3, the same physical channel. SUSPICION is the doctrinal ceiling for D3-only cases (**L-051 / §9.4-LIM**). The split implementation remains as historical record on branch `claude/b052-p2-domain-signals-xk5ecq` (`c5c8d38`+`a74d360`, **DO NOT MERGE**); `densidad_causal_D3` discarded by pre-registered experiment (r=0.9185, fail-closed grey zone). Implemented mitigation: `suspicion_class` (GENERIC \| D3_RICH_NO_TRIANGULATION) in narrative + pipeline_meta, text only (`docs/B052_P2_DESIGN.md` §10; 12 tests). |
 | **Severity** | MEDIUM — the v2 engine's Peircean narrative is unreachable for mobile evidence by design |
 | **Files** | `sift_orchestrator.py` (shim, mobile-only route); P2: `vigia/sift/{macos,ios,android,google_takeout}_forensics.py` |
 | **Detected** | `AUDITORIA_MACOS_NARRATIVA.md` (2026-07-03) |

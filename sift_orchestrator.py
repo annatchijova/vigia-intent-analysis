@@ -200,6 +200,67 @@ def _mobile_hypothesis(mobile_signals: List[Dict[str, Any]]) -> tuple:
     return hypothesis, max_z, is_conclusive, n_critical
 
 
+# §9.4-LIM (decisión sellada 2026-07-10, opción (ii) pura + extensión de
+# narrativa): texto doctrinal EXACTO para la clase D3_RICH_NO_TRIANGULATION.
+_D3_TRIANGULATION_NOTE = (
+    "[§9.4-LIM] SUSPICION — evidencia de filesystem robusta y multi-vector, "
+    "pero confinada a un único canal físico (D3). El motor NO puede confirmar "
+    "MALICE sin una segunda fuente independiente (memoria, red, o contenido). "
+    "Se recomienda triangulación manual urgente antes de descartar el caso."
+)
+
+
+def _mobile_suspicion_class(mobile_signals: List[Dict[str, Any]],
+                            max_z: Fraction) -> str:
+    """
+    §9.4-LIM: clasifica la situación probatoria de la ruta mobile-only en dos
+    clases que hoy son indistinguibles para el analista humano:
+
+      "GENERIC"                  — poca evidencia / ambigüedad real.
+      "D3_RICH_NO_TRIANGULATION" — anomalías fuertes pero TODAS confinadas al
+                                   canal físico D3 (filesystem local); por
+                                   doctrina (ii) el motor no puede escalar sin
+                                   una segunda fuente independiente (D2/D4/D5).
+
+    Regla exacta (docs/B052_P2_DESIGN.md §10):
+      cond2 := >=1 señal analizada (unanalyzed no cuenta)
+               AND todas las analizadas resuelven dominio D3
+                   (evidence_type|artifact_type → _EVIDENCE_MAP → _DOMAIN_MAP)
+               AND max_z > 3   (mismo umbral crítico que _mobile_hypothesis)
+               AND >=2 finding_types distintos (unión sobre señales)
+
+    Fail-closed: dominio no resoluble o mapas no importables → GENERIC.
+    SOLO clasifica — no toca hypothesis, score ni veredicto (narrativa +
+    pipeline_meta; gate comparativo 0 flips pineado en tests).
+    """
+    try:
+        from vigia.core.forensic_adapter import _EVIDENCE_MAP
+        from vigia.tools.caie import _DOMAIN_MAP
+    except Exception:
+        return "GENERIC"
+
+    analyzed = [s for s in mobile_signals
+                if not (s.get("metadata") or {}).get("unanalyzed")]
+    if not analyzed or max_z <= Fraction(3, 1):
+        return "GENERIC"
+
+    finding_types: set = set()
+    for s in analyzed:
+        meta = s.get("metadata") or {}
+        ev = meta.get("evidence_type")
+        if not ev:
+            at = str(meta.get("artifact_type", "")).lower()
+            ev = _EVIDENCE_MAP.get(at)
+        domain = _DOMAIN_MAP.get(str(ev).lower()) if ev else None
+        if not domain or domain[1] != "D3":
+            return "GENERIC"
+        finding_types.update(str(t) for t in (meta.get("finding_types") or []))
+
+    if len(finding_types) < 2:
+        return "GENERIC"
+    return "D3_RICH_NO_TRIANGULATION"
+
+
 class SIFTOrchestrator:
     """
     Shim de compatibilidad.
@@ -308,6 +369,10 @@ class SIFTOrchestrator:
                     _bit += f" [{', '.join(str(t) for t in _ftypes[:4])}]"
                 _finding_bits.append(_bit)
 
+            # §9.4-LIM: clase de SUSPICION — narrativa + pipeline_meta
+            # únicamente; NO cambia hypothesis/score/veredicto.
+            _susp_class = _mobile_suspicion_class(mobile_signals, max_z)
+
             result = {
                 "case_id": self.case_id,
                 "signals": mobile_signals,
@@ -345,6 +410,8 @@ class SIFTOrchestrator:
                         "Esto es una limitación de diseño documentada "
                         "(B-052, AUDITORIA_MACOS_NARRATIVA.md), no un error "
                         "de pipeline."
+                        + ("\n" + _D3_TRIANGULATION_NOTE
+                           if _susp_class == "D3_RICH_NO_TRIANGULATION" else "")
                     ),
                 },
                 "results": (
@@ -360,6 +427,9 @@ class SIFTOrchestrator:
                     # B-052 P1: estado del razonador explícito y consultable —
                     # distingue "no corrió por diseño" de "corrió y falló".
                     "abductive_reasoner": "NOT_RUN_MOBILE_SINGLE_SOURCE",
+                    # §9.4-LIM: GENERIC | D3_RICH_NO_TRIANGULATION — consultable
+                    # por el analista sin parsear la narrativa.
+                    "suspicion_class": _susp_class,
                 },
             }
             return result

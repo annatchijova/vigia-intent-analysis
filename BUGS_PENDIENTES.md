@@ -2966,11 +2966,11 @@ Clamp del argumento a `±LOG_LR_EXP_CAP = 700.0` antes de `math.exp`:
 
 ---
 
-## B-052 — Motores mobile/macOS: señal única agregada puentea el AbductiveReasoner [P1 FIXED / P2 PENDING]
+## B-052 — Motores mobile/macOS: señal única agregada puentea el AbductiveReasoner [P1 FIXED / P2 CERRADO POR DOCTRINA — NOT ADOPTED]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | P1 (narrativa honesta) FIXED — 2026-07-03; P2 (granularidad) PENDING |
+| **Estado** | P1 (narrativa honesta) FIXED — 2026-07-03; **P2 CERRADO 2026-07-10 — NOT ADOPTED por decisión sellada §9.4 (opción (ii) pura, colectivo + firma de Anna)**: el split por dominios lógicos manufactura corroboración — todos los dominios macOS son D3, mismo canal físico. SUSPICION es el techo doctrinal para D3-only (**L-051 / §9.4-LIM**). La implementación del split queda como registro histórico en la rama `claude/b052-p2-domain-signals-xk5ecq` (`c5c8d38`+`a74d360`, **NO MERGEAR**); `densidad_causal_D3` descartada por experimento pre-registrado (r=0.9185, zona gris fail-closed). Mitigación implementada: clase `suspicion_class` (GENERIC \| D3_RICH_NO_TRIANGULATION) en narrativa + pipeline_meta, solo texto (`docs/B052_P2_DESIGN.md` §10; 12 tests). |
 | **Severidad** | MEDIA — la narrativa Peircean del motor v2 es inalcanzable para evidencia mobile por diseño |
 | **Archivos** | `sift_orchestrator.py` (shim, ruta mobile-only); P2: `vigia/sift/{macos,ios,android,google_takeout}_forensics.py` |
 | **Detectado en** | `AUDITORIA_MACOS_NARRATIVA.md` (2026-07-03) |

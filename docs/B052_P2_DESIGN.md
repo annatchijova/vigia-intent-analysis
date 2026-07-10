@@ -347,6 +347,90 @@ más parsers), solo remueve el bypass arquitectónico
 
 ---
 
+## 10. DECISIÓN FINAL §9.4 — SELLADA POR EL COLECTIVO + FIRMA DE ANNA (2026-07-10)
+
+> **Opción (ii) pura, adoptada:**
+> - SUSPICION es el techo honesto para casos macOS/mobile D3-only.
+> - NO se implementa split por dominios lógicos (B-052-P2 original).
+> - NO se adopta densidad causal (descartado por experimento, r=0.9185).
+> - Queda documentado como **§9.4-LIM**: límite estructural conocido.
+
+Consecuencia sobre las decisiones de §9: D1–D4 quedan **cerradas por
+superación** — el split no se adopta, así que no hay opción que firmar. La
+rama `claude/b052-p2-domain-signals-xk5ecq` (implementación del split,
+`c5c8d38`) queda como **registro histórico — NO MERGEAR**.
+
+### 10.1 §9.4-LIM — límite estructural conocido
+
+Un caso cuyo canal físico de evidencia es únicamente D3 (filesystem local: el
+dispositivo mismo) no puede escalar más allá de SUSPICION por doctrina:
+todos sus dominios lógicos comparten el mismo canal de fabricación, así que
+la multiplicidad de dominios D3 no constituye corroboración independiente.
+**Criterio de cierre del límite:** engines de canal D2/D4 para evidencia
+mobile (memoria/red del dispositivo), o validación con corpus real ≥50 casos
+macOS/mobile etiquetados.
+
+**Discrepancia observada (medida 2026-07-10, pre-extensión):** el pipeline
+actual de la ruta mobile-only sella **INTENT** para el fixture D3-rico
+(`_mobile_hypothesis` F6: max_z=3.8 → INTENT_DETECTED, is_conclusive=True →
+`classify_agent_verdict` → INTENT con n_primary=1). Es decir, el techo
+SUSPICION de la doctrina (ii) **no está enforced hoy** en el camino del
+veredicto. El mandato de esta tarea fue explícito ("NO tocar el reasoner ni
+el scorer — únicamente narrativa"), así que esta discrepancia queda
+**documentada y pineada** (test `test_verdict_and_score_unchanged`), y su
+enforcement — capar `_mobile_hypothesis`/`classify` a SUSPICION cuando la
+evidencia es D3-only — **requiere firma aparte** porque SÍ mueve veredictos.
+
+### 10.2 Extensión aprobada — dos clases de SUSPICION en el output
+
+Detección (implementada en el shim `sift_orchestrator.py`,
+`_mobile_suspicion_class` — narrativa + `pipeline_meta`, cero cambio de
+score/veredicto):
+
+```
+cond2 := ruta mobile-only (reasoner NOT_RUN_MOBILE_SINGLE_SOURCE)
+         AND >=1 señal analizada (los marcadores unanalyzed no cuentan)
+         AND TODAS las señales analizadas resuelven dominio D3
+             (evidence_type|artifact_type → _EVIDENCE_MAP → _DOMAIN_MAP)
+         AND max_z > 3          (umbral crítico pre-existente, Fraction)
+         AND n_finding_types_distintos >= 2 (unión de metadata.finding_types)
+
+cond2  → pipeline_meta.suspicion_class = "D3_RICH_NO_TRIANGULATION"
+         + nota doctrinal en narrativa (texto exacto de la decisión)
+!cond2 → pipeline_meta.suspicion_class = "GENERIC" (sin texto adicional)
+```
+
+Notas de diseño:
+- Umbral `> 3` estricto: reutiliza el umbral crítico pre-existente
+  (`_mobile_hypothesis` is_conclusive y tipos críticos del reasoner) — cero
+  umbrales nuevos.
+- `breadth_tactics >= 2` se consideró y se descartó por ahora: las señales
+  mobile no llevan táctica MITRE en metadata (el mapeo MITRE ocurre aguas
+  abajo); `finding_types >= 2` es el proxy disponible hoy.
+- **Fail-closed:** dominio no resoluble, mapas no importables, o cualquier
+  señal fuera de D3 → GENERIC (la nota solo aparece cuando el confinamiento
+  D3 es *probado*).
+- 12 tests en `tests/test_s94_lim_suspicion_class.py` (E2E con fixtures +
+  unidad de la regla + pin de invariancia de veredicto).
+
+### 10.3 Anexo — registro de la inquiry (evidencia de proceso adversarial)
+
+1. **Experimento de discriminación** (regla pre-registrada, fail-closed):
+   r(densidad_causal_D3, z_agregado_D3) = **0.9185** sobre 6 fixtures → zona
+   gris [0.70, 0.95] → NOT ADOPTED por default. Detalle completo por fixture
+   en §9.4.1 del design doc de la rama `claude/b052-p2-domain-signals-xk5ecq`
+   (commit `a74d360`); script reproducible en
+   `scripts/experiments/b052_discriminacion.py` (misma rama).
+2. **Decisión sellada** (verbatim arriba, §10) — transmitida por Anna
+   2026-07-10 tras 3 rondas de debate del colectivo.
+3. **Registro completo de las 3 rondas del colectivo:** NO disponible en la
+   sesión que produjo este documento — el agente no lo recibió y no lo
+   fabrica. **[PENDIENTE: Anna pega aquí el registro completo]**. Hasta
+   entonces, la evidencia de proceso adversarial disponible es (1) + (2) +
+   la regla pre-registrada aplicada sin excepción.
+
+---
+
 ## Apéndice A — finding_type → corr_group (verbatim, con líneas)
 
 **macOS** (`macos_forensics.py`): `antiforensic` = SIP_DISABLED(527,551),

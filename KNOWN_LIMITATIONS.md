@@ -1955,3 +1955,36 @@ verified by blocking Pydantic at import). Suite green, corpus 166/199, 0 verdict
 value is maximally incriminating." Fail-closed (reject the corrupt signal loudly) is the
 only defensible behavior — a silently-substituted `5.0` z-score is a fabricated CRITICAL
 finding with no evidentiary basis.
+
+---
+
+## L-051 — §9.4-LIM: SUSPICION es el techo doctrinal para casos macOS/mobile D3-only (decisión sellada, opción (ii) pura)
+
+**Sellado 2026-07-10 (colectivo + firma de Anna; ver `docs/B052_P2_DESIGN.md` §10).**
+
+Un caso cuya evidencia proviene únicamente del canal físico D3 (filesystem
+local del propio dispositivo — TODOS los dominios lógicos macOS/mobile:
+browser, antiforensic, persistence, quarantine, apps, fsevents, spotlight)
+no puede escalar más allá de SUSPICION por doctrina: los "múltiples dominios"
+comparten el mismo canal de fabricación, así que su multiplicidad NO
+constituye corroboración independiente. Quien controla el disco controla
+todas esas fuentes a la vez.
+
+- El split por dominios lógicos (B-052-P2) fue implementado, medido y
+  **rechazado** — rama `claude/b052-p2-domain-signals-xk5ecq`, NO mergeada,
+  preservada como registro.
+- La métrica alternativa `densidad_causal_D3` fue descartada por experimento
+  pre-registrado (Pearson r=0.9185 vs z, zona gris fail-closed).
+- Mitigación implementada (solo narrativa + `pipeline_meta`): la clase
+  `suspicion_class = D3_RICH_NO_TRIANGULATION` distingue en el bundle el
+  SUSPICION "evidencia fuerte confinada a D3, triangulación manual urgente"
+  del SUSPICION genérico (poca evidencia). Regla exacta y tests en
+  `docs/B052_P2_DESIGN.md` §10.2.
+- **Discrepancia conocida:** el camino de veredicto actual de la ruta
+  mobile-only puede sellar INTENT para un caso D3-rico (medido; ver §10.1).
+  El enforcement del techo SUSPICION mueve veredictos y requiere firma
+  aparte — hasta entonces el techo es doctrinal, no mecánico.
+
+**Criterio de cierre:** engines de canal D2/D4 para evidencia mobile
+(memoria/red del dispositivo), o validación con corpus real ≥50 casos
+macOS/mobile etiquetados.
