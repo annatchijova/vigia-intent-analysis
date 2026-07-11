@@ -102,14 +102,34 @@ class LikelihoodEngine(_BaseLikelihoodEngine):
         if not _calibrator and calibration_path:
             try:
                 _lr_cal = _il.import_module("vigia.core.lr_calibration")
-                _calibrator = _lr_cal.LRCalibrator.load(calibration_path)
+                # B-102: resolve candidates the same way the pipeline does
+                # (shared helper) so the same calibration_path cannot leave
+                # this layer in FALLBACK while another layer calibrates.
+                for _cand in _lr_cal.candidate_calibrator_paths(calibration_path):
+                    try:
+                        _calibrator = _lr_cal.LRCalibrator.load(_cand)
+                        break
+                    except FileNotFoundError:
+                        continue
+                    except Exception as _cand_exc:
+                        _logger.warning(
+                            "[LikelihoodEngine] calibrator at %s exists but "
+                            "failed to load (%s: %s) — trying next candidate.",
+                            _cand, type(_cand_exc).__name__, _cand_exc,
+                        )
             except Exception as _exc:
                 # B-098: this was a bare 'except: pass' — the cause of a
                 # FALLBACK-mode degradation was unrecoverable from the logs.
                 _logger.warning(
-                    "[LikelihoodEngine] calibrador no cargado desde %s "
-                    "(%s: %s) — modo FALLBACK.",
+                    "[LikelihoodEngine] calibrator setup failed for %s "
+                    "(%s: %s) — FALLBACK mode.",
                     calibration_path, type(_exc).__name__, _exc,
+                )
+            if not _calibrator:
+                _logger.warning(
+                    "[LikelihoodEngine] no usable calibrator for %s — "
+                    "FALLBACK mode.",
+                    calibration_path,
                 )
 
         super().__init__(z_cap=z_cap, calibrator=_calibrator)

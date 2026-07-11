@@ -74,34 +74,29 @@ def _import_verify_bundle():
     import importlib.util
 
     script = os.path.join(_REPO_ROOT, "forensics", "verify_ebs_v1.py")
+    # spec_from_file_location returns a spec even for a missing file (the
+    # failure would surface later as a raw FileNotFoundError from
+    # exec_module) — check explicitly so installed-package layouts that do
+    # not ship top-level forensics/ get a clear ImportError instead.
+    if not os.path.isfile(script):
+        raise ImportError(
+            f"Standalone verifier not found: {script} — this deployment "
+            "does not ship the top-level forensics/ package (B-097)."
+        )
     spec = importlib.util.spec_from_file_location("_vigia_verify_ebs_v1", script)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Standalone verifier not found: {script}")
+        raise ImportError(f"Standalone verifier not loadable: {script}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module.verify_bundle
 
 
-def _candidate_calibrator_paths(calibration_path: Optional[str]) -> List[str]:
-    """Candidate LRCalibrator files for calibration_path, in priority order.
-
-    Historically H28 derived '<name>_isotonic.json' via a naive str.replace
-    and looked ONLY for that file — which no tool in this repo ever produced
-    (scripts/run_calibration.py writes 'calibrated_lr.json'), so the H28
-    enrichment was dead with the documented flow (B-098). The isotonic
-    variant is kept as first candidate for backward compatibility; the
-    calibration_path itself — the file run_calibration.py actually writes —
-    is the fallback that makes the documented flow work.
-    """
-    if not calibration_path:
-        return []
-    from pathlib import Path
-
-    p = Path(calibration_path)
-    variant = str(p.with_name(p.stem + "_isotonic" + p.suffix))
-    if variant == calibration_path:
-        return [calibration_path]
-    return [variant, calibration_path]
+# B-098/B-102: calibrator path resolution is shared with LikelihoodEngine —
+# one resolver, one behavior. See candidate_calibrator_paths in
+# vigia/core/lr_calibration.py.
+from vigia.core.lr_calibration import (
+    candidate_calibrator_paths as _candidate_calibrator_paths,
+)
 
 from vigia.core.ebs_v1 import (
     SignalOutput, EvidenceGraph, EvidenceEdge,
@@ -262,20 +257,20 @@ class VigiaPipeline:
             for _cand in _candidate_calibrator_paths(calibration_path):
                 try:
                     self._lr_calibrator = LRCalibrator.load(_cand)
-                    logger.info("[VigiaPipeline] H28: LRCalibrator cargado desde %s", _cand)
+                    logger.info("[VigiaPipeline] H28: LRCalibrator loaded from %s", _cand)
                     break
                 except FileNotFoundError:
-                    logger.info("[VigiaPipeline] H28: %s no existe.", _cand)
+                    logger.info("[VigiaPipeline] H28: %s does not exist.", _cand)
                 except Exception as _cal_exc:
                     logger.warning(
-                        "[VigiaPipeline] H28: %s existe pero no se pudo cargar "
+                        "[VigiaPipeline] H28: %s exists but failed to load "
                         "(%s: %s).",
                         _cand, type(_cal_exc).__name__, _cal_exc,
                     )
             if self._lr_calibrator is None:
                 logger.info(
-                    "[VigiaPipeline] H28: sin calibrador utilizable para %s — "
-                    "LR sin calibración logística.",
+                    "[VigiaPipeline] H28: no usable calibrator for %s — "
+                    "LR runs without logistic calibration.",
                     calibration_path,
                 )
 
@@ -411,21 +406,22 @@ class VigiaPipeline:
             _internal_drift = _RBL.internal_drift_from_z_scores(z_vals)
             if _internal_drift is None:
                 logger.info(
-                    "[Pipeline] H27: PSI indeterminado con n=%d señales (<4) — "
-                    "usando drift externo %.4f (degradación documentada B-099).",
+                    "[Pipeline] H27: PSI indeterminate with n=%d finite signals "
+                    "(<4) — using external drift %.4f (documented degradation, "
+                    "B-099/L-053).",
                     len(z_vals), drift_score,
                 )
             else:
                 if abs(_internal_drift - drift_score) > 0.1:
                     logger.warning(
-                        "[Pipeline] H27: drift recalculado internamente (%.4f) difiere "
-                        "del drift externo (%.4f) en más de 0.1. "
-                        "Usando drift interno — el externo podría estar manipulado.",
+                        "[Pipeline] H27: internally recomputed drift (%.4f) differs "
+                        "from external drift (%.4f) by more than 0.1. "
+                        "Using internal drift — the external one may be manipulated.",
                         _internal_drift, drift_score,
                     )
                 drift_score = _internal_drift
         except Exception as _drift_exc:
-            logger.warning("[Pipeline] H27: recálculo de drift falló (%s) — usando drift externo", _drift_exc)
+            logger.warning("[Pipeline] H27: drift recomputation failed (%s) — using external drift", _drift_exc)
 
         # ── PRE-FILTRO: Lazy Abstraction (VisibleVariablesEngine) ──────────
         # Solo las variables "visibles" para la fase detectada entran al motor
@@ -538,8 +534,16 @@ class VigiaPipeline:
         # regresión logística para producir probabilidades calibradas (ECE válido).
         # Sin calibración, el "posterior" es una estimación — no una probabilidad.
         # El método de calibración se registra en inference_result para Daubert.
+        # B-102: when the engine itself loaded a calibrator (mode=CALIBRATED),
+        # every per-signal log-LR is ALREADY logistically calibrated
+        # (likelihood_ratio.py, Paso 2) — re-applying calibrated_posterior here
+        # stacked the same sigmoid twice and distorted the posterior against
+        # the corpus the calibrator was fitted on. H28 is a FALLBACK layer:
+        # it only calibrates when the engine could not.
         lr_calibration_method = "uncalibrated"
-        if self._lr_calibrator is not None:
+        if self._likelihood_engine._mode == "CALIBRATED":
+            lr_calibration_method = "engine_calibrated"
+        elif self._lr_calibrator is not None:
             try:
                 # Usamos el log_lr del inference_result como entrada al calibrador
                 raw_log_lr = inference_result.get("log_lr", 0.0)
@@ -548,8 +552,9 @@ class VigiaPipeline:
                 calibrated_posterior = self._lr_calibrator.calibrated_posterior(_z_approx)
                 if 0.0 < calibrated_posterior < 1.0:
                     logger.info(
-                        "[Pipeline] H28: posterior calibrado logísticamente %.4f → %.4f",
-                        posterior, calibrated_posterior,
+                        "[Pipeline] H28: posterior logistically calibrated %.4f -> %.4f "
+                        "(engine mode=%s fallback)",
+                        posterior, calibrated_posterior, self._likelihood_engine._mode,
                     )
                     posterior = calibrated_posterior
                     inference_result = dict(inference_result)
@@ -1231,7 +1236,14 @@ class VigiaPipeline:
         if strict:
             cmd.append("--strict")
 
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        # B-097 review follow-up: this subprocess path only became reachable
+        # once verify_script resolved to a real file, so TimeoutExpired is a
+        # new exception surface — keep the documented dict contract instead
+        # of letting it propagate.
+        try:
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+        except subprocess.TimeoutExpired:
+            return {"error": "external verifier timed out after 30s", "passed": False}
 
         try:
             return json.loads(proc.stdout)
@@ -1345,45 +1357,22 @@ def run_vigia(
         except Exception as e:
             logger.warning("[run_vigia] Señal inválida ignorada: %s — %s", d, e)
 
-    # H27: recalcular drift internamente — no confiar en el parámetro externo.
-    # Un atacante que controle el script que llama a VIGÍA puede pasar drift=0.0
-    # para anular la Risk Bounded Layer. El drift se recalcula desde los z-scores
-    # reales de las señales usando PSI. El parámetro externo se usa solo como
-    # fallback documentado cuando no hay suficientes señales para PSI.
-    # B-099: the previous estimator (seed-42 sampled gaussian reference fed to
-    # compute_psi) saturated to drift=1.0 for benign and anomalous input alike
-    # (100% of 20k genuine N(0,1) samples at n=2-3, 67-100% up to n=50) — a
-    # constant disguised as a measurement, sealed into the decision path.
-    # Replaced by the chi2-gated analytic-reference PSI. This partially
-    # reverts P1-21 (threshold 4→2): below n=4 the estimator has no power in
-    # either direction (even all-z=5 input scored 0), so emitting a number
-    # there was never anti-evasion — the honest output is "indeterminate" plus
-    # the documented external-drift fallback.
-    internal_drift = drift_score  # fallback documentado
-    try:
-        from vigia.core.risk_bounded_layer import RiskBoundedDecisionLayer
-        z_scores = [s.z_score for s in signals if hasattr(s, "z_score")]
-        _recalc = RiskBoundedDecisionLayer.internal_drift_from_z_scores(z_scores)
-        if _recalc is None:
-            logger.info(
-                "[run_vigia] H27: PSI indeterminado con n=%d señales (<4) — "
-                "usando drift externo %.4f (degradación documentada B-099).",
-                len(z_scores), drift_score,
-            )
-        else:
-            internal_drift = _recalc
-            if abs(internal_drift - drift_score) > 0.15:
-                logger.warning(
-                    "[run_vigia] H27: drift externo=%.4f difiere del recalculado=%.4f. "
-                    "Usando drift recalculado internamente.",
-                    drift_score, internal_drift,
-                )
-    except Exception as _drift_exc:
-        logger.warning(
-            "[run_vigia] H27: no se pudo recalcular drift (%s) — "
-            "usando parámetro externo %.4f como fallback.",
-            _drift_exc, drift_score,
-        )
+    # H27/H28 note (B-102, code review 2026-07-10): this function used to carry
+    # its OWN drift recomputation and its OWN per-signal z-score calibration.
+    # Both were redundant with — and actively harmful on top of — the layers
+    # that run for every entry point:
+    #   - drift: run_full() recomputes internal drift from the signals with
+    #     the same chi2-gated estimator and overwrites the value passed here,
+    #     so the local copy was dead computation whose only lasting output was
+    #     a log line that could contradict run_full's own recomputation (and
+    #     its NaN handling diverged — B-103).
+    #   - calibration: LikelihoodEngine (mode=CALIBRATED) already applies
+    #     calibrated_log_lr per signal, and run_full's H28 calibrates the
+    #     posterior when the engine could not; rewriting z_scores here stacked
+    #     the same logistic map a third time.
+    # The external drift_score parameter is still not trusted: run_full
+    # recomputes it whenever >=4 finite z-scores exist (B-099/L-053 documents
+    # the n<4 fallback).
 
     # Inicializar pipeline
     pipeline = VigiaPipeline(
@@ -1391,65 +1380,8 @@ def run_vigia(
         covariance_path=covariance_path,
     )
 
-    # H28: aplicar LRCalibrator si está disponible — calibración logística
-    # El LR crudo del KDE no tiene curva de confianza respaldada hasta que
-    # pasa por la regresión logística. Sin esto el "Posterior" es una suposición.
-    calibrated_signals = signals
-    if _LR_CALIBRATOR_AVAILABLE and LRCalibrator is not None:
-        try:
-            # Load a persisted calibrator if one exists: legacy '_isotonic'
-            # variant first, then calibration_path itself (B-098 — the old
-            # naive str.replace only ever looked for a file no tool produces).
-            _cal = None
-            for _cal_path in _candidate_calibrator_paths(calibration_path):
-                if os.path.isfile(_cal_path):
-                    _cal = LRCalibrator.load(_cal_path)
-                    logger.info("[run_vigia] H28: LRCalibrator cargado desde %s", _cal_path)
-                    break
-            if _cal is not None and _cal._fitted:
-                # Ajustar z_score de cada señal con el LR calibrado
-                _adjusted = []
-                _failed = 0
-                _first_exc: Optional[BaseException] = None
-                for sig in signals:
-                    try:
-                        _log_lr_cal = _cal.calibrated_log_lr(sig.z_score)
-                        # Reconstruir señal con z_score equivalente al LR calibrado
-                        # z_cal = clip(log_lr_calibrado, -Z_CLIP, Z_CLIP)
-                        _z_cal = max(-6.0, min(6.0, _log_lr_cal))
-                        import dataclasses as _dc
-                        if _dc.is_dataclass(sig):
-                            sig_cal = _dc.replace(sig, z_score=_z_cal)
-                        else:
-                            sig_cal = sig  # fallback si no es dataclass
-                        _adjusted.append(sig_cal)
-                    except Exception as _sig_exc:
-                        # B-098: this except used to be fully silent, and the
-                        # summary log below counted uncalibrated signals as
-                        # calibrated. Honest degradation: count and report.
-                        _failed += 1
-                        if _first_exc is None:
-                            _first_exc = _sig_exc
-                        _adjusted.append(sig)
-                calibrated_signals = _adjusted
-                if _failed:
-                    logger.warning(
-                        "[run_vigia] H28: LR calibrado en %d/%d señales — %d "
-                        "quedaron SIN calibrar y entran mezcladas al sellado "
-                        "(primera causa: %s: %s)",
-                        len(signals) - _failed, len(signals), _failed,
-                        type(_first_exc).__name__, _first_exc,
-                    )
-                else:
-                    logger.info(
-                        "[run_vigia] H28: LR calibrado logísticamente (%d/%d señales)",
-                        len(calibrated_signals), len(signals),
-                    )
-        except Exception as _cal_exc:
-            logger.warning("[run_vigia] H28: LRCalibrator falló (%s) — usando señales sin calibrar", _cal_exc)
-
     # Ejecutar pipeline soberano
-    result = pipeline.run_full(calibrated_signals, drift_score=internal_drift)
+    result = pipeline.run_full(signals, drift_score=drift_score)
     bundle = result["bundle"]
     sealed_dict = result["sealed_dict"]
 

@@ -60,6 +60,25 @@ class TestInternalDriftUnit:
         d = RBL.internal_drift_from_z_scores(zs)
         assert d is not None and d > 0.5
 
+    def test_non_finite_values_are_dropped(self):
+        # B-103: Python min/max comparison semantics silently clipped NaN
+        # into the top bin, so NaN z-scores counted as extreme +3
+        # observations — 6 benign values scored 0.0 but adding 3 NaNs drove
+        # drift to 1.0, and [nan]*4 scored 1.0 instead of "indeterminate".
+        nan = float("nan")
+        benign = [0.1, -0.2, 0.3, -0.1, 0.05, -0.3]
+        clean = RBL.internal_drift_from_z_scores(benign)
+        polluted = RBL.internal_drift_from_z_scores(benign + [nan, nan, nan])
+        assert polluted == clean, (
+            "NaN z-scores must be dropped, not binned as extreme values"
+        )
+        assert RBL.internal_drift_from_z_scores([nan] * 4) is None, (
+            "fewer than 4 FINITE values is indeterminate"
+        )
+        assert RBL.internal_drift_from_z_scores(
+            [float("inf"), float("-inf"), 0.1, 0.2]
+        ) is None
+
     def test_deterministic_and_order_invariant(self):
         rng = random.Random(3)
         zs = [rng.gauss(0.5, 1) for _ in range(16)]

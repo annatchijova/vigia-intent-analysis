@@ -63,6 +63,34 @@ class TestB100AbstainAlert:
             "the aggregation reconciliation wording is wrong for ABSTAIN"
         )
 
+    def test_abstain_with_high_magnitude_is_scoped_not_unqualified(self):
+        # Review widening of B-100: an ABSTAIN whose analyzed fragment shows
+        # real magnitude must not seal an unqualified assessed-looking
+        # MEDIUM/HIGH alert — the level is kept but explicitly scoped to
+        # the analyzed portion, and the ABSTAIN reconciliation line fires.
+        # (One primary signal in 2<z<=3 yields a MEDIUM alert while staying
+        # ABSTAIN: z>3 triggers the L-036 override to INTENT_DETECTED and
+        # three 2<z<=3 primaries trigger the SUSPICION_DETECTED escalation,
+        # so those variants stop being ABSTAIN before the alert floor runs.)
+        results = {
+            "signals": [_sig_dict("MFT_ANALYZER", 2.5)],
+            "abduction": {"best_hypothesis": "UNDETERMINED",
+                          "is_conclusive": False, "narrative": "x"},
+            "results": {},
+        }
+        assert classify_agent_verdict(
+            results["abduction"], *_signal_stats(results)) == "ABSTAIN"
+
+        agent = VIGIAAgent("T-B100-HIGH", ".")
+        narrative = agent._generate_narrative(results, "a" * 64)
+        alert_block = _final_alert_block(narrative)
+        assert "ABSTAIN verdict" in alert_block, (
+            "non-LOW magnitude on an ABSTAIN case must carry the ABSTAIN "
+            "qualification (B-100 review gap)"
+        )
+        assert "ANALYZED portion only" in alert_block
+        assert "Reconciliation: ABSTAIN verdict" in narrative
+
     def test_clean_analyzed_case_keeps_low_alert(self):
         # No behavior change for genuine NOISE: analyzed clean evidence
         # still presents the per-signal LOW magnitude level.

@@ -86,7 +86,7 @@ class TestH28Resurrection:
             "corrupt isotonic candidate must not block the valid fallback"
         )
         warnings = [r for r in caplog.records if r.levelno == logging.WARNING]
-        assert any("existe pero no se pudo cargar" in r.getMessage() for r in warnings), (
+        assert any("exists but failed to load" in r.getMessage() for r in warnings), (
             "a corrupt (existing) candidate must be logged as WARNING with "
             "its real cause, not as 'not found' at INFO"
         )
@@ -110,8 +110,47 @@ class TestLikelihoodEngineLogging:
             engine = LikelihoodEngine(calibration_path="/nonexistent/cal.json")
         assert engine._mode == "FALLBACK"
         assert any(
-            "calibrador no cargado" in r.getMessage() for r in caplog.records
+            "no usable calibrator" in r.getMessage() for r in caplog.records
         ), "FALLBACK degradation must log its cause (was a bare except: pass)"
+
+    def test_engine_uses_candidate_resolution(self, tmp_path):
+        # B-102: the engine must resolve candidates the same way the pipeline
+        # does — a legacy isotonic-only layout must not leave the engine in
+        # FALLBACK while H28 calibrates.
+        from vigia.core.likelihood_engine import LikelihoodEngine
+
+        iso_only = tmp_path / "cal_isotonic.json"
+        shutil.copy(CANONICAL_CALIBRATOR, iso_only)
+        engine = LikelihoodEngine(calibration_path=str(tmp_path / "cal.json"))
+        assert engine._mode == "CALIBRATED", (
+            "engine must find the legacy '_isotonic' candidate via the "
+            "shared resolver (B-102)"
+        )
+
+
+class TestNoDoubleCalibration:
+    def test_engine_calibrated_skips_h28_posterior_recalibration(self):
+        # B-102: with the documented flow the engine applies per-signal
+        # logistic calibration (mode=CALIBRATED); H28 must NOT stack
+        # calibrated_posterior on top — it is a fallback layer, and the
+        # sealed method label must attribute calibration to the engine.
+        from vigia.core.ebs_v1 import SignalOutput
+
+        pipeline = VigiaPipeline(calibration_path=CANONICAL_CALIBRATOR)
+        assert pipeline._likelihood_engine._mode == "CALIBRATED"
+        assert pipeline._lr_calibrator is not None
+
+        signals = [
+            SignalOutput(tool_name=f"T{i}", value=0.5, z_score=z, confidence=0.9)
+            for i, z in enumerate([0.4, -0.2, 1.1, 0.3])
+        ]
+        result = pipeline.run_full(signals)
+        method = result["inference"]["lr_calibration_method"]
+        assert method == "engine_calibrated", (
+            f"expected engine-attributed calibration, got {method!r} — "
+            "'logistic_regression' here means H28 double-calibrated the "
+            "posterior the engine already calibrated (B-102 regression)"
+        )
 
 
 if __name__ == "__main__":

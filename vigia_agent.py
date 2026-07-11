@@ -1217,22 +1217,40 @@ class VIGIAAgent:
                     "recommended. Alert floored (B-028/B-065)."
                 )
         elif _final_verdict in ("INTENT", "SUSPICION") and alert.startswith("LOW"):
+            # Review fix (B-100 follow-up): name the ACTUAL verdict — the old
+            # hardcoded "INTENT verdict" sealed a narrative claiming INTENT on
+            # SUSPICION cases, overstating a finding that explicitly did not
+            # meet the two-source Refutation Protocol.
             alert = (
-                "MEDIUM — INTENT verdict with individual z-scores below "
-                "threshold. Alert floored (B-028/B-065): an intent finding "
-                "cannot present as LOW."
+                f"MEDIUM — {_final_verdict} verdict with individual z-scores "
+                "below threshold. Alert floored (B-028/B-065): an intent-class "
+                "finding cannot present as LOW."
             )
-        elif _final_verdict == "ABSTAIN" and alert.startswith("LOW"):
+        elif _final_verdict == "ABSTAIN":
             # B-100: an ABSTAIN (pipeline error, unanalyzed artifacts,
             # insufficient signals) must not close with an assessed-looking
-            # "LOW" level — 5 sealed corpus bundles paired
+            # level — 5 sealed corpus bundles paired
             # best_hypothesis=PIPELINE_ERROR with a LOW alert (the
             # FALLO_OCULTO PARCIAL of AUDIT_NARRATIVAS_20260702).
+            # Review widening: the first fix only intercepted LOW; an ABSTAIN
+            # whose analyzed fragment contained one z>2 signal still sealed an
+            # unqualified MEDIUM/HIGH/CRITICAL — same hidden-failure class,
+            # over-alarming direction. LOW becomes INDETERMINATE; higher
+            # magnitudes keep their level but are explicitly scoped to the
+            # analyzed portion.
             _hyp_label = str(abduction.get("best_hypothesis") or "no hypothesis")
-            alert = (
-                f"INDETERMINATE — ABSTAIN verdict ({_hyp_label}): the evidence "
-                "was not (fully) analyzed, so no alert level can be asserted."
-            )
+            if alert.startswith("LOW"):
+                alert = (
+                    f"INDETERMINATE — ABSTAIN verdict ({_hyp_label}): the "
+                    "evidence was not (fully) analyzed, so no alert level can "
+                    "be asserted."
+                )
+            else:
+                alert = (
+                    f"{alert} [ABSTAIN verdict ({_hyp_label}): this level "
+                    "describes the ANALYZED portion only — the evidence was "
+                    "not (fully) analyzed.]"
+                )
 
         narrative_parts.extend([
             "--- FINAL ALERT LEVEL ---",
@@ -1847,19 +1865,25 @@ def _run_text_pipeline(evidence_path: Path, case_id: str, params: Dict) -> Dict[
 # design — but the operator was never told why at startup). Degradation stays
 # non-fatal by design (tests/test_tanda_a_triage.py enshrines degrade-not-
 # crash); the drift itself must be loud.
-_CRITICAL_RUNTIME_DEPS = ("defusedxml",)
+# Review fix: the first version hardcoded only defusedxml, while the B-101
+# registry names BOTH declared-but-absent deps — the check itself was a
+# hand-maintained parallel manifest. Both known offenders are covered with
+# their concrete degradation consequence.
+_CRITICAL_RUNTIME_DEPS = {
+    "defusedxml": "XML/EVTX evidence will degrade to UNANALYZED/ABSTAIN",
+    "psutil": "process/resource monitoring tools will degrade",
+}
 
 
 def _warn_missing_critical_deps() -> None:
     import importlib.util
 
-    for _dep in _CRITICAL_RUNTIME_DEPS:
+    for _dep, _consequence in _CRITICAL_RUNTIME_DEPS.items():
         if importlib.util.find_spec(_dep) is None:
             print(
                 f"[VIGIA][StartupCheck] WARNING: dependency '{_dep}' is "
                 f"declared in requirements.txt but NOT installed in this "
-                f"environment. XML/EVTX evidence will degrade to "
-                f"UNANALYZED/ABSTAIN. Fix: pip install {_dep}",
+                f"environment. {_consequence}. Fix: pip install {_dep}",
                 file=sys.stderr,
             )
 

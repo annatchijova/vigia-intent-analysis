@@ -585,6 +585,14 @@ class RiskBoundedDecisionLayer:
         """
         Calcula PSI entre distribución de referencia y actual.
 
+        WARNING (B-099): do NOT use this for drift over small samples. Its
+        eps=1e-6 empty-bin handling blows PSI past the 0.25 saturation
+        threshold whenever the actual sample is small (measured: drift=1.0
+        for benign and anomalous input alike up to n~50), and the 0.25
+        large-sample rule ignores the PSI null distribution (~chi2(k-1)/n).
+        For case-level internal drift use internal_drift_from_z_scores(),
+        which replaced every production call site of this function.
+
         PSI < 0.1  → sin drift
         PSI 0.1-0.2 → drift moderado
         PSI > 0.2  → drift severo
@@ -667,11 +675,18 @@ class RiskBoundedDecisionLayer:
           data yields drift 0 (false-saturation measured <= 2%) while shifted
           or extreme data still saturates from n=4.
 
-        Returns None when n < 4: below that the test has no power in either
-        direction (even all-z=5 input scores 0), so the honest output is
-        "indeterminate", not a number. Callers must fall back to their
-        documented external drift and log the degradation.
+        Returns None when fewer than 4 FINITE z-scores are available: below
+        that the test has no power in either direction (even all-z=5 input
+        scores 0), so the honest output is "indeterminate", not a number.
+        Callers must fall back to their documented external drift and log the
+        degradation.
+
+        Non-finite values (NaN/inf) are dropped here rather than trusted to
+        callers (B-103): Python's min/max comparison semantics silently clip
+        NaN into the top bin, so unfiltered NaN z-scores counted as extreme
+        +3 observations and drove drift to 1.0.
         """
+        z_scores = [float(z) for z in z_scores if math.isfinite(z)]
         n = len(z_scores)
         if n < 4:
             return None

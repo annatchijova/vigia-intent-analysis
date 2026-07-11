@@ -40,6 +40,27 @@ import datetime
 from typing import Dict, List, Optional, Tuple
 
 
+def candidate_calibrator_paths(calibration_path: Optional[str]) -> List[str]:
+    """Candidate LRCalibrator files for calibration_path, in priority order.
+
+    Single source of truth for calibrator path resolution (B-098 / review
+    finding B-102): historically each loader resolved the path its own way —
+    H28 looked only for '<name>_isotonic.json' (a file no tool in this repo
+    produces; scripts/run_calibration.py writes 'calibrated_lr.json') while
+    LikelihoodEngine loaded the bare path — so the same calibration_path
+    could calibrate one layer and leave another in FALLBACK. The legacy
+    isotonic variant is kept as first candidate for backward compatibility;
+    the path itself is the candidate that makes the documented flow work.
+    """
+    if not calibration_path:
+        return []
+    from pathlib import Path
+
+    p = Path(calibration_path)
+    variant = str(p.with_name(p.stem + "_isotonic" + p.suffix))
+    return [variant, calibration_path]
+
+
 # ---------------------------------------------------------------------------
 # Platt Scaling manual — fallback sin sklearn
 # ---------------------------------------------------------------------------
