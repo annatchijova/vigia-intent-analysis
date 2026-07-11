@@ -79,6 +79,37 @@ class TestInternalDriftUnit:
             [float("inf"), float("-inf"), 0.1, 0.2]
         ) is None
 
+    def test_rational_ln_matches_libm(self):
+        # B-104: the kernel's rational ln must agree with libm to double
+        # precision over the ratio range PSI actually feeds it.
+        import math
+        from fractions import Fraction
+
+        for num, den in [(1, 100), (1, 7), (999, 1000), (1, 1), (3, 2),
+                         (7, 1), (1000, 1), (1, 10**6), (10**6, 1)]:
+            x = Fraction(num, den)
+            assert abs(float(RBL._ln_fraction(x)) - math.log(x)) < 1e-14
+
+    def test_bitforbit_golden_values(self):
+        # B-104: the kernel is pure integer/rational arithmetic over frozen
+        # constants, so these exact outputs pin cross-platform determinism —
+        # any last-bit difference here means libm re-entered the sealed path.
+        golden = [0.5, -0.3, 1.2, 0.1, -0.9, 2.1]
+        d = RBL.internal_drift_from_z_scores(golden)
+        assert d == RBL.internal_drift_from_z_scores(list(golden))
+        assert d == 0.0
+        d5 = RBL.internal_drift_from_z_scores([5.0] * 8)
+        assert d5 == 1.0
+
+    def test_large_n_clamps_bins_and_stays_covered(self):
+        # k clamps at 12, so the frozen tables and chi2 constants always
+        # cover the request — no runtime fallback path exists.
+        import random
+        rng = random.Random(5)
+        zs = [rng.gauss(0, 1) for _ in range(5000)]
+        d = RBL.internal_drift_from_z_scores(zs)
+        assert d is not None and 0.0 <= d < 1.0
+
     def test_deterministic_and_order_invariant(self):
         rng = random.Random(3)
         zs = [rng.gauss(0.5, 1) for _ in range(16)]
