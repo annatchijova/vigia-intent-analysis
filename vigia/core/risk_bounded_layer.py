@@ -66,10 +66,10 @@ except ImportError:
     np = None  # type: ignore
     _NP_AVAILABLE = False
 
-import os as _os_gov, sys as _sys_gov
-_ROOT_GOV = _os_gov.path.dirname(_os_gov.path.dirname(_os_gov.path.abspath(__file__)))
-if _ROOT_GOV not in _sys_gov.path:
-    _sys_gov.path.insert(0, _ROOT_GOV)
+# B-097 root cause: this module inserted <repo>/vigia into sys.path at
+# import time (under aliased names, invisible to naive greps), shadowing
+# top-level packages process-wide. All imports here are vigia.-qualified;
+# the insert served nothing.
 
 from vigia.core.ebs_v1 import (
     DecisionTrace, PolicySpec, SystemState,

@@ -29,13 +29,18 @@ REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CHILD_SCRIPT = r"""
 import json, sys, tempfile, os
 
-# Order matters: this import is what shadows the top-level "forensics" package.
+# The B-097 root cause (modules inserting <repo>/vigia at import time) was
+# removed in the follow-up fix, so the shadow no longer arises naturally.
+# SIMULATE it explicitly: the explicit-path verifier import must keep working
+# even in a process where some other code shadows the top-level name.
+sys.path.insert(0, os.path.join(os.getcwd(), "vigia"))
+
 from vigia.pipeline.pipeline import VigiaPipeline
 
-import forensics  # noqa: F401 — prove the shadow is active in this process
+import forensics  # noqa: F401 — prove the simulated shadow is active
 assert "vigia" in forensics.__file__.replace(os.sep, "/"), (
     "precondition failed: 'forensics' did not resolve to vigia/forensics/ — "
-    "the shadowing scenario this test guards against no longer exists"
+    "the simulated shadow is not active, the test is not exercising B-097"
 )
 
 from vigia.core.ebs_v1 import (

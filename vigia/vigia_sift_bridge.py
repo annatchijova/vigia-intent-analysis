@@ -54,9 +54,12 @@ from vigia.phonetic_loader import (
 # ---------------------------------------------------------------------------
 # vigia.* modules — seguridad, sandbox, config y tools forenses
 # ---------------------------------------------------------------------------
-# sys.path garantiza que 'vigia/' se encuentra sin importar desde dónde
-# se invoca el bridge (Claude Code, Ollama-MCP, tests, CLI).
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# B-097 root cause note: this module used to insert its own directory
+# (<repo>/vigia) into sys.path, claiming it guaranteed 'vigia/' was found.
+# It never did — 'import vigia.*' needs <repo> on sys.path (the launcher's
+# PYTHONPATH provides it), while the insert only shadowed top-level packages
+# (forensics, pki_tools, ...) process-wide. Removed; all imports below are
+# vigia.-qualified.
 
 from vigia.config import CONFIG, LLMBackend
 from vigia.security import (
@@ -3461,7 +3464,7 @@ def _sanitize_path(raw: str, base_dir: str | None = None, **kwargs) -> str:  # t
     """
     import os as _os
     from pathlib import Path as _Path
-    from security import _sanitize_path as _sp
+    from vigia.security import _sanitize_path as _sp
     _base = base_dir if base_dir is not None else EVIDENCE_BASE_DIR
     # Si el path es relativo, joinear con base_dir antes de sanitizar
     # para que Path.resolve() lo interprete dentro del directorio correcto

@@ -54,11 +54,9 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# Patron de raiz dinamica
-_HERE_RO = os.path.dirname(os.path.abspath(__file__))
-_ROOT_RO = os.path.dirname(_HERE_RO)
-if _ROOT_RO not in sys.path:
-    sys.path.insert(0, _ROOT_RO)
+# B-097 root cause: this module inserted <repo>/vigia into sys.path at
+# import time, shadowing top-level packages (forensics, ...) process-wide.
+# All imports here are vigia.-qualified; the insert served nothing.
 
 from vigia.core.ebs_v1 import PolicySpec, EPS_NUMERIC
 

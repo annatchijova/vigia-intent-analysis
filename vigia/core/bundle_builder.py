@@ -49,9 +49,11 @@ from typing import Any, Dict, Optional
 # El sistema debe saber donde esta parado sin importar desde donde se ejecuta.
 # ---------------------------------------------------------------------------
 _HERE = os.path.dirname(os.path.abspath(__file__))
-_ROOT = os.path.dirname(_HERE)
-if _ROOT not in sys.path:
-    sys.path.insert(0, _ROOT)
+_ROOT = os.path.dirname(_HERE)  # <repo>/vigia — used ONLY for the attestation
+# source scan below. B-097 root cause: this used to be sys.path.insert(0,
+# _ROOT), which shadowed every top-level package sharing a name with a
+# vigia/ subpackage (forensics, pki_tools, ...) for the whole process. All
+# imports in this module are vigia.-qualified; the insert served nothing.
 
 from vigia.core.ebs_v1 import (
     ForensicBundle, IntegrityBlock, EBS_VERSION,

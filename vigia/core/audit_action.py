@@ -34,10 +34,10 @@ from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-import os as _os_aud, sys as _sys_aud
-_ROOT_AUD = _os_aud.path.dirname(_os_aud.path.dirname(_os_aud.path.abspath(__file__)))
-if _ROOT_AUD not in _sys_aud.path:
-    _sys_aud.path.insert(0, _ROOT_AUD)
+# B-097 root cause: this module inserted <repo>/vigia into sys.path at
+# import time (under aliased names, invisible to naive greps), shadowing
+# top-level packages process-wide. All imports here are vigia.-qualified;
+# the insert served nothing.
 
 from vigia.core.ebs_v1 import (
     EvidenceGraph, DecisionTrace, PolicySpec, ActionRecord,

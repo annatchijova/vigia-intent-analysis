@@ -72,10 +72,10 @@ except ImportError:
     spearmanr = None  # type: ignore
     _SCIPY_AVAILABLE = False
 
-import os as _os_gs, sys as _sys_gs
-_ROOT_GS = _os_gs.path.dirname(_os_gs.path.dirname(_os_gs.path.abspath(__file__)))
-if _ROOT_GS not in _sys_gs.path:
-    _sys_gs.path.insert(0, _ROOT_GS)
+# B-097 root cause: this module inserted <repo>/vigia into sys.path at
+# import time (under aliased names, invisible to naive greps), shadowing
+# top-level packages process-wide. All imports here are vigia.-qualified;
+# the insert served nothing.
 
 from vigia.core.ebs_v1 import (
     EvidenceEdge, EvidenceGraph,

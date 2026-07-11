@@ -54,11 +54,12 @@ from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-# Patron de raiz dinamica
-_HERE_PKI = os.path.dirname(os.path.abspath(__file__))
-_ROOT_PKI = os.path.dirname(_HERE_PKI)
-if _ROOT_PKI not in sys.path:
-    sys.path.insert(0, _ROOT_PKI)
+# B-097 root cause: this module inserted <repo>/vigia into sys.path at
+# import time — especially hazardous here because pki_tools.py exists BOTH
+# as vigia/forensics/pki_tools.py and <repo>/forensics/pki_tools.py, so the
+# name resolved to a different module depending on import order. All
+# imports here are vigia.-qualified or third-party; the insert served
+# nothing.
 
 # ---------------------------------------------------------------------------
 # Dependencias opcionales
