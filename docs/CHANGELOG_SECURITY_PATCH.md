@@ -45,7 +45,12 @@
 
 #### V07 — XML Billion Laughs / XXE
 - **Archivo**: `event_log_correlator.py`
-- **Fix**: Importa `defusedxml.ElementTree` como fallback seguro. Si no está instalado, usa `ET.fromstring(xml_str, forbid_dtd=True)`.
+- **Fix**: Importa `defusedxml.ElementTree` con guard. Si `defusedxml` no está
+  instalado, NO hay fallback a `xml.etree` (decisión deliberada anti-XXE):
+  los artefactos XML/EVTX quedan marcados `UNANALYZED_ARTIFACT` y el caso
+  degrada honestamente a ABSTAIN. (Nota: una versión anterior de esta entrada
+  describía un fallback `ET.fromstring(..., forbid_dtd=True)` que no existe
+  en el código vivo.)
 
 #### V19 — DoS por `Fraction` gigante en IOC Manager
 - **Archivo**: `ioc_manager.py`

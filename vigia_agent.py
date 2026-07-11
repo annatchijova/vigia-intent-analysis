@@ -1205,6 +1205,17 @@ class VIGIAAgent:
                 "threshold. Alert floored (B-028/B-065): an intent finding "
                 "cannot present as LOW."
             )
+        elif _final_verdict == "ABSTAIN" and alert.startswith("LOW"):
+            # B-100: an ABSTAIN (pipeline error, unanalyzed artifacts,
+            # insufficient signals) must not close with an assessed-looking
+            # "LOW" level — 5 sealed corpus bundles paired
+            # best_hypothesis=PIPELINE_ERROR with a LOW alert (the
+            # FALLO_OCULTO PARCIAL of AUDIT_NARRATIVAS_20260702).
+            _hyp_label = str(abduction.get("best_hypothesis") or "no hypothesis")
+            alert = (
+                f"INDETERMINATE — ABSTAIN verdict ({_hyp_label}): the evidence "
+                "was not (fully) analyzed, so no alert level can be asserted."
+            )
 
         narrative_parts.extend([
             "--- FINAL ALERT LEVEL ---",
@@ -1214,12 +1225,23 @@ class VIGIAAgent:
         # magnitud por señal divergen, la narrativa explica ambos niveles en
         # vez de imprimirlos contradictorios lado a lado.
         if alert is not _magnitude_alert:
-            narrative_parts.append(
-                f"Reconciliation: verdict {_final_verdict} rests on "
-                f"hypothesis-level aggregation, not on any single "
-                f"high-magnitude signal. Per-signal magnitude level was: "
-                f"{_magnitude_alert}"
-            )
+            if _final_verdict == "ABSTAIN":
+                # B-100: the aggregation wording below is wrong for ABSTAIN —
+                # nothing was aggregated; the magnitude line only describes
+                # what little was analyzed.
+                narrative_parts.append(
+                    f"Reconciliation: ABSTAIN verdict — the per-signal "
+                    f"magnitude level ({_magnitude_alert}) describes only the "
+                    f"analyzed portion and is not an assessment of the "
+                    f"unanalyzed evidence."
+                )
+            else:
+                narrative_parts.append(
+                    f"Reconciliation: verdict {_final_verdict} rests on "
+                    f"hypothesis-level aggregation, not on any single "
+                    f"high-magnitude signal. Per-signal magnitude level was: "
+                    f"{_magnitude_alert}"
+                )
         narrative_parts.extend([
             "",
             f"Critical signals (z>3, primary): {n_critical}",
@@ -1801,7 +1823,32 @@ def _run_text_pipeline(evidence_path: Path, case_id: str, params: Dict) -> Dict[
 # MAIN
 # ════════════════════════════════════════════════════════════════════════════
 
+# B-101: venv-vs-requirements drift check. defusedxml is declared in all
+# three manifests (requirements.txt, requirements-ci.txt, pyproject.toml) but
+# was absent from the runtime environment for weeks: 10/200 corpus cases
+# silently lost their XML/EVTX signal (degrading to UNANALYZED/ABSTAIN per
+# design — but the operator was never told why at startup). Degradation stays
+# non-fatal by design (tests/test_tanda_a_triage.py enshrines degrade-not-
+# crash); the drift itself must be loud.
+_CRITICAL_RUNTIME_DEPS = ("defusedxml",)
+
+
+def _warn_missing_critical_deps() -> None:
+    import importlib.util
+
+    for _dep in _CRITICAL_RUNTIME_DEPS:
+        if importlib.util.find_spec(_dep) is None:
+            print(
+                f"[VIGIA][StartupCheck] WARNING: dependency '{_dep}' is "
+                f"declared in requirements.txt but NOT installed in this "
+                f"environment. XML/EVTX evidence will degrade to "
+                f"UNANALYZED/ABSTAIN. Fix: pip install {_dep}",
+                file=sys.stderr,
+            )
+
+
 def main() -> None:
+    _warn_missing_critical_deps()
     parser = argparse.ArgumentParser(
         description="VIGÍA Autonomous Forensic Agent — SANS FIND EVIL Hackathon 2026",
         formatter_class=argparse.RawDescriptionHelpFormatter,
