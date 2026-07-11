@@ -128,3 +128,63 @@ class TestTamperDetection:
         _, _, sealed = _sealed_reference()
         ok, msg = BundleBuilder.quick_verify(copy.deepcopy(sealed))
         assert ok, msg
+
+
+# ---------------------------------------------------------------------------
+# CAIE absent — seal(caie_analysis=None) is a supported, verifiable state
+# ---------------------------------------------------------------------------
+
+class TestSealWithCaieNone:
+    """Pins the contract audited on 2026-07-10: None means 'CAIE did not run'.
+
+    pipeline.py passes caie_analysis=None to seal() whenever CAIE found no
+    artifacts, failed non-blocking, or returned empty. This was covered only
+    de facto (integration tests omitting the argument); an external audit
+    flagged it as a suspected crash. It is not: the field is omitted from the
+    payload and the bundle seals and verifies.
+    """
+
+    @staticmethod
+    def _bare_bundle():
+        from vigia.core.ebs_v1 import (
+            EvidenceGraph, DecisionTrace, SystemState, ForensicBundle,
+            make_default_policy,
+        )
+        return ForensicBundle(
+            evidence_graph=EvidenceGraph(nodes=["A0"], edges=[]),
+            decision_trace=DecisionTrace(
+                decision="ABSTAIN", posterior=0.5, risk=0.1,
+                reason_code="TEST:CAIE-NONE",
+            ),
+            policy_spec=make_default_policy(),
+            system_state=SystemState(
+                drift_score=0.0, graph_stability_global=0.5,
+            ),
+        )
+
+    def test_seal_with_none_omits_field_and_verifies(self):
+        sealed = BundleBuilder.seal(self._bare_bundle(), caie_analysis=None)
+        assert "caie_analysis" not in sealed, (
+            "None must mean 'CAIE did not run' — the field is omitted, "
+            "not serialized as null"
+        )
+        ok, msg = BundleBuilder.quick_verify(sealed)
+        assert ok, msg
+
+    def test_seal_default_matches_explicit_none(self):
+        sealed_default = BundleBuilder.seal(self._bare_bundle())
+        assert "caie_analysis" not in sealed_default
+        ok, msg = BundleBuilder.quick_verify(sealed_default)
+        assert ok, msg
+
+    def test_seal_with_dict_includes_field_and_verifies(self):
+        # Contrast: a real CAIE result is included and attested.
+        sealed = BundleBuilder.seal(
+            self._bare_bundle(),
+            caie_analysis={"verdict": "SUSPICION", "composite_score": 0.4,
+                           "fractures": [], "golden_rules_triggered": 0},
+        )
+        assert "caie_analysis" in sealed
+        assert sealed["config_attestation"]["caie_enabled"] is True
+        ok, msg = BundleBuilder.quick_verify(sealed)
+        assert ok, msg
