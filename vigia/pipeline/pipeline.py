@@ -56,6 +56,31 @@ _ROOT_PIPELINE = os.path.dirname(os.path.abspath(__file__))
 if _ROOT_PIPELINE not in sys.path:
     sys.path.insert(0, _ROOT_PIPELINE)
 
+# Repo root (two levels above vigia/pipeline/) — location of the standalone
+# verifier <repo>/forensics/verify_ebs_v1.py. The bare top-level name
+# "forensics" must NOT be trusted here: once "<repo>/vigia" lands on sys.path
+# (inserted at import time by vigia.core.bundle_builder and others), that name
+# resolves to vigia/forensics/, which has no verify_ebs_v1 module, and the
+# import fails in any fresh process depending on import order (B-097).
+_REPO_ROOT = os.path.dirname(os.path.dirname(_ROOT_PIPELINE))
+
+
+def _import_verify_bundle():
+    """Load verify_bundle from <repo>/forensics/verify_ebs_v1.py by explicit path.
+
+    Import-order independent: uses importlib with the file path instead of the
+    shadowable top-level package name "forensics" (see _REPO_ROOT note above).
+    """
+    import importlib.util
+
+    script = os.path.join(_REPO_ROOT, "forensics", "verify_ebs_v1.py")
+    spec = importlib.util.spec_from_file_location("_vigia_verify_ebs_v1", script)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Standalone verifier not found: {script}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module.verify_bundle
+
 from vigia.core.ebs_v1 import (
     SignalOutput, EvidenceGraph, EvidenceEdge,
     DecisionTrace, ForensicBundle, PolicySpec, SystemState,
@@ -1150,15 +1175,16 @@ class VigiaPipeline:
         Verifica un bundle usando el verificador independiente (subprocess).
         Emula cómo SIFT consumiría el bundle.
         """
-        verify_script = os.path.join(
-            os.path.dirname(__file__), "forensics", "verify_ebs_v1.py"
-        )
+        # B-097: the verifier lives at <repo>/forensics/, not under vigia/pipeline/.
+        # The previous dirname(__file__)-relative path never existed, so this
+        # method always fell through to a shadowable name-based import.
+        verify_script = os.path.join(_REPO_ROOT, "forensics", "verify_ebs_v1.py")
 
         if not os.path.exists(verify_script):
-            # Fallback: verificación interna
+            # Fallback: in-process verification via explicit-path import
             with open(bundle_path) as f:
                 bundle_dict = json.load(f)
-            from forensics.verify_ebs_v1 import verify_bundle
+            verify_bundle = _import_verify_bundle()
             result = verify_bundle(bundle_dict, strict=strict)
             return result.to_dict()
 
@@ -1208,13 +1234,11 @@ class VigiaPipeline:
         with open(bundle_path, "r", encoding="utf-8") as f:
             bundle_dict = json.load(f)
 
-        try:
-            from forensics.verify_ebs_v1 import verify_bundle
-        except ImportError:
-            # Fallback si el path no está configurado
-            sys.path.insert(0, os.path.dirname(__file__))
-            from forensics.verify_ebs_v1 import verify_bundle
-
+        # B-097: explicit-path import — the name-based "from forensics..." import
+        # crashed in any fresh process where vigia/ shadowed the top-level
+        # forensics/ package, and the old fallback re-inserted a directory that
+        # was already on sys.path (a no-op) before re-raising.
+        verify_bundle = _import_verify_bundle()
         result = verify_bundle(bundle_dict)
         return result.to_dict()
 
