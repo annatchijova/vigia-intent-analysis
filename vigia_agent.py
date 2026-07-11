@@ -26,6 +26,7 @@
 from __future__ import annotations
 
 import argparse
+import decimal
 import hashlib
 import json
 import logging
@@ -309,6 +310,22 @@ def _json_serial(obj: Any) -> Any:
         return {"__fraction__": True, "num": obj.numerator, "den": obj.denominator}
     if isinstance(obj, datetime):
         return obj.isoformat()
+    if isinstance(obj, decimal.Decimal):
+        # B-105: CAIE computes internally with Decimal; two Fracture
+        # constructors leaked it into the sealed results and the whole case
+        # died at serialization (a wall-clock time bomb: the offending
+        # fracture only fires once evidence trust decays past a threshold).
+        # The type-contract fix lives in caie.py; this boundary keeps a
+        # future leak from destroying otherwise-valid work (honest
+        # degradation, warned at the boundary) while preserving exactness:
+        # Fraction(Decimal) is exact.
+        logging.getLogger(__name__).warning(
+            "[_json_serial] Decimal reached the sealed payload (%s) — "
+            "type-contract violation upstream (B-105); encoding exactly "
+            "as Fraction.", obj,
+        )
+        _f = Fraction(obj)
+        return {"__fraction__": True, "num": _f.numerator, "den": _f.denominator}
     raise TypeError(f"Tipo no serializable: {type(obj)!r} — {obj!r}")
 
 

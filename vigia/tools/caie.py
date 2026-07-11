@@ -1489,7 +1489,10 @@ class CrossArtifactIncongruenceEngine:
                 tech_pids = {str(a.metadata.get("pid")).strip() for a in technical if a.metadata.get("pid") is not None}
                 pid_overlap = log_pids & tech_pids
 
-                severity = _dround(0.95 if pid_overlap else 0.75, _DETERMINISTIC_INTERNAL_PREC)
+                # B-105: Fracture.severity is declared float; _dround returns
+                # Decimal, which crashes the agent's canonical serializer when
+                # this fracture fires. Exact literals need no rounding.
+                severity = 0.95 if pid_overlap else 0.75
 
                 self._fractures.append(Fracture(
                     artifact_a=f"Log evidence asserts outbound network activity",
@@ -2050,7 +2053,13 @@ class CrossArtifactIncongruenceEngine:
                         artifact_a=f"Narrative: {nar.description[:60]}",
                         artifact_b=f"Technical: {tech.description[:60]}",
                         fracture_type="NARRATIVE_POISONING_DETECTED",
-                        severity=_dround(0.85, _DETERMINISTIC_INTERNAL_PREC),
+                        # B-105: severity must be float (dataclass contract) —
+                        # the Decimal from _dround leaked into the sealed
+                        # results and crashed serialization the moment this
+                        # fracture fired (time-gated by trust decay, so the
+                        # crash appeared only once the case evidence aged past
+                        # the raw_score threshold: a wall-clock time bomb).
+                        severity=0.85,
                         interpretation=(
                             "Unverified textual claim of benignity contradicts "
                             "high-confidence technical evidence of malicious activity. "
