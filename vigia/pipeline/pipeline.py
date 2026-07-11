@@ -65,12 +65,20 @@ if _ROOT_PIPELINE not in sys.path:
 _REPO_ROOT = os.path.dirname(os.path.dirname(_ROOT_PIPELINE))
 
 
+_VERIFY_BUNDLE_CACHE = None
+
+
 def _import_verify_bundle():
     """Load verify_bundle from <repo>/forensics/verify_ebs_v1.py by explicit path.
 
     Import-order independent: uses importlib with the file path instead of the
     shadowable top-level package name "forensics" (see _REPO_ROOT note above).
+    Cached after the first load — repeated verification in a batch loop must
+    not re-execute the verifier module per bundle (review follow-up).
     """
+    global _VERIFY_BUNDLE_CACHE
+    if _VERIFY_BUNDLE_CACHE is not None:
+        return _VERIFY_BUNDLE_CACHE
     import importlib.util
 
     script = os.path.join(_REPO_ROOT, "forensics", "verify_ebs_v1.py")
@@ -88,7 +96,8 @@ def _import_verify_bundle():
         raise ImportError(f"Standalone verifier not loadable: {script}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.verify_bundle
+    _VERIFY_BUNDLE_CACHE = module.verify_bundle
+    return _VERIFY_BUNDLE_CACHE
 
 
 # B-098/B-102: calibrator path resolution is shared with LikelihoodEngine —
@@ -396,6 +405,17 @@ class VigiaPipeline:
         # and anomalous input alike (82-97% of genuine N(0,1) samples at
         # n=4..50) and by construction could not detect a shift (both halves
         # share it). Replaced by the chi2-gated analytic-reference PSI.
+        # B-110: full provenance of the applied drift is recorded and returned
+        # BESIDE the seal (result["drift_provenance"], 5.1 doctrine: narrative/
+        # audit companions live next to the sealed payload, never inside it) —
+        # an examiner can now distinguish "PSI barely above the chi2 null"
+        # from "PSI far above it" and see WHICH source produced the sealed D.
+        # Moving this INTO the sealed payload is an ebs_v1 schema decision
+        # (R3-2 compat) left to the maintainer.
+        drift_provenance: Dict[str, Any] = {
+            "requested_external": float(drift_score),
+            "source": "external_fallback",
+        }
         try:
             z_vals = []
             for s in signals:
@@ -403,25 +423,33 @@ class VigiaPipeline:
                 if isinstance(z, (int, float)) and z == z:  # no NaN
                     z_vals.append(float(z))
             from vigia.core.risk_bounded_layer import RiskBoundedDecisionLayer as _RBL
-            _internal_drift = _RBL.internal_drift_from_z_scores(z_vals)
-            if _internal_drift is None:
+            _drift_details = _RBL.internal_drift_details(z_vals)
+            if _drift_details is None:
                 logger.info(
                     "[Pipeline] H27: PSI indeterminate with n=%d finite signals "
                     "(<4) — using external drift %.4f (documented degradation, "
                     "B-099/L-053).",
                     len(z_vals), drift_score,
                 )
+                drift_provenance["reason"] = "indeterminate_below_4_finite_signals"
             else:
+                _internal_drift = _drift_details["drift"]
                 if abs(_internal_drift - drift_score) > 0.1:
                     logger.warning(
                         "[Pipeline] H27: internally recomputed drift (%.4f) differs "
-                        "from external drift (%.4f) by more than 0.1. "
+                        "from external drift (%.4f) by more than 0.1 "
+                        "(raw_psi=%.6f null_95=%.6f). "
                         "Using internal drift — the external one may be manipulated.",
                         _internal_drift, drift_score,
+                        _drift_details["raw_psi"], _drift_details["null_95"],
                     )
                 drift_score = _internal_drift
+                drift_provenance.update(_drift_details)
+                drift_provenance["source"] = "internal_h27"
         except Exception as _drift_exc:
             logger.warning("[Pipeline] H27: drift recomputation failed (%s) — using external drift", _drift_exc)
+            drift_provenance["reason"] = f"recomputation_failed: {type(_drift_exc).__name__}"
+        drift_provenance["applied"] = float(drift_score)
 
         # ── PRE-FILTRO: Lazy Abstraction (VisibleVariablesEngine) ──────────
         # Solo las variables "visibles" para la fase detectada entran al motor
@@ -866,6 +894,7 @@ class VigiaPipeline:
             "intervention":    intervention,
             "verify_quick":    (verify_ok, verify_msg),
             "lazy_filtered":   lazy_filtered_count,
+            "drift_provenance": drift_provenance,  # B-110 — beside the seal
         }
 
 

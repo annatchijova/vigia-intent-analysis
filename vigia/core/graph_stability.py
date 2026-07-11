@@ -180,9 +180,16 @@ class BootstrapSampler:
         self.n_bootstrap = n_bootstrap
         self.seed = seed
         if not _NP_AVAILABLE:
+            # B-109: the old message demanded "numpy+scipy" — the sampler only
+            # needs numpy (declared in requirements.txt). scipy is a separate,
+            # UNDECLARED optional that switches the correlation estimator
+            # (scipy.stats.spearmanr vs the stdlib fallback); installing it
+            # changes a decision-path value (graph stability S) and therefore
+            # requires a signed comparative gate — do not suggest it casually.
             warnings.warn(
                 "[GraphStabilityEngine] numpy no disponible — usando random.Random fallback. "
-                "Este modo NO cumple determinismo Daubert-grade. Instala numpy+scipy.",
+                "Este modo NO cumple determinismo Daubert-grade. Instala numpy "
+                "(declarado en requirements.txt).",
                 RuntimeWarning, stacklevel=2,
             )
 

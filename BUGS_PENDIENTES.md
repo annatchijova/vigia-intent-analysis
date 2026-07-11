@@ -3551,33 +3551,6 @@ Ningún cambio de código sellado. `caie.py` revertido a HEAD (`a021a6a`);
 árbol de trabajo limpio. La comparativa que sustenta esta decisión está
 archivada como artefacto de sesión (baseline vs post, 267 casos).
 
-### Re-confirmación con el dataset Tanda C (2026-07-09, método independiente)
-
-Con el dataset de calibración a nivel señal construido
-(`data/signal_calibration_dataset_20260709.json`, 979 señales EBS etiquetadas),
-se re-midió A4 con un candidato **dataset-driven** — distinto del método por
-analogía de B-069. `spoofability` re-derivada por diagnosticidad (bidireccional:
-tipos enriquecidos en inculpatorio bajan, en benigno suben), `base_weight` sin
-tocar. Harness: `scripts/experiment_a4_profile_refit.py` (solo mide, monkeypatch,
-restaura al salir — **`caie.py` nunca modificado**).
-
-Medido sobre 199 casos del corpus:
-
-| Variante | veredictos movidos | FIXED | BROKEN |
-|---|---|---|---|
-| spoofability realista (K=0.6) | 0 | 0 | 0 |
-| spoofability extrema (K=5.0) | 0 | 0 | 0 |
-| control: spoof=0.15 **+ weight=0.30** | 1 (FAIL→FAIL) | 0 | 0 |
-
-El harness demostrablemente SÍ puede mover veredictos (el control de inflación de
-peso mueve `OWL-NEXUS5-CASE` NOISE→SUSPICION, pero expected=MALICE → sigue
-FAIL→FAIL), así que el resultado 0-flips es real, no un no-op. **Confirmación
-independiente de la conclusión de B-069:** el re-fit de perfiles legacy tiene 0
-upside de corpus; la única palanca que mueve algo (peso) reproduce la inflación
-sin arreglar un caso. El valor restante de A4 es Daubert puro (spoofability
-principiada), y aun así no cambia ningún veredicto. Reclasificado: A4
-corpus-neutro, NO APLICADO. Ver `docs/TANDA_C_SIGNAL_CALIBRATION.md` §6.
-
 ---
 
 ## B-070 — Rol epistémico device/contextual/narrative: cierra el canal composite del FP NGDC-003 (Opción C) [RESUELTO]
@@ -4286,17 +4259,10 @@ sellado), C1/C2 del censo P0-001.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | RESUELTO — el audit-before-patch (2026-07-08) lo encontró ya arreglado por **F8** (la propia tanda de remediación de la auditoría). No hizo falta código nuevo. |
+| **Estado** | RESUELTO (ver header) — nota histórica: no tuvo ID de tracker hasta 2026-07-08 |
 | **Severidad** | P2 |
-| **Archivo** | `vigia_agent.py` (`_seal_bundle`, bloque `sans_compliance`) |
+| **Archivo** | `vigia_agent.py:936-942` |
 | **Detectado en** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, hallazgo **N13** (2026-07-03) |
-
-**Verificación (2026-07-08, audit-before-patch):** el único `accuracy_validation`
-en `vigia_agent.py` ya lee `(s.get("tool") or s.get("source"))` — con el comentario
-inline `# F8 (N13): los adaptadores del shim (vol3, EBS-JSON, mobile) etiquetan la
-herramienta como "source" — aceptar ambos.` La referencia `936-942` era a un layout
-previo del archivo; el chequeo se movió y F8 lo cerró. Ningún bundle de camino
-adaptador da falso negativo en este flag. Cerrado como verificado, no re-parcheado.
 
 **Descripción:** `sans_compliance.accuracy_validation` exige la clave `tool`
 en cada señal para calcular su flag de compliance. Los adaptadores del shim
@@ -4336,26 +4302,10 @@ accuracy_validation, n_primary, n_unanalyzed y n_total.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | RESUELTO — el audit-before-patch (2026-07-08) lo encontró ya arreglado por **F8**, y el camino de fix originalmente propuesto era en sí mismo incorrecto. No hizo falta código nuevo. |
+| **Estado** | RESUELTO (ver header) — nota histórica: no tuvo ID de tracker hasta 2026-07-08 |
 | **Severidad** | P2 |
-| **Archivo** | `vigia/sift/sift_orchestrator.py::_to_signal_safe` (:311) |
+| **Archivo** | `vigia/sift:267-275` |
 | **Detectado en** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, hallazgo **N14** (2026-07-03) |
-
-**Verificación (2026-07-08, audit-before-patch):** `_to_signal_safe` ya no
-descarta en silencio — ante una excepción de `to_signal()` agrega a
-`self._signal_drops` (`# F8 (N14)`, :320), que se surface como
-`results["signal_conversion_drops"]` (lista completa, :883) y
-`pipeline_meta.n_signal_conversion_drops` (conteo, :926). La pérdida es visible
-en el bundle.
-
-**Corrección al camino de fix original:** la entrada proponía emitir una señal
-sintética `*_UNANALYZED`. Eso sería **semánticamente incorrecto** — un fallo de
-conversión `to_signal()` significa que el artefacto *sí* se analizó (el motor
-produjo un resultado) pero la conversión DTO tiene un defecto; representarlo como
-"evidencia no analizada" engañaría. Un contador de drops es la representación
-honesta, distinta de la marca `_UNANALYZED` que F7 usa para motores que
-genuinamente no corrieron. El comportamiento F8 en producción es el diseño
-correcto.
 
 **Descripción:** `_to_signal_safe` captura cualquier excepción lanzada por
 `to_signal()` y retorna `None` con una entrada de log — nada más. La señal se
@@ -4421,26 +4371,10 @@ pinea). 7 tests rojos primero (`TestShimMobileUnanalyzed`). Gate comparativo
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | RESUELTO (impacto de veredicto) — el audit-before-patch (2026-07-08) confirmó que el tag `derived` hace la señal de timeline inerte a todo gate de veredicto. El residual es cosmético. |
-| **Severidad** | P2 → cosmético |
-| **Archivo** | `sift_orchestrator.py` — cableado `UNIFIED_TIMELINE` (:760), `vigia_agent.py::_is_primary_signal` (:101) |
+| **Estado** | RESUELTO (ver header) — nota histórica: no tuvo ID de tracker hasta 2026-07-08. Marcado explícitamente "⏳ abierto" en la propia tabla de estado de la auditoría fuente, ítem **P2-E** |
+| **Severidad** | P2 |
+| **Archivo** | `sift_orchestrator.py` — cableado del motor `UNIFIED_TIMELINE` |
 | **Detectado en** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.2 |
-
-**Verificación (2026-07-08, audit-before-patch):** la señal de timeline se emite
-vía `_mark_derived(...)` (`sift_orchestrator.py:760`), estampando
-`signal_class="derived"`. `_is_primary_signal` (`vigia_agent.py:101`) devuelve
-False para cualquier señal `derived`/`unanalyzed`, y todo gate de veredicto —
-el `≥3` del reasoner, el `<3 → ABSTAIN` de `classify_agent_verdict`, y el
-override L-036 — cuenta solo `n_primary` de `_signal_stats`. Así una derivación
-de timeline (vacía o no) **no puede inflar el conteo de señales ni influir en
-ningún veredicto**. Se renderiza además `[DERIVED]` en la narrativa (:982). La
-marca "⏳ abierto" de la fila §3.2 de la auditoría está stale — precede a F5;
-la tabla de implementación al tope del mismo documento ya lista F5 como ✅.
-
-**Residual (no-defecto):** si `UnifiedTimelineEngine` emite señal o no ante un
-input de timestamp cero es una cuestión cosmética sobre una señal derivada,
-excluida de los gates, etiquetada `[DERIVED]` y sin contenido de timeline — sin
-impacto forense.
 
 **Descripción:** el motor `UNIFIED_TIMELINE` emite una señal derivada
 independientemente de si efectivamente encontró eventos con timestamp
@@ -4461,9 +4395,12 @@ contribuir a un veredicto no-ABSTAIN. Requiere re-verificación contra el
 tagging `signal_class` actual para confirmar si F5 ya cerró esto o si el caso
 específico de timeline vacío todavía se filtra.
 
-**Resultado:** cerrado como RESUELTO-por-F5 para la parte relevante al veredicto,
-exactamente la disposición que el "camino de fix" original anticipaba una vez
-confirmado que el tag `derived` lo excluye.
+**Camino de fix:** re-correr la reproducción de N4/F5 de
+`docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §1 contra el HEAD actual con un caso de
+timestamp cero. Si el tag `derived` ya lo excluye, cerrar como
+RESUELTO-por-F5 y actualizar esta entrada. Si no, condicionar la emisión de
+señal de `UNIFIED_TIMELINE` a `timestamps>0`, o asegurar que el tag `derived`
+también se aplique acá.
 
 **Resolución (2026-07-10):** re-verificación contra HEAD con la reproducción
 que esta entrada exigía (señales SIN timestamp → `build_timeline` →
@@ -4480,7 +4417,12 @@ crasheaba `build_timeline`; la timeline desaparecía del bundle en silencio).
 
 ---
 
-## B-093 — `UnifiedTimelineEngine` crashea con `metadata=None` y la timeline desaparece del bundle en silencio [RESUELTO]
+## B-108 — `UnifiedTimelineEngine` crashea con `metadata=None` y la timeline desaparece del bundle en silencio [RESUELTO]
+
+> **Nota de numeración (2026-07-11, precedente L-029/L-051):** registrado
+> originalmente como B-093 (2026-07-10), en colisión con el B-093 de la banda
+> mobile (2026-07-09, cronológicamente anterior — conserva el número).
+> Renumerado a B-108; los mensajes de commit conservan el número viejo.
 
 | Campo | Valor |
 |-------|-------|
@@ -5024,3 +4966,445 @@ qué" es más defendible que un fallo silencioso repetido en cada corrida del
 corpus), dejar 3 en el backlog de motor separado de la doctrina de scoring,
 y mantener 4 donde está.
 
+## B-106 — Shadowing del paquete `forensics` rompe la verificación de bundles in-process
+
+> **Nota de numeración (2026-07-11, precedente L-029/L-051):** esta entrada se
+> registró originalmente como B-097 en la rama de trabajo, en colisión con el
+> B-097 de `main` (colapso SUSPICION→INTENT en el sellado, firmado por Anna,
+> cronológicamente anterior). Renumerada a B-106 al mergear; los mensajes de
+> commit y los bundles históricos conservan el número viejo — cualquier
+> referencia a "B-097 (shadowing)" en commits de la rama apunta acá.
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/pipeline/pipeline.py` |
+| **Función** | `VigiaPipeline.load_and_verify()`, `VigiaPipeline.verify_bundle_external()` |
+| **Commit fix** | "POST HACKATHON: fix forensics package shadowing in bundle verification (B-097)" (número pre-renumeración; ver nota) |
+| **Detectado en** | Auditoría de pipeline 2026-07-10 (`PIPELINE_AUDIT_2026-07-10.md`, punto 6) |
+
+### Descripción
+
+`vigia/core/bundle_builder.py` (y otros módulos) insertan `<repo>/vigia` en
+`sys.path` en tiempo de import. Con eso, el nombre top-level `forensics`
+resuelve a `vigia/forensics/` — que NO contiene `verify_ebs_v1` — y el
+`from forensics.verify_ebs_v1 import verify_bundle` de `load_and_verify()`
+crashea con `ModuleNotFoundError` en todo proceso fresco que importe el
+pipeline antes que el paquete `forensics/` real (fallo orden-dependiente).
+`verify_bundle_external()` además construía el path del script relativo a
+`vigia/pipeline/` (`vigia/pipeline/forensics/verify_ebs_v1.py`, inexistente),
+por lo que siempre caía al mismo import roto. El fallback del `except
+ImportError` re-insertaba un directorio ya presente en `sys.path` (no-op).
+La hipótesis original del auditor externo ("import circular / no-determinismo")
+fue REFUTADA — no hay ciclo y la resolución es determinística por entry point;
+el bug real es el shadowing orden-dependiente.
+
+### Impacto
+
+- La verificación de bundles desde el pipeline estaba rota en todo proceso
+  fresco. `tests/integration/test_ebs_v1_integration.py` solo sobrevivía por
+  orden accidental de imports intra-archivo.
+- Mitigante: el verificador standalone (`forensics/verify_ebs_v1.py` por CLI)
+  funcionaba independientemente.
+
+### Fix aplicado
+
+`_REPO_ROOT` explícito (dos niveles sobre `vigia/pipeline/`) +
+`_import_verify_bundle()` que carga el verificador por path de archivo con
+`importlib` — resolución determinística e independiente del orden de imports.
+Regresión: `tests/test_pipeline_verify_import_shadowing.py` (subprocess fresco
+con el shadow activo, ambos paths de verificación).
+
+---
+
+## B-098 — H28 (LRCalibrator) funcionalmente muerto por mismatch de nombres + excepts silenciosos
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/pipeline/pipeline.py`, `vigia/core/likelihood_engine.py` |
+| **Función** | `VigiaPipeline.__init__()`, `run_vigia()`, `LikelihoodEngine.__init__()` |
+| **Commit fix** | "POST HACKATHON: revive dead H28 calibrator path and stop swallowing its failures (B-098)" |
+| **Detectado en** | Auditoría de pipeline 2026-07-10 (punto 2) |
+
+### Descripción
+
+H28 derivaba `<nombre>_isotonic.json` desde `calibration_path` con un
+`str.replace` ingenuo y buscaba SOLO ese archivo. Ninguna herramienta del repo
+lo produce: `scripts/run_calibration.py` escribe `calibrated_lr.json` y
+documenta `VigiaPipeline(calibration_path='models/calibrated_lr.json')`. El
+enrichment H28 (posterior calibrado en el bundle + recalibración de z-scores
+en `run_vigia`) estaba muerto con el flujo documentado, invisiblemente: el
+`except` del constructor logueaba "no encontrado" a nivel INFO para CUALQUIER
+fallo (incluido archivo corrupto). Además: el except per-señal de `run_vigia`
+era totalmente silencioso y el log de resumen contaba señales sin calibrar
+como calibradas; `likelihood_engine.py` tenía un `except: pass` literal que
+hacía irrecuperable la causa de una degradación a FALLBACK.
+
+### Impacto
+
+- Con el flujo documentado, el posterior nunca se calibraba (H28 no-op
+  silencioso). Señales mezcladas calibradas/sin calibrar entraban al sellado
+  sin marca ni log honesto.
+
+### Fix aplicado
+
+`_candidate_calibrator_paths()`: derivación suffix-aware (pathlib), variante
+`_isotonic` primero (compat), `calibration_path` mismo como fallback (el flujo
+documentado funciona). Constructor distingue `FileNotFoundError` (INFO,
+degradación documentada) de otras causas (WARNING con causa real); candidato
+corrupto no bloquea al siguiente. `run_vigia` cuenta fallos per-señal y reporta
+"calibradas N/M + primera causa". `likelihood_engine` loguea la causa del
+FALLBACK. Regresión: `tests/test_lr_calibrator_path_resolution.py`.
+Nota de comportamiento: quien pase `calibration_path` ahora obtiene la
+calibración H28 documentada (antes no-op silencioso); flujos default sin
+cambio.
+
+---
+
+## B-099 — Drift interno H27 degenerado: constante 1.0 disfrazada de medición en el decision path
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/pipeline/pipeline.py`, `vigia/core/risk_bounded_layer.py` |
+| **Función** | bloques H27 de `run_full()` y `run_vigia()`; nuevo `RiskBoundedDecisionLayer.internal_drift_from_z_scores()` |
+| **Commit fix** | "POST HACKATHON: replace degenerate H27 internal-drift PSI with chi2-gated analytic estimator (B-099)" |
+| **Detectado en** | Auditoría de pipeline 2026-07-10 (punto 3) |
+
+### Descripción
+
+Los dos bloques H27 computaban un drift interno que saturaba a 1.0 para
+entrada benigna y anómala por igual, y esa constante entraba al decision path
+sellado (D multiplica el riesgo hasta ×3 en `compute_risk` y puede flipear
+ACCEPT→ABSTAIN→REJECT). Medido: el bloque de `run_vigia` (referencia gaussiana
+muestreada con seed 42) saturaba el 100% de 20k muestras N(0,1) genuinas a
+n=2-3 y 67-100% hasta n=50; el split-half de `run_full` saturaba 82-97% y por
+construcción no puede detectar un shift (ambas mitades lo comparten). La
+hipótesis del auditor externo culpaba al seed fijo — REFUTADA: el seed era
+deliberado (determinismo) e irrelevante; la causa real es el `eps=1e-6` de
+`compute_psi` (un bin vacío en una muestra chica dispara PSI > 0.25).
+
+### Impacto
+
+- Sesgo conservador sistemático en Modos 4/CLI/`run_vigia` (riesgo de falso
+  REJECT — Daubert-relevante). El Modo 1 (`vigia_agent.py`) no atraviesa este
+  código. Bundle real observado con `drift_score=1.0` sellado
+  (`VIGIA-REAL-009`).
+
+### Fix aplicado
+
+`internal_drift_from_z_scores()`: referencia analítica por CDF normal (sin
+RNG), suavizado Dirichlet (bins vacíos acotados), y descuento del cuantil 0.95
+del nulo (~χ²(k−1)/n, que solo ya excede la regla 0.25 para n≤~15). Medido:
+falsa saturación ≤2% en datos genuinos; N(2,1) detectado desde n=4 y ~100%
+desde n=8; all-z=5 satura desde n=4. Bajo n=4 el estimador no tiene potencia
+en ninguna dirección → retorna None y ambos callers caen al drift externo
+documentado con log INFO (revierte parcialmente P1-21, umbral 4→2: emitir un
+número sin potencia nunca fue anti-evasión). Regresión:
+`tests/test_h27_internal_drift.py`. Pendiente operacional: re-baseline de
+resultados de corpus producidos con el estimador saturado (ver L-054).
+
+---
+
+## B-100 — Veredicto ABSTAIN cerraba la narrativa con alerta "LOW" de apariencia evaluada
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia_agent.py` |
+| **Función** | `_generate_narrative()` (piso de alerta B-065) |
+| **Commit fix** | "POST HACKATHON: INDETERMINATE alert for ABSTAIN verdicts + startup dep-drift warning (B-100, B-101)" |
+| **Detectado en** | Auditoría de pipeline 2026-07-10 (punto 5); `docs/AUDIT_NARRATIVAS_20260702.md` (FALLO_OCULTO PARCIAL) |
+
+### Descripción
+
+El piso de alerta B-065 cubría MALICE/INTENT/SUSPICION pero no ABSTAIN: un
+caso con `best_hypothesis=PIPELINE_ERROR` (o artefactos sin analizar, o
+señales insuficientes) cerraba con "LOW (per-signal magnitude)..." — un nivel
+de apariencia evaluada sobre evidencia que no fue analizada. 5 bundles
+sellados del corpus presentan esa combinación. La línea de reconciliación
+además afirmaba "hypothesis-level aggregation" cuando no se agregó nada.
+
+### Fix aplicado
+
+ABSTAIN con magnitud LOW presenta ahora
+"INDETERMINATE — ABSTAIN verdict (<hipótesis>): the evidence was not (fully)
+analyzed, so no alert level can be asserted." y una línea de reconciliación
+específica. NOISE genuino conserva LOW (regresión-testeado). Regresión:
+`tests/test_b100_b101_abstain_alert_and_deps.py`.
+
+---
+
+## B-101 — Deriva venv-vs-requirements silenciosa (defusedxml, psutil declaradas pero no instaladas)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO (código) — la instalación en el entorno de ejecución real es operacional |
+| **Archivo** | `vigia_agent.py` |
+| **Función** | nuevo `_warn_missing_critical_deps()` al inicio de `main()` |
+| **Commit fix** | "POST HACKATHON: INDETERMINATE alert for ABSTAIN verdicts + startup dep-drift warning (B-100, B-101)" |
+| **Detectado en** | Auditoría de pipeline 2026-07-10 (punto 5) |
+
+### Descripción
+
+`defusedxml` y `psutil` están declaradas en los tres manifiestos
+(`requirements.txt`, `requirements-ci.txt`, `pyproject.toml`) pero ausentes
+del entorno de ejecución. Post-fix del import guarded (2026-07-03), la
+ausencia de defusedxml degrada honestamente (XML/EVTX → UNANALYZED → ABSTAIN,
+exit 4) pero sin ninguna señal de arranque del PORQUÉ: 10/200 casos del corpus
+perdían su señal XML/EVTX en silencio operacional. 5 bundles sellados pre-fix
+en `results/` aún contienen el PIPELINE_ERROR original (ver L-054).
+
+### Fix aplicado
+
+Chequeo de arranque ruidoso pero NO fatal en `main()`: WARN a stderr por cada
+dependencia crítica declarada y ausente. Se implementó la variante WARN y no
+el abort propuesto originalmente en este registro (línea ~802): abortar
+contradiría el diseño degrade-not-crash ya testeado
+(`tests/test_tanda_a_triage.py`). Regresión:
+`tests/test_b100_b101_abstain_alert_and_deps.py`. Nota: la corrección del
+changelog V07 (describía un fallback `forbid_dtd` inexistente) va en el mismo
+commit.
+
+---
+
+## B-102 — Apilamiento triple de la calibración logística al resucitar H28
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO (detectado por code review adversarial en la misma sesión que lo introdujo) |
+| **Archivo** | `vigia/pipeline/pipeline.py`, `vigia/core/likelihood_engine.py`, `vigia/core/lr_calibration.py` |
+| **Commit fix** | "POST HACKATHON: code review fixes — calibration stacking (B-102), NaN drift (B-103), ABSTAIN alert gaps" |
+| **Detectado en** | Code review de 8 ángulos sobre los fixes de la sesión (B-098..B-101 y B-106) (2026-07-10) |
+
+### Descripción
+
+El fix B-098 resucitó las dos piernas H28 que estaban muertas — sin advertir
+que la capa del `LikelihoodEngine` (viva desde siempre, `likelihood_ratio.py`
+Paso 2) YA aplica `calibrated_log_lr` por señal cuando `mode=CALIBRATED`. Con
+el flujo documentado, la misma sigmoide se aplicaba TRES veces: z-scores
+reescritos en `run_vigia` → log-LRs calibrados de nuevo por el engine →
+posterior re-calibrado por el H28 de `run_full`. Posteriors distorsionados
+respecto al corpus con que se ajustó el calibrador, con
+`lr_calibration_method='logistic_regression'` sellado reclamando un ECE que
+ya no vale. Además los tres loaders resolvían el path de forma divergente
+(el de `run_vigia` sin manejo per-candidato: un `_isotonic` corrupto abortaba
+la calibración entera; el del engine sin resolución de candidatos: layouts
+legacy quedaban en FALLBACK mientras H28 calibraba).
+
+### Fix aplicado
+
+Una sola capa de calibración con fallback explícito: (1) resolución de
+candidatos unificada en `candidate_calibrator_paths()`
+(`vigia/core/lr_calibration.py`), usada por el constructor del pipeline y por
+`LikelihoodEngine` (ahora con catch per-candidato); (2) el H28 de `run_full`
+se gatea por modo del engine — si `CALIBRATED`, no re-calibra y sella
+`lr_calibration_method='engine_calibrated'` (antes sellaba 'uncalibrated'
+aunque el engine calibrara: misreport preexistente); (3) el bloque de
+reescritura de z-scores de `run_vigia` se ELIMINA (era la tercera
+aplicación), junto con su recomputación de drift redundante (run_full la
+rehace y sobreescribe — solo generaba un log contradictorio). Regresión:
+`tests/test_lr_calibrator_path_resolution.py::TestNoDoubleCalibration` y
+`::test_engine_uses_candidate_resolution`.
+
+---
+
+## B-103 — NaN en z-scores se binea como observación extrema y satura el drift
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/core/risk_bounded_layer.py` (`internal_drift_from_z_scores`) |
+| **Commit fix** | mismo commit que B-102 |
+| **Detectado en** | Code review de 8 ángulos sobre B-099 (2026-07-10) |
+
+### Descripción
+
+La semántica de comparación de `min`/`max` de Python con NaN clipeaba
+silenciosamente los NaN al bin superior del estimador B-099: cada
+`z_score=NaN` contaba como observación extrema ≈+3. Medido: 6 z benignos →
+drift 0.0; los mismos 6 + 3 NaN → drift 1.0; `[nan]*4` → 1.0 en vez de
+indeterminado. `run_full` filtraba NaN en su caller (`z == z`) pero
+`run_vigia` no — y `json.loads` acepta el literal `NaN` por default, así que
+un JSON de señales podía inflar el riesgo ×3 con basura.
+
+### Fix aplicado
+
+Filtro de no-finitos (`math.isfinite`) DENTRO del estimador — la defensa vive
+en el único choke point, no en cada caller. Menos de 4 valores finitos →
+None (indeterminado → fallback externo documentado). Regresión:
+`tests/test_h27_internal_drift.py::test_non_finite_values_are_dropped`.
+
+---
+
+## B-104 — Float/libm (math.erf, math.log) en el drift sellado del decision path
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/core/risk_bounded_layer.py` (`internal_drift_from_z_scores`) |
+| **Commit fix** | "POST HACKATHON: bit-for-bit deterministic H27 drift kernel — no libm in the sealed path (B-104)" |
+| **Detectado en** | Code review de 8 ángulos (hallazgo diferido, ángulo convenciones §5.2) |
+
+### Descripción
+
+El estimador B-099 computaba `system_state.drift_score` (valor sellado) vía
+`math.erf` y `math.log` — funciones de libm que no son correctly-rounded y
+pueden diferir en el último bit entre plataformas → digests de bundle
+distintos para el mismo caso (violación del invariante #4 / §5.2 "no float
+in the decision path"). Exposición preexistente (`drift_score` fue siempre
+float), re-comprometida por el rewrite del estimador.
+
+### Fix aplicado
+
+Kernel 100% aritmética entera/racional: probabilidades de referencia N(0,1)
+CONGELADAS como constantes racionales por k (numeradores sobre 10^17, el bin
+central absorbe el residuo → cada fila suma exactamente 1); k por
+`bit_length` (sin log2); binning por conversión exacta float→Fraction; PSI
+vía `_ln_fraction` (reducción de rango por potencias de 2 + serie atanh,
+error máximo 8.9e-16 vs math.log); tabla χ² racional (k clampeado a 12 →
+sin fallback sqrt). El único `float()` final es conversión correctly-rounded
+de un racional exacto. Validación: diferencia máxima 1.7e-15 vs la
+implementación float en 3000 sweeps, cero flips de frontera; tests golden
+pinean los outputs exactos. El PSI crudo ahora se loguea a DEBUG (hallazgo
+de trazabilidad del review).
+
+---
+
+## B-105 — Decimal en severity de fracturas CAIE: bomba de tiempo de reloj que mataba casos al serializar
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/tools/caie.py` (~1374, ~1932), `vigia_agent.py` (`_json_serial`) |
+| **Commit fix** | "POST HACKATHON: fix Decimal severity leak that killed cases at serialization (B-105)" |
+| **Detectado en** | Re-baseline de corpus 2026-07-11 — VIGIA-BREAK-016 selló MALICE a la mañana y devolvió NO_BUNDLE a la tarde con código idéntico |
+
+### Descripción
+
+Dos constructores de `Fracture` pasaban `_dround(...)` — un `Decimal` —
+como `severity`, violando el contrato del dataclass (`severity: float`):
+LOG_VS_MEMORY (0.95/0.75) y NARRATIVE_POISONING_DETECTED (0.85). El
+dataclass crudo viaja al resultado sellado del agente por un path de
+salida (el path de `cross_artifact_analysis` sanitiza a str por separado),
+y el serializador canónico rechaza correctamente tipos desconocidos → el
+caso entero moría con TypeError cuando la fractura disparaba. El disparo
+está gateado por el trust decay temporal de la evidencia → crash
+dependiente del reloj sobre código sin cambios (bisección por worktrees:
+todos los commits incluida la tag de restore crasheaban a la misma hora).
+
+### Fix aplicado
+
+Literales float en ambos constructores (valores exactos, sin redondeo,
+como todos los constructores hermanos) + frontera tolerante en
+`_json_serial`: un Decimal extraviado se codifica EXACTO
+(`Fraction(Decimal)`, convención `__fraction__`) con WARNING que nombra
+la violación de contrato upstream — degradación honesta en vez de
+destruir trabajo válido (§5.3); los tipos desconocidos se siguen
+rechazando. Regresión: `tests/test_b105_decimal_serialization.py`
+(frontera + trigger determinístico de la fractura + caso E2E).
+
+---
+
+## B-107 — `fit_calibration.py` hacía `sys.exit(1)` a nivel de import; harness de integración roto por imports planos post-B-106
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/core/fit_calibration.py`, `tests/integration/test_ebs_v1_integration.py`, `vigia_agent.py` |
+| **Commit fix** | "POST HACKATHON: fit_calibration import must raise, not exit; integration harness qualified imports (B-107)" |
+| **Detectado en** | Intento de correr el harness de integración con numpy recién instalado (2026-07-11) |
+
+### Descripción
+
+Tres hallazgos encadenados al cerrar la deriva venv (numpy y scikit-learn
+declarados en `requirements.txt:20/:46`, ausentes del entorno — clase B-101):
+
+1. **`sys.exit(1)` a nivel de módulo**: los guards de dependencia de
+   `fit_calibration.py` mataban el INTÉRPRETE entero al importar el módulo
+   sin numpy/sklearn — pytest moría con INTERNALERROR SystemExit durante la
+   colección en vez de reportar un error de import por archivo. Un módulo de
+   librería debe hacer raise, no exit. También tenía su propio insert
+   vestigial de `<repo>/vigia` (clase B-106).
+2. **Imports planos rotos por B-106**: el harness de integración
+   (`test_ebs_v1_integration.py`, 7 sitios) usaba `from pipeline import ...`,
+   que solo resolvía por el efecto colateral del insert que B-106 eliminó —
+   7/55 tests en FAIL (`ModuleNotFoundError: pipeline`), invisible al CI
+   porque el harness está excluido del pytest run. Bisección con worktree:
+   55/55 en el tag de restore, 48/55 en HEAD → regresión de la serie,
+   corregida con imports calificados (`vigia.pipeline.pipeline`).
+3. **Grado de análisis dependiente del venv**: sin numpy el
+   GraphStabilityEngine cae a bootstrap con `random.Random` que el propio
+   código marca "NO Daubert-grade"; sin sklearn no hay modo FULL de KDE.
+   Ambos agregados a `_CRITICAL_RUNTIME_DEPS` (con mapeo sklearn→scikit-learn
+   para el hint de pip).
+
+### Gates
+
+Suite 1280 passed / 0 failed; harness de integración 55/55; corpus
+199 casos con numpy y con numpy+sklearn: **0 flips de veredicto** en ambos
+gates (167/199 estable).
+
+---
+
+## B-109 — Cuatro módulos muertos con nombres colisionantes + warning que exigía una dependencia no declarada
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/security.py`, `vigia/vigia_namespace_shim.py`, `vigia/core/pipeline.py`, `vigia/forensics/vision_audit_final.py` (eliminados), `vigia/core/graph_stability.py` |
+| **Commit fix** | "POST HACKATHON: dead-module sweep + drift provenance beside the seal (B-109, B-110)" |
+| **Detectado en** | Barrido de higiene post-L-052 (2026-07-11) |
+
+### Descripción
+
+Cuatro módulos muertos de la clase de riesgo L-052 (qué copia carga no debe
+depender del spelling del import):
+
+1. `vigia/security.py` — shim eclipsado por el paquete `vigia/security/`
+   (los paquetes tienen precedencia): inalcanzable, e importaba un módulo
+   top-level `security` que NO existe — habría crasheado de ser alcanzable.
+2. `vigia/vigia_namespace_shim.py` — sin importers; nombraba engañosamente
+   `_REPO_ROOT` al directorio `vigia/` y admitía placeholders en su docstring.
+3. `vigia/core/pipeline.py` — definía OTRA `class VigiaPipeline` homónima a
+   la real (`vigia/pipeline/pipeline.py`), sin ningún importer vivo.
+4. `vigia/forensics/vision_audit_final.py` — copia vieja de vision_audit,
+   referenciada solo por el shim muerto (2).
+
+Los cuatro eliminados (recuperables de git). Además, el warning del
+BootstrapSampler exigía "Instala numpy+scipy": el sampler solo necesita
+numpy (declarado); scipy NO está declarado en ningún manifiesto y cambiaría
+el estimador de correlación (spearmanr vs fallback stdlib) — un valor del
+decision path (S) que requiere gate comparativo firmado. Texto corregido.
+
+---
+
+## B-110 — Proveniencia del drift H27 y PSI crudo irrecuperables del output
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Archivo** | `vigia/core/risk_bounded_layer.py`, `vigia/pipeline/pipeline.py` |
+| **Commit fix** | mismo commit que B-109 |
+| **Detectado en** | Findings diferidos del code review de 8 ángulos (2026-07-10) |
+
+### Descripción
+
+Dos huecos de trazabilidad Daubert del drift sellado: (a) el PSI crudo era
+irrecuperable de todo output — un examinador no podía distinguir "PSI apenas
+sobre el nulo χ²" de "PSI muy por encima"; (b) el bundle no registraba si el
+`drift_score` sellado provino del recálculo interno H27 o del parámetro
+externo (fallback documentado).
+
+### Fix aplicado
+
+`internal_drift_details()` (el estimador escalar delega en él): drift,
+raw_psi, null_95, n_finite, n_dropped_nonfinite, bins. `run_full` retorna
+`result["drift_provenance"]` — fuente (internal_h27 / external_fallback /
+recomputation_failed), valor solicitado vs aplicado, e intermedios — JUNTO
+al sello, no adentro (doctrina §5.1); meterlo EN el payload sellado es una
+decisión de esquema ebs_v1 (compat R3-2) que queda para la mantenedora.
+También: cache del verificador en `_import_verify_bundle` (no re-ejecutar el
+módulo por bundle en loops de batch). Regresión:
+`tests/test_h27_internal_drift.py::TestDriftDetailsAndProvenance`.

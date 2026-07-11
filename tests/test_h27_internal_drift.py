@@ -121,6 +121,55 @@ class TestInternalDriftUnit:
         assert d1 == d2 == d3
 
 
+class TestDriftDetailsAndProvenance:
+    def test_details_expose_raw_psi(self):
+        # B-110: raw PSI was unrecoverable from any output.
+        import random
+        rng = random.Random(3)
+        zs = [rng.gauss(0, 1) for _ in range(16)]
+        d = RBL.internal_drift_details(zs)
+        assert d is not None
+        assert set(d) == {"drift", "raw_psi", "null_95", "n_finite",
+                          "n_dropped_nonfinite", "bins"}
+        assert d["drift"] == RBL.internal_drift_from_z_scores(zs)
+        assert d["n_finite"] == 16 and d["n_dropped_nonfinite"] == 0
+        assert d["raw_psi"] >= 0.0
+
+    def test_details_indeterminate_matches_scalar_contract(self):
+        assert RBL.internal_drift_details([0.1, 0.2]) is None
+
+    def test_run_full_returns_drift_provenance(self):
+        from vigia.core.ebs_v1 import SignalOutput
+        from vigia.pipeline.pipeline import VigiaPipeline
+
+        pipeline = VigiaPipeline()
+        signals = [
+            SignalOutput(tool_name=f"T{i}", value=0.5, z_score=z, confidence=0.9)
+            for i, z in enumerate([0.4, -0.2, 1.1, 0.3, -0.5])
+        ]
+        result = pipeline.run_full(signals, drift_score=0.7)
+        prov = result["drift_provenance"]
+        assert prov["source"] == "internal_h27"
+        assert prov["requested_external"] == 0.7
+        assert prov["applied"] == result["bundle"].system_state.drift_score
+        assert "raw_psi" in prov and "null_95" in prov
+
+    def test_run_full_provenance_external_fallback(self):
+        from vigia.core.ebs_v1 import SignalOutput
+        from vigia.pipeline.pipeline import VigiaPipeline
+
+        pipeline = VigiaPipeline()
+        signals = [
+            SignalOutput(tool_name="T0", value=0.5, z_score=0.4, confidence=0.9),
+            SignalOutput(tool_name="T1", value=0.5, z_score=-0.2, confidence=0.9),
+        ]
+        result = pipeline.run_full(signals, drift_score=0.25)
+        prov = result["drift_provenance"]
+        assert prov["source"] == "external_fallback"
+        assert prov["reason"] == "indeterminate_below_4_finite_signals"
+        assert prov["applied"] == 0.25
+
+
 class TestPipelineIntegration:
     @staticmethod
     def _sealed_drift(result):

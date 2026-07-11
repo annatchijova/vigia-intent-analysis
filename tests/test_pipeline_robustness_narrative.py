@@ -610,7 +610,7 @@ class TestB090EmptyTimelineExcludedFromGates:
         assert n_primary == 2
 
     def test_none_metadata_signal_does_not_crash_timeline(self):
-        # B-093 (hallazgo adyacente en la reproducción de B-090):
+        # B-108 (ex B-093, renumerado 2026-07-11; hallazgo adyacente en la reproducción de B-090):
         # metadata=None es legal en SignalOutput; sin el guard, UNA señal sin
         # metadata crasheaba build_timeline entero y el wiring tragaba el
         # error — la timeline desaparecía del bundle en silencio. Test

@@ -90,7 +90,7 @@ class UnifiedTimelineEngine:
         for signal in signals:
             ts = self._extract_timestamp(signal)
             entity = self._extract_entity(signal)
-            # B-093: mismo guard isinstance que _extract_timestamp/_entity —
+            # B-108 (ex B-093, renumerado 2026-07-11): mismo guard isinstance que _extract_timestamp/_entity —
             # metadata no-dict (no solo None) tampoco puede crashear el loop.
             meta = signal.metadata if isinstance(signal.metadata, dict) else {}
 
@@ -129,7 +129,7 @@ class UnifiedTimelineEngine:
 
     def _extract_timestamp(self, signal: SignalOutput) -> int:
         """Extrae timestamp de la metadata del signal."""
-        # B-093: metadata=None es legal en SignalOutput (default del contrato
+        # B-108 (ex B-093, renumerado 2026-07-11): metadata=None es legal en SignalOutput (default del contrato
         # EBS v1) — sin el guard, UNA señal sin metadata crasheaba
         # build_timeline entero y el wiring tragaba el error: la timeline
         # desaparecía del bundle en silencio.

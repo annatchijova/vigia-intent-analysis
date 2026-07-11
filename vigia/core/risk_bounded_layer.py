@@ -772,6 +772,27 @@ class RiskBoundedDecisionLayer:
         NaN into the top bin, so unfiltered NaN z-scores counted as extreme
         +3 observations and drove drift to 1.0.
         """
+        details = cls.internal_drift_details(z_scores, alpha=alpha)
+        return None if details is None else details["drift"]
+
+    @classmethod
+    def internal_drift_details(
+        cls,
+        z_scores: List[float],
+        alpha: int = 1,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Full H27 drift computation with its audit-trail intermediates
+        (B-110, review follow-up: the raw PSI was unrecoverable from any
+        output — an examiner auditing why internal and external drift
+        diverged could not distinguish "PSI barely above the chi2 null"
+        from "PSI far above it").
+
+        Returns None when indeterminate (same contract as
+        internal_drift_from_z_scores), else a dict with:
+        drift (float, the sealed value), raw_psi, null_95, n_finite,
+        n_dropped_nonfinite, bins.
+        """
         finite = [float(z) for z in z_scores if math.isfinite(z)]
         n = len(finite)
         if n < 4:
@@ -805,4 +826,11 @@ class RiskBoundedDecisionLayer:
             "[RiskLayer] H27 drift: n=%d k=%d raw_psi=%s null95=%s -> drift=%s",
             n, k, float(psi), float(null_95), float(drift),
         )
-        return float(drift)
+        return {
+            "drift": float(drift),
+            "raw_psi": float(psi),
+            "null_95": float(null_95),
+            "n_finite": n,
+            "n_dropped_nonfinite": len(z_scores) - n,
+            "bins": k,
+        }
