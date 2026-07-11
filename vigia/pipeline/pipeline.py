@@ -81,6 +81,28 @@ def _import_verify_bundle():
     spec.loader.exec_module(module)
     return module.verify_bundle
 
+
+def _candidate_calibrator_paths(calibration_path: Optional[str]) -> List[str]:
+    """Candidate LRCalibrator files for calibration_path, in priority order.
+
+    Historically H28 derived '<name>_isotonic.json' via a naive str.replace
+    and looked ONLY for that file — which no tool in this repo ever produced
+    (scripts/run_calibration.py writes 'calibrated_lr.json'), so the H28
+    enrichment was dead with the documented flow (B-098). The isotonic
+    variant is kept as first candidate for backward compatibility; the
+    calibration_path itself — the file run_calibration.py actually writes —
+    is the fallback that makes the documented flow work.
+    """
+    if not calibration_path:
+        return []
+    from pathlib import Path
+
+    p = Path(calibration_path)
+    variant = str(p.with_name(p.stem + "_isotonic" + p.suffix))
+    if variant == calibration_path:
+        return [calibration_path]
+    return [variant, calibration_path]
+
 from vigia.core.ebs_v1 import (
     SignalOutput, EvidenceGraph, EvidenceEdge,
     DecisionTrace, ForensicBundle, PolicySpec, SystemState,
@@ -230,18 +252,31 @@ class VigiaPipeline:
         self._ollama_model = ollama_model
 
         # H28: LRCalibrator — calibración logística del LR antes de la gobernanza
-        # Carga desde calibration_path con sufijo _isotonic.json.
-        # Si no existe, pipeline corre sin calibrar (documentado en bundle).
+        # Tries '<name>_isotonic<ext>' first (legacy convention), then
+        # calibration_path itself (what scripts/run_calibration.py produces).
+        # A missing file is a documented degradation (INFO); a file that exists
+        # but fails to load is NOT "not found" and is logged as a WARNING with
+        # its real cause (B-098).
         self._lr_calibrator = None
         if _LR_CALIBRATOR_AVAILABLE and LRCalibrator is not None and calibration_path:
-            _iso_path = calibration_path.replace(".json", "_isotonic.json")
-            try:
-                self._lr_calibrator = LRCalibrator.load(_iso_path)
-                logger.info("[VigiaPipeline] H28: LRCalibrator cargado desde %s", _iso_path)
-            except Exception:
+            for _cand in _candidate_calibrator_paths(calibration_path):
+                try:
+                    self._lr_calibrator = LRCalibrator.load(_cand)
+                    logger.info("[VigiaPipeline] H28: LRCalibrator cargado desde %s", _cand)
+                    break
+                except FileNotFoundError:
+                    logger.info("[VigiaPipeline] H28: %s no existe.", _cand)
+                except Exception as _cal_exc:
+                    logger.warning(
+                        "[VigiaPipeline] H28: %s existe pero no se pudo cargar "
+                        "(%s: %s).",
+                        _cand, type(_cal_exc).__name__, _cal_exc,
+                    )
+            if self._lr_calibrator is None:
                 logger.info(
-                    "[VigiaPipeline] H28: %s no encontrado — LR sin calibración logística.",
-                    _iso_path,
+                    "[VigiaPipeline] H28: sin calibrador utilizable para %s — "
+                    "LR sin calibración logística.",
+                    calibration_path,
                 )
 
         # Estado del pipeline
@@ -1349,30 +1384,54 @@ def run_vigia(
     calibrated_signals = signals
     if _LR_CALIBRATOR_AVAILABLE and LRCalibrator is not None:
         try:
-            _cal = LRCalibrator()
-            # Intentar cargar calibrador persistido si existe
-            _cal_path = (calibration_path or "").replace(".json", "_isotonic.json")
-            if _cal_path and __import__("os").path.isfile(_cal_path):
-                _cal = LRCalibrator.load(_cal_path)
-                if _cal._fitted:
-                    # Ajustar z_score de cada señal con el LR calibrado
-                    _adjusted = []
-                    for sig in signals:
-                        try:
-                            _log_lr_cal = _cal.calibrated_log_lr(sig.z_score)
-                            # Reconstruir señal con z_score equivalente al LR calibrado
-                            # z_cal = clip(log_lr_calibrado, -Z_CLIP, Z_CLIP)
-                            _z_cal = max(-6.0, min(6.0, _log_lr_cal))
-                            import dataclasses as _dc
-                            if _dc.is_dataclass(sig):
-                                sig_cal = _dc.replace(sig, z_score=_z_cal)
-                            else:
-                                sig_cal = sig  # fallback si no es dataclass
-                            _adjusted.append(sig_cal)
-                        except Exception:
-                            _adjusted.append(sig)
-                    calibrated_signals = _adjusted
-                    logger.info("[run_vigia] H28: LR calibrado logísticamente (%d señales)", len(calibrated_signals))
+            # Load a persisted calibrator if one exists: legacy '_isotonic'
+            # variant first, then calibration_path itself (B-098 — the old
+            # naive str.replace only ever looked for a file no tool produces).
+            _cal = None
+            for _cal_path in _candidate_calibrator_paths(calibration_path):
+                if os.path.isfile(_cal_path):
+                    _cal = LRCalibrator.load(_cal_path)
+                    logger.info("[run_vigia] H28: LRCalibrator cargado desde %s", _cal_path)
+                    break
+            if _cal is not None and _cal._fitted:
+                # Ajustar z_score de cada señal con el LR calibrado
+                _adjusted = []
+                _failed = 0
+                _first_exc: Optional[BaseException] = None
+                for sig in signals:
+                    try:
+                        _log_lr_cal = _cal.calibrated_log_lr(sig.z_score)
+                        # Reconstruir señal con z_score equivalente al LR calibrado
+                        # z_cal = clip(log_lr_calibrado, -Z_CLIP, Z_CLIP)
+                        _z_cal = max(-6.0, min(6.0, _log_lr_cal))
+                        import dataclasses as _dc
+                        if _dc.is_dataclass(sig):
+                            sig_cal = _dc.replace(sig, z_score=_z_cal)
+                        else:
+                            sig_cal = sig  # fallback si no es dataclass
+                        _adjusted.append(sig_cal)
+                    except Exception as _sig_exc:
+                        # B-098: this except used to be fully silent, and the
+                        # summary log below counted uncalibrated signals as
+                        # calibrated. Honest degradation: count and report.
+                        _failed += 1
+                        if _first_exc is None:
+                            _first_exc = _sig_exc
+                        _adjusted.append(sig)
+                calibrated_signals = _adjusted
+                if _failed:
+                    logger.warning(
+                        "[run_vigia] H28: LR calibrado en %d/%d señales — %d "
+                        "quedaron SIN calibrar y entran mezcladas al sellado "
+                        "(primera causa: %s: %s)",
+                        len(signals) - _failed, len(signals), _failed,
+                        type(_first_exc).__name__, _first_exc,
+                    )
+                else:
+                    logger.info(
+                        "[run_vigia] H28: LR calibrado logísticamente (%d/%d señales)",
+                        len(calibrated_signals), len(signals),
+                    )
         except Exception as _cal_exc:
             logger.warning("[run_vigia] H28: LRCalibrator falló (%s) — usando señales sin calibrar", _cal_exc)
 

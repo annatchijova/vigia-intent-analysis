@@ -5,8 +5,11 @@ Acepta los parámetros extendidos (calibration_path, covariance_path, hint_thres
 y los traduce a la interfaz real de likelihood_ratio.LikelihoodEngine.
 """
 import importlib as _il, sys as _sys, os as _os
+import logging as _logging
 _root = _os.path.dirname(_os.path.dirname(_os.path.dirname(_os.path.abspath(__file__))))
 if _root not in _sys.path: _sys.path.insert(0, _root)
+
+_logger = _logging.getLogger(__name__)
 
 _base_mod = _il.import_module("vigia.core.likelihood_ratio")
 globals().update({k: getattr(_base_mod, k) for k in dir(_base_mod) if not k.startswith("__")})
@@ -100,8 +103,14 @@ class LikelihoodEngine(_BaseLikelihoodEngine):
             try:
                 _lr_cal = _il.import_module("vigia.core.lr_calibration")
                 _calibrator = _lr_cal.LRCalibrator.load(calibration_path)
-            except Exception:
-                pass
+            except Exception as _exc:
+                # B-098: this was a bare 'except: pass' — the cause of a
+                # FALLBACK-mode degradation was unrecoverable from the logs.
+                _logger.warning(
+                    "[LikelihoodEngine] calibrador no cargado desde %s "
+                    "(%s: %s) — modo FALLBACK.",
+                    calibration_path, type(_exc).__name__, _exc,
+                )
 
         super().__init__(z_cap=z_cap, calibrator=_calibrator)
         self.hint_threshold_reject = hint_threshold_reject
