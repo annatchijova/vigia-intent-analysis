@@ -631,3 +631,77 @@ class RiskBoundedDecisionLayer:
         """Normaliza PSI a [0, 1] para usar en compute_risk."""
         # PSI > 0.25 → drift severo (score = 1.0)
         return min(1.0, psi / 0.25)
+
+    # chi-square 0.95 quantiles by degrees of freedom, for the H27 null gate.
+    # Fallback for uncovered df: df + 2*sqrt(2*df) (normal approximation).
+    _CHI2_95 = {
+        2: 5.991, 3: 7.815, 4: 9.488, 5: 11.070, 6: 12.592,
+        7: 14.067, 8: 15.507, 9: 16.919, 10: 18.307,
+    }
+
+    @classmethod
+    def internal_drift_from_z_scores(
+        cls,
+        z_scores: List[float],
+        alpha: float = 1.0,
+    ) -> Optional[float]:
+        """
+        H27 internal drift: PSI of the case's z-scores against the analytic
+        standard normal N(0,1), gated by the PSI null distribution (B-099).
+
+        Replaces two degenerate estimators that both saturated to drift=1.0
+        for benign and anomalous input alike at forensic sample sizes
+        (measured: 100% of 20k genuine N(0,1) samples at n=2-3, 67-100% up to
+        n=50 for the seed-42 sampled reference; 82-97% for the split-half
+        variant, which additionally cannot detect a shift at all because both
+        halves share it):
+
+        - Reference probabilities are computed from the normal CDF per bin —
+          no RNG, no sampling noise, fully deterministic.
+        - Actual proportions use Dirichlet smoothing toward the reference
+          (alpha), so an empty bin contributes a bounded term instead of the
+          eps-blowup that made compute_psi saturate.
+        - Under H0 (no drift) the sampled PSI is approximately chi2(k-1)/n,
+          which alone exceeds the 0.25 large-sample rule for n <= ~15. The
+          0.95 null quantile is subtracted before normalizing, so genuine
+          data yields drift 0 (false-saturation measured <= 2%) while shifted
+          or extreme data still saturates from n=4.
+
+        Returns None when n < 4: below that the test has no power in either
+        direction (even all-z=5 input scores 0), so the honest output is
+        "indeterminate", not a number. Callers must fall back to their
+        documented external drift and log the degradation.
+        """
+        n = len(z_scores)
+        if n < 4:
+            return None
+
+        k = max(3, math.ceil(1.0 + math.log2(n)))
+        lo, hi = -3.0, 3.0
+        width = (hi - lo) / k
+
+        def _phi(x: float) -> float:
+            return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
+
+        # Reference bin probabilities from N(0,1); tails folded into end bins
+        # to mirror the clipping of the actual values below.
+        p_ref = []
+        for i in range(k):
+            p_lo = 0.0 if i == 0 else _phi(lo + i * width)
+            p_hi = 1.0 if i == k - 1 else _phi(lo + (i + 1) * width)
+            p_ref.append(p_hi - p_lo)
+
+        counts = [0] * k
+        for z in z_scores:
+            zc = max(lo, min(hi - 1e-12, float(z)))
+            counts[min(k - 1, int((zc - lo) / width))] += 1
+
+        psi = 0.0
+        for i in range(k):
+            p_act = (counts[i] + alpha * p_ref[i]) / (n + alpha)
+            psi += (p_act - p_ref[i]) * math.log(p_act / p_ref[i])
+
+        df = k - 1
+        chi2_95 = cls._CHI2_95.get(df, df + 2.0 * math.sqrt(2.0 * df))
+        null_95 = chi2_95 / n
+        return min(1.0, max(0.0, psi - null_95) / 0.25)

@@ -397,21 +397,25 @@ class VigiaPipeline:
         # la Risk Bounded Layer, el pipeline lo detecta y lo sobreescribe con el
         # drift calculado desde las propias señales.
         # El drift_score externo solo se usa si no hay señales suficientes para calcular.
-        _internal_drift = drift_score  # fallback si no hay suficientes señales
+        # B-099: the previous split-half PSI saturated to drift=1.0 for benign
+        # and anomalous input alike (82-97% of genuine N(0,1) samples at
+        # n=4..50) and by construction could not detect a shift (both halves
+        # share it). Replaced by the chi2-gated analytic-reference PSI.
         try:
             z_vals = []
             for s in signals:
                 z = s.z_score if hasattr(s, "z_score") else s.get("z_score", 0.0)
                 if isinstance(z, (int, float)) and z == z:  # no NaN
                     z_vals.append(float(z))
-            if len(z_vals) >= 4:
-                from vigia.core.risk_bounded_layer import RiskBoundedDecisionLayer as _RBL
-                # Usar la mitad de las señales como "referencia" y la otra como "actual"
-                # — aproximación válida para Daubert: deriva el drift de los datos del caso
-                half = len(z_vals) // 2
-                _internal_drift = _RBL.psi_to_drift_score(
-                    _RBL.compute_psi(z_vals[:half], z_vals[half:])
+            from vigia.core.risk_bounded_layer import RiskBoundedDecisionLayer as _RBL
+            _internal_drift = _RBL.internal_drift_from_z_scores(z_vals)
+            if _internal_drift is None:
+                logger.info(
+                    "[Pipeline] H27: PSI indeterminado con n=%d señales (<4) — "
+                    "usando drift externo %.4f (degradación documentada B-099).",
+                    len(z_vals), drift_score,
                 )
+            else:
                 if abs(_internal_drift - drift_score) > 0.1:
                     logger.warning(
                         "[Pipeline] H27: drift recalculado internamente (%.4f) difiere "
@@ -1346,31 +1350,40 @@ def run_vigia(
     # para anular la Risk Bounded Layer. El drift se recalcula desde los z-scores
     # reales de las señales usando PSI. El parámetro externo se usa solo como
     # fallback documentado cuando no hay suficientes señales para PSI.
+    # B-099: the previous estimator (seed-42 sampled gaussian reference fed to
+    # compute_psi) saturated to drift=1.0 for benign and anomalous input alike
+    # (100% of 20k genuine N(0,1) samples at n=2-3, 67-100% up to n=50) — a
+    # constant disguised as a measurement, sealed into the decision path.
+    # Replaced by the chi2-gated analytic-reference PSI. This partially
+    # reverts P1-21 (threshold 4→2): below n=4 the estimator has no power in
+    # either direction (even all-z=5 input scored 0), so emitting a number
+    # there was never anti-evasion — the honest output is "indeterminate" plus
+    # the documented external-drift fallback.
     internal_drift = drift_score  # fallback documentado
-    # P1-21: umbral bajado de 4 a 2 — atacante no puede evadir con 3 señales
-    if len(signals) >= 2:
-        try:
-            from vigia.core.risk_bounded_layer import RiskBoundedDecisionLayer
-            z_scores = [s.z_score for s in signals if hasattr(s, "z_score")]
-            # Referencia: distribución gaussiana estándar en [-3, 3]
-            import random as _rand
-            _rng = _rand.Random(42)
-            reference = [_rng.gauss(0, 1) for _ in range(max(len(z_scores) * 3, 30))]
-            reference = [max(-3.0, min(3.0, v)) for v in reference]
-            psi = RiskBoundedDecisionLayer.compute_psi(reference, z_scores)
-            internal_drift = RiskBoundedDecisionLayer.psi_to_drift_score(psi)
+    try:
+        from vigia.core.risk_bounded_layer import RiskBoundedDecisionLayer
+        z_scores = [s.z_score for s in signals if hasattr(s, "z_score")]
+        _recalc = RiskBoundedDecisionLayer.internal_drift_from_z_scores(z_scores)
+        if _recalc is None:
+            logger.info(
+                "[run_vigia] H27: PSI indeterminado con n=%d señales (<4) — "
+                "usando drift externo %.4f (degradación documentada B-099).",
+                len(z_scores), drift_score,
+            )
+        else:
+            internal_drift = _recalc
             if abs(internal_drift - drift_score) > 0.15:
                 logger.warning(
-                    "[run_vigia] H27: drift externo=%.4f difiere del recalculado=%.4f "
-                    "(PSI=%.4f). Usando drift recalculado internamente.",
-                    drift_score, internal_drift, psi,
+                    "[run_vigia] H27: drift externo=%.4f difiere del recalculado=%.4f. "
+                    "Usando drift recalculado internamente.",
+                    drift_score, internal_drift,
                 )
-        except Exception as _drift_exc:
-            logger.warning(
-                "[run_vigia] H27: no se pudo recalcular drift (%s) — "
-                "usando parámetro externo %.4f como fallback.",
-                _drift_exc, drift_score,
-            )
+    except Exception as _drift_exc:
+        logger.warning(
+            "[run_vigia] H27: no se pudo recalcular drift (%s) — "
+            "usando parámetro externo %.4f como fallback.",
+            _drift_exc, drift_score,
+        )
 
     # Inicializar pipeline
     pipeline = VigiaPipeline(
