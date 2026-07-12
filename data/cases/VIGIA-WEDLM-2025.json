@@ -3,7 +3,7 @@
   "case_name": "WeDLM-main — Python LLM evaluation framework for academic benchmarks",
   "schema_version": 1,
   "description": "ZIP archive WeDLM-main.zip (SHA-256: edf227d6d95fde1d1b8e92047eaafe6e40322a8b007202793acb38cdefb99d64) containing a Python LLM evaluation framework dated 2025-12-30. Structure: evaluation/dataset_download/ with benchmark download scripts for ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag; README.md (9.7KB), MANIFEST.in. The '-main' suffix indicates a GitHub archive. The benchmark names (ARC, GPQA, GSM8K, HumanEval, MATH, MBPP, MMLU, HellaSwag) are all publicly documented academic LLM evaluation datasets. This is a research/academic software project with no malicious indicators.",
-  "expected_verdict": "ABSTAIN",
+  "expected_verdict": "NOISE",
   "expected_confidence": 0.95,
   "expected_mitre_ttps": [],
   "peirce_chain": {
@@ -91,7 +91,7 @@
   "caie_fractures": [],
   "source_dataset": "VIGÍA Real Evidence Corpus — Academic/Research Software",
   "source_origin": "github_archive",
-  "_expected_verdict_correction_note": "Corregido de 'NOISE' a 'ABSTAIN' el 2026-07-02: n_signals<3 con is_conclusive=False activa el gate anti-falso-negativo de classify_agent_verdict() (226bec1). ABSTAIN es el veredicto honesto para evidencia con menos de 3 señales, no un error del agente.",
+  "_expected_verdict_correction_note": "Revertido de ABSTAIN a NOISE el 2026-07-12 (Anna, ground-truth owner): proyecto benigno verificado (framework academico Python para benchmarks LLM). El gate n_signals<3 aplicaba ABSTAIN de forma demasiado conservadora a evidencia sin ambiguedad real. El motor ya sella NOISE correctamente.",
   "signals": [
     {
       "artifact_id": "WEDLM-ART-001",
