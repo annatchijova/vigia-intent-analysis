@@ -96,9 +96,11 @@ class TestB065IntentFloor:
             assert "No significant anomalies" not in nar
 
     def test_abstain_verdict_not_floored(self):
-        # ABSTAIN no es MALICE/INTENT: la magnitud se reporta tal cual.
+        # B-100: ABSTAIN emits INDETERMINATE + Reconciliation to honestly
+        # document that the per-signal magnitude level describes only the
+        # analyzed portion, not the unanalyzed evidence.
         res = _results("ABSTAIN_DETECTED", "0/1", False)
         assert classify_agent_verdict(res["abduction"], 4) == "ABSTAIN"
         nar = _narrative(res)
-        assert "LOW (per-signal magnitude)" in nar
-        assert "Reconciliation:" not in nar
+        assert "INDETERMINATE" in nar
+        assert "Reconciliation:" in nar
