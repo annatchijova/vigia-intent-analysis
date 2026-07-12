@@ -8,7 +8,14 @@ medición propia corpus-wide. Convención de conteo: **/193 case_ids únicos**
 (referencia oficial; el /199 son archivos, incluye la lista BREAK_001-010 y 5
 case_id duplicados).
 
-**Baseline al empezar la sesión: 155/193. Tras este trabajo: 161/193 (+6).**
+**Baseline al empezar la sesión: 155/193. Tras este trabajo: 163/193 (+8).**
+
+> **Actualización (segunda tanda, misma sesión):** se agregaron 2 detectores
+> TTP más (§3.1, commit `c64cf5c`): `CLAIM_VS_RECORD_FABRICATION` (case_108) y
+> extensión de `DOCUMENT_FORGERY` por date-regex-substitution (case_094).
+> 161 → 163, cero roturas, ambos verificados FP-safe. Quedan como **decisión
+> tuya, no aplicados** los data-fixes MAGNET-2020 y DEMO — ver §3.2 (razones
+> abajo). Suite 1243 passed.
 
 ---
 
@@ -73,30 +80,29 @@ inalcanzable — esto lo hace alcanzable vía evidencia real, sin label-leak.
 
 ## 3. DIFERIDO — recuperable pero requiere tu decisión / próxima sesión
 
-### 3.1 Dos TTP nuevos más estrechos (B-115), verificados FP-safe
+### 3.1 Dos TTP nuevos más estrechos (B-115) — IMPLEMENTADO (commit c64cf5c)
 
-| Fractura candidata | Keys on | Recupera | Por qué diferido |
+| Fractura | Keys on | Recupera | Nota |
 |---|---|---|---|
-| `CLAIM_VS_RECORD_FABRICATION` | `claimed_*==True ∧ *_found==False` | case_108 (+ fusion_agresion) | Patrón real (corroboración afirmada refutada por el registro) pero más estrecho; decidir si vale como golden rule general |
-| `DOCUMENT_FORGERY_MASS` | `modification_pattern=='date_regex_substitution'` | case_094 | **Solapa** el tipo existente `DOCUMENT_FORGERY`; conviene unificar en vez de agregar tipo nuevo |
+| `CLAIM_VS_RECORD_FABRICATION` (nuevo) | `claimed_*==True ∧ *_found==False` en el mismo artefacto | case_108 | Patrón general de coartada fabricada; FP-safe (fusion_agresion ya pasaba, sigue) |
+| `DOCUMENT_FORGERY` (extendido, sin tipo nuevo) | `modification_pattern=='date_regex_substitution'` | case_094 | Se unificó con el tipo existente en vez de crear `DOCUMENT_FORGERY_MASS` — evita duplicar catálogo |
 
-Ambos FP-safe (N=1/2, cero roturas). Los dejé fuera del batch por ser más
-específicos y (el segundo) por solapamiento — no por riesgo. Decisión tuya si
-entran tal cual o refactorizados.
+Ambos verificados FP-safe (161→163, cero roturas). Recuperan por la señal real
+(coartada refutada por el registro / masa de docs con fechas reescritas por
+script), no por el TCV fósil removido. Salieron de KNOWN_PENDING.
 
-### 3.2 Data-fixes (ediciones de datos, no de motor) — verificados
+### 3.2 Data-fixes — DECISIÓN TUYA (medidos, NO aplicados)
 
-| Caso | Defecto | Fix medido | Resultado |
+Los dejé sin aplicar a propósito: son ediciones de datos sellados con
+sensibilidad que preferí no resolver solo (mismo criterio que CAN-008/047:
+medir → presentar → tu aprobación → aplicar).
+
+| Caso | Defecto | Fix medido | Por qué NO lo apliqué solo |
 |---|---|---|---|
-| MAGNET-2020 | La tabla Volatility `netscan` (red en memoria) está tipada `log_entry` por pérdida de conversión | retipar a tipo de red | → MALICE (score 0.3297→cruza; INTENT acepta MALICE). FP-safe (1 solo cambio) |
-| DEMO-004/007/009 | La copia ganadora bajo dedupe es `converted/` (lossy: aplanó `evidence_type` a log_entry, perdió dominio de red) | dedupe canonical-first, o borrar las copias converted/ lossy | +3, FP-safe (verificado: agreement 156→159 en ese harness) |
-| LINUX-008 | Mismo masquerade del hermano 006, pero declarado en **texto libre** de la descripción, no en metadata | agregar `malicious_path`/`legitimate_path` a su metadata (mirroring 006) → PROCESS_MASQUERADE dispara | Autoría de metadata nueva — más discutible; NO aplicado |
-| MAGNET-2014-TIMELINE | 4 artefactos tipados `file_timestamp` → un solo dominio; RECOVERABLE-RISKY | retipar docx/prefetch | FP-safe pero retipo debatible; diferido |
-
-Recomendación: MAGNET-2020 y DEMO-004/007/009 son data-fixes limpios (corrigen
-pérdida de conversión, como el subgrupo C) — aplicables con el mismo protocolo
-de medición aislada. LINUX-008 y TIMELINE son más discutibles (autoría de
-metadata / retipo dudoso) — tu decisión.
+| **MAGNET-2020** | La tabla Volatility `netscan` (MAG2020W-007, conexiones de red en memoria) está tipada `log_entry` por pérdida de conversión | retipar `MAG2020W-007` a `network_flow` → **MALICE 0.3546** (rama cross-domain; INTENT acepta MALICE). FP-safe (1 solo cambio) | Es el **caso gatillo de B-114** con historia sensible: su propia narrativa dice *"INTENT sin ocultamiento… no external compromise"*. El retipo es legítimo (netscan ES red), pero empujarlo a MALICE contradice la doctrina declarada del caso. Vos decidís si el retipo correcto justifica la over-severity que el comparador tolera. |
+| **DEMO-004/007/009** | Enredo de duplicados: `converted/VIGIA-2026-DEMO-00X.json` y un gemelo canónico con OTRO stem (`case_006_false_flag_demo`, `case_009_insomnio_tactico_es`) comparten `case_id`; find_cases dedupea por stem, el snapshot por case_id last-wins | elegir el gemelo canónico (no-lossy) como ganador, o borrar las copias converted/ lossy | Es **higiene de corpus**, no motor — el dossier (§4) ya marcó "decidir cuál duplicado es canónico antes de cualquier freeze". Requiere resolver los 5 duplicados de forma consistente, no caso por caso. Merece su propia mini-sesión de hygiene. |
+| LINUX-008 | Mismo masquerade del hermano 006, pero en **texto libre** de la descripción, no en metadata | agregar `malicious_path`/`legitimate_path` a su metadata (mirroring 006) | Autoría de metadata NUEVA (no corrección de tipo) — más cerca de fitting. Diferido. |
+| MAGNET-2014-TIMELINE | 4 artefactos `file_timestamp` → un solo dominio; RECOVERABLE-RISKY | retipar docx/prefetch | Retipo debatible; diferido. |
 
 ---
 
@@ -138,22 +144,24 @@ un **hueco de ground-truth**, no un error de motor. Decisión: etiquetar el caso
 
 ---
 
-## 7. Resumen de decisiones que te quedan (para las próximas 2 sesiones)
+## 7. Resumen de decisiones que te quedan (para las próximas sesiones)
 
-1. **Data-fixes limpios** (MAGNET-2020 netscan retype; DEMO-004/007/009 dedupe
-   canonical-first): +4 más, mismo protocolo de medición aislada. ¿Aplico?
-2. **case_108 / case_094**: ¿agrego CLAIM_VS_RECORD_FABRICATION y unifico
-   DOCUMENT_FORGERY_MASS con el DOCUMENT_FORGERY existente? +2.
+1. **MAGNET-2020 netscan retype** (+1): retipo legítimo, pero el caso tiene
+   doctrina INTENT-sin-ocultamiento — ¿aplico el retipo aunque empuje a MALICE?
+   (§3.2). Tu decisión por la sensibilidad B-114.
+2. **DEMO-004/007/009 hygiene** (+3): resolver los 5 case_id duplicados de forma
+   consistente (mini-sesión de higiene de corpus, §3.2).
 3. **B-115 data repair (D-2)**: re-anclar `metadata.*_time` en los ~26 casos
-   canonical_v2. Independiente de esto; algunos B-115 solo se recuperan así.
+   canonical_v2. Independiente; algunos B-115 restantes solo se recuperan así.
 4. **Reetiquetas de doctrina** (case_024→SUSPICION, CTF-Eli→etiqueta,
-   JESS/RAFAEL como INTENT-honesto-SUSPICION): decisiones de anotación, no de
-   motor.
+   JESS/RAFAEL como INTENT-honesto-SUSPICION): anotación, no motor.
 5. **Dejar quietos** los UNFIXABLE (§5) — recuperarlos sería forzar.
 
-Techo realista de agreement sin forzar y sin tocar labels: **~165-167/193**
-(161 actual + 4 data-fixes + 2 TTP estrechos). El resto son decisiones de
-doctrina/etiqueta o genuinamente ABSTAIN/SUSPICION correctos.
+Techo realista sin forzar y sin tocar labels: **~167/193** (163 actual + 1
+MAGNET-2020 + 3 DEMO). El resto son decisiones de doctrina/etiqueta o
+genuinamente ABSTAIN/SUSPICION correctos. **Implementado esta sesión: +8
+(155→163), 5 detectores TTP nuevos + 1 gate ABSTAIN + rúbrica CAN-008/047, todo
+FP-safe verificado, cero golden rules removidas.**
 
 ---
 
