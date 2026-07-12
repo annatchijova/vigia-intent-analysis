@@ -8,7 +8,7 @@
       "evidence_type": "memory_process",
       "source_tool": "sift_volatility",
       "timestamp": "2026-05-19T14:30:00Z",
-      "raw_score": 0.07,
+      "raw_score": 0.88,
       "prior_trust": 0.95,
       "provenance_chain": [
         "sha256:mem026a"
@@ -29,7 +29,7 @@
     },
     {
       "artifact_id": "a026_network",
-      "evidence_type": "ip_geolocation",
+      "evidence_type": "network_flow",
       "source_tool": "sift_netflow",
       "timestamp": "2026-05-19T14:30:00Z",
       "raw_score": 0.82,
@@ -57,7 +57,7 @@
       "evidence_type": "log_entry",
       "source_tool": "sift_syslog",
       "timestamp": "2026-05-19T14:30:00Z",
-      "raw_score": 0.07,
+      "raw_score": 0.8,
       "prior_trust": 0.4,
       "provenance_chain": [
         "sha256:log026c"
@@ -172,6 +172,17 @@
       }
     }
   ],
+  "_rescore_note": {
+    "date": "2026-07-12",
+    "operation": "Sesión de re-puntuación (docs/RESCORING_SESSION_SCOPE_20260712.md) — retipado D-5 + rúbrica raw_score aplicados ATÓMICAMENTE (regla del scope: nunca por separado)",
+    "changes": {
+      "a026_process": "raw_score 0.07 -> 0.88 (rúbrica: sección .text RWX con hollowed=true; gemelo CAN-038 autorado 0.90 para la misma señal física; comparables 0.85/0.88 — docs/RUBRIC_RAW_SCORE_20260712.md)",
+      "a026_network": "ip_geolocation -> network_flow (conexión TCP de netflow; la geolocalización es atributo, no el artefacto; D-5)",
+      "a026_parent": "raw_score 0.07 -> 0.80 (rúbrica: parent rundll32 en vez de services.exe; comparables FN-003 0.88, case_020 0.85; el descuento de canal-log vive en el profile sp=0.85, no en raw)"
+    },
+    "measured": "aislado con motor real antes de aplicar: SUSPICION 0.1909 (post-M2) -> MALICE 0.4233 vía rama cross-domain (4 dominios, 4 artefactos), CERO fracturas, boost 0.0 — veredicto por composite limpio. Los raw previos 0.07 afirmaban semánticamente 'observación limpia' de las señales duras del hollowing (inversión de autoría).",
+    "note": "El bloque 'signals' NO se modifica: preserva el snapshot del bundle sellado pre-corrección (ver _migration_note)."
+  },
   "_migration_note": {
     "date": "2026-07-06",
     "source": "results/agent_batch/VIGIA-CAN-047_agent_bundle.json",

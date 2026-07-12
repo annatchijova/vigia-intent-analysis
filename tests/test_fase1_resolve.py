@@ -73,12 +73,28 @@ class TestBlindGate:
     que el motor canónico clasifica MALICE."""
 
     def test_nolabel_case_is_not_dismissed_as_noise(self, monkeypatch):
+        # M2 update (2026-07-12): the fixture is a label-stripped copy of
+        # case_090 (subgroup C), whose historical MALICE 0.5553 rode the
+        # FALSE_FLAG_PATTERN fossil; the canonical motor now says SUSPICION
+        # pending the raw re-scoring session. The invariant under test is
+        # label-blindness + no benign collapse, so the expectation follows
+        # the canonical motor dynamically instead of freezing one era's
+        # verdict (it tracks the re-score automatically).
+        from vigia_scorer import _vigia_score
+
+        blind = json.loads(RT_NOLABEL.read_text(encoding="utf-8"))
+        blind.pop("expected_verdict", None)
+        motor_verdict = _vigia_score(blind)["verdict"]
+        assert motor_verdict not in ("NOISE", "ERROR"), (
+            f"fixture degenerated: canonical motor says {motor_verdict}"
+        )
         res = _adapter(monkeypatch, "motor", RT_NOLABEL)
         hyp = res["abduction"]["best_hypothesis"]
-        assert hyp == "MALICIOUS_INTENT_DETECTED", (
-            f"RT-NOLABEL-001 (motor ciego: MALICE 0.5553) produjo '{hyp}' — "
+        assert hyp == so._MOTOR_HYPOTHESIS_MAP[motor_verdict], (
+            f"RT-NOLABEL-001 (motor ciego: {motor_verdict}) produjo '{hyp}' — "
             "el adaptador sigue ciego sin etiqueta (P2-C)."
         )
+        assert hyp != "NO_SEMIOTIC_ANOMALY_DETECTED"
 
     def test_motor_mode_matches_canonical_scorer_on_all_fixtures(self, monkeypatch):
         """resolve() ES la selección del motor: hipótesis == map(veredicto motor)."""
@@ -94,10 +110,17 @@ class TestBlindGate:
 
     def test_resolve_metadata_sealed_for_traceability(self, monkeypatch):
         """Daubert: el bundle debe declarar QUÉ función de selección decidió."""
+        from vigia_scorer import _vigia_score
+
+        blind = json.loads(RT_NOLABEL.read_text(encoding="utf-8"))
+        blind.pop("expected_verdict", None)
+        motor_verdict = _vigia_score(blind)["verdict"]
         res = _adapter(monkeypatch, "motor", RT_NOLABEL)
         meta = res["pipeline_meta"]
         assert meta["ebs_adapter_mode"] == "motor"
-        assert meta["resolve"]["motor_verdict"] == "MALICE"
+        # M2 update (2026-07-12): compare against the live canonical motor
+        # instead of the fossil-era hardcoded MALICE (see BlindGate note).
+        assert meta["resolve"]["motor_verdict"] == motor_verdict
         assert "motor_score" in meta["resolve"]
 
 

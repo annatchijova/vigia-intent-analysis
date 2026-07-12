@@ -5,7 +5,7 @@
   "artifacts": [
     {
       "artifact_id": "a106_01",
-      "evidence_type": "file_hash",
+      "evidence_type": "document_visual",
       "source_tool": "sift_document",
       "timestamp": "2026-01-23T16:30:10Z",
       "raw_score": 0.72,
@@ -30,7 +30,7 @@
     },
     {
       "artifact_id": "a106_02",
-      "evidence_type": "cultural_marker",
+      "evidence_type": "log_entry",
       "source_tool": "sift_mail_gateway",
       "timestamp": "2026-01-23T16:32:45Z",
       "raw_score": 0.9,
@@ -53,7 +53,7 @@
     },
     {
       "artifact_id": "a106_03",
-      "evidence_type": "dns_record",
+      "evidence_type": "log_entry",
       "source_tool": "sift_pcap",
       "timestamp": "2026-01-23T16:32:45Z",
       "raw_score": 0.88,
@@ -75,7 +75,7 @@
     },
     {
       "artifact_id": "a106_04",
-      "evidence_type": "memory_process",
+      "evidence_type": "file_hash",
       "source_tool": "sift_file_audit",
       "timestamp": "2026-01-21T16:30:00Z",
       "raw_score": 0.05,
@@ -178,6 +178,18 @@
       }
     }
   ],
+  "_retype_note": {
+    "date": "2026-07-12",
+    "operation": "D-5 (FOSSIL_HUNT_20260711 §4 F-26, subgrupo C) — retipado de evidence_type en artifacts",
+    "changes": {
+      "a106_01": "file_hash -> document_visual (análisis visual del PDF adulterado; digital_perfection_detected)",
+      "a106_02": "cultural_marker -> log_entry (email por mail gateway)",
+      "a106_03": "dns_record -> log_entry (validación contra base de proveedores)",
+      "a106_04": "memory_process -> file_hash (comparación de hash del PDF original)"
+    },
+    "measured": "aislado con motor real antes de aplicar: MALICE 0.5807 (vía FALSE_FLAG_PATTERN fósil) -> MALICE 0.5834 (vía DOCUMENT_FORGERY, rama cross-domain 3 dominios). FALSE_FLAG_PATTERN deja de disparar.",
+    "note": "El bloque 'signals' NO se modifica: preserva el snapshot del bundle sellado pre-retipado (ver _migration_note)."
+  },
   "_migration_note": {
     "date": "2026-07-06",
     "source": "results/agent_batch/VIGIA-CAN-024_agent_bundle.json",
