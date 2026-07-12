@@ -45,14 +45,18 @@ _HONEST_SUSPICION = ("re-scoring session resolved this case as honest "
                      "reach MALICE); expected_verdict relabel decision "
                      "pending (CAN-026 criterion)")
 KNOWN_PENDING = {
+    # case_004_incompetencia_armamentizada and case_012_camuflaje_simbiotico
+    # were removed from this list on 2026-07-12: the new canonical TTP
+    # detectors (DEFENSE_EVASION_ARTIFACT / PROCESS_INJECTION_ANTIFORENSIC,
+    # docs/CASE_RECOVERY_20260712.md) now fire on their real attack signal, so
+    # they seal MALICE at the motor layer and SUSPICION at the CAIE-tool layer
+    # (both accepted for MALICE-expected). They pass; they must NOT be xfail.
     **{cid: _B115 for cid in (
-        "case_004_incompetencia_armamentizada",
         "case_005_ruido_blanco_distractor",
         "case_007_insomnio_tactico",
         "case_008_paranoia_perimetro",
         "case_009_vacio_quirurgico",
         "case_010_falso_positivo_empatico",
-        "case_012_camuflaje_simbiotico",
         "case_016_auto_gaslighting_sistema",
         "case_020_mimetismo_topografico",
         "case_083_sacrificio_del_peon",

@@ -2065,6 +2065,118 @@ class CrossArtifactIncongruenceEngine:
                         ttp_id="T1565.001",
                     ))
 
+        # ===================================================================
+        # CANONICAL TTP DETECTORS (2026-07-12, docs/CASE_RECOVERY_20260712.md)
+        # Structured-metadata detectors for three canonical anti-forensic /
+        # masquerade IoIs that the engine previously produced no fracture for
+        # (all real cases with genuine multi-domain evidence stalled at
+        # composite 0.30, just under MALICE — the dossier's "fracture-detector
+        # coverage is the sole malicious-side bottleneck" finding). Each keys
+        # ONLY on structured metadata fields (never free text, never
+        # annotation fields), and each maps to a named MITRE TTP that any DFIR
+        # engine should detect independent of this corpus. All three verified
+        # FP-safe corpus-wide (fire only on genuine targets, break zero
+        # currently-correct verdicts).
+        # ===================================================================
+
+        # Rule 12: PROCESS_MASQUERADE
+        # A process whose basename matches a legitimate system binary but whose
+        # directory differs — the canonical masquerade IoI (svchost from
+        # C:\Users\Temp, systemd-logind from /var/tmp). Peirce Thirdness:
+        # borrowing a trusted name to suppress analyst scrutiny.
+        for a in self._artifacts:
+            mal_path = a.metadata.get("malicious_path")
+            leg_path = a.metadata.get("legitimate_path")
+            if not (mal_path and leg_path):
+                continue
+            mal_path, leg_path = str(mal_path), str(leg_path)
+            if (os.path.basename(mal_path) == os.path.basename(leg_path)
+                    and os.path.dirname(mal_path) != os.path.dirname(leg_path)):
+                self._fractures.append(Fracture(
+                    artifact_a=f"Process at anomalous path: {mal_path}",
+                    artifact_b=f"Legitimate system path: {leg_path}",
+                    fracture_type="PROCESS_MASQUERADE",
+                    severity=0.85,
+                    interpretation=(
+                        f"PROCESS MASQUERADE: a process named "
+                        f"'{os.path.basename(mal_path)}' executes from {os.path.dirname(mal_path)} "
+                        f"but the legitimate binary lives in {os.path.dirname(leg_path)}. "
+                        "A system-process name in a non-system path is a structural "
+                        "impossibility for a genuine OS binary, not a misconfiguration. "
+                        "Peirce Thirdness: the HABIT is to borrow a trusted name to "
+                        "suppress analyst scrutiny. MITRE T1036.005 — Masquerading: "
+                        "Match Legitimate Name or Location."
+                    ),
+                    spoofability_delta=_dround(0.85 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1036.005",
+                ))
+
+        # Rule 13: DEFENSE_EVASION_ARTIFACT
+        # Volume Shadow Copy deletion (vssadmin delete shadows — the
+        # pathognomonic ransomware precursor) or host firewall disabled. Both
+        # are deliberate, privilege-requiring anti-forensic / anti-recovery
+        # acts with no benign automated equivalent.
+        for a in self._artifacts:
+            deleted_vsc = a.metadata.get("deleted_vsc") is True
+            fw_off = str(a.metadata.get("firewall_state", "")).strip().lower() == "off"
+            if not (deleted_vsc or fw_off):
+                continue
+            _acts = []
+            if deleted_vsc:
+                _acts.append("Volume Shadow Copies deleted (vssadmin delete shadows)")
+            if fw_off:
+                _acts.append("host firewall disabled")
+            self._fractures.append(Fracture(
+                artifact_a=f"Defense-evasion action: {'; '.join(_acts)}",
+                artifact_b="Baseline: system recovery and perimeter controls intact",
+                fracture_type="DEFENSE_EVASION_ARTIFACT",
+                severity=0.85,
+                interpretation=(
+                    "DEFENSE EVASION: " + "; ".join(_acts) + ". Shadow-copy deletion "
+                    "destroys the primary recovery path (the pathognomonic ransomware "
+                    "precursor) and firewall disable removes perimeter controls — both "
+                    "are deliberate, privilege-requiring acts with no benign automated "
+                    "equivalent. Peirce Thirdness: the HABIT is to remove recovery and "
+                    "detection before acting. MITRE T1490 — Inhibit System Recovery / "
+                    "T1562.004 — Disable or Modify System Firewall."
+                ),
+                spoofability_delta=_dround(0.85 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                ttp_id="T1490",
+            ))
+
+        # Rule 14: PROCESS_INJECTION_ANTIFORENSIC
+        # Process hollowing / injection or a deliberately hidden PID — a
+        # process executing code that is not its on-disk image, or absent from
+        # the userland process list. Requires active manipulation of a running
+        # process; no benign generator.
+        _INJECTION_TECHNIQUES = frozenset({
+            "process_hollowing", "process_injection", "reflective_dll",
+            "thread_hijacking", "process_doppelganging",
+        })
+        for a in self._artifacts:
+            technique = str(a.metadata.get("injection_technique", "")).strip().lower()
+            pid_hidden = a.metadata.get("pid_hidden") is True
+            if technique not in _INJECTION_TECHNIQUES and not pid_hidden:
+                continue
+            _detail = (f"injection technique '{technique}'" if technique in _INJECTION_TECHNIQUES
+                       else "process hidden from the userland process list")
+            self._fractures.append(Fracture(
+                artifact_a=f"Process manipulation: {_detail}",
+                artifact_b="Baseline: process executes its on-disk image and is listed",
+                fracture_type="PROCESS_INJECTION_ANTIFORENSIC",
+                severity=0.85,
+                interpretation=(
+                    f"PROCESS INJECTION / HIDING: {_detail}. The process executes code "
+                    "that is not its legitimate on-disk image, or has been unlinked from "
+                    "the process list — active, privilege-requiring manipulation of a "
+                    "running process with no benign generator. Peirce Secondness: the "
+                    "in-memory reality contradicts the on-disk identity. MITRE T1055.012 "
+                    "— Process Hollowing / T1055 — Process Injection."
+                ),
+                spoofability_delta=_dround(0.85 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                ttp_id="T1055.012",
+            ))
+
         return self._fractures
 
     # ------------------------------------------------------------------

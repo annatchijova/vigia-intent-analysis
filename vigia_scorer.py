@@ -976,6 +976,15 @@ def _vigia_score(case: dict) -> dict:
         "FALSE_FLAG_ATTRIBUTION_MISMATCH",
         "LOG_VS_MEMORY",
         "TIMESTAMP_PRECISION_ANOMALY",
+        # Canonical TTP detectors (2026-07-12, docs/CASE_RECOVERY_20260712.md):
+        # structured-metadata detectors for masquerade / defense-evasion /
+        # injection IoIs that previously produced no fracture, leaving real
+        # multi-domain MALICE cases stalled at composite ~0.30. Each maps to a
+        # named MITRE TTP; all verified FP-safe corpus-wide (fire only on
+        # genuine targets, break zero currently-correct verdicts).
+        "PROCESS_MASQUERADE",
+        "DEFENSE_EVASION_ARTIFACT",
+        "PROCESS_INJECTION_ANTIFORENSIC",
         # M2 (docs/M2_DISCRIMINATORS_DESIGN_20260711.md): class-correct
         # replacements for the pre-M2 FALSE_FLAG_PATTERN catch-all, at weight
         # parity (severity 0.8) so genuine linguistic-attribution and social-
@@ -1337,6 +1346,49 @@ def _vigia_score(case: dict) -> dict:
             for a in _narrative_artifacts
         ],
     }
+
+    # -----------------------------------------------------------------------
+    # Intake-abstain gate (2026-07-12, docs/CASE_RECOVERY_20260712.md)
+    #
+    # A NOISE verdict claims "analyzed and found clean". That claim is
+    # unsupportable when the evidence itself declares that analysis did not
+    # occur: an intake-only record whose content was never extracted, or a
+    # device image from which no user evidence was recovered. Certifying such
+    # a record NOISE is a false clean bill of health; the honest verdict is
+    # ABSTAIN ("insufficient analysis to assert benignity" — VIGÍA doctrine:
+    # ABSTAIN documents the gap rather than guessing).
+    #
+    # Keys ONLY on examiner-declared acquisition/analysis-state metadata
+    # (status/analysis_status extraction markers, user_data/content/partition
+    # == False), never on annotation fields (expected_verdict,
+    # confidence_expected, abstention_risk). Fires only when the verdict is
+    # already NOISE, so it can never soften a SUSPICION/MALICE finding.
+    # Verified FP-safe corpus-wide: fires on exactly the intake/firmware-only
+    # records, breaks zero currently-correct verdicts (benign source-code and
+    # analyzed phone dumps carry none of these markers).
+    # -----------------------------------------------------------------------
+    if base_result["verdict"] == "NOISE":
+        _analysis_incomplete = any(
+            str((a.get("metadata") or {}).get("status", "")).upper().startswith("INTAKE_ONLY")
+            or "EXTRACTION PENDING" in str((a.get("metadata") or {}).get("status", "")).upper()
+            or str((a.get("metadata") or {}).get("analysis_status", "")).upper().startswith("PENDING")
+            or (a.get("metadata") or {}).get("user_data_found") is False
+            or (a.get("metadata") or {}).get("user_content_found") is False
+            or (a.get("metadata") or {}).get("user_partition") is False
+            for a in artifacts
+        )
+        if _analysis_incomplete:
+            verdict = "ABSTAIN"
+            confidence = 0.0
+            base_result["verdict"] = "ABSTAIN"
+            base_result["confidence"] = 0.0
+            base_result["reason"] = (
+                "INTAKE / INCOMPLETE ANALYSIS: evidence acquired but its content "
+                "was not extracted/analyzed, or no user evidence was recovered — "
+                "insufficient analysis to assert benignity. NOISE would overclaim "
+                "a clean finding; ABSTAIN documents the gap (re-acquisition / full "
+                "extraction required before a benignity verdict)."
+            )
 
     base_result["quadripartite_state"] = _apply_quadripartite(
         verdict=verdict,
