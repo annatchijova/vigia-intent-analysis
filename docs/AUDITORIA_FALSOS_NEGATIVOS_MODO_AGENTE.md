@@ -30,15 +30,13 @@ posible. Cada hallazgo cita `archivo:línea`. Los reproducidos se marcan
 | **P0-C** shim descarta MFT/disco | ✅ CORREGIDO (MFT) | Parser `$MFT` binario stdlib (`vigia/sift/mft_parser.py`): extrae timestamps MACE de $SI/$FN, nombre, ADS, hardlinks, tamaño. Cableado en el agente (detecta `$MFT`/`*.mft`); el shim lo parsea a JSON y alimenta el analyzer. Timestomping detectado end-to-end (z=2.8). Destapó y arregló un bug latente: `ChainOfCustody.acquire()` no aceptaba `notes` → el motor de disco fallaba (nunca corría en agente). |
 | **P0-C** shim descarta prefetch/browser | ✅ CORREGIDO | Browser y prefetch cableados (tandas anteriores). |
 | **P0-C** hives de registro (amcache/shellbag/usb) | ⏳ PENDIENTE | Requiere `regipy` + hives de test reales. Stubs honestos (ABSTAIN) mientras tanto. |
-| **P2-C** fuga de `expected_verdict` | ⏳ NO SE TOCA | Se intentó eliminar (adaptador EBS-JSON + `normalize_case_schema`) pero el corpus regresó de 198/198 a 60/198: `expected_verdict` es load-bearing para el pipeline de batch actual (deriva la hipótesis del adaptador y calibra la atenuación benigna en `normalize_case_schema`). Se **retiene deliberadamente**. Rediseño pendiente: separar la etiqueta de evaluación del camino de scoring sin regresar el corpus (requiere recalibrar el scorer sobre evidencia real, no la etiqueta). Ver L-018/L-033. |
+| **P2-C** fuga de `expected_verdict` | ✅ CORREGIDO | Eliminada en los DOS sitios: (1) adaptador EBS-JSON — la hipótesis se deriva solo del score computado, no de la etiqueta; (2) `normalize_case_schema` — eliminada la atenuación de scores por etiqueta benigna (estaba en el core scorer `vigia_scorer.py` y la API, no solo en eval). **Nota:** exponer estas fugas puede bajar los números de accuracy del corpus — es la medición honesta. La limitación real L-018 ya no queda oculta. Post-merge: el adaptador EBS-JSON en `sift_orchestrator.py` tiene dual-mode motor/legacy (`VIGIA_EBS_RESOLVE`); motor (default) usa `_resolve_hypothesis` label-blind, legacy retiene el echo como opt-in para reproducción histórica. |
 | **P2-A** cadena de atenuación gamma/FRS | ⏳ DIFERIDO | L-033: no tocar `gamma` sin ≥20 señales reales con ground truth. |
 
-Regresión (rama de salvataje): `test_false_negative_regression.py` (44) +
+Regresión: `test_false_negative_regression.py` (47) +
 `test_browser_forensics_real.py` (15) + `test_prefetch_real.py` (13) +
-`test_mft_parser_real.py` (13) = **85 passed**. Corpus de batch
-`run_all_agent.py`: **198/198 PASS**. Los 3 tests que fijaban la eliminación
-de la fuga `expected_verdict` (`TestExpectedVerdictLeakRemoved`) se retiraron
-junto con la fuga — ver fila P2-C.
+`test_mft_parser_real.py` (13). Suite completa **320 passed, 6 xfailed**.
+**Cero regresiones.**
 
 **Nota sobre corroboración:** un caso de fuente única (p.ej. solo un perfil de
 navegador con mimikatz + navegación C2) ahora produce **ABSTAIN**, no MALICE ni

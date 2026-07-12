@@ -25,6 +25,8 @@ from vigia.sift._sql_utils import safe_sqlite_connect
 
 logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
+
 TOOL_NAME = "BROWSER_FORENSICS"
 ARTIFACT_RELIABILITY = Fraction(65, 100)
 

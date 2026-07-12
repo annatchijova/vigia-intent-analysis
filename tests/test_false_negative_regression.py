@@ -288,6 +288,54 @@ class TestUnanalyzedStubsHonest:
             f"{cls}: stub debe marcar unanalyzed, no presentarse como limpio"
 
 
+class TestExpectedVerdictLeakRemoved:
+    """P2-C: ningún camino de scoring puede leer expected_verdict para decidir."""
+
+    def test_normalize_does_not_attenuate_by_label(self):
+        from vigia.pipeline.vigia_integration_bridge import normalize_case_schema
+        case = {
+            "case_id": "LEAK", "expected_verdict": "NOISE", "expected_mitre_ttps": [],
+            "artifacts": [{"artifact_id": "a1", "source_tool": "t",
+                           "evidence_type": "log_entry", "raw_score": 0.9,
+                           "prior_trust": 0.8, "description": "x"}],
+        }
+        out = normalize_case_schema(case)
+        a = out["artifacts"][0]
+        # El score NO se reduce por estar etiquetado benigno.
+        assert a["raw_score"] == 0.9
+        assert a.get("prior_trust") == 0.8
+
+    def test_ebs_adapter_label_malice_but_low_score_not_malice(self, tmp_path):
+        # Etiqueta MALICE + artefactos de score ínfimo → NO debe dar malicia
+        # (antes el leak hacía echo de la etiqueta). Honestamente: benigno por
+        # score — expone la limitación real del scorer (L-018), no la oculta.
+        import json
+        from sift_orchestrator import SIFTOrchestrator
+        case = {"case_id": "FN", "expected_verdict": "MALICE",
+                "artifacts": [{"artifact_id": "a", "raw_score": 0.05,
+                               "prior_trust": 0.5, "evidence_type": "log",
+                               "description": "x"}]}
+        p = tmp_path / "case.json"
+        p.write_text(json.dumps(case))
+        r = SIFTOrchestrator("FN").analyze(log_path=str(p))
+        assert r["abduction"]["best_hypothesis"] == "NO_SEMIOTIC_ANOMALY_DETECTED"
+
+    def test_ebs_adapter_label_benign_but_high_score_flags(self, tmp_path):
+        # Etiqueta BENIGN + artefactos de score alto → debe detectar por score
+        # (antes el leak lo forzaba a BENIGN). El score manda, no la etiqueta.
+        import json
+        from sift_orchestrator import SIFTOrchestrator
+        arts = [{"artifact_id": f"a{i}", "raw_score": 5.0, "prior_trust": 1.0,
+                 "evidence_type": "memory_process", "description": "x"}
+                for i in range(3)]
+        case = {"case_id": "FP", "expected_verdict": "BENIGN", "artifacts": arts}
+        p = tmp_path / "case.json"
+        p.write_text(json.dumps(case))
+        r = SIFTOrchestrator("FP").analyze(log_path=str(p))
+        assert "MALICIOUS" in r["abduction"]["best_hypothesis"]
+
+
+
 class TestEventLogUnanalyzed:
     def test_plaintext_log_surfaces_unanalyzed(self, tmp_path):
         from vigia.sift.event_log_correlator import EventLogCorrelator
