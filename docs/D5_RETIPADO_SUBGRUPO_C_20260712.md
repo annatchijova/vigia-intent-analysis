@@ -76,3 +76,20 @@ retipado. Detalle:
 - Reproducibilidad: mediciones con `_vigia_score` real; ablaciones con
   `scripts/experiments/scorer_gate.py`. Corpus fuera de estos 5 casos: sin
   cambios (la edición es local al dato de CAN-024).
+
+**Actualización 2026-07-12 (post-M2):** M2 aterrizó (ver
+`docs/IMPL_20260712_M1_M3_M2.md`). Resultado por caso:
+
+- **CAN-011:** recuperado sin re-autoría — `LINGUISTIC_ATTRIBUTION_SIGNAL` lo
+  levanta a MALICE con score bit-idéntico. Cerrado.
+- **CAN-046:** re-medido específicamente post-M3 (a pedido explícito) — NO se
+  recupera, ni siquiera completando `timestomp_detected=True`. Se une a
+  CAN-008/CAN-047 en el punto siguiente.
+- **CAN-008 y CAN-047:** cayeron a SUSPICION como efecto automático de M2 (el
+  fósil que los sostenía ya no dispara). **Esto no es un veredicto final
+  aceptado sobre estos dos casos** — es un estado transitorio mientras el
+  raw_score siga sin corregir (inversión flagrante ya diagnosticada arriba:
+  rootkit con 12 SSDT hooks / sección RWX del hollowing a raw 0.05-0.07).
+  Quedan para la sesión de re-puntuación de datos, aparte, con su propio
+  criterio de revisión — no decidir por omisión que "son SUSPICION porque así
+  es el caso".
