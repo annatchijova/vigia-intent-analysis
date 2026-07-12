@@ -88,7 +88,7 @@ def _try_imports(candidates: list, symbols: list) -> tuple:
 
 # Pipeline EBS v1 — canónico primero, legacy como fallback
 _pipeline_mod, _pipeline_name = _try_imports(
-    ["pipeline", "pipeline__4_"], ["run_vigia", "VigiaPipeline"]
+    ["vigia.pipeline.pipeline", "pipeline", "pipeline__4_"], ["run_vigia", "VigiaPipeline"]
 )
 if _pipeline_mod is not None:
     run_vigia = getattr(_pipeline_mod, "run_vigia")
