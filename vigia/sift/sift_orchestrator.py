@@ -622,6 +622,38 @@ class SIFTOrchestrator:
             except Exception as e:
                 logger.error("SignalMapper CCS Gate falló: %s", e)
 
+        # Part 4 fix (AUDITORIA_COBERTURA_MOTOR): un motor deshabilitado por
+        # dependencia ausente (self.<engine> is None vía _safe_engine) con su
+        # artefacto presente se salteaba SIN marca F7 — el guard de cada bloque
+        # `if <artefacto> and self.<engine>:` es falso y el _unanalyzed_signal
+        # (que vive en el `except`) nunca se alcanza. Simetría con el caso
+        # "engine presente pero lanzó excepción": aquí se materializa la
+        # NO-disponibilidad como señal `unanalyzed` para que el artefacto no
+        # desaparezca en silencio (posible NOISE espurio → ahora ABSTAIN).
+        _engine_artifacts = (
+            (memory_dump_path, self.memory, "memory", "memory"),
+            (registry_hives, self.registry, "registry", "registry"),
+            (event_logs, self.eventlog, "eventlog", "windows_event_log"),
+            (mft_json, self.disk, "disk", "mft"),
+            (network_flows, self.network, "network", "network"),
+            (prefetch_dir, getattr(self, "prefetch", None), "prefetch", "prefetch"),
+            (usb_hive_path, getattr(self, "usb", None), "usb", "usb"),
+            (browser_profile, getattr(self, "browser", None), "browser", "browser"),
+            (shellbag_hive, getattr(self, "shellbag", None), "shellbag", "shellbag"),
+            (amcache_path or system_hive_path, getattr(self, "amcache", None),
+             "amcache", "amcache"),
+        )
+        for _artifact, _engine, _name, _art_type in _engine_artifacts:
+            if _artifact and _engine is None:
+                logger.warning(
+                    "[SIFT] Artefacto '%s' presente pero motor '%s' no disponible "
+                    "(dependencia ausente) — marcado UNANALYZED, no benigno.",
+                    _art_type, _name,
+                )
+                raw_signals.append(self._unanalyzed_signal(
+                    _name, _art_type, "engine unavailable (dependency absent)"
+                ))
+
         # F7 (N7 variante PathGuard): cada ruta rechazada por PathGuard se
         # materializa como señal `unanalyzed` — el rechazo silencioso era el
         # candidato más fuerte del patrón "agente no ve lo que Claude sí ve".
