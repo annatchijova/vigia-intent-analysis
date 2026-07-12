@@ -84,26 +84,26 @@ logger = logging.getLogger(__name__)
 # Patron de raiz dinamica
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)
-if _ROOT not in sys.path:
-    sys.path.insert(0, _ROOT)
 
 # ---------------------------------------------------------------------------
 # Dependencias — verificacion temprana
 # ---------------------------------------------------------------------------
 try:
     import numpy as np
-except ImportError:
-    logger.critical("numpy requerido: pip install numpy")
-    sys.exit(1)
+except ImportError as _e:
+    raise ImportError(
+        "numpy is required for fit_calibration: pip install numpy"
+    ) from _e
 
 try:
     from sklearn.neighbors import KernelDensity
     from sklearn.model_selection import GridSearchCV, cross_val_score
     from sklearn.covariance import LedoitWolf
     from sklearn.preprocessing import StandardScaler
-except ImportError:
-    logger.critical("scikit-learn requerido: pip install scikit-learn")
-    sys.exit(1)
+except ImportError as _e:
+    raise ImportError(
+        "scikit-learn is required for fit_calibration: pip install scikit-learn"
+    ) from _e
 
 
 # ---------------------------------------------------------------------------
