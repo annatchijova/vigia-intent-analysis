@@ -286,14 +286,14 @@ would require an ASN/subnet clustering layer before Noisy-OR computation.
 
 **Status:** Real limitation (architectural, code-verified 2026-07-11)
 
-> **Nota metodológica (corrección 2026-07-11):** esta entrada listaba antes
-> un `case_id` puntual bajo "Affects" como si fuera evidencia de la
-> limitación. Un caso de prueba (N=1) prueba que ESE caso falla, no la
-> frecuencia ni severidad de la clase general — exactamente la
-> sobregeneralización que la doctrina Daubert de VIGÍA existe para evitar.
-> Reescrita para afirmar solo el hecho arquitectónico verificado en código;
-> el comportamiento empírico sobre el caso puntual vive en "Accuracy by
-> Mode" más abajo, marcado N=1, no generalizable.
+> **Methodological note (correction 2026-07-11):** this entry previously
+> listed a specific `case_id` under "Affects" as if it were evidence of the
+> limitation. A test case (N=1) proves that THAT case fails — not the
+> frequency or severity of the general class — exactly the kind of
+> overgeneralization that VIGÍA's Daubert doctrine exists to prevent.
+> Rewritten to assert only the architectural fact verified in code; the
+> empirical behavior of the individual case lives in "Accuracy by Mode"
+> below, marked N=1, not generalizable.
 
 **Description:** The composite (`vigia_scorer._vigia_score`, Noisy-OR style
 aggregation weighted by `raw_score × (1−spoofability) × weight × trust`)
@@ -326,9 +326,9 @@ is not a substitute for a scorer-level fix.
 
 **Status:** Real limitation (architectural, code-verified 2026-07-11)
 
-> **Nota metodológica (corrección 2026-07-11):** ídem L-016 — los ejemplos
-> numéricos puntuales (raw/trust de artefactos específicos) se movieron a
-> "Accuracy by Mode", marcados N=2, no generalizables.
+> **Methodological note (correction 2026-07-11):** same as L-016 — the
+> specific numerical examples (raw/trust of individual artifacts) were
+> moved to "Accuracy by Mode", marked N=2, not generalizable.
 
 **Description:** The MALICE corroboration gate (`vigia_scorer.py`, R4-3 v2,
 ~line 1141) requires one of three branches to open: cross-domain evidence
@@ -361,11 +361,11 @@ not the 2 illustrative cases in Accuracy by Mode) before adoption.
 
 **Status:** Real limitation (architectural, code-verified 2026-07-11)
 
-> **Nota metodológica (corrección 2026-07-11):** ídem L-016/L-017 — los
-> ejemplos puntuales se movieron a "Accuracy by Mode", marcados N=2, no
-> generalizables. Además se verificó (no se asumió) que el mecanismo ATMS
-> mencionado en el docstring de `vigia_scorer.py` no cierra este gap: ver
-> "Root cause" abajo.
+> **Methodological note (correction 2026-07-11):** same as L-016/L-017 —
+> the case-specific examples were moved to "Accuracy by Mode", marked N=2,
+> not generalizable. Additionally, it was verified (not assumed) that the
+> ATMS mechanism mentioned in the `vigia_scorer.py` docstring does not
+> close this gap: see "Root cause" below.
 
 **Description:** the composite scores each artifact independently via
 `raw_score × (1−spoofability) × weight × trust`; there is no mechanism for
@@ -846,10 +846,10 @@ Reproduce: `python3 run_all_agent.py --timeout 90`
 
 ## Summary Table
 
-*L-016/L-017/L-018 (marcadas abajo): "Affects" apuntaba antes a un `case_id`
-puntual como si fuera evidencia de la limitación — corregido 2026-07-11 (ver
-nota metodológica en cada entrada). El ejemplo ilustrativo de un solo caso
-(N=1/2) vive en "Accuracy by Mode", no acá.*
+*L-016/L-017/L-018 (marked below): "Affects" previously pointed to a specific
+`case_id` as if it were evidence of the limitation — corrected 2026-07-11
+(see the methodological note in each entry). The single-case illustrative
+example (N=1/2) lives in "Accuracy by Mode", not here.*
 
 | ID | Description | Affects | Status |
 |----|-------------|---------|--------|
@@ -1047,7 +1047,7 @@ to the real file.
 
 **Submission impact:** **Zero.** Confirmed by tracing all three submission entry points in `SUBMISSION_COMPLIANCE.md` (`vigia_agent.py`, `scripts/run_case.py→vigia_sift_bridge.py::reason_with_llm`, `vigia/scripts/evaluate_detector.py`): none import `VigiaPipeline`. `generate_release_bundle.py` is a packaging script with no runtime imports. `generate_execution_log.py` uses `SemioticDetectorV2`/`aggregate_evidence`/`decide`, not `VigiaPipeline`.
 
-**Secondary effect of the bug:** `consistency_score` was hardcoded to `1.0` on every call, which suppressed the Disonancia Semántica rule (`posterior > 0.7 and consistency_score < 0.5 → ABSTAIN`). Any case routed through `VigiaPipeline` (not the submission path) would never trigger ABSTAIN via this gate.
+**Secondary effect of the bug:** `consistency_score` was hardcoded to `1.0` on every call, which suppressed the Disonancia Semántica (semantic dissonance) rule — its name in code (`posterior > 0.7 and consistency_score < 0.5 → ABSTAIN`). Any case routed through `VigiaPipeline` (not the submission path) would never trigger ABSTAIN via this gate.
 
 **Fix applied (POST HACKATHON, 2026-06-22):**
 
@@ -1675,9 +1675,9 @@ being available in `PATH`. If tshark is not installed, pcap evidence will fail w
 - Requires `tshark` ≥ 3.0 (tested with 4.2.2).
 - Install: `sudo apt install tshark` (Debian/Ubuntu) or `sudo dnf install wireshark-cli` (Fedora).
 - Safety cap: maximum 50,000 packets per file. Larger files are truncated with a warning.
-- Timestamps se truncan a segundo (epoch int) — sub-second jitter no es capturado por el parser, lo cual puede afectar la detección de beaconing con intervalos sub-segundo.
-- No soporta pcap sobre stdin ni streams en vivo — solo archivos en disco.
-- tshark subprocess tiene timeout de 120 segundos — pcaps extremadamente grandes pueden excederlo.
+- Timestamps are truncated to whole seconds (epoch int) — sub-second jitter is not captured by the parser, which can affect detection of beaconing with sub-second intervals.
+- No support for pcap over stdin or live streams — on-disk files only.
+- The tshark subprocess has a 120-second timeout — extremely large pcaps can exceed it.
 
 ---
 
@@ -2008,39 +2008,40 @@ finding with no evidentiary basis.
 
 ---
 
-## L-051 — §9.4-LIM: SUSPICION es el techo doctrinal para casos macOS/mobile D3-only (decisión sellada, opción (ii) pura)
+## L-051 — §9.4-LIM: SUSPICION is the doctrinal ceiling for macOS/mobile D3-only cases (sealed decision, pure option (ii))
 
-**Sellado 2026-07-10 (colectivo + firma de Anna; ver `docs/B052_P2_DESIGN.md` §10).**
+**Sealed 2026-07-10 (collective + Anna's signature; see `docs/B052_P2_DESIGN.md` §10).**
 
-Un caso cuya evidencia proviene únicamente del canal físico D3 (filesystem
-local del propio dispositivo — TODOS los dominios lógicos macOS/mobile:
-browser, antiforensic, persistence, quarantine, apps, fsevents, spotlight)
-no puede escalar más allá de SUSPICION por doctrina: los "múltiples dominios"
-comparten el mismo canal de fabricación, así que su multiplicidad NO
-constituye corroboración independiente. Quien controla el disco controla
-todas esas fuentes a la vez.
+A case whose evidence comes exclusively from the D3 physical channel (the
+device's own local filesystem — ALL macOS/mobile logical domains: browser,
+antiforensic, persistence, quarantine, apps, fsevents, spotlight) cannot
+escalate beyond SUSPICION by doctrine: the "multiple domains" share the
+same fabrication channel, so their multiplicity does NOT constitute
+independent corroboration. Whoever controls the disk controls all of those
+sources at once.
 
-- El split por dominios lógicos (B-052-P2) fue implementado, medido y
-  **rechazado** — rama `claude/b052-p2-domain-signals-xk5ecq`, NO mergeada,
-  preservada como registro.
-- La métrica alternativa `densidad_causal_D3` fue descartada por experimento
-  pre-registrado (Pearson r=0.9185 vs z, zona gris fail-closed).
-- Mitigación implementada (solo narrativa + `pipeline_meta`): la clase
-  `suspicion_class = D3_RICH_NO_TRIANGULATION` distingue en el bundle el
-  SUSPICION "evidencia fuerte confinada a D3, triangulación manual urgente"
-  del SUSPICION genérico (poca evidencia). Regla exacta y tests en
-  `docs/B052_P2_DESIGN.md` §10.2.
-- **Techo ENFORCED (firmado y aplicado 2026-07-10):** cuando la condición
-  D3-rico-sin-triangulación se cumple, el shim declara
-  `abduction.verdict_ceiling = "SUSPICION"` y `classify_agent_verdict` (el
-  camino único de sellado) capea MALICE/INTENT → **SUSPICION** pre-emisión
-  (patrón REFUTATION GATE: la hipótesis cruda del engine se preserva y el
-  gate queda logueado en la narrativa; el LLM no puede anularlo). SUSPICION
-  entra al espacio de veredictos sellados compartiendo `EXIT_INTENT`
-  (contrato documentado "3=intent/suspicion") y el piso de alerta de INTENT
-  — el cap no des-alerta. Gate comparativo del enforcement: 0 flips en 291
-  bundles, corpus 167/199 idéntico, output del runner byte-idéntico.
+- The logical-domain split (B-052-P2) was implemented, measured, and
+  **rejected** — branch `claude/b052-p2-domain-signals-xk5ecq`, NOT merged,
+  preserved as a record.
+- The alternative metric `densidad_causal_D3` (D3 causal density) was
+  discarded via a pre-registered experiment (Pearson r=0.9185 vs z,
+  fail-closed gray zone).
+- Mitigation implemented (narrative + `pipeline_meta` only): the class
+  `suspicion_class = D3_RICH_NO_TRIANGULATION` distinguishes, within the
+  bundle, the "strong evidence confined to D3, manual triangulation urgent"
+  SUSPICION from the generic (weak evidence) SUSPICION. Exact rule and
+  tests in `docs/B052_P2_DESIGN.md` §10.2.
+- **Ceiling ENFORCED (signed and applied 2026-07-10):** when the
+  D3-rich-without-triangulation condition is met, the shim declares
+  `abduction.verdict_ceiling = "SUSPICION"` and `classify_agent_verdict`
+  (the single sealing path) caps MALICE/INTENT → **SUSPICION** pre-emission
+  (REFUTATION GATE pattern: the engine's raw hypothesis is preserved and
+  the gate is logged in the narrative; the LLM cannot override it).
+  SUSPICION enters the sealed verdict space sharing `EXIT_INTENT`
+  (documented contract "3=intent/suspicion") and INTENT's alerting floor —
+  the cap does not de-alert. Comparative enforcement gate: 0 flips across
+  291 bundles, corpus 167/199 identical, byte-identical runner output.
 
-**Criterio de cierre:** engines de canal D2/D4 para evidencia mobile
-(memoria/red del dispositivo), o validación con corpus real ≥50 casos
-macOS/mobile etiquetados.
+**Closure criterion:** D2/D4-channel engines for mobile evidence (device
+memory/network), or validation against a real labeled corpus of ≥50
+macOS/mobile cases.
