@@ -2177,6 +2177,59 @@ class CrossArtifactIncongruenceEngine:
                 ttp_id="T1055.012",
             ))
 
+        # Rule 15: CLAIM_VS_RECORD_FABRICATION
+        # A subject asserts a corroborating fact (claimed_*==True) that the
+        # executed record check refutes (a matching *_found==False in the same
+        # artifact). The claim was fabricated to survive scrutiny; the record
+        # is ground truth. General deception pattern (e.g. "I already spoke
+        # with the manager" — communication_found=False over a 48h window).
+        for a in self._artifacts:
+            md = a.metadata if isinstance(a.metadata, dict) else {}
+            claims = [k for k in md if k.startswith("claimed_") and md.get(k) is True]
+            refuted = [k for k in md if k.endswith("_found") and md.get(k) is False]
+            if claims and refuted:
+                self._fractures.append(Fracture(
+                    artifact_a=f"Asserted corroboration: {', '.join(sorted(claims))}",
+                    artifact_b=f"Executed record check refutes it: {', '.join(sorted(refuted))}",
+                    fracture_type="CLAIM_VS_RECORD_FABRICATION",
+                    severity=0.85,
+                    interpretation=(
+                        "FABRICATED CORROBORATION: the subject asserts a corroborating "
+                        "fact that the executed record check does not support "
+                        f"({', '.join(sorted(claims))} vs {', '.join(sorted(refuted))}). "
+                        "The record is ground truth; the claim was manufactured to "
+                        "survive scrutiny. Peirce Secondness: the assertion collides "
+                        "with the observable record. MITRE T1565.001 — Data "
+                        "Manipulation: Stored Data."
+                    ),
+                    spoofability_delta=_dround(0.85 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1565.001",
+                ))
+
+        # Rule 4 extension: DOCUMENT_FORGERY via mass date-regex substitution.
+        # A corpus of documents whose dates were rewritten by regex/script
+        # (modification_pattern=='date_regex_substitution') is fabricated
+        # evidence — the same DOCUMENT_FORGERY theory as digital-perfection,
+        # reached through a different structured marker (kept as the existing
+        # type, not a new one, to avoid catalogue duplication).
+        for a in self._artifacts:
+            md = a.metadata if isinstance(a.metadata, dict) else {}
+            if str(md.get("modification_pattern", "")) == "date_regex_substitution":
+                self._fractures.append(Fracture(
+                    artifact_a=f"Document set: {a.description[:50]}",
+                    artifact_b="Expected: authored documents with organic timestamps",
+                    fracture_type="DOCUMENT_FORGERY",
+                    severity=0.9,
+                    interpretation=(
+                        "MASS DOCUMENT FORGERY: document dates were rewritten by "
+                        "regex/script substitution (not authored) — a manufactured "
+                        "evidentiary corpus. Peirce Thirdness: the HABIT is to "
+                        "fabricate a paper trail on demand. MITRE T1564.002."
+                    ),
+                    spoofability_delta=0.60,
+                    ttp_id="T1564.002",
+                ))
+
         return self._fractures
 
     # ------------------------------------------------------------------

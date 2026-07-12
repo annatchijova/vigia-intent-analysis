@@ -985,6 +985,11 @@ def _vigia_score(case: dict) -> dict:
         "PROCESS_MASQUERADE",
         "DEFENSE_EVASION_ARTIFACT",
         "PROCESS_INJECTION_ANTIFORENSIC",
+        # Fabricated-corroboration detector (2026-07-12): a subject's claimed
+        # corroboration refuted by the executed record check. DOCUMENT_FORGERY
+        # (already present above) also gained a mass date-regex-substitution
+        # trigger — same type, no new entry needed.
+        "CLAIM_VS_RECORD_FABRICATION",
         # M2 (docs/M2_DISCRIMINATORS_DESIGN_20260711.md): class-correct
         # replacements for the pre-M2 FALSE_FLAG_PATTERN catch-all, at weight
         # parity (severity 0.8) so genuine linguistic-attribution and social-

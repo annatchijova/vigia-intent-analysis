@@ -88,6 +88,37 @@ class TestProcessInjection:
         assert "PROCESS_INJECTION_ANTIFORENSIC" not in _types(a)
 
 
+class TestClaimVsRecordFabrication:
+
+    def test_fires_on_claimed_refuted_pair(self):
+        a = _art(evidence_type="log_entry", raw=0.06,
+                 metadata={"claimed_manager_talk": True, "communication_found": False})
+        assert "CLAIM_VS_RECORD_FABRICATION" in _types(a)
+
+    def test_silent_when_claim_corroborated(self):
+        a = _art(evidence_type="log_entry",
+                 metadata={"claimed_manager_talk": True, "communication_found": True})
+        assert "CLAIM_VS_RECORD_FABRICATION" not in _types(a)
+
+    def test_silent_without_a_claim(self):
+        a = _art(evidence_type="log_entry",
+                 metadata={"communication_found": False})
+        assert "CLAIM_VS_RECORD_FABRICATION" not in _types(a)
+
+
+class TestDocumentForgeryMassExtension:
+
+    def test_fires_on_date_regex_substitution(self):
+        a = _art(evidence_type="log_entry", raw=0.09,
+                 metadata={"modification_pattern": "date_regex_substitution"})
+        assert "DOCUMENT_FORGERY" in _types(a)
+
+    def test_silent_on_other_modification_patterns(self):
+        a = _art(evidence_type="log_entry",
+                 metadata={"modification_pattern": "manual_edit"})
+        assert "DOCUMENT_FORGERY" not in _types(a)
+
+
 class TestIntakeAbstainGate:
 
     _BASE = {
