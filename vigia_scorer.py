@@ -1018,23 +1018,45 @@ def _vigia_score(case: dict) -> dict:
             return default
         return max(0.0, min(1.0, v))
 
+    # Invariant-4 hardening (docs/SCORER_ARCHITECTURE_DOSSIER_20260712.md D-E):
+    # the boost/penalty accumulators were plain float `+=`, which makes the
+    # accumulated value depend on fracture EMISSION ORDER. A constructed
+    # reproduction through the real engine flips the sealed verdict
+    # (UNKNOWN<->SUSPICION at a 5e-5 rounding cliff) from emission order
+    # alone, so any CAIE refactor that reorders rule evaluation could change
+    # sealed verdicts. Fix: each term keeps the SAME float value as before
+    # (a single multiplication has no ordering), but terms are lifted exactly
+    # into Fraction and summed exactly — exact addition is associative and
+    # commutative, so the sum no longer depends on emission order. The result
+    # converts back to float once, at the cap. For 0-2 terms (the entire
+    # corpus today) this is bit-identical to the old accumulation; the
+    # acceptance gate (scripts/experiments/fraction_gate.py) verifies
+    # bit-identity corpus-wide on every change to this block.
+    _boost_terms   = []
+    _penalty_terms = []
     for f in fractures:
         sev = _sev_float(f.get("severity", 0.5))
         ft  = f.get("fracture_type", "")
         if ft in MALICIOUS_FRACTURE_TYPES:
-            fracture_malice_boost += sev * 0.45
+            _boost_terms.append(Fraction(sev * 0.45))
         elif ft in CREDIBILITY_REDUCING_TYPES:
-            fracture_credibility_penalty += sev * 0.25
+            _penalty_terms.append(Fraction(sev * 0.25))
 
-    fracture_malice_boost        = min(0.5,  fracture_malice_boost)
-    fracture_credibility_penalty = min(0.35, fracture_credibility_penalty)
+    fracture_malice_boost        = float(min(Fraction(1, 2),  sum(_boost_terms,   Fraction(0))))
+    fracture_credibility_penalty = float(min(Fraction(7, 20), sum(_penalty_terms, Fraction(0))))
 
-    # STATISTICAL_UNIFORMITY from the temporal engine (not CAIE) — valid signal
-    for v in violations:
-        if v.get("type") == "STATISTICAL_UNIFORMITY":
-            fracture_malice_boost += _sev_float(v.get("severity", 0), 0.0) * 0.35
-
-    fracture_malice_boost = min(0.5, fracture_malice_boost)
+    # STATISTICAL_UNIFORMITY from the temporal engine (not CAIE) — valid signal.
+    # Same exact-summation treatment; note the pre-existing semantics are
+    # preserved: the CAIE-fracture sum is capped FIRST, then SU terms add on
+    # top of the capped value, then the cap applies again.
+    _su_terms = [
+        Fraction(_sev_float(v.get("severity", 0), 0.0) * 0.35)
+        for v in violations
+        if v.get("type") == "STATISTICAL_UNIFORMITY"
+    ]
+    fracture_malice_boost = float(
+        min(Fraction(1, 2), Fraction(fracture_malice_boost) + sum(_su_terms, Fraction(0)))
+    )
 
     # Hard gate: physical law violation — unconditional MALICE override
     hard_temporal = any(
