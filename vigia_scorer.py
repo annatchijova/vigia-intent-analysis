@@ -976,6 +976,13 @@ def _vigia_score(case: dict) -> dict:
         "FALSE_FLAG_ATTRIBUTION_MISMATCH",
         "LOG_VS_MEMORY",
         "TIMESTAMP_PRECISION_ANOMALY",
+        # M2 (docs/M2_DISCRIMINATORS_DESIGN_20260711.md): class-correct
+        # replacements for the pre-M2 FALSE_FLAG_PATTERN catch-all, at weight
+        # parity (severity 0.8) so genuine linguistic-attribution and social-
+        # engineering signal keeps its score while the sealed theory becomes
+        # the one the case actually supports.
+        "LINGUISTIC_ATTRIBUTION_SIGNAL",
+        "SOCIAL_ENGINEERING_PATTERN",
     }
     CREDIBILITY_REDUCING_TYPES = {
         "VERDICT_CONFLICT",

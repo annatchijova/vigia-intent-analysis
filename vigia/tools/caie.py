@@ -1202,8 +1202,6 @@ class CrossArtifactIncongruenceEngine:
         self._fractures.clear()
 
         # Group artifacts by evidence type category
-        cultural = [a for a in self._artifacts if a.evidence_type in
-                    ("cultural_marker", "ip_geolocation", "user_agent")]
         technical = [a for a in self._artifacts if a.evidence_type in
                      ("memory_process", "lsass_session", "kernel_structure",
                       "usn_journal", "hmac_audit_log")]
@@ -1215,62 +1213,138 @@ class CrossArtifactIncongruenceEngine:
         host_logs = [a for a in self._artifacts if a.evidence_type in
                      ("log_entry", "memory_process") and "socket" in str(a.metadata).lower()]
 
-        # Rule 1: False flag detection (H-02 fix)
-        # Distinguishes two cases that share the same surface pattern
-        # (cultural_marker high + technical low):
+        # Rule 1: marker-class discrimination (M2)
+        # Ref: docs/M2_DISCRIMINATORS_DESIGN_20260711.md and
+        # docs/FOSSIL_HUNT_20260711.md (mechanism M2, F-07..F-28).
         #
-        #   CASE A — Foreign machine, native config, no incident:
-        #     cultural_marker has ONLY config fields (keyboard_layout_detected,
-        #     timezone_offset, cyrillic_filenames, language_confidence).
-        #     No forensic analysis was performed. This is FP-CULTURAL-CLEAN.
-        #     → DO NOT fire. Not a false flag — just a Russian developer's machine.
+        # The pre-M2 rule collapsed every high-scoring cultural_marker with
+        # weak memory corroboration into one theory — "cultural evidence
+        # planted to mislead attribution" — which was the sealed narrative in
+        # 22 corpus firings where it was never true: genuine linguistic traces
+        # that ATTRIBUTE the actor (the exact inverse of planted), social-
+        # engineering patterns with no attribution question at all, and two
+        # clean-foreign-machine controls (H-02 / L-019). The evidence class is
+        # now read from the marker's own metadata (deterministic field
+        # inventory — typing errors in evidence_type must not decide the
+        # sealed theory), and each class carries a theory that matches it:
         #
-        #   CASE B — Forensic case with cultural bait (original correct behavior):
-        #     cultural_marker has FORENSIC fields (deviation_sigma,
-        #     features_anomalous, attribution_consistency_with_ttps, etc.)
-        #     indicating active analysis detected manipulation evidence.
-        #     → Fire FALSE_FLAG_PATTERN (original Rule 1 behavior).
-        #
-        #   CASE C — Genuine false flag (real attack + attribution mismatch):
-        #     Real attack confirmed (avg_technical > 0.5) AND cultural markers
-        #     explicitly contradict the TTP profile (has_manip).
-        #     → Fire FALSE_FLAG_ATTRIBUTION_MISMATCH.
-        #
-        # Ref: L-019, Finding H-02, test_audit_false_flag.py
-        # Guard against false positives on clean foreign machines (H-02 / L-019).
-        # If the investigator explicitly documented that manipulation checks were
-        # performed and came back negative (timestomp_detected=False, etc.),
-        # the machine is confirmed clean — do NOT fire FALSE_FLAG_PATTERN.
-        # Cases WITHOUT these explicit False flags remain suspicious (original behavior).
-        if cultural and technical:
-            # DETERMINISTIC: Use math.fsum for precise summation
-            avg_cultural = _dround(_dsum([a.raw_score for a in cultural]) / len(cultural), _DETERMINISTIC_INTERNAL_PREC)
-            avg_technical = _dround(_dsum([a.raw_score for a in technical]) / len(technical), _DETERMINISTIC_INTERNAL_PREC)
+        #   attribution_bait   -> FALSE_FLAG_PATTERN / _ATTRIBUTION_MISMATCH
+        #                         (planted-evidence theory REQUIRES manipulation
+        #                         evidence: too_clean placement, TTP mismatch,
+        #                         timestomp/backdating on the markers)
+        #   attribution_genuine-> LINGUISTIC_ATTRIBUTION_SIGNAL (the trace is
+        #                         real and betrays the actor; nothing planted)
+        #   social_engineering -> SOCIAL_ENGINEERING_PATTERN (Carnegie layer;
+        #                         no attribution claim is made)
+        #   config_native      -> no fracture (Case A is now the default for
+        #                         config-only markers: absence of manipulation
+        #                         evidence is never treated as guilt, and the
+        #                         explicit-False confirmed_clean flags are no
+        #                         longer required to stay safe)
+        #   unclassified       -> no fracture (a marker whose metadata asserts
+        #                         no analysis class carries no theory to seal)
+        _MARKER_BOOKKEEPING = frozenset({
+            "acquisition_tool", "acquisition_timestamp", "acquisition_hash",
+            "acquisition_note", "write_blocker_used", "examiner_id",
+        })
+        _MARKER_CONFIG_FIELDS = frozenset({
+            "cyrillic_filenames", "keyboard_layout_detected", "timezone_offset",
+            "language_confidence", "organic_user_files", "normal_creation_dates",
+            "document_properties_valid",
+        })
+        _MARKER_ATTRIBUTION_FIELDS = frozenset({
+            # linguistic origin / calque analysis
+            "linguistic_origin", "native_language_prob", "attribution_region",
+            "intended_russian", "intended_meaning", "calco_source", "calco_1",
+            # keyboard/locale slips
+            "locale_detected", "keyboard_layout_probability",
+            "keyboard_mapping_confidence", "input_method",
+            # stylometric deviation / authorship linkage
+            "deviation_sigma", "features_anomalous", "shared_anomaly",
+            "ttr_similarity", "style_entropy", "stylometric_match",
+        })
+        _MARKER_SOCIAL_FIELDS = frozenset({
+            "tone", "manager_appeal", "guilt_inversion", "phrases_matched",
+            "source_phrases", "style_match_score", "tickets_analyzed",
+            "messages_analyzed", "pattern_match_count", "response_latency_ms",
+            "behavioral_shift", "historical_normalization_count",
+            "pattern_entropy", "time_variance_sec", "bot_likelihood",
+            "verification_source",
+        })
 
-            # confirmed_clean: investigator explicitly verified no manipulation.
-            # Fires only when manipulation flags are EXPLICITLY set to False
-            # (not merely absent). FP-CULTURAL-CLEAN sets timestomp_detected=False, etc.
-            confirmed_clean = any(
-                a.metadata.get("timestomp_detected") is False
-                or a.metadata.get("backdating_detected") is False
-                or a.metadata.get("mft_inconsistency") is False
-                or a.metadata.get("suspiciously_obvious") is False
-                for a in cultural
-            )
-            # Has explicit manipulation evidence pointing to planted attribution
-            has_manip = any(
-                a.metadata.get("mismatch_with_technical_profile") is True
-                or a.metadata.get("attribution_consistency_with_ttps") == "LOW"
-                or a.metadata.get("timestomp_detected") is True
-                or a.metadata.get("backdating_detected") is True
-                or a.metadata.get("placement") == "too_clean"
-                for a in cultural
+        def _marker_has_manip(md: dict) -> bool:
+            # Value-sensitive on purpose: the confirmed-clean controls carry
+            # these keys with explicit False values.
+            return (
+                md.get("mismatch_with_technical_profile") is True
+                or md.get("attribution_consistency_with_ttps") == "LOW"
+                or md.get("timestomp_detected") is True
+                or md.get("backdating_detected") is True
+                or md.get("placement") == "too_clean"
             )
 
+        def _marker_class(a: "Artifact") -> str:
+            md = a.metadata if isinstance(a.metadata, dict) else {}
+            keys = set(md) - _MARKER_BOOKKEEPING
+            if _marker_has_manip(md):
+                return "attribution_bait"
+            if keys & _MARKER_ATTRIBUTION_FIELDS:
+                return "attribution_genuine"
+            if a.evidence_type != "cultural_marker":
+                # Rescued artifacts (below) only qualify via attribution/manip
+                # metadata; anything else stays whatever its type says it is.
+                return "unclassified"
+            if keys & _MARKER_SOCIAL_FIELDS:
+                return "social_engineering"
+            if keys and keys <= _MARKER_CONFIG_FIELDS:
+                return "config_native"
+            return "unclassified"
+
+        # Marker pool: cultural_marker-typed artifacts, plus artifacts of any
+        # other type whose metadata asserts attribution analysis or marker
+        # manipulation (typing errors must not hide attribution evidence:
+        # the corpus carries a layout-slip analysis typed ip_geolocation and
+        # a stylometric analysis typed file_hash). ip_geolocation/user_agent
+        # WITHOUT such fields are network/client telemetry, not culture —
+        # they no longer enter this rule at all.
+        _marker_pool = [
+            a for a in self._artifacts
+            if a.evidence_type == "cultural_marker"
+            or (isinstance(a.metadata, dict)
+                and (set(a.metadata) & _MARKER_ATTRIBUTION_FIELDS
+                     or _marker_has_manip(a.metadata)))
+        ]
+        _by_class: dict = {}
+        for _a in _marker_pool:
+            _by_class.setdefault(_marker_class(_a), []).append(_a)
+        bait_markers = _by_class.get("attribution_bait", [])
+        genuine_markers = _by_class.get("attribution_genuine", [])
+        social_markers = _by_class.get("social_engineering", [])
+
+        def _avg_raw(arts: list) -> object:
+            return _dround(_dsum([a.raw_score for a in arts]) / len(arts),
+                           _DETERMINISTIC_INTERNAL_PREC)
+
+        avg_technical = _avg_raw(technical) if technical else _dround(0.0, _DETERMINISTIC_INTERNAL_PREC)
+
+        # confirmed_clean: investigator explicitly verified no manipulation
+        # (explicit False values, never mere absence). Scanned across ALL
+        # artifacts: the negative controls document it on filesystem
+        # artifacts, not only on the marker itself.
+        confirmed_clean = any(
+            a.metadata.get("timestomp_detected") is False
+            or a.metadata.get("backdating_detected") is False
+            or a.metadata.get("mft_inconsistency") is False
+            or a.metadata.get("suspiciously_obvious") is False
+            for a in self._artifacts
+        )
+
+        if bait_markers and technical:
+            avg_bait = _avg_raw(bait_markers)
             # Case C: genuine false flag — real attack + contradictory attribution
-            if avg_cultural > 0.5 and avg_technical > 0.5 and has_manip:
+            if avg_bait > 0.5 and avg_technical > 0.5:
                 self._fractures.append(Fracture(
-                    artifact_a=f"Cultural markers (avg={avg_cultural:.2f}, attribution contradicts TTP profile)",
+                    artifact_a=f"Cultural markers (avg={avg_bait:.2f}, attribution contradicts TTP profile)",
                     artifact_b=f"Technical evidence (avg={avg_technical:.2f}, real attack confirmed)",
                     fracture_type="FALSE_FLAG_ATTRIBUTION_MISMATCH",
                     severity=0.85,
@@ -1286,24 +1360,75 @@ class CrossArtifactIncongruenceEngine:
                     spoofability_delta=_dround(0.90 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
                     ttp_id="T1036.005",
                 ))
-            # Case B: cultural bait, no confirmed-clean documentation — original behavior
-            elif avg_cultural > 0.5 and avg_technical < 0.2 and not confirmed_clean:
+            # Case B: planted bait without a real attack behind it. Only fires
+            # on markers whose OWN metadata evidences manipulation — "high
+            # cultural + low technical" alone is no longer a planting theory.
+            elif avg_bait > 0.5 and avg_technical < 0.2 and not confirmed_clean:
                 self._fractures.append(Fracture(
-                    artifact_a=f"Cultural markers (avg={avg_cultural:.2f})",
+                    artifact_a=f"Cultural markers (avg={avg_bait:.2f}, manipulation evidence on markers)",
                     artifact_b=f"Technical evidence (avg={avg_technical:.2f})",
                     fracture_type="FALSE_FLAG_PATTERN",
                     severity=0.8,
                     interpretation=(
-                        "High cultural attribution markers with near-zero technical "
-                        "corroboration, confirmed by forensic analysis. Classic "
-                        "false-flag pattern: cultural evidence planted to mislead "
-                        "attribution. "
+                        "Cultural attribution markers carrying manipulation evidence "
+                        "(too-clean placement, TTP mismatch, timestomp/backdating) "
+                        "with near-zero technical corroboration. False-flag pattern: "
+                        "the markers were planted to mislead attribution. "
                         "Peirce Thirdness: the HABIT is to disguise origin, not to act."
                     ),
                     spoofability_delta=_dround(0.90 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
                     ttp_id="T1585.001",
                 ))
-            # Case A: native config only — no fracture fired (FP-CULTURAL-CLEAN)
+
+        # attribution_genuine: the trace is real evidence attributing the
+        # action; the theory sealed here must never assert planting.
+        if genuine_markers:
+            avg_genuine = _avg_raw(genuine_markers)
+            if avg_genuine > 0.5:
+                self._fractures.append(Fracture(
+                    artifact_a=f"Linguistic attribution markers (avg={avg_genuine:.2f})",
+                    artifact_b=f"Claimed identity / technical context (avg_technical={avg_technical:.2f})",
+                    fracture_type="LINGUISTIC_ATTRIBUTION_SIGNAL",
+                    severity=0.8,
+                    interpretation=(
+                        "Involuntary linguistic or behavioral trace (keyboard-layout "
+                        "slip, semantic calque, stylometric deviation, authorship "
+                        "linkage across personas) inconsistent with the claimed "
+                        "identity — or stylistic consistency exceeding human "
+                        "biological variance, the signature of machine-fabricated "
+                        "style. The trace is genuine evidence ATTRIBUTING the "
+                        "action; no evidence-planting theory is asserted. "
+                        "Peirce Secondness: the index resists the claimed identity — "
+                        "habit betrays the actor."
+                    ),
+                    spoofability_delta=_dround(0.90 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1036",
+                ))
+
+        # social_engineering: Carnegie-layer manipulation of the human control
+        # plane; no cultural-attribution claim is made.
+        if social_markers:
+            avg_social = _avg_raw(social_markers)
+            if avg_social > 0.5:
+                self._fractures.append(Fracture(
+                    artifact_a=f"Social-engineering markers (avg={avg_social:.2f})",
+                    artifact_b=f"Technical corroboration (avg_technical={avg_technical:.2f})",
+                    fracture_type="SOCIAL_ENGINEERING_PATTERN",
+                    severity=0.8,
+                    interpretation=(
+                        "Systematic interpersonal-manipulation pattern targeting the "
+                        "human control layer (Carnegie taxonomy: mirroring, "
+                        "normalization, fabricated authority, defensive aggression, "
+                        "coordinated panic, instrumental doubt). No cultural-"
+                        "attribution claim is made and no evidence-planting theory "
+                        "is asserted. "
+                        "Peirce Thirdness: the HABIT is to neutralize the human "
+                        "verifier, not to disguise origin."
+                    ),
+                    spoofability_delta=_dround(0.90 - 0.15, _DETERMINISTIC_INTERNAL_PREC),
+                    ttp_id="T1656",
+                ))
+        # config_native / unclassified markers: no fracture (Case A default).
 
         # Rule 1b: Active manipulation evidence with confirmed real attack (H-02 variant)
         # Covers false flag cases where the manipulation is proven by timestomping
