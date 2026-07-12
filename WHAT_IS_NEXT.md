@@ -72,6 +72,17 @@ que ya se cerró desde entonces. La Fase 0 (sorpresas protegidas) y la Fase 1
 
 ### 1.2 Doctrina y calibración (Grupo A / Tanda C — requieren decisión de Anna y/o ground truth)
 
+> **Precondición Tanda C — CONSTRUIDA (2026-07-09).** El dataset de calibración
+> a nivel señal existe: `data/signal_calibration_dataset_20260709.json`
+> (generador `scripts/build_signal_calibration_dataset.py`, hash Daubert, test).
+> Ver `docs/TANDA_C_SIGNAL_CALIBRATION.md`. Resultado medido, honesto:
+> **A4 desbloqueado** (979 señales reales etiquetadas, ambas polaridades — L-033
+> satisfecho para el re-fit de perfiles) pero **A3 sigue bloqueado** (solo 7
+> señales gamma reales, todas MALICE — L-033 NO satisfecho para gamma). El
+> bloqueo de A3 pasó de "no hay dataset" a "faltan ~13+ señales gamma reales con
+> clase benigna": es adquisición de datos (más casos de disco crudo con
+> `event_log` etiquetado), no ingeniería.
+
 En orden de dependencia:
 
 1. **A2 / B-052-P2** — granularidad mobile/macOS: `to_signal()` →
@@ -80,11 +91,20 @@ En orden de dependencia:
    pins de Grupo C (§1.3) — son el arnés de la migración.**
 2. **A5 / B-041b** — CAIE retroalimenta el veredicto: DIFERIDO, se desbloquea
    con A2 (necesita artefactos multi-capa).
-3. **A4 / B-069** — re-fit conjunto perfiles+umbrales con dataset etiquetado
-   (`fit_calibration.py`); la calibración aislada ya fue rechazada por el gate
-   comparativo (70.8→70.4%). Depende de §1.1.2.
-4. **A3 / L-033/L-034** — cadena de atenuación gamma×FRS: no tocar sin ≥20
-   señales reales etiquetadas (regla L-033).
+3. **A4 / B-069** — re-fit de perfiles. **MEDIDO 2026-07-09: resultado NEUTRO,
+   NO APLICADO.** Con el dataset (979 señales) se corrió el re-fit dataset-driven
+   detrás del gate comparativo (`scripts/experiment_a4_profile_refit.py`, solo
+   mide): **0 flips** (0 fixed / 0 broken) en las variantes realistas; la única
+   palanca que mueve algo (subir `base_weight`) reproduce la inflación de B-069
+   sin arreglar nada. Confirma B-069 con método independiente. `caie.py` NO
+   tocado. Los errores restantes del corpus son estructurales, no de perfiles.
+   Ver `docs/TANDA_C_SIGNAL_CALIBRATION.md` §6. Cerrado como corpus-neutro (valor
+   residual solo Daubert, que tampoco cambia veredictos).
+4. **A3 / L-033/L-034** — cadena de atenuación gamma×FRS. **SIGUE BLOQUEADO por
+   datos** (solo 7 señales gamma reales, todas MALICE — ver Tanda C §4). No
+   tocar: calibrar con 7 señales de una polaridad violaría L-033. Desbloqueo =
+   más evidencia cruda con `event_log`/`windows_event_log` etiquetada, incluida
+   clase benigna.
 5. **Hueco estructural INTENT del ladder + revisión ABSTAIN/L-012** — decisiones
    abiertas documentadas en `docs/FASE2_DATASET_CALIBRACION.md` §4–§5 (los
    experimentos E2/E3 ya fueron medidos y refutados).
@@ -116,15 +136,20 @@ suite 1034):
 
 | # | Ítem | Fix diseñado |
 |---|------|--------------|
-| B1 | S-1 | sincronizar `requirements-ci.txt` + test de contrato de imports |
-| B2 | S-2 / BUG-NLP-002 | heurística OOV o centinela `xfail(strict=True)` |
+| ~~B1~~ | ~~S-1~~ | **CERRADO** — `requirements-ci.txt` sincronizado (psutil/pyyaml/pytest-cov/pytest-asyncio) + `tests/test_requirements_ci_contract.py` verde (verificado 2026-07-08) |
+| ~~B2~~ | ~~S-2 / BUG-NLP-002~~ | **CERRADO** — `TestL33tOOVUnreachable::test_analyze_surfaces_l33tspeak_as_oov` con `xfail(strict=True)`: suite verde sin ocultar el hallazgo, XPASS truena si el tokenizer lo arregla (verificado 2026-07-08) |
 | ~~B3~~ | ~~B-016 residual~~ | **CERRADO** — detector stderr en el motor V4 (B-087) |
 | ~~B4~~ | ~~B-018 residual~~ | **CERRADO** — VIGIA_VOL3_TIMEOUT + escalado + pipeline_meta (B-087) |
-| B6 | B-060 | `ARTIFACT_TYPE_REGISTRY` único o test de consistencia de mapas |
+| ~~B6~~ | ~~B-060~~ | **CERRADO 2026-07-08** — `check_adapter_map_consistency()` en `forensic_adapter.py` + `tests/test_b060_adapter_map_consistency.py` (LAYER≡ONTOLOGY, LAYER⊆EVIDENCE, superset identity; tests rojos primero con "dientes") |
 | ~~B7~~ | ~~B-061~~ | **CERRADO** — clamp unificado, 4 implementaciones acordadas (B-087) |
 | ~~B8~~ | ~~A-1~~ | **CERRADO** — verify_daubert_record_hash + self-check (B-087) |
 | ~~B9~~ | ~~A-2~~ | **CERRADO** — deactivate + TTL + sweep auditado (B-087) |
-| B10 | B-058 | comparador de `run_all_agent.py` lee `agent_verdict` sellado |
+| ~~B10~~ | ~~B-058~~ | **CERRADO 2026-07-08** — `extract_verdict_from_bundle` lee el `agent_verdict` sellado (autoritativo, decide el exit) con fallback legacy; doctrina en `verdict_matches`. Gate comparativo sobre 198 bundles: **0 regresiones, +3 mejoras** (casos INTENT sub-reportados como SUSPICION) |
+
+**Nota (auditoría cruzada 2026-07-08):** B1 y B2 ya estaban implementados en el
+código (requirements-ci sincronizado, xfail strict presente) pero figuraban como
+pendientes en este documento — mismo patrón "el tracker miente" que documentó
+`docs/AUDITORIA_B047_CORRELATION.md`. Verificados verdes y cerrados aquí.
 
 Sumados por el censo P0-001 (B-083, opcionales):
 
@@ -141,13 +166,15 @@ el doc, sin entrada en `BUGS_PENDIENTES(_EN).md`. Asignados ahora:
 
 | # | Ítem | Qué falta |
 |---|------|-----------|
-| B88 | N13 | `sans_compliance.accuracy_validation` exige clave `tool`; adaptadores del shim (vol3/EBS-JSON/mobile) emiten `source` → falso negativo de compliance en esos bundles |
-| B89 | N14 | `_to_signal_safe` traga cualquier excepción de `to_signal()` y retorna `None` sin marca `unanalyzed` — mismo hueco que N7/N8, no cubierto por el fix F7 |
-| B90 | P2-E | `UNIFIED_TIMELINE` emite señal derivada aun con `timestamps=0`; sigue marcado "⏳ abierto" en la auditoría fuente tras el fix F5 — requiere re-verificación |
+| B88 | N13 | **RESUELTO (verificado 2026-07-08)** — ya arreglado por F8: `accuracy_validation` lee `tool or source` |
+| B89 | N14 | **RESUELTO (verificado 2026-07-08)** — ya arreglado por F8: el drop se contabiliza en `signal_conversion_drops`/`pipeline_meta`. El fix propuesto original (`_UNANALYZED`) era semánticamente incorrecto |
+| B90 | P2-E | **RESUELTO impacto de veredicto (verificado 2026-07-08)** — F5 etiqueta la señal `derived`; `_is_primary_signal` la excluye de todo gate. La marca "⏳ abierto" de la auditoría era stale |
 
-Ninguno de los tres tiene audit-before-patch re-corrido contra HEAD actual —
-son documentación del hueco, no bugs confirmados vivos hoy. Ver
-`BUGS_PENDIENTES_EN.md` (B-088/B-089/B-090) para el detalle completo.
+**Actualización 2026-07-08 (audit-before-patch):** los tres se verificaron contra
+HEAD y resultaron YA resueltos por las tandas F5/F8 de la propia auditoría de
+robustez (F1–F9 sí aterrizaron). La disciplina de audit-before-patch evitó
+parchear código ya arreglado; se corrigió el registro en su lugar. Ver
+`BUGS_PENDIENTES_EN.md` (B-088/B-089/B-090) para la evidencia de código.
 
 **También corregido (documental, sin cambio de código):** la entrada B-041
 original (`BUGS_PENDIENTES(_EN).md`) quedaba marcada `[PENDING]`/`[PENDIENTE]`

@@ -128,24 +128,42 @@ def extract_expected(case_path: Path) -> str:
         return "UNKNOWN"
 
 
+# B-058 (B10): el veredicto sellado por el agente (agent_verdict, escrito por
+# _seal_bundle vía classify_agent_verdict) es la ÚNICA fuente autoritativa —
+# es el mismo valor que decide el exit code. Su escala es de 4 valores:
+# {MALICE, INTENT, ABSTAIN, NOISE}. NO tiene escalón SUSPICION (SUSPICION_DETECTED
+# se sella como INTENT) ni UNKNOWN.
+_AGENT_VERDICT_VALUES = {"MALICE", "INTENT", "ABSTAIN", "NOISE"}
+
+# Derivación legacy desde best_hypothesis — SOLO para bundles previos al campo
+# agent_verdict. Re-derivar de best_hypothesis puede DIVERGIR del veredicto
+# sellado (p.ej. SUSPICION_DETECTED → "SUSPICION" acá vs "INTENT" sellado), que
+# es exactamente la divergencia que B-058 pedía dejar de enmascarar.
+_HYP_MAP = {
+    "MALICE": "MALICE", "SUSPICION": "SUSPICION", "UNKNOWN": "UNKNOWN",
+    "NOISE": "NOISE", "ABSTAIN": "ABSTAIN", "BENIGN": "NOISE", "INTENT": "INTENT",
+    "MALICIOUS_INTENT_DETECTED": "MALICE",
+    "MALICIOUS_ACTIVITY_DETECTED": "MALICE",
+    "INTENT_DETECTED": "INTENT",
+    "SUSPICION_DETECTED": "SUSPICION",
+    "NO_SEMIOTIC_ANOMALY_DETECTED": "NOISE",
+    "ABSTAIN_DETECTED":           "ABSTAIN",
+    "NO_THREAT_DETECTED": "NOISE",
+    "BENIGN_ACTIVITY": "NOISE",
+    "INSUFFICIENT_EVIDENCE": "UNKNOWN",
+    "INCONCLUSIVE": "UNKNOWN",
+}
+
+
 def extract_verdict_from_bundle(bundle_path: Path) -> str:
-    """Lee el veredicto del bundle usando campos estructurados, sin búsqueda en texto libre."""
-    _MAP = {
-        # Veredictos canónicos
-        "MALICE": "MALICE", "SUSPICION": "SUSPICION", "UNKNOWN": "UNKNOWN",
-        "NOISE": "NOISE", "ABSTAIN": "ABSTAIN", "BENIGN": "NOISE", "INTENT": "INTENT",
-        # Veredictos del agente (best_hypothesis)
-        "MALICIOUS_INTENT_DETECTED": "MALICE",
-        "MALICIOUS_ACTIVITY_DETECTED": "MALICE",
-        "INTENT_DETECTED": "INTENT",
-        "SUSPICION_DETECTED": "SUSPICION",
-        "NO_SEMIOTIC_ANOMALY_DETECTED": "NOISE",
-        "ABSTAIN_DETECTED":           "ABSTAIN",
-        "NO_THREAT_DETECTED": "NOISE",
-        "BENIGN_ACTIVITY": "NOISE",
-        "INSUFFICIENT_EVIDENCE": "UNKNOWN",
-        "INCONCLUSIVE": "UNKNOWN",
-    }
+    """Lee el veredicto SELLADO del bundle (agent_verdict), sin re-derivarlo.
+
+    B-058 (B10): lee el campo top-level `agent_verdict` que `_seal_bundle`
+    embebe — el mismo veredicto que decide el exit code del agente. Solo si el
+    campo está ausente (bundles previos a su introducción) cae al camino legacy
+    de re-derivación desde `best_hypothesis`. Así el batch nunca reporta un
+    veredicto distinto del que el agente efectivamente selló.
+    """
     try:
         data = json.loads(bundle_path.read_text())
         # 0. B10 (B-058): el campo top-level `agent_verdict` es el veredicto
@@ -169,9 +187,9 @@ def extract_verdict_from_bundle(bundle_path: Path) -> str:
         hyp = (data.get("pipeline_results", {})
                    .get("abduction", {})
                    .get("best_hypothesis", ""))
-        if hyp in _MAP:
-            return _MAP[hyp]
-        # 3. Prefix matching para variantes no conocidas
+        if hyp in _HYP_MAP:
+            return _HYP_MAP[hyp]
+        # 3. Prefix matching para variantes no conocidas (legacy).
         hyp_up = hyp.upper()
         if "MALICI" in hyp_up or "MALICE" in hyp_up:
             return "MALICE"
@@ -182,6 +200,36 @@ def extract_verdict_from_bundle(bundle_path: Path) -> str:
         return "UNKNOWN"
     except Exception:
         return "ERROR"
+
+
+def verdict_matches(expected: str, got: str) -> bool:
+    """Doctrina de comparación etiqueta-esperada vs veredicto-del-agente.
+
+    El veredicto del agente vive en su escala de 4 valores
+    {MALICE, INTENT, ABSTAIN, NOISE}; las etiquetas del corpus son de 6
+    (agregan SUSPICION y UNKNOWN). Reglas:
+
+      * alias BENIGN → NOISE en ambos lados.
+      * expected == UNKNOWN → siempre PASS (caso sin ground truth accionable).
+      * over-severity: expected INTENT + got MALICE → PASS (MALICE ⊃ INTENT +
+        ocultamiento; sobre-severidad, no error de dirección — Fase 2 §4).
+      * expected SUSPICION + got INTENT → PASS: la escala del agente no tiene
+        escalón SUSPICION; su tier INTENT representa "INTENT/SUSPICION"
+        (documentado en B-073). La sub-severidad (INTENT→SUSPICION) NO existe
+        acá porque el agente nunca emite SUSPICION.
+    """
+    aliases = {"BENIGN": "NOISE"}
+    g = aliases.get(got, got)
+    e = aliases.get(expected, expected)
+    if expected == "UNKNOWN":
+        return True
+    if g == e:
+        return True
+    if e == "INTENT" and g == "MALICE":
+        return True
+    if e == "SUSPICION" and g == "INTENT":
+        return True
+    return False
 
 
 def main():
@@ -248,20 +296,10 @@ def main():
             else:
                 got = "NO_BUNDLE"
 
-            # Alias BENIGN → NOISE para comparación
-            aliases = {"BENIGN": "NOISE"}
-            got_norm = aliases.get(got, got)
-            exp_norm = aliases.get(expected, expected)
-
-            # Doctrina 2026-07-05 (Fase 2 §4, decisión de Anna, opción (a)):
-            # MALICE donde la etiqueta dice INTENT es SOBRE-severidad, no
-            # error de dirección — la escala define MALICE ⊃ INTENT +
-            # ocultamiento y el ladder del motor no tiene escalón INTENT
-            # (espacio {MALICE, SUSPICION, UNKNOWN, NOISE, ABSTAIN}). La
-            # sub-severidad NO se acepta: INTENT→SUSPICION sigue siendo FAIL.
-            over_severity = (exp_norm == "INTENT" and got_norm == "MALICE")
-
-            ok = (got_norm == exp_norm) or (expected == "UNKNOWN") or over_severity
+            # B-058 (B10): doctrina de comparación centralizada en
+            # verdict_matches (over-severity INTENT⊆MALICE, SUSPICION⊆tier
+            # INTENT del agente, UNKNOWN siempre PASS, alias BENIGN→NOISE).
+            ok = verdict_matches(expected, got)
 
             status = f"{GRN}PASS{RST}" if ok else f"{RED}FAIL{RST}"
             print(f"  got={got:<12} {status}  ({elapsed:.1f}s)")

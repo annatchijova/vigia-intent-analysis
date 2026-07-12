@@ -3816,6 +3816,33 @@ No code change sealed. `caie.py` reverted to HEAD (`a021a6a`); working tree
 clean. The comparative supporting this decision is archived as a session
 artifact (baseline vs post, 267 cases).
 
+### Re-confirmation with the Tanda C dataset (2026-07-09, independent method)
+
+With the signal-level calibration dataset built (`data/signal_calibration_dataset_20260709.json`,
+979 labeled EBS signals), A4 was re-measured via a **dataset-driven** candidate —
+distinct from B-069's original analogy method. `spoofability` re-derived by
+diagnosticity (bidirectional: types enriched in inculpatory cases move DOWN,
+benign-enriched move UP), `base_weight` untouched. Harness:
+`scripts/experiment_a4_profile_refit.py` (measurement-only, monkeypatch, restores
+on exit — **`caie.py` never modified**).
+
+Measured over 199 corpus cases:
+
+| Variant | verdicts moved | FIXED | BROKEN |
+|---|---|---|---|
+| spoofability realistic (K=0.6) | 0 | 0 | 0 |
+| spoofability extreme (K=5.0) | 0 | 0 | 0 |
+| control: spoof=0.15 **+ weight=0.30** | 1 (FAIL→FAIL) | 0 | 0 |
+
+The harness demonstrably CAN move verdicts (the weight-inflation control moves
+`OWL-NEXUS5-CASE` NOISE→SUSPICION, but expected=MALICE so it stays FAIL→FAIL),
+so the 0-flip result is real, not a no-op bug. **Independent confirmation of
+B-069's conclusion:** legacy-profile re-fit has 0 corpus upside; the only lever
+that moves anything (weight) reproduces the inflation without fixing a case. A4's
+remaining value is Daubert-only (principled spoofability), and even that changes
+no verdict. Reclassified: A4 corpus-neutral, NOT APPLIED. See
+`docs/TANDA_C_SIGNAL_CALIBRATION.md` §6.
+
 ---
 
 ## B-070 — Device/contextual/narrative epistemic role: closes the NGDC-003 FP composite channel (Option C) [RESOLVED]
@@ -4522,10 +4549,18 @@ agent_verdict), C1/C2 from the P0-001 census.
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING — never assigned a tracker ID until this entry (2026-07-08) |
+| **Status** | RESOLVED — audit-before-patch (2026-07-08) found this already fixed by **F8** (the audit's own remediation tanda). No new code needed. |
 | **Severity** | P2 |
-| **File** | `vigia_agent.py:936-942` |
+| **File** | `vigia_agent.py` (`_seal_bundle`, the `sans_compliance` block) |
 | **Detected** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, finding **N13** (2026-07-03) |
+
+**Verification (2026-07-08, audit-before-patch):** the single `accuracy_validation`
+check in `vigia_agent.py` already reads `(s.get("tool") or s.get("source"))` —
+carrying the inline comment `# F8 (N13): los adaptadores del shim (vol3,
+EBS-JSON, mobile) etiquetan la herramienta como "source" — aceptar ambos.` The
+`936-942` line reference in the original finding was to a prior file layout;
+the check moved and F8 closed it. No adapter-path bundle false-negatives on
+this flag anymore. Closed as verified, not re-patched.
 
 **Description:** `sans_compliance.accuracy_validation` requires the key `tool`
 on every signal to compute its compliance flag. The shim adapters (vol3,
@@ -4563,10 +4598,24 @@ n_unanalyzed and n_total.
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING — never assigned a tracker ID until this entry (2026-07-08) |
+| **Status** | RESOLVED — audit-before-patch (2026-07-08) found this already fixed by **F8**, and the originally-proposed fix path was itself wrong. No new code needed. |
 | **Severity** | P2 |
-| **File** | `vigia/sift:267-275` |
+| **File** | `vigia/sift/sift_orchestrator.py::_to_signal_safe` (:311) |
 | **Detected** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.1, finding **N14** (2026-07-03) |
+
+**Verification (2026-07-08, audit-before-patch):** `_to_signal_safe` no longer
+drops silently — on a `to_signal()` exception it appends to `self._signal_drops`
+(`# F8 (N14)`, :320), which is surfaced as `results["signal_conversion_drops"]`
+(full list, :883) and `pipeline_meta.n_signal_conversion_drops` (count, :926).
+The loss is visible in the bundle.
+
+**Correction to the original fix path:** the entry originally proposed emitting a
+synthetic `*_UNANALYZED` signal. That would be **semantically wrong** — a
+`to_signal()` conversion failure means the artifact *was* analyzed (the engine
+produced a result) but the DTO conversion has a defect; representing it as
+"unanalyzed evidence" would mislead. A drop counter is the honest
+representation, distinct from the `_UNANALYZED` marker F7 uses for engines that
+genuinely did not run. The shipped F8 behavior is the correct design.
 
 **Description:** `_to_signal_safe` catches any exception raised by
 `to_signal()` and returns `None` with a log entry — nothing else. The signal
@@ -4630,10 +4679,25 @@ cases: 0 flips across verdict/score/n_primary/n_unanalyzed/n_total.
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING — never assigned a tracker ID until this entry (2026-07-08). Explicitly marked "⏳ abierto" (open) in the source audit's own status table, item **P2-E** |
-| **Severity** | P2 |
-| **File** | `sift_orchestrator.py` — `UNIFIED_TIMELINE` engine wiring |
+| **Status** | RESOLVED (verdict impact) — audit-before-patch (2026-07-08) confirmed the derived tag makes the timeline signal inert to every verdict gate. The residual is cosmetic. |
+| **Severity** | P2 → cosmetic |
+| **File** | `sift_orchestrator.py` — `UNIFIED_TIMELINE` engine wiring (:760), `vigia_agent.py::_is_primary_signal` (:101) |
 | **Detected** | `docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §3.2 |
+
+**Verification (2026-07-08, audit-before-patch):** the timeline signal is emitted
+through `_mark_derived(...)` (`sift_orchestrator.py:760`), stamping
+`signal_class="derived"`. `_is_primary_signal` (`vigia_agent.py:101`) returns
+False for any `derived`/`unanalyzed` signal, and every verdict gate — the
+reasoner's `≥3`, `classify_agent_verdict`'s `<3 → ABSTAIN`, and the L-036
+override — counts only `n_primary` from `_signal_stats`. So a timeline
+derivation (empty or not) **cannot inflate the signal count nor influence any
+verdict**. It is also rendered `[DERIVED]` in the narrative (:982). The
+"⏳ abierto" mark in the audit's §3.2 status row is stale — it predates F5;
+the same document's top implementation table already lists F5 as ✅ done.
+
+**Residual (non-defect):** whether `UnifiedTimelineEngine` emits a signal at all
+on a zero-timestamp input is a cosmetic question about a derived, gate-excluded,
+`[DERIVED]`-labeled signal with no timeline content — no forensic impact.
 
 **Description:** the `UNIFIED_TIMELINE` engine emits a derived signal
 regardless of whether it actually found any timestamped events
@@ -4653,11 +4717,9 @@ contribute toward a non-ABSTAIN verdict. Needs re-verification against
 current `signal_class` tagging to confirm whether F5 already closed this or
 whether the empty-timeline case specifically still leaks through.
 
-**Fix path:** re-run the N4/F5 reproduction from
-`docs/AUDITORIA_PIPELINE_ROBUSTEZ.md` §1 against current HEAD with a
-zero-timestamp case. If the derived tag already excludes it, close as
-RESOLVED-by-F5 and update this entry. If not, gate `UNIFIED_TIMELINE` signal
-emission on `timestamps>0`, or ensure the `derived` tag is applied here too.
+**Outcome:** closed as RESOLVED-by-F5 for the verdict-relevant concern, exactly
+the disposition the original "fix path" anticipated once the derived tag was
+confirmed to exclude it.
 
 **Resolution (2026-07-10):** re-verified against HEAD with the exact
 reproduction this entry required (signals WITHOUT timestamps →
