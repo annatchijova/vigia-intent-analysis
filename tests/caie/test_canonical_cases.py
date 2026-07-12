@@ -26,8 +26,24 @@ CASES_DIR = Path("data/cases/consolidated_canonical")
 # XPASS and must be removed from this map.
 _B115 = ("CAIE-layer verdict was sustained by fossil TCV on B-115-broken "
          "metadata timestamps; pending data repair decision D-2")
-_RESCORE = ("subgroup-C case: strong signal carries inverted raw_score "
-            "(0.05-0.07); pending the dedicated re-scoring session")
+# Re-scoring session outcome (2026-07-12, docs/RESCORING_SESSION_SCOPE_20260712.md):
+# case_090 and case_026 were retyped+re-scored per the rubric and now seal
+# MALICE at the MOTOR layer on clean composite (0.4359 / 0.4233, zero
+# fractures). They still read NOISE at the CAIE-TOOL layer (composite ~0.095
+# vs the 0.5/0.2 Noisy-OR thresholds) — that residue is the D-G mode
+# divergence (fusion scale, not data): see
+# docs/SCORER_ARCHITECTURE_DOSSIER_20260712.md D-G. case_024 was resolved as
+# honest SUSPICION (no re-score; CAN-026 criterion applies, expected_verdict
+# relabel decision pending).
+_MODE_DIVERGENCE = ("data repaired (retype+rubric 2026-07-12): motor seals "
+                    "MALICE on clean composite; CAIE-tool layer still NOISE "
+                    "because its 0.5/0.2 Noisy-OR thresholds are structurally "
+                    "unreachable on the adjusted scale — pending D-G mode "
+                    "unification, not a data fix")
+_HONEST_SUSPICION = ("re-scoring session resolved this case as honest "
+                     "SUSPICION (no re-score; rubric band cannot defensibly "
+                     "reach MALICE); expected_verdict relabel decision "
+                     "pending (CAN-026 criterion)")
 KNOWN_PENDING = {
     **{cid: _B115 for cid in (
         "case_004_incompetencia_armamentizada",
@@ -59,9 +75,9 @@ KNOWN_PENDING = {
         "case_109_silencio_estadistico_log",
         "case_111_falso_rastro_incompetencia",
     )},
-    "case_090_anacronismo_herramienta": _RESCORE,
-    "case_024_paracaidista": _RESCORE,
-    "case_026_ventrilocuo": _RESCORE,
+    "case_090_anacronismo_herramienta": _MODE_DIVERGENCE,
+    "case_024_paracaidista": _HONEST_SUSPICION,
+    "case_026_ventrilocuo": _MODE_DIVERGENCE,
 }
 
 def load_canonical_cases():

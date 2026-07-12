@@ -29,7 +29,7 @@
     },
     {
       "artifact_id": "a090_02",
-      "evidence_type": "cultural_marker",
+      "evidence_type": "log_entry",
       "source_tool": "sift_edr",
       "timestamp": "2026-05-20T11:30:00Z",
       "raw_score": 0.91,
@@ -52,10 +52,10 @@
     },
     {
       "artifact_id": "a090_03",
-      "evidence_type": "memory_process",
+      "evidence_type": "kernel_structure",
       "source_tool": "sift_volatility",
       "timestamp": "2026-05-20T11:28:00Z",
-      "raw_score": 0.05,
+      "raw_score": 0.9,
       "prior_trust": 0.95,
       "provenance_chain": [
         "sha256:a090kern03"
@@ -76,7 +76,7 @@
     },
     {
       "artifact_id": "a090_04",
-      "evidence_type": "dns_record",
+      "evidence_type": "network_flow",
       "source_tool": "sift_pcap",
       "timestamp": "2026-05-20T11:29:00Z",
       "raw_score": 0.82,
@@ -184,6 +184,17 @@
       }
     }
   ],
+  "_rescore_note": {
+    "date": "2026-07-12",
+    "operation": "Sesión de re-puntuación (docs/RESCORING_SESSION_SCOPE_20260712.md) — retipado D-5 + rúbrica raw_score aplicados ATÓMICAMENTE (regla del scope: nunca por separado)",
+    "changes": {
+      "a090_02": "cultural_marker -> log_entry (alertas EDR = log del EDR; D-5)",
+      "a090_03": "memory_process -> kernel_structure (driver de kernel, volatility; D-5) + raw_score 0.05 -> 0.90 (rúbrica: SSDT hooking sin generador benigno; comparables 0.88 case_111, 0.96 LINUX-004, 0.97 NROMANOFF — docs/RUBRIC_RAW_SCORE_20260712.md)",
+      "a090_04": "dns_record -> network_flow (tráfico pcap/netflow, no registro DNS; D-5)"
+    },
+    "measured": "aislado con motor real antes de aplicar: SUSPICION 0.1953 (post-M2) -> MALICE 0.4359 vía rama cross-domain (4 dominios, 4 artefactos), CERO fracturas, boost 0.0 — veredicto por composite limpio. El raw previo 0.05 afirmaba semánticamente 'observación limpia' del ataque central del caso (inversión de autoría, no juicio conservador).",
+    "note": "El bloque 'signals' NO se modifica: preserva el snapshot del bundle sellado pre-corrección (ver _migration_note)."
+  },
   "_migration_note": {
     "date": "2026-07-06",
     "source": "results/agent_batch/VIGIA-CAN-008_agent_bundle.json",
