@@ -535,7 +535,7 @@ def t42():
 @test("T50 — VigiaPipeline end-to-end con BundleBuilder")
 def t50():
     from vigia.core.ebs_v1 import SignalOutput
-    from pipeline import VigiaPipeline
+    from vigia.pipeline.pipeline import VigiaPipeline
     from forensics.bundle_builder import BundleBuilder
 
     pipeline = VigiaPipeline(adaptive_policy=False)
@@ -556,7 +556,7 @@ def t50():
 
 @test("T51 — run_vigia retorna bundle_hash y pasa verificacion")
 def t51():
-    from pipeline import run_vigia
+    from vigia.pipeline.pipeline import run_vigia
     from forensics.verify_ebs_v1 import verify_bundle
 
     result = run_vigia([
@@ -577,7 +577,7 @@ def t51():
 
 @test("T52 — bundle_json no contiene variables de infraestructura LLM")
 def t52():
-    from pipeline import run_vigia
+    from vigia.pipeline.pipeline import run_vigia
 
     result = run_vigia([
         {"tool_name": "SDA", "value": 0.7, "z_score": 2.0, "confidence": 0.85},
@@ -595,7 +595,7 @@ def t52():
 
 @test("T53 — decisiones son deterministas (mismo input = misma decision)")
 def t53():
-    from pipeline import run_vigia
+    from vigia.pipeline.pipeline import run_vigia
 
     signals = [
         {"tool_name": "SDA", "value": 0.7, "z_score": 2.0, "confidence": 0.85},
@@ -835,7 +835,7 @@ def t80():
 
 @test("T81 — VigiaPipeline conecta hint_threshold con PolicySpec automaticamente")
 def t81():
-    from pipeline import VigiaPipeline
+    from vigia.pipeline.pipeline import VigiaPipeline
     from vigia.core.ebs_v1 import make_default_policy
 
     # Con epsilon=0.15, el motor debe tener thresholds coherentes
@@ -970,7 +970,7 @@ def t86():
 @test("T87 — VigiaPipeline construye AbductionTrace automaticamente")
 def t87():
     from vigia.core.ebs_v1 import SignalOutput
-    from pipeline import VigiaPipeline
+    from vigia.pipeline.pipeline import VigiaPipeline
 
     pipeline = VigiaPipeline(adaptive_policy=False)
     signals = [
@@ -1298,7 +1298,7 @@ def t98():
     El pipeline debe configurar RiskBoundedDecisionLayer desde PolicySpec.
     Verificar que los epsilons del layer coinciden con los del PolicySpec.
     """
-    from pipeline import VigiaPipeline
+    from vigia.pipeline.pipeline import VigiaPipeline
     from vigia.core.ebs_v1 import make_default_policy
 
     policy = make_default_policy(epsilon=0.08)
