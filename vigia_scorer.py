@@ -278,6 +278,22 @@ def _verdict_color(verdict) -> str:
     }.get(v_str.upper(), BLU)
 
 
+def _frac_sev(raw, default: "Fraction" = Fraction(1, 2)) -> "Fraction":
+    """
+    Coerce an examiner-supplied severity to an exact Fraction, shielding the
+    decision path against malformed values. A string ("high") or None in a
+    temporal_violations severity previously reached Fraction(str(raw)) and
+    raised ValueError, crashing the whole scorer. Non-parseable -> default
+    (0.5, matching the missing-key `.get(..., 0.5)` convention). Valid numeric
+    values are passed through UNCHANGED (no clamp) so corpus scoring stays
+    bit-identical. Ref: docs/SCORER_ARCHITECTURE_DOSSIER_20260712.md D-E.
+    """
+    try:
+        return Fraction(str(raw))
+    except (ValueError, ZeroDivisionError, TypeError):
+        return default
+
+
 def _compute_temporal_factor(violations: list[dict], artifact_id: str) -> Fraction:
     """
     Temporal penalty factor per artifact. Returns Fraction (P0: no math.exp()).
@@ -309,7 +325,7 @@ def _compute_temporal_factor(violations: list[dict], artifact_id: str) -> Fracti
     ]
     if not relevant:
         return Fraction(1, 1)
-    ws = [Fraction(str(v.get("severity", 0.5))) * weights.get(v.get("type", ""), Fraction(1, 2))
+    ws = [_frac_sev(v.get("severity", 0.5)) * weights.get(v.get("type", ""), Fraction(1, 2))
           for v in relevant]
     max_ws = max(ws)
     max_ws_clamped = min(Fraction(1, 1), max(Fraction(0, 1), max_ws))
@@ -1072,9 +1088,17 @@ def _vigia_score(case: dict) -> dict:
         min(Fraction(1, 2), Fraction(fracture_malice_boost) + sum(_su_terms, Fraction(0)))
     )
 
-    # Hard gate: physical law violation — unconditional MALICE override
+    # Hard gate: physical law violation — unconditional MALICE override.
+    # Severity is read through _sev_float (the same coercion shield every other
+    # severity consumer uses): this is the highest-authority branch in the
+    # scorer (unconditional MALICE), yet it read raw examiner JSON directly, so
+    # a string/None severity ("high", null) raised TypeError on the `>= 0.9`
+    # comparison and crashed the whole scorer. Non-numeric -> 0.0 (default),
+    # which does NOT fire the gate — a malformed severity must not fabricate an
+    # unconditional MALICE. Ref: docs/SCORER_ARCHITECTURE_DOSSIER_20260712.md D-E.
     hard_temporal = any(
-        v.get("type") == "EFFECT_BEFORE_CAUSE" and v.get("severity", 0) >= 0.9
+        v.get("type") == "EFFECT_BEFORE_CAUSE"
+        and _sev_float(v.get("severity", 0), 0.0) >= 0.9
         for v in violations
     )
 
