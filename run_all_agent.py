@@ -175,14 +175,14 @@ def extract_verdict_from_bundle(bundle_path: Path) -> str:
         #    canonico conocido; cualquier otra cosa (None, legacy, vocabulario
         #    futuro) cae a la heuristica de abajo, preservando la compatibilidad.
         sealed = data.get("agent_verdict")
-        if isinstance(sealed, str) and sealed in _MAP:
-            return _MAP[sealed]
+        if isinstance(sealed, str) and sealed in _HYP_MAP:
+            return _HYP_MAP[sealed]
         # 1. Campo verdict directo (audit_trail entry)
         for entry in data.get("audit_trail", {}).get("entries", []):
             if entry.get("action") == "AGENT_EXIT":
                 v = entry.get("inputs_summary", {}).get("verdict", "")
-                if v in _MAP:
-                    return _MAP[v]
+                if v in _HYP_MAP:
+                    return _HYP_MAP[v]
         # 2. pipeline_results.abduction.best_hypothesis
         hyp = (data.get("pipeline_results", {})
                    .get("abduction", {})

@@ -108,6 +108,7 @@ _EVIDENCE_MAP = {
     "shellbag": "registry_key",
     "amcache": "registry_key",
     "event_log": "windows_event_log",
+    "windows_event_log": "windows_event_log",
     "cultural_marker": "cultural_marker",
     "memory_process": "memory_process",
     "lsass_session": "lsass_session",
