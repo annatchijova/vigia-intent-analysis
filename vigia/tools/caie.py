@@ -1212,13 +1212,6 @@ class CrossArtifactIncongruenceEngine:
                      ("document_visual", "document_geometry")]
         cryptographic = [a for a in self._artifacts if a.evidence_type in
                          ("cryptographic_hash", "digital_signature")]
-        network_logs = [a for a in self._artifacts if a.evidence_type in
-                        ("log_entry", "dns_record") and (
-                            "network" in a.description.lower()
-                            or "red" in a.description.lower()
-                            or "conexión" in a.description.lower()
-                            or "conexion" in a.description.lower()
-                        )]
         host_logs = [a for a in self._artifacts if a.evidence_type in
                      ("log_entry", "memory_process") and "socket" in str(a.metadata).lower()]
 
@@ -1452,34 +1445,37 @@ class CrossArtifactIncongruenceEngine:
         # ===================================================================
 
         # Rule 6: TEMPORAL_CAUSALITY_VIOLATION (TCV)
-        # Effect-before-cause: Any log/timestamp artifact precedes the process that
+        # Effect-before-cause: a network event precedes the process that
         # supposedly caused it.
         #
-        # BUG FIX (session 2026-05-18): El filtro original usaba
-        #   "network" in a.description.lower()
-        # Esto descartaba silenciosamente artefactos válidos como windows_event_log
-        # y file_timestamp que tienen network_log_time en metadata pero no la
-        # palabra "network" en la descripción. Resultado observado: golden_rules_triggered=0
-        # en casos con violación causal de -5s (DLL antes que el proceso).
-        #
-        # Fix: cualquier artefacto que tenga network_log_time en metadata califica
-        # como "evento previo". El campo network_log_time es el contrato semántico
-        # correcto, no la descripción en texto libre.
-        #
-        # Rationale Daubert: un filtro sobre texto libre no es reproducible —
-        # depende de cómo el operador redactó la descripción. Un filtro sobre
-        # un campo estructurado del metadata sí lo es.
+        # M1 (docs/FOSSIL_HUNT_20260711.md): structured-fields-only TCV.
+        # A pair qualifies only when BOTH event times are asserted as
+        # structured metadata: network_log_time for the network event and
+        # process_creation_time for the process. Two former branches are
+        # removed as inadmissible:
+        #   - free-text matching ("network"/"red"/"conexión" as substrings of
+        #     the description) classified ANY artifact as network activity on
+        #     words like "registered", "flickered", "credentials" or "stored",
+        #     and sustained 6 sealed verdicts on comparisons with no causal
+        #     relation (registry install keys vs. memory-acquisition snapshot,
+        #     vacation-request logs vs. file uploads — gaps up to 11 years);
+        #   - fallback to the generic artifact timestamp, which is
+        #     collection/acquisition time, not event time. Comparing it
+        #     against an event time is a category error, and its _utcnow()
+        #     default fabricated a severity-1.0 fracture out of millisecond
+        #     object-creation skew on artifacts with no timestamps at all
+        #     (VIGIA-REAL-006).
+        # An artifact lacking the structured field simply does not enter the
+        # rule: absence of an asserted event time is missing data, never a
+        # causality signal.
         network_artifacts = [
-            a for a in self._artifacts
-            if (
-                a.metadata.get("network_log_time")  # campo estructurado (correcto)
-                or "network" in a.description.lower()  # compatibilidad backward
-                or "red" in a.description.lower()       # ES: red de comunicaciones
-                or "conexión" in a.description.lower()  # ES: conexión de red
-                or "conexion" in a.description.lower()  # ES: sin tilde
-            )
+            a for a in self._artifacts if a.metadata.get("network_log_time")
         ]
-        process_artifacts = [a for a in self._artifacts if a.evidence_type == "memory_process"]
+        process_artifacts = [
+            a for a in self._artifacts
+            if a.evidence_type == "memory_process"
+            and a.metadata.get("process_creation_time")
+        ]
 
         def _range_guard_tcv(dt: "datetime", ts_str: str, artifact_tool: str,
                              field: str) -> "datetime | None":
@@ -1579,13 +1575,13 @@ class CrossArtifactIncongruenceEngine:
             return None
 
         for net in network_artifacts:
-            net_time_str = net.metadata.get("network_log_time") or net.timestamp
+            net_time_str = net.metadata.get("network_log_time")
             net_time = _parse_ts_tcv(net_time_str, net.source_tool, "network_log_time")
             if net_time is None:
                 continue
 
             for proc in process_artifacts:
-                proc_time_str = proc.metadata.get("process_creation_time") or proc.timestamp
+                proc_time_str = proc.metadata.get("process_creation_time")
                 proc_time = _parse_ts_tcv(proc_time_str, proc.source_tool, "process_creation_time")
                 if proc_time is None:
                     continue
