@@ -716,7 +716,7 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > | Modo | Qué procesa | El número honesto |
 > |---|---|---|
 > | **Claude/MCP (Dominio A)** — principal | evidencia raw real, cadena de extracción MCP completa | **Análisis profundo por caso — sin número agregado por diseño.** Registro a la fecha: 100% de veredictos correctos en todas las investigaciones corridas (docs por caso en `evidence/`, `results/`, `reports/`) |
-> | **Agente sobre JSON (Dominio B)** | casos JSON sintéticos/convertidos | **91.8% (146/159) en el corpus de detección** — el ÚNICO modo con número de corpus |
+> | **Agente sobre JSON (Dominio B)** | casos JSON sintéticos/convertidos | **91.8% (146/159) en el corpus de detección** — el ÚNICO modo con número de corpus; agregado del corpus mixto 167/199 (segmentación abajo) |
 > | **Agente sobre RAW (Dominio C)** | corpus forense público real | **43 fuentes de evidencia raw distintas con bundles sellados en `results/`** — SRL 2018 (22 imágenes de memoria), MUS2019/Narcos (13 dumps), M57 (3), NPS 2010/2014, Magnet 2020 CTF, Tuck 2019 macOS, Vanko — más las investigaciones Magnet 2022 (Windows/iOS/Android), Owl HD1/Nexus 5 y HMG documentadas por caso. **Cada una es una investigación individual con sus propios findings — NO se agrega como precisión** |
 >
 > El modo Claude Code / MCP (Modo 2) se evalúa aparte y por caso: **100% de
@@ -726,13 +726,13 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > quedaba en PIPELINE_ERROR; MAGNET-2022-WINDOWS: el Modo 2 llegó a MALICE
 > con evidencia de C2 donde el Modo 1 decía NOISE). Ver Dominio A abajo.
 >
-> **Corpus de detección (Dominio A): 146/159 (91.8%).** La tabla a
-> continuación desglosa todos los casos JSON. Los casos adversariales/BREAK
-> (31) son datos de resistencia, no de precisión — son independientes del
-> corpus de detección y están diseñados para romper el sistema. Los casos de
-> frontera epistémica (8) tienen etiquetas en revisión. La evidencia raw
-> (Dominio C) se evalúa por investigación y llega a mejores resultados o
-> retorna ABSTAIN — no forma parte de este conteo. (Dataset: ground-truth 2026-07-06)
+> **Modo agente — `run_all_agent.py` sobre el corpus JSON de 199 casos —
+> agregado: 167/199 (83.9%), ciego a la etiqueta, distribución idéntica a la del
+> scorer standalone corriendo ciego.** Ese agregado NO es una cifra de precisión
+> por sí solo: el corpus mezcla deliberadamente conjuntos de evaluación con
+> propósitos distintos — incluyendo suites adversariales *diseñadas para romper el
+> sistema* y casos de frontera epistémica — y deben leerse por separado
+> (segmentación desde el dataset de ground truth, 2026-07-06):
 >
 > | Segmento | Casos | Ciego a etiqueta | Lectura |
 > |---|---|---|---|
