@@ -1,0 +1,947 @@
+{
+ "generated": "2026-07-12",
+ "workflow_run": "wf_c28ab882-615",
+ "subagent_tokens": 1146324,
+ "note": "10 sondas empiricas sobre el motor real. La pasada de verificacion adversarial (33 agentes) fallo por limite de cuota de sesion — NINGUN hallazgo tiene verificacion adversarial independiente; ver el dossier para el estado de verificacion real (spot-checks del agente principal + consistencia cruzada entre sondas).",
+ "probes": [
+  {
+   "probe": "coeff-sensitivity",
+   "summary": "The heuristic fracture coefficients (boost=0.45, penalty=0.25, boost-cap=0.5) sit on a wide, asymmetric plateau: corpus agreement stays exactly 153/193 with zero verdict flips for boost anywhere in [0.39, 1.0-uncapped], penalty anywhere in [0.0, 0.34], and any boost-cap in {0.4, 0.5, 0.6, off}. There are NO knife-edge cases within +/-0.05 of the current coefficients (0.01-resolution sweep, zero flips); the nearest cliff is at boost=0.38 (-0.07), below which expected-MALICE cases start dropping (2 flips by 0.35, 11 by 0.30, all MALICE->SUSPICION on correct verdicts). The sev-0.8 single fracture crossing the whole SUSPICION->MALICE distance is the TYPICAL geometry, not an extreme: 20/21 fracture-bearing cases carry exactly one malicious fracture, and 18 boost-carried MALICE verdicts (16 of them single sev-0.8 M2 discriminators, +0.36) have composite-only residuals of 0.02-0.26 — without the fracture most would land at NOISE/UNKNOWN, not SUSPICION. No swept setting improves agreement above 153: the coefficients offer only downside, and the false-positive side is structurally protected by the R4-3 gate (boost=1.0 uncapped creates zero new MALICE) and empirically unconstrained (zero expected-benign cases carry a malicious fracture).",
+   "method": "Parametrized the live engine in-memory: inspect.getsource(vigia_scorer._vigia_score), replaced the 5 literal coefficient sites (boost 0.45, penalty 0.25, boost-caps at both min() sites, penalty-cap 0.35) with injectable globals, re-exec'd in a copy of the module namespace (repo untouched). Sanity gate: at defaults the parametrized scorer reproduced the real engine verdict-for-verdict on all cases (0 mismatches) and the 153/193 baseline of snap_m2.json. Corpus: 198 scoreable dict cases from run_all_agent.find_cases(CASES_DIRS), collapsing to 193 unique case_ids (last-write-wins, mirroring the reference harness); comparator doctrine mirrored exactly (BENIGN->NOISE alias, UNKNOWN accepts all, INTENT accepts MALICE). Scripts: arch/fracture-coeff-sensitivity/coeff_sweep.py (107 combos: boost {0.30..0.60 x0.05} x penalty {0.15..0.35 x0.05} x cap {0.4,0.5,0.6} + ablations boost=0 and penalty=0) and fine_sweep.py (boost 0.36..0.50 step 0.01; boost 0.65..1.0 with cap removed; penalty 0.26..0.35 step 0.01; cap-off at defaults). ~2.4M case-scorings total at ~1.6s per 198-case corpus pass. Geometry analysis from per-case dump at defaults (default_detail.json): composite_base, boost, penalty, malicious-fracture severities, hard-gate flag; boost-carried classification cross-validated against the empirical boost=0 ablation (identical 18-case set).",
+   "key_numbers": {
+    "corpus_unique_cases": 193,
+    "baseline_agreement": "153/193 (matches snap_m2.json exactly; parametrized scorer 0 verdict mismatches vs direct engine)",
+    "grid_combos_swept": 107,
+    "fine_combos_swept": 31,
+    "boost_plateau": "[0.39, >=1.0 uncapped] — 0 flips, agreement 153",
+    "boost_cliff": "0.38: 1 flip; 0.35: 2 flips (agree 151); 0.30: 11 flips (agree 142); 0.0: 18 flips (agree 135)",
+    "penalty_plateau": "[0.00, 0.34] — 0 flips; 0.35: 1 flip (regression, agree 152)",
+    "cap_effect": "0 flips across {0.4, 0.5, 0.6, removed}; cap binds on 1/193 cases",
+    "knife_edge_cases_within_0.05": 0,
+    "cases_with_malicious_fracture": "21/193 (20 single-fracture; severity mode 0.8 x16)",
+    "malice_verdicts": "97 total: 1 hard-gate, 75 composite-only (boost=0), 21 with boost>0, 18 boost-carried",
+    "boost_carried_by_single_sev08": "16/18 (all expected=MALICE; composite-only residual 0.02-0.26)",
+    "expected_benign_with_boost": 0,
+    "max_agreement_anywhere_in_sweep": 153
+   },
+   "findings": [
+    {
+     "title": "boost=0.45 sits on a wide plateau, not a knife edge: zero flips for boost in [0.39, >=1.0], nearest cliff at -0.07",
+     "severity": "high",
+     "evidence": "fine_sweep.json: boost swept 0.36..0.50 at 0.01 steps — agreement 153/193 and 0 flips for every value >=0.39; first flip at 0.38 (case_013_estocolmo_inverso MALICE->SUSPICION); boost=0.65..1.0 WITH CAP REMOVED still 153/193, 0 flips. sweep_results.json: all 60 grid combos with boost>=0.40 and penalty<=0.30 are identical to current (153, 0 flips).",
+     "decision_impact": "The roadmap item 'Bayesian calibration of boost on labelled dataset' (vigia_scorer.py line 950) is low-yield on this corpus: no setting in a 2x range improves agreement (max observed anywhere = 153), and the current value has 0.07 of downward margin and unbounded upward margin. Calibration effort should go to the fracture DETECTORS and the R4-3 gate, which are the actual decision boundaries."
+    },
+    {
+     "title": "A single sev-0.8 fracture carrying the whole verdict distance is the dominant corpus geometry, not an outlier",
+     "severity": "high",
+     "evidence": "default_detail.json analysis: 21/193 cases have malicious fractures, 20/21 have exactly ONE (severities: 0.8 x16, 0.85 x3, 0.9 x1, one case with 0.95+1.0). Of 97 MALICE verdicts, 18 are boost-carried (composite alone <=0.33); 16/18 carry a single sev-0.8 M2 discriminator (LINGUISTIC_ATTRIBUTION_SIGNAL / SOCIAL_ENGINEERING_PATTERN, +0.36). Their composite-only residual scores are 0.02-0.26 (median ~0.08) — without the fracture they fall to NOISE/UNKNOWN, skipping SUSPICION entirely. Confirmed empirically: boost=0 ablation flips exactly these 18 (135/193).",
+     "decision_impact": "The boost is functionally a binary step ('malicious fracture present -> MALICE-band'), not a graded severity weight — severity granularity is unused (94% of mass is a single 0.8 or 0.85 fracture). Architecture: either accept and formalize it as a gate (simpler, honest under Daubert), or diversify severity assignments; but the current continuous coefficient adds no discrimination. It also concentrates risk: 16 of 18 boost-carried MALICE verdicts stand entirely on the precision of two M2 fracture types."
+    },
+    {
+     "title": "The false-positive side of the boost coefficient is completely unconstrained by the corpus — calibration is one-sided",
+     "severity": "high",
+     "evidence": "default_detail.json: ZERO expected-NOISE/BENIGN cases carry any malicious fracture (boost>0). fine_sweep.json: boost=1.0 with cap removed produces zero new MALICE verdicts (R4-3 corroboration gate and thresholds absorb everything). All 18+ flips in the entire swept space are downward (correct MALICE degrading), never upward.",
+     "decision_impact": "Any calibration (Bayesian or otherwise) on this corpus can only estimate the miss-rate side of the coefficient; its false-alarm cost is invisible because no benign case triggers a malicious fracture. Before recalibrating, the corpus needs adversarial benign cases that fire LINGUISTIC_ATTRIBUTION_SIGNAL / SOCIAL_ENGINEERING_PATTERN spuriously; otherwise the empirically optimal boost is unbounded above, which is clearly an artifact. FP protection currently lives entirely in the R4-3 gate, so gate correctness, not coefficient magnitude, is the safety-critical component."
+    },
+    {
+     "title": "The credibility penalty (0.25, cap 0.35) is corpus-dead: exactly 1/193 cases bears any penalty, and every non-default setting is neutral or harmful",
+     "severity": "medium",
+     "evidence": "default_detail.json: only case_110_paradoja_auditor_externo (VIGIA-CAN-028, expected MALICE, penalty 0.15 from one CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED at sev 0.6) has penalty>0. Sweeps: penalty in [0.0, 0.34] at 0.01 resolution -> zero flips corpus-wide (including full ablation p=0.0); p=0.35 flips that one case MALICE->SUSPICION (agreement 153->152), a regression on a correct verdict.",
+     "decision_impact": "The CREDIBILITY_REDUCING path cannot be calibrated from this corpus and its only measurable marginal effect is negative. Either add corpus coverage for VERDICT_CONFLICT / METADATA_CONCEALMENT / CRYPTOGRAPHIC_INCONSISTENCY_UNVERIFIED before tuning, or freeze the coefficient and document it as untested (Daubert-relevant: an untestable parameter in the scoring formula)."
+    },
+    {
+     "title": "The boost cap (0.5) is dead code in practice: binds on 1/193 cases and changes no verdict at any swept setting including removal",
+     "severity": "low",
+     "evidence": "sweep_results.json: the three cap columns {0.4, 0.5, 0.6} are verdict-identical for all 35 boost/penalty combos; fine_sweep.json cap-off at defaults: 0 flips. Only case_024_paracaidista_timestomping exceeds the cap (2 fractures, sev mass 1.95 -> uncapped 0.8775), and it scores 0.99 MALICE regardless.",
+     "decision_impact": "The cap value needs no calibration; keep it only as a defensive bound against future multi-fracture cases. Its presence should not be cited as a calibrated safeguard — it has never intervened in a verdict on this corpus."
+    },
+    {
+     "title": "Knife-edge census within +/-0.05 of current coefficients: EMPTY; the closest case is case_013_estocolmo_inverso at boost-delta -0.07",
+     "severity": "medium",
+     "evidence": "fine_sweep.json: boost 0.40..0.50 and penalty 0.20..0.30, both at 0.01 steps -> zero verdict changes vs current in any of the 193 cases. First flips: boost 0.38/0.37 (case_013, score 0.3847, single SOCIAL_ENGINEERING_PATTERN 0.8), boost 0.36 adds case_fusion_panico_coordinado (0.3979); penalty 0.35 (case_110). All flip candidates are expected-MALICE with default margins over the 0.33 threshold of +0.05 to +0.11.",
+     "decision_impact": "No sealed verdict in the corpus is coefficient-fragile at the +/-0.05 level, which supports defending the current values as robust under Daubert sensitivity challenge; the defense argument should cite the plateau ([0.39, 1.0] x [0.0, 0.34]) rather than claim the specific values 0.45/0.25 are calibrated — they are not, and the sweep shows nothing distinguishes them from neighbors."
+    }
+   ],
+   "caveats": [
+    "198 case files score as dicts but 5 duplicate case_ids collapse last-write-wins to 193 unique cases — identical behavior to the reference harness (snap_m2.json also has 193), so all agreement numbers are /193.",
+    "Flip detection is at 0.01 coefficient resolution; since final_score is monotone in each coefficient for fixed case structure, any missed knife-edge window is narrower than 0.01 — none was observed at grid points.",
+    "The 'composite-only residual' scores for the 18 boost-carried cases are analytic reconstructions (support factor derived from score/raw); the classification itself is corroborated by the empirical boost=0 ablation, which flips exactly the same 18 cases.",
+    "Penalty cap was held at 0.35 during the boost/penalty/cap grid (per probe spec); it was only exercised implicitly — with max corpus penalty mass 0.15 it cannot bind, so its dead status is inferred from coverage, not from a sweep.",
+    "Sensitivity conclusions are conditional on this corpus's fracture-severity distribution (essentially all mass at sev 0.8/0.85 single fractures); a future corpus with graded severities or multi-fracture benign cases could reopen both the cliff position and the FP side.",
+    "Agreement uses the batch-comparator doctrine (expected UNKNOWN accepts anything), which can mask verdict movement on UNKNOWN-labelled cases in the agreement metric; flip counts, however, are raw verdict changes and include those cases — zero were found within +/-0.05."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-coeff-sensitivity/coeff_sweep.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-coeff-sensitivity/fine_sweep.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-coeff-sensitivity/sweep_results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-coeff-sensitivity/fine_sweep.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-coeff-sensitivity/default_detail.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-coeff-sensitivity/verdict_matrix.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-coeff-sensitivity/sweep_run.log"
+   ]
+  },
+  {
+   "probe": "threshold-robustness",
+   "summary": "Current thresholds do NOT sit at corpus local optima. The MALICE threshold 0.33 is strictly dominated by 0.32 (+1 agreement at zero FP cost: VIGIA-MAGNET-2020-WINDOWS, expected INTENT, gate-open, scores 0.3297 — 0.0003 below the cut) and by 0.28 (+4 net, but that trade is 8 fixed MALICE/INTENT false negatives against 4 new gate-open MALICE FPs on expected-SUSPICION cases). SUSPICION 0.10 sits on a flat plateau (0.08–0.10 all give 153) whose best point is 0.07 (154), and it sits only 0.001 below a 4-case cluster at exactly 0.1010 (all VIGIA_BREAK, expected SUSPICION) — a +0.01 move loses 4 cases at once. The UNKNOWN band [0.08,0.10] is net-negative under the comparator doctrine (raising the NOISE/UNKNOWN boundary to 0.09–0.10, i.e., emptying the band, gives 154): expected-UNKNOWN accepts anything, so an UNKNOWN verdict can never earn agreement, only lose it. Overall the corpus is boundary-robust: 89.6% of threshold-path cases lie more than 0.02 from any boundary and 63% more than 0.05; the joint (MALICE, SUSPICION) optimum in the swept grid is 158/193 at (0.28, 0.07), +5 over the 153/193 baseline, confirmed against the live engine.",
+   "method": "One instrumented scoring pass over the 193 unique-case_id corpus (198 dict cases dedup by case_id, mirroring corpus_snapshot.py) with the real engine (_vigia_score): recorded score, decision path (192 threshold-path, 1 hard-gate EFFECT_BEFORE_CAUSE, 0 errors/abstains), and R4-3 gate-open status via a patched engine copy with MALICE threshold set to -1 forcing gate traversal (gate status is score-independent by construction — the branch logic never reads final_score — so verdicts are exactly separable into score-vs-threshold + fixed gate boolean). Scripts: .../scratchpad/arch/threshold-robustness/instrument_pass.py (instrument.json) and sweep.py (sweep_results.json). Verdict simulation validated 3 ways: 193/193 verdict-exact vs live engine at baseline (0.33/0.10/0.08, agreement 153/193), and two live full-corpus runs with source-patched thresholds — (0.28,0.07) live 163/198 vs simulated 158/193 (both +5 over baseline) and (0.30,0.10) live 161/198 vs simulated 156/193 (both +3). Sweeps: MALICE 0.28–0.42 step 0.01 (SUSP=0.10, UNK=0.08); SUSPICION 0.06–0.16 (MAL=0.33, UNK=0.08); UNKNOWN boundary 0.03–0.10; full 15x11 joint MALICE x SUSPICION grid; comparator doctrine mirrored exactly (BENIGN->NOISE alias, expected UNKNOWN accepts all, INTENT accepts MALICE). All Fraction-exact comparisons on decimal score strings.",
+   "key_numbers": {
+    "baseline_agreement": "153/193 (dedup) = 158/198 (no dedup)",
+    "simulator_validation": "193/193 verdict-exact at baseline; live patched runs match simulated deltas at (0.28,0.07) and (0.30,0.10)",
+    "malice_sweep_susp0.10_unk0.08": {
+     "0.28": 157,
+     "0.29": 155,
+     "0.30": 156,
+     "0.31": 153,
+     "0.32": 154,
+     "0.33": 153,
+     "0.34": 151,
+     "0.35": 149,
+     "0.36": 143,
+     "0.37": 138,
+     "0.38": 137,
+     "0.39": 132,
+     "0.40": 129,
+     "0.41": 125,
+     "0.42": 119
+    },
+    "suspicion_sweep_mal0.33_unk0.08": {
+     "0.06": 149,
+     "0.07": 154,
+     "0.08": 153,
+     "0.09": 153,
+     "0.10": 153,
+     "0.11": 149,
+     "0.12": 149,
+     "0.13": 147,
+     "0.14": 145,
+     "0.15": 144,
+     "0.16": 144
+    },
+    "unknown_boundary_sweep_mal0.33_susp0.10": {
+     "0.03": 133,
+     "0.04": 135,
+     "0.05": 146,
+     "0.06": 148,
+     "0.07": 153,
+     "0.08": 153,
+     "0.09": 154,
+     "0.10": 154
+    },
+    "joint_grid_best": "158/193 at (MALICE=0.28, SUSPICION=0.07); runners-up 157 at (0.28,0.08/0.09/0.10) and (0.30,0.07)",
+    "boundary_distance_hist_192_threshold_path_cases": {
+     "<=0.005": 6,
+     "(0.005,0.01]": 6,
+     "(0.01,0.02]": 8,
+     "(0.02,0.05]": 51,
+     ">0.05": 121
+    },
+    "pct_within_0.02_of_boundary": "20/192 = 10.4%",
+    "band_0.08_0.12_census": "7 cases: 0.0804 UNKNOWN/ok, 0.0854 FP-CULTURAL-CLEAN exp NOISE FAIL, 4x 0.1010 VIGIA_BREAK exp SUSPICION ok, 0.1066 VIGIA-BEN-014 exp NOISE FAIL",
+    "malice_threshold_clearances": "0.0003 below (0.3297 exp-INTENT FN) / 0.0053 above (0.3353 first TP)",
+    "gate_status": "137 gate-open / 55 gate-closed of 192 threshold-path cases; 1 hard-gate case",
+    "score_deciles_threshold_path": [
+     0,
+     0.0457,
+     0.125,
+     0.3363,
+     0.4511,
+     0.5429,
+     0.99
+    ]
+   },
+   "findings": [
+    {
+     "title": "MALICE threshold 0.33 is not a local optimum; 0.32 strictly dominates and the loss curve is violently asymmetric upward",
+     "severity": "high",
+     "evidence": "sweep.py MALICE sweep: 0.28->157, 0.29->155, 0.30->156, 0.31->153, 0.32->154, 0.33->153 (base), 0.34->151, 0.35->149, 0.36->143, 0.38->137, 0.40->129, 0.42->119. Only case in (0.32,0.33] is VIGIA-MAGNET-2020-WINDOWS: score 0.3297, expected INTENT, gate-open — moving to 0.32 is +1 with zero FP cost. Band (0.28,0.33] holds 8 expected-MALICE/INTENT gate-open FNs vs 4 expected-SUSPICION gate-open cases (0.2872-0.3135) that would flip to MALICE FPs at 0.28.",
+     "decision_impact": "Threshold calibration: lower MALICE threshold at least into the empty gap (0.3135, 0.3297), e.g. 0.32; never raise it (raising to 0.35 already costs 4 cases, 0.42 costs 34). Whether to go to 0.28 (+4 net) is a cost-asymmetry policy call — it buys 8 FN fixes with 4 new MALICE FPs, and under Daubert an FP MALICE is costlier than an FN."
+    },
+    {
+     "title": "The comparator doctrine makes the UNKNOWN band structurally unrewardable — calibrating agreement will always squeeze it to empty",
+     "severity": "high",
+     "evidence": "sweep.py UNKNOWN sweep: boundary 0.08->153, 0.09->154, 0.10->154 (band emptied = best); 0.07->153, 0.05->146, 0.03->133. Under the doctrine expected-UNKNOWN accepts ANY verdict, so an emitted UNKNOWN can only ever lose agreement (whenever expected is NOISE/SUSPICION), never gain it. The band's only non-free occupant is FP-CULTURAL-CLEAN (0.0854, expected NOISE, emitted UNKNOWN — the motivating incident), which flips to agree if the band shrinks.",
+     "decision_impact": "Metric/architecture: do not calibrate the UNKNOWN band against corpus agreement — the objective's optimum is always band-width zero. If the UNKNOWN verdict is a product requirement (human-triage tier), the comparator must be changed to reward it (e.g., expected UNKNOWN matches only UNKNOWN, or partial credit), or the band must be pinned by doctrine, not by the corpus."
+    },
+    {
+     "title": "SUSPICION threshold 0.10 sits 0.001 below a 4-case degenerate cluster at exactly 0.1010 — sub-0.01 clearance on the fragile side",
+     "severity": "medium",
+     "evidence": "instrument.json: VIGIA_BREAK_007/008/009/010 all score exactly 0.1010 (expected SUSPICION, currently correct). SUSPICION sweep: 0.10->153 but 0.11->149 (-4 in one step). Identical 4-way score suggests templated cases hitting identical arithmetic. Plateau 0.08-0.10 all give 153; best point 0.07->154 (gains VIGIA-OWL-2019-NEXUS5, 0.0715, expected SUSPICION currently NOISE); 0.06->149 (5 expected-NOISE cases at 0.0636-0.0666 flip in).",
+     "decision_impact": "Calibration: the SUSPICION threshold has almost no upward margin (0.001) and the NOISE/SUSPICION separation gap is only 0.0049 wide (benign mass tops at 0.0666, first expected-SUSPICION FN at 0.0715). If 0.07 is adopted (+1), the UNKNOWN band inverts (susp < unk) — reinforces finding 2 that the band placement must be decided first. Also flags the BREAK quartet as a brittle regression sentinel: any scoring change that moves them -0.001 silently drops 4 cases."
+    },
+    {
+     "title": "Corpus is globally boundary-robust: ~90% of cases are >0.02 from any threshold; score distribution is bimodal with a sparse mid-band",
+     "severity": "medium",
+     "evidence": "sweep_results.json boundary_hist over 192 threshold-path cases (dist to nearest of 0.08/0.10/0.33): <=0.005: 6, (0.005,0.01]: 6, (0.01,0.02]: 8 (total 20/192 = 10.4% within 0.02), (0.02,0.05]: 51, >0.05: 121 (63.0%). Score deciles [0, 0.0457, 0.125, 0.3363, 0.4511, 0.5429, 0.99] — median sits AT the MALICE threshold; the [0.08,0.12] band holds only 7 cases (5 agree, 2 FPs: FP-CULTURAL-CLEAN 0.0854 and VIGIA-BEN-014 0.1066).",
+     "decision_impact": "Architecture confidence: threshold jitter of +/-0.02 touches at most ~10% of the corpus, so the scorer's separation is mostly driven by the score pipeline, not knife-edge thresholds — small recalibrations are safe to evaluate case-by-case. But both boundary incidents (FP-CULTURAL-CLEAN at 0.0854, MAGNET-2020-WINDOWS at 0.3297) live in the 6-case <=0.005 tail: near-boundary cases deserve an explicit margin/abstain treatment rather than hard cuts."
+    },
+    {
+     "title": "Above 0.33 the R4-3 corroboration gate, not the threshold, is what suppresses false MALICE — and gate status is fully score-independent",
+     "severity": "medium",
+     "evidence": "instrument_pass.py: gate-open computed for all 192 threshold-path cases (137 open, 55 closed) by patching the MALICE cut to -1; the R4-3 branch logic reads only artifact structure, never final_score. In (0.33,0.42] the only 2 expected-SUSPICION cases (case_002_log_fabrication 0.3354, VIGIA-REAL-005 0.3792) are both gate-closed — the threshold contributes zero FP suppression there. Below 0.33, lowering the cut is partially protected too (VIGIA-NGDC-003 at 0.2803 stays SUSPICION, gate-closed) but not fully (4 gate-open expected-SUSPICION cases in 0.2872-0.3135).",
+     "decision_impact": "Architecture: MALICE FP control is already delegated to the structural gate; the threshold's real job is FN control. This argues for calibrating the MALICE cut aggressively low (findings 1) while hardening the gate against the 4 gate-open expected-SUSPICION cases — improving the gate would decouple the FP cost from threshold lowering entirely."
+    },
+    {
+     "title": "Corpus dedup convention hides 3 disagreeing converted-case twins — calibration numbers depend on which duplicate wins",
+     "severity": "low",
+     "evidence": "Live no-dedup baseline is 158/198; the case_id-dedup convention gives 153/193. 5 duplicate case_ids exist; for VIGIA-2026-DEMO-004/007/009 the original files agree (MALICE) but their data/cases/converted/ twins score lower and emit SUSPICION (disagree), and the dedup keeps the disagreeing converted variant (e.g. DEMO-007 kept at 0.2803 SUSPICION).",
+     "decision_impact": "Corpus hygiene before any calibration freeze: decide which duplicate is canonical (the converted DEMO variants lose signal in conversion — that itself is a bug lead), otherwise every measured agreement number, including the 153/193 headline, is convention-dependent by up to 3 cases."
+    }
+   ],
+   "caveats": [
+    "Agreement is measured under the batch-comparator doctrine (expected UNKNOWN accepts anything; INTENT accepts MALICE) — the UNKNOWN-band findings are partly artifacts of that doctrine, not forensic truth.",
+    "Corpus counts use the case_id-dedup convention of the reference harness (193 unique ids from 198 dict cases); 5 duplicate ids exist and 3 of them dedup to the disagreeing variant (see finding 6).",
+    "Joint grid swept only MALICE x SUSPICION at fixed UNKNOWN boundary 0.08; the 158 joint optimum was not re-searched with the UNKNOWN boundary free (given finding 2, the unconstrained optimum would trivially empty the band and could reach 159-160).",
+    "Score-based simulation is exact for this engine version because the R4-3 gate is score-independent; any future change that makes the gate read final_score invalidates the separability assumption.",
+    "Sweep step is 0.01 as specified; the strictly-dominating MALICE move exploits the empty score gap (0.3135, 0.3297), so 0.32 is the finest on-grid point — sub-0.01 placement inside the gap was verified by the case census, not by a finer sweep.",
+    "instrument_pass.py briefly wrote instrument.json into the repo root due to an os.chdir; the file was moved to the scratchpad and `git status --porcelain` confirmed the repo clean — no tracked file was touched."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/threshold-robustness/instrument_pass.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/threshold-robustness/instrument.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/threshold-robustness/sweep.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/threshold-robustness/sweep_results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/threshold-robustness/_vigia_scorer_gateprobe.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/threshold-robustness/_vs_a.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/threshold-robustness/_vs_b.py"
+   ]
+  },
+  {
+   "probe": "fracture-dominance",
+   "summary": "Post-M1/M2/M3, the fracture boost is a one-fracture-decides mechanism, but only for a well-separated sub-family of the corpus. Of 97 MALICE verdicts, 18 (18.6%) fall below the 0.33 threshold if fracture_malice_boost is zeroed, and every one of those 18 is carried by exactly ONE fracture type (LINGUISTIC_ATTRIBUTION_SIGNAL 8, SOCIAL_ENGINEERING_PATTERN 8, NARRATIVE_POISONING_DETECTED 1, DOCUMENT_FORGERY 1); the other 78 MALICE survive boost=0 on composite alone and 75/78 have no fracture at all. The arithmetic makes this structural, not incidental: one severity-0.8 fracture yields boost 0.36 > threshold 0.33 at any n_signal>=1, and the 0.5 cap saturates at 1.39 fractures, so the \"additive\" design is effectively binary. Daubert's two-independent-sources doctrine is currently delegated entirely to the R4-3 cardinality gate (all 18 SPOF cases pass via the cross-domain branch with 3 domains/4 artifacts), while the probative MASS crossing the threshold is a single semiotic detector — and CAIE's own evaluate(), which keeps structural and probabilistic channels separate, would rule 16 of those 18 as SUSPICION (probabilistic verdict is NOISE for all 18). Symmetrically, all 22 under-called MALICE/INTENT disagreements have boost==0: fracture COVERAGE, not calibration, is the current accuracy bottleneck.",
+   "method": "Wrote /tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-dominance/decompose.py; ran it against the real engine (_vigia_score, live CAIE) over the full corpus via run_all_agent.find_cases (198 dict rows, deduped to 193 by case_id exactly as corpus_snapshot does; baseline 153/193 agreement reproduced bit-for-bit under the comparator doctrine). Per case: (a) replicated the scorer decision tail from exposed fields (composite_base, effective_trusts, caie_fracture_details, temporal_violations) and validated it against the engine — 0 mismatches on 198/198; (b) computed the boost=0 counterfactual final_score and verdict through the full cascade (hard gate, provenance, low-trust branch, R4-3 gate, thresholds); (c) ablated each fired fracture TYPE via monkeypatch on CrossArtifactIncongruenceEngine.detect_fractures (plus deepcopy ablation of STATISTICAL_UNIFORMITY temporal violations) and re-scored; (d) ran CAIE's own evaluate() on the scorer-equivalent artifact set (B-070 narrative filter + FASE2 exculpatory/Eco filter replicated) capturing structural_verdict, probabilistic verdict and composite. Gate branches for the 18 SPOF cases extracted from live reason strings. Outputs: decomp_results.json, dominance_summary.json in the same directory.",
+   "key_numbers": {
+    "corpus_deduped": 193,
+    "baseline_agreement": "153/193 (reproduced)",
+    "replica_validation_mismatches": 0,
+    "cases_with_any_fracture": 22,
+    "census1_boost_gt_composite_nonnoise": "19/154 (12.3%)",
+    "census1_median_boost_share": 0.822,
+    "census2_spof_malice": "18/97 (18.6%)",
+    "spof_counterfactual": "10 NOISE, 2 UNKNOWN, 6 SUSPICION",
+    "spof_single_fracture_type": "18/18",
+    "carrier_types": "LAS 8, SEP 8, NPD 1, DOCUMENT_FORGERY 1",
+    "malice_surviving_boost0": 78,
+    "surviving_with_boost>0": 3,
+    "hard_gate_malice": 1,
+    "undercalls_expected_malice_or_intent": 22,
+    "undercalls_with_boost_zero": "22/22",
+    "single_sev08_fracture_boost": 0.36,
+    "malice_threshold": 0.33,
+    "boost_cap_saturation": "0.5/0.36 = 1.39 fractures",
+    "spof_gate_branch": "cross-domain 18/18",
+    "caie_evaluate_agreement": "43/191 vs scorer 151/191",
+    "spof18_caie_structural": "SUSPICION 16, MALICE 2",
+    "spof18_caie_probabilistic": "NOISE 18/18",
+    "surviving78_caie_structural_noise": 74
+   },
+   "findings": [
+    {
+     "title": "18 of 97 MALICE verdicts are single-fracture single-point-of-failure, each resting on exactly one fracture type",
+     "severity": "high",
+     "evidence": "decompose.py census 2 (dominance_summary.json): 18/97 MALICE fall below 0.33 with boost zeroed (counterfactual: 10 NOISE, 2 UNKNOWN, 6 SUSPICION); all 18 have exactly 1 fracture type (LAS 8, SEP 8, NPD 1, DOCUMENT_FORGERY 1); all 18 are expected=MALICE and currently correct. 78 MALICE survive boost=0; only 3 of those even have boost>0.",
+     "decision_impact": "Whether to keep the additive boost as the MALICE carrier: the design is empirically one-fracture-decides for the semiotic sub-family. Any redesign requiring two independent malicious signals (fracture+fracture, or fracture+composite mass) must supply a second signal source for these 18 cases or accept losing them; conversely a single regression in one detector silently flips up to 8 sealed MALICE verdicts."
+    },
+    {
+     "title": "One severity-0.8 fracture alone crosses the MALICE threshold — the additive design is arithmetically binary",
+     "severity": "high",
+     "evidence": "vigia_scorer.py math verified against corpus: sev 0.8 x 0.45 = 0.36 boost > 0.33 threshold; final >= 0.36 x 0.9431 = 0.3395 at n_signal=1, so composite can be ~0 (measured minimum among SPOF: composite_base 0.0247, case_013_estocolmo_inverso). Boost cap 0.5 saturates at 1.39 fractures; observed boosts: 0.36 x16, 0.38 x3, 0.41, 0.30, 0.50 (dominance_summary.json arithmetic block).",
+     "decision_impact": "Threshold/coefficient calibration: 0.45 x sev0.8 vs threshold 0.33 means the boost is not an increment on top of evidence mass — it IS a verdict override in disguise. If the intent is additive fusion, either the coefficient must drop below ~0.41 x threshold-equivalent or the threshold must exceed 0.36; if the intent is a structural override, it should be modeled explicitly as a verdict floor (like CAIE) rather than as probability mass."
+    },
+    {
+     "title": "All 22 under-called MALICE/INTENT cases have boost==0 — fracture coverage is the sole accuracy bottleneck on the malicious side",
+     "severity": "high",
+     "evidence": "decompose.py under-call census: 40 total disagreements; 22 are expected MALICE/INTENT emitted as SUSPICION/NOISE (16 MALICE->SUSPICION, 4 INTENT->SUSPICION, 2 MALICE->NOISE); 22/22 have fracture_malice_boost == 0 (no malicious fracture fired).",
+     "decision_impact": "Where to invest: not in re-weighting the composite (78 surviving MALICE show it works when raw scores carry mass) but in fracture-detector coverage. Every remaining malicious-side error is a missing fracture, confirming in the negative direction that the fracture channel is the deciding channel."
+    },
+    {
+     "title": "The R4-3 corroboration gate certifies collection-domain cardinality, not signal independence — Daubert two-sources is satisfied in form, not in mass",
+     "severity": "high",
+     "evidence": "Gate-branch census: all 18 SPOF MALICE pass via the cross-domain branch (typically 3 domains, 4 artifacts), yet the cross-domain artifacts contribute composite 0.0247-0.2637 (median boost share of final mass 82.2% in census 1: 19/154 non-NOISE verdicts have boost > composite_base).",
+     "decision_impact": "Gate design: the corpus geometry does NOT currently support two-independent-sources at the score level — the 'second source' the gate counts is often near-zero-mass scenery around one linguistic/social-engineering detector hit. If two-source doctrine is meant literally, the gate should require a second independent SIGNAL (second malicious fracture family, or composite alone > SUSPICION threshold), not just artifact-domain diversity."
+    },
+    {
+     "title": "Scorer is more aggressive than CAIE's own doctrine on the same fractures: 16 of the 18 SPOF MALICE rest on fracture types CAIE rates only structural-SUSPICION",
+     "severity": "medium",
+     "evidence": "CAIE evaluate() on scorer-filtered artifacts: for all 18 SPOF cases probabilistic verdict = NOISE (composite 0.068-0.172); structural verdict = SUSPICION for the 16 LAS/SEP cases (LAS/SEP are not in CAIE's _STRUCTURAL_MALICE_TYPES) and MALICE only for NPD and DOCUMENT_FORGERY. Overall CAIE evaluate agreement is 43/191 vs scorer 151/191 under the same doctrine; on the 78 surviving MALICE, CAIE structural is NOISE for 74.",
+     "decision_impact": "Architecture choice between additive contamination and channel separation: CAIE already implements the structural/probabilistic split the DeepSeek P0 audit demanded, and under that split these cases are SUSPICION-with-structural-flag, not MALICE. Either promote LAS/SEP into an explicit structural-verdict tier with its own Daubert justification, or accept that the scorer's 0.45-additive path is doing structural-override work the sibling engine explicitly refuses to do. Note CAIE evaluate() as-is is far too conservative to replace the scorer (43/191)."
+    },
+    {
+     "title": "Precise M2 carry census: LINGUISTIC_ATTRIBUTION_SIGNAL and SOCIAL_ENGINEERING_PATTERN each carry exactly 8 verdicts (not ~10); 3 malicious types are score-inert on this corpus",
+     "severity": "medium",
+     "evidence": "Per-type ablation (dominance_summary.json census3): LAS present=8, verdict_drops=8, agree_lost=8; SEP present=8/8/8; NPD 1/1/1; DOCUMENT_FORGERY 1/1/1; STATISTICAL_UNIFORMITY(temporal) 1/1/1 (SUSPICION-level, not MALICE). FALSE_FLAG_ATTRIBUTION_MISMATCH (present=2), TIMESTAMP_PRECISION_ANOMALY (1) and USN_JOURNAL_GAP (1) drop nothing — their cases have composite 0.452-0.685, already over threshold.",
+     "decision_impact": "Calibration targeting: exactly two detectors (LAS, SEP) hold 16 sealed MALICE verdicts; they are the highest-value regression-test surface and the right place for a dedicated adversarial suite. The M3 realignment types (FFAM, TPA, USN gap) currently add no verdict on this corpus — their value is redundancy, which is the correct Daubert direction, but it means their calibration is untested by corpus agreement."
+    },
+    {
+     "title": "Zero false-positive exposure from boost dominance on the current corpus",
+     "severity": "low",
+     "evidence": "Census 1: all 19 non-NOISE boost-dominant cases agree with expected (18 expected MALICE, 1 expected SUSPICION); the 3 other boost>0 cases are composite-dominant expected-MALICE. No expected-NOISE/BENIGN case fires any malicious fracture (22/193 cases have fractures at all).",
+     "decision_impact": "Risk assessment for keeping the current design short-term: the one-fracture-decides geometry currently costs nothing in false positives — the brittleness is entirely on the robustness/regression side, so a redesign can be sequenced (structural-tier refactor before coefficient recalibration) without an accuracy emergency."
+    }
+   ],
+   "caveats": [
+    "Counterfactual boost=0 was computed by an exact replication of the scorer's decision tail (validated 198/198 against the live engine, 0 mismatches), not by patching the engine; gate-branch outcomes for counterfactuals >0.33 are inherited from the actual run, which is sound because zeroing the boost only lowers final_score and gate inputs are boost-independent.",
+    "Dedupe to 193 keeps the LAST occurrence per duplicated case_id (5 duplicates: VIGIA-2026-DEMO-004/007/008/009, case_007_insomnio_tactico), mirroring corpus_snapshot's dict-overwrite; raw 198-row numbers differ only in agreement (158/198) and not in any census composition (LAS/SEP presence is 8 each in both views).",
+    "The '~10 each after M2' prior from the probe brief measures as exactly 8 each (present=drops=agree_lost=8) on this corpus under type-level ablation; the earlier figure likely counted fracture instances or pre-dedupe rows.",
+    "CAIE evaluate() was fed the scorer-equivalent artifact set (B-070 narrative filter + FASE2 exculpatory/Eco replica); 2 cases returned NO_ARTIFACTS and are excluded from the 191-case CAIE comparison. CAIE's CDL/INCONCLUSIVE states have no scorer equivalent and count as disagreement under the doctrine, which depresses its 43/191 figure.",
+    "Per-type ablation removes ALL instances of a type per case (type-level, not instance-level); instance-level ablation exists in the prior fossil_sweep_results.json and was not re-run here."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-dominance/decompose.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-dominance/decomp_results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-dominance/dominance_summary.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/fracture-dominance/decompose_stderr.log"
+   ]
+  },
+  {
+   "probe": "mode-divergence",
+   "summary": "The sealed motor (_vigia_score) and the MCP tool layer (CrossArtifactIncongruenceEngine.evaluate()) agree on only 55/193 verdicts (28.5%) despite computing bit-identical fracture sets in 193/193 cases — every divergence is downstream doctrine: Noisy-OR fusion scale, the 0.5/0.2 probabilistic thresholds, and the CDL coverage rule. There are 40 hard direction flips (MALICE vs NOISE), all one-directional: motor says MALICE, CAIE-tool says NOISE, and 39/40 have expected=MALICE. Against ground truth under the corpus comparator, motor scores 153/193 vs CAIE-tool 49/193; unifying to the CAIE doctrine would lose 110 correct verdicts while unifying to the motor doctrine loses only 6 (all benign-side over-severity in the 0.085-0.27 score band). The answer to the unification question is unambiguous: the motor doctrine wins by 110-to-6, and it still wins (173 vs 92) even under CAIE's own laxer test-suite comparator. The CAIE tool layer should stop emitting standalone verdicts (or delegate to the motor's decision layer), because an MCP-mode investigation calling cross_artifact_analysis today sees a verdict that contradicts the sealed bundle in 71.5% of cases, including NOISE on 40 cases the sealed engine correctly seals as MALICE.",
+   "method": "Built /tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/mode-divergence/census.py: for each of the 193 dict-shaped cases from run_all_agent.find_cases(CASES_DIRS), ran (a) _vigia_score on the raw case (it normalizes internally) and (b) CrossArtifactIncongruenceEngine.evaluate() on Artifact objects mirroring tests/caie/test_canonical_cases.py::case_to_artifacts, built from the SAME normalize_case_schema output the motor uses, with logging disabled and stdout/stderr redirected. Recorded verdict, score/composite, structural_verdict, probabilistic_verdict, fracture-type sets, and parse failures per case into census.json. analyze.py produced the contingency table, agreement under the exact comparator doctrine (BENIGN->NOISE alias, expected UNKNOWN accepts all, expected INTENT accepts MALICE), unification loss accounting, and per-disagreement root-cause classification from motor reason strings + CAIE structural/probabilistic fields. drill.py drilled the 6 motor-loss cases, both-wrong set, INCONCLUSIVE class, NO_ARTIFACTS cases, and composite distribution; CDL rule confirmed by reading vigia/collapse_decision.py. Fracture-set parity checked across all 193 cases.",
+   "key_numbers": {
+    "cases_scored": 193,
+    "identical_verdicts": 55,
+    "identical_verdict_pct": 28.5,
+    "disagreements": 138,
+    "hard_flips_malice_vs_noise": 40,
+    "hard_flips_direction_motor_malice_caie_noise": 40,
+    "hard_flips_direction_caie_malice_motor_noise": 0,
+    "hard_flips_expected_malice": 39,
+    "motor_agreement": "153/193",
+    "caie_tool_agreement": "49/193",
+    "motor_agreement_caie_test_doctrine": "173/193",
+    "caie_agreement_caie_test_doctrine": "92/193",
+    "lose_if_unify_to_caie": 110,
+    "lose_if_unify_to_motor": 6,
+    "both_wrong": 34,
+    "fracture_set_parity": "193/193 identical (22 cases with fractures per side)",
+    "expected_malice_caie_composite_median": 0.1539,
+    "expected_malice_composite_ge_0.5": "6/103",
+    "expected_malice_composite_ge_0.2": "28/103",
+    "caie_inconclusive_cases": 17,
+    "caie_inconclusive_with_zero_fractures": 17,
+    "caie_structural_malice_verdicts": 2,
+    "no_artifacts_schema_gap_cases": 2,
+    "contingency": {
+     "MALICE": {
+      "MALICE": 15,
+      "SUSPICION": 42,
+      "NOISE": 40
+     },
+     "SUSPICION": {
+      "INCONCLUSIVE": 11,
+      "SUSPICION": 8,
+      "NOISE": 36
+     },
+     "UNKNOWN": {
+      "INCONCLUSIVE": 1,
+      "NOISE": 1
+     },
+     "NOISE": {
+      "INCONCLUSIVE": 5,
+      "NOISE": 32,
+      "NO_ARTIFACTS": 2
+     }
+    }
+   },
+   "findings": [
+    {
+     "title": "Unification direction is unambiguous: motor doctrine loses 6 correct verdicts, CAIE-tool doctrine loses 110",
+     "severity": "high",
+     "evidence": "unification.json: unify->CAIE loses 110 correct verdicts, unify->motor loses 6, both-wrong 34; corpus agreement motor 153/193 vs CAIE-tool 49/193; even under CAIE's own laxer test-suite comparator (MALICE accepts SUSPICION) motor wins 173 vs 92 (drill.py output)",
+     "decision_impact": "If the two verdict doctrines are unified, unify onto the motor's decision layer (final_score bands + R4-3 gate + hard gates). Adopting evaluate()'s 0.5/0.2 Noisy-OR thresholds corpus-wide would collapse accuracy from 79.3% to 25.4%."
+    },
+    {
+     "title": "40 hard MALICE-vs-NOISE flips, all one-directional: the MCP tool layer emits NOISE on cases the sealed motor correctly seals as MALICE",
+     "severity": "high",
+     "evidence": "census.json contingency: cell (motor=MALICE, caie=NOISE)=40, cell (motor=NOISE, caie=MALICE)=0; 39/40 have expected=MALICE (analyze.py 'hard direction flips' list: all VIGIA-REAL-*, SRL memory series, case_0xx canonicals); overall identical verdicts only 55/193 (28.5%)",
+     "decision_impact": "cross_artifact_analysis as an MCP tool currently contradicts the sealed bundle in 71.5% of cases. Architecture: evaluate() should return composite+fractures as signals and delegate the verdict to the motor decision layer, or its verdict field must be labeled non-authoritative — otherwise Claude-Code-mode investigations report NOISE on ground-truth MALICE."
+    },
+    {
+     "title": "Root cause of the flips is fusion-scale/threshold mismatch, NOT fracture detection — fracture sets are bit-identical in 193/193 cases",
+     "severity": "high",
+     "evidence": "Fracture parity check: motor_fractures == caie_fractures in 193/193 cases (22 cases with fractures each side). For the 103 expected-MALICE cases, CAIE Noisy-OR composite has median 0.1539, only 6/103 reach the 0.5 MALICE threshold and 28/103 reach 0.2 (drill.py); motor reaches MALICE on 81 of them via final_score>0.33 + R4-3 branch (root-cause classes: 39 cross-domain vs caie-NOISE, 39 cross-domain vs caie-SUSPICION, 2 per-artifact-cost, 1 hard-mass, 1 hard-gate)",
+     "decision_impact": "Calibration decision: evaluate()'s probabilistic thresholds (0.5/0.2) are structurally unreachable on the adjusted-score scale after spoofability weighting and the <3-source penalty — CAIE MALICE only occurs at composite>=0.5 on FLAREON-style saturated cases (13) or via structural fractures (2). Any unified scorer must keep the motor's 0.33 threshold + corroboration-gate pairing; do not port CAIE's thresholds."
+    },
+    {
+     "title": "CDL coverage_ratio rule fires INCONCLUSIVE on 17 cases with ZERO fractures, purely because all artifacts share one evidence layer",
+     "severity": "medium",
+     "evidence": "All 17 caie=INCONCLUSIVE cases have empty fracture lists (drill.py); vigia/collapse_decision.py line 45-46: coverage_ratio<0.3 -> INCONCLUSIVE, and coverage = distinct evidence_type-or-layer labels / 6 hardcoded layers, so 1 distinct type = 0.167 < 0.3. This overrides 9 comparator-correct motor SUSPICION verdicts (e.g. VIGIA_BREAK_001/003/004/006/007/008/009/010, DEMO-008) plus 5 correct NOISE ones",
+     "decision_impact": "The CDL's coverage rule is a single-evidence-class tripwire unrelated to assumption collapse (its stated purpose) and exists only in the tool layer — the motor has no CDL. In a unified architecture, drop or re-scope the coverage_ratio<0.3 branch; the sensor_independence/pipeline_integrity branches never fired on this corpus."
+    },
+    {
+     "title": "The 6 cases where CAIE-tool beats the motor are all benign-side over-severity in the motor's 0.085-0.27 band — a calibration issue, not a doctrine advantage",
+     "severity": "medium",
+     "evidence": "drill.py: VIGIA-BREAK-012 (BENIGN, motor SUSPICION 0.2709), VIGIA-FP-003 (BENIGN, 0.1762), NPS-2009-DOMEXUSERS (NOISE, 0.1459), VIGIA-BEN-012 (NOISE, 0.1248), VIGIA-BEN-014 (NOISE, 0.1066), FP-CULTURAL-CLEAN (NOISE, UNKNOWN 0.0854); all have zero fractures on both sides",
+     "decision_impact": "The motor's SUSPICION floor (>0.10, lowered from 0.18 by B-076) is slightly hot for fracture-free benign cases. If any adjustment is made when unifying, it is a targeted benign-side floor review (e.g. require a fracture or a minimum domain count for SUSPICION under ~0.20), worth at most 6 cases — not adoption of CAIE's 0.2 cutoff, which costs 110."
+    },
+    {
+     "title": "Structural-override doctrine (Golden Rules / structural-MALICE fractures) decided only 2/193 verdicts at the tool layer, and both agreed with the motor",
+     "severity": "low",
+     "evidence": "caie=MALICE census (drill.py): 13/15 are probabilistic (composite 0.51-0.83, FLAREON/NGDC/SRL-DC/VANKO), only VIGIA-BREAK-016 (NARRATIVE_POISONING_DETECTED) and case_106 (DOCUMENT_FORGERY) are structural, both motor=MALICE too; zero disagreements attributable to the structural override or to the motor's corroboration gate capping (no case where motor was gate-capped while CAIE said MALICE)",
+     "decision_impact": "The feared divergence channels — structural override and the R4-3 corroboration gate — produce no corpus disagreement at all. Unification effort should target fusion scale, thresholds, and CDL, not the override/gate logic."
+    },
+    {
+     "title": "Schema mirror gap: 2 legacy converted cases produce zero Artifact objects at the tool layer (12 parse failures) while the motor scores them",
+     "severity": "low",
+     "evidence": "VIGIA-REAL-NPS-2014-USB-NONDETERMINISTIC and NPS-2010-EMAILS: normalize_case_schema emits artifacts keyed 'source' (source_tool absent), so the test-mirror Artifact construction (art['source_tool']) raises KeyError on all 6 artifacts each -> caie NO_ARTIFACTS vs motor NOISE (drill.py artifact-keys dump)",
+     "decision_impact": "Any unified/MCP artifact-construction path must consume the bridge's normalized field names (source/source_tool tolerance), not the test fixture's; also means tests/caie/test_canonical_cases.py::case_to_artifacts is not a safe template for production construction."
+    }
+   ],
+   "caveats": [
+    "CAIE evaluate() was run with default environment (all enrichment flags enabled, no VIGIA_HMAC_KEY); an ephemeral-HMAC warning fires but does not affect verdicts.",
+    "The comparator doctrine has no mapping for CAIE-only verdicts INCONCLUSIVE and NO_ARTIFACTS — they count as disagreement with any expected verdict except UNKNOWN; 7 expected-ABSTAIN and 1 expected-'?' cases are unreachable for the CAIE layer by construction (it has no ABSTAIN), accounting for at most 8 of its 144 misses.",
+    "Artifact construction for the tool layer mirrors tests/caie/test_canonical_cases.py exactly (including its KeyError-on-'source_tool' behavior); the 2 NO_ARTIFACTS cases are a construction-mirror artifact, not an evaluate() doctrine result — excluding them changes CAIE agreement by at most +2.",
+    "Root-cause classification of motor-side branches is parsed from the motor's reason strings (deterministic text emitted by vigia_scorer.py); CAIE-side causes come from its structural_verdict/probabilistic_verdict fields directly.",
+    "Both engines ran on branch claude/fossil-hunt-daubert-o85ou4 HEAD (post M1/M2/M3, 2026-07-12); numbers will shift after the pending re-scoring session (task #15)."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/mode-divergence/census.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/mode-divergence/census.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/mode-divergence/analyze.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/mode-divergence/drill.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/mode-divergence/disagreements.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/mode-divergence/unification.json"
+   ]
+  },
+  {
+   "probe": "rawscore-fragility",
+   "summary": "Single-artifact raw_score authoring errors of ±0.10 flip the verdict in 32/193 cases (16.6%); in 19 of those 32 a single artifact holds sole verdict authority. The dominant fragility mechanism is NOT score arithmetic but the signal-existence cliff: _signal_flags = adjusted_score > 0.0 (vigia_scorer.py:153,757), so a −0.10 on a raw 0.02–0.10 artifact zeroes it out of the R4-3 corroboration gate count — 17 of 24 MALICE→SUSPICION flips happen with the perturbed score still above 0.33 (up to 0.594). On the authored-vs-computed question the corpus is overwhelmingly authored: zeroing all raw_scores collapses 133/193 verdicts (77 MALICE→NOISE, 52 SUSPICION→NOISE); only 18/97 MALICE verdicts survive on structure (fractures/gates) alone. Doctrine exposure is material: 28 of the 153 currently-agreeing cases (18.3%) would break agreement under one ±0.10 authoring slip, and 9 upward SUSPICION→MALICE flips show a single +0.10 overstatement can buy a MALICE verdict (Daubert false-positive risk).",
+   "method": "Full-factorial perturbation sweep against the real engine (_vigia_score with live CAIE), no sampling: for each of 193 unique scoreable cases (corpus_snapshot convention, dedup by case_id over 198 dict files), every artifact's raw_score perturbed by +0.10 and −0.10 clamped to [0,1] and the case fully re-scored — 1,878 scoring runs (118 boundary perturbations were clamp-noops), 60s wall. Scripts: scratchpad/arch/raw-fragility/perturb_sweep.py (sweep → results.json), analyze.py (fragility/concentration/doctrine metrics), authored_vs_computed.py (zero-all-raw ablation, 193 extra runs; score-invariance test; lever math vs EVIDENCE_PROFILES). Flip mechanism classification (gate vs threshold) done by comparing perturbed score against the 0.33 MALICE threshold in flip_details.json. Agreement computed with the exact run_all_agent doctrine (BENIGN→NOISE alias, UNKNOWN accepts all, INTENT accepts MALICE) against snap_m2.json (153/193 baseline reproduced).",
+   "key_numbers": {
+    "cases_scored": 193,
+    "scoring_runs_perturbation": 1878,
+    "scoring_runs_zero_ablation": 193,
+    "noop_clamped_perturbations": 118,
+    "cases_with_any_flip": 32,
+    "fraction_fragile": 0.166,
+    "fragile_with_exactly_one_decider": 19,
+    "decider_distribution": {
+     "0": 161,
+     "1": 19,
+     "2": 9,
+     "3": 3,
+     "8": 1
+    },
+    "malice_to_suspicion_flips": 24,
+    "malice_flips_gate_driven": 17,
+    "malice_flips_threshold_driven": 7,
+    "suspicion_to_malice_flips_plus010": 9,
+    "zero_all_raw_collapse": 133,
+    "zero_all_raw_survive": 60,
+    "malice_surviving_zero_raw": "18/97",
+    "nonnoise_authored_fraction": 0.86,
+    "score_invariant_cases": 21,
+    "agreement_baseline": "153/193",
+    "agree_breaking_cases": 28,
+    "agree_fixing_cases": 2,
+    "artifacts_raw_in_0_to_010": "221/998 (22.1%)",
+    "artifacts_raw_exactly_0": 118,
+    "median_dist_to_threshold_fragile": 0.0391,
+    "median_dist_to_threshold_stable": 0.0722,
+    "signal_cliff_constant": "_M2_MIN_SIGNAL_ADJ = 0.0 (vigia_scorer.py:153, used line 757)"
+   },
+   "findings": [
+    {
+     "title": "Corroboration-gate signal cliff at raw>0 is the dominant fragility mechanism, not the 0.33 threshold",
+     "severity": "high",
+     "evidence": "17 of 24 MALICE→SUSPICION flips are gate-driven: perturbed final_score remains above 0.33 (e.g. case_093_deepfake_estilo drops 0.6237→0.5936 yet flips) but a −0.10 on an artifact authored at raw 0.02–0.10 zeroes its adjusted_score, so _signal_flags = adjusted_score > _M2_MIN_SIGNAL_ADJ (=0.0) at vigia_scorer.py:153/757 removes it from the R4-3 corroboration count. Measured in arch/raw-fragility/flip_details.json + gate/threshold split script (gate=17, threshold=7). Exposure surface: 221/998 artifacts (22.1%) sit at raw in (0,0.10], 47 of them inside MALICE-verdict cases.",
+     "decision_impact": "The R4-3 corroboration gate should not define a corroborator as adjusted_score>0 strictly — a hair-width existence bit lets a 0.05-vs-0.15 authoring choice decide MALICE vs SUSPICION while barely moving the score. Direction: count gate corroborators by minimum adjusted mass (e.g. >= a per-class floor) or add hysteresis, so gate membership is not flippable by a ±0.10 slip on a near-zero artifact."
+    },
+    {
+     "title": "Corpus verdicts are ~69% raw_score-authored; structure alone sustains only 18/97 MALICE",
+     "severity": "high",
+     "evidence": "Zero-all-raw ablation (authored_vs_computed.py, 193 runs): 133/193 verdicts collapse when every raw_score is set to 0 (transitions: MALICE→NOISE 77, SUSPICION→NOISE 52, MALICE→SUSPICION 2, UNKNOWN→NOISE 2); 60 survive, but 39 of those are NOISE which survive trivially. Among non-NOISE verdicts, 133/154 (86%) are raw-authored; only 18/97 MALICE verdicts stand on fractures/gates alone. Corroborating: only 21/193 cases are score-invariant under any single ±0.10.",
+     "decision_impact": "Informs where calibration investment goes: the verdict set is authored, not computed — raw_score provenance/validation (authoring lint, per-evidence-type raw priors, subgroup-C-style re-scoring audits) will move corpus accuracy far more than adding CAIE fracture types. It also bounds the marketing claim 'deterministic structure decides': for 86% of non-NOISE cases the human-authored number decides."
+    },
+    {
+     "title": "18.3% of currently-agreeing cases are one ±0.10 authoring slip from breaking agreement; +0.10 alone can buy MALICE",
+     "severity": "high",
+     "evidence": "analyze.py: 28/153 agreeing cases break under at least one single-artifact ±0.10 (list includes VIGIA-REAL-SRL-ADMIN/AV, 4× VIGIA_BREAK_00x, 5 case_0xx MALICE cases); 2 current disagreements would be fixed (VIGIA-MAGNET-2020-WINDOWS, FP-CULTURAL-CLEAN). Upward: 9 SUSPICION→MALICE flips from a single +0.10 (VIGIA-NITROBA-M57-001 via lsass_session raw 0.75→0.85; VIGIA-MAGNET-2020-WINDOWS via 8 of its 8 artifacts — perturbed scores 0.3339–0.3502, just over 0.33).",
+     "decision_impact": "The reported 153/193 accuracy carries an authoring-noise error bar of roughly ±28 cases downward under one-artifact ±0.10 noise. For architecture: MALICE emission at scores in the 0.33–0.35 band is knife-edge; consider a margin requirement (e.g. MALICE only if score clears threshold by the max single-artifact leverage) or report a fragility flag in the sealed bundle when any single artifact's ±0.10 flips the verdict — directly Daubert-relevant since a +0.10 overstatement can mint MALICE."
+    },
+    {
+     "title": "Verdict authority is highly concentrated: 59% of fragile cases hang on exactly one artifact",
+     "severity": "medium",
+     "evidence": "analyze.py decider distribution: 161 cases 0 deciders, 19 cases exactly 1, 9 cases 2, 3 cases 3, 1 case 8 (VIGIA-MAGNET-2020-WINDOWS: all 8 of its artifacts individually flip SUSPICION→MALICE at +0.10, base score 0.3297). 13 MALICE cases at scores 0.38–0.62 each hang on ONE low-raw artifact (mostly memory_process raw 0.04–0.10) via the gate cliff. Fragile cases sit at median distance 0.039 from a threshold vs 0.072 for stable cases.",
+     "decision_impact": "Supports adding a per-case 'single point of verdict failure' diagnostic to the bundle: when one artifact is the sole verdict decider, the report should name it and its raw provenance. Cheap to compute (2×n_artifacts re-scores, ~0.03s/run measured) and turns this probe into a runtime self-audit."
+    },
+    {
+     "title": "Lever math weight×(1−spoofability) does not predict observed verdict authority",
+     "severity": "medium",
+     "evidence": "authored_vs_computed.py part (c): highest-lever type cryptographic_hash (lever 0.427) had 0 flips in 16 opportunities; kernel_structure (0.315) 0/12. Observed flip rates instead peak at memory_os_profile 2/4 (0.50), windows_event_log 3/8 (0.375), mft_entry 2/8 (0.25), lsass_session 4/18 (0.222), registry_key 5/30 (0.167); bulk flip counts come from memory_process 18/296 and log_entry 17/658. Gate-driven flips ride on LOW-weight artifacts authored near raw 0 — authority comes from gate membership and threshold proximity, not from the profile weights.",
+     "decision_impact": "Tuning EVIDENCE_PROFILES spoofability/weights is a weak calibration knob for verdict stability; the effective levers are (i) the >0 signal cliff and (ii) the 0.33/0.10 threshold bands. Calibration effort should target those two, not the profile table."
+    },
+    {
+     "title": "VIGIA_BREAK_007-010 cluster sits at score exactly 0.1010, 0.001 above the SUSPICION threshold, with every artifact a decider",
+     "severity": "low",
+     "evidence": "analyze.py fragile-case table: four cases at s=0.1010 (threshold SUSPICION>0.10), 2 artifacts each, 2/2 deciders, expected=SUSPICION so any −0.10 flip breaks agreement (SUSPICION→UNKNOWN, 9 such flips corpus-wide). Also a NOISE-side band: VIGIA-LINUX-002/FP-CULTURAL-CLEAN-001/VIGIA-NOKIA6230-001 at 0.063–0.066 flip NOISE→UNKNOWN under +0.10 (UNKNOWN>0.08 line).",
+     "decision_impact": "The 0.08/0.10 lower thresholds create a second knife-edge band populated by the red-team BREAK cases; if those cases are meant as regression anchors, their raw_scores should be re-authored away from 0.101 or the SUSPICION threshold given a small margin, otherwise any raw recalibration pass will churn them."
+    }
+   ],
+   "caveats": [
+    "Only single-artifact ±0.10 perturbations were tested; joint perturbations (two artifacts drifting together) would raise the fragility fraction above 16.6% — the 22.1% low-raw exposure surface suggests meaningful joint risk that was not measured.",
+    "118 perturbations were clamp no-ops (raw=0.0 with −0.10 or raw=1.0 with +0.10) and are excluded from flip statistics; artifacts at exactly raw=0 were therefore never tested for the +0.10 'existence-bit gain' direction on the minus side (they were tested with +0.10).",
+    "The zero-all-raw ablation is an extreme upper-bound test of 'authored': NOISE verdicts (39) survive it trivially since zeroing can only lower scores, so the authored fraction is only meaningful for non-NOISE verdicts (86%).",
+    "5 duplicate case_id JSON files exist (VIGIA-2026-DEMO-004/007/008/009, case_007_insomnio_tactico); analysis deduplicates keeping the last file per case_id, matching the corpus_snapshot dict semantics that yield the 193 baseline.",
+    "Ephemeral HMAC key warning appears once per process start; logging was disabled and stderr redirected for all sweeps, so it does not contaminate results."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-fragility/perturb_sweep.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-fragility/results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-fragility/analyze.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-fragility/flip_details.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-fragility/authored_vs_computed.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-fragility/authored_vs_computed.json"
+   ]
+  },
+  {
+   "probe": "calibration-machinery",
+   "summary": "The existing calibration machinery is complete on paper but entirely dead in practice: the sealed verdict path (_vigia_score -> build_bundle) contains zero LR/calibration wiring, and both regeneration scripts are broken today — fit_calibration.py dies on missing numpy/sklearn (and lacks sys.path setup standalone), while run_calibration.py converts 0/68 cases because CaseAdapter formats Fraction values with f'{raw_score:.8f}' (vigia_integration_bridge.py:674), a TypeError on Python 3.11, so the committed models/calibrated_lr.json (2026-06-24, test n=14, Brier 0.149, FPR@0.5=0.25) is an unreproducible fossil that nothing in any default path loads (the pipeline H28 hook additionally looks for a *_isotonic.json file no script ever produced). ENFSI/B-059 doctrine already settled the LR-vs-threshold question: LR gets a canonical verbal-equivalence scale as a REPORTING layer (vigia/core/enfsi.py, bucket semantics sealed in bundles), while verdicts stay threshold-based. On data reuse: I rebuilt the corpus harness with a parametrized scorer copy (bit-identical at defaults, 153/193 reproduced) and measured that B-076 is worth +9 cases today, but per LOOCV (154) and leave-family-out CV (152) that specific tuning carries ~0-1 case of optimism — it generalizes. The real fragility is elsewhere: 153/193 decomposes as only 140 exact matches + 11 INTENT->MALICE over-severity + 2 UNKNOWN auto-accepts (doctrine adopted the same day as B-076); the SUSPICION threshold's working band is only [0.093, 0.101]; 22/193 cases sit within 0.02 of a boundary; and a full in-sample joint threshold refit would claim 158/193 but scores 146/193 under leave-family-out CV — worse than the current heuristics — so refitting on this 193-case, family-clustered, 103-MALICE-heavy corpus is measurably counterproductive.",
+   "method": "All scripts under /tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/calibration-archaeology/ (repo untouched). (1) Archaeology: read scripts/fit_calibration.py, scripts/run_calibration.py, vigia/core/{fit_calibration,lr_calibration,enfsi}.py, models/*, data/calibration*_dataset*.json, docs/FASE2_DATASET_CALIBRACION.md, KNOWN_LIMITATIONS L-033, tests/test_b059_enfsi_unification.py, vigia/tests/test_lr_calibrator_serialization.py; executed both fit scripts read-only (fit_calibration: numpy ImportError exit; run_calibration --out /dev/null: 0/68 cases converted, aborts) and reproduced the root cause (Fraction.__format__ TypeError at vigia_integration_bridge.py:674 on Python 3.11.15). (2) Quantification: probe_snapshot.py runs the REAL _vigia_score plus a parametrized copy (vigia_scorer_param.py: thresholds as module globals, corroboration gate computed unconditionally, threshold-independent probe features exported) over all 193 scoreable corpus cases with the exact batch-comparator doctrine — 0 parity mismatches, 153/193 baseline reproduced. threshold_cv.py and cv_grouped.py then do offline exact sweeps over score-midpoint grids (mal 136 x susp 62 x unk 30 candidates), LOOCV, 10-seed 5-fold CV, and 12-family leave-family-out CV, plus doctrine decomposition and boundary-margin mass. Raw numbers in RESULTS.json, probe_snapshot.json.",
+   "key_numbers": {
+    "baseline_agreement": "153/193 (reproduced, 0 parity mismatches vs parametrized copy)",
+    "b076_revert_susp_0.18": "144/193 (B-076 worth +9 today)",
+    "susp_only_LOOCV": "154/193",
+    "susp_only_5fold_mean": 153.4,
+    "susp_only_leave_family_out": "152/193",
+    "joint_refit_in_sample": "158/193 at (0.2367, 0.0759, 0.0691)",
+    "joint_refit_leave_family_out": "146/193 (worse than current 153)",
+    "doctrine_decomposition": "153 = 140 exact + 11 INTENT->MALICE over-severity + 2 UNKNOWN auto-accept",
+    "susp_threshold_viable_band": "[0.08, 0.1010)",
+    "cases_within_0.02_of_any_threshold": "22/193 (11.4%)",
+    "run_calibration_conversion_rate": "0/68 cases (CaseAdapter Fraction format bug, bridge line 674)",
+    "fossil_calibrator": "models/calibrated_lr.json: 2026-06-24, test n=14, Brier 0.1491, FPR@0.5=0.25",
+    "corpus_class_balance": "103 MALICE / 33 SUSPICION / 30 NOISE / 15 INTENT / 7 ABSTAIN / 2 BENIGN / 2 UNKNOWN / 1 unlabeled"
+   },
+   "findings": [
+    {
+     "title": "LR calibration feed is bitrotted: CaseAdapter cannot convert a single case (Fraction.__format__ on py3.11), so the committed calibrator is an unreproducible fossil",
+     "severity": "high",
+     "evidence": "PYTHONPATH=repo python3 scripts/run_calibration.py --out /dev/null -> 'authentic: 0 casos, fabricated: 0 casos, skipped: 68, Corpus insuficiente'; every artifact raises at vigia/pipeline/vigia_integration_bridge.py:674 f\"{raw_score:.8f}|{z:.8f}\" with raw_score/z as Fraction (TypeError confirmed on Python 3.11.15; float-format for Fraction is 3.12+). models/calibrated_lr.json metadata: fitted 2026-06-24, 78-file corpus, test n=14, Brier 0.1491, FPR@0.5=0.25.",
+     "decision_impact": "Any 'add calibrated P(malice)/LR' architecture decision must first budget the feed repair (1-line format fix + rerun) and must NOT treat the committed model as usable — n=14 test with 25% FPR is indefensible under Daubert."
+    },
+    {
+     "title": "The sealed verdict path has zero calibration wiring, and even the pipeline's H28 hook is dead by construction",
+     "severity": "high",
+     "evidence": "grep: vigia_scorer.py and vigia_agent.py contain no LRCalibrator/LikelihoodEngine/enfsi imports; bundle_builder.build_bundle seals only verdict/composite_score/confidence (bundle_builder.py:549-560); ebs_v1 SignalOutput.log_lr defaults 0.0 and is never set on this path; pipeline.py:211-214 requires calibration_path (default None) and loads '*_isotonic.json' — no such file exists in models/ and no script produces one.",
+     "decision_impact": "Putting a calibrated LR in the sealed bundle is a greenfield wiring task (~2-4 days for enrichment-only sealing consistent with Invariant 3), not a re-enable; the defensibility bottleneck is calibration data, not code."
+    },
+    {
+     "title": "B-076's in-sample threshold tuning is nearly optimism-free (+9 real, ~0-1 case optimism), so the reported 153/193 is NOT materially inflated by that specific reuse",
+     "severity": "medium",
+     "evidence": "threshold_cv.py/cv_grouped.py: susp=0.18 -> 144/193 vs susp=0.10 -> 153/193 (+9 today); LOOCV re-tuning susp per held-out case: 154/193; 10-seed 5-fold CV: mean 153.4 (sd 0.97); 12-family leave-family-out: 152/193 vs 153 fixed.",
+     "decision_impact": "Keep the B-076 value; the Daubert defense should cite these CV numbers rather than the in-sample '+10, 0 regressions' claim, which was measured on the training corpus itself."
+    },
+    {
+     "title": "Joint threshold refit on this corpus is measurably counterproductive: +5 in-sample, -7 out-of-family",
+     "severity": "high",
+     "evidence": "cv_grouped.py: exhaustive joint optimum 158/193 at (mal=0.2367, susp=0.0759, unk=0.0691) vs current 153; but joint 5-fold CV mean 152.2 and leave-family-out 146/193 (< 153 of the current fixed heuristics). Fold-level picks are unstable (mal flips between 0.10 and 0.2367 across families).",
+     "decision_impact": "Rejects the 'refit all thresholds' architecture option until the corpus gains more independent case families; the current heuristic thresholds are the empirically better generalizer, and the MALICE->SUSPICION cluster should not be chased by lowering 0.33."
+    },
+    {
+     "title": "13 of 153 agreement points come from comparator doctrine, not verdicts, and the SUSPICION threshold's viable band is ~1 score-point wide",
+     "severity": "medium",
+     "evidence": "Decomposition at current thresholds: 140 exact (after BENIGN->NOISE alias) + 11 INTENT->MALICE over-severity + 2 expected-UNKNOWN auto-accept. Sweep: agreement stays 153 only for susp in [0.08, 0.1010); 0.1038 already drops to 149. 22/193 band-decided cases sit within 0.02 of a threshold (8 near 0.08, 7 near 0.10, 7 near 0.33), including 4 same-generator VIGIA_BREAK cases at exactly 0.1010.",
+     "decision_impact": "Any architecture that reports headline accuracy should disclose the doctrine decomposition; and score-perturbing changes (new fracture weights, profile edits) will silently cross boundaries for ~11% of the corpus — argues for margin/near-threshold regression gates in CI and for reporting a calibrated confidence band instead of a point verdict near boundaries."
+    },
+    {
+     "title": "Inventory: 5 constant families in vigia_scorer.py are corpus-fitted (comments cite specific incidents), 3 more are self-declared uncalibrated heuristics",
+     "severity": "medium",
+     "evidence": "vigia_scorer.py — corpus-cited: SUSPICION Fraction(10,100) (line 1255, B-076 ladder dataset); MALICE 0.33/UNKNOWN 0.08 (lines 1056-1065, 'calibrated on real EBS v1 case distribution'); _M2_MIN_SIGNAL_ADJ=0.0 (line 153, 'no existe umbral > 0 compatible con el corpus de 199 casos', CAN-029); R4-3 gate branches (lines 1165-1236, REAL-005/case_002/CAN-029/FLAREON); R4-3 tail_start=4 + r=0.5/0.7 + D5 exemption (lines 878-884, 'corrida 3 aplastaba 14 casos MALICE', BREAK-014). Uncalibrated-by-admission: fracture boost 0.45/cap 0.5, credibility 0.25/cap 0.35, STAT_UNIFORMITY 0.35 (lines 950-951: 'heuristic. Roadmap: Bayesian calibration'); M2 severity 0.8 parity (979-985); mean_effective<0.15 / 0.65 cap / support & diversity constants (no justification).",
+     "decision_impact": "Defines the exact surface a principled calibration effort would touch; the R4-3 gate branches are the most incident-overfitted (three branches each traceable to one named case) and the least defensible under cross-examination."
+    },
+    {
+     "title": "ENFSI/B-059 doctrine already resolved LR-vs-threshold: LR is a sealed REPORTING scale, verdicts stay threshold-gated — an LR-in-verdict-path redesign would contradict standing doctrine",
+     "severity": "medium",
+     "evidence": "vigia/core/enfsi.py header ('DECISIÓN DE DOCTRINA, TANDA 1, 2026-07-06': canonical scale = the one ebs_v1 seals; all 4 divergent implementations delegate; bundle and judicial report derive from the same bucketing) + tests/test_b059_enfsi_unification.py pins bucket semantics bit-for-bit for historical bundles.",
+     "decision_impact": "The lowest-friction calibration architecture is ENFSI-conformant LR reporting alongside the deterministic verdict (option C below), not replacing thresholds with LR decisions; changing bucket semantics is off the table (would invalidate sealed bundles)."
+    },
+    {
+     "title": "Decision brief — three options with measured effort",
+     "severity": "high",
+     "evidence": "Option A (keep heuristics + publish sensitivity/CV evidence): 0 code; attach this probe's CV numbers to KNOWN_LIMITATIONS; strongest available Daubert posture for current release. Option B (threshold refit with grouped CV): harness now exists (probe extraction 3.2s for 193 cases, joint LOFO sweep ~6 min); measurement says do not apply until corpus adds independent families — effort is corpus expansion (labeling, per-family provenance), not code. Option C (LR/P(malice) as sealed enrichment per ENFSI): fix vigia_integration_bridge.py:674 (format via float(), ~1 line + test), rerun run_calibration with stdlib PlattCalibrator (sklearn absent in env), wire calibrated_posterior into build_bundle as a non-verdict field with enfsi_label — ~2-4 days code+tests; making the number court-defensible needs a balanced held-out corpus (today: 103 MALICE vs 32 NOISE/BENIGN, families correlated, old test set was n=14) — weeks of data work, and per B-059 doctrine it must not alter verdicts.",
+     "decision_impact": "Recommend A immediately + C's one-line feed fix now (it un-bricks future calibration cheaply); defer B and full C until the corpus has enough independent families that leave-family-out CV stops punishing refits."
+    }
+   ],
+   "caveats": [
+    "Leave-family-out grouping was inferred from case-id prefixes (12 families incl. CASE n=57, OTHER n=41); a provenance-true grouping (same author/generator/session) could shift the grouped-CV numbers a few cases either way — the qualitative conclusion (joint refit does not generalize) is robust across per-case LOOCV, random 5-fold, and family-grouped CV.",
+    "fit_calibration.py (KDE/Ledoit-Wolf) could not be executed even with PYTHONPATH because numpy/sklearn are not installed in this environment; its 'runs today' verdict is environment-dependent, though the standalone sys.path defect and the fact that no default path consumes its .pkl outputs are environment-independent.",
+    "run_calibration.py was executed with --out /dev/null; it aborted before any write, but note it hardcodes models/calibration_metadata.json under the repo root — a successful future run from an agent must account for that write.",
+    "The 6 ERROR/list-shaped corpus files excluded by the standing 193/199 convention were not re-examined; agreement fractions use the 193 denominator throughout.",
+    "CV tuned only the three verdict thresholds; corpus-fitted structural constants (R4-3 gate branches, decay r, tail_start) were held fixed, so total in-sample fitting across ALL constants is necessarily >= the threshold-only optimism measured here — the constants inventory lists which ones would need the same treatment."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/calibration-archaeology/RESULTS.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/calibration-archaeology/probe_snapshot.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/calibration-archaeology/probe_snapshot.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/calibration-archaeology/threshold_cv.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/calibration-archaeology/cv_grouped.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/calibration-archaeology/vigia_scorer_param.py"
+   ]
+  },
+  {
+   "probe": "determinism-audit",
+   "summary": "Invariant 4 (\"no floating-point in the decision path\") is factually false as implemented — the verdict pipeline is float end-to-end (boost/penalty accumulate via plain float +=, composite via math.prod, final_score is a round-4 float compared against Fraction thresholds) — but it is EMPIRICALLY order-invariant on the current corpus: 198 cases x 4 artifact permutations, temporal-violation reversal, fracture-order permutation (only 1 corpus case has >=2 live fractures), and 150 realistic-severity full-permutation synthetic trials all produced bit-identical verdicts and scores. The hazard is real but latent: a constructed reproduction through the real engine flips the sealed verdict UNKNOWN<->SUSPICION (score 0.0999 vs 0.1000) from fracture EMISSION ORDER alone when the pre-round value sits within ~1 ulp of a 5e-5 rounding cliff; the corpus currently sits >=3e-4 (12 orders of magnitude) from any verdict threshold, but 262 pre-round prec-4 values across 80 cases (41% of corpus) sit within 1e-12 of a rounding cliff and survive only because the multiply chains that produce them are order-fixed — any reassociating refactor or CAIE parallelization flips them. Two additional decision-path defects: R4-3 tail decay reintroduced libm pow (0.7**k) — the exact class of platform-dependent transcendental that the P0 lookup tables were built to eliminate — exercised by 10 corpus cases including the one closest to the MALICE threshold; and the hard gate/temporal-factor crash on string/None severity (uncoerced comparison), violating the scorer's own never-crash doctrine. An invariant-clean fix is cheap and localized: Fraction accumulator for boost/penalty (sev as Fraction(str(float)) x Fraction(45,100), cap Fraction(1,2)), a Fraction power table for the 0.7**k tail (the project's own _EPC_FACTOR_TABLE pattern), and _sev_float-style coercion at the hard gate.",
+   "method": "Empirical audit against the real engine at /home/user/vigia-intent-analysis (branch claude/fossil-hunt-daubert-o85ou4, repo untouched). Scripts under scratchpad/arch/float-determinism/: perm_test.py (198 corpus dict-cases via run_all_agent.find_cases; per case: reversed + 3 fixed-seed shuffles of artifacts, reversed temporal_violations, and monkeypatched CrossArtifactIncongruenceEngine.detect_fractures returning reversed/shuffled fracture lists; bit-exact fingerprint = verdict + float.hex of score/confidence/composite/boost/penalty/mean_trust/domain_scores); synthetic_hazard.py (20,000 random 3-8-severity boost sets, all-orders sum spread + post-round divergence; Fraction-vs-float threshold semantics); flip_construct.py (constructed 4-artifact case + 3 monkeypatched LOG_VS_MEMORY fractures, ulp-scan of severity s3 around the 0.09995 cliff, all 6 emission orders through the real _vigia_score); cliff_scan.py (monkeypatched vigia_scorer._dround spy recording all 8,369 pre-round values corpus-wide, exact Decimal(binary) distance to nearest rounding midpoint); plus inline probes for R4-3 subband tail reach (classify_domain_subband over corpus) and type-boundary crash tests (string/None severity), and 150 full-permutation trials with realistic CAIE severities {0.5..1.0} through the real engine.",
+   "key_numbers": {
+    "corpus_cases_scored": 198,
+    "artifact_permutation_mismatches": 0,
+    "fracture_permutation_mismatches": 0,
+    "violation_permutation_mismatches": 0,
+    "corpus_cases_with_2plus_live_fractures": 1,
+    "corpus_fracture_histogram": "171 zero / 21 one / 1 two",
+    "realistic_severity_fullperm_trials": 150,
+    "realistic_severity_mismatches": 0,
+    "max_boost_order_spread_20k_random_sets": 8.881784197001252e-16,
+    "post_round4_divergent_of_20k": 0,
+    "constructed_verdict_flips_found": 2,
+    "flip_scores": "UNKNOWN 0.0999 vs SUSPICION 0.1000",
+    "min_rounded_score_distance_to_threshold": 0.0003,
+    "closest_case": "VIGIA-MAGNET-2020-WINDOWS score 0.3297 (SUSPICION)",
+    "preround_prec4_values_within_1e-12_of_cliff": 262,
+    "cases_with_near_cliff_values": 80,
+    "min_cliff_distance": 1.18e-20,
+    "cases_exercising_r43_libm_pow": 10,
+    "cases_with_inexact_0.7_pow": 5,
+    "float_033_gt_frac_33_100": true
+   },
+   "findings": [
+    {
+     "title": "CONFIRMED (constructed repro): fracture emission order alone flips the sealed verdict at a rounding cliff",
+     "severity": "high",
+     "evidence": "flip_construct.py: same case dict, same 3 MALICIOUS fractures (severities 0.03, 0.007, 0x1.0280cbe3c879ep-6 = 0.015777777777777773); emission order (0.007, 0.0157..., 0.03) -> SUSPICION score 0.1000, order (0.03, 0.007, 0.0157...) -> UNKNOWN score 0.0999, through the real _vigia_score (flip_results.json, 2 flip points found in a 120k-ulp scan). Mechanism: 'fracture_malice_boost += sev*0.45' float accumulation is non-associative (max spread 8.88e-16 over 20k random sets, synthetic_results.json part1), and Fraction(10,100) < float(0.1) makes 0.1000 SUSPICION while 0.0999 is UNKNOWN.",
+     "decision_impact": "The boost/penalty accumulators must become exact arithmetic (Fraction: sev_frac * Fraction(45,100), cap min(Fraction(1,2), .)) before any CAIE refactor that can change fracture emission order (rule reordering, parallel detection, set-based dedup). Today emission order is deterministic per platform, so this is a fragility guarantee gap, not an active corpus bug — but it is exactly what Invariant 4 claims cannot happen."
+    },
+    {
+     "title": "Corpus decision path is empirically order-invariant today: zero mismatches across ~1,000 permutation runs",
+     "severity": "high",
+     "evidence": "perm_test.py/perm_results.json: 198 cases x (reversed + 3 seeded artifact shuffles) = 0 fingerprint mismatches; temporal_violations reversal = 0; fracture-order permutations on the only eligible corpus case (fracture histogram: 171 cases 0 fractures, 21 cases 1, 1 case 2) = 0; 150 realistic-severity (0.5-1.0) full-permutation synthetic multi-fracture trials through the real engine = 0. Corpus min rounded-score distance to any verdict threshold = 3.0e-4 (VIGIA-MAGNET-2020-WINDOWS, 0.3297 vs 0.33) vs max order-noise 8.9e-16.",
+     "decision_impact": "No emergency recall of sealed corpus verdicts is needed; the Fraction-accumulator migration can be shipped as a guarantee hardening with an expectation of ZERO corpus verdict changes (bit-identical gate should be the acceptance test). Note the probe's premise of '~30 multi-fracture cases' is false — only 1 corpus case emits >=2 live fractures, so corpus-based fracture-order testing has almost no power and synthetic coverage is mandatory."
+    },
+    {
+     "title": "262 pre-round values in 80 cases (41% of corpus) sit within 1e-12 of a rounding cliff — latent reassociation fragility",
+     "severity": "medium",
+     "evidence": "cliff_scan.py/cliff_results.json: of 5,612 prec-4 _dround calls corpus-wide, 262 pre-round values are within 1e-12 of a 5e-5 rounding midpoint (min distance 1.18e-20 at VIGIA-BREAK-012, value 0.00265; most common tie value 0.00225 x96; worst case VIGIA-BREAK-014 with 101 such values). These are exact-decimal-tie products of clean calibration constants (raw x (1-spoof) x weight x trust).",
+     "decision_impact": "Any refactor that reassociates or reorders the per-artifact multiply chains or the Noisy-OR math.prod (e.g. vectorization, different grouping) flips 262 roundings at once — whether a verdict flips then depends on downstream propagation, and there is no guardrail. Architecture direction: either move to exact arithmetic (Decimal prec-28 or Fraction, the CAIE side already returns Decimal) or freeze operation order contractually and add a regression test pinning float.hex of all intermediate values."
+    },
+    {
+     "title": "R4-3 tail decay reintroduced libm pow (0.7**k) into the decision path — the exact hazard class the P0 lookup tables eliminated",
+     "severity": "medium",
+     "evidence": "vigia_scorer.py:906 'adj_scores[_i] * (_r ** (_pos - _R43_TAIL_START + 1))' uses CPython float.__pow__ -> C library pow(), platform-dependent at ULP level (the stated rationale for _EPC_FACTOR_TABLE/_EXP_NEG2_TABLE at lines 67-70). 10 corpus cases exercise the tail (>4 artifacts in one decaying subband); 5 of them use r=0.7 (non-dyadic, inexact): NPS-2009-DOMEXUSERS, NPS-2010-EMAILS, VIGIA-MAGNET-2020-WINDOWS, VIGIA-REAL-SRL-DC-CDRIVE, VIGIA-REAL-VANKO. VIGIA-MAGNET-2020-WINDOWS is simultaneously the corpus case closest to the MALICE threshold (0.3297, distance 3e-4). The r=0.5 cases (D1a) are exact powers of two and safe.",
+     "decision_impact": "Theoretical-only on Linux x86-64/ARM64 (glibc pow is correctly rounded), but it breaks the project's own cross-platform Daubert argument (KNOWN_LIMITATIONS already flags macOS/Windows as untested). Fix is mechanical and zero-risk: a Fraction power table for (7/10)^k, k=1..N, identical to the existing _EPC_FACTOR_TABLE pattern."
+    },
+    {
+     "title": "Threshold comparisons mix round-4 float scores with Fraction thresholds: effective thresholds are INCLUSIVE at 0.3300/0.1000/0.0800, half a rounding step below the documented strict '>'",
+     "severity": "medium",
+     "evidence": "synthetic_results.json part3: float(0.33) > Fraction(33,100) is True (0.33 = 5944751508129055/18014398509481984 > 33/100); same for 0.10 and 0.08. So a final_score that ROUNDS EXACTLY TO the documented threshold passes the 'strictly greater' comparison (vigia_scorer.py:1129/1255/1259). Deterministic — no corpus case currently lands exactly on a threshold (exact hits: none; nearest 0.3297/0.101/0.0804).",
+     "decision_impact": "Not a determinism violation but a calibration-semantics trap: converting the comparison to pure-float (score > 0.33 -> 0.3300 fails) or converting final_score itself to Fraction/Decimal (0.3300 as Decimal('0.33') == 33/100 -> fails strict >) silently moves the effective threshold by one rounding step. The Fraction-end-to-end migration must pin the intended boundary semantics (recommend: score >= threshold, documented) and add boundary-value tests at exactly 0.3300/0.1000/0.0800."
+    },
+    {
+     "title": "Decision-path type-boundary crashes: string or None severity in temporal_violations crashes the whole scorer",
+     "severity": "medium",
+     "evidence": "Inline probe: temporal_violations=[{type: EFFECT_BEFORE_CAUSE, severity: '0.95'}] -> TypeError ('>=' not supported between str and float) at the hard gate (vigia_scorer.py:1041, uncoerced v.get('severity',0) >= 0.9); severity: None -> ValueError (Invalid literal for Fraction: 'None') in _compute_temporal_factor (vigia_scorer.py:312, Fraction(str(...))). Both escape as exceptions instead of the ERROR-dict fail-loud contract the scorer applies elsewhere (Round 4 boundary guard, B-057/_sev_float family).",
+     "decision_impact": "The hard gate is the highest-authority branch in the scorer (unconditional MALICE) and reads raw examiner JSON without the coercion shield every other severity consumer got. Route both reads through _sev_float (which already exists 20 lines above) — also note the hard gate currently treats a string '0.95' severity as non-firing on other platforms is moot since it crashes; after coercion, gate semantics must be re-pinned."
+    },
+    {
+     "title": "Float census: the only order-sensitive accumulators in the decision path are fracture boost/penalty (float +=) and the Noisy-OR math.prod chains; _dsum is already order-invariant",
+     "severity": "low",
+     "evidence": "Static trace + instrumentation: floats reaching verdict comparisons are final_score (composite [math.prod, vigia_scorer.py:847/914/924] + fracture_malice_boost [float += at 1024-1027, 1035] - penalty, x (0.9 + 0.1*Fraction support -> float)), mean_effective (via _dsum: Decimal-accumulated from str(v), order-invariant, line 184-193), adjusted_score signal flags (> 0.0, line 757), spoofability <= 0.30 (float, line 1221), and the 0.65 single-artifact cap (line 1103). Permutation sweep confirms the products are order-stable under artifact reordering because ranking sorts re-canonicalize order before multiplication.",
+     "decision_impact": "Scopes the Fraction migration: only ~15 lines need exact arithmetic (fracture loop, SU loop, the two min() caps, and the final composite+boost-penalty combination); _dsum, the Fraction lookup tables, and _compute_temporal_factor are already invariant-clean. An invariant-clean accumulator: boost = min(Fraction(1,2), sum(Fraction(str(_sev_float(f['severity']))) * Fraction(45,100) for f in malicious)), compared against Fraction thresholds without ever materializing a float."
+    }
+   ],
+   "caveats": [
+    "The probe's premise of '~30 multi-fracture cases' does not hold: only 1 of 198 corpus cases emits >=2 live CAIE fractures, so fracture-order sensitivity was necessarily tested synthetically (150 realistic-severity full-permutation trials + 20k accumulator-only trials + constructed cliff cases) rather than on corpus data.",
+    "Case count is 198 dict-shaped cases (includes a few that return verdict=ERROR), vs the 193 'scoreable' figure in the briefing; the permutation fingerprint comparison is unaffected since each case is compared against its own baseline.",
+    "Cross-platform claims (libm pow, round()) are analytic, not measured: this box is x86-64 Linux/glibc only; the 0.7**k hazard could not be empirically demonstrated to diverge, only shown to be in the banned function class on 5 identified cases.",
+    "The constructed verdict flip requires a fracture severity within ~1 ulp of a rounding cliff; live CAIE emits clean literal/Decimal severities (0.6-1.0), so the flip is not reachable from current CAIE output without an adversarially crafted json_fallback bundle or future severity formulas.",
+    "Artifact permutations were applied to the top-level artifacts list only; permuting nested structures (provenance_chain order, metadata key order) was not tested.",
+    "The 262 near-cliff values were shown stable under list-order permutation, but propagation analysis (which of the 262, if flipped by a reassociating refactor, would actually change a verdict) was not performed - it requires per-value forced-flip injection, ~5,600 extra instrumented runs."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/float-determinism/perm_test.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/float-determinism/perm_results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/float-determinism/synthetic_hazard.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/float-determinism/synthetic_results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/float-determinism/flip_construct.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/float-determinism/flip_results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/float-determinism/cliff_scan.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/float-determinism/cliff_results.json"
+   ]
+  },
+  {
+   "probe": "deadpath-census",
+   "summary": "Full branch census of _vigia_score over the corpus (198 dict case files, 193 unique case_ids; last-wins dedupe reproduces the stated 153/193 exactly). Of 34 instrumented branches, 14 have zero corpus coverage — including every ABSTAIN-producing path, the json_fallback path (0 as expected), the provenance-collapse and broken-chain branches, the single-artifact 0.65 cap (proved verdict-inert by construction), and one provably unreachable guard (L921). The verdict mass flows through: R4-3 gate MALICE 96 (93 via cross-domain, 1 hard-mass, 2 per-cost, 3 capped), SUSPICION band 52, NOISE band 39, UNKNOWN band 2, hard-temporal 1. Ablations show the load-bearing order for the 153: gate-open mechanism (-95 if always closed), live CAIE (-74 if import blocked, honestly labeled json_fallback throughout), gate cap (-3 if always open), per-cost branch (-2), hard-mass branch (-1), hard temporal gate (-1), everything else 0. Degraded-mode synthetics confirm every dormant guard behaves as documented (ERROR on degenerate input, B-070 ABSTAIN, exculpatory NOISE, provenance-collapse ABSTAIN, broken-chain SUSPICION, quadripartite UNAVAILABLE stub), with one doctrine-level caveat: a blocked Eco module makes exculpatory evidence count toward severity.",
+   "method": "Line-level sys.settrace instrumentation restricted to the _vigia_score code object, with 34 branch anchors verified against co_lines() (scratchpad/arch/branch-census/census.py -> census_results.json), run over all find_cases(CASES_DIRS) dict cases at HEAD 8fce912; deduped last-wins by case_id to mirror the reference snapshot (dedup_table.json). Gate branch eligibility recomputed independently on _normalize_case-normalized artifacts, 0/99 mismatches vs trace (gate_eligibility_normalized.json). 8 ablations via string-patched copies of vigia_scorer.py exec'd from scratchpad, full corpus re-run each (ablations.py -> ablation_results.json). Degraded modes: full corpus with vigia.tools.caie import blocked (degraded_caie.py), plus a 12-probe synthetic battery for degenerate inputs, all-narrative, exculpatory/Eco paths, provenance collapse, broken-chain+fracture, hard temporal, 0.65-cap reachability, eco-blocked and quadripartite-blocked (degraded_edges.py + inline follow-ups). Repo untouched (read-only).",
+   "key_numbers": {
+    "corpus_dict_files": 198,
+    "unique_case_ids": 193,
+    "baseline_agreement": "153/193",
+    "zero_coverage_branches": 14,
+    "instrumented_branches": 34,
+    "gate_population_score_gt_033": 99,
+    "gate_b1_crossdomain_opens": 93,
+    "gate_b2_hardmass_opens": 1,
+    "gate_b3_percost_first_match": 2,
+    "gate_capped_to_SUSPICION": 3,
+    "ablation_gate_always_closed": -95,
+    "ablation_no_live_caie": -74,
+    "ablation_gate_always_open": -3,
+    "ablation_no_percost": -2,
+    "ablation_no_hardmass": -1,
+    "ablation_no_hard_temporal": -1,
+    "ablation_prov_collapse_brokenchain_065cap": 0,
+    "json_fallback_on_corpus": 0,
+    "support_score_saturated_at_1": "130/193",
+    "n_signal_dist": "0:1, 1:16, 2:16, 3:30, >=4:130",
+    "UNKNOWN_band_cases": 2,
+    "expected_ABSTAIN_all_got_NOISE": 7,
+    "disagreements_in_SUSPICION_band": "25/40",
+    "disagreements_exp_MALICE_stuck_SUSPICION": 16,
+    "no_caie_agreement": "79/193",
+    "no_caie_fallback_artifacts": "983/983",
+    "hard_temporal_case_composite_score": 0.0824,
+    "duplicate_case_id_pairs_scoring_differently": 3
+   },
+   "findings": [
+    {
+     "title": "R4-3 corroboration gate is effectively single-branch: cross-domain admits 93 of 96 MALICE; hard-mass and per-cost are calibrated on 1 and 2 corpus cases",
+     "severity": "high",
+     "evidence": "gate_eligibility_normalized.json + ablation_results.json: of 99 cases with final_score>0.33, b1 cross-domain opens 93 (85 b1-only), b2 hard-mass opens exactly 1 (case_111_falso_rastro_incompetencia, b2-only), b3 per-cost first-matches 2 (VIGIA-FLAREON-11/2014; 8 more co-eligible with b1), 3 capped. Ablations: removing b2 costs 1 agreement, removing b3 costs 2, closing the whole gate costs 95 (153->58), opening it unconditionally costs 3 (the 3 capped cases are all expected-SUSPICION FP-blocks).",
+     "decision_impact": "Any re-tuning of the hard-mass (>=3 hard types / >=4 hard artifacts) or per-cost (>=4 D5) thresholds is empirically unconstrained: one case each way. Do not recalibrate these branches against this corpus; add cases first. Conversely the gate itself (cap-to-SUSPICION) is the single most load-bearing mechanism in the scorer and its cross-domain branch is where all real discrimination happens."
+    },
+    {
+     "title": "Every ABSTAIN-producing path has zero corpus coverage while 7 expected-ABSTAIN cases all mis-resolve to NOISE — ABSTAIN is architecturally unreachable for ordinary low-trust evidence",
+     "severity": "high",
+     "evidence": "census dedup_table.json: ABSTAIN_prov_collapsed (L1119) and ABSTAIN_all_narrative (L490) hit 0/193 cases; verdict distribution contains no ABSTAIN. The 7 expected-ABSTAIN cases (VIGIA-ANDROID11-001, ASCIISTUDIO, FP-002, PAGINA-WEB-PAPA, SEP800, SET68I, WEDLM) all emit NOISE at scores 0.006-0.045 — 7 of the 40 disagreements (17.5%) are structural, not calibration. Synthetic checks confirm both paths work when forced (prov_collapsed fires only at mean_effective<0.01 with zero fractures).",
+     "decision_impact": "If ABSTAIN parity with the corpus labels matters, the scorer needs a reachable ABSTAIN band (e.g. low-score + low-trust or low-support region) — no threshold tuning of the existing paths can recover these 7 cases because their mean_effective is far above the 0.01 collapse bar. This is the largest single addressable block of disagreements after MALICE-under-scoring."
+    },
+    {
+     "title": "Live CAIE is the dominant load-bearing dependency: agreement collapses 153 -> 79 without it, but degradation is honest and fully labeled",
+     "severity": "high",
+     "evidence": "degraded_caie_results.json: with vigia.tools.caie import blocked, corpus agreement drops to 79/193 (-74); MALICE verdicts 97->21; caie_fractures_source = json_fallback on 198/198 files and all 983 artifacts carry the conservative 0.50/0.20 spoofability/weight fallback. On the intact engine json_fallback fires 0/193 (probe expectation confirmed).",
+     "decision_impact": "The documented 'standalone mode with json_fallback' is a real but drastically weaker engine (59% fewer MALICE). Either regression-test that mode as a first-class deployment target or document it as narrative-only; corpus accuracy claims only hold for live-CAIE. Degradation behavior itself is honest (correct labels, no crash) — no fail-loud gap found."
+    },
+    {
+     "title": "support_score is a near-inert multiplier: 67% of cases saturate at 1.0 and the whole term spans only [0.9, 1.0]",
+     "severity": "medium",
+     "evidence": "census n_signal distribution: 0:1, 1:16, 2:16, 3:30, >=4:130 of 193 -> support_score dist {0.0:1, 0.4307:16, 0.6826:16, 0.8614:30, 1.0:130}. final_score = raw_intent x (0.9 + 0.1 x support) therefore moves at most -6.9% for the 16 single-artifact cases and 0% for 130 cases.",
+     "decision_impact": "Not a useful calibration lever and a simplification candidate; evidence-scarcity is actually enforced by the R4-3 gate (which counts artifacts/domains directly), not by this multiplier. If scarcity should matter below the gate, the coefficient 0.1 is too small to ever cross a band on its own for n>=2."
+    },
+    {
+     "title": "The n_artifacts<2 -> 0.65 cap is verdict-inert by construction (decision-dead code); composite-empty guard at L921 is provably unreachable",
+     "severity": "medium",
+     "evidence": "Zero corpus hits (L1104). Synthetic reach test (degraded_edges + follow-up): 1 cryptographic_hash artifact raw=1.0 + STATISTICAL_UNIFORMITY sev 1.0 hits the cap exactly (score 0.65) yet verdict is SUSPICION anyway because a single signal artifact can never satisfy any gate branch (b1 needs >=4 arts or >=3 types, b2 >=4 hard arts/3 hard types, b3 >=4) and 0.65 remains inside the >0.33 region — the cap maps (0.65,0.99] to 0.65 without ever crossing a verdict boundary. L921 (`if not r43_scores`) requires empty effective_trusts, impossible after the empty-artifacts ERROR return at L454.",
+     "decision_impact": "Both can be removed or downgraded to assertions without any behavioral risk; keeping the 0.65 cap as a 'gate' in documentation overstates its role — it only cosmetically clips the reported score."
+    },
+    {
+     "title": "The hard EFFECT_BEFORE_CAUSE gate carries its one corpus case entirely alone: composite sees 0.0824 (UNKNOWN band) for an expected-MALICE case",
+     "severity": "medium",
+     "evidence": "census: HARD_temporal_MALICE fires on exactly 1 case (case_001_temporal, exp MALICE). Ablation A1 (gate off): that case falls to UNKNOWN at score 0.0824 (-1 agreement). Also ordering: the broken-chain branch (L1126) preempts the MALICE gate — synthetic FF-GENUINE-001 with stripped chains scores 0.4075 (>0.33) yet emits SUSPICION via 'Broken chain of custody + 1 active fracture(s)'.",
+     "decision_impact": "The temporal-violation signal contributes almost nothing to the composite (temporal_factor only degrades trust), so the hard gate is a single point of failure for physics-violation cases; if the gate's severity>=0.9 bar is ever raised or the violation type renamed, the case silently drops two bands. Also decide deliberately whether broken-chain SUSPICION should preempt gate-corroborated MALICE at high scores — it currently does, untested by corpus."
+    },
+    {
+     "title": "Disagreements concentrate in the sub-gate score bands, not in gate logic: 25 of 40 in SUSPICION band (16 expected-MALICE under-scored), 13 in NOISE band",
+     "severity": "medium",
+     "evidence": "census disagreement crosstab: (SUSPICION_band, exp MALICE) 16, (NOISE_band, exp ABSTAIN) 7, (NOISE_band, exp SUSPICION) 4, (SUSPICION_band, exp INTENT) 4, (SUSPICION_band, exp NOISE/BENIGN) 5, (NOISE_band, exp MALICE) 2, (UNKNOWN_band, exp NOISE) 1, (MALICE_via_gate, exp '?') 1. MALICE_via_gate itself is 95/96 correct.",
+     "decision_impact": "Future accuracy work should target composite/fracture scoring for the 20 expected-MALICE/INTENT cases stuck at 0.10-0.33 (they never reach the gate), not the gate branches (already near-perfect precision on corpus). The UNKNOWN band holds only 2 cases — it is nearly vestigial as a verdict band."
+    },
+    {
+     "title": "Eco fail-closed design degrades toward MORE severity, and the only corpus case exercising eco-retention is a false positive",
+     "severity": "medium",
+     "evidence": "Synthetic: same 2-artifact case scores 0.1528 with eco available (exculpatory set aside) vs 0.2318 with vigia.core.eco_check blocked (exculpatory RETAINED and counted toward malice; refutation_context.eco_retained note sealed correctly). Corpus: excul_retained_eco_fired fires once — VIGIA-BEN-014, expected NOISE, emitted SUSPICION (disagree). excul_set_aside fires 18x (15/3).",
+     "decision_impact": "Fail-closed here means a broken/missing Eco module makes exculpatory evidence count as incriminating signal, raising severity against the defendant — defensible as anti-neutralization but worth an explicit doctrine note under Daubert; and the D1 bait-term filter's single live firing produced the wrong verdict, so its term list has zero confirmed true positives on corpus."
+    },
+    {
+     "title": "Corpus accounting is fragile: 198 dict case files but 193 unique case_ids; 5 duplicate-id pairs where the converted/ variant scores DIFFERENTLY (3 pairs flip agree/disagree)",
+     "severity": "medium",
+     "evidence": "census duplicate scan: VIGIA-2026-DEMO-004/007/009 score MALICE-agree from data/cases/*.json but SUSPICION-disagree from data/cases/converted/*.json; the stated 153/193 exists only because dict-overwrite keeps the last find_cases occurrence. Also confirmed the gate's inputs depend on _normalize_case: mirroring the gate on RAW artifacts mis-predicts 17/99 cases (VIGIA-REAL-001 etc. show 1 domain raw vs cross-domain normalized) — evidence_type rewriting by the bridge is load-bearing for the gate.",
+     "decision_impact": "Any scorer evaluation harness must pin (a) dedupe order and (b) normalization, or reported accuracy moves by up to 3 cases silently; the converted/ variants of identical case_ids are materially different inputs and should be de-duplicated or re-labeled in the corpus itself. The normalization bridge should be treated as part of the deterministic core, not a convenience shim."
+    },
+    {
+     "title": "R4-3 tail decay (subband >4 artifacts) touches only 10 cases and splits 5 agree / 5 disagree",
+     "severity": "low",
+     "evidence": "census: r43_tail_decay hits VIGIA-BREAK-011/012/014/016, NPS-2009-DOMEXUSERS, NPS-2010-EMAILS, VIGIA-MAGNET-2020-WINDOWS, VIGIA-MAGNET-2022-iOS-JESS, VIGIA-REAL-SRL-DC-CDRIVE, VIGIA-REAL-VANKO; 187/193 cases never have >4 same-subband artifacts and are bit-exact legacy.",
+     "decision_impact": "The anti-drowning machinery is validated mostly by synthetic BREAK cases, not the corpus; its 50/50 agreement on the few real hits (including 2 INTENT under-scores, MAGNET cases) suggests the decay r values are a plausible recalibration lever for the volume-heavy real-image cases, with small blast radius."
+    }
+   ],
+   "caveats": [
+    "Branch coverage was measured at file granularity then deduped last-wins by case_id to match the reference snapshot; the 5 shadowed duplicate files (3 of which score differently) are excluded from the deduped table, same as the official 153/193 accounting.",
+    "The gate eligibility mirror initially ran on raw artifacts and mis-predicted 17/99 cases until _normalize_case was applied — reported gate numbers use the normalized mirror, which matches the trace 99/99.",
+    "Load-bearing deltas are single-branch ablations; interactions (e.g. removing b2 AND b3 together) were not run but are additive here because the affected case sets are disjoint (verified via per-case flips).",
+    "Nested helper functions inside _vigia_score (_prefix_factor, _spoof) have separate code objects and their internal lines were not traced; their behavior is covered indirectly via the branch anchors in the parent frame.",
+    "The broken-chain+fractures SUSPICION branch could not be triggered with a from-scratch synthetic (my artifacts produced no live CAIE fracture); it was exercised by degrading a real fracture-bearing corpus case (FF-GENUINE-001), which fired it as documented.",
+    "M2-1 prefix-pruning usage (best_k < n) was not counted separately — it is not one of the probe's requested branches and cannot be distinguished by line tracing alone."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/census.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/census_results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/dedup_table.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/gate_eligibility_normalized.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/ablations.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/ablation_results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/degraded_caie.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/degraded_caie_results.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/degraded_edges.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/branch-census/degraded_edges_results.json"
+   ]
+  },
+  {
+   "probe": "rawscore-rubric",
+   "summary": "A verdict-independent raw_score rubric is derivable directly from the corpus's own authoring norms: raw_score = strength of the observation as an indicator of a malicious act (P(obs|malicious)-style), with channel fabricability and importance explicitly excluded because EVIDENCE_PROFILES already applies them ((1-spoofability) x weight). Empirically, the corpus already uses this scale — memory_process in MALICE-expected cases has median raw 0.92 (n=117, q25 0.85), while raw 0.00-0.10 is reserved for clean/expected observations — so the inverted artifacts at 0.05-0.07 currently assert cleanliness of each case's declared central attack signal. Anchoring on same-archetype corpus comparables (never on the 0.33 threshold) yields: a090_03 SSDT rootkit 0.90, a026_process RWX-hollowed 0.88, a026_parent rundll32 0.80, a024_hash no-repo-match+entropy-7.8 only 0.72 (an in-corpus benign counterexample, LINUX-005 Go binary entropy 7.4 authored at 0.62, forbids the pathognomonic band). Dry-run on the real engine with D-5 retypes applied: CAN-008 -> MALICE 0.4359 and CAN-047 -> MALICE 0.4233, both via the healthy cross-domain corroboration branch with zero fractures and zero boost; CAN-046 honestly stays SUSPICION 0.3085 (unchanged by timestomp_detected=True) and only crosses 0.33 at raw>=0.90, which the counterexample makes indefensible — CAN-046 is a CAN-026-criterion candidate (accept SUSPICION or relabel expected), not a re-scoring candidate. Corpus effect if applied: 153/193 -> 155/193 with zero engine changes.",
+   "method": "Read docs/RESCORING_SESSION_SCOPE_20260712.md and docs/D5_RETIPADO_SUBGRUPO_C_20260712.md; extracted EVIDENCE_PROFILES from vigia/tools/caie.py (lines 343-420). Ran scratchpad/arch/raw-score-rubric/raw_dist.py over the full corpus (198 dict cases via run_all_agent.find_cases, ~900 artifacts) producing per-evidence_type x expected-class raw_score quartiles (raw_dist.json). Grepped the corpus for same-archetype comparables (SSDT/rootkit, RWX/hollowing, entropy/packed, anomalous-parent, hash-no-match) to build anchor examples. Ran scratchpad/arch/raw-score-rubric/dry_run.py: in-memory deep-copied variants of data/cases/consolidated_canonical/VIGIA-CAN-{008,046,047}.json with D-5 retype maps + rubric raw values, scored with the real vigia_scorer._vigia_score (baseline / retype-only / rubric-only / combined / +timestomp-flag variants), plus a raw sensitivity sweep for CAN-046 (0.50-1.00 in 8 steps) and gate-branch inspection of the resulting MALICE reasons. Verified current disagreement state against snap_m2.json (153/193).",
+   "key_numbers": {
+    "corpus_cases_scanned": 198,
+    "current_agreement": "153/193",
+    "memory_process_MAL_median_raw": 0.92,
+    "memory_process_MAL_n": 117,
+    "CAN008_baseline": "SUSPICION 0.1953",
+    "CAN008_retype_plus_rubric": "MALICE 0.4359",
+    "CAN047_baseline": "SUSPICION 0.1909",
+    "CAN047_retype_plus_rubric": "MALICE 0.4233",
+    "CAN046_retype_plus_rubric": "SUSPICION 0.3085",
+    "CAN046_min_raw_to_cross": 0.9,
+    "CAN046_rubric_value": 0.72,
+    "rubric_values": {
+     "a090_03": 0.9,
+     "a024_hash": 0.72,
+     "a026_process": 0.88,
+     "a026_parent": 0.8
+    },
+    "agreement_if_applied": "155/193"
+   },
+   "findings": [
+    {
+     "title": "Rubric anchor bands are already the corpus's implicit authoring norm, making a non-circular rubric possible",
+     "severity": "high",
+     "evidence": "raw_dist.py: memory_process in MALICE-expected cases n=117 median 0.92 [q25 0.85]; file_hash in MAL cases median 0.88 [0.82-0.95]; kernel_structure MAL median 0.85; clean/expected observations sit at 0.00-0.10 (clean memory 0.05, EWF entropy artifact 0.05, BEN file_hash median 0.02). Full table in scratchpad/arch/raw-score-rubric/raw_dist.json",
+     "decision_impact": "The re-scoring session should adopt the 5-band rubric (0.85-0.97 pathognomonic / 0.65-0.85 strong / 0.40-0.65 ambiguous / 0.10-0.40 weak / 0.00-0.10 clean) as documented doctrine in RUBRIC.md — it is descriptive of existing corpus practice, so it satisfies the scope doc's verdict-independence constraint by construction rather than by assertion."
+    },
+    {
+     "title": "The 0.05-0.07 raws on the inverted artifacts semantically assert 'clean system state', confirming data-entry inversion rather than conservative scoring",
+     "severity": "high",
+     "evidence": "Corpus twins use 0.05 exclusively for clean observations (FP-CULTURAL-CLEAN 'No process injection... Clean system state' raw=0.05; NPS-2010 expected-benign entropy raw=0.05), while the literal twin cases of the same signals carry 0.87-0.90 (CAN-038 svchost 8MB RWX raw=0.90 -> MALICE 0.4614 agree; CAN-037 raw=0.87 -> MALICE 0.99 agree)",
+     "decision_impact": "Justifies proceeding with the re-scoring session at all: the change is correction of inverted data entry to the house scale, not re-authoring evidence strength upward to hit a verdict."
+    },
+    {
+     "title": "CAN-008 and CAN-047 recover to MALICE under rubric+retype via the healthy cross-domain branch with zero fractures",
+     "severity": "high",
+     "evidence": "dry_run.py: CAN-008 SUSPICION 0.1953 -> MALICE 0.4359; CAN-047 SUSPICION 0.1909 -> MALICE 0.4233; both reasons read 'corroboration branch: cross-domain (4 domains, 4 artifacts) (B-068 gate, R4-3 v2)' with fracture_malice_boost=0.0 and 0 fractures — no fossil dependency",
+     "decision_impact": "Green-lights applying retype+rubric to CAN-008 and CAN-047 in the re-scoring session and removing them from tests/caie KNOWN_PENDING; the verdicts rest on composite evidence strength, the most cross-examination-resistant path."
+    },
+    {
+     "title": "CAN-046 honestly does NOT reach MALICE across the entire defensible raw band — it is a relabel candidate, not a re-scoring candidate",
+     "severity": "high",
+     "evidence": "dry_run.py + sweep: retype+rubric(0.72) -> SUSPICION 0.3085; timestomp_detected=True adds exactly nothing (0.3085); crossing 0.33 requires a024_hash raw>=0.90 as file_hash, but the in-corpus benign counterexample VIGIA-LINUX-005 (custom Go binary, entropy 7.4, no repo match, authored raw=0.62, resolved benign) caps the honest value in the 0.65-0.80 strong-indicator band",
+     "decision_impact": "The session should invoke the CAN-026 criterion for CAN-046 (accept SUSPICION or relabel expected_verdict) instead of raising raw to 0.90+ — doing so would be exactly the circular calibration the scope doc forbids, and the metadata-completion lever is measured dead."
+    },
+    {
+     "title": "Rubric applied WITHOUT the D-5 retype lets CAN-046 sneak over the threshold on the wrong evidence profile",
+     "severity": "medium",
+     "evidence": "dry_run.py rubric-only variant: CAN-046 -> MALICE at exactly 0.3330, riding memory_process (spoofability 0.15, weight 0.30) for what is actually a hash/static-analysis observation; with the honest file_hash profile (0.50/0.25) it drops to 0.3085",
+     "decision_impact": "Confirms the scope doc's mandate that retype and re-score must land as one atomic edit per case; the session must never measure or commit rubric values against the old evidence_type."
+    },
+    {
+     "title": "Corpus impact of applying the rubric is exactly +2 agreement with zero engine-side risk",
+     "severity": "medium",
+     "evidence": "snap_m2.json: 153/193 agree with CAN-008/046/047 all disagreeing (SUSPICION vs expected MALICE); dry-run flips 008 and 047 -> 155/193; changes are local to 3 data files, no scorer/caie code touched",
+     "decision_impact": "Sets the honest expectation for the session outcome: 155/193 if CAN-046 is relabeled per CAN-026 (which would make it 156/193 counted as agree under a SUSPICION expected label), and rules out any regression-sweep requirement beyond the 3 files."
+    }
+   ],
+   "caveats": [
+    "The empirical distribution partly reflects the same authoring process being corrected (some inverted 0.05s from case_111 etc. are inside the MAL-class quartiles), so the bands were anchored on named same-archetype comparables rather than raw quartiles alone.",
+    "raw_dist.py counts 198 dict cases (find_cases yields duplicates across CASES_DIRS variants of the same case_id for distribution purposes, e.g. FF-GENUINE-001/case_003); artifact-level duplication slightly inflates n per type but does not move medians materially.",
+    "CAN-046's a026-style RWX evidence exists only in twin CAN-037/CAN-038, not in CAN-046 itself; the conclusion that CAN-046 cannot reach MALICE assumes no NEW evidence is authored (adding a memory artifact would be re-authoring beyond the session scope).",
+    "The CAN-008 NETWORK_VS_HOST metadata gap (a090_04 firewall_claim without traffic_type/open_sockets) was not exercised because the case recovers without it; completing it remains an optional, separately-justified edit.",
+    "Repo untouched: all measurements are in-memory variants; the 155/193 projection assumes the session applies exactly the retype+rubric maps measured here."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-score-rubric/RUBRIC.md",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-score-rubric/raw_dist.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-score-rubric/raw_dist.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-score-rubric/dry_run.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/raw-score-rubric/dry_run.json"
+   ]
+  },
+  {
+   "probe": "decision-archaeology",
+   "summary": "The scorer's constants fall into two strata: a pre-history stratum (single-artifact cap 0.65, boost 0.45/penalty 0.25/uniformity 0.35, support log(1+n)/log(5), 0.9+0.1 envelope, broken-chain 0.15, hard-gate 0.9) with NO documented derivation anywhere, and a post-2026-05-19 stratum where every change is incident-driven and validated on the same 199-case corpus that reports accuracy. Reversion simulations quantify the path-dependence: reverting MALICE 0.33 to the pre-P2 0.75 drops agreement 153->64/193 (58% of all agreements rest on one threshold whose calibration record is a single sentence); the full legacy ladder drops it to 40/193; reverting B-076 (SUSPICION 0.10->0.18) loses exactly the 9 synthetic BREAK/DEMO cases that motivated it; removing the B-068/R4-3 gate loses exactly its 3 motivating FP cases (REAL-005, MAGNET-2020-PAGEFILE, case_002) and nothing else. At least ~50 precisely-identified tuning-incident cases (NGDC-003/LINUX-005/LINUX-002, 9 B-076 band cases, BREAK-014, CAN-018/029/032, 9 FLAREON, 14 SRL, CAN-008/046/047, FF-GENUINE-001...) remain in the evaluation corpus and count toward the 153/193. The trajectory 143->167->153 shows incident patching has entered the regime where fixing genuine engine defects (M1/M2, 2026-07-12) REDUCES measured accuracy, because labels, data defects and constants co-evolved. Evidence points toward global joint recalibration with a held-out split — the repo itself already concluded this once (B-069: profiles and thresholds are coupled and must be re-fit jointly) but deferred it as \"major work\".",
+   "method": "Documentary mining: vigia_scorer.py in-file dated comments (PATCH HISTORY block, threshold comment L1056-1074, M2-2 calibration note L147-153), BUGS_PENDIENTES.md entries B-068/B-069/B-070/B-076/B-077/B-091/B-093, docs/FASE2_DATASET_CALIBRACION.md, docs/REDTEAM_ROUND2_MONOTONICITY.md, docs/M2_DISCRIMINATORS_DESIGN_20260711.md, docs/IMPL_20260712_M1_M3_M2.md, git log (60 commits, history starts 2026-07-05). Empirical: fresh corpus snapshot recording verdict+score+branch-reason per case (scratchpad/arch/decision-archaeology/snap_reason.py -> snap_reason.json; 193 cases, 153 agree, exact match to baseline), then branch-aware threshold-reversion simulation (analyze.py -> analyze_out.txt): sanity replay reproduced 153/193 with 0 flips before running S1 (SUSPICION back to 0.18), S2 (MALICE back to 0.75), S3 (full legacy ladder 0.75/0.55/0.25 no gate), S4 (gate removal); plus band census and incident-case census (CAN-NN file-number to case_id mapping verified against data/cases/consolidated_canonical/). Consolidated timeline in timeline_constants.json.",
+   "key_numbers": {
+    "corpus_baseline": "153/193 agree (sanity replay reproduced exactly, 0 flips)",
+    "S1_revert_B076_susp_to_0.18": "144/193 (-9, all 9 = the tuning cases)",
+    "S2_revert_malice_to_0.75": "64/193 (-89)",
+    "S3_full_legacy_ladder": "40/193 (-118, +5)",
+    "S4_remove_corroboration_gate": "150/193 (-3, exactly the 3 motivating FPs)",
+    "malice_verdicts_in_(0.33,0.75]": "90 of 96",
+    "gate_capped_cases_total": 3,
+    "incident_tuning_cases_in_corpus": "~50 precisely identified (65 by loose substring match), >=49 counted as agreements",
+    "never_calibrated_constant_groups": 10,
+    "accuracy_trajectory": "143 -> 153 (B-076) -> 165 (B-077) -> 167 (R4-3) -> 160/193 baseline 2026-07-12 -> 153/193 (M1/M2/M3)",
+    "comparator_doctrine_bonus": "+12 (INTENT accepts MALICE, 2026-07-05)"
+   },
+   "findings": [
+    {
+     "title": "58% of corpus agreement rests on one threshold (MALICE 0.33) whose entire calibration record is one comment sentence",
+     "severity": "high",
+     "evidence": "S2 in analyze_out.txt: reverting MALICE threshold to pre-P2 0.75 drops agreement 153->64/193 (89 agreements lost); 90 of the 96 current MALICE verdicts have scores in (0.33,0.75]. The 0.33 value dates to the 2026-05-19 Kimi patch (pre-git-history), documented only as 'calibrated on real EBS v1 case distribution' (vigia_scorer.py L1056-1062) with no per-case record, no held-out set, no derivation artifact.",
+     "decision_impact": "Global recalibration: the single most load-bearing constant has the weakest provenance. Any recalibration must treat 0.33 as un-derived and re-fit it jointly with profiles (per B-069's own root-cause finding), not patch around it."
+    },
+    {
+     "title": "Incident-tuned constants are validated on the exact cases that then count as accuracy — zero held-out evaluation anywhere in the tuning history",
+     "severity": "high",
+     "evidence": "Incident census (analyze_out.txt): >=50 precisely-identified tuning cases in the 193-case eval corpus, essentially all counted as agreements: B-068/B-070 (NGDC-001..004, LINUX-005: 5/5 agree), B-069 rejection (LINUX-002 agrees), B-076 (9 BREAK/DEMO band cases + SRL-DC-MEMORY: 10/10), R4-3 (BREAK-014, CAN-018/029/032, 9 FLAREON, REAL-005, case_002: 16/16), M3 (FF-GENUINE-001, case_003: 2/2). FASE2_DATASET_CALIBRACION.md confirms the calibration dataset IS the corpus (198 cases via find_cases); every acceptance gate ('0 regressions') was measured on it.",
+     "decision_impact": "Global recalibration: the reported 153/193 is train-set accuracy. Any recalibration decision needs a held-out split or cross-validation first — otherwise the comparison baseline itself is inflated by construction."
+    },
+    {
+     "title": "B-076 (SUSPICION 0.18->0.10) benefit is 100% its own tuning cases — reverting loses exactly the 9 motivating synthetic cases and nothing else",
+     "severity": "medium",
+     "evidence": "S1 in analyze_out.txt: agree 153->144, the 9 lost are VIGIA_BREAK_001/003/004/006/007/008/009/010 + DEMO-008 — precisely the '10 SUSPICION->UNKNOWN in band [0.101,0.148]' cited in B-076 (BUGS_PENDIENTES.md L3849-3872). Band census: of 16 cases now in (0.10,0.18], 6 disagree (incl. 3 expected-NOISE/BENIGN cases: BEN-012 0.1248, BEN-014 0.1066, FP-003 0.1762 pushed into SUSPICION), so the lowered threshold also created FP pressure the doc's '+3 BENIGN/NOISE->SUSPICION vigilar' warning flagged.",
+     "decision_impact": "Continued patching vs recalibration: threshold moves that only fix their motivating band (all synthetic red-team cases at scores 0.101-0.148, i.e. authored near the old threshold) are corpus-shape artifacts, not calibration. Direction: fold into a global refit rather than defending 0.10."
+    },
+    {
+     "title": "The R4-3 corroboration gate's measurable benefit is exactly its 3 motivating FP cases; all 3 gate branches are one-case rules",
+     "severity": "high",
+     "evidence": "S4 in analyze_out.txt: deleting the whole B-068/R4-3 gate costs exactly 3 agreements (VIGIA-REAL-005, VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT, case_002_log_fabrication) — only 3 of 193 cases ever hit the cap. B-091 (BUGS_PENDIENTES.md L4472-4477) documents each branch tuned to one case: branch-1 mass floor <- REAL-005/case_002, branch-2 hard-mass spoofability<=0.30 <- CAN-029, branch-3 per-artifact-cost <- FLAREON; the no-evidence_type decay exemption exists because run 3 crushed 14 SRL MALICE cases. Meanwhile the gate's original motivating case NGDC-003 (score now 0.2803) no longer even reaches it.",
+     "decision_impact": "Architecture: the gate is a lattice of N=1 doctrines, cheap to keep but with no demonstrated generalization. If the scorer is rebuilt, the gate should be re-derived from the collection-domain taxonomy as a principled independence model, not ported branch-by-branch."
+    },
+    {
+     "title": "The pre-history constant stratum (0.65 cap, 0.45/0.25/0.35, support formula, 0.9+0.1, 0.15 source penalty, hard-gate 0.9) has zero calibration record and the file admits it",
+     "severity": "medium",
+     "evidence": "vigia_scorer.py L52-53 and L950-951 still carry 'boost=0.45 and penalty=0.25 coefficients are heuristic... Roadmap: Bayesian calibration' (unchanged since 2026-05-19). No repo document derives 0.65, log(5), 0.9+0.1, 0.15/0.5 source penalty, broken-chain 0.15, or the 0.95/0.3/x2.0 confidence constants; M2-1 (REDTEAM_ROUND2) proved the 0.15 source-penalty breaks positive monotonicity (adding evidence lowers score in 29/30 matrix cells). Census of 10 never-calibrated constant groups in timeline_constants.json.",
+     "decision_impact": "Global recalibration: half the scoring pipeline has never been fit to anything. A recalibration effort has a well-defined target list (the 10-group census) and the repo already ships fit_calibration.py as an acknowledged placeholder."
+    },
+    {
+     "title": "The repo already proved constants are jointly coupled and rejected piecewise recalibration once (B-069) — the strongest internal evidence against continued incident patching",
+     "severity": "high",
+     "evidence": "B-069 (BUGS_PENDIENTES.md L3493-3546): per-type recalibration of the 36 uncalibrated 0.50/0.20 profile pins was attempted, broke exactly 1 corpus case (LINUX-002), lowered accuracy 70.8->70.4%, and was reverted with root cause stated verbatim: thresholds were calibrated WITH legacy weights, so 'recalibrating profiles without jointly re-fitting verdict thresholds breaks the balance'; pendiente reclassified to 'joint profiles+thresholds refit — major work'. That refit has not happened; 6 subsequent constant changes (B-076, R4-3, B-093, M1/M2/M3) were all made piecewise on top of the coupled system.",
+     "decision_impact": "Directly answers the probe's architecture question: the system's own negative result says piecewise tuning of a coupled constant set is unstable; every patch since increases the coupling debt. Direction: schedule the joint refit (profiles + thresholds + gate) with a labeled, split corpus."
+    },
+    {
+     "title": "Incident patching has entered the accuracy-inversion regime: fixing real engine defects now lowers measured accuracy",
+     "severity": "high",
+     "evidence": "IMPL_20260712_M1_M3_M2.md: corpus 160->153/193 across M1/M3/M2 — all drops pre-accepted as label/data debt (MAGNET-2020 + case_004/012/094/108 rode a TCV fabricated from a substring match and acquisition-time fallback; CAN-008/046/047 rode mistyped artifacts, re-scoring session still pending as open task). _M2_MIN_SIGNAL_ADJ is pinned to 0.0 because the measured corpus-compatible interval is empty (canonical MALICE corroborate at adjusted 0.0017-0.002 vs 0.013 needed to exclude the CAN-029 diluent; vigia_scorer.py L147-153). Trajectory: 143->153->165->167->160(eval-base change)->153.",
+     "decision_impact": "Global recalibration timing: constants and label/data errors have co-evolved to the point where the corpus can no longer discriminate good constants from fossils (empty-interval result). Data re-scoring (labels + artifact typing) must precede or accompany any constant refit; more incident patches against current labels will re-fossilize."
+    },
+    {
+     "title": "+12 of the current agreement comes from a comparator doctrine change, not the engine",
+     "severity": "low",
+     "evidence": "FASE2_DATASET_CALIBRACION.md §4, decision 2026-07-05 (Anna): engine cannot emit INTENT by construction; comparator now accepts MALICE for expected INTENT (over-severity). 12 cases (9 FLAREON, TUCK-2019, MAGNET-iOS...) flipped to 'agree' with zero engine change; INTENT->SUSPICION still fails (2 cases).",
+     "decision_impact": "Calibration bookkeeping: when comparing recalibration candidates, the INTENT-alias must be held fixed or accuracy deltas are not comparable across the 2026-07-05 boundary; also the missing INTENT rung remains an open structural gap (E2 discriminator refuted: would flip 49 correct MALICE)."
+    }
+   ],
+   "caveats": [
+    "S2/S3 reversion simulations are branch-aware re-ladderings of recorded final_scores, not re-runs of a historical binary: gate outcomes observed at threshold 0.33 were held fixed for cases above the simulated threshold, and modern branches (hard gate, ABSTAIN, semantic roles, R4-3 decay) remain active in S3 — so S3 measures 'threshold-package reversion on today's engine', not a faithful time-travel to May 2026. S1 and S4 are exact (verified: only rung/gate cases move).",
+    "The 2026-05-19 P2 recalibration predates git history (squashed import 2026-07-05); its per-case tuning record is unrecoverable — the 'calibrated on real EBS v1 case distribution' claim cannot be audited beyond the in-file comment.",
+    "Incident census by case-ID/path substring is exact for NGDC/LINUX/BREAK/FLAREON/CAN (CAN-NN -> case_id mapping verified file-by-file) but the M1 row over-matches: all 11 MAGNET-family cases matched though only ~5 are named in the M1 acceptance record; the headline count uses the precisely-named ~50.",
+    "Quadripartite thresholds (4/5, 3/5) sit downstream of the base verdict and were not reversion-tested; they never change a base verdict, only the 8-state rendering.",
+    "Two untracked files (cliff_results.json, flip_results.json) exist in the repo root from a sibling probe; not created or modified by this probe — repo tracked files verified untouched (git status clean apart from them). My snapshot briefly landed in the repo root due to a chdir in the harness and was immediately moved to the scratchpad."
+   ],
+   "artifacts_scratchpad": [
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/decision-archaeology/snap_reason.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/decision-archaeology/snap_reason.json",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/decision-archaeology/analyze.py",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/decision-archaeology/analyze_out.txt",
+    "/tmp/claude-0/-home-user-vigia-intent-analysis/f5f579c0-6c8e-53f9-8c3d-00a48a43930c/scratchpad/arch/decision-archaeology/timeline_constants.json"
+   ]
+  }
+ ]
+}
