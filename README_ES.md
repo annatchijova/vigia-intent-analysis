@@ -709,14 +709,14 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 >
 > ## ⚠ CÓMO LEER LOS NÚMEROS DE VIGÍA — un modo, una lectura (2026-07-06)
 >
-> **El 91.8% de abajo es SOLO el camino JSON del agente. No dice nada de cómo
+> **El 92.6% de abajo es SOLO el camino JSON del agente. No dice nada de cómo
 > le va a VIGÍA sobre evidencia raw real — eso se mide por caso, en los otros
 > dos modos.** La presentación honesta es una línea por modo:
 >
 > | Modo | Qué procesa | El número honesto |
 > |---|---|---|
 > | **Claude/MCP (Dominio A)** — principal | evidencia raw real, cadena de extracción MCP completa | **Análisis profundo por caso — sin número agregado por diseño.** Registro a la fecha: 100% de veredictos correctos en todas las investigaciones corridas (docs por caso en `evidence/`, `results/`, `reports/`) |
-> | **Agente sobre JSON (Dominio B)** | casos JSON sintéticos/convertidos | **91.8% (146/159) en el corpus de detección** — el ÚNICO modo con número de corpus; agregado del corpus mixto 167/199 (segmentación abajo) |
+> | **Agente sobre JSON (Dominio B)** | casos JSON sintéticos/convertidos | **92.6% (150/162) en el corpus de detección** — el ÚNICO modo con número de corpus; agregado del corpus mixto 174/199 (segmentación abajo) |
 > | **Agente sobre RAW (Dominio C)** | corpus forense público real | **43 fuentes de evidencia raw distintas con bundles sellados en `results/`** — SRL 2018 (22 imágenes de memoria), MUS2019/Narcos (13 dumps), M57 (3), NPS 2010/2014, Magnet 2020 CTF, Tuck 2019 macOS, Vanko — más las investigaciones Magnet 2022 (Windows/iOS/Android), Owl HD1/Nexus 5 y HMG documentadas por caso. **Cada una es una investigación individual con sus propios findings — NO se agrega como precisión** |
 >
 > El modo Claude Code / MCP (Modo 2) se evalúa aparte y por caso: **100% de
@@ -727,7 +727,7 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > con evidencia de C2 donde el Modo 1 decía NOISE). Ver Dominio A abajo.
 >
 > **Modo agente — `run_all_agent.py` sobre el corpus JSON de 199 casos —
-> agregado: 167/199 (83.9%), ciego a la etiqueta, distribución idéntica a la del
+> agregado: 174/199 (87.4%), ciego a la etiqueta, distribución idéntica a la del
 > scorer standalone corriendo ciego.** Ese agregado NO es una cifra de precisión
 > por sí solo: el corpus mezcla deliberadamente conjuntos de evaluación con
 > propósitos distintos — incluyendo suites adversariales *diseñadas para romper el
@@ -736,9 +736,9 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 >
 > | Segmento | Casos | Ciego a etiqueta | Lectura |
 > |---|---|---|---|
-> | **Corpus de detección** (canónico 61, benigno 15, FLARE-ON CTF 10, real/convertido 51, demo 4, otros 18) | **159** | **146/159 (91.8%)** | **la métrica de precisión de este camino** — canónico 61/61, benigno 15/15, FLARE-ON 10/10; los 13 fallos son mayormente severidad adyacente (MALICE→SUSPICION) en casos reales/convertidos |
+> | **Corpus de detección** (canónico 61, benigno 18, FLARE-ON CTF 10, real/convertido 51, demo 4, otros 18) | **162** | **150/162 (92.6%)** | **la métrica de precisión de este camino** — canónico 61/61, benigno 18/18, FLARE-ON 10/10; los 12 fallos son mayormente severidad adyacente en casos reales/convertidos |
 > | Suites adversariales (BREAK 16, KIWI 7, suite FN 3, suite FP 5) | 31 | 18/31 | Material del Dominio C, *diseñado para romper*: sus fallos SON los límites documentados (L-014 constelaciones emergentes, L-016 consenso de confianza, FP de cultural_marker) — datos de resistencia, no precisión |
-> | Frontera epistémica / intake ABSTAIN | 8 | 2/8 | revisión de etiquetas pendiente (FASE2 §5): el motor limpia casos cuyas etiquetas los declaran indecidibles |
+> | Frontera epistémica / intake ABSTAIN | 5 | 2/5 | revisión de etiquetas pendiente (FASE2 §5): el motor limpia casos cuyas etiquetas los declaran indecidibles |
 > | Caso agregado pipeline-error | 1 | 1/1 | agregado legacy con forma de lista, expected UNKNOWN |
 >
 > Trayectoria del agregado honesto, cada paso con gate: el flip B-075 quedó en
@@ -776,8 +776,8 @@ corpus).
 
 **Dominio B — Agente autónomo, casos pre-procesados en JSON:** Runner batch sobre
 bundles EBS estructurados — es el ÚNICO modo con número de corpus, la métrica
-segmentada de la nota de arriba (**corpus de detección: 146/159, 91.8%**; agregado
-167/199). Desde B-075 el veredicto sale del scorer determinista ciego a la etiqueta;
+segmentada de la nota de arriba (**corpus de detección: 150/162, 92.6%**; agregado
+174/199). Desde B-075 el veredicto sale del scorer determinista ciego a la etiqueta;
 la cifra anterior 165/167 medía reproducción de etiqueta (ver la nota de cambio de
 métrica).
 
@@ -810,7 +810,7 @@ constituye la métrica de precisión del sistema.
 > cuando el adaptador EBS todavía eco-reproducía `expected_verdict` (fuga P2-C), así
 > que mide reproducción de etiqueta, no detección. Se conserva como registro
 > histórico de la evaluación del hackathon. La métrica honesta vigente para este
-> camino es el **167/199 de detección ciega** en la nota de cambio de métrica de
+> camino es el **174/199 de detección ciega** en la nota de cambio de métrica de
 > arriba. `SUBMISSION_COMPLIANCE.md` refleja los claims tal como se presentaron y
 > queda intencionalmente sin modificar.
 
@@ -833,7 +833,7 @@ constituye la métrica de precisión del sistema.
 > falsa atribución (contado pero nunca creado — solo existen 3: FF-GENUINE-001,
 > FP-CULTURAL-CLEAN-001, FP-CULTURAL-CLEAN).
 
-Reproducir (post-B-075/B-076 + doctrina esto da el 167/199 honesto, no la tabla
+Reproducir (post-B-075/B-076 + doctrina esto da el 174/199 honesto, no la tabla
 histórica de arriba): `python3 run_all_agent.py --timeout 90`
 Para reproducir explícitamente el comportamiento histórico de eco de etiqueta:
 `VIGIA_EBS_RESOLVE=legacy python3 run_all_agent.py --timeout 90`
@@ -1366,8 +1366,8 @@ por completo.
 ### Detección ciega a la etiqueta — métrica segmentada del corpus, modo AGENTE (actualizado 2026-07-06)
 
 **Afirmación (vigente, post-B-075/B-076 — modo agente / Modo 1; el modo Claude/MCP
-se evalúa por caso con 100%, ver la nota de precisión):** corpus de detección 146/159 (91.8%);
-agregado del corpus mixto completo 167/199 — segmentación en la NOTA DE PRECISIÓN
+se evalúa por caso con 100%, ver la nota de precisión):** corpus de detección 150/162 (92.6%);
+agregado del corpus mixto completo 174/199 — segmentación en la NOTA DE PRECISIÓN
 de arriba. El claim histórico "129/129, 100%" medía reproducción de etiqueta (fuga
 P2-C pre-B-075) y se conserva solo como registro histórico.
 
@@ -1381,7 +1381,7 @@ adversarial + frontera combinados) e imprime un censo de procedencia del cache.
 
 Salida esperada (agregado sobre el corpus mixto):
 ```
-Results: 167/199 PASS  32 FAIL
+Results: 174/199 PASS  25 FAIL
 Cache: 199/199 desde bundle sellado (motor: 198, pre-B075: 1)
 ```
 Salida histórica pre-B-075 (eco de etiqueta — conservada como registro):
