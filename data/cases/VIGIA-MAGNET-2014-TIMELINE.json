@@ -3,7 +3,8 @@
   "case_name": "Magnet 2014 — Hidden.docx Staging + USB Exfiltration (HENRY-PC)",
   "schema_version": 1,
   "description": "Document named Hidden.docx with content 'Super secret document / Trade secrets worth millions' found at C:\\Users\\Public\\ on machine HENRY-PC. Author metadata wiped to literal '-'. LNK artifact records USB drive (D:\\) access. WINWORD.EXE Prefetch confirms execution. Four-artifact cluster consistent with insider threat data staging and possible exfiltration via removable media.",
-  "expected_verdict": "INTENT",
+  "expected_verdict": "SUSPICION",
+  "_label_correction_20260713": "INTENT does not exist in the motor verdict scale (5 values: MALICE/SUSPICION/UNKNOWN/NOISE/ABSTAIN). Relabeled to SUSPICION — legacy pre-motor vocabulary. No active concealment layer (author metadata wipe is cosmetic, not anti-forensics).",
   "expected_confidence": 0.7,
   "expected_mitre_ttps": [
     "T1074.001",
