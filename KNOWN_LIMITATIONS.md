@@ -2138,6 +2138,49 @@ semantically. The SUSPICION verdict in these cases is correct from the
 motor's perspective — it flags the anomaly and leaves the authorization
 judgment to the human investigator or Mode 2 analysis.
 
+**Measured cost of the doctrinal choice — B-028/B-065 floor neutralizes
+D1 Eco filter (measured 2026-07-13):**
+
+The D1 Eco filter in `_vigia_score()` correctly sets aside artifacts
+marked `"semantic_role": "exculpatory"` before computing the composite.
+However, when a residual incriminatory signal of medium magnitude remains
+after exclusion, the B-028/B-065 alert floor overrides the net score:
+an intent-class hypothesis cannot present as LOW alert regardless of
+per-signal magnitude.
+
+Measured example — VIGIA-BEN-014 (journalist Tor case):
+
+- ART-002 (authorization memo) and ART-003 (traffic analysis) are
+  correctly excluded by D1 Eco filter (`semantic_role: "exculpatory"`).
+- ART-001 (Tor connection, raw_score=0.7, z=0.49) remains as the sole
+  scored artifact and produces hypothesis `SUSPICION_DETECTED`.
+- B-028/B-065 floors the alert to MEDIUM.
+- Mode 1 result: **SUSPICION, posterior 21/100**.
+- MCP `evaluate()` result (no floor): **NOISE, composite 0.0070**.
+
+The D1 Eco filter did its job — it correctly isolated the exculpatory
+context and reduced the scoring set to one artifact. The floor then
+overrode the resulting low-magnitude score back to SUSPICION. This is
+not a bug in either layer: the floor is a deliberate Daubert-conservative
+choice (preventing malicious actors from planting exculpatory metadata to
+suppress alerts), and the D1 Eco filter is working as designed. The
+interaction between them creates a measurable false-positive rate in
+authorized-use cases with one structurally anomalous artifact remaining.
+
+**NPS-2009-DOMEXUSERS** shows the same floor effect without the
+exculpatory semantic_role mechanism (no exculpatory fields in the case):
+Mode 1 returns SUSPICION at 29/100 while MCP returns NOISE at 0.0139.
+The floor applies at hypothesis level regardless of semantic_role.
+
+**This is not a bug to fix today.** The B-028/B-065 doctrine (over-alert
+on intent-class findings) is a deliberate design decision requiring
+explicit doctrinal review to change. This entry quantifies the known cost
+of that decision: any exculpatory case with a single structurally anomalous
+artifact of medium magnitude (z~0.4-0.9) will produce Mode 1 SUSPICION
+regardless of how well the D1 Eco filter identifies and excludes the
+exculpatory context. The floor is working correctly by its own definition;
+the cost is now measured and documented.
+
 ---
 
 ## L-055 — Anthropic API and Claude Code Subscription Plans Are Separate Authentication Products [DOCUMENTED]
@@ -2208,3 +2251,79 @@ export VIGIA_LLM_BACKEND=anthropic
 Alternatively, `VIGIA_LLM_BACKEND=ollama` with a local model
 (`hermes3:8b`, `deepseek-r1:8b`) covers the same MCP tool functionality
 with no API key required.
+
+---
+
+## L-056 — Mode 1 vs Mode 2 Alert Architecture Divergence (third divergence type, distinct from M3) [DOCUMENTED]
+
+**Registered 2026-07-13. Status: DOCUMENTED — architectural gap, no fix
+intended.**
+
+**Affects:** Any case where Mode 1 (`vigia_agent.py`) and Mode 2 (Claude
+Code + MCP `cross_artifact_analysis`) are compared on the same evidence.
+
+### Background — three known divergence types between modes
+
+| Type | Source | Mechanism | Status |
+|------|--------|-----------|--------|
+| M3 | `tests/test_m3_scorer_caie_parity.py` | Fracture-type weight maps in `vigia_scorer.py` drift from the live CAIE fracture catalogue in `vigia/tools/caie.py`. Missing fracture types are silently weighted at zero in the scorer. | Regression-tested — M3 test catches new drift. |
+| semantic_role | `vigia_scorer.py:_vigia_score()` L-054 | `_vigia_score()` honors `semantic_role: "exculpatory"` via D1 Eco filter; MCP `evaluate()` ignores the field. | Documented as part of L-054. |
+| **Alert floor (this entry)** | `vigia_scorer.py` B-028/B-065 | `_vigia_score()` applies a floor preventing intent-class hypotheses from presenting as LOW; MCP `evaluate()` is a pure Noisy-OR scoreboard with no floor. | Documented here — L-056. |
+
+### Description of the alert floor divergence
+
+`vigia/tools/caie.py::evaluate()` (called by MCP `cross_artifact_analysis`)
+computes a Noisy-OR composite score and maps it to a verdict via a
+numerical threshold: composite < 0.05 → NOISE. No floor is applied.
+
+`vigia_scorer.py::_vigia_score()` (called by `vigia_agent.py` Mode 1)
+computes z-scores per signal, aggregates to a hypothesis, then applies
+the B-028/B-065 alert floor: a SUSPICION hypothesis cannot present as LOW
+alert regardless of per-signal magnitude. This floor is downstream of all
+scoring — it applies after the Noisy-OR composite, after D1 Eco filter
+exclusions, and after z-score normalization.
+
+**Measured divergence (2026-07-13):**
+
+| Case | MCP composite | MCP verdict | Mode 1 posterior | Mode 1 verdict | Floor note |
+|------|--------------|-------------|-----------------|----------------|-----------|
+| VIGIA-BEN-014 | 0.0070 | NOISE | 21/100 | SUSPICION | B-028/B-065 floored — 1 residual artifact z=0.49 |
+| NPS-2009-DOMEXUSERS | 0.0139 | NOISE | 29/100 | SUSPICION | B-028/B-065 floored — 9 artifacts, top z=0.18 |
+
+In both cases the per-signal magnitudes are well below the z>2 threshold.
+The Noisy-OR composite is sub-0.05 (NOISE). But the hypothesis-level
+aggregation produces `SUSPICION_DETECTED`, and the floor prevents the
+SUSPICION from collapsing to a LOW alert or NOISE verdict.
+
+### Why this is not M3
+
+M3 is specifically about fracture-type weight map drift: fracture types
+present in `caie.py` but absent from the scorer's `MALICIOUS_FRACTURE_TYPES`
+set receive zero weight in the scorer, causing systematic under-weighting
+of specific fracture signals. Neither BEN-014 nor NPS-2009 has fractures
+detected — M3 is not the active mechanism here.
+
+### Why this gap exists and will not be closed
+
+The two scorers serve different roles:
+- `evaluate()` is designed for MCP tool use: a deterministic, stateless,
+  composable function that returns a numeric score for pipeline integration.
+  No floor — the number is the number.
+- `_vigia_score()` is designed for Mode 1 sealed verdicts with full Daubert
+  posture: a SUSPICION finding cannot be filed as LOW because an investigator
+  reading a LOW alert will not escalate it. The floor encodes the doctrinal
+  choice that it is better to over-report a structural anomaly than to allow
+  it to disappear into a LOW-priority queue.
+
+Aligning the two would require either adding a floor to `evaluate()` (which
+would break MCP integrations that rely on the raw numeric value) or removing
+the floor from `_vigia_score()` (which would require a doctrinal decision
+equivalent to L-054 / B-028/B-065 review).
+
+**Mitigation for analysts comparing Mode 1 and Mode 2 outputs:**
+When Mode 1 returns SUSPICION with per-signal z-scores all below 2.0 and
+Mode 2 returns NOISE, the likely cause is the B-028/B-065 floor — not an
+error in either system. Mode 2's NOISE verdict reflects the raw Noisy-OR
+composite; Mode 1's SUSPICION reflects the floor applied to a low-magnitude
+hypothesis. Both are correct by their own contract. Human review is the
+intended resolution layer.

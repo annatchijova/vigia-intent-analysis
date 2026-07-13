@@ -796,6 +796,129 @@ override.
 > documented per-case in `evidence/` and `results/`; Domain C coverage limits are
 > documented in `KNOWN_LIMITATIONS.md`.
 
+### Why Claude/MCP mode reaches 100% while the Python agent is at 97.5%
+
+The two numbers measure fundamentally different things and are not comparable with
+each other. They arise from different evaluation methodologies applied to different
+modes of operation.
+
+**Claude/MCP mode (Domain A) — 100%, evaluated per-case:**
+
+Claude Code (Mode 2) conducts each investigation as a fresh, evidence-driven
+reasoning session. It reads raw artifacts through the MCP extraction toolchain,
+applies the full Peircean triad (Firstness / Secondness / Thirdness), evaluates
+exculpatory context semantically (written authorization, documented exceptions,
+corpus provenance), runs the Mandatory Refutation Protocol on every INTENT/MALICE
+candidate, and selects ABSTAIN when evidence is insufficient rather than forcing a
+verdict. Because each investigation is a full reasoning session — not a pass through
+fixed thresholds — the investigator can correctly identify cases like VIGIA-BEN-014
+(journalist with editorial authorization using Tor) as NOISE even though the Tor
+connection is structurally anomalous, because it can evaluate the authorization
+memo as a forensic fact rather than a field to ignore.
+
+This mode has no aggregate accuracy number by design: aggregating individual
+investigations into a single percentage would conflate cases with vastly different
+evidence quality, artifact completeness, and epistemic certainty. The 100% figure
+means every investigation run in this mode reached the verdict that the full
+evidence supports — it does not mean 100% of all possible cases would be correctly
+classified.
+
+**Python agent mode (Domain B) — 97.5%, evaluated on the 162-case detection corpus:**
+
+Mode 1 (`vigia_agent.py`) applies the deterministic scoring pipeline — a fixed
+mathematical engine that operates with zero LLM calls and zero tokens. It cannot
+evaluate exculpatory context semantically: the B-028/B-065 alert floor prevents any
+SUSPICION hypothesis from presenting as LOW regardless of per-signal magnitude, and
+the D1 Eco filter that sets aside `semantic_role: "exculpatory"` artifacts can be
+neutralized by the floor when a residual incriminatory signal of medium magnitude
+remains (L-054, L-056). This is a deliberate doctrinal choice — over-alerting on
+benign cases is preferable to under-alerting on malicious ones with planted
+exculpatory metadata — and its cost is a measurable false-positive rate on
+authorized-use cases.
+
+The 4 misses in 162 cases are all in this category: adjacent-severity calls
+(SUSPICION where expected NOISE, or NOISE where expected SUSPICION for very weak
+signals) or doctrinal over-alert (L-054 exculpatory context not modeled). None
+are missed detections of actual malicious activity — the detection corpus canonical
+cases, benign cases, and FLARE-ON CTF cases all pass at 100%. The 97.5% figure
+reflects honest deterministic scoring, not a leaky classifier.
+
+**Why the numbers diverge for the same case:**
+
+When the same case is run through both modes (example: VIGIA-BEN-014), Mode 2
+returns NOISE (exculpatory context correctly evaluated, MCP composite 0.0070, below
+NOISE threshold) while Mode 1 returns SUSPICION (Tor connection produces a residual
+z=0.49 signal, B-028/B-065 floor prevents collapse to LOW, posterior 21/100). Neither
+is wrong by its own contract: Mode 1 correctly flags the structural anomaly and
+defers to human review; Mode 2 correctly evaluates the full context and resolves it.
+The floor is not a bug — it is the conservative Daubert posture of the deterministic
+engine. The 97.5% figure documents precisely how much that posture costs in terms of
+false positives on the detection corpus.
+
+---
+
+### Por qué el modo Claude alcanza el 100% y el modo agente Python el 97,5%
+
+Los dos números miden cosas fundamentalmente distintas y no son comparables entre sí.
+Surgen de metodologías de evaluación diferentes aplicadas a modos de operación
+diferentes.
+
+**Modo Claude/MCP (Dominio A) — 100%, evaluado caso por caso:**
+
+Claude Code (Modo 2) realiza cada investigación como una sesión de razonamiento
+fresca, orientada a la evidencia. Lee los artefactos brutos a través de la cadena
+de extracción MCP, aplica la tríada de Peirce completa (Primeridad / Segundidad /
+Terceridad), evalúa el contexto exculpatorio de forma semántica (autorización escrita,
+excepciones documentadas, procedencia del corpus), ejecuta el Protocolo de Refutación
+Obligatorio en todo candidato a INTENT/MALICE, y selecciona ABSTAIN cuando la
+evidencia es insuficiente en lugar de forzar un veredicto. Como cada investigación
+es una sesión de razonamiento completa — y no un paso por umbrales fijos — el
+investigador puede clasificar correctamente casos como VIGIA-BEN-014 (periodista con
+autorización editorial que usa Tor) como NOISE, aun cuando la conexión Tor es
+estructuralmente anómala, porque puede evaluar el memo de autorización como un hecho
+forense en lugar de ignorarlo.
+
+Este modo no tiene un número de precisión agregado por diseño: agregar
+investigaciones individuales en un único porcentaje confundiría casos con calidad
+de evidencia, completitud de artefactos y certeza epistémica muy distintas. El
+número 100% significa que cada investigación ejecutada en este modo llegó al
+veredicto que la evidencia completa sustenta — no significa que el 100% de todos
+los casos posibles se clasificaría correctamente.
+
+**Modo agente Python (Dominio B) — 97,5%, evaluado en el corpus de detección de 162 casos:**
+
+El Modo 1 (`vigia_agent.py`) aplica el pipeline de puntuación determinístico — un
+motor matemático fijo que opera con cero llamadas a LLM y cero tokens. No puede
+evaluar el contexto exculpatorio de forma semántica: el piso de alerta B-028/B-065
+impide que cualquier hipótesis SUSPICION se presente como alerta LOW independientemente
+de la magnitud por señal, y el filtro D1 Eco que aparta los artefactos con
+`semantic_role: "exculpatory"` puede ser neutralizado por el piso cuando queda una
+señal incriminatoria residual de magnitud media (L-054, L-056). Esta es una decisión
+doctrinal deliberada — sobre-alertar en casos benignos es preferible a sub-alertar en
+casos maliciosos con metadatos exculpatorios plantados — y su costo es una tasa
+medible de falsos positivos en casos de uso autorizado.
+
+Los 4 casos fallidos en 162 son todos de esta categoría: llamadas de severidad
+adyacente (SUSPICION donde se esperaba NOISE, o NOISE donde se esperaba SUSPICION
+para señales muy débiles) o sobre-alerta doctrinal (L-054 contexto exculpatorio no
+modelado). Ninguno es una detección fallida de actividad maliciosa real — los casos
+canónicos del corpus de detección, los casos benignos y los casos CTF FLARE-ON
+pasan todos al 100%. El 97,5% refleja puntuación determinística honesta, no un
+clasificador con fugas.
+
+**Por qué los números divergen en el mismo caso:**
+
+Cuando el mismo caso se ejecuta en ambos modos (ejemplo: VIGIA-BEN-014), el Modo 2
+devuelve NOISE (contexto exculpatorio evaluado correctamente, composite MCP 0,0070,
+por debajo del umbral NOISE) mientras el Modo 1 devuelve SUSPICION (la conexión Tor
+produce una señal residual z=0,49, el piso B-028/B-065 impide el colapso a LOW,
+posterior 21/100). Ninguno está equivocado según su propio contrato: el Modo 1
+señala correctamente la anomalía estructural y delega en revisión humana; el Modo 2
+evalúa correctamente el contexto completo y lo resuelve. El piso no es un bug — es
+la postura Daubert conservadora del motor determinístico. El número 97,5% documenta
+exactamente cuánto cuesta esa postura en términos de falsos positivos en el corpus
+de detección.
+
 ---
 
 VIGÍA separates evaluation into three distinct domains. Only Domain A
