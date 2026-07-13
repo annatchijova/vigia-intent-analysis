@@ -1,0 +1,79 @@
+{
+  "case_id": "VIGIA-BREAK-012",
+  "analyst": "VIGIA Mode 3 (Ollama — hermes3:8b)",
+  "analysis_timestamp": "2026-07-13T14:15:00Z",
+  "llm_backend": "ollama",
+  "ollama_model": "hermes3:8b",
+  "mode": "3 — Ollama (local LLM, no data leaves the machine)",
+  "verdict_jdoe": "NOISE",
+  "verdict_attacker": "SUSPICION",
+  "confidence": "65/100",
+  "note": "Dual verdict required by case structure. jdoe is NOT culpable — SSH keys were compromised before the events; the rm -rf / commands were executed by the attacker impersonating jdoe via stolen credentials. The attacker earns SUSPICION (not MALICE) because CAIE composite is 0.0246 (below MALICE threshold) and the CONSENSUS_FALLACY fracture reveals the four syslog entries are one evidence stream, not four. Mode 1 SUSPICION (27/50) is consistent — B-028/B-065 floor applied on crypto audit signal z=0.78.",
+
+  "peircean_analysis": {
+    "firstness": "6 artifacts: 4 syslog entries (WEB-01..04, prior_trust=0.30, raw_score=0.82 each) reporting 'user jdoe executed rm -rf / at 03:00'; 1 airgapped syslog (AIRGAPPED-01, prior_trust=0.95, raw_score=0.05) reporting 'user jdoe executed ls -la at 03:05'; 1 crypto audit (prior_trust=0.85, raw_score=0.92) confirming WEB-01..04 share compromised_key_A (fingerprint a1b2c3d4, found in dark web leak 2026-05). AIRGAPPED-01 uses independent key e5f6g7h8.",
+    "secondness": "Legitimate multi-source consensus requires independent evidence channels. Here the four syslog entries share the same SSH key — they are a single evidence stream routed through four endpoints, not four independent witnesses. Against this baseline: (A) AIRGAPPED-01 cannot be reached via network and reports no rm -rf event at 03:00 — if jdoe had executed the command, this server would either corroborate or be unreachable, not silently contradictory; (B) the crypto audit confirms key_A was published to a dark web leak before the incident — any holder of the leak could authenticate as jdoe on WEB-01..04; (C) AIRGAPPED-01's prior_trust=0.95 vs WEB-01..04 prior_trust=0.30 means the minority source is epistemically stronger than the majority combined.",
+    "thirdness": "CONSENSUS_FALLACY (T1195): attacker obtained compromised_key_A from the dark web leak, authenticated to WEB-01..04 simultaneously (or sequentially at 03:00), executed rm -rf / under jdoe's identity, and left no trace on the airgapped server that the attacker could not reach. The four syslog entries create the appearance of majority consensus — a social proof manipulation applied to forensic aggregation: 'four servers agree, jdoe must be guilty'. The correct weighting by channel reliability (spoofability=0.85 for log_entry vs 0.15 for memory_process crypto audit) collapses the four entries to one effective stream and gives primacy to the cryptographic evidence that reveals the compromise vector."
+  },
+
+  "ollama_peircean_chain": {
+    "firstness": "The observed phenomenon includes multiple instances of the 'rm -rf /' command being executed by user jdoe on compromised web servers (WEB-01 to WEB-04) via SSH using the same compromised key. Additionally, a benign action ('ls -la') is observed on an airgapped system by jdoe using a different key. The crypto audit confirms the key compromise, and the CONSENSUS_FALLACY fracture indicates that the sources are not independent, as they share the same compromise vector.",
+    "secondness": "This is abnormal, as 'rm -rf /' is a high-risk command that can cause catastrophic damage. The consensus of four sources (the web server events) is suspicious, but the low CAIE score (0.0246) and prior_trust values suggest that the evidence may be noise or a false positive. The airgapped system's benign action counters the malicious hypothesis, indicating that the consensus is flawed and not necessarily indicative of culpability.",
+    "thirdness": "The general rule is that attackers compromise SSH keys to execute commands and create a false sense of consensus to mislead. jdoe may be a legitimate user whose credentials were stolen, and the attacker orchestrates the events behind the scenes. The pattern suggests a coordinated attack, but the evidence is weak due to the flawed consensus and low CAIE score.",
+    "verdict_from_ollama": {"jdoe": "NOT_CULPABLE", "attacker": "SUSPICION", "confidence": "LOW"}
+  },
+
+  "caie_result": {
+    "composite_score": "0.0246",
+    "verdict": "NOISE",
+    "independent_sources": 2,
+    "fractures_detected": 0,
+    "daubert": "1/6 artifacts structurally irrefutable (memory_process crypto audit, spoofability=0.15). Admissible.",
+    "dominant_signal": "sift_crypto_audit (memory_process, spoofability=0.15, weight=0.30, adjusted=0.0235) — the crypto audit is the epistemically authoritative artifact; 4 syslog entries collapse to adjusted=0.0018 each due to spoofability=0.85",
+    "key_arithmetic": "WEB-01..04 log entries share source_tool=sift_syslog and evidence_type=log_entry — CAIE groups them as one source, then Noisy-OR within-group: 1-(1-0.0018)^4=0.0072. Across groups with crypto audit: 1-(1-0.0235)*(1-0.0072)=0.0246. The four entries contribute 0.0072 total vs the single crypto audit at 0.0235."
+  },
+
+  "mode1_result": {
+    "verdict": "SUSPICION",
+    "posterior": "27/50",
+    "alert_level": "MEDIUM",
+    "floor_applied": "B-028/B-065",
+    "note": "Mode 1 SUSPICION is consistent with CAIE NOISE — the crypto audit (z=0.78) produces SUSPICION_DETECTED at hypothesis level, B-028/B-065 prevents collapse to LOW. Not a contradiction: Mode 1 correctly flags the structural anomaly (key compromise evidence) and defers to human review."
+  },
+
+  "hypotheses": {
+    "H1_jdoe_culpable": "jdoe deliberately executed rm -rf / on four production servers at 03:00 using his own credentials.",
+    "H2_credential_theft": "An attacker obtained compromised_key_A from a dark web leak, authenticated as jdoe on WEB-01..04, and executed the destructive commands. jdoe's actual session on AIRGAPPED-01 at 03:05 shows benign activity (ls -la)."
+  },
+
+  "refutation_protocol": {
+    "benign_hypothesis": "H1: Four independent servers independently logged jdoe executing rm -rf / — majority consensus should prevail. jdoe had access to all four servers legitimately.",
+    "test_result": "H1 REFUTED: (A) The four servers are NOT independent witnesses — they share compromised_key_A, meaning a single key holder could authenticate to all four simultaneously. Independence requires different credential sets or channels. (B) The dark web leak of compromised_key_A predates the incident (2026-05), providing the mechanism: any leak downloader could impersonate jdoe on all four servers. (C) AIRGAPPED-01 (prior_trust=0.95, no network access, independent key) shows jdoe running ls -la at 03:05 — a benign command inconsistent with a user who just executed rm -rf / across four servers. (D) Spoofability weighting: log entries from compromised-key servers have spoofability=0.85 (easily planted), while the crypto audit (spoofability=0.15) is structurally irrefutable. Weighting by reliability, not count, the 4-source majority contributes less than the 1-source crypto audit.",
+    "refutation_outcome": "H1 REFUTED on four independent prongs. H2 (credential theft, attacker impersonating jdoe) is the only coherent explanation. jdoe verdict: NOISE. Attacker verdict: SUSPICION."
+  },
+
+  "devil_advocate": "Four out of five sources agree — majority consensus should prevail in any reasonable aggregation system. The rm -rf / command is unambiguously destructive; false positives of this kind are unusual. However: the crypto audit (the only structurally irrefutable artifact) provides the refutation key — shared compromised credentials collapse four sources to one, and no forensic standard accepts four log entries from compromised endpoints as independent evidence of user intent.",
+
+  "caie_fracture": "CONSENSUS_FALLACY (severity=0.9, T1195) — documented in case file. 4/5 sources share the same compromise vector (compromised_key_A). The minority source (AIRGAPPED-01, prior_trust=0.95) is epistemically stronger than the majority combined. Note: CAIE engine did not re-detect this fracture at runtime because CONSENSUS_FALLACY is not in the engine's live fracture catalogue (M3 gap) — documented as L-016.",
+
+  "evidence_anchors": [
+    "b012_meta: SSH crypto audit — compromised_key_A fingerprint a1b2c3d4 shared by WEB-01..04, found in dark web leak 2026-05 (irrefutable: spoofability=0.15)",
+    "b012_05: AIRGAPPED-01 — jdoe running ls -la at 03:05, no rm -rf, independent key e5f6g7h8, no network vector for attacker (prior_trust=0.95)",
+    "b012_01..04: WEB-01..04 syslog — rm -rf / under jdoe identity, all via compromised_key_A (spoofability=0.85, collapsed to one evidence stream)"
+  ],
+
+  "mitre_ttps": [
+    "T1195 (Supply Chain Compromise — SSH key compromise via dark web leak)",
+    "T1078 (Valid Accounts — attacker uses stolen jdoe credentials)",
+    "T1485 (Data Destruction — rm -rf / on four production servers)"
+  ],
+
+  "carnegie_pattern": "Social Proof via Manufactured Consensus — attacker exploits the natural human tendency to trust majority agreement by routing a single attack through four servers sharing one credential, creating the appearance of four independent witnesses.",
+
+  "known_limitations": [
+    "CONSENSUS_FALLACY fracture not detected by CAIE engine at runtime — documented M3 gap (L-016). Fracture was present in case file and applied manually.",
+    "Ollama hermes3:8b response was consistent with CAIE result but low-confidence — the model correctly identified jdoe as not culpable and attacker as SUSPICION but did not develop the Noisy-OR arithmetic independently.",
+    "No forensic verification of the dark web leak timestamp (2026-05) or the key distribution scope — SUSPICION ceiling is correct; INTENT would require confirmation of leak acquisition by a specific actor.",
+    "rm -rf / damage scope not determinable from this artifact set — servers may or may not have been recovered."
+  ]
+}
