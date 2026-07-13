@@ -1,0 +1,78 @@
+{
+  "case_id": "VIGIA-BEN-014",
+  "analyst": "VIGIA Mode 3 (Ollama — hermes3:8b)",
+  "analysis_timestamp": "2026-07-13T14:19:00Z",
+  "llm_backend": "ollama",
+  "ollama_model": "hermes3:8b",
+  "mode": "3 — Ollama (local LLM, no data leaves the machine)",
+  "verdict": "NOISE",
+  "confidence": "70/100",
+  "note": "CAIE NOISE (composite=0.0028, well below threshold). Ollama NOISE (0.75). Confidence reduced from Ollama's 0.75 to 70/100 to account for the authorization expiry gap (memo valid 2024-01-01 to 2024-12-31; connection timestamp 2026-04-10 — ~16 months after expiry). Traffic profile fully consistent with legitimate journalistic source protection. Verdict held at NOISE: the expiry gap is an administrative finding requiring policy follow-up, not a forensic indicator of malicious intent. See known_limitations for escalation path.",
+
+  "peircean_analysis": {
+    "firstness": "Tor connection from 10.0.2.15:9050 to Tor guard node. Process: tor (PID 4455). User: journalist (Ana Martinez). Session: 45 minutes. Traffic: 100% to whistleblower-platform.onion. No financial sites, no C2 IPs, no file transfers greater than 1MB. Written authorization memo signed by Editor-in-Chief and Legal Counsel, policy JOURNALIST-ETHICS, valid 2024-01-01 to 2024-12-31. Connection timestamp: 2026-04-10. Authorization expiry gap: ~16 months.",
+    "secondness": "Tor from a corporate machine is a SUSPICION trigger by baseline — most corporate security policies prohibit Tor without explicit authorization. Against this baseline: (A) the traffic profile is entirely consistent with the stated journalistic purpose: single .onion destination, 45-minute session consistent with a source interview, no file transfers or exfiltration indicators; (B) the written authorization, though expired, establishes that this exact use case was previously evaluated, approved by two organizational authorities (editorial and legal), and granted a named policy exception. The expiry gap is the single structural anomaly: the connection occurred ~16 months after the memo's validity period ended, with no renewal document in the artifact set.",
+    "thirdness": "Two candidate patterns: (A) Administrative gap — journalist renewed the authorization verbally or through a process that did not generate a new written memo captured in this artifact set. Organizational context: news organizations with active source protection programs typically maintain standing policies, and the specific-name authorization style (naming Ana Martinez) is consistent with a one-time memo rather than an evergreen policy. (B) Unauthorized use using historical policy knowledge — journalist knowingly uses Tor after authorization lapsed, relying on institutional memory of the prior approval. The traffic profile strongly favors (A): if the intent were exfiltration or unauthorized activity, the behavioral indicators would differ — multiple .onion addresses, file transfers, timed sessions. The absence of all exfiltration indicators makes (B) unlikely even if the authorization lapsed."
+  },
+
+  "ollama_output": {
+    "firstness": "An expired Tor authorization being used by a journalist on a corporate machine, with all traffic directed to a .onion site. The authorization expired approximately 16 months before the connection, and the traffic profile shows no suspicious activity (100% to a single .onion site, no exfiltration indicators).",
+    "secondness": "The 16-month authorization gap is a forensically relevant anomaly, as it suggests a potential policy violation or administrative oversight. However, the clean traffic profile does not support malicious intent, reducing the risk. The CAIE score of 0.0028 indicates a low anomaly, but the date gap introduces tension.",
+    "thirdness": "The pattern suggests authorized journalistic use with an administrative gap, potentially due to oversight. The clean traffic profile dominates, favoring legitimate use.",
+    "verdict": "NOISE",
+    "confidence_raw": 0.75,
+    "next_step_ollama": "Investigate the authorization renewal process to confirm if gaps are common, verify the machine Tor configuration for hidden backdoors, and cross-reference journalist access logs with policy records."
+  },
+
+  "caie_result": {
+    "composite_score": "0.0028",
+    "verdict": "NOISE",
+    "independent_sources": 2,
+    "fractures_detected": 0,
+    "daubert": "1/3 artifacts structurally irrefutable (hmac_audit_log, spoofability=0.05). Admissible.",
+    "dominant_signal": "sift_document_analysis (hmac_audit_log, spoofability=0.05, weight=0.40, adjusted=0.0018) — the authorization document is the epistemically strongest artifact in this set",
+    "note": "ART-002 and ART-003 carry semantic_role=exculpatory. MCP evaluate() does not honor this field (L-056 gap). _vigia_score() would set them aside via D1 Eco filter, then B-028/B-065 floor would apply to ART-001 alone (Tor connection z=0.49) — producing Mode 1 SUSPICION. This is the documented Mode 1 vs Mode 2 divergence for this case."
+  },
+
+  "authorization_gap_analysis": {
+    "memo_valid_from": "2024-01-01",
+    "memo_valid_to": "2024-12-31",
+    "connection_timestamp": "2026-04-10",
+    "gap_months": 16,
+    "forensic_classification": "administrative_gap",
+    "forensic_note": "The expiry gap is real and documentable. It does not change the verdict because: (A) the traffic profile provides no behavioral indicators of malicious use, (B) the prior authorization establishes institutional awareness and approval of the exact use case, (C) organizational renewal lapses are common in editorial environments without formal IT policy governance. The gap is an HR/policy finding, not a forensic indicator of intent.",
+    "escalation_threshold": "If the investigation required INTENT or MALICE escalation, the gap would reduce confidence further. As a NOISE finding, 70/100 reflects the gap appropriately — a clean renewal would produce 90+/100."
+  },
+
+  "hypotheses": {
+    "H1_authorized_journalism": "Journalist with documented institutional approval uses Tor for source protection, authorization lapsed administratively but practice remained organizationally sanctioned.",
+    "H2_unauthorized_use": "Journalist uses Tor after knowing authorization expired, exploiting historical approval as informal cover.",
+    "H3_active_exfiltration": "The Tor session is a cover channel for data exfiltration, with the .onion address masking the actual destination."
+  },
+
+  "refutation_protocol": {
+    "benign_hypothesis": "H1: Authorization gap is administrative, institutional practice continued under standing policy, traffic is fully consistent with stated journalistic purpose.",
+    "test_result": "H3 REFUTED: No file transfers greater than 1MB eliminates bulk exfiltration. Single .onion destination with descriptive name eliminates multi-endpoint exfiltration pattern. 45-minute session timing inconsistent with automated exfiltration. H2 PARTIALLY ADDRESSED: cannot rule out knowing lapse without additional policy records. H1 CONSISTENT with all observed indicators. Verdict: NOISE, confidence 70/100 to reflect H2 residual uncertainty.",
+    "refutation_outcome": "H3 fully refuted. H2 partially addressed — not confirmable or refutable without additional policy/renewal records. H1 most consistent with full evidence set. NOISE maintained."
+  },
+
+  "devil_advocate": "The authorization memo explicitly states a validity period ending 2024-12-31. The connection occurs 2026-04-10. No renewal document exists in the artifact set. An employee who uses corporate resources under an expired authorization is in policy violation regardless of whether the use is benign. If this were an internal compliance investigation, the authorization gap alone would require a finding. Counter: compliance findings and forensic findings are different standards. NOISE means the activity does not indicate malicious intent — it does not mean the activity was administratively proper.",
+
+  "evidence_anchors": [
+    "ART-001: Tor connection 10.0.2.15:9050, user=journalist, 100% to whistleblower-platform.onion, 45 min session",
+    "ART-002: Written authorization signed by Editor-in-Chief and Legal Counsel (expired: 2024-12-31, connection: 2026-04-10) — irrefutable document, gap documented",
+    "ART-003: Traffic analysis — no financial sites, no C2, no transfers >1MB, consistent with source interview"
+  ],
+
+  "mitre_ttps": [],
+
+  "carnegie_pattern": "None detected for malicious activity. The authorization gap does not establish a manipulation pattern — it is an administrative anomaly.",
+
+  "known_limitations": [
+    "Authorization expiry gap (16 months) is real and unresolved — no renewal document in artifact set. Confidence capped at 70/100. Would reach 90+/100 with a 2025 or 2026 renewal memo.",
+    "Ollama hermes3:8b correctly identified the gap and correctly maintained NOISE verdict based on traffic profile dominance.",
+    "Mode 1 SUSPICION for this case (B-028/B-065 floor, documented L-054/L-056) is a known divergence — not a contradiction of this NOISE finding.",
+    "The .onion address identity cannot be independently verified — whistleblower-platform.onion is a descriptive name, not a verified platform.",
+    "validate_and_correct not run (Ollama reliability — L-055 pattern)."
+  ]
+}
