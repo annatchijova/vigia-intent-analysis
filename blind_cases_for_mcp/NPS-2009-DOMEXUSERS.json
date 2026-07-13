@@ -1,0 +1,468 @@
+{
+  "case_id": "NPS-2009-DOMEXUSERS",
+  "name": "NPS 2009 Domain Exercise Users — Educational Forensic Corpus",
+  "description": "Windows XP NTFS forensic corpus published by the Naval Postgraduate School (2009). Simulated domain exercise with two scripted users (domex1/domex2). Image acquired 2008-10-30. Source: realistic.aff. fiwalk v0.5.1, TSK 3.0.0. 35313 file objects cataloged. Evidence analyzed via Claude Code MCP (Mode 2) — this JSON feeds Mode 1 deterministic scorer for sealed bundle generation.",
+  "artifacts": [
+    {
+      "artifact_id": "FIWALK-001",
+      "evidence_type": "file_metadata",
+      "source_tool": "read_evidence",
+      "timestamp": "2008-10-30T16:50:00Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.95,
+      "provenance_chain": [
+        "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
+      ],
+      "acquisition_tool": "fiwalk_v0.5.1_TSK3.0.0",
+      "acquisition_hash": "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97",
+      "acquisition_timestamp": "2026-06-27T15:20:26Z",
+      "description": "fiwalk XML catalog: 35313 fileobjects, NTFS partition offset=32256, sectorsize=512, block_count=10482404. Source image: realistic.aff. Acquisition: fiwalk v0.5.1 / TSK 3.0.0 / AFF 3.3.4. No deleted files detected (ALLOC=0 count: 0). Filesystem consistent and complete.",
+      "metadata": {
+        "total_fileobjects": 35313,
+        "partition_offset": 32256,
+        "sectorsize": 512,
+        "block_count": 10482404,
+        "ftype": "ntfs",
+        "fiwalk_version": "0.5.1",
+        "tsk_version": "3.0.0",
+        "alloc_zero_count": 0,
+        "acquisition_date": "2009-05-10T22:48:26Z",
+        "acquisition_seconds": 7238,
+        "write_blocker_used": true,
+        "examiner_id": "nps_digital_corpora",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:3092fbda7d3c928810adce80f7245214af1743db82e6a39c387a1457346c8040",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json."
+      }
+    },
+    {
+      "artifact_id": "USER-001",
+      "evidence_type": "registry_key",
+      "source_tool": "bash_xml_parse",
+      "timestamp": "2008-10-30T16:47:55Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
+      ],
+      "acquisition_tool": "fiwalk_v0.5.1",
+      "acquisition_hash": "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97",
+      "acquisition_timestamp": "2026-06-27T15:22:00Z",
+      "description": "NTUSER.DAT registry hive for domex1 (SID S-1-5-21-842925246-725345543-1844994965-1003). Last write 2008-10-30 16:47:55 UTC. 786432 bytes. 16 restore point snapshots of SID-1003 registry found in System Volume Information (RP6 through RP16). First domex1 profile snapshot at RP6 (2008-10-21 20:08 UTC).",
+      "metadata": {
+        "user": "domex1",
+        "sid": "S-1-5-21-842925246-725345543-1844994965-1003",
+        "hive_size_bytes": 786432,
+        "last_write": "2008-10-30T16:47:55Z",
+        "first_login": "2008-10-21T19:12:36Z",
+        "restore_point_snapshots": 11,
+        "profile_files": 797,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:3092fbda7d3c928810adce80f7245214af1743db82e6a39c387a1457346c8040",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "USER-002",
+      "evidence_type": "registry_key",
+      "source_tool": "bash_xml_parse",
+      "timestamp": "2008-10-30T03:34:59Z",
+      "raw_score": 0.08,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
+      ],
+      "acquisition_tool": "fiwalk_v0.5.1",
+      "acquisition_hash": "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97",
+      "acquisition_timestamp": "2026-06-27T15:22:00Z",
+      "description": "NTUSER.DAT registry hive for domex2 (SID S-1-5-21-842925246-725345543-1844994965-1004). Last write 2008-10-30 03:34:59 UTC. 786432 bytes. DPAPI credential store (CREDHIST + master key cc7fb371-278c-4ef1-88a9-0af50af67b09) created 2008-10-28 21:02 UTC — first Outlook 2007 launch.",
+      "metadata": {
+        "user": "domex2",
+        "sid": "S-1-5-21-842925246-725345543-1844994965-1004",
+        "hive_size_bytes": 786432,
+        "last_write": "2008-10-30T03:34:59Z",
+        "first_login": "2008-10-21T19:29:59Z",
+        "dpapi_credhist_size": 24,
+        "dpapi_master_key_size": 388,
+        "dpapi_created": "2008-10-28T21:02:15Z",
+        "profile_files": 617,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:3092fbda7d3c928810adce80f7245214af1743db82e6a39c387a1457346c8040",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "DOC-001",
+      "evidence_type": "file_timestamp",
+      "source_tool": "bash_xml_parse",
+      "timestamp": "2008-10-29T16:14:52Z",
+      "raw_score": 0.18,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
+      ],
+      "acquisition_tool": "fiwalk_v0.5.1",
+      "acquisition_hash": "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97",
+      "acquisition_timestamp": "2026-06-27T15:22:30Z",
+      "description": "domex1 document lifecycle: 4 Office 2007 files created/sent/deleted in 152 seconds (2008-10-29 16:14:52 to 16:17:24 UTC). Files: 'This is a word document by domex user 1.docx' (9844b, mtime=16:14:52), 'This is a word document sent by domex user 1.docx' (9926b, mtime=16:15:20), 'This is a spreadsheet by domex user 1.xlsx' (8230b, mtime=16:16:28), 'This is a spreadsheet sent by domex user 1.xlsx' (8203b, mtime=16:16:52). Naming convention is explicit exercise label, not organic user behavior. Shannon entropy of creation sequence: 4.41 (NORMAL).",
+      "metadata": {
+        "user": "domex1",
+        "path": "Documents and Settings/domex1/My Documents/",
+        "files_created": 4,
+        "elapsed_seconds": 152,
+        "naming_pattern": "explicit_exercise_label",
+        "entropy_sequence": 4.41,
+        "custom_dic_size_bytes": 2,
+        "lnk_files_count": 6,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:3092fbda7d3c928810adce80f7245214af1743db82e6a39c387a1457346c8040",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "REC-001",
+      "evidence_type": "mft_entry",
+      "source_tool": "bash_xml_parse",
+      "timestamp": "2008-10-29T16:15:34Z",
+      "raw_score": 0.2,
+      "prior_trust": 0.9,
+      "provenance_chain": [
+        "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
+      ],
+      "acquisition_tool": "fiwalk_v0.5.1",
+      "acquisition_hash": "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97",
+      "acquisition_timestamp": "2026-06-27T15:22:45Z",
+      "description": "RECYCLER SID-1003 (domex1): Dc3.docx (9852b, mtime=2008-10-29 16:15:34, ALLOC=1) and Dc4.xlsx (8236b, mtime=2008-10-29 16:17:24, ALLOC=1). Files are recoverable — not permanently deleted. INFO2 Recycle Bin metadata last updated 2008-10-30 03:38 and 03:40 UTC. domex1 session confirmed active until 2008-10-30 16:47 UTC. No cross-SID access evidence.",
+      "metadata": {
+        "user": "domex1",
+        "sid": "S-1-5-21-842925246-725345543-1844994965-1003",
+        "path": "RECYCLER/S-1-5-21-842925246-725345543-1844994965-1003/",
+        "entries": [
+          {
+            "name": "Dc3.docx",
+            "size": 9852,
+            "mtime": "2008-10-29T16:15:34Z",
+            "alloc": 1
+          },
+          {
+            "name": "Dc4.xlsx",
+            "size": 8236,
+            "mtime": "2008-10-29T16:17:24Z",
+            "alloc": 1
+          }
+        ],
+        "info2_last_write_1": "2008-10-30T03:38:44Z",
+        "info2_last_write_2": "2008-10-30T03:40:07Z",
+        "permanently_deleted": false,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:3092fbda7d3c928810adce80f7245214af1743db82e6a39c387a1457346c8040",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "EMAIL-001",
+      "evidence_type": "file_metadata",
+      "source_tool": "bash_xml_parse",
+      "timestamp": "2008-10-30T03:32:51Z",
+      "raw_score": 0.1,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
+      ],
+      "acquisition_tool": "fiwalk_v0.5.1",
+      "acquisition_hash": "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97",
+      "acquisition_timestamp": "2026-06-27T15:23:00Z",
+      "description": "domex2 Outlook 2007 email infrastructure: 3 PST files — Outldomexuser2@gmail.com-00000002.pst (525312b, mtime=2008-10-30 03:32:51), Outldomexuser2@hotmail.com-00000004.pst (271360b, mtime=2008-10-30 02:59:28), Outlook.pst (271360b, mtime=2008-10-30 03:32:51). Outlook.NK2 autocomplete (5584b). Address book domex2.wab (176212b). Incoming Hotmail log at 2008-10-29 18:58:13. Browser cache: InboxLight[1].htm (Hotmail webmail) at 2008-10-30 02:44:26. CUSTOM.DIC 90 bytes (custom words added).",
+      "metadata": {
+        "user": "domex2",
+        "pst_gmail_size": 525312,
+        "pst_hotmail_size": 271360,
+        "pst_default_size": 271360,
+        "outlook_nk2_size": 5584,
+        "address_book_size": 176212,
+        "custom_dic_size": 90,
+        "incoming_log_timestamp": "2008-10-29T18:58:13Z",
+        "webmail_cache_timestamp": "2008-10-30T02:44:26Z",
+        "temp_lock_file": "~$rmalEmail.dotm",
+        "dpapi_protected": true,
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:3092fbda7d3c928810adce80f7245214af1743db82e6a39c387a1457346c8040",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "IM-001",
+      "evidence_type": "file_metadata",
+      "source_tool": "bash_xml_parse",
+      "timestamp": "2008-10-21T20:08:01Z",
+      "raw_score": 0.05,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
+      ],
+      "acquisition_tool": "fiwalk_v0.5.1",
+      "acquisition_hash": "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97",
+      "acquisition_timestamp": "2026-06-27T15:22:30Z",
+      "description": "domex1 Pidgin IM infrastructure: accounts.xml (5138b, mtime=2008-10-21 20:04:42), blist.xml (5112b, mtime=2008-10-21 20:08:01), 7 buddy icons, Gmail TLS cert. AIM/AOL acccore: domexuser1 buddyicon + feedbag (2008-10-29). XMPP caps updated 2008-10-21 19:44. domex2 Pidgin: MSN certs (contacts.msn.com, login.live.com), Gmail cert, blist.xml (4834b, 2008-10-30 02:48:55).",
+      "metadata": {
+        "domex1_im_platforms": [
+          "Pidgin/XMPP",
+          "Gmail/XMPP",
+          "AIM/AOL"
+        ],
+        "domex2_im_platforms": [
+          "Pidgin/MSN",
+          "Pidgin/Gmail",
+          "Pidgin/XMPP"
+        ],
+        "pidgin_accounts_xml_size": 5138,
+        "pidgin_blist_size": 5112,
+        "buddy_icons_count": 7,
+        "aim_account": "domexuser1",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:3092fbda7d3c928810adce80f7245214af1743db82e6a39c387a1457346c8040",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "SYS-001",
+      "evidence_type": "registry_key",
+      "source_tool": "bash_xml_parse",
+      "timestamp": "2008-10-30T16:49:00Z",
+      "raw_score": 0.22,
+      "prior_trust": 0.8,
+      "provenance_chain": [
+        "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97"
+      ],
+      "acquisition_tool": "fiwalk_v0.5.1",
+      "acquisition_hash": "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97",
+      "acquisition_timestamp": "2026-06-27T15:23:15Z",
+      "description": "Windows System Restore: 16 restore points (RP1 2008-10-20 21:59 to RP16 2008-10-30 16:49) over 10 days. Distribution: RP1-RP5 in first 3 hours (setup phase), RP6 on 2008-10-22 (first domex user snapshot), RP7 on 2008-10-23, RP8-RP9 on 2008-10-28 (Outlook setup), RP10-RP16 on 2008-10-30 (acquisition day). Pattern consistent with active installation phase and forensic acquisition triggering restore points. Volume GUID: 6636DFB4-3563-4401-B767-70A62BFCF4C9.",
+      "metadata": {
+        "restore_points_total": 16,
+        "volume_guid": "6636DFB4-3563-4401-B767-70A62BFCF4C9",
+        "rp_first": "2008-10-20T21:59:21Z",
+        "rp_last": "2008-10-30T16:49:00Z",
+        "exercise_duration_days": 10,
+        "rp_on_acquisition_day": 7,
+        "dominant_pattern": "installation_phase_plus_acquisition_trigger",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:3092fbda7d3c928810adce80f7245214af1743db82e6a39c387a1457346c8040",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    },
+    {
+      "artifact_id": "HASH-001",
+      "evidence_type": "cryptographic_hash",
+      "source_tool": "generate_forensic_hash",
+      "timestamp": "2026-06-27T15:20:25Z",
+      "raw_score": 0.02,
+      "prior_trust": 0.99,
+      "provenance_chain": [
+        "sha256:063da1512a1c7d6762318c0fc3388621eed544e322adfe4e4b3bb2854e157821",
+        "sha256:f48d4218562ee5f2d1d95839aff3e0d53ddf84a41150d1f5f50355f5a828cd97",
+        "sha256:5c52f16eddd6d1afef216d968b19e7267fbd5e3c8bb1626bfb2d8c4f36cfaa1c",
+        "sha256:cd774b24bccc8dc3a2eb72e8a76d379d2404967b4ee749db28c15cc8f7587e28",
+        "sha256:a207ae77a76a3835a046d55f5ff3d0e4926d302d644ae3457cad1a8e4057405d",
+        "sha256:e4fa35c66ada777bd0925b6f2c080ce23e52030b6f148b7925c8d8de722bd169"
+      ],
+      "acquisition_tool": "mcp_generate_forensic_hash",
+      "acquisition_hash": "sha256:063da1512a1c7d6762318c0fc3388621eed544e322adfe4e4b3bb2854e157821",
+      "acquisition_timestamp": "2026-06-27T15:20:25Z",
+      "description": "Cryptographic chain of custody: 6 primary artifacts hashed before analysis. SHA-256 verified at acquisition. All hashes computed atomically (single-pass, TOCTOU-safe for XMLs via MCP; bash/sha256sum for E01s). No integrity violations detected. Session nonce derived from first hash: 063da151...",
+      "metadata": {
+        "artifacts_hashed": 6,
+        "method_xml": "mcp_generate_forensic_hash_atomic",
+        "method_e01": "bash_sha256sum",
+        "integrity_violations": 0,
+        "session_nonce_source": "nps-2009-domexusers-redacted.xml",
+        "acquisition_tool": "VIGIA deterministic pipeline — señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canóni",
+        "acquisition_timestamp": "2026-07-06T00:00:00Z",
+        "acquisition_hash": "sha256:3092fbda7d3c928810adce80f7245214af1743db82e6a39c387a1457346c8040",
+        "acquisition_note": "Metadata documentada retroactivamente (2026-07-07, WHAT_IS_NEXT §1.1.2). Sin adquisición física: caso de corpus. El hash cubre: bundle fuente results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json.",
+        "write_blocker_used": false
+      }
+    }
+  ],
+  "corpus_context": {
+    "source": "Naval Postgraduate School Digital Corpora",
+    "url": "https://digitalcorpora.org/corpora/disk-images/nps-2009-domexusers",
+    "purpose": "Educational DFIR training corpus",
+    "public": true,
+    "scripted_users": [
+      "domex1",
+      "domex2"
+    ],
+    "image_type": "Windows XP NTFS full disk image",
+    "acquisition_tool": "AFF/fiwalk"
+  },
+  "signals": [
+    {
+      "artifact_id": "FIWALK-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "description": "fiwalk XML catalog: 35313 fileobjects, NTFS partition offset=32256, sectorsize=512, block_count=10482404. Source image: realistic.aff. Acquisition: fiwalk v0.5.1 / TSK 3.0.0 / AFF 3.3.4. No deleted fi",
+      "evidence_type": "file_metadata",
+      "source": "read_evidence",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 19
+      }
+    },
+    {
+      "artifact_id": "USER-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "NTUSER.DAT registry hive for domex1 (SID S-1-5-21-842925246-725345543-1844994965-1003). Last write 2008-10-30 16:47:55 UTC. 786432 bytes. 16 restore point snapshots of SID-1003 registry found in Syste",
+      "evidence_type": "registry_key",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 44
+      }
+    },
+    {
+      "artifact_id": "USER-002",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 22
+      },
+      "description": "NTUSER.DAT registry hive for domex2 (SID S-1-5-21-842925246-725345543-1844994965-1004). Last write 2008-10-30 03:34:59 UTC. 786432 bytes. DPAPI credential store (CREDHIST + master key cc7fb371-278c-4e",
+      "evidence_type": "registry_key",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 625,
+        "num": 44
+      }
+    },
+    {
+      "artifact_id": "DOC-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "domex1 document lifecycle: 4 Office 2007 files created/sent/deleted in 152 seconds (2008-10-29 16:14:52 to 16:17:24 UTC). Files: 'This is a word document by domex user 1.docx' (9844b, mtime=16:14:52),",
+      "evidence_type": "file_timestamp",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 1000,
+        "num": 153
+      }
+    },
+    {
+      "artifact_id": "REC-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 9
+      },
+      "description": "RECYCLER SID-1003 (domex1): Dc3.docx (9852b, mtime=2008-10-29 16:15:34, ALLOC=1) and Dc4.xlsx (8236b, mtime=2008-10-29 16:17:24, ALLOC=1). Files are recoverable — not permanently deleted. INFO2 Recycl",
+      "evidence_type": "mft_entry",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 9
+      }
+    },
+    {
+      "artifact_id": "EMAIL-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "domex2 Outlook 2007 email infrastructure: 3 PST files — Outldomexuser2@gmail.com-00000002.pst (525312b, mtime=2008-10-30 03:32:51), Outldomexuser2@hotmail.com-00000004.pst (271360b, mtime=2008-10-30 0",
+      "evidence_type": "file_metadata",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 200,
+        "num": 17
+      }
+    },
+    {
+      "artifact_id": "IM-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 17
+      },
+      "description": "domex1 Pidgin IM infrastructure: accounts.xml (5138b, mtime=2008-10-21 20:04:42), blist.xml (5112b, mtime=2008-10-21 20:08:01), 7 buddy icons, Gmail TLS cert. AIM/AOL acccore: domexuser1 buddyicon + f",
+      "evidence_type": "file_metadata",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 400,
+        "num": 17
+      }
+    },
+    {
+      "artifact_id": "SYS-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "description": "Windows System Restore: 16 restore points (RP1 2008-10-20 21:59 to RP16 2008-10-30 16:49) over 10 days. Distribution: RP1-RP5 in first 3 hours (setup phase), RP6 on 2008-10-22 (first domex user snapsh",
+      "evidence_type": "registry_key",
+      "source": "bash_xml_parse",
+      "z_score": {
+        "__fraction__": true,
+        "den": 125,
+        "num": 22
+      }
+    },
+    {
+      "artifact_id": "HASH-001",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 99
+      },
+      "description": "Cryptographic chain of custody: 6 primary artifacts hashed before analysis. SHA-256 verified at acquisition. All hashes computed atomically (single-pass, TOCTOU-safe for XMLs via MCP; bash/sha256sum f",
+      "evidence_type": "cryptographic_hash",
+      "source": "generate_forensic_hash",
+      "z_score": {
+        "__fraction__": true,
+        "den": 5000,
+        "num": 99
+      }
+    }
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/NPS-2009-DOMEXUSERS_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 9
+  },
+  "schema_version": 1,
+  "case_name": "NPS-2009-DOMEXUSERS"
+}

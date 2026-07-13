@@ -1,0 +1,101 @@
+{
+  "case_id": "VIGIA-BREAK-012",
+  "case_name": "Consensus Trap",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-13T13:30:00Z",
+  "mode": "Claude Code (Mode 2)",
+  "verdict_jdoe": "NOISE",
+  "verdict_attacker": "SUSPICION",
+  "confidence": "81/100",
+  "sans_phase": "Identification",
+  "executive_summary": "Four out of five log sources report 'jdoe executed rm -rf /' but all four share the same compromised SSH key (found in dark web leak 2026-05). The single air-gapped source (prior_trust=0.95, physically disconnected) reports only 'jdoe executed ls -la'. Cryptographic audit confirms key compromise. The 4/5 majority vote is inadmissible: all four reports share a single compromise vector and are therefore not independent sources. jdoe is NOT the actor. An unknown attacker used jdoe's stolen SSH credentials to execute destructive commands across four network-accessible servers while framing the legitimate user.",
+
+  "peircean_analysis": {
+    "firstness": "5 log entries: WEB-01 through WEB-04 each record 'jdoe executed rm -rf / at 03:00' via SSH (all using key fingerprint a1b2c3d4). AIRGAPPED-01 records 'jdoe executed ls -la at 03:05' via a different key (fingerprint e5f6g7h8). SSH key analysis: key a1b2c3d4 found in dark web credential dump dated 2026-05. AIRGAPPED-01 has no network connectivity (last sync 2026-06-10).",
+    "secondness": "Evidence weight is not determined by source count but by channel independence and reliability. The four WEB servers are not independent sources — they share the same authentication credential (compromised_key_A). A single credential compromise allows simultaneous access to all four servers. AIRGAPPED-01 cannot have been reached by the attacker (no network for 5 days) and uses an uncompromised key. Its report of benign activity (ls -la) from a high-trust, tamper-resistant source carries more evidentiary weight than four logs from a single compromised credential chain.",
+    "thirdness": "Credential theft (T1078 — Valid Accounts) and lateral movement via stolen SSH key. The attacker obtained jdoe's SSH private key from a dark web leak, used it to authenticate to WEB-01 through WEB-04 simultaneously, executed destructive commands (rm -rf /), and implicitly relied on majority-voting forensics to attribute the act to jdoe. The AIRGAPPED-01 log exonerates jdoe: at 03:05 jdoe was running ls -la on a machine unreachable by the attacker. The logs on the four compromised servers represent attacker-generated evidence, not authentic jdoe activity."
+  },
+
+  "mcp_results": {
+    "caie": {
+      "verdict": "NOISE",
+      "composite_score": "0.0246",
+      "independent_sources": 2,
+      "fractures": 0,
+      "daubert": "1/6 artifacts structurally irrefutable (sift_crypto_audit, spoofability=0.15). Anchored.",
+      "key_scoring": "sift_crypto_audit (SSH key compromise evidence): adjusted=0.0235 — dominates over all four sift_syslog entries combined. The cryptographic evidence outweighs majority count."
+    }
+  },
+
+  "consensus_analysis": {
+    "apparent_majority": "4/5 sources report rm -rf / by jdoe",
+    "true_independence": "1 independent source (AIRGAPPED-01). The 4 network-reachable servers share one compromise vector and constitute a single evidence stream.",
+    "weighted_verdict": "AIRGAPPED-01 (prior_trust=0.95) + crypto_audit (irrefutable) > 4 logs from compromised_key_A",
+    "epistemological_principle": "Evidence aggregation must weight by channel reliability and independence, not source count. Majority voting on dependent sources is a fallacy."
+  },
+
+  "hypotheses": {
+    "H1_jdoe_actor": "jdoe deliberately executed rm -rf / on four servers — insider threat.",
+    "H2_credential_theft": "Unknown attacker obtained jdoe's SSH key from dark web, used it to compromise WEB-01 through WEB-04, executing destructive commands while jdoe was active on the air-gapped machine."
+  },
+
+  "refutation_protocol": {
+    "benign_hypothesis": "H1 (jdoe as actor): Four logs from four different servers all record the same action. This is strong circumstantial evidence.",
+    "test_result": "H1 REFUTED: (A) All four servers used the same stolen SSH key — this is not four independent confirmations, it is one attacker with one key across four targets. (B) AIRGAPPED-01 (unreachable by attacker) records jdoe performing benign activity at 03:05, five minutes after the alleged destructive action — jdoe was active but doing ls -la, not rm -rf /. (C) The SSH key was found in a dark web credential dump from the previous month, establishing the theft timeline predates the incident.",
+    "refutation_outcome": "H1 REFUTED. H2 confirmed. jdoe verdict: NOISE (framed). Attacker verdict: SUSPICION (destructive action via stolen credentials, T1078 + T1485)."
+  },
+
+  "devil_advocate": "jdoe could have shared their SSH key deliberately for insider threat purposes. The dark web presence of the key could have been jdoe's own action. AIRGAPPED-01's log could be manually falsified if jdoe had physical access. Counter: the air-gapped machine's log has prior_trust=0.95 and no network vector for remote falsification. The dark web leak preceded the incident by weeks, consistent with credential theft rather than deliberate sharing.",
+
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "title": "jdoe Exonerated — Framed by Stolen Credentials",
+      "verdict": "NOISE",
+      "confidence": "CONFIRMED",
+      "artifact": "b012_05 (AIRGAPPED-01) + b012_meta (crypto audit)",
+      "tools_used": ["cross_artifact_analysis"],
+      "firstness": "AIRGAPPED-01 records ls -la at 03:05; SSH key a1b2c3d4 in dark web dump 2026-05",
+      "secondness": "Disconnected machine cannot be reached by attacker; shared key = single compromise vector",
+      "thirdness": "jdoe's credential stolen, attacker impersonated jdoe across 4 network servers",
+      "mitre_ttps": ["T1078"],
+      "carnegie": "Carnegie Authority Transfer — attacker borrowed jdoe's legitimate identity to shield destructive action",
+      "devil_advocate": "jdoe could have shared key deliberately",
+      "corroboration": "AIRGAPPED-01 (air-gap ensures no attacker access) + cryptographic key compromise evidence — two independent irrefutable sources"
+    },
+    {
+      "finding_id": "F-002",
+      "title": "Destructive Action via Compromised Credentials on WEB-01 to WEB-04",
+      "verdict": "SUSPICION",
+      "confidence": "CONFIRMED",
+      "artifact": "b012_01 through b012_04 + b012_meta",
+      "tools_used": ["cross_artifact_analysis"],
+      "firstness": "rm -rf / executed on 4 servers via compromised SSH key at 03:00",
+      "secondness": "Simultaneous execution on 4 servers within same minute using one credential is automated scripted attack",
+      "thirdness": "Attacker with stolen credential conducted systematic destructive action (T1485 Data Destruction)",
+      "mitre_ttps": ["T1078", "T1485"],
+      "carnegie": "None — pure technical attack",
+      "devil_advocate": "Attack could have been opportunistic (credential found, servers scanned) rather than targeted at jdoe specifically",
+      "corroboration": "Cryptographic audit independently confirms key compromise (2 sources)"
+    }
+  ],
+
+  "refutation_gate_log": {
+    "finding_id": "F-001",
+    "candidate_verdict": "MALICE (against jdoe as insider threat)",
+    "gate_applied": "Daubert Corroboration Gate — air-gapped exoneration",
+    "gate_result": "jdoe verdict REJECTED as MALICE. Attacker's MALICE cannot be confirmed without identity. Emitted as SUSPICION for the attacker action.",
+    "forensic_note": "Self-correction pre-emission. The 4-server consensus was the trap; the air-gapped exoneration is the resolution."
+  },
+
+  "known_limitations": [
+    "Attacker identity unknown — cannot confirm who accessed the dark web dump.",
+    "No post-incident logs available to confirm whether rm -rf / was actually executed (could the command have been injected into syslog without execution?).",
+    "validate_and_correct not run due to Ollama backend reliability issues."
+  ],
+
+  "token_usage": {
+    "session_id": "2026-07-13T13:00:00Z",
+    "note": "Full token breakdown available at usage.anthropic.com"
+  }
+}

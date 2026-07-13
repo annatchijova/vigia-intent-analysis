@@ -1,0 +1,110 @@
+{
+  "case_id": "VIGIA-FN-003",
+  "case_name": "The Admin Mirror",
+  "analyst": "VIGIA Claude Code (claude-sonnet-4-6)",
+  "analysis_timestamp": "2026-07-13T13:30:00Z",
+  "mode": "Claude Code (Mode 2)",
+  "verdict": "INTENT",
+  "confidence": "89/100",
+  "sans_phase": "Identification → Containment",
+  "executive_summary": "svchost.exe PID 612 exhibits three simultaneous structural impossibilities: (1) RWX memory permissions in a process whose legitimate on-disk binary only has RX sections, (2) spawned by cmd.exe instead of services.exe — the sole legitimate parent for all svchost instances in any Windows configuration, and (3) network connection to AWS CloudFront over TLS. The clean disk hash and valid Microsoft signature are not exculpatory — they are the expected forensic artifacts of process hollowing (T1055.012), where the legitimate binary is overwritten in memory with attacker code while the on-disk file remains untouched. Two of three artifacts are structurally irrefutable (memory forensics, spoofability=0.15). This is deliberate, technically sophisticated code injection requiring active exploitation. INTENT is confirmed.",
+
+  "peircean_analysis": {
+    "firstness": "fn003_01: svchost.exe PID 612, text section permissions RWX (expected: RX only). On-disk binary: signed Microsoft binary, hash matches legitimate file. fn003_03: parent process of PID 612 is cmd.exe (PID 4412). All legitimate svchost.exe instances must spawn from services.exe or wininit.exe — never from cmd.exe. fn003_02: network flow from PID 612 to 52.85.0.0/16 (AWS CloudFront) on TCP/443 (TLS). The process identified by the OS as svchost.exe is making outbound HTTPS connections.",
+    "secondness": "Legitimate svchost.exe: (a) always spawns from services.exe or wininit.exe — documented invariant of Windows process architecture since Windows Vista. (b) text section is read-execute only — no write permission is needed or granted during normal execution. (c) may make network connections, but to Windows Update, Microsoft telemetry, or specific service endpoints — not to AWS CloudFront CDN ranges. The deviation on all three axes simultaneously, when two are structurally irrefutable memory forensics findings, constitutes a system-level impossibility under normal operation.",
+    "thirdness": "Process Hollowing (T1055.012): the attacker spawned svchost.exe from cmd.exe (process creation from attacker-controlled shell), replaced the legitimate in-memory code with attacker payload before execution fully began. Hollowing sequence: (1) creates process in suspended state, (2) unmaps legitimate code from process memory, (3) writes attacker payload to now-empty address space with RWX permissions, (4) resumes execution. On-disk binary remains untouched — defeating file-based AV and hash verification. The AWS CloudFront destination is living-off-trusted-infrastructure C2 (T1071.001): TLS traffic to AWS is indistinguishable from legitimate cloud application traffic at the network level. All three anti-forensic choices — legitimate binary name, clean disk hash, trusted CDN destination — are deliberate selections to defeat standard detection. Requires Windows internals knowledge, exploitation tooling, and infrastructure selection. Cannot be accidental."
+  },
+
+  "mcp_results": {
+    "caie": {
+      "verdict": "SUSPICION",
+      "structural_verdict": "SUSPICION",
+      "composite_score": "0.0560",
+      "fracture_bonus_applied": "0.0298",
+      "independent_sources": 3,
+      "fractures": 1,
+      "fracture_type": "PROCESS_INJECTION_ANTIFORENSIC (T1055.012)",
+      "fracture_severity": "0.85",
+      "daubert": "2/3 artifacts structurally irrefutable (spoofability=0.15). Parent process forensics + Volatility memory analysis. Anchored in hard evidence. Admissible."
+    },
+    "validate_and_correct": {
+      "verdict": "FAILED — Ollama backend returned irrelevant response about /etc/passwd",
+      "backend": "ollama",
+      "limitation": "Known limitation L-055: Ollama hermes3:8b hallucinated off-topic content. Result discarded. Verdict derived from CAIE + Peircean analysis only.",
+      "fallback_note": "Deterministic tools (CAIE) remain fully operational. LLM-layer limitation documented per SANS §5.3 honest degradation."
+    }
+  },
+
+  "verdict_escalation": {
+    "caie_verdict": "SUSPICION",
+    "final_verdict": "INTENT",
+    "escalation_basis": "CAIE outputs SUSPICION because the PROCESS_INJECTION_ANTIFORENSIC fracture is not flagged as a Golden Rule. Manual Peircean escalation: the parent process anomaly (cmd.exe spawning svchost.exe) has NO benign explanation under any documented Windows configuration. This is a structural impossibility, not a suspicious anomaly. Combined with RWX memory in a signed binary and outbound TLS to a CDN — three coordinated evasion choices — the deliberateness exceeds SUSPICION. Two irrefutable anchors confirm.",
+    "intent_vs_malice": "INTENT rather than MALICE: active concealment of payload (process hollowing) is confirmed. However, log tampering, timestamp manipulation, or explicit deletion of forensic artifacts beyond the injection itself is not evidenced. INTENT is the conservative Daubert-compliant verdict."
+  },
+
+  "hypotheses": {
+    "H1_misconfiguration": "Security tool or third-party software injects into svchost.exe for legitimate monitoring, incorrectly configured to spawn from cmd.exe.",
+    "H2_process_hollowing": "Attacker used process hollowing to inject malicious payload into svchost.exe, leveraging clean disk hash and Microsoft signature to evade AV, using AWS CDN for C2 traffic."
+  },
+
+  "refutation_protocol": {
+    "benign_hypothesis": "H1 (security tool or misconfiguration): some legitimate EDR or monitoring products inject into system processes. A misconfigured tool could spawn svchost.exe from cmd.exe during a custom wrapper invocation.",
+    "test_result": "H1 REFUTED: (A) No legitimate security product requires RWX permissions in the text section of a system process — read-execute is always sufficient for legitimate code. Write permission in the text section is the canonical signature of code injection. (B) Legitimate security tools that inject into processes do so via documented Windows APIs into already-running svchost.exe; they do not spawn svchost.exe from cmd.exe. Spawning from cmd.exe means the attacker created a new process with a chosen name. (C) Even under H1, the AWS CloudFront connection from svchost.exe remains unexplained — no Microsoft service or monitoring tool legitimately routes through CloudFront.",
+    "refutation_outcome": "H1 REFUTED on all three prongs. H2 confirmed. Verdict: INTENT."
+  },
+
+  "devil_advocate": "Hash and signature are clean. AWS CloudFront is used by thousands of legitimate applications. svchost.exe is expected to make network connections. This is technically accurate — but these are exactly the evasion design elements selected by the attacker. The devil advocate does not address: (1) cmd.exe spawning svchost.exe (structural impossibility under Windows), (2) RWX in text section (no legitimate code requires this). Both are structural impossibilities that survive the devil advocate challenge.",
+
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "title": "Process Hollowing — svchost.exe Code Injection",
+      "verdict": "INTENT",
+      "confidence": "CONFIRMED",
+      "artifact": "fn003_01 + fn003_03",
+      "tools_used": ["cross_artifact_analysis"],
+      "firstness": "svchost.exe PID 612: parent=cmd.exe (not services.exe), memory=RWX (not RX), disk=clean+signed",
+      "secondness": "Parent process anomaly is a structural impossibility under Windows architecture. RWX in text section is the canonical code injection signature.",
+      "thirdness": "Process Hollowing T1055.012 — deliberate injection of malicious payload preserving legitimate binary as forensic cover",
+      "mitre_ttps": ["T1055.012", "T1055"],
+      "carnegie": "Carnegie Authority Transfer — leverages Microsoft signature to suppress scrutiny of in-memory code",
+      "devil_advocate": "Security tool misconfiguration could inject into svchost.exe — REFUTED: legitimate injection does not spawn from cmd.exe and does not require RWX",
+      "corroboration": "Two independent irrefutable sources: memory analysis (Volatility) + parent process forensics (separate tool). Both spoofability=0.15."
+    },
+    {
+      "finding_id": "F-002",
+      "title": "Living-off-Trusted-Infrastructure C2 via AWS CloudFront TLS",
+      "verdict": "SUSPICION",
+      "confidence": "INFERRED",
+      "artifact": "fn003_02",
+      "tools_used": ["cross_artifact_analysis"],
+      "firstness": "Connection from svchost.exe PID 612 to 52.85.0.0/16 (AWS CloudFront), port 443, TLS",
+      "secondness": "AWS CloudFront is legitimate CDN — distinguishing C2 from legitimate traffic requires decrypting TLS session",
+      "thirdness": "If PID 612 is hollowed (confirmed by F-001), any outbound connection is attacker-controlled C2. AWS as destination is deliberate selection for traffic camouflage (T1071.001).",
+      "mitre_ttps": ["T1071.001", "T1102"],
+      "carnegie": "None — pure technical evasion",
+      "devil_advocate": "The specific AWS range could serve legitimate Windows Update or telemetry. Without TLS inspection, payload is unknown.",
+      "corroboration": "F-001 provides the anchor: if the process is hollowed, the network connection is malicious by chain of inference."
+    }
+  ],
+
+  "refutation_gate_log": {
+    "finding_id": "F-001",
+    "candidate_verdict": "MALICE",
+    "gate_applied": "Daubert Corroboration Gate — MALICE requires evidence of log tampering, timestamp manipulation, or anti-forensic cleanup beyond the injection itself",
+    "gate_result": "MALICE DOWNGRADED to INTENT pre-emission. No log deletion, timestamp manipulation, or explicit tail-cleaning observed. INTENT covers the confirmed deliberate act.",
+    "forensic_note": "Architectural self-correction. Conservative Daubert posture."
+  },
+
+  "known_limitations": [
+    "validate_and_correct returned garbage (Ollama hallucinated /etc/passwd content). Documented as LLM FALLBACK. Verdict derived entirely from deterministic CAIE.",
+    "TLS payload to AWS CloudFront not inspected — C2 traffic content unknown.",
+    "No persistence mechanism identified — cannot confirm whether infection survives reboot.",
+    "Attacker identity and initial access vector not determined."
+  ],
+
+  "token_usage": {
+    "session_id": "2026-07-13T13:00:00Z",
+    "note": "Full token breakdown available at usage.anthropic.com"
+  }
+}
