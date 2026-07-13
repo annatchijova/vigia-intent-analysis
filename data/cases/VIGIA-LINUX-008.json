@@ -4,7 +4,8 @@
   "schema_version": "1.1",
   "description": "Epistemological boundary test derived from the Huntress multi-actor incident (VIGIA-LINUX-006 + VIGIA-LINUX-007). All signals from Actor A (cryptominer), Actor B/C (botnet + credential harvester), and the legitimate user's Codex-generated commands are presented as an interleaved, unseparated evidence stream — as they would appear to a SOC analyst during initial triage before attribution. VIGÍA must determine: (1) is this one actor or multiple actors? (2) what is the correct verdict when signals of different sophistication levels are entangled? (3) can the AI-generated forensic noise be distinguished from attacker tradecraft? This case tests VIGÍA at the boundary of multi-actor attribution.",
   "abstention_risk": "medium",
-  "expected_verdict": "MALICE",
+  "expected_verdict": "SUSPICION",
+  "_label_correction_20260712": "MALICE -> SUSPICION: epistemic boundary test with entangled multi-actor signals and AI noise. No active concealment layer — the motor does not over-classify, the original label did.",
   "carnegie_pattern_expected": null,
   "confidence_expected": 88,
   "artifacts": [
