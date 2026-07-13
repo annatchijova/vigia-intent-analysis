@@ -2239,6 +2239,51 @@ class CrossArtifactIncongruenceEngine:
                     ttp_id="T1564.002",
                 ))
 
+        # Rule 16: LOG_TAMPERING_DETECTED
+        # An append-only log was manually edited (VIM/nano/sed signature in
+        # slack space, or inode mtime after last chronological entry) AND/OR
+        # events confirmed by an independent source (netflow, auditd, EDR)
+        # are absent from the log. Either condition alone is sufficient:
+        # editing an append-only log IS tampering; a contradiction between
+        # the log and an independent record IS evidence suppression.
+        # spoofability=0.10 — the metadata fields reflect filesystem facts
+        # (inode timestamps, slack space tool signatures) that require
+        # physical access or root to fabricate.
+        for a in self._artifacts:
+            md = a.metadata if isinstance(a.metadata, dict) else {}
+            log_edited = md.get("log_edited_with_tool") is not None
+            inode_gap = md.get("inode_mtime_after_last_entry") is True
+            entries_missing = md.get("entries_missing_from_independent_source") is True
+            if not (log_edited or inode_gap or entries_missing):
+                continue
+            _details = []
+            if log_edited:
+                _details.append(f"log edited with {md['log_edited_with_tool']}")
+            if inode_gap:
+                gap = md.get("mtime_gap_seconds", "unknown")
+                _details.append(f"inode mtime {gap}s after last log entry")
+            if entries_missing:
+                src = md.get("independent_source_type", "independent source")
+                _details.append(f"events from {src} absent in log")
+            self._fractures.append(Fracture(
+                artifact_a=f"Log tampering: {'; '.join(_details)}",
+                artifact_b="Baseline: append-only log with entries matching all independent sources",
+                fracture_type="LOG_TAMPERING_DETECTED",
+                severity=0.90,
+                interpretation=(
+                    "LOG TAMPERING: " + "; ".join(_details) + ". "
+                    "System logs are append-only by design (syslog/rsyslog write, "
+                    "never edit). Manual editing (tool signature in slack space or "
+                    "inode mtime gap) or entries absent from the log but confirmed "
+                    "by an independent source (netflow, auditd) are structurally "
+                    "impossible without deliberate evidence suppression. "
+                    "Peirce Thirdness: the HABIT is to erase traces of presence. "
+                    "MITRE T1070.002 — Indicator Removal: Clear Linux or Mac System Logs."
+                ),
+                spoofability_delta=_dround(0.70 - 0.10, _DETERMINISTIC_INTERNAL_PREC),
+                ttp_id="T1070.002",
+            ))
+
         return self._fractures
 
     # ------------------------------------------------------------------
@@ -2354,6 +2399,7 @@ class CrossArtifactIncongruenceEngine:
             "NETWORK_VS_HOST",
             "MFT_ENTRY_ANOMALY",
             "NARRATIVE_POISONING_DETECTED",
+            "LOG_TAMPERING_DETECTED",
         })
 
         has_golden_rule = any(f.fracture_type in _GOLDEN_RULE_TYPES for f in filtered_fractures)

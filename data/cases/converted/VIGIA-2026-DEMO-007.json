@@ -58,6 +58,10 @@
           "Owner is 'syslog' but vim requires elevated permissions to write — the editor was run as root"
         ],
         "content_preview": "{'file': '/var/log/auth.log', 'size': 48291, 'inode_modify_time': '2026-04-10T23:47:33Z', 'last_acce",
+        "log_edited_with_tool": "vim",
+        "inode_mtime_after_last_entry": true,
+        "mtime_gap_seconds": 21553,
+        "_metadata_correction_20260713": "Added log_edited_with_tool/inode_mtime_after_last_entry: VIM signature in slack space + inode mtime 23:47 vs last entry 17:38 (6h gap). Enables CAIE Rule 16 (LOG_TAMPERING_DETECTED).",
         "acquisition_tool": "legacy_converter_v1",
         "acquisition_hash": "sha256:legacy_LOG-002",
         "acquisition_timestamp": "2026-04-10T10:00:00Z",
@@ -89,6 +93,9 @@
           "10.0.0.15 is the workstation IP of Carlos M., a systems administrator with authorized overnight access"
         ],
         "content_preview": "23:41:07 10.0.0.15 -> 10.0.0.42:22 SYN [ESTABLISHED] bytes=0\n23:41:08 10.0.0.15 -> 10.0.0.42:22 [SSH",
+        "entries_missing_from_independent_source": true,
+        "independent_source_type": "netflow",
+        "_metadata_correction_20260713": "Added entries_missing_from_independent_source: two SSH sessions at 23:41 and 23:47 confirmed by netflow but absent from auth.log. Enables CAIE Rule 16 (LOG_TAMPERING_DETECTED).",
         "acquisition_tool": "legacy_converter_v1",
         "acquisition_hash": "sha256:legacy_LOG-003",
         "acquisition_timestamp": "2026-04-10T10:00:00Z",

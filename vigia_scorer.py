@@ -1006,6 +1006,10 @@ def _vigia_score(case: dict) -> dict:
         # (already present above) also gained a mass date-regex-substitution
         # trigger — same type, no new entry needed.
         "CLAIM_VS_RECORD_FABRICATION",
+        # Log tampering detector (2026-07-13): append-only log edited with
+        # VIM/tool OR entries missing vs independent source (netflow/auditd).
+        # Active evidence suppression — same calibre as LOG_VS_MEMORY.
+        "LOG_TAMPERING_DETECTED",
         # M2 (docs/M2_DISCRIMINATORS_DESIGN_20260711.md): class-correct
         # replacements for the pre-M2 FALSE_FLAG_PATTERN catch-all, at weight
         # parity (severity 0.8) so genuine linguistic-attribution and social-
