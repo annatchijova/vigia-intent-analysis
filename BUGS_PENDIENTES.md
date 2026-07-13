@@ -5549,6 +5549,47 @@ Observar el patron en un segundo expediente judicial independiente (distinto a M
 
 ---
 
+## B-114 — `add_from_tool_result()` en CAIE construye `Artifact` sin pasar por los guardrails de `add_artifact()`
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | OBSERVADO — no explotado, revisar más adelante |
+| **Severidad** | P3 (guardrail bypass, no explotado en el caso probado) |
+| **Archivo** | `vigia/tools/caie.py` |
+| **Función** | `CrossArtifactIncongruenceEngine.add_from_tool_result()` (línea ~1135) vs `add_artifact()` (línea ~1089) |
+| **Detectado en** | Sanity check Nivel 1 del pipeline CLIP (2026-07-13), branch `claude/clip-pipeline-sanity-check-roh22k` |
+
+### Descripción
+
+`add_from_tool_result()` construye un `Artifact` y lo agrega directamente a
+`self._artifacts` (línea ~1169), en vez de delegar a `add_artifact()`. Esto
+salta dos guardrails que `add_artifact()` sí aplica a cualquier llamador que
+pase por él:
+
+1. **`_MAX_ARTIFACTS`** — protección anti-flooding (DoS). `add_from_tool_result()`
+   no chequea el límite antes de appendear.
+2. **Whitelist de `evidence_type`** — `add_artifact()` rechaza tipos que no
+   estén en `_VALID_EVIDENCE_TYPES` (deriva de `EVIDENCE_PROFILES`).
+   `add_from_tool_result()` no valida esto; un `evidence_type` arbitrario
+   entraría sin spoofability weighting definido.
+
+`vision_intent_audit` (CLIP) usa `add_from_tool_result()` con
+`evidence_type="document_visual"`, que sí está en la whitelist — no se
+explotó en el sanity check de CLIP corrido en esta sesión. Pero el bypass es
+estructural: **cualquier tool MCP que use `add_from_tool_result()` en vez de
+`add_artifact()` hereda el mismo hueco**, no es específico de CLIP.
+
+### Criterio de escalada
+
+Revisar qué otros tools MCP (además de `vision_intent_audit`) llaman
+`add_from_tool_result()`, y si alguno puede pasar un `evidence_type`
+influenciado por input externo (no hardcodeado como en vision_audit.py).
+Si es así, escalar a P1/P2 — es una vía de bypass del whitelist con
+influencia de atacante. Fix candidato: que `add_from_tool_result()` delegue
+a `add_artifact()` en vez de appendear directo.
+
+---
+
 ## REVIEW-001 — VIGIA-BREAK-012 label review (BENIGN vs SUSPICION)
 
 | Campo | Valor |

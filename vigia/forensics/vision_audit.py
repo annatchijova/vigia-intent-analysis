@@ -1175,7 +1175,7 @@ async def vision_intent_audit(image_path: str) -> dict:
         mcp.tool()(vision_intent_audit)
     """
     try:
-        auditor = get_auditor()
+        auditor = await get_auditor()
     except RuntimeError as exc:
         return {
             "status": "ERROR",
