@@ -5501,6 +5501,54 @@ dos eventos aislados actuales.
 
 ---
 
+## B-112 — CAIE catalogue gap candidato: SELF_INCRIMINATION_LOG — evidencia auto-incriminatoria epistemicamente distinta de log espoofeable por tercero
+
+| Campo | Valor |
+|-------|-------|
+| Detectado | 2026-07-13 |
+| Caso fuente | KIWI-001-A02 y KIWI-003-A03/A04 (expediente MPF7779408) |
+| Estado | CANDIDATO — N=1 caso judicial real |
+
+### Descripcion
+
+Cuando el propio actor aporta voluntariamente credenciales o logs que lo incriminan a si mismo en documentacion judicial, el artefacto es epistemicamente irrefutable aunque CAIE le asigne `spoofability=0.85` (log_entry). La metrica de spoofability modela un atacante externo que fabrica evidencia; no aplica cuando la evidencia proviene del propio acusador.
+
+En KIWI-001 (A02) y KIWI-003 (A03/A04), el denunciante (actor_a) presento sus propias credenciales de servidor de stalkeo y admitio haber hackeado a una ex pareja. CAIE computa adjusted=0.0071 y 0.0081 respectivamente por spoofability=0.85 — valores que subestiman el peso epistemico real. Si existiera una fractura `SELF_INCRIMINATION_LOG`, el composite superaria el umbral de SUSPICION en ambos casos sin necesidad de escalada manual.
+
+### Restriccion de generalizacion
+
+Los tres casos KIWI (001, 002, 003) pertenecen al mismo expediente judicial (MPF7779408) vistos desde angulos distintos — **no son 3 muestras independientes, son 1 caso real mirado 3 veces**. La observacion es N=1 de caso judicial real. Se necesita un segundo expediente independiente con la misma estructura (acusador que aporta evidencia auto-incriminatoria) antes de generalizar este patron como gap de catalogo real e implementar la fractura.
+
+### Criterio de escalada
+
+Observar el patron en un segundo expediente judicial independiente (distinto a MPF7779408). No implementar la fractura hasta entonces.
+
+---
+
+## B-113 — CAIE catalogue gap candidato: INSTITUTIONAL_REJECTION — rechazo institucional independiente como corroboracion forense
+
+| Campo | Valor |
+|-------|-------|
+| Detectado | 2026-07-13 |
+| Caso fuente | KIWI-003-A05 (expediente MPF7779408) |
+| Estado | CANDIDATO — N=1 caso judicial real |
+
+### Descripcion
+
+En KIWI-003-A05, tres oficios presentaron 6 irregularidades formales y dos comisarias rechazaron independientemente ejecutar el allanamiento ordenado. El rechazo institucional de dos organismos independientes constituye corroboracion forense de la irregularidad documental — una fuente de evidencia que CAIE no captura porque `document_geometry` solo modela el artefacto fisico, no la reaccion institucional frente a el.
+
+Si existiera una fractura `INSTITUTIONAL_REJECTION`, el artefacto A05 pasaria de adjusted=0.0327 a un peso significativamente mayor, dado que el rechazo policial elimina la explicacion de "error administrativo aislado" como hipotesis benigna.
+
+### Restriccion de generalizacion
+
+Misma restriccion que B-112: los tres casos KIWI son el mismo expediente MPF7779408 — **N=1 caso real**. No es evidencia de un gap sistematico del catalogo CAIE hasta que se observe en un segundo expediente independiente con rechazo institucional de documentacion en contexto forense.
+
+### Criterio de escalada
+
+Observar el patron en un segundo expediente judicial independiente (distinto a MPF7779408). No implementar la fractura hasta entonces.
+
+---
+
 ## REVIEW-001 — VIGIA-BREAK-012 label review (BENIGN vs SUSPICION)
 
 | Campo | Valor |
