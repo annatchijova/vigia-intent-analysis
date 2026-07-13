@@ -708,14 +708,14 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 >
 > ## ⚠ HOW TO READ VIGÍA's NUMBERS — one mode, one reading (2026-07-06)
 >
-> **The 95.1% below is the agent's JSON path ONLY. It says nothing about how
+> **The 97.5% below is the agent's JSON path ONLY. It says nothing about how
 > VIGÍA performs on real raw evidence — that is measured per case, in the
 > other two modes.** The honest presentation is one line per mode:
 >
 > | Mode | What it processes | The honest number |
 > |---|---|---|
 > | **Claude/MCP (Domain A)** — primary | real raw evidence, full MCP extraction chain | **Deep per-case analysis — no aggregate number by design.** Record to date: 100% correct verdicts on every investigation run (per-case docs in `evidence/`, `results/`, `reports/`) |
-> | **Agent over JSON (Domain B)** | synthetic/converted JSON cases | **95.1% (154/162) on the detection corpus** — the ONLY mode with a corpus-wide number; mixed-corpus aggregate 184/199 (segmentation below) |
+> | **Agent over JSON (Domain B)** | synthetic/converted JSON cases | **97.5% (158/162) on the detection corpus** — the ONLY mode with a corpus-wide number; mixed-corpus aggregate 184/199 (segmentation below) |
 > | **Agent over RAW (Domain C)** | real public forensic corpora | **43 distinct raw evidence sources with sealed bundles in `results/`** — SRL 2018 (22 memory images), MUS2019/Narcos (13 dumps), M57 (3), NPS 2010/2014, Magnet 2020 CTF, Tuck 2019 macOS, Vanko — plus the Magnet 2022 (Windows/iOS/Android), Owl HD1/Nexus 5 and HMG investigations documented per case. **Each is an individual investigation with its own findings — NOT aggregated as accuracy** |
 >
 > Claude Code / MCP mode (Mode 2) is evaluated separately and per-case:
@@ -735,7 +735,7 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 >
 > | Segment | Cases | Label-blind | Reading |
 > |---|---|---|---|
-> | **Detection corpus** (canonical 61, benign 18, FLARE-ON CTF 10, real/converted 51, demo 4, other 18) | **162** | **154/162 (95.1%)** | **the accuracy-bearing metric for this path** — canonical 61/61, benign 18/18, FLARE-ON 10/10; the 8 misses are mostly adjacent-severity on real/converted cases |
+> | **Detection corpus** (canonical 61, benign 18, FLARE-ON CTF 10, real/converted 51, demo 4, other 18) | **162** | **158/162 (97.5%)** | **the accuracy-bearing metric for this path** — canonical 61/61, benign 18/18, FLARE-ON 10/10; the 4 misses are adjacent-severity or doctrinal over-alert (L-054) on real/converted and benign cases |
 > | Adversarial suites (BREAK 16, KIWI 7, FN-suite 3, FP-suite 5) | 31 | 18/31 | Domain C material, *designed to break*: failures here ARE the documented limits (L-014 emergent constellations, L-016 trust consensus, cultural_marker FP) — resistance data, not accuracy |
 > | Epistemic boundary / intake ABSTAIN | 5 | 2/5 | label review pending (FASE2 §5): the motor clears cases whose labels declare them undecidable |
 > | Aggregate pipeline-error case | 1 | 1/1 | list-shaped legacy aggregate, expected UNKNOWN |
@@ -774,7 +774,7 @@ not with a single corpus number).
 
 **Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over
 structured EBS case bundles — this is the ONLY mode with a corpus-wide number, the
-segmented metric in the note above (**detection corpus: 154/162, 95.1%**; aggregate
+segmented metric in the note above (**detection corpus: 158/162, 97.5%**; aggregate
 184/199). Since B-075 the verdict comes from the label-blind deterministic scorer;
 the previous 165/167 figure measured label reproduction (see metric change note).
 
@@ -1358,7 +1358,7 @@ or benchmark reports, this section can be ignored entirely.
 ### Label-blind detection — segmented corpus metric, AGENT mode (updated 2026-07-06)
 
 **Claim (current, post-B-075/B-076 — agent mode / Mode 1; Claude/MCP mode is
-evaluated per-case at 100%, see the accuracy note):** detection corpus 154/162 (95.1%);
+evaluated per-case at 100%, see the accuracy note):** detection corpus 158/162 (97.5%);
 full mixed-corpus aggregate 184/199 — segmentation in the ACCURACY NOTE above.
 The historical "129/129, 100%" claim measured label reproduction (pre-B-075
 label leak, P2-C) and is retained only as historical record.

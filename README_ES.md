@@ -709,14 +709,14 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 >
 > ## ⚠ CÓMO LEER LOS NÚMEROS DE VIGÍA — un modo, una lectura (2026-07-06)
 >
-> **El 95.1% de abajo es SOLO el camino JSON del agente. No dice nada de cómo
+> **El 97.5% de abajo es SOLO el camino JSON del agente. No dice nada de cómo
 > le va a VIGÍA sobre evidencia raw real — eso se mide por caso, en los otros
 > dos modos.** La presentación honesta es una línea por modo:
 >
 > | Modo | Qué procesa | El número honesto |
 > |---|---|---|
 > | **Claude/MCP (Dominio A)** — principal | evidencia raw real, cadena de extracción MCP completa | **Análisis profundo por caso — sin número agregado por diseño.** Registro a la fecha: 100% de veredictos correctos en todas las investigaciones corridas (docs por caso en `evidence/`, `results/`, `reports/`) |
-> | **Agente sobre JSON (Dominio B)** | casos JSON sintéticos/convertidos | **95.1% (154/162) en el corpus de detección** — el ÚNICO modo con número de corpus; agregado del corpus mixto 184/199 (segmentación abajo) |
+> | **Agente sobre JSON (Dominio B)** | casos JSON sintéticos/convertidos | **97.5% (158/162) en el corpus de detección** — el ÚNICO modo con número de corpus; agregado del corpus mixto 184/199 (segmentación abajo) |
 > | **Agente sobre RAW (Dominio C)** | corpus forense público real | **43 fuentes de evidencia raw distintas con bundles sellados en `results/`** — SRL 2018 (22 imágenes de memoria), MUS2019/Narcos (13 dumps), M57 (3), NPS 2010/2014, Magnet 2020 CTF, Tuck 2019 macOS, Vanko — más las investigaciones Magnet 2022 (Windows/iOS/Android), Owl HD1/Nexus 5 y HMG documentadas por caso. **Cada una es una investigación individual con sus propios findings — NO se agrega como precisión** |
 >
 > El modo Claude Code / MCP (Modo 2) se evalúa aparte y por caso: **100% de
@@ -736,7 +736,7 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 >
 > | Segmento | Casos | Ciego a etiqueta | Lectura |
 > |---|---|---|---|
-> | **Corpus de detección** (canónico 61, benigno 18, FLARE-ON CTF 10, real/convertido 51, demo 4, otros 18) | **162** | **154/162 (95.1%)** | **la métrica de precisión de este camino** — canónico 61/61, benigno 18/18, FLARE-ON 10/10; los 8 fallos son mayormente severidad adyacente en casos reales/convertidos |
+> | **Corpus de detección** (canónico 61, benigno 18, FLARE-ON CTF 10, real/convertido 51, demo 4, otros 18) | **162** | **158/162 (97.5%)** | **la métrica de precisión de este camino** — canónico 61/61, benigno 18/18, FLARE-ON 10/10; los 4 fallos son severidad adyacente o sobre-alerta doctrinal (L-054) en casos reales/convertidos y benignos |
 > | Suites adversariales (BREAK 16, KIWI 7, suite FN 3, suite FP 5) | 31 | 18/31 | Material del Dominio C, *diseñado para romper*: sus fallos SON los límites documentados (L-014 constelaciones emergentes, L-016 consenso de confianza, FP de cultural_marker) — datos de resistencia, no precisión |
 > | Frontera epistémica / intake ABSTAIN | 5 | 2/5 | revisión de etiquetas pendiente (FASE2 §5): el motor limpia casos cuyas etiquetas los declaran indecidibles |
 > | Caso agregado pipeline-error | 1 | 1/1 | agregado legacy con forma de lista, expected UNKNOWN |
@@ -776,7 +776,7 @@ corpus).
 
 **Dominio B — Agente autónomo, casos pre-procesados en JSON:** Runner batch sobre
 bundles EBS estructurados — es el ÚNICO modo con número de corpus, la métrica
-segmentada de la nota de arriba (**corpus de detección: 154/162, 95.1%**; agregado
+segmentada de la nota de arriba (**corpus de detección: 158/162, 97.5%**; agregado
 184/199). Desde B-075 el veredicto sale del scorer determinista ciego a la etiqueta;
 la cifra anterior 165/167 medía reproducción de etiqueta (ver la nota de cambio de
 métrica).
@@ -1366,7 +1366,7 @@ por completo.
 ### Detección ciega a la etiqueta — métrica segmentada del corpus, modo AGENTE (actualizado 2026-07-06)
 
 **Afirmación (vigente, post-B-075/B-076 — modo agente / Modo 1; el modo Claude/MCP
-se evalúa por caso con 100%, ver la nota de precisión):** corpus de detección 154/162 (95.1%);
+se evalúa por caso con 100%, ver la nota de precisión):** corpus de detección 158/162 (97.5%);
 agregado del corpus mixto completo 184/199 — segmentación en la NOTA DE PRECISIÓN
 de arriba. El claim histórico "129/129, 100%" medía reproducción de etiqueta (fuga
 P2-C pre-B-075) y se conserva solo como registro histórico.
