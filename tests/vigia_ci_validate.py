@@ -197,7 +197,7 @@ class VIGIACIValidator:
             "vigia/tools/mitre_clustering.py",
             "vigia/tools/visible_variables.py",
             "vigia/tools/picerl_mapping.py",
-            "vigia/tools/abductive_intent_engine.py",
+            "vigia/inference/abductive_intent_engine.py",
         ]
         missing = []
         for fname in tabla_files:
