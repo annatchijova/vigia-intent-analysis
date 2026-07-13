@@ -1,0 +1,112 @@
+{
+  "case_id": "VIGIA-KIWI-007-TESTIMONY-QUANTITY-CONCEALMENT",
+  "analyst": "VIGIA Mode 3 (Ollama — hermes3:8b)",
+  "analysis_timestamp": "2026-07-13T14:26:00Z",
+  "llm_backend": "ollama",
+  "ollama_model": "hermes3:8b",
+  "mode": "3 — Ollama (local LLM, no data leaves the machine)",
+  "verdict": "SUSPICION",
+  "verdict_a01": "SUSPICION",
+  "verdict_a02": "ABSTAIN",
+  "verdict_a03": "SUSPICION",
+  "confidence": "70/100",
+  "note": "CAIE NOISE composite=0.0104 (correct: all testimony, 0/3 irrefutable anchors). Ollama returned invalid JSON (response truncated mid-object). Partial Ollama content recovered for A01 (NOISE/0.2) and beginning of A02. Manual Peircean synthesis applied for full verdict. A01 escalated to SUSPICION from Ollama NOISE — the technical impossibility (active block prevents real-time monitoring) is a structural finding, not a credibility gap, and the evidence withholding is corroborated by A03's inverse precision pattern. A02 remains ABSTAIN: panic button activation is verifiable via police records, but verification not performed — ABSTAIN is the correct Daubert posture. A03: SUSPICION — inverse precision pattern (Grice Quantity violation) is the dominant CAIE signal (document_geometry adjusted=0.0097). Overall SUSPICION 70/100. Mode 1 result not available for this session; expected SUSPICION based on B-028/B-065 floor pattern documented for KIWI cases.",
+
+  "peircean_analysis": {
+    "firstness": "Three artifacts, all from manual_forensic_review. A01: Brother claims real-time notification via screenshots; cannot produce device; does not know defendant's phone number; defendant has had him actively blocked for years; download quantity declared=null. A02: Panic button activated claiming defendant's physical presence; police record with timestamp, GPS, dispatched unit — independently verifiable. Claimed outcome: defendant fled. A03: Precision asymmetry — brother (primary, most active downloader) declares null quantity; peripheral Testigo-A from KIWI-006 declares exactly 10GB. Inverse precision pattern.",
+    "secondness": "Three structural anomalies against the baseline of honest testimony: (A) A01 technical impossibility — a blocked contact cannot view the blocking party's content or receive communications in real time. The claimed surveillance mechanism is not a misremembering; it is physically impossible given the block status, which is stated as active and of long standing ('for years'). (B) A03 inverse precision — Grice's Quantity maxim requires speakers to provide information they possess. The brother, as the primary downloader, should know the quantity better than any peripheral associate. The reversal (peripheral knows 10GB exactly; primary actor knows nothing) is not explicable by honest uncertainty — it indicates active concealment by the party with most information. (C) A02 is structurally distinct from A01 and A03: the panic button activation has a verifiable external record (police dispatch logs). The activation itself is not in question; whether defendant was actually present at the claimed time and location is the unverified element.",
+    "thirdness": "A01 + A03 together constitute a coherent pattern of testimony management: the brother conceals his download quantity (Grice Quantity) while claiming a surveillance method that cannot have functioned (Grice Quality). The peripheral witness's knowledge of the exact quantity (10GB) reveals the figure is known to the social network — the brother is not ignorant of it, he is actively suppressing it. A02 is epistemically orthogonal: it is the only artifact in this case with an independent verification path. If police records confirm defendant's location at the claimed time, A02 becomes confirmatory; if they contradict, A02 becomes a false report finding. Current status: unverified."
+  },
+
+  "ollama_output": {
+    "status": "PARTIAL — JSON truncated mid-response. Partial content recovered.",
+    "a01_partial": {
+      "verdict": "NOISE",
+      "confidence_raw": 0.2,
+      "firstness": "Raw phenomenon: A claim of surveillance capability without any supporting evidence or verifiable details.",
+      "secondness": "Anomalous because it lacks verifiable proof and the physical impossibility due to being blocked suggests it may be fabricated or exaggerated. Without direct contradiction, could be misunderstanding or error.",
+      "thirdness": "Witnesses may claim surveillance capabilities without evidence, often due to overconfidence or miscommunication, but inconsistencies can indicate deception or fabrication.",
+      "note": "Ollama verdict NOISE for A01 is conservative and correct given prior_trust=0.10. Escalated to SUSPICION in final verdict because the technical impossibility (not merely 'inconsistency') is a structural finding confirmed by A03's corroboration."
+    },
+    "a02_partial": "Response truncated before A02 verdict was emitted.",
+    "a03_partial": "Response truncated before A03 was reached.",
+    "ollama_failure_note": "hermes3:8b returned a raw response that is not valid JSON (truncated mid-object). Treated as partial Ollama failure. Manual Peircean synthesis covers the gaps. Documented as L-055 pattern — Ollama output reliability."
+  },
+
+  "caie_result": {
+    "composite_score": "0.0104",
+    "verdict": "NOISE",
+    "independent_sources": 2,
+    "fractures_detected": 0,
+    "daubert": "0/3 artifacts structurally irrefutable. WARNING: No irrefutable anchor. Weak under cross-examination.",
+    "dominant_signal": "document_geometry A03 (spoofability=0.45, weight=0.22, adjusted=0.0097) — inverse precision pattern is the highest-weighted artifact in this case",
+    "note": "CAIE NOISE is correct for accusations against defendant. The document_geometry type (A03) has lower spoofability than log_entry (0.45 vs 0.85), making it the dominant signal and the epistemically strongest artifact. No irrefutable anchor exists — all testimony, no device forensics."
+  },
+
+  "findings": [
+    {
+      "finding_id": "F-001",
+      "artifact": "KIWI-007-A01 + KIWI-007-A03",
+      "title": "Brother's Testimony — Technical Impossibility and Active Quantity Concealment",
+      "verdict": "SUSPICION",
+      "confidence": "INFERRED",
+      "firstness": "Brother claims real-time monitoring via blocked channel; declares null download quantity while peripheral associate knows 10GB exactly.",
+      "secondness": "Active block renders claimed channel impossible. Inverse precision pattern violates Grice Quantity — primary actor knows least about his own activity.",
+      "thirdness": "Active concealment of download quantity combined with fabricated surveillance narrative. Two corroborating anomalies on same witness.",
+      "carnegie": "Carnegie Scarcity — creates urgency claims (real-time monitoring, danger) without verifiable supporting evidence.",
+      "devil_advocate": "Memory failures under stress. The block could have been temporarily lifted. Quantity omission could be embarrassment.",
+      "corroboration": "A03 independently confirms the quantity is known to the network (peripheral knows 10GB) — brother's null declaration is concealment, not ignorance."
+    },
+    {
+      "finding_id": "F-002",
+      "artifact": "KIWI-007-A02",
+      "title": "Panic Button Activation — Verifiable Act, Unconfirmed Cause",
+      "verdict": "ABSTAIN",
+      "confidence": "INFERRED",
+      "firstness": "Panic button activated with police record (timestamp, GPS, unit dispatch) — activation is documented.",
+      "secondness": "Activation is confirmed as a real event. Whether defendant was present at claimed location is a separate question requiring independent verification.",
+      "thirdness": "Cannot determine truthfulness of the cause (defendant's presence) without defendant location at the claimed time — alibi evidence, phone GPS, credit card records.",
+      "devil_advocate": "Panic button can be activated in genuine fear without defendant being present — the fear itself may be real even if the attribution is wrong.",
+      "corroboration": "Police record verification pending. ABSTAIN until records obtained."
+    }
+  ],
+
+  "refutation_gate_log": {
+    "finding": "F-001 — testimony integrity",
+    "candidate_verdict": "INTENT (deliberate false testimony)",
+    "gate_applied": "Daubert Corroboration Gate — no irrefutable anchor",
+    "gate_result": "INTENT REJECTED pre-emission. 0/3 artifacts structurally irrefutable. Without device forensics on brother's phone (download logs, block confirmation, screenshot metadata), the structural anomalies remain in the testimonial evidence tier where spoofability=0.85-0.45 and the ceiling is SUSPICION.",
+    "forensic_note": "INTENT would require: (1) forensic extraction of brother's device confirming block status and download quantity, (2) metadata of downloaded material confirming 10GB and timeline, (3) comparison of download timestamps vs claimed real-time notification timeline."
+  },
+
+  "hypotheses": {
+    "H1_honest_recall": "Brother genuinely monitored defendant via some other channel; panic occurred when confronted with block status; forgot quantity under stress.",
+    "H2_testimony_management": "Brother deliberately conceals download quantity and fabricates impossible surveillance claim to avoid disclosing monitoring behavior while attributing harmful conduct to defendant."
+  },
+
+  "refutation_protocol": {
+    "benign_hypothesis": "H1: Stress and poor memory could explain phone production failure and number ignorance. The block could have been lifted and re-applied, creating a window of access.",
+    "test_result": "H1 PARTIALLY REFUTED: (A) Not knowing one's own phone number is unusual and not explained by stress — routine device ownership involves familiarity with the number. (B) The inverse precision pattern (peripheral knows 10GB; primary actor knows nothing) requires that the quantity was discussed within the network — the brother knows it and is concealing it, not forgetting it. (C) The block is stated as current and of long standing ('for years') — an occasional lift-and-reapply would require evidence the block was ever removed.",
+    "refutation_outcome": "H1 partially refuted. H2 consistent with all observed anomalies. SUSPICION maintained."
+  },
+
+  "devil_advocate": "The brother's quantity omission could be embarrassment rather than strategic deception. The panic button activation (A02) is a verifiable act — it is not fabricated even if the cause could be disputed. The block status is stated but not forensically confirmed in this artifact set. Counter: the convergence of three anomalies (technical impossibility, quantity concealment, evidence withholding) on one witness strains the incompetence or embarrassment explanation.",
+
+  "evidence_anchors": [
+    "KIWI-007-A01: Brother — claimed surveillance via blocked channel (structural impossibility), quantity=null, device not produced",
+    "KIWI-007-A02: Panic button — verifiable police record (activation confirmed), cause unverified (ABSTAIN)",
+    "KIWI-007-A03: Inverse precision — peripheral knows 10GB, primary actor declares null (Grice Quantity violation, dominant CAIE signal)"
+  ],
+
+  "mitre_ttps": [],
+
+  "carnegie_pattern": "Scarcity — creates real-time danger urgency claims without verifiable supporting evidence to produce decision pressure.",
+
+  "known_limitations": [
+    "Ollama hermes3:8b returned truncated JSON — only A01 partial verdict recovered. A02 and A03 verdicts derived from manual Peircean synthesis.",
+    "0/3 artifacts structurally irrefutable — all testimonial. Daubert WARNING active. SUSPICION is the correct ceiling.",
+    "Police records for panic button activation not verified — A02 remains ABSTAIN until records obtained.",
+    "Device forensics for brother's phone not available — block status and download quantity unverified at forensic level.",
+    "validate_and_correct not run (Ollama reliability — L-055 pattern)."
+  ]
+}

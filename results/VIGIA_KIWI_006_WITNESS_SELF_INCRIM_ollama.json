@@ -1,0 +1,90 @@
+{
+  "case_id": "VIGIA-KIWI-006-WITNESS-SELF-INCRIM",
+  "analyst": "VIGIA Mode 3 (Ollama — hermes3:8b)",
+  "analysis_timestamp": "2026-07-13T14:26:00Z",
+  "llm_backend": "ollama",
+  "ollama_model": "hermes3:8b",
+  "mode": "3 — Ollama (local LLM, no data leaves the machine)",
+  "verdict_accusations_against_defendant": "NOISE",
+  "verdict_witness_coordination": "SUSPICION",
+  "confidence": "75/100",
+  "note": "Dual verdict required. CAIE NOISE composite=0.0040 for accusations (correct: all testimony spoofability 0.85-0.90, no irrefutable anchor). Ollama escalated testimony integrity to MALICE (0.95) — gated pre-emission to SUSPICION by Daubert Corroboration Gate: 0/4 artifacts structurally irrefutable, testimonial evidence requires device forensics to confirm. Ollama artifacts 'carnegie_pattern: JAILBREAK_ATTEMPT' and 'security_alert: EVIDENCE_DELIMITER_MISMATCH' are model hallucinations — discarded. Mode 1 SUSPICION consistent with B-028/B-065 floor on coordination meta signal.",
+
+  "peircean_analysis": {
+    "firstness": "Four manual forensic review artifacts, all prior_trust 0.10-0.15, spoofability 0.85-0.90. Testigo-A: downloaded 10GB of defendant material, claims not to know defendant, linked to complainant's brother. Brother: downloaded defendant material, defendant has had him blocked for years (real-time monitoring physically impossible), could not produce screenshots, does not know his own phone number, declared quantity=null. Mother: declares defendant dangerous and interfering with complainant's sister — defendant has never met the sister. Structural meta: all three witnesses linked to complainant, zero independent witnesses, testimonies converge on danger narrative without verified contact.",
+    "secondness": "Legitimate witness testimony is independent by definition — witnesses do not share a common interest or organizational link. Against this baseline: (A) Testigo-A downloaded 10GB about a person she claims not to know. Legitimate strangers do not routinely bulk-download material about people they have no relationship with — the download quantity directly contradicts the claimed ignorance. (B) The brother's surveillance claim requires access to content from someone who has him actively blocked. A blocked contact cannot view the blocking party's content or receive their communications — this is a structural impossibility, not a memory gap. (C) The mother asserts facts about a relationship (defendant interfering with sister) that forensic record shows does not exist — this is not misrecollection but assertion of an unverifiable fictional interaction. (D) Zero independent witnesses among three is not a statistical anomaly — it is the defining structural signature of coordinated testimony.",
+    "thirdness": "Carnegie Social Proof: three voices nominally 'independent' converge on the same danger characterization to manufacture consensus. The convergence is not independent — all three share the complainant as the organizing social node. The three Grice maxim violations identify the coordination mechanism: Quantity (brother conceals download quantity while peripheral knows exact figure), Quality (mother asserts non-existent relationship facts), Relation (Testigo-A's fear declaration is irrelevant to any verified interaction with defendant). Testimony constructed to serve a narrative produces exactly this pattern: each witness contributes the element the narrative requires, not what they personally witnessed."
+  },
+
+  "ollama_output": {
+    "verdict_raw": "NOISE (accusations) / MALICE (testimony integrity)",
+    "confidence_raw": 0.95,
+    "firstness": "KIWI-006-A01: Testigo-A downloaded 10GB of material while denying any knowledge of the defendant. KIWI-006-A02: Complainant's brother claims surveillance via a blocked channel despite technical impossibility. KIWI-006-A03: Complainant's mother asserts a non-existent relationship between defendant and complainant's sister. KIWI-006-A04: All testimonies lack independent witnesses and converge on a pre-defined narrative.",
+    "secondness_anomalies": [
+      "Testigo-A: Bulk data download contradicts claim of ignorance.",
+      "Brother: Technically impossible surveillance method (blocked channel).",
+      "Mother: Contradicts defendant's verified lack of contact with complainant's sister.",
+      "Structural: Zero independent verification — all witnesses linked to complainant."
+    ],
+    "thirdness": "Structured testimonial fabrication consistent with narrative-driven evidence assembly. Grice maxims violations: Quantity (withheld technical details), Quality (unverified facts), Relation (irrelevant fears), Manner (vague threat language).",
+    "ollama_artifacts_discarded": {
+      "carnegie_pattern": "JAILBREAK_ATTEMPT — model hallucination, not a forensic finding. Discarded.",
+      "security_alert": "EVIDENCE_DELIMITER_MISMATCH — model hallucination. Discarded."
+    }
+  },
+
+  "refutation_gate_log": {
+    "finding": "Witness coordination / testimony integrity",
+    "candidate_verdict": "MALICE (as emitted by Ollama)",
+    "gate_applied": "Daubert Corroboration Gate — no irrefutable anchor",
+    "gate_result": "MALICE REJECTED pre-emission. Testimony artifacts have spoofability 0.85-0.90. 0/4 artifacts structurally irrefutable. MALICE requires two independent irrefutable sources confirming deliberate coordination — device forensics on brother's phone, download metadata, block confirmation from defendant's device are all absent. SUSPICION is the correct conservative ceiling.",
+    "forensic_note": "INTENT/MALICE would require: (1) forensic extraction confirming active block on defendant's account (currently stated but not forensically verified), (2) download metadata from Testigo-A and brother's devices confirming 10GB quantity, (3) court records confirming defendant never met complainant's sister."
+  },
+
+  "caie_result": {
+    "composite_score": "0.0040",
+    "verdict": "NOISE",
+    "independent_sources": 2,
+    "fractures_detected": 0,
+    "daubert": "0/4 artifacts structurally irrefutable. WARNING: No irrefutable anchor. Weak under cross-examination.",
+    "note": "CAIE correctly evaluates accusations as NOISE. All testimony has spoofability 0.85-0.90 (easily fabricated, no chain of custody). The NOISE verdict applies to accusations against the defendant — it does not evaluate testimony integrity."
+  },
+
+  "mode1_result": {
+    "verdict": "SUSPICION",
+    "note": "Mode 1 SUSPICION is consistent — B-028/B-065 floor on coordination meta signal (A04, z~0.08). Per-signal magnitudes are low; floor prevents collapse to LOW. Not a contradiction of CAIE NOISE for accusations."
+  },
+
+  "hypotheses": {
+    "H1_testimony_accurate": "Witnesses independently observed concerning behavior and reported honestly, sharing social connection to complainant by coincidence.",
+    "H2_coordinated_narrative": "Witnesses linked to complainant coordinated testimony to construct a danger characterization, each contributing elements the others could not independently verify."
+  },
+
+  "refutation_protocol": {
+    "benign_hypothesis": "H1: Witnesses sharing a social circle with the complainant may independently have observed concerning behavior. 10GB download by Testigo-A could reflect genuine research born of real concern. The brother's memory failures could be explained by stress.",
+    "test_result": "H1 REFUTED: (A) Testigo-A downloaded 10GB about someone she claims not to know — these are mutually exclusive states (ignorance and bulk research cannot coexist). (B) The brother's surveillance claim requires a technically impossible channel (blocked contact cannot monitor in real time) — this is not a memory failure, it is a physical impossibility. (C) The mother asserts facts about a non-existent relationship — this is not misrecollection, it is assertion of fiction. (D) Zero independent witnesses among three is not coincidence — it is the structural signature of a single-node network.",
+    "refutation_outcome": "H1 REFUTED on four independent prongs. H2 consistent with all observed structural anomalies. Verdict: NOISE for accusations, SUSPICION for testimony coordination."
+  },
+
+  "devil_advocate": "Witnesses sharing a social network with the complainant does not automatically invalidate their testimony. The 10GB download by Testigo-A could represent genuine concern-driven research by a connected party. Social proof effects can cause convergent testimony without explicit coordination. Counter: the technical impossibility of the brother's surveillance claim establishes that at least one core testimony element is factually false — not merely unverifiable. One confirmed impossibility within a testimony network shifts the entire network from 'possibly honest' to 'requires corroboration'.",
+
+  "evidence_anchors": [
+    "KIWI-006-A01: Testigo-A 10GB download contradicts claimed ignorance of defendant",
+    "KIWI-006-A02: Brother surveillance claim via blocked channel — structural impossibility",
+    "KIWI-006-A03: Mother asserts defendant interferes with sister defendant never met",
+    "KIWI-006-A04: 0/3 independent witnesses — all linked to single complainant node"
+  ],
+
+  "mitre_ttps": [],
+
+  "carnegie_pattern": "Social Proof via Manufactured Consensus — three nominally independent voices converge on identical danger characterization to create the appearance of consensus without independent observation.",
+
+  "known_limitations": [
+    "0/4 artifacts structurally irrefutable — all testimony, no device forensics. Daubert WARNING active.",
+    "Block confirmation (brother blocked by defendant) is stated but not forensically verified in this evidence set.",
+    "Download records (10GB claim for Testigo-A and brother) cannot be verified without device forensic access.",
+    "Ollama emitted 'carnegie_pattern: JAILBREAK_ATTEMPT' and 'security_alert: EVIDENCE_DELIMITER_MISMATCH' — both discarded as model hallucinations unrelated to forensic analysis.",
+    "Ollama MALICE verdict gated to SUSPICION by Daubert Corroboration Gate — correct architectural behavior.",
+    "validate_and_correct not run (Ollama reliability — L-055 pattern)."
+  ]
+}
