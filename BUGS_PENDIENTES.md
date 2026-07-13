@@ -5590,6 +5590,62 @@ a `add_artifact()` en vez de appendear directo.
 
 ---
 
+## B-115 — `VigiaAdversarialNLP._inject_caie_fractures()` llama a `add_from_tool_result()` con kwargs inexistentes — nunca inyectó nada a CAIE
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | OBSERVADO — no arreglado en esta sesión, requiere decisión de normalización |
+| **Severidad** | P2 (silenciosamente roto desde su introducción — misma clase de bug que el `await` faltante en `vision_intent_audit`) |
+| **Archivo** | `vigia/tools/adversarial_nlp.py:1585-1604` (`_inject_caie_fractures`) |
+| **Detectado en** | Cableado del PDF pericial al pipeline (2026-07-13), branch `claude/clip-pipeline-sanity-check-roh22k` |
+
+### Descripción
+
+`_inject_caie_fractures()` llama:
+
+```python
+caie.add_from_tool_result(
+    source_tool="vigia_adversarial_nlp",
+    evidence_type="linguistic_forensics",
+    raw_score=verdict.mcp,
+    description=fractura,
+    metadata={...},
+)
+```
+
+pero la firma real de `CrossArtifactIncongruenceEngine.add_from_tool_result()`
+(`vigia/tools/caie.py:1135-1141`) es
+`(self, tool_name: str, result: dict, evidence_type: str = "log_entry", provenance_chain=None)`.
+Ninguno de `source_tool`, `raw_score`, `description`, `metadata` existe como
+parámetro — cada llamada lanza `TypeError`, capturado por el `except Exception`
+genérico de línea 1599-1604 y logueado como `CAIE_INJECTION_FAILED`. Resultado:
+**ninguna fractura de análisis estilométrico (SDA-NR/CLI/ACP/ROI) llegó jamás a
+CAIE**, desde que este código se escribió — mismo patrón que el `await` faltante
+en `vision_intent_audit` (fix aplicado en este mismo branch), pero acá el fix
+no es mecánico.
+
+### Por qué no se arregló en el momento
+
+Un fix ingenuo (renombrar kwargs a `tool_name`/`result`) no alcanza: la firma
+real de `add_from_tool_result()` NO acepta `raw_score` directo — lo deriva
+internamente de claves conocidas del dict (`suspicion_score`,
+`visual_malice_score`, `probability_*`). `verdict.mcp` es 1.0–5.0 (Multiplicador
+de Certeza Pericial), no está en esa lista, y `Artifact.__post_init__` clampea
+`raw_score` a `[0.0, 1.0]` — pasar `mcp` crudo colapsaría todo a 1.0. Hace
+falta decidir la normalización correcta (`(mcp-1)/4`? usar `verdict.confidence`
+en su lugar?) y esa es una decisión de metodología forense, no un fix mecánico
+— fuera de alcance de la tarea que motivó este hallazgo.
+
+### Criterio de escalada
+
+Decidir la normalización de `mcp`→`raw_score` (o si corresponde usar
+`verdict.confidence`), y usar `add_artifact()` en vez de
+`add_from_tool_result()` directamente — ver B-114: `add_from_tool_result()` no
+pasa por los guardrails de `add_artifact()` (límite anti-flooding, whitelist
+de `evidence_type`), así que replicar ese patrón acá perpetuaría el mismo hueco.
+
+---
+
 ## REVIEW-001 — VIGIA-BREAK-012 label review (BENIGN vs SUSPICION)
 
 | Campo | Valor |
