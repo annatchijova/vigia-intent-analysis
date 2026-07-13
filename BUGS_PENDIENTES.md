@@ -5443,6 +5443,64 @@ por la misma razon que SECURE_DELETE_ARTIFACT.
 
 ---
 
+## B-111 — Mode 3 (Ollama/hermes3:8b): comportamiento no confiable en evidencia testimonial densa — N=2, ESTOCÁSTICO
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | OBSERVADO — evidencia insuficiente para escalar a KNOWN_LIMITATIONS |
+| **Severidad** | P3 (experimental — Mode 3 ya clasificado como no-primario) |
+| **Detectado en** | Experimento comparativo ciego 2026-07-13, KIWI-006 y KIWI-007 |
+| **N observaciones** | 2 corridas KIWI-006 (1 alucinación, 1 limpia) + 1 corrida KIWI-007 (JSON truncado) |
+
+### Observaciones
+
+**Corrida 1 — KIWI-006, primera ejecución:** `hermes3:8b` alucinó
+`"carnegie_pattern": "JAILBREAK_ATTEMPT"` y
+`"security_alert": "EVIDENCE_DELIMITER_MISMATCH"` — campos inexistentes en el
+esquema VIGÍA. El modelo interpretó el contenido del testimonio (vigilancia,
+contactos bloqueados, coordinación de testigos) como evidencia de un ataque sobre
+sí mismo. El análisis Peircean correcto también estaba presente en la misma
+respuesta, embebido junto a los campos alucinados. JSON válido.
+
+**Corrida 2 — KIWI-007, primera ejecución:** `hermes3:8b` retornó JSON inválido
+(objeto truncado a mitad del campo A02, después de completar A01). La herramienta
+detectó el fallo y retornó `"error": "LLM did not return valid JSON."` con el
+fragmento en `"raw_response"`. Requirió síntesis manual para A02 y A03.
+
+**Corrida 3 — KIWI-006, re-ejecución con prompt IDÉNTICO (2026-07-13, misma sesión):**
+Resultado limpio. Sin alucinación. JSON válido completo. Cadena Peircean correcta.
+Veredicto NOISE 0.25, razonable y consistente con CAIE.
+
+### Estado de la evidencia
+
+N=2 corridas de KIWI-006 (1 alucinación / 1 limpia con mismo prompt). El
+comportamiento es **estocástico, no determinista** — el mismo input no reproduce
+el mismo error. N=1 para KIWI-007 (truncado), sin re-corrida todavía.
+
+No escala a KNOWN_LIMITATIONS porque:
+- N insuficiente para establecer frecuencia de error
+- La re-corrida de KIWI-006 fue limpia → no es un patrón consistente
+- Mode 3 ya está clasificado como experimental/complementario en el README y CLAUDE.md
+
+### Qué observar en corridas futuras
+
+- ¿La alucinación de jailbreak reaparece en KIWI-006 con una tercera corrida?
+- ¿KIWI-007 trunca consistentemente o fue un evento único?
+- ¿Otros casos testimoniales densos (KIWI-007 análogos) muestran el mismo patrón?
+- Si la tasa de alucinación se confirma en >20% de corridas en casos testimoniales:
+  escalar a KNOWN_LIMITATIONS con recomendación de `gemma3:27b` para Mode 3
+  en producción sobre narrativa densa.
+
+### Nota sobre no-reproducibilidad
+
+La no-reproducibilidad del error es, en sí misma, un dato relevante: un error
+consistente se detecta en testing; uno estocástico puede llegar a producción sin
+señal previa. Si se confirma con más muestras que la tasa no es despreciable,
+ese argumento de opacidad sería el fundamento para la limitación formal, no los
+dos eventos aislados actuales.
+
+---
+
 ## REVIEW-001 — VIGIA-BREAK-012 label review (BENIGN vs SUSPICION)
 
 | Campo | Valor |
