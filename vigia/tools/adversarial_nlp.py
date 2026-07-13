@@ -77,6 +77,7 @@ except ImportError:
     CrossArtifactIncongruenceEngine = None  # type: ignore
 
 
+
 # ============================================================================
 # CARGA DE CONFIGURACIÓN EXTERNA (auditable Daubert)
 # ============================================================================
@@ -1538,6 +1539,7 @@ class VigiaAdversarialNLP:
         author_id: Optional[str] = None,
         emitter_type: str = "UNKNOWN",
         force_language: Optional[str] = None,
+        case_number: Optional[str] = None,
         **_kwargs: Any,
     ) -> Dict:
         ext = Path(document_path).suffix.lower()
@@ -1563,7 +1565,11 @@ class VigiaAdversarialNLP:
         if auto_inject_caie and verdict.fracturas:
             self._inject_caie_fractures(verdict)
 
-        return verdict.to_dict()
+        result = verdict.to_dict()
+        pdf_path = self._export_pdf(verdict, document_path, case_number)
+        if pdf_path:
+            result["pericial_pdf_path"] = pdf_path
+        return result
 
     def _extract_pdf(self, path: str) -> str:
         try:
@@ -1603,6 +1609,59 @@ class VigiaAdversarialNLP:
                 message=str(exc),
             )
 
+    def _export_pdf(
+        self, verdict: ForensicVerdict, document_path: str, case_number: Optional[str],
+    ) -> Optional[str]:
+        """
+        Write the pericial PDF (vigia.forensics.forensic_reporter) as a side
+        effect of every stylometric register analysis. Never raises — a PDF
+        export failure must not fail the underlying forensic verdict.
+
+        The import of forensic_reporter is deliberately deferred to call time
+        (not module load time): forensic_reporter imports ForensicVerdict back
+        from this module via the vigia_adversarial_nlp compatibility shim, so
+        importing it at module scope here creates a circular import that
+        silently fails while this module is still initializing.
+        """
+        if os.getenv("VIGIA_PERICIAL_PDF_ENABLED", "true").lower() != "true":
+            return None
+
+        try:
+            from vigia.forensics.forensic_reporter import generate_forensic_pdf
+
+            out_dir = os.getenv("VIGIA_PERICIAL_PDF_DIR", ".")
+            os.makedirs(out_dir, exist_ok=True)
+            stem = Path(document_path).stem
+            safe_ts = verdict.timestamp.replace(":", "").replace("-", "")
+            output_path = str(Path(out_dir) / f"{stem}_pericial_{safe_ts}.pdf")
+
+            evidence_dir = os.getenv("VIGIA_EVIDENCE_DIR", "")
+            if evidence_dir and str(Path(output_path).resolve()).startswith(
+                str(Path(evidence_dir).resolve())
+            ):
+                audit_logger.log_block(
+                    event_type="PDF_EXPORT_INTO_EVIDENCE_DIR",
+                    tool="VigiaAdversarialNLP",
+                    input_preview=output_path,
+                    reason="Refusing to write pericial PDF inside VIGIA_EVIDENCE_DIR "
+                           "(evidence directories are read-only).",
+                )
+                return None
+
+            generate_forensic_pdf(
+                verdict,
+                output_path,
+                case_metadata={"case_number": case_number or verdict.document_id},
+            )
+            return output_path
+        except Exception as exc:
+            audit_logger.log_info(
+                event_type="PDF_EXPORT_FAILED",
+                tool="VigiaAdversarialNLP",
+                message=str(exc),
+            )
+            return None
+
     def export_database(self, path: str) -> str:
         return self.engine.export_for_sift(path)
 
@@ -1616,8 +1675,15 @@ async def analyze_document_register(
     content_category: Optional[str] = None,
     force_language: Optional[str] = None,
     export_db_path: Optional[str] = None,
+    case_number: Optional[str] = None,
 ) -> Dict:
-    """MCP Tool: análisis pericial completo con MCP y exportación opcional para SIFT."""
+    """MCP Tool: análisis pericial completo con MCP y exportación opcional para SIFT.
+
+    Como efecto de cada análisis exitoso, escribe el PDF pericial
+    (vigia.forensics.forensic_reporter) salvo que VIGIA_PERICIAL_PDF_ENABLED=false.
+    Ver result["pericial_pdf_path"] para la ruta escrita (ausente si falló o
+    está deshabilitado — nunca bloquea el veredicto forense).
+    """
     try:
         analyzer = VigiaAdversarialNLP()
         result = analyzer.analyze_document(
@@ -1627,6 +1693,7 @@ async def analyze_document_register(
             author_id=author_id,
             emitter_type=emitter_type,
             force_language=force_language,
+            case_number=case_number,
         )
         if export_db_path:
             result["sift_export_path"] = analyzer.export_database(export_db_path)
