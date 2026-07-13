@@ -2045,3 +2045,77 @@ sources at once.
 **Closure criterion:** D2/D4-channel engines for mobile evidence (device
 memory/network), or validation against a real labeled corpus of ≥50
 macOS/mobile cases.
+
+## L-052 — Living-off-the-Land Attacks Invisible to the Deterministic Motor [DOCUMENTED]
+
+**Registered 2026-07-13. Status: DOCUMENTED — architectural limitation.**
+
+The deterministic motor cannot detect attacks where the attacker uses
+exclusively legitimate tools (PowerShell, Veeam, RDP) with stolen but
+valid credentials, during normal business hours, with no anti-forensic
+artifacts. Every individual signal is indistinguishable from authorized
+activity.
+
+Corpus evidence: VIGIA-FN-001 (score 0.020, NOISE) and VIGIA-FN-002
+(score 0.018, NOISE) — both designed to exercise this gap.
+
+**Why this is not a CAIE gap:** The anomaly is not a contradiction between
+artifacts (what CAIE detects). It is the absence of anomaly in a context
+where an anomaly should exist — detectable only with a per-user behavioral
+baseline (User Behavior Analytics / UBA). UBA requires historical activity
+profiles, which are outside the scope of a deterministic case-level scorer
+that processes each case in isolation.
+
+**Mitigation:** Mode 2 (Claude/MCP) can detect these patterns through
+semantic analysis of the full evidence context. The limitation applies
+only to Mode 1 (autonomous deterministic motor).
+
+## L-053 — Weak Signal Convergence Below Individual Threshold [DOCUMENTED]
+
+**Registered 2026-07-13. Status: DOCUMENTED — scorer architecture decision.**
+
+When N signals individually below the SUSPICION threshold (0.10) all
+point to the same target, the motor does not aggregate their collective
+weight. Each signal is evaluated independently against the threshold;
+convergence without individual significance produces NOISE.
+
+Corpus evidence: VIGIA-BREAK-011 (20 weak signals, score 0.036, NOISE).
+
+**Why this is not a CAIE gap:** Signal convergence is an accumulation
+problem (how to sum N weak indicators), not a cross-artifact contradiction
+(what CAIE fractures detect). The scorer's composite formula uses a
+Noisy-OR model per artifact, not a collective convergence detector.
+
+**Architectural note:** Adding a convergence detector would require a
+fundamentally different accumulation model (e.g., Bayesian network over
+indicator co-occurrence). The current N=1 corpus case does not justify
+the complexity. If more cases emerge, this becomes a scorer enhancement
+candidate, not a CAIE rule.
+
+## L-054 — Exculpatory Context Not Modeled in Deterministic Scoring [DOCUMENTED]
+
+**Registered 2026-07-13. Status: DOCUMENTED — doctrinal decision.**
+
+The motor does not attenuate scores based on exculpatory metadata
+(e.g., `authorized=true`, `benign_explanation` fields). Cases with
+structurally suspicious artifacts that have documented legitimate
+explanations (journalist using Tor with editorial authorization, Linux
+kernel worker threads, NPS exercise data) receive SUSPICION rather than
+NOISE.
+
+Corpus evidence: VIGIA-BEN-012 (kworker, score 0.125), VIGIA-BEN-014
+(Tor journalist, score 0.107), NPS-2009-DOMEXUSERS (exercise, score
+0.146), VIGIA-FP-003 (shared password, score 0.176).
+
+**Why this is a doctrinal decision, not a bug:** An exculpatory metadata
+field (`authorized=true`) in a case file is an assertion by the case
+author, not a forensic fact. An attacker who controls the evidence can
+fabricate exculpatory context. The motor's conservative posture (alert
+on structural anomaly regardless of claimed authorization) is the
+Daubert-correct choice: over-alerting on benign cases is preferable to
+under-alerting on malicious ones with planted exculpatory metadata.
+
+**Mitigation:** Mode 2 (Claude/MCP) evaluates exculpatory context
+semantically. The SUSPICION verdict in these cases is correct from the
+motor's perspective — it flags the anomaly and leaves the authorization
+judgment to the human investigator or Mode 2 analysis.

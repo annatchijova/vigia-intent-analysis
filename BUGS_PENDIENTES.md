@@ -5408,3 +5408,52 @@ decisión de esquema ebs_v1 (compat R3-2) que queda para la mantenedora.
 También: cache del verificador en `_import_verify_bundle` (no re-ejecutar el
 módulo por bundle en loops de batch). Regresión:
 `tests/test_h27_internal_drift.py::TestDriftDetailsAndProvenance`.
+
+---
+
+## CAIE-FUTURE-001 — SECURE_DELETE_ARTIFACT (candidate rule, not implemented)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | CANDIDATA — sin caso en corpus que la active |
+| **Severidad** | P3 (enhancement) |
+
+Regla CAIE propuesta para detectar borrado seguro deliberado (SDelete,
+shred, wipe). Detectable por `metadata.secure_delete_tool` o patrones
+en USN Journal (secuencia delete+create en rafaga sobre archivos de
+evidencia). No implementada porque no hay caso en el corpus de 199
+que la active — seria codigo muerto sin verificacion.
+
+Implementar cuando aparezca un caso real que la necesite.
+
+---
+
+## CAIE-FUTURE-002 — REGISTRY_TAMPERING (candidate rule, not implemented)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | CANDIDATA — sin caso en corpus que la active |
+| **Severidad** | P3 (enhancement) |
+
+Regla CAIE propuesta para detectar limpieza de registros de ejecucion
+(prefetch, shimcache, amcache). Detectable por gaps en secuencias que
+deberian ser continuas (prefetch faltante para binarios con evidencia
+de ejecucion, shimcache entries borrados selectivamente). No implementada
+por la misma razon que SECURE_DELETE_ARTIFACT.
+
+---
+
+## REVIEW-001 — VIGIA-BREAK-012 label review (BENIGN vs SUSPICION)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE DE REVISION |
+| **Severidad** | P4 (label hygiene) |
+
+Caso adversarial disenado para confundir: 4/5 fuentes comprometidas
+reportan anomalia, 1 legitima dice lo contrario. El motor da SUSPICION
+(coherente con la mayoria de fuentes). La etiqueta dice BENIGN (porque
+la fuente correcta es la unica legitima). Amerita dossier propio —
+la pregunta no es si el motor falla sino si BENIGN es la etiqueta
+correcta cuando el motor no puede distinguir fuentes comprometidas
+de legitimas.
