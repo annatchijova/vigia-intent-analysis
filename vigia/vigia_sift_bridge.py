@@ -2836,7 +2836,8 @@ async def reason_with_llm(evidence: str, context: str = "") -> dict:
         return {
             "error": "LLM returned empty response. Check VIGIA_LLM_BACKEND and credentials.",
             "verdict": "ERROR",
-            "llm_backend": CONFIG.llm_backend,
+            "llm_backend": llm._actual_backend or CONFIG.llm_backend,
+            "backend_warn": llm._backend_warn,
             "timestamp": _utcnow(),
         }
 
@@ -2846,8 +2847,9 @@ async def reason_with_llm(evidence: str, context: str = "") -> dict:
     try:
         clean = response.strip().removeprefix("```json").removesuffix("```").strip()
         result = json.loads(clean)
-        result["llm_backend"] = CONFIG.llm_backend
-        result["timestamp"]   = _utcnow()
+        result["llm_backend"]   = llm._actual_backend or CONFIG.llm_backend
+        result["backend_warn"]  = llm._backend_warn
+        result["timestamp"]     = _utcnow()
         # Protocolo Kassandra: interceptar antes de devolver al pipeline.
         # _process_llm_verdict registra KASSANDRA_TRIPWIRE_TRIGGERED si el
         # LLM detecto una inyeccion semantica, o KASSANDRA_PROTOCOL_VIOLATION
@@ -2857,7 +2859,8 @@ async def reason_with_llm(evidence: str, context: str = "") -> dict:
         return {
             "raw_response": response[:2000],
             "error"       : "LLM did not return valid JSON.",
-            "llm_backend" : CONFIG.llm_backend,
+            "llm_backend" : llm._actual_backend or CONFIG.llm_backend,
+            "backend_warn": llm._backend_warn,
             "timestamp"   : _utcnow(),
         }
 
@@ -2906,7 +2909,8 @@ If analysis is sound, return it unchanged with:
     if not response:
         return {
             "error"                    : "LLM returned empty response.",
-            "llm_backend"              : CONFIG.llm_backend,
+            "llm_backend"              : llm._actual_backend or CONFIG.llm_backend,
+            "backend_warn"             : llm._backend_warn,
             "self_correction_timestamp": _utcnow(),
         }
 
@@ -2914,14 +2918,16 @@ If analysis is sound, return it unchanged with:
         clean  = response.strip().removeprefix("```json").removesuffix("```").strip()
         result = json.loads(clean)
         result["self_correction_timestamp"] = _utcnow()
-        result["llm_backend"]               = CONFIG.llm_backend
+        result["llm_backend"]               = llm._actual_backend or CONFIG.llm_backend
+        result["backend_warn"]              = llm._backend_warn
         return result
     except json.JSONDecodeError:
         return {
             "raw_response"             : response[:2000],
             "error"                    : "Model did not return valid JSON.",
             "self_correction_timestamp": _utcnow(),
-            "llm_backend"              : CONFIG.llm_backend,
+            "llm_backend"              : llm._actual_backend or CONFIG.llm_backend,
+            "backend_warn"             : llm._backend_warn,
         }
 
 

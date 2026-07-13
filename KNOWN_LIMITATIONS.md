@@ -172,6 +172,23 @@ fractures that feed back into the scoring pipeline. Without it,
 `reason_with_llm` produces post-bundle narrative only and does not
 influence scoring.
 
+**Silent-fallback sub-case (confirmed 2026-07-13):** When
+`VIGIA_LLM_BACKEND=anthropic` is configured but `ANTHROPIC_API_KEY` is not
+set, `LLMBackend._try_anthropic()` raises `TypeError` (SDK auth validation)
+which is caught internally and the call silently falls through to Ollama at
+`http://127.0.0.1:11434`. If Ollama is running, `reason_with_llm` appears
+to work but is actually answered by the local Ollama model, not by Claude.
+If Ollama is also down, the empty-response error is returned.
+Since 2026-07-13 the output field `llm_backend` reflects the actual
+responding backend (`"ollama"` not `"anthropic"`) and a `backend_warn`
+field is included when degradation occurred (`vigia/config.py:LLMBackend`).
+
+**Important architectural constraint — see L-055:** Setting
+`VIGIA_LLM_BACKEND=anthropic` without `ANTHROPIC_API_KEY` cannot be fixed
+by any code change in VIGÍA. The Claude Code Max plan session is not
+exposed to Python subprocesses. An independent `ANTHROPIC_API_KEY` is
+required for the Anthropic path.
+
 **Forensic implication:** Fallback mode is deliberately conservative.
 Cases with strong semantic intent signals but weak structural anomalies
 will score as SUSPICION rather than MALICE. This is epistemologically
@@ -180,7 +197,7 @@ names and narrative context alone.
 
 **Configuration:** Set `VIGIA_LLM_BACKEND=ollama` with a local model
 (tested: `hermes3:8b`, `deepseek-r1:8b`) or `VIGIA_LLM_BACKEND=anthropic`
-with a valid API key.
+with a valid `ANTHROPIC_API_KEY`.
 
 ---
 
@@ -903,6 +920,7 @@ example (N=1/2) lives in "Accuracy by Mode", not here.*
 | L-050 | Non-finite fail-closed on value/z_score/confidence × 4 impls | ebs_v1.py, signal_contract.py | **RESOLVED** (B-083/B-083b) |
 | L-051 | Formal specification of arbitration contract (Axiom A1) — renumbered from shared L-029 | Scoring/CAIE precedence | [OPEN] — design gap, not a bug |
 | L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
+| L-055 | Anthropic API and Claude Code Max plan are separate auth products — no bridge from subprocess | vigia/config.py:LLMBackend | DOCUMENTED — product boundary, no code fix possible |
 
 ---
 
@@ -2119,3 +2137,74 @@ under-alerting on malicious ones with planted exculpatory metadata.
 semantically. The SUSPICION verdict in these cases is correct from the
 motor's perspective — it flags the anomaly and leaves the authorization
 judgment to the human investigator or Mode 2 analysis.
+
+---
+
+## L-055 — Anthropic API and Claude Code Subscription Plans Are Separate Authentication Products [DOCUMENTED]
+
+**Registered 2026-07-13. Status: DOCUMENTED — product boundary. No code
+fix is possible from VIGÍA's side.**
+
+**Affects:** `vigia/config.py:LLMBackend._try_anthropic()` — specifically
+the Python `reason_with_llm` / `validate_and_correct_analysis` MCP tools,
+in any environment where Claude Code is running but `ANTHROPIC_API_KEY`
+is not set.
+
+**Important scope clarification:** This limitation applies exclusively to
+VIGÍA's Python tools calling `anthropic.Anthropic()` as a subprocess HTTP
+client. It does NOT affect Claude Code's own operation as the conversational
+LLM: in Mode 2, Claude Code itself reads evidence, calls MCP tools, writes
+analysis, and produces investigation reports — all of that works correctly
+regardless of this limitation. The gap is narrower than it appears: the
+only missing piece is that `reason_with_llm` (a Python tool) cannot call
+the Anthropic API independently. Ollama fills that role in this environment.
+
+**Description:** When `reason_with_llm` or `validate_and_correct_analysis`
+are called as MCP tools (from vigia_sift_bridge.py), they instantiate
+`anthropic.Anthropic()` directly in Python and call `client.messages.create()`.
+This requires a standalone `ANTHROPIC_API_KEY`. Without it, the SDK raises
+`TypeError` ("Could not resolve authentication method") which causes the
+tool to fall back to Ollama.
+
+**Root cause — two separate products with separate auth:**
+
+| System | Auth mechanism | Accessible from Python subprocess |
+|--------|---------------|-----------------------------------|
+| Claude Code (Pro / Max / API subscription via claude.ai or the CLI) | OAuth session token, stored internally by the CLI (`~/.claude/`) | NO — not exposed to subprocesses |
+| Anthropic API (`api.anthropic.com`) | `ANTHROPIC_API_KEY` (static) or `ANTHROPIC_AUTH_TOKEN` (OAuth Bearer) | Yes, if explicitly set in the environment |
+
+Claude Code injects `CLAUDECODE=1`, `CLAUDE_CODE_ENTRYPOINT=cli`, and
+`CLAUDE_CODE_EXECPATH=...` into subprocess environments. None of these
+variables carry API credentials. The Anthropic Python SDK (v0.109.2)
+does not check `CLAUDECODE` at any point in its credential resolution chain
+(`default_credentials()` in `anthropic/_client.py`).
+
+This is by design: Claude Code's Pro/Max subscription billing applies to
+conversations in the claude.ai UI or the Claude Code CLI. API calls from
+Python (`client.messages.create()`) are a separate product with separate
+per-token billing.
+
+**Consequence:** Setting `VIGIA_LLM_BACKEND=anthropic` without
+`ANTHROPIC_API_KEY` will always fall through to Ollama (if running) or
+produce an empty-response error. Since 2026-07-13, the fallback is honest:
+`backend_warn` in the tool output carries an explicit degradation notice,
+and `llm_backend` reflects the actual responding backend.
+
+**What is NOT possible from VIGÍA code:**
+- Detecting or reusing the Claude Code session token from a Python subprocess.
+- Using Pro/Max plan conversation quota for `client.messages.create()` calls.
+- Any code change in VIGÍA that bridges the two auth systems.
+
+**Mitigation:**
+To activate the Anthropic Python path in VIGÍA, obtain a dedicated
+`ANTHROPIC_API_KEY` from console.anthropic.com (separate billing) and set
+it before launching the MCP server:
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+export VIGIA_LLM_BACKEND=anthropic
+```
+
+Alternatively, `VIGIA_LLM_BACKEND=ollama` with a local model
+(`hermes3:8b`, `deepseek-r1:8b`) covers the same MCP tool functionality
+with no API key required.

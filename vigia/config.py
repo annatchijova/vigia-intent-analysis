@@ -240,6 +240,14 @@ class LLMBackend:
         self._anthropic_model: str = model or CONFIG.anthropic_model
         self._ollama_model: str = model or CONFIG.ollama_model
         self._ollama_host: str = CONFIG.ollama_host
+        # Honest-degradation state (§5.3). Set on every call to reason().
+        # _actual_backend: which backend produced the response ("anthropic",
+        #   "ollama", "none", or None if reason() has not been called yet).
+        # _backend_warn: non-None when the configured backend was bypassed;
+        #   callers must surface this in their output so the user knows
+        #   which model actually answered.
+        self._actual_backend: str | None = None
+        self._backend_warn: str | None = None
 
     async def reason(self, prompt: str, system_prompt: str = "") -> str:
         """
@@ -247,23 +255,59 @@ class LLMBackend:
 
         Falls back to Ollama if Anthropic raises an exception, then returns
         an empty string if Ollama also fails.
+
+        After each call:
+        - ``_actual_backend`` records which backend actually responded.
+        - ``_backend_warn`` is non-None when the configured backend was
+          bypassed (honest degradation, §5.3).  Callers that include this
+          in their output satisfy the Daubert audit-trail requirement.
         """
+        import logging as _logging
+        _log = _logging.getLogger(__name__)
+        self._actual_backend = None
+        self._backend_warn = None
+
         if self.backend == "anthropic":
             result = await self._try_anthropic(prompt, system_prompt)
             if result is not None:
+                self._actual_backend = "anthropic"
                 return result
-            # Automatic fallback to Ollama if configured
+            # Anthropic failed (no ANTHROPIC_API_KEY or auth error).
+            # Emit an explicit WARN — silent degradation violates §5.3.
+            warn_msg = (
+                "DEGRADED: anthropic backend failed (no ANTHROPIC_API_KEY "
+                "or auth error); falling back to ollama "
+                f"({self._ollama_model} @ {self._ollama_host}). "
+                "Set ANTHROPIC_API_KEY for direct Anthropic API access."
+            )
+            _log.warning(warn_msg)
+            self._backend_warn = warn_msg
             if CONFIG.ollama_host:
                 result = await self._try_ollama(prompt, system_prompt)
                 if result is not None:
+                    self._actual_backend = "ollama"
                     return result
+            # Both backends failed.
+            self._backend_warn = (
+                "DEGRADED: all LLM backends failed — anthropic: no "
+                "credentials; ollama: no response from "
+                f"{self._ollama_host}. reason_with_llm unavailable."
+            )
             return ""
 
         if self.backend == "ollama":
             result = await self._try_ollama(prompt, system_prompt)
-            return result if result is not None else ""
+            if result is not None:
+                self._actual_backend = "ollama"
+                return result
+            self._backend_warn = (
+                f"DEGRADED: ollama backend failed ({self._ollama_host}, "
+                f"model={self._ollama_model}). reason_with_llm unavailable."
+            )
+            return ""
 
         # backend == "none"
+        self._actual_backend = "none"
         return ""
 
     async def _try_anthropic(self, prompt: str, system_prompt: str) -> str | None:
