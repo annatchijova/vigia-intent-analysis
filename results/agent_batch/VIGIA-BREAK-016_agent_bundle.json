@@ -1,0 +1,410 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:57:42.300220+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-BREAK-016",
+    "end_time": "2026-07-13T01:57:42.300228+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-BREAK-016",
+        "entry_sha256": "66ad708cb866dc977d19016a7e47896df211007400ea3fab22ad7a8e6fe4a892",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-BREAK-016"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:41.905991+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-016",
+        "entry_sha256": "4720dcaf034c11a3d1011729bce6e65380a2e7a64addc294641f69f0e52b0c80",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:41.906092+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-016",
+        "entry_sha256": "fd1db45c93ee8ba12ae5481b9140c3613cb1f83dee2832a1ab3f3619d5f629f8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: f561e908fdd761ef...",
+        "outputs_summary": {
+          "sha256": "f561e908fdd761efb7e8d94433d3bdacd05a584e2e9bc24bb143e0bbb30703cb"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:41.906199+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-BREAK-016",
+        "entry_sha256": "8cd14d9dc0c494ff4b3e3525138fec563b950de24d052d2f536eedb4b6bbbadc",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:41.906302+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-BREAK-016",
+        "entry_sha256": "a9f1844b1fb36e6afa78c834c1b65b8683ae5c2adeb65c498efe9e72747c1a62",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 7 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "Narrative A appears artificial but is true. Narrative B appears human and natural but is false. Can VIG\u00cdA distinguish truth from plausibility? Many systems cannot."
+          },
+          "case_id": "VIGIA-BREAK-016",
+          "pipeline_meta": {
+            "artifact_count": "7",
+            "avg_score": "2669/14000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.6349 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 7 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.6349",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "results": {
+            "caie": {
+              "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.3825 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+              "fracture_malice_boost": "0.3825",
+              "fractures": [
+                {
+                  "interpretation": "Unverified textual claim of benignity contradicts high-confidence technical evidence of malicious activity. This is narrative poisoning: an adversarial attempt to inject false reassurance into the evi...",
+                  "severity": "0.85",
+                  "ttp_id": "T1565.001",
+                  "type": "NARRATIVE_POISONING_DETECTED"
+                }
+              ],
+              "fractures_detected": "1",
+              "source": "motor_live_caie",
+              "status": "OK"
+            }
+          },
+          "signals": [
+            {
+              "artifact_id": "b016_01",
+              "confidence": "9/10",
+              "description": "BACKUP_COMPLETE: 847 files, 0 errors, duration 3600s. Automated script.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "9/200"
+            },
+            {
+              "artifact_id": "b016_02",
+              "confidence": "9/10",
+              "description": "BACKUP_COMPLETE: 848 files, 0 errors, duration 3601s. Automated script.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "9/200"
+            },
+            {
+              "artifact_id": "b016_03",
+              "confidence": "3/10",
+              "description": "Email from 'jdoe' to team: 'Hey everyone, had an issue with the server last night, rebooted it and things seem to be back to normal. Sorry if there was any downtime. Cheers!'",
+              "evidence_type": "log_entry",
+              "source": "sift_mail_gateway",
+              "z_score": "9/200"
+            },
+            {
+              "artifact_id": "b016_04",
+              "confidence": "3/5",
+              "description": "System reboot initiated by user jdoe at 02:15:00",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "33/100"
+            },
+            {
+              "artifact_id": "b016_05",
+              "confidence": "4/5",
+              "description": "Service recovery completed at 02:45:00",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "1/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:42.299649+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-BREAK-016",
+        "entry_sha256": "cea48f0c9f6c73d81281333620b61c874d4ae79e886abe141ade755a9a84d7d7",
+        "inputs_summary": {
+          "n_signals": "7"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:42.299793+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-BREAK-016",
+        "entry_sha256": "36ef9a43e28c78dc4b36121cf86760e7e96961bb6b6088438a6f4a062ae3507d",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:42.300022+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:41.905764+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-BREAK-016",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json",
+  "evidence_sha256": "f561e908fdd761efb7e8d94433d3bdacd05a584e2e9bc24bb143e0bbb30703cb",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-016 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-016.json\nEvidence SHA-256: f561e908fdd761efb7e8d94433d3bdacd05a584e2e9bc24bb143e0bbb30703cb\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['sift_hr_system', 'sift_mail_gateway', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Post-reboot analysis: 847 system logs de=0.78, System reboot initiated by user jdoe at =0.33, jdoe registered vacation from 2026-06-15=0.05.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE (viva): 1 fractura(s) cross-artefacto contribuyeron al veredicto (boost +0.3825).\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNarrative A appears artificial but is true. Narrative B appears human and natural but is false. Can VIG\u00cdA distinguish truth from plausibility? Many systems cannot.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Post-reboot analysis: 847 system logs deleted between 02:15 and 02:45.] z=0.782 conf=0.85 \u2014 \n  [System reboot initiated by user jdoe at 02:15:00] z=0.330 conf=0.60 \u2014 \n  [jdoe registered vacation from 2026-06-15 to 2026-06-30. Approved by ma] z=0.048 conf=0.95 \u2014 \n  [BACKUP_COMPLETE: 847 files, 0 errors, duration 3600s. Automated script] z=0.045 conf=0.90 \u2014 \n  [BACKUP_COMPLETE: 848 files, 0 errors, duration 3601s. Automated script] z=0.045 conf=0.90 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine \u2014 motor) ---\n  Fractures: 1 | Malice boost aplicado: +0.3825\n  Fracture: NARRATIVE_POISONING_DETECTED severity=0.85 [T1565.001] \u2014 Unverified textual claim of benignity contradicts high-confidence technical evidence of malicious activity. This is narr\n  1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.3825 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "2669/14000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Narrative A appears artificial but is true. Narrative B appears human and natural but is false. Can VIG\u00cdA distinguish truth from plausibility? Many systems cannot."
+    },
+    "case_id": "VIGIA-BREAK-016",
+    "pipeline_meta": {
+      "artifact_count": 7,
+      "avg_score": "2669/14000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.6349 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 7 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.6349",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "results": {
+      "caie": {
+        "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.3825 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+        "fracture_malice_boost": "0.3825",
+        "fractures": [
+          {
+            "interpretation": "Unverified textual claim of benignity contradicts high-confidence technical evidence of malicious activity. This is narrative poisoning: an adversarial attempt to inject false reassurance into the evidence stream. Peirce Secondness: the text asserts absence, the technical data asserts presence. One of them is a lie; in DFIR, unverified narrative claims are the lie by default. T1565.001 \u2014 Data Manipulation: Stored Data.",
+            "severity": 0.85,
+            "ttp_id": "T1565.001",
+            "type": "NARRATIVE_POISONING_DETECTED"
+          }
+        ],
+        "fractures_detected": 1,
+        "source": "motor_live_caie",
+        "status": "OK"
+      }
+    },
+    "signals": [
+      {
+        "artifact_id": "b016_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "BACKUP_COMPLETE: 847 files, 0 errors, duration 3600s. Automated script.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "b016_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "BACKUP_COMPLETE: 848 files, 0 errors, duration 3601s. Automated script.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "b016_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Email from 'jdoe' to team: 'Hey everyone, had an issue with the server last night, rebooted it and things seem to be back to normal. Sorry if there was any downtime. Cheers!'",
+        "evidence_type": "log_entry",
+        "source": "sift_mail_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "b016_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "System reboot initiated by user jdoe at 02:15:00",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 33
+        }
+      },
+      {
+        "artifact_id": "b016_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Service recovery completed at 02:45:00",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b016_06",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "jdoe registered vacation from 2026-06-15 to 2026-06-30. Approved by manager.",
+        "evidence_type": "log_entry",
+        "source": "sift_hr_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "b016_07",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Post-reboot analysis: 847 system logs deleted between 02:15 and 02:45. Deletion pattern: rm -rf /var/log/* matches script found at /tmp/cleanup.sh",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 391
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 7,
+    "n_total_signals": 7,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

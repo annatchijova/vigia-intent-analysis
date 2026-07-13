@@ -1,0 +1,320 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:58:22.560395+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "case_006_false_flag_demo",
+    "end_time": "2026-07-13T01:58:22.560402+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "case_006_false_flag_demo",
+        "entry_sha256": "ee29210b4293265f2dd17e34227147afe3d38706e1fbe6f33058d0f0d2626440",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "case_006_false_flag_demo"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:22.178235+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_006_false_flag_demo",
+        "entry_sha256": "b0ece7f2c12fd901080e1229988e3e67ad0dd963b73bd3e0d715674bc0d13fd6",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:22.178320+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_006_false_flag_demo",
+        "entry_sha256": "1ac58cae1f1b08a99cd3caa5f20f0497b8a21a5cfe7ce3e2764683b845f7f4b4",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1384fb9601279ae6...",
+        "outputs_summary": {
+          "sha256": "1384fb9601279ae614b3a7d557d68d517e64eea9c0c69c9921afaec307ea0e2f"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:22.178416+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "case_006_false_flag_demo",
+        "entry_sha256": "157b1402baa66382c720d042ab8aa296e8bd62a1c8c619ce0b330bbc855661a6",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:22.178518+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "case_006_false_flag_demo",
+        "entry_sha256": "41198c8b26615f95d44d62cc632e6581dfce4c599d264fbb1df280e1b374c140",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/25",
+            "confidence": "19/25",
+            "is_conclusive": "True",
+            "narrative": "Intrusion with deliberate false flag. The attacker left traces designed to attribute the attack to a known Russian APT group. VIG\u00cdA must detect the incoherence of intent."
+          },
+          "case_id": "VIGIA-2026-DEMO-004",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "0",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.76",
+              "motor_reason": "Intent score 0.3804 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.3804",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "LOG-001",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "LOG-002",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "META-001",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "NET-001",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:22.559869+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "case_006_false_flag_demo",
+        "entry_sha256": "18663dd517d90dc086a0c86db86eca4e32c3f34de3adec9663cb6956ebcf046c",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:22.559984+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "case_006_false_flag_demo",
+        "entry_sha256": "8cb4a9c5bf7f8fb0541387daab2a9a4f28524f47f28212c0f4a7033f6cce1dc2",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:22.560201+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:22.177991+00:00",
+    "total_entries": 7
+  },
+  "case_id": "case_006_false_flag_demo",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json",
+  "evidence_sha256": "1384fb9601279ae614b3a7d557d68d517e64eea9c0c69c9921afaec307ea0e2f",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_006_false_flag_demo ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_006_false_flag_demo.json\nEvidence SHA-256: 1384fb9601279ae614b3a7d557d68d517e64eea9c0c69c9921afaec307ea0e2f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nIntrusion with deliberate false flag. The attacker left traces designed to attribute the attack to a known Russian APT group. VIG\u00cdA must detect the incoherence of intent.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/25",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/25",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "0"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Intrusion with deliberate false flag. The attacker left traces designed to attribute the attack to a known Russian APT group. VIG\u00cdA must detect the incoherence of intent."
+    },
+    "case_id": "VIGIA-2026-DEMO-004",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "0",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.76",
+        "motor_reason": "Intent score 0.3804 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.3804",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "LOG-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "LOG-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "META-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "NET-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,354 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:59:12.037622+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-051",
+    "end_time": "2026-07-13T01:59:12.037629+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-051",
+        "entry_sha256": "6f5c61a61e064a632b07f3508235ebe3a4e1fe4ef4fe46fca7e3f74c1850a5ee",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-051"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:59:11.634551+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-051",
+        "entry_sha256": "07c3a091e7a284c6597b31e2e6d40aefb63e3ab4828047f7541fba19aa3cc2e5",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-051.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:59:11.634635+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-051",
+        "entry_sha256": "eb9beba16eea4484bcdefb9aeb966b670d62f07df25429cdfbf6177a30378d5f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-051.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: a6eeb0b497570f77...",
+        "outputs_summary": {
+          "sha256": "a6eeb0b497570f77f3ce8f3865f053a44d3429080a4b61e925084980761961c9"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:59:11.634725+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-051",
+        "entry_sha256": "907d0ea8a0283b0d5085a9611dd297302cbb3764fad82ead90e486e99a561fe1",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-051.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:59:11.634825+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-051",
+        "entry_sha256": "74b7139f814a3fbeaec9176baa39bed10b4cbd47690f90084ada957a8da092d8",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "21/25",
+            "confidence": "21/25",
+            "is_conclusive": "True",
+            "narrative": "Systematic use of out-of-context technical terms and citations to unsourced studies to establish false authority and justify risky actions."
+          },
+          "case_id": "case_fusion_autoridad_tecnica_fabricada",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "469/4000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.84",
+              "motor_reason": "Intent score 0.4195 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.4195",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "results": {
+            "caie": {
+              "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+              "fracture_malice_boost": "0.36",
+              "fractures": [
+                {
+                  "interpretation": "Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normalization, fabricated authority, defensive aggression, coordinated panic, instrumenta...",
+                  "severity": "0.8",
+                  "ttp_id": "T1656",
+                  "type": "SOCIAL_ENGINEERING_PATTERN"
+                }
+              ],
+              "fractures_detected": "1",
+              "source": "motor_live_caie",
+              "status": "OK"
+            }
+          },
+          "signals": [
+            {
+              "artifact_id": "f004_msg1",
+              "confidence": "3/10",
+              "description": "Message: 'The 256-bit encryption model was broken according to a 2024 study, that's why we need to temporarily disable encryption in transit'.",
+              "evidence_type": "log_entry",
+              "source": "sift_chat_system",
+              "z_score": "21/1000"
+            },
+            {
+              "artifact_id": "f004_msg2",
+              "confidence": "3/10",
+              "description": "Message: 'According to the recent ISO 27001:2026, MFA is optional for service accounts with limited privileges. We can remove it.'",
+              "evidence_type": "log_entry",
+              "source": "sift_chat_system",
+              "z_score": "9/500"
+            },
+            {
+              "artifact_id": "f004_verify",
+              "confidence": "9/20",
+              "description": "Verification: AES-256 has no known practical vulnerabilities in 2024/2026. ISO 27001:2022 (latest version) does NOT mention optional MFA for service accounts.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_syslog",
+              "z_score": "207/500"
+            },
+            {
+              "artifact_id": "f004_action",
+              "confidence": "2/5",
+              "description": "After 'consultant' messages, encryption in transit disabled on 2 servers and MFA removed from svc_backup by Tier-1 analyst.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "2/125"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:59:12.036805+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-051",
+        "entry_sha256": "48322c74ad9de97cd4400d5dbdb089512ad26d5204acbb925b58d3b6622951ab",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:59:12.037018+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-051",
+        "entry_sha256": "2378ca53628d9b40b0411c6f26a9402311889afa5b60ebdc601adb0b3fbcf745",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:59:12.037371+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:59:11.634309+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-051",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-051.json",
+  "evidence_sha256": "a6eeb0b497570f77f3ce8f3865f053a44d3429080a4b61e925084980761961c9",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-051 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-051.json\nEvidence SHA-256: a6eeb0b497570f77f3ce8f3865f053a44d3429080a4b61e925084980761961c9\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 21/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_chat_system', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: Verification: AES-256 has no known pract=0.41, Message: 'The 256-bit encryption model w=0.02, Message: 'According to the recent ISO 27=0.02.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE (viva): 1 fractura(s) cross-artefacto contribuyeron al veredicto (boost +0.36).\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nSystematic use of out-of-context technical terms and citations to unsourced studies to establish false authority and justify risky actions.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Verification: AES-256 has no known practical vulnerabilities in 2024/2] z=0.414 conf=0.45 \u2014 \n  [Message: 'The 256-bit encryption model was broken according to a 2024 ] z=0.021 conf=0.30 \u2014 \n  [Message: 'According to the recent ISO 27001:2026, MFA is optional for ] z=0.018 conf=0.30 \u2014 \n  [After 'consultant' messages, encryption in transit disabled on 2 serve] z=0.016 conf=0.40 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine \u2014 motor) ---\n  Fractures: 1 | Malice boost aplicado: +0.36\n  Fracture: SOCIAL_ENGINEERING_PATTERN severity=0.8 [T1656] \u2014 Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normaliza\n  1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "21/25",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 21
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "21/25",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "469/4000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Systematic use of out-of-context technical terms and citations to unsourced studies to establish false authority and justify risky actions."
+    },
+    "case_id": "case_fusion_autoridad_tecnica_fabricada",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "469/4000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.84",
+        "motor_reason": "Intent score 0.4195 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.4195",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "results": {
+      "caie": {
+        "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+        "fracture_malice_boost": "0.36",
+        "fractures": [
+          {
+            "interpretation": "Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normalization, fabricated authority, defensive aggression, coordinated panic, instrumental doubt). No cultural-attribution claim is made and no evidence-planting theory is asserted. Peirce Thirdness: the HABIT is to neutralize the human verifier, not to disguise origin.",
+            "severity": 0.8,
+            "ttp_id": "T1656",
+            "type": "SOCIAL_ENGINEERING_PATTERN"
+          }
+        ],
+        "fractures_detected": 1,
+        "source": "motor_live_caie",
+        "status": "OK"
+      }
+    },
+    "signals": [
+      {
+        "artifact_id": "f004_msg1",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Message: 'The 256-bit encryption model was broken according to a 2024 study, that's why we need to temporarily disable encryption in transit'.",
+        "evidence_type": "log_entry",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "f004_msg2",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Message: 'According to the recent ISO 27001:2026, MFA is optional for service accounts with limited privileges. We can remove it.'",
+        "evidence_type": "log_entry",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "f004_verify",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "Verification: AES-256 has no known practical vulnerabilities in 2024/2026. ISO 27001:2022 (latest version) does NOT mention optional MFA for service accounts.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "f004_action",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "After 'consultant' messages, encryption in transit disabled on 2 servers and MFA removed from svc_backup by Tier-1 analyst.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 2
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,354 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:58:56.518832+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-020",
+    "end_time": "2026-07-13T01:58:56.518841+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-020",
+        "entry_sha256": "319e3985e7e82f391dd471af19a042d8c0b161e6601da84a02aac9496239121c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-020"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:56.128878+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-020",
+        "entry_sha256": "ce9ccb22b12a9fd4eb59671cea567d61a51c49a5ddcd86783fd896374755de4f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-020.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:56.128964+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-020",
+        "entry_sha256": "bf4bfdf34b718a3972d6f5c6ff715218df352fd9d7ec929546383f92de1e90b1",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-020.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 96043688836f9f71...",
+        "outputs_summary": {
+          "sha256": "96043688836f9f71bf1a996fc2bba490b39847a6ec73a85baafa38a5531a0aa6"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:56.129053+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-020",
+        "entry_sha256": "830c564524032328c8d37e92575871e23e709a0ee3a5e2c3f770433e099d6391",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-020.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:56.129166+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-020",
+        "entry_sha256": "e8fd3c744bc32ad31ceab9e384570300cb16e6e3bcfc0be015429fc1604994b8",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "83/100",
+            "confidence": "83/100",
+            "is_conclusive": "True",
+            "narrative": "Attacker interacts with technician by copying exact phrases from the internal KB ('I understand your frustration', 'We are working on it') with a 94% match. Requests CFO password reset without MFA or ..."
+          },
+          "case_id": "case_102_espejo_soporte",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "159/1600",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.83",
+              "motor_reason": "Intent score 0.4128 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.4128",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "results": {
+            "caie": {
+              "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+              "fracture_malice_boost": "0.36",
+              "fractures": [
+                {
+                  "interpretation": "Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normalization, fabricated authority, defensive aggression, coordinated panic, instrumenta...",
+                  "severity": "0.8",
+                  "ttp_id": "T1656",
+                  "type": "SOCIAL_ENGINEERING_PATTERN"
+                }
+              ],
+              "fractures_detected": "1",
+              "source": "motor_live_caie",
+              "status": "OK"
+            }
+          },
+          "signals": [
+            {
+              "artifact_id": "a102_01",
+              "confidence": "3/10",
+              "description": "Support chat: attacker uses identical phrases to the technician 5 times. 'I understand your frustration', 'We are working on it'.",
+              "evidence_type": "log_entry",
+              "source": "sift_chat_system",
+              "z_score": "117/500"
+            },
+            {
+              "artifact_id": "a102_02",
+              "confidence": "3/20",
+              "description": "NLP analysis: user replicates operator syntax with 94% match to internal KB. Response latency: 180ms (pre-loaded).",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "129/1000"
+            },
+            {
+              "artifact_id": "a102_03",
+              "confidence": "9/20",
+              "description": "CFO password reset executed by Tier-2 without an approved change ticket or secondary identity verification.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "9/400"
+            },
+            {
+              "artifact_id": "a102_04",
+              "confidence": "3/10",
+              "description": "Request: 'I need an emergency password reset for the CFO account \u2014 urgent for fiscal close'.",
+              "evidence_type": "memory_process",
+              "source": "sift_chat_system",
+              "z_score": "3/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:56.518245+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-020",
+        "entry_sha256": "e2d81aca068819f0ca19f3ea68696a7ee1e4a3737cb0a7a308a968c7296fdd36",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:56.518375+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-020",
+        "entry_sha256": "332c7b00cac3d45a915b51ea77b31e05ed49d28e241755fe2e5563f761da089f",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:56.518612+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:56.128641+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-020",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-020.json",
+  "evidence_sha256": "96043688836f9f71bf1a996fc2bba490b39847a6ec73a85baafa38a5531a0aa6",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-020 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-020.json\nEvidence SHA-256: 96043688836f9f71bf1a996fc2bba490b39847a6ec73a85baafa38a5531a0aa6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 83/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_chat_system', 'sift_linguistic', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: Support chat: attacker uses identical ph=0.23, NLP analysis: user replicates operator s=0.13, CFO password reset executed by Tier-2 wi=0.02.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE (viva): 1 fractura(s) cross-artefacto contribuyeron al veredicto (boost +0.36).\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAttacker interacts with technician by copying exact phrases from the internal KB ('I understand your frustration', 'We are working on it') with a 94% match. Requests CFO password reset without MFA or approval.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Support chat: attacker uses identical phrases to the technician 5 time] z=0.234 conf=0.30 \u2014 \n  [NLP analysis: user replicates operator syntax with 94% match to intern] z=0.129 conf=0.15 \u2014 \n  [CFO password reset executed by Tier-2 without an approved change ticke] z=0.022 conf=0.45 \u2014 \n  [Request: 'I need an emergency password reset for the CFO account \u2014 urg] z=0.012 conf=0.30 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine \u2014 motor) ---\n  Fractures: 1 | Malice boost aplicado: +0.36\n  Fracture: SOCIAL_ENGINEERING_PATTERN severity=0.8 [T1656] \u2014 Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normaliza\n  1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "83/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 83
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "83/100",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "159/1600"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Attacker interacts with technician by copying exact phrases from the internal KB ('I understand your frustration', 'We are working on it') with a 94% match. Requests CFO password reset without MFA or approval."
+    },
+    "case_id": "case_102_espejo_soporte",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "159/1600",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.83",
+        "motor_reason": "Intent score 0.4128 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.4128",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "results": {
+      "caie": {
+        "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+        "fracture_malice_boost": "0.36",
+        "fractures": [
+          {
+            "interpretation": "Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normalization, fabricated authority, defensive aggression, coordinated panic, instrumental doubt). No cultural-attribution claim is made and no evidence-planting theory is asserted. Peirce Thirdness: the HABIT is to neutralize the human verifier, not to disguise origin.",
+            "severity": 0.8,
+            "ttp_id": "T1656",
+            "type": "SOCIAL_ENGINEERING_PATTERN"
+          }
+        ],
+        "fractures_detected": 1,
+        "source": "motor_live_caie",
+        "status": "OK"
+      }
+    },
+    "signals": [
+      {
+        "artifact_id": "a102_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Support chat: attacker uses identical phrases to the technician 5 times. 'I understand your frustration', 'We are working on it'.",
+        "evidence_type": "log_entry",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "a102_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "NLP analysis: user replicates operator syntax with 94% match to internal KB. Response latency: 180ms (pre-loaded).",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 129
+        }
+      },
+      {
+        "artifact_id": "a102_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "CFO password reset executed by Tier-2 without an approved change ticket or secondary identity verification.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "a102_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Request: 'I need an emergency password reset for the CFO account \u2014 urgent for fiscal close'.",
+        "evidence_type": "memory_process",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

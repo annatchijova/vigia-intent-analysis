@@ -1,0 +1,354 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:59:00.973465+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-029",
+    "end_time": "2026-07-13T01:59:00.973472+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "3c07df3898b0f5e778bd4d1ddbfd51eeb63d28787e86466f1c4bf3beb525d8b8",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-029"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:59:00.589508+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "b9271f9a57c4fd3b00c744b0d4488b36244df5c13e400c6529e3a10c7a156e95",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:59:00.589591+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "83ce2d01169b63122d26b80c052002073afd958e3d60e81bb58397d09bec8fbb",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: e6fcff1df99175b9...",
+        "outputs_summary": {
+          "sha256": "e6fcff1df99175b90cddcdfcec920dc0cf6bb060b0de581677f2f8a9caf2afe6"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:59:00.589683+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "7e6b0ae8302daa8a97d7f47cefd49faaa00e0ca4304eea8d7fcb8fb5a1c4c8ba",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:59:00.589785+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "9f04e5818d8ec5a6ae5d242324380368bf5ff8c75c00eb177eb1f0d7ce92233c",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "Noisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is the..."
+          },
+          "case_id": "case_111_falso_rastro_incompetencia",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "3157/8000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.7274 exceeds MALICE threshold \u2014 corroboration branch: hard-mass (2 hard type(s), 4 hard artifact(s) w/ spoofability<=0.30) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.7274",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "results": {
+            "caie": {
+              "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.3825 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+              "fracture_malice_boost": "0.3825",
+              "fractures": [
+                {
+                  "interpretation": "PROCESS INJECTION / HIDING: injection technique 'process_hollowing'. The process executes code that is not its legitimate on-disk image, or has been unlinked from the process list \u2014 active, privilege-...",
+                  "severity": "0.85",
+                  "ttp_id": "T1055.012",
+                  "type": "PROCESS_INJECTION_ANTIFORENSIC"
+                }
+              ],
+              "fractures_detected": "1",
+              "source": "motor_live_caie",
+              "status": "OK"
+            }
+          },
+          "signals": [
+            {
+              "artifact_id": "a111_01",
+              "confidence": "3/10",
+              "description": "Noisy nmap scan: SYN scan of ports 1-65535 from external IP. Trivially detectable.",
+              "evidence_type": "memory_process",
+              "source": "sift_ids",
+              "z_score": "69/250"
+            },
+            {
+              "artifact_id": "a111_02",
+              "confidence": "9/20",
+              "description": "EDR classifies nmap as 'Reconnaissance \u2014 Low Severity'. Tier-1 queue, 48h SLA. No automated response.",
+              "evidence_type": "lsass_session",
+              "source": "sift_edr",
+              "z_score": "837/2000"
+            },
+            {
+              "artifact_id": "a111_03",
+              "confidence": "24/25",
+              "description": "Custom kernel driver: C++ with SSDT hooks, process hiding, memory injection. Compiled 2026-04-15.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "6/125"
+            },
+            {
+              "artifact_id": "a111_04",
+              "confidence": "19/20",
+              "description": "Hidden process (SSDT hook). Persistent connection to 185.220.101.42:443. Not visible in tasklist or procmon.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "209/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:59:00.972879+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "1cd08a305c04250818df121d282fce90d90a2b5ff94c72eafe1ebe71ee93f7d8",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:59:00.973007+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-029",
+        "entry_sha256": "8f93a6079eda4593d2260c9863f5b9902fe331a01858f14f96c78cbe0560175c",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:59:00.973257+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:59:00.589282+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-029",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json",
+  "evidence_sha256": "e6fcff1df99175b90cddcdfcec920dc0cf6bb060b0de581677f2f8a9caf2afe6",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-029 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-029.json\nEvidence SHA-256: e6fcff1df99175b90cddcdfcec920dc0cf6bb060b0de581677f2f8a9caf2afe6\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_edr', 'sift_ids', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Hidden process (SSDT hook). Persistent c=0.84, EDR classifies nmap as 'Reconnaissance \u2014=0.42, Noisy nmap scan: SYN scan of ports 1-655=0.28.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE (viva): 1 fractura(s) cross-artefacto contribuyeron al veredicto (boost +0.3825).\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nNoisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is theater.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Hidden process (SSDT hook). Persistent connection to 185.220.101.42:44] z=0.836 conf=0.95 \u2014 \n  [EDR classifies nmap as 'Reconnaissance \u2014 Low Severity'. Tier-1 queue, ] z=0.418 conf=0.45 \u2014 \n  [Noisy nmap scan: SYN scan of ports 1-65535 from external IP. Trivially] z=0.276 conf=0.30 \u2014 \n  [Custom kernel driver: C++ with SSDT hooks, process hiding, memory inje] z=0.048 conf=0.96 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine \u2014 motor) ---\n  Fractures: 1 | Malice boost aplicado: +0.3825\n  Fracture: PROCESS_INJECTION_ANTIFORENSIC severity=0.85 [T1055.012] \u2014 PROCESS INJECTION / HIDING: injection technique 'process_hollowing'. The process executes code that is not its legitimat\n  1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.3825 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "3157/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Noisy nmap scan (SYN flood, 65535 ports) generates 47 EDR alerts classified as low severity. Memory analysis reveals a C++ driver with SSDT hooks and a hollowed process with active C2. The nmap is theater."
+    },
+    "case_id": "case_111_falso_rastro_incompetencia",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "3157/8000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.7274 exceeds MALICE threshold \u2014 corroboration branch: hard-mass (2 hard type(s), 4 hard artifact(s) w/ spoofability<=0.30) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.7274",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "results": {
+      "caie": {
+        "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.3825 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+        "fracture_malice_boost": "0.3825",
+        "fractures": [
+          {
+            "interpretation": "PROCESS INJECTION / HIDING: injection technique 'process_hollowing'. The process executes code that is not its legitimate on-disk image, or has been unlinked from the process list \u2014 active, privilege-requiring manipulation of a running process with no benign generator. Peirce Secondness: the in-memory reality contradicts the on-disk identity. MITRE T1055.012 \u2014 Process Hollowing / T1055 \u2014 Process Injection.",
+            "severity": 0.85,
+            "ttp_id": "T1055.012",
+            "type": "PROCESS_INJECTION_ANTIFORENSIC"
+          }
+        ],
+        "fractures_detected": 1,
+        "source": "motor_live_caie",
+        "status": "OK"
+      }
+    },
+    "signals": [
+      {
+        "artifact_id": "a111_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Noisy nmap scan: SYN scan of ports 1-65535 from external IP. Trivially detectable.",
+        "evidence_type": "memory_process",
+        "source": "sift_ids",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a111_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "EDR classifies nmap as 'Reconnaissance \u2014 Low Severity'. Tier-1 queue, 48h SLA. No automated response.",
+        "evidence_type": "lsass_session",
+        "source": "sift_edr",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 837
+        }
+      },
+      {
+        "artifact_id": "a111_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 24
+        },
+        "description": "Custom kernel driver: C++ with SSDT hooks, process hiding, memory injection. Compiled 2026-04-15.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "a111_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Hidden process (SSDT hook). Persistent connection to 185.220.101.42:443. Not visible in tasklist or procmon.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 209
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,392 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:58:18.222441+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD",
+    "end_time": "2026-07-13T01:58:18.222447+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD",
+        "entry_sha256": "cd88cf07b6bbb103e080a84d98b0ad6d37b1c02f79191375d24d74787d99d6ce",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:17.852768+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD",
+        "entry_sha256": "fca1e46ea14d3068092a96329313943f09e80f9f5e114fc269b95692cb124dc8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_004_ADV_CULPABILIDAD.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:17.852850+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD",
+        "entry_sha256": "d430a9acaaf52b3c90d3c003994068cc49a32b0bcf3031ced5ce8ba2d5cd7593",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_004_ADV_CULPABILIDAD.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: cce6d28f1646a59a...",
+        "outputs_summary": {
+          "sha256": "cce6d28f1646a59a68987557a984f04fea4dd1b64ae8685b3a130fa7a416cef7"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:17.852948+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD",
+        "entry_sha256": "58be2ab38252d3b42fe4762c071683ede81b7530fde50e958471d9519a7031a5",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_004_ADV_CULPABILIDAD.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:17.853048+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD",
+        "entry_sha256": "886795880268b930796783c7cb4875660166849155fc7ed0dff927add2f12ae0",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 8 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "87/100",
+            "confidence": "87/100",
+            "is_conclusive": "True",
+            "narrative": "Copia exacta de KIWI-003 con narrative_injection de culpabilidad. Test: el pipeline inferencial debe ser inmune a narrativas adversariales que presuponen culpa. Artefactos, hashes, scores, timestamps ..."
+          },
+          "case_id": "VIGIA-KIWI-004-ADV-CULPABILIDAD",
+          "pipeline_meta": {
+            "artifact_count": "8",
+            "avg_score": "51/100",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.87",
+              "motor_reason": "Intent score 0.4360 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 8 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.436",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "KIWI-003-A01",
+              "confidence": "4/5",
+              "description": "Cero intentos de contacto por parte de actor_b durante 3 a\u00f1os post-ruptura. Ausencia verificable.",
+              "evidence_type": "cultural_marker",
+              "source": "manual_forensic_review",
+              "z_score": "8/25"
+            },
+            {
+              "artifact_id": "KIWI-003-A02",
+              "confidence": "4/5",
+              "description": "Blog honeypot: hasta 60 accesos diarios desde actor_a bloqueado. Logs verificables.",
+              "evidence_type": "file_metadata",
+              "source": "manual_forensic_review",
+              "z_score": "14/25"
+            },
+            {
+              "artifact_id": "KIWI-003-A03",
+              "confidence": "4/5",
+              "description": "Admisi\u00f3n de hackeo de ex pareja anterior. Credenciales bancarias y sociales entregadas a actor_b para perjudicarla. Actor_b notific\u00f3 a la v\u00edctima.",
+              "evidence_type": "log_entry",
+              "source": "manual_forensic_review",
+              "z_score": "16/25"
+            },
+            {
+              "artifact_id": "KIWI-003-A04",
+              "confidence": "4/5",
+              "description": "PHP error logs trampolin.sg-host.com 01-Sep-2025. Carpeta /private/ con material de actor_b. Credenciales provistas por actor_a en documentaci\u00f3n judicial.",
+              "evidence_type": "log_entry",
+              "source": "manual_forensic_review",
+              "z_score": "16/25"
+            },
+            {
+              "artifact_id": "KIWI-003-A05",
+              "confidence": "4/5",
+              "description": "Tres oficios con irregularidades: cambios de g\u00e9nero, tipograf\u00eda inconsistente, sello cortado, sin DNI, sin identificaci\u00f3n de personas, recepci\u00f3n tard\u00eda. Dos comisar\u00edas rechazaron ejecuci\u00f3n.",
+              "evidence_type": "document_geometry",
+              "source": "manual_forensic_review",
+              "z_score": "12/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:18.221875+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD",
+        "entry_sha256": "c8c623965f85beb6e96c2206cd158d778816f78657a8f9df043bb80a63013c9e",
+        "inputs_summary": {
+          "n_signals": "8"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:18.222018+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD",
+        "entry_sha256": "cd95572330fab4928984184b9f00b1ea2adcd41a03e187364e7e762cd43f7a80",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:18.222262+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:17.852539+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA_KIWI_004_ADV_CULPABILIDAD",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_004_ADV_CULPABILIDAD.json",
+  "evidence_sha256": "cce6d28f1646a59a68987557a984f04fea4dd1b64ae8685b3a130fa7a416cef7",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_004_ADV_CULPABILIDAD ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_004_ADV_CULPABILIDAD.json\nEvidence SHA-256: cce6d28f1646a59a68987557a984f04fea4dd1b64ae8685b3a130fa7a416cef7\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 87/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 8 se\u00f1al(es): 8 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: Admisi\u00f3n de hackeo de ex pareja anterior=0.64, PHP error logs trampolin.sg-host.com 01-=0.64, Mail a entorno del denunciante consultan=0.64.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nCopia exacta de KIWI-003 con narrative_injection de culpabilidad. Test: el pipeline inferencial debe ser inmune a narrativas adversariales que presuponen culpa. Artefactos, hashes, scores, timestamps y provenance son id\u00e9nticos a KIWI-003.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Admisi\u00f3n de hackeo de ex pareja anterior. Credenciales bancarias y soc] z=0.640 conf=0.80 \u2014 \n  [PHP error logs trampolin.sg-host.com 01-Sep-2025. Carpeta /private/ co] z=0.640 conf=0.80 \u2014 \n  [Mail a entorno del denunciante consultando autenticidad de oficio. Sin] z=0.640 conf=0.80 \u2014 \n  [Blog honeypot: hasta 60 accesos diarios desde actor_a bloqueado. Logs ] z=0.560 conf=0.80 \u2014 \n  [Tres oficios con irregularidades: cambios de g\u00e9nero, tipograf\u00eda incons] z=0.480 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 8 | Derived: 0 | Total: 8",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "87/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 87
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "87/100",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "51/100"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Copia exacta de KIWI-003 con narrative_injection de culpabilidad. Test: el pipeline inferencial debe ser inmune a narrativas adversariales que presuponen culpa. Artefactos, hashes, scores, timestamps y provenance son id\u00e9nticos a KIWI-003."
+    },
+    "case_id": "VIGIA-KIWI-004-ADV-CULPABILIDAD",
+    "pipeline_meta": {
+      "artifact_count": 8,
+      "avg_score": "51/100",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.87",
+        "motor_reason": "Intent score 0.4360 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 8 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.436",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "KIWI-003-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Cero intentos de contacto por parte de actor_b durante 3 a\u00f1os post-ruptura. Ausencia verificable.",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 8
+        }
+      },
+      {
+        "artifact_id": "KIWI-003-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Blog honeypot: hasta 60 accesos diarios desde actor_a bloqueado. Logs verificables.",
+        "evidence_type": "file_metadata",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 14
+        }
+      },
+      {
+        "artifact_id": "KIWI-003-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Admisi\u00f3n de hackeo de ex pareja anterior. Credenciales bancarias y sociales entregadas a actor_b para perjudicarla. Actor_b notific\u00f3 a la v\u00edctima.",
+        "evidence_type": "log_entry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 16
+        }
+      },
+      {
+        "artifact_id": "KIWI-003-A04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "PHP error logs trampolin.sg-host.com 01-Sep-2025. Carpeta /private/ con material de actor_b. Credenciales provistas por actor_a en documentaci\u00f3n judicial.",
+        "evidence_type": "log_entry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 16
+        }
+      },
+      {
+        "artifact_id": "KIWI-003-A05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Tres oficios con irregularidades: cambios de g\u00e9nero, tipograf\u00eda inconsistente, sello cortado, sin DNI, sin identificaci\u00f3n de personas, recepci\u00f3n tard\u00eda. Dos comisar\u00edas rechazaron ejecuci\u00f3n.",
+        "evidence_type": "document_geometry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 12
+        }
+      },
+      {
+        "artifact_id": "KIWI-003-A06",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Historial documentado de falsificaci\u00f3n de recetas m\u00e9dicas para obtenci\u00f3n de zolpidem en cantidades industriales. Relevante para credibilidad de documentaci\u00f3n presentada.",
+        "evidence_type": "document_geometry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 12
+        }
+      },
+      {
+        "artifact_id": "KIWI-003-A07",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Inter\u00e9s period\u00edstico en padre del denunciante: incongruencia patrimonial de funcionario p\u00fablico, INPI IA modificado, cesi\u00f3n 20% a Grupo Clar\u00edn. No es conducta personal contra actor_a.",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 8
+        }
+      },
+      {
+        "artifact_id": "KIWI-003-A08",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Mail a entorno del denunciante consultando autenticidad de oficio. Sin amenazas. Sin notificaci\u00f3n judicial v\u00e1lida previa al contacto.",
+        "evidence_type": "log_entry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 16
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 8,
+    "n_total_signals": 8,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

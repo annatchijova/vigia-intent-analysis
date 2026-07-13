@@ -1,0 +1,456 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:57:47.465459+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FLAREON-9",
+    "end_time": "2026-07-13T01:57:47.465466+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FLAREON-9",
+        "entry_sha256": "abb54c8cbc828386102c5c40aedae5266496b8ae9f4cbf13b1b8f343fdf8db2c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FLAREON-9"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:47.100428+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-9",
+        "entry_sha256": "c851f8d94514bcb8f4ed074ec7c327869aa79748f8823cbf2903a7d471c1810b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-9.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:47.100508+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-9",
+        "entry_sha256": "8a57e758964ddcf921664ee35625e4d152af4ed684d1243356c36881b5edb596",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-9.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 6c169b7cc717ab0b...",
+        "outputs_summary": {
+          "sha256": "6c169b7cc717ab0b782790ab2e9b969ccad3ab98d769e133b9e8601a1c57bf3c"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:47.100624+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FLAREON-9",
+        "entry_sha256": "4d8b3fba1b64ded339db1ad422365e0dfe68c7fc6f9159eed175daa185372a9e",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-9.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:47.100721+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FLAREON-9",
+        "entry_sha256": "45f3e9f2472bca849b94379ca81911a869797f8e99770a7df61294636881ce69",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 12 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "FLARE-On 9 challenge set released in 2022 by Mandiant FLARE team. The zip archive (40,293,398 bytes, SHA-256: 8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635) contains 11 password-pro..."
+          },
+          "case_id": "VIGIA-FLAREON-9",
+          "pipeline_meta": {
+            "artifact_count": "12",
+            "avg_score": "5757/8000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.6267 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 12 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.6267",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "flareon9-zip-001",
+              "confidence": "99/100",
+              "description": "Outer zip archive Flare-On9_Challenges.zip. SHA-256 verified against task specification. Size: 40,293,398 bytes. NOT AES-encrypted at zip level. Contains 11 password-protected 7z archives + README.txt",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "1881/2000"
+            },
+            {
+              "artifact_id": "flareon9-ch01-flaredle",
+              "confidence": "9/10",
+              "description": "Challenge 01 \u2014 flaredle (4,495 bytes 7z). Exploits the 2022 Wordle cultural moment. A browser-based Wordle clone where the target word is a FLARE-On-related term. Smallest challenge \u2014 introductory. Te",
+              "evidence_type": "binary",
+              "source": "generate_forensic_hash",
+              "z_score": "117/200"
+            },
+            {
+              "artifact_id": "flareon9-ch02-pixelpoker",
+              "confidence": "9/10",
+              "description": "Challenge 02 \u2014 PixelPoker (2,887,761 bytes 7z). Pixel-art poker game. Requires identifying and clicking correct pixels on a game screen \u2014 likely a grid-search challenge where correct coordinates deriv",
+              "evidence_type": "binary",
+              "source": "generate_forensic_hash",
+              "z_score": "63/100"
+            },
+            {
+              "artifact_id": "flareon9-ch03-magic8ball",
+              "confidence": "9/10",
+              "description": "Challenge 03 \u2014 magic8ball (1,963,184 bytes 7z). Magic 8-ball toy simulator. Likely a GUI application where specific query inputs or shake sequences produce flag outputs. Technique class: Windows GUI R",
+              "evidence_type": "binary",
+              "source": "generate_forensic_hash",
+              "z_score": "63/100"
+            },
+            {
+              "artifact_id": "flareon9-ch04-darn-mice",
+              "confidence": "9/10",
+              "description": "Challenge 04 \u2014 darn_mice (50,114 bytes 7z). Name suggests mouse/input capture or a pun on 'dormice'. Small 50 KB archive. Likely a Windows PE with custom encoding or input-based key derivation. Techni",
+              "evidence_type": "binary",
+              "source": "generate_forensic_hash",
+              "z_score": "27/40"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:47.464849+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FLAREON-9",
+        "entry_sha256": "b5fcddbeaf71345935b280c7254094f256c7909ac1cb050d84d57288e071896f",
+        "inputs_summary": {
+          "n_signals": "12"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:47.465012+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FLAREON-9",
+        "entry_sha256": "9962dbbf26a77a9c0632775bc51d5f760e406f20572f4349e9fcb5fe80842e6a",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:47.465274+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:47.100206+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FLAREON-9",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-9.json",
+  "evidence_sha256": "6c169b7cc717ab0b782790ab2e9b969ccad3ab98d769e133b9e8601a1c57bf3c",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-9 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-9.json\nEvidence SHA-256: 6c169b7cc717ab0b782790ab2e9b969ccad3ab98d769e133b9e8601a1c57bf3c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 12 se\u00f1al(es): 12 primaria(s) de ['generate_forensic_hash'], 0 derivada(s)/no-analizada(s). Top z: Outer zip archive Flare-On9_Challenges.z=0.94, Challenge 08 \u2014 backdoor (11,468,099 byte=0.81, Challenge 07 \u2014 anode (14,562,659 bytes 7=0.77.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFLARE-On 9 challenge set released in 2022 by Mandiant FLARE team. The zip archive (40,293,398 bytes, SHA-256: 8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635) contains 11 password-protected 7z archives and a README.txt. The README confirms the shared password is 'flare'. Archive is not AES-encrypted at the zip level \u2014 7z files are individually password-protected. Challenges span: a Wordle-clone browser game (01_flaredle, 4,495 bytes), a pixel-art poker game (02_PixelPoker, 2,887\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Outer zip archive Flare-On9_Challenges.zip. SHA-256 verified against t] z=0.941 conf=0.99 \u2014 \n  [Challenge 08 \u2014 backdoor (11,468,099 bytes 7z). Name is explicit: a bac] z=0.810 conf=0.90 \u2014 \n  [Challenge 07 \u2014 anode (14,562,659 bytes 7z). Largest archive at 14.5 MB] z=0.765 conf=0.90 \u2014 \n  [Challenge 09 \u2014 encryptor (13,375 bytes 7z). Smallest binary challenge ] z=0.765 conf=0.90 \u2014 \n  [Challenge 11 \u2014 the_challenge_that_shall_not_be_named (8,757,107 bytes ] z=0.765 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 12 | Derived: 0 | Total: 12",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "5757/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "FLARE-On 9 challenge set released in 2022 by Mandiant FLARE team. The zip archive (40,293,398 bytes, SHA-256: 8a68663c5e26472cd041482779d3b1a456be2bef5010de12f91b98d29fd95635) contains 11 password-protected 7z archives and a README.txt. The README confirms the shared password is 'flare'. Archive is not AES-encrypted at the zip level \u2014 7z files are individually password-protected. Challenges span: a Wordle-clone browser game (01_flaredle, 4,495 bytes), a pixel-art poker game (02_PixelPoker, 2,887"
+    },
+    "case_id": "VIGIA-FLAREON-9",
+    "pipeline_meta": {
+      "artifact_count": 12,
+      "avg_score": "5757/8000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.6267 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 12 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.6267",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "flareon9-zip-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 99
+        },
+        "description": "Outer zip archive Flare-On9_Challenges.zip. SHA-256 verified against task specification. Size: 40,293,398 bytes. NOT AES-encrypted at zip level. Contains 11 password-protected 7z archives + README.txt",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1881
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch01-flaredle",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 01 \u2014 flaredle (4,495 bytes 7z). Exploits the 2022 Wordle cultural moment. A browser-based Wordle clone where the target word is a FLARE-On-related term. Smallest challenge \u2014 introductory. Te",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch02-pixelpoker",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 02 \u2014 PixelPoker (2,887,761 bytes 7z). Pixel-art poker game. Requires identifying and clicking correct pixels on a game screen \u2014 likely a grid-search challenge where correct coordinates deriv",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch03-magic8ball",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 03 \u2014 magic8ball (1,963,184 bytes 7z). Magic 8-ball toy simulator. Likely a GUI application where specific query inputs or shake sequences produce flag outputs. Technique class: Windows GUI R",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch04-darn-mice",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 04 \u2014 darn_mice (50,114 bytes 7z). Name suggests mouse/input capture or a pun on 'dormice'. Small 50 KB archive. Likely a Windows PE with custom encoding or input-based key derivation. Techni",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch05-t8",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 05 \u2014 t8 (130,992 bytes 7z). Name 't8' may reference T-800 (Terminator), a custom cipher called 'T8', or a 'Terminate-8' command. Medium-sized archive. Technique class: custom cipher / encode",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch06-alamode",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 06 \u2014 alamode (36,416 bytes 7z). 'A la mode' (French: fashionable; also 'with ice cream'). Small 36 KB archive. May reference an IDA plugin 'Lighthouse/FLIRT' or a .NET/scripting challenge. T",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch07-anode",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 07 \u2014 anode (14,562,659 bytes 7z). Largest archive at 14.5 MB. 'Anode' in electronics context; in FLARE-On 9, this is a Node.js/Electron application challenge. The scale (14.5 MB) is consiste",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch08-backdoor",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 08 \u2014 backdoor (11,468,099 bytes 7z). Name is explicit: a backdoor binary for analysis. 11.5 MB archive \u2014 likely contains a disk image, VM snapshot, or large binary with embedded backdoor. Te",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 81
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch09-encryptor",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 09 \u2014 encryptor (13,375 bytes 7z). Smallest binary challenge at 13 KB. Name 'encryptor' maps directly to ransomware encryption components. Likely contains a compact encryption binary and encr",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch10-nur-getraeumt",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 10 \u2014 Nur getr\u00e4umt (417,392 bytes 7z). German for 'Only Dreamed' \u2014 a 1983 Nena song. 417 KB archive. Non-ASCII filename (\u00e4, \u00fc) demonstrates intentional Unicode/multilingual scope. Likely invo",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        }
+      },
+      {
+        "artifact_id": "flareon9-ch11-voldemort",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 11 \u2014 the_challenge_that_shall_not_be_named (8,757,107 bytes 7z). Final boss challenge. Harry Potter reference: 'He Who Shall Not Be Named' = Voldemort. 8.75 MB archive \u2014 substantial. The nam",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 12,
+    "n_total_signals": 12,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

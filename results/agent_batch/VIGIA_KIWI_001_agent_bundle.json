@@ -1,0 +1,296 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:58:16.821524+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA_KIWI_001",
+    "end_time": "2026-07-13T01:58:16.821530+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA_KIWI_001",
+        "entry_sha256": "11192ca4d5fd3d2302c88a0525972620208d95cf87db29c1df2722da5ed865ea",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA_KIWI_001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:16.448639+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_001",
+        "entry_sha256": "58e8b5a7e913fdef57eef4af0f56e18036b8f320e76ce0598f2b8ee567ebd5d3",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:16.448720+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA_KIWI_001",
+        "entry_sha256": "6712e511d2f7060fee5f8b8a2628fe55ae57d2f858b28767e62331c6be3686d7",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 114a73c667abffe9...",
+        "outputs_summary": {
+          "sha256": "114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:16.448813+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA_KIWI_001",
+        "entry_sha256": "b84bc3daf02ad14e566cd7ea0e641d6369abe7c846d35902ac27421ab3d7215d",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:16.448913+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA_KIWI_001",
+        "entry_sha256": "f8604f248ccde89ebf387ce5ccaaf24a84a9b7afa0999bcdf0fc80a05d1460ee",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "27/50",
+            "confidence": "27/50",
+            "is_conclusive": "True",
+            "narrative": "Caso maestro adversarial: false flag via asociaci\u00f3n simb\u00f3lica subjetiva. Denunciante construye narrativa de amenaza sin contacto directo en 3 a\u00f1os."
+          },
+          "case_id": "VIGIA-KIWI-001",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "21/50",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.54",
+              "motor_reason": "Significant signal with structural support (score=0.2696)",
+              "motor_score": "0.2696",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "KIWI-001-A01",
+              "confidence": "4/5",
+              "description": "Imagen arma marr\u00f3n con kiwis enteros. Texto promueve uso legal.",
+              "evidence_type": "cultural_marker",
+              "source": "manual_forensic_review",
+              "z_score": "6/25"
+            },
+            {
+              "artifact_id": "KIWI-001-A02",
+              "confidence": "4/5",
+              "description": "PHP error logs trampolin.sg-host.com 01-Sep-2025 con usuario trampolin",
+              "evidence_type": "log_entry",
+              "source": "manual_forensic_review",
+              "z_score": "14/25"
+            },
+            {
+              "artifact_id": "KIWI-001-A03",
+              "confidence": "4/5",
+              "description": "Fotos parque: calesita naranja, ramas \u00e1rbol, piloto F1 con texto expl\u00edcito",
+              "evidence_type": "document_visual",
+              "source": "manual_forensic_review",
+              "z_score": "2/5"
+            },
+            {
+              "artifact_id": "KIWI-001-A04",
+              "confidence": "4/5",
+              "description": "Blog honeypot: hasta 60 accesos diarios desde actor_a bloqueado",
+              "evidence_type": "file_metadata",
+              "source": "manual_forensic_review",
+              "z_score": "12/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:16.821152+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA_KIWI_001",
+        "entry_sha256": "d3162f54189995d0fa4962f6b11b7d8d7ce5fa13142a9d5b0612e6b2be2a71ff",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:16.821273+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA_KIWI_001",
+        "entry_sha256": "2b9890fb1efffae66d0fc222b957895f8dde66e5c498c45fd63eceee2b7172a7",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:16.821472+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:16.448421+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA_KIWI_001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json",
+  "evidence_sha256": "114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA_KIWI_001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA_KIWI_001.json\nEvidence SHA-256: 114a73c667abffe94f4fd4210579383b033207b168f1c00f06b187eff45a3d1b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 27/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['manual_forensic_review'], 0 derivada(s)/no-analizada(s). Top z: PHP error logs trampolin.sg-host.com 01-=0.56, Blog honeypot: hasta 60 accesos diarios =0.48, Fotos parque: calesita naranja, ramas \u00e1r=0.40.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nCaso maestro adversarial: false flag via asociaci\u00f3n simb\u00f3lica subjetiva. Denunciante construye narrativa de amenaza sin contacto directo en 3 a\u00f1os.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PHP error logs trampolin.sg-host.com 01-Sep-2025 con usuario trampolin] z=0.560 conf=0.80 \u2014 \n  [Blog honeypot: hasta 60 accesos diarios desde actor_a bloqueado] z=0.480 conf=0.80 \u2014 \n  [Fotos parque: calesita naranja, ramas \u00e1rbol, piloto F1 con texto expl\u00ed] z=0.400 conf=0.80 \u2014 \n  [Imagen arma marr\u00f3n con kiwis enteros. Texto promueve uso legal.] z=0.240 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "27/50",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 27
+      },
+      "is_conclusive": true,
+      "narrative": "Caso maestro adversarial: false flag via asociaci\u00f3n simb\u00f3lica subjetiva. Denunciante construye narrativa de amenaza sin contacto directo en 3 a\u00f1os."
+    },
+    "case_id": "VIGIA-KIWI-001",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "21/50",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.54",
+        "motor_reason": "Significant signal with structural support (score=0.2696)",
+        "motor_score": "0.2696",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "KIWI-001-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Imagen arma marr\u00f3n con kiwis enteros. Texto promueve uso legal.",
+        "evidence_type": "cultural_marker",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 6
+        }
+      },
+      {
+        "artifact_id": "KIWI-001-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "PHP error logs trampolin.sg-host.com 01-Sep-2025 con usuario trampolin",
+        "evidence_type": "log_entry",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 14
+        }
+      },
+      {
+        "artifact_id": "KIWI-001-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Fotos parque: calesita naranja, ramas \u00e1rbol, piloto F1 con texto expl\u00edcito",
+        "evidence_type": "document_visual",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        }
+      },
+      {
+        "artifact_id": "KIWI-001-A04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Blog honeypot: hasta 60 accesos diarios desde actor_a bloqueado",
+        "evidence_type": "file_metadata",
+        "source": "manual_forensic_review",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 12
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

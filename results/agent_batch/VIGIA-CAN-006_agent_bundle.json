@@ -1,0 +1,354 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:58:49.271189+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-006",
+    "end_time": "2026-07-13T01:58:49.271197+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "3429d48b3504757fbe0e5e10efbf32c6a074f398f2deafe62994e41a57cf2553",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-006"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:48.852843+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "cca1cddcd586a01840e31738cdb40b1ae3b5701e913de393436fa2cc8f91e271",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:48.852930+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "cde1bdb8e6c6c22497f1c6c88c4250652066f20e6ace5cd7fed586e147d8b22a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d2ee8d66cfa0f175...",
+        "outputs_summary": {
+          "sha256": "d2ee8d66cfa0f1757e6dd55f2ba39d4e3c4a7ae3b4880765b0bf67a2908431f4"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:48.853023+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "6c3214f27130e01524af87b71bc9ed6da3e85693cb636accee60edcbe6b4b4ec",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:48.853136+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "d8c54da5304667fd89adcc07e95b72186fd1457274af417a75e56d9dfe1e5e32",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "87/100",
+            "confidence": "87/100",
+            "is_conclusive": "True",
+            "narrative": "Internal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure."
+          },
+          "case_id": "case_088_calco_semantico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "39/250",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.87",
+              "motor_reason": "Intent score 0.4368 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.4368",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "results": {
+            "caie": {
+              "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+              "fracture_malice_boost": "0.36",
+              "fractures": [
+                {
+                  "interpretation": "Involuntary linguistic or behavioral trace (keyboard-layout slip, semantic calque, stylometric deviation, authorship linkage across personas) inconsistent with the claimed identity \u2014 or stylistic cons...",
+                  "severity": "0.8",
+                  "ttp_id": "T1036",
+                  "type": "LINGUISTIC_ATTRIBUTION_SIGNAL"
+                }
+              ],
+              "fractures_detected": "1",
+              "source": "motor_live_caie",
+              "status": "OK"
+            }
+          },
+          "signals": [
+            {
+              "artifact_id": "a088_01",
+              "confidence": "3/10",
+              "description": "Ticket: 'I need to check the state of the country'. Context: electric utility server.",
+              "evidence_type": "log_entry",
+              "source": "sift_ticket_system",
+              "z_score": "117/500"
+            },
+            {
+              "artifact_id": "a088_02",
+              "confidence": "3/20",
+              "description": "Semantic calque: 'state of the country' directly translates '\u0441\u0442\u0440\u0430\u043d\u0435', which in informal Russian means 'area/sector'. Literal translation error.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "123/1000"
+            },
+            {
+              "artifact_id": "a088_03",
+              "confidence": "19/20",
+              "description": "RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_tech'.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "57/1000"
+            },
+            {
+              "artifact_id": "a088_04",
+              "confidence": "7/20",
+              "description": "Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does not exist in the official repository; loaded from an unknown module.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "21/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:49.270599+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "3b58a224e20844f983318b287540528fd495a44f63163db1ff5e7a46e8bce20b",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:49.270727+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-006",
+        "entry_sha256": "3fc87e8392177bbb6b0034d3a0db61a066ba2529694620cec85ccac0eda8115e",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:49.270956+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:48.852600+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-006",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json",
+  "evidence_sha256": "d2ee8d66cfa0f1757e6dd55f2ba39d4e3c4a7ae3b4880765b0bf67a2908431f4",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-006 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-006.json\nEvidence SHA-256: d2ee8d66cfa0f1757e6dd55f2ba39d4e3c4a7ae3b4880765b0bf67a2908431f4\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 87/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_linguistic', 'sift_syslog', 'sift_ticket_system', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Ticket: 'I need to check the state of th=0.23, Command executed: 'Get-StateOfCountry -S=0.21, Semantic calque: 'state of the country' =0.12.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE (viva): 1 fractura(s) cross-artefacto contribuyeron al veredicto (boost +0.36).\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nInternal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Ticket: 'I need to check the state of the country'. Context: electric ] z=0.234 conf=0.30 \u2014 \n  [Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does no] z=0.210 conf=0.35 \u2014 \n  [Semantic calque: 'state of the country' directly translates '\u0441\u0442\u0440\u0430\u043d\u0435', ] z=0.123 conf=0.15 \u2014 \n  [RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_] z=0.057 conf=0.95 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine \u2014 motor) ---\n  Fractures: 1 | Malice boost aplicado: +0.36\n  Fracture: LINGUISTIC_ATTRIBUTION_SIGNAL severity=0.8 [T1036] \u2014 Involuntary linguistic or behavioral trace (keyboard-layout slip, semantic calque, stylometric deviation, authorship lin\n  1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "87/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 87
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "87/100",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "39/250"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Internal ticket in English uses 'state of the country' as a calque of '\u0441\u0442\u0440\u0430\u043d\u0435' (area/side in Russian) in an electric utility company. The error reveals a native-language thought structure."
+    },
+    "case_id": "case_088_calco_semantico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "39/250",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.87",
+        "motor_reason": "Intent score 0.4368 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.4368",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "results": {
+      "caie": {
+        "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+        "fracture_malice_boost": "0.36",
+        "fractures": [
+          {
+            "interpretation": "Involuntary linguistic or behavioral trace (keyboard-layout slip, semantic calque, stylometric deviation, authorship linkage across personas) inconsistent with the claimed identity \u2014 or stylistic consistency exceeding human biological variance, the signature of machine-fabricated style. The trace is genuine evidence ATTRIBUTING the action; no evidence-planting theory is asserted. Peirce Secondness: the index resists the claimed identity \u2014 habit betrays the actor.",
+            "severity": 0.8,
+            "ttp_id": "T1036",
+            "type": "LINGUISTIC_ATTRIBUTION_SIGNAL"
+          }
+        ],
+        "fractures_detected": 1,
+        "source": "motor_live_caie",
+        "status": "OK"
+      }
+    },
+    "signals": [
+      {
+        "artifact_id": "a088_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Ticket: 'I need to check the state of the country'. Context: electric utility server.",
+        "evidence_type": "log_entry",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "a088_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Semantic calque: 'state of the country' directly translates '\u0441\u0442\u0440\u0430\u043d\u0435', which in informal Russian means 'area/sector'. Literal translation error.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 123
+        }
+      },
+      {
+        "artifact_id": "a088_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "RDP session from IP geolocated in Moscow, timezone UTC+3, user 'field_tech'.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 57
+        }
+      },
+      {
+        "artifact_id": "a088_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Command executed: 'Get-StateOfCountry -ServerId NY-42'. Cmdlet does not exist in the official repository; loaded from an unknown module.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 21
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

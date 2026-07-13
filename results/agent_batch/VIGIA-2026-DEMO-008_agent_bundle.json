@@ -1,0 +1,296 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:58:26.370961+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-2026-DEMO-008",
+    "end_time": "2026-07-13T01:58:26.370967+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-2026-DEMO-008",
+        "entry_sha256": "0734e3b37c95eb7929e57067f0f09b8d8b0a549cc4ae40b43e719c9286202e9a",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-2026-DEMO-008"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:25.999008+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-2026-DEMO-008",
+        "entry_sha256": "1e5bac634baae235ff4f7c9794e2ec6e3cad4359e883541962ca0e9d6d17b52f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-008.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:25.999101+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-2026-DEMO-008",
+        "entry_sha256": "16ad15bc797d01d3e632272482a60d93aae55326f65b481c4067742f905c0540",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-008.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: ccbcc464be3d0869...",
+        "outputs_summary": {
+          "sha256": "ccbcc464be3d0869676dc77ba96fd9825d28c8219b42004129017a6a5611a7be"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:25.999195+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-2026-DEMO-008",
+        "entry_sha256": "fb0dd5b18e7c509c2ac00f01320db51830dffdba3a4ad900c3a63c720e6e63e6",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-008.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:25.999295+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-2026-DEMO-008",
+        "entry_sha256": "59f3c5777526cc6db6048b72dc6c93dfa8302babf991d4543b575e9954292bd2",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3/10",
+            "confidence": "3/10",
+            "is_conclusive": "False",
+            "narrative": "A company receives an external audit report concluding there were no accounting irregularities. The report is accompanied by system logs and a screenshot of the financial dashboard. VIG\u00cdA must correla..."
+          },
+          "case_id": "VIGIA-2026-DEMO-008",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "289/400",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.3",
+              "motor_reason": "Significant signal with structural support (score=0.1482)",
+              "motor_score": "0.1482",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "DOC-001",
+              "confidence": "17/20",
+              "description": "{'conclusion': 'No irregularities were detected in the Q1 2026 period. Accounting records are consistent with declared operations.', 'declared_author': 'Dra. Patricia Goldstein \u2014 Grant & Associates Au",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "LOG-001",
+              "confidence": "17/20",
+              "description": "2026-01-15 09:23:11 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100023441 AMOUNT:45000.00 ACCOUNT:6210 APPROVED:yes\n2026-01-15 09:23:45 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100023442 AMOUNT:45000.00 ",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "IMG-001",
+              "confidence": "17/20",
+              "description": "{'declared_content': 'Screenshot of SAP financial dashboard showing Q1 2026 balances in green, no alerts', 'dimensions': '1920x1080', 'file_size_kb': 847, 'format': 'PNG'}",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "META-001",
+              "confidence": "17/20",
+              "description": "From: p.goldstein@grant-associates.com\nTo: directorio@nexus-corp.com\nSubject: Q1 2026 Audit Report\nDate: Thu, 10 Apr 2026 09:15:22 -0300\nMessage-ID: <20260410091522.4821@grant-associates.com>\nX-Origin",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:26.370587+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-2026-DEMO-008",
+        "entry_sha256": "61cd8fd5cd83b94d81116374e1580276c026824fbab5be52b318332f79641b76",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:26.370713+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-2026-DEMO-008",
+        "entry_sha256": "1b6d0248079e85370f7f7283b7cceee5e5d8eb29eb3a367222ec75e1b206c5e1",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:26.370910+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:25.998787+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-2026-DEMO-008",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-008.json",
+  "evidence_sha256": "ccbcc464be3d0869676dc77ba96fd9825d28c8219b42004129017a6a5611a7be",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-2026-DEMO-008 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-2026-DEMO-008.json\nEvidence SHA-256: ccbcc464be3d0869676dc77ba96fd9825d28c8219b42004129017a6a5611a7be\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3/10\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: {'conclusion': 'No irregularities were d=0.72, 2026-01-15 09:23:11 USER:finanzas01 ACTI=0.72, {'declared_content': 'Screenshot of SAP =0.72.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nA company receives an external audit report concluding there were no accounting irregularities. The report is accompanied by system logs and a screenshot of the financial dashboard. VIG\u00cdA must correlate three independent sources to detect that all three were manipulated with the same objective.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [{'conclusion': 'No irregularities were detected in the Q1 2026 period.] z=0.723 conf=0.85 \u2014 \n  [2026-01-15 09:23:11 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100023441] z=0.723 conf=0.85 \u2014 \n  [{'declared_content': 'Screenshot of SAP financial dashboard showing Q1] z=0.723 conf=0.85 \u2014 \n  [From: p.goldstein@grant-associates.com\nTo: directorio@nexus-corp.com\nS] z=0.723 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3/10",
+      "confidence": {
+        "__fraction__": true,
+        "den": 10,
+        "num": 3
+      },
+      "is_conclusive": false,
+      "narrative": "A company receives an external audit report concluding there were no accounting irregularities. The report is accompanied by system logs and a screenshot of the financial dashboard. VIG\u00cdA must correlate three independent sources to detect that all three were manipulated with the same objective."
+    },
+    "case_id": "VIGIA-2026-DEMO-008",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "289/400",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.3",
+        "motor_reason": "Significant signal with structural support (score=0.1482)",
+        "motor_score": "0.1482",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "DOC-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'conclusion': 'No irregularities were detected in the Q1 2026 period. Accounting records are consistent with declared operations.', 'declared_author': 'Dra. Patricia Goldstein \u2014 Grant & Associates Au",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "LOG-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "2026-01-15 09:23:11 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100023441 AMOUNT:45000.00 ACCOUNT:6210 APPROVED:yes\n2026-01-15 09:23:45 USER:finanzas01 ACTION:JOURNAL_ENTRY DOC:100023442 AMOUNT:45000.00 ",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "IMG-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'declared_content': 'Screenshot of SAP financial dashboard showing Q1 2026 balances in green, no alerts', 'dimensions': '1920x1080', 'file_size_kb': 847, 'format': 'PNG'}",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "META-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "From: p.goldstein@grant-associates.com\nTo: directorio@nexus-corp.com\nSubject: Q1 2026 Audit Report\nDate: Thu, 10 Apr 2026 09:15:22 -0300\nMessage-ID: <20260410091522.4821@grant-associates.com>\nX-Origin",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

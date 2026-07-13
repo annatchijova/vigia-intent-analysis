@@ -1,0 +1,354 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:59:08.997615+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-045",
+    "end_time": "2026-07-13T01:59:08.997621+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-045",
+        "entry_sha256": "57abad9f9c3abcf58e7cce60b12e234c3c9f642a96483a799b9945bb9ff81105",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-045"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:59:08.602325+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-045",
+        "entry_sha256": "bd18ebf6e1c19692eda1961c2829c97604503498543722856a905477b10bf5ca",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:59:08.602407+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-045",
+        "entry_sha256": "5835ea2c9596c0be13d4f95f233bce5b04ccd1eaa16b1b9d99d93744cd209480",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: e5efe4d242441f7f...",
+        "outputs_summary": {
+          "sha256": "e5efe4d242441f7fb5465df990fbdfd42a884c003c3d41a6707b8999be1a861a"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:59:08.602497+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-045",
+        "entry_sha256": "2adfea7fefac12306127675ab128d28c8ff5734d16b7520a7bc894ccc2125022",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:59:08.602595+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-045",
+        "entry_sha256": "419107f49055933afcf7e39e4fb2cb6141049442cac2b22ac109ce326d91f2b3",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "PowerShell script from a US IT department has perfect English comments but uses angle quotes \u00ab \u00bb and non-breaking spaces typical of Cyrillic/European keyboards."
+          },
+          "case_id": "case_021_motin_comillas",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "723/4000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5135 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.5135",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "results": {
+            "caie": {
+              "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+              "fracture_malice_boost": "0.36",
+              "fractures": [
+                {
+                  "interpretation": "Involuntary linguistic or behavioral trace (keyboard-layout slip, semantic calque, stylometric deviation, authorship linkage across personas) inconsistent with the claimed identity \u2014 or stylistic cons...",
+                  "severity": "0.8",
+                  "ttp_id": "T1036",
+                  "type": "LINGUISTIC_ATTRIBUTION_SIGNAL"
+                }
+              ],
+              "fractures_detected": "1",
+              "source": "motor_live_caie",
+              "status": "OK"
+            }
+          },
+          "signals": [
+            {
+              "artifact_id": "a021_script",
+              "confidence": "13/20",
+              "description": "PowerShell script 'Update-GPO.ps1' with perfect English comments but angle quotes \u00ab \u00bb in strings and non-breaking spaces (U+00A0) between words.",
+              "evidence_type": "file_hash",
+              "source": "sift_file_audit",
+              "z_score": "221/400"
+            },
+            {
+              "artifact_id": "a021_locale",
+              "confidence": "3/20",
+              "description": "Locale leakage detection: angle quotes \u00ab\u00bb are characteristic of Russian keyboards (Windows ru-RU layout); NBSP between words indicates a Cyrillic input method.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "33/250"
+            },
+            {
+              "artifact_id": "a021_git",
+              "confidence": "9/20",
+              "description": "Script commit from a machine with git config user.name='Admin' but timezone Europe/Moscow and core.autocrlf=false.",
+              "evidence_type": "memory_process",
+              "source": "sift_git_audit",
+              "z_score": "9/400"
+            },
+            {
+              "artifact_id": "a021_exec",
+              "confidence": "2/5",
+              "description": "Script execution with -EncodedCommand parameter that downloads a payload from a .ru domain; digitally signed with a self-signed certificate 'Microsoft Windows'.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "2/125"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:59:08.996972+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-045",
+        "entry_sha256": "21303b523ebc8e632cef55b38e28332f064684bbc2d05fcc0741b776e5f81561",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:59:08.997112+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-045",
+        "entry_sha256": "1e1cbcdce49828eae9bb924f00d01bcf1bf54f0bade70d9f4c535f3b12ff31e8",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:59:08.997399+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:59:08.602099+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-045",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json",
+  "evidence_sha256": "e5efe4d242441f7fb5465df990fbdfd42a884c003c3d41a6707b8999be1a861a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-045 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-045.json\nEvidence SHA-256: e5efe4d242441f7fb5465df990fbdfd42a884c003c3d41a6707b8999be1a861a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_file_audit', 'sift_git_audit', 'sift_linguistic', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: PowerShell script 'Update-GPO.ps1' with =0.55, Locale leakage detection: angle quotes \u00ab=0.13, Script commit from a machine with git co=0.02.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE (viva): 1 fractura(s) cross-artefacto contribuyeron al veredicto (boost +0.36).\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nPowerShell script from a US IT department has perfect English comments but uses angle quotes \u00ab \u00bb and non-breaking spaces typical of Cyrillic/European keyboards.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [PowerShell script 'Update-GPO.ps1' with perfect English comments but a] z=0.552 conf=0.65 \u2014 \n  [Locale leakage detection: angle quotes \u00ab\u00bb are characteristic of Russia] z=0.132 conf=0.15 \u2014 \n  [Script commit from a machine with git config user.name='Admin' but tim] z=0.022 conf=0.45 \u2014 \n  [Script execution with -EncodedCommand parameter that downloads a paylo] z=0.016 conf=0.40 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine \u2014 motor) ---\n  Fractures: 1 | Malice boost aplicado: +0.36\n  Fracture: LINGUISTIC_ATTRIBUTION_SIGNAL severity=0.8 [T1036] \u2014 Involuntary linguistic or behavioral trace (keyboard-layout slip, semantic calque, stylometric deviation, authorship lin\n  1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "723/4000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "PowerShell script from a US IT department has perfect English comments but uses angle quotes \u00ab \u00bb and non-breaking spaces typical of Cyrillic/European keyboards."
+    },
+    "case_id": "case_021_motin_comillas",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "723/4000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5135 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.5135",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "results": {
+      "caie": {
+        "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+        "fracture_malice_boost": "0.36",
+        "fractures": [
+          {
+            "interpretation": "Involuntary linguistic or behavioral trace (keyboard-layout slip, semantic calque, stylometric deviation, authorship linkage across personas) inconsistent with the claimed identity \u2014 or stylistic consistency exceeding human biological variance, the signature of machine-fabricated style. The trace is genuine evidence ATTRIBUTING the action; no evidence-planting theory is asserted. Peirce Secondness: the index resists the claimed identity \u2014 habit betrays the actor.",
+            "severity": 0.8,
+            "ttp_id": "T1036",
+            "type": "LINGUISTIC_ATTRIBUTION_SIGNAL"
+          }
+        ],
+        "fractures_detected": 1,
+        "source": "motor_live_caie",
+        "status": "OK"
+      }
+    },
+    "signals": [
+      {
+        "artifact_id": "a021_script",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "PowerShell script 'Update-GPO.ps1' with perfect English comments but angle quotes \u00ab \u00bb in strings and non-breaking spaces (U+00A0) between words.",
+        "evidence_type": "file_hash",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 221
+        }
+      },
+      {
+        "artifact_id": "a021_locale",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Locale leakage detection: angle quotes \u00ab\u00bb are characteristic of Russian keyboards (Windows ru-RU layout); NBSP between words indicates a Cyrillic input method.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 33
+        }
+      },
+      {
+        "artifact_id": "a021_git",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "Script commit from a machine with git config user.name='Admin' but timezone Europe/Moscow and core.autocrlf=false.",
+        "evidence_type": "memory_process",
+        "source": "sift_git_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "a021_exec",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "Script execution with -EncodedCommand parameter that downloads a payload from a .ru domain; digitally signed with a self-signed certificate 'Microsoft Windows'.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 2
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

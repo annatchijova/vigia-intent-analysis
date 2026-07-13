@@ -1,0 +1,272 @@
+{
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-13T01:58:31.696956+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-BEN-010",
+    "end_time": "2026-07-13T01:58:31.696963+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "49375e47ec653c99e3bffae42e133d0746c1f582880ecdf8f08977e0583f5f15",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-BEN-010"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:31.289604+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "29e8360c640a8080fa3b007eb62c569e580c0a1ce40c8f1ed2e09ee2d7bc8584",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:31.289741+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "a99a32d40dc423ebc633b3998e0110f52091a8d66e9565ac53e7059901dd264a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 924072710139ca48...",
+        "outputs_summary": {
+          "sha256": "924072710139ca4852e638a9cd2b73e35b21d59a3f32ef8d6bfd5a0b34640b36"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:31.289866+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "5935735fc7c9c257d8e1f2fd41a32cb453d6f664d31e3649b842e234ba61ad95",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:31.290163+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "3c13590e7f59a962e758b8633c8a13bfe58b104ebdfb822fff6a34582d23e438",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "Email from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the wo..."
+          },
+          "case_id": "VIGIA-BEN-010",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "827/1200",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+              "motor_score": "0.0457",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "7/10",
+              "description": "From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Financial Report for investor board meeting | Date: 2024-03-15 08:00 | DKIM: PASS | SPF: PASS | Reply-To: ceo@company.com",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "49/100"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "17/20",
+              "description": "Calendar event: 'Investor Board Meeting \u2014 Q4 Presentation' | Date: 2024-03-15 10:00 | Location: Room A | Attendees: board_members, cfo, ceo | Created: 2024-02-01 by executive_assistant",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "9/10",
+              "description": "Email thread: 2024-03-08 | ceo\u2192cfo: 'Please prepare Q4 report for board meeting on the 15th' | cfo\u2192ceo: 'OK, I'll have it by the 12th' | 2024-03-12 | cfo\u2192ceo: 'Draft attached' | 2024-03-14 | ceo\u2192cfo: ",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "171/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:31.696553+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "3e82b41da0b15b855a01ef5201ab90843e0ecf693915fe064370e3c75d1cbff2",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:31.696681+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-BEN-010",
+        "entry_sha256": "410455faf4ab72a931a47034855c7f95def83bf377305297036ad721096aa0d5",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:31.696901+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:31.289292+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-BEN-010",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json",
+  "evidence_sha256": "924072710139ca4852e638a9cd2b73e35b21d59a3f32ef8d6bfd5a0b34640b36",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-010 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-010.json\nEvidence SHA-256: 924072710139ca4852e638a9cd2b73e35b21d59a3f32ef8d6bfd5a0b34640b36\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Email thread: 2024-03-08 | ceo\u2192cfo: 'Ple=0.85, Calendar event: 'Investor Board Meeting =0.72, From: ceo@company.com | To: cfo@company.=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEmail from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the word 'urgent' in board meeting contexts.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Email thread: 2024-03-08 | ceo\u2192cfo: 'Please prepare Q4 report for boar] z=0.855 conf=0.90 \u2014 \n  [Calendar event: 'Investor Board Meeting \u2014 Q4 Presentation' | Date: 202] z=0.723 conf=0.85 \u2014 \n  [From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Fina] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "is_conclusive": true,
+      "narrative": "Email from CEO with 'URGENT: I need the report for the investor board meeting in 2 hours'. It is real: the meeting is on the calendar, the report was requested a week ago, and the CEO only uses the word 'urgent' in board meeting contexts."
+    },
+    "case_id": "VIGIA-BEN-010",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "827/1200",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0457)",
+        "motor_score": "0.0457",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "From: ceo@company.com | To: cfo@company.com | Subject: URGENT: Q4 Financial Report for investor board meeting | Date: 2024-03-15 08:00 | DKIM: PASS | SPF: PASS | Reply-To: ceo@company.com",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 49
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Calendar event: 'Investor Board Meeting \u2014 Q4 Presentation' | Date: 2024-03-15 10:00 | Location: Room A | Attendees: board_members, cfo, ceo | Created: 2024-02-01 by executive_assistant",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Email thread: 2024-03-08 | ceo\u2192cfo: 'Please prepare Q4 report for board meeting on the 15th' | cfo\u2192ceo: 'OK, I'll have it by the 12th' | 2024-03-12 | cfo\u2192ceo: 'Draft attached' | 2024-03-14 | ceo\u2192cfo: ",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 3,
+    "n_total_signals": 3,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

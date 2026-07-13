@@ -1,0 +1,330 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:57:36.093638+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "FF-GENUINE-001",
+    "end_time": "2026-07-13T01:57:36.093646+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "0f15ba3b9ffabd61c2625b6c1d7b82750b9be9cd2954e222aa4551cdde2cb6e3",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "FF-GENUINE-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:35.720929+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "7b69ad96bb54ecf46f6c7d64e9d7ad0e3c258527363bf9a68c628ae338fb2ded",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:35.721011+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "95aa1309278f0f9d7e3f4fee6cd58dd8d197ca6b733178721ef75508e3c3482a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 3900f5762b64d74a...",
+        "outputs_summary": {
+          "sha256": "3900f5762b64d74ac1a090a10f3ae0e50b9b071cfc50d122dbda6d3953a076d2"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:35.721115+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "48e972418a8ce93ae08ca5bfea0aff20daf39f9e5c818b5419cf848d25b8df12",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:35.721219+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "05d286078633d82263f5f0f4296c79e9208e674a25aff9bc53315cdaf889365d",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "A real compromise: process hollowing and LSASS credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted suspiciously pristine Russian-..."
+          },
+          "case_id": "FF-GENUINE-001",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "238/375",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.8230 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 3 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.823",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "results": {
+            "caie": {
+              "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.3825 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+              "fracture_malice_boost": "0.3825",
+              "fractures": [
+                {
+                  "interpretation": "Real malicious event confirmed (high technical score) with cultural attribution markers that contradict the observed TTP profile. The markers were engineered to misdirect attribution. MALICE belongs t...",
+                  "severity": "0.85",
+                  "ttp_id": "T1036.005",
+                  "type": "FALSE_FLAG_ATTRIBUTION_MISMATCH"
+                }
+              ],
+              "fractures_detected": "1",
+              "source": "motor_live_caie",
+              "status": "OK"
+            }
+          },
+          "signals": [
+            {
+              "artifact_id": "tech_real_001",
+              "confidence": "19/20",
+              "description": "Process hollowing in svchost.exe confirmed (T1055.012). Reflective DLL injection. Structural, hard-to-fake evidence of a real intrusion.",
+              "evidence_type": "memory_process",
+              "source": "list_processes",
+              "z_score": "209/250"
+            },
+            {
+              "artifact_id": "tech_real_002",
+              "confidence": "19/20",
+              "description": "LSASS credential dumping detected (T1003.001). Active compromise, not a clean system.",
+              "evidence_type": "lsass_session",
+              "source": "list_processes",
+              "z_score": "399/500"
+            },
+            {
+              "artifact_id": "cultural_planted_001",
+              "confidence": "3/10",
+              "description": "Suspiciously pristine Russian-language strings injected into the dropper, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile.",
+              "evidence_type": "cultural_marker",
+              "source": "infer_intent",
+              "z_score": "27/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:36.093098+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "85fee95854ca36fd8be42abe6fcac8dba58a3829df47961d5816e93b5b019481",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:36.093236+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "FF-GENUINE-001",
+        "entry_sha256": "eeb8682f2e5be1e24c369979df8ea0e06e6fefd76170027758b5738c3054494e",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:36.093449+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:35.720709+00:00",
+    "total_entries": 7
+  },
+  "case_id": "FF-GENUINE-001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json",
+  "evidence_sha256": "3900f5762b64d74ac1a090a10f3ae0e50b9b071cfc50d122dbda6d3953a076d2",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE FF-GENUINE-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/FF-GENUINE-001.json\nEvidence SHA-256: 3900f5762b64d74ac1a090a10f3ae0e50b9b071cfc50d122dbda6d3953a076d2\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['infer_intent', 'list_processes'], 0 derivada(s)/no-analizada(s). Top z: Process hollowing in svchost.exe confirm=0.84, LSASS credential dumping detected (T1003=0.80, Suspiciously pristine Russian-language s=0.27.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE (viva): 1 fractura(s) cross-artefacto contribuyeron al veredicto (boost +0.3825).\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nA real compromise: process hollowing and LSASS credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted suspiciously pristine Russian-language strings whose profile contradicts the actual TTPs and OPSEC. This is what a real false flag looks like: the malicious event is PRESENT, and the attribution is engineered to misdirect. MALICE is correct here \u2014 and it belongs to the framer, not to any Russian-speaker.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Process hollowing in svchost.exe confirmed (T1055.012). Reflective DLL] z=0.836 conf=0.95 \u2014 \n  [LSASS credential dumping detected (T1003.001). Active compromise, not ] z=0.798 conf=0.95 \u2014 \n  [Suspiciously pristine Russian-language strings injected into the dropp] z=0.270 conf=0.30 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine \u2014 motor) ---\n  Fractures: 1 | Malice boost aplicado: +0.3825\n  Fracture: FALSE_FLAG_ATTRIBUTION_MISMATCH severity=0.85 [T1036.005] \u2014 Real malicious event confirmed (high technical score) with cultural attribution markers that contradict the observed TTP\n  1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.3825 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "238/375"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "A real compromise: process hollowing and LSASS credential dumping confirmed in memory (hard-to-fake structural evidence). On top of the real attack, the operator planted suspiciously pristine Russian-language strings whose profile contradicts the actual TTPs and OPSEC. This is what a real false flag looks like: the malicious event is PRESENT, and the attribution is engineered to misdirect. MALICE is correct here \u2014 and it belongs to the framer, not to any Russian-speaker."
+    },
+    "case_id": "FF-GENUINE-001",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "238/375",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.8230 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 3 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.823",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "results": {
+      "caie": {
+        "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.3825 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+        "fracture_malice_boost": "0.3825",
+        "fractures": [
+          {
+            "interpretation": "Real malicious event confirmed (high technical score) with cultural attribution markers that contradict the observed TTP profile. The markers were engineered to misdirect attribution. MALICE belongs to the planter, not to whoever writes in the indicated language. Peirce Thirdness: the HABIT is deliberate deception of origin. MITRE T1036.005 \u2014 Masquerading.",
+            "severity": 0.85,
+            "ttp_id": "T1036.005",
+            "type": "FALSE_FLAG_ATTRIBUTION_MISMATCH"
+          }
+        ],
+        "fractures_detected": 1,
+        "source": "motor_live_caie",
+        "status": "OK"
+      }
+    },
+    "signals": [
+      {
+        "artifact_id": "tech_real_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Process hollowing in svchost.exe confirmed (T1055.012). Reflective DLL injection. Structural, hard-to-fake evidence of a real intrusion.",
+        "evidence_type": "memory_process",
+        "source": "list_processes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 209
+        }
+      },
+      {
+        "artifact_id": "tech_real_002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "LSASS credential dumping detected (T1003.001). Active compromise, not a clean system.",
+        "evidence_type": "lsass_session",
+        "source": "list_processes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 399
+        }
+      },
+      {
+        "artifact_id": "cultural_planted_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Suspiciously pristine Russian-language strings injected into the dropper, inconsistent with the actor's actual toolchain and OPSEC. Attribution markers contradict the observed technical TTP profile.",
+        "evidence_type": "cultural_marker",
+        "source": "infer_intent",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 27
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 3,
+    "n_total_signals": 3,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

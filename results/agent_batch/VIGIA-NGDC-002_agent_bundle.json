@@ -1,0 +1,376 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:57:56.537406+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-NGDC-002",
+    "end_time": "2026-07-13T01:57:56.537413+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-NGDC-002",
+        "entry_sha256": "6057a6322da13dd3ad288899ee2d06954e774e121f8a315c0e8a3cfe5c399604",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-NGDC-002"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:56.146928+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NGDC-002",
+        "entry_sha256": "03283d3843a17d789c32b09e87e4f5df16cee8e851505d4cd2531848746df485",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:56.147011+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-NGDC-002",
+        "entry_sha256": "345b2654e382b3580c6cae8d7128037801fac125bd71b383b55e3e88b25af268",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1737a0ffddf291ee...",
+        "outputs_summary": {
+          "sha256": "1737a0ffddf291ee2652221d1bacfb50f311c8f1e5a278e89d15dbbe26c09a02"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:56.147129+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-NGDC-002",
+        "entry_sha256": "a79573409dcefc60e916db562559de3582f0404296b6f83181e56c4285041ed4",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:56.147234+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-NGDC-002",
+        "entry_sha256": "4381d522833a591f73e1428671e7de2518fe510e87f9186b4162ea599d30b239",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 7 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "Tracy is a National Gallery DC supervisor recruited by Carry as an insider asset. Evidence sourced from two independent channels: (1) keystroke logs captured by LogKext Daemon on Tracy's MacBook Air, ..."
+          },
+          "case_id": "VIGIA-NGDC-002",
+          "pipeline_meta": {
+            "artifact_count": "7",
+            "avg_score": "3429/4375",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.4785 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 6 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.4785",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ngdc002_01",
+              "confidence": "22/25",
+              "description": "Keystroke log captures Tracy composing the following text on 2012-07-03: 'I was told that we are supposed to be receiving a rare collection of stamps. That would explain why the shipping information l",
+              "evidence_type": "keylogger_capture",
+              "source": "LogKext Daemon v? \u2014 MacOS keylogger, cron+postfix exfiltration to joe.sum.twelve@gmail.com \u2014 logfile-2012-07-03-1000.eml",
+              "z_score": "517/625"
+            },
+            {
+              "artifact_id": "ngdc002_02",
+              "confidence": "17/20",
+              "description": "Keystroke logs from June 28-29 capture Tracy establishing contact with Carry via Thunderbird. On June 28: password 'legalBee' entered, email typed to 'coralblue22[corrections]uetwo@hotmail.com' \u2014 Carr",
+              "evidence_type": "keylogger_capture",
+              "source": "LogKext Daemon \u2014 logfile-2012-06-28-1600.eml + logfile-2012-06-29-1100.eml",
+              "z_score": "1479/2000"
+            },
+            {
+              "artifact_id": "ngdc002_03",
+              "confidence": "93/100",
+              "description": "Tracy responds to Carry's tablet smuggling request: 'Hey, I can definitely help get your tablet in. Our security guards can be pretty ridiculous sometimes! When would you want to get in and take a loo",
+              "evidence_type": "email_content",
+              "source": "sqlite3 \u2014 EmailProviderBody.db messageKey=23, extracted from carry-tablet-2012-07-16-final.E01",
+              "z_score": "8463/10000"
+            },
+            {
+              "artifact_id": "ngdc002_04",
+              "confidence": "93/100",
+              "description": "Tracy responds to Carry's request for security shift schedules in exchange for cash. Full text: 'Okay carrie I'm going to send this but you need to make sure no one else sees it okay I could get in a ",
+              "evidence_type": "email_content",
+              "source": "sqlite3 \u2014 EmailProviderBody.db messageKey=25",
+              "z_score": "558/625"
+            },
+            {
+              "artifact_id": "ngdc002_05",
+              "confidence": "23/25",
+              "description": "After Carry's operational security lapse ('It willbe gun'), Tracy asks 'What do you mean by that?' \u2014 showing she perceived the anomaly. Carry corrects to 'It will be fun. Sorry... it's the keyboard on",
+              "evidence_type": "email_content",
+              "source": "sqlite3 \u2014 EmailProviderBody.db messageKey=27",
+              "z_score": "2047/2500"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:56.536817+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-NGDC-002",
+        "entry_sha256": "7c86d9c2cc4eed1150ad135ce48f13725aea87faa3642cd88860e257a286cbf1",
+        "inputs_summary": {
+          "n_signals": "7"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:56.536961+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-NGDC-002",
+        "entry_sha256": "3e0787a27fa492e61cb752e6d4ed88bcd9ae42db0eb79148b17552b60849da97",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:56.537204+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:56.146706+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-NGDC-002",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json",
+  "evidence_sha256": "1737a0ffddf291ee2652221d1bacfb50f311c8f1e5a278e89d15dbbe26c09a02",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-NGDC-002 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-NGDC-002.json\nEvidence SHA-256: 1737a0ffddf291ee2652221d1bacfb50f311c8f1e5a278e89d15dbbe26c09a02\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 7 se\u00f1al(es): 7 primaria(s) de ['Digital Corpora scenario documentation + keylogger aggregate', 'LogKext Daemon v? \u2014 MacOS keylogger, cron+postfix exfiltration to joe.sum.twelve@gmail.com \u2014 logfile-2012-07-03-1000.eml', 'LogKext Daemon \u2014 logfile-2012-06-28-1600.eml + logfile-2012-06-29-1100.eml', 'LogKext Daemon \u2014 logfile-2012-07-12-1200.eml', 'sqlite3 \u2014 EmailProviderBody.db messageKey=23, extracted from carry-tablet-2012-07-16-final.E01', 'sqlite3 \u2014 EmailProviderBody.db messageKey=25', 'sqlite3 \u2014 EmailProviderBody.db messageKey=27'], 0 derivada(s)/no-analizada(s). Top z: Tracy responds to Carry's request for se=0.89, Tracy responds to Carry's tablet smuggli=0.85, Keystroke log captures Tracy composing t=0.83.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nTracy is a National Gallery DC supervisor recruited by Carry as an insider asset. Evidence sourced from two independent channels: (1) keystroke logs captured by LogKext Daemon on Tracy's MacBook Air, exfiltrated hourly via cron+postfix to joe.sum.twelve@gmail.com and recovered from email.zip (Digital Corpora); (2) the outbound side of Tracy's correspondence recovered from EmailProviderBody.db extracted from carry-tablet-2012-07-16-final.E01. Tracy was not the initiator and did not know the real \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Tracy responds to Carry's request for security shift schedules in exch] z=0.893 conf=0.93 \u2014 \n  [Tracy responds to Carry's tablet smuggling request: 'Hey, I can defini] z=0.846 conf=0.93 \u2014 \n  [Keystroke log captures Tracy composing the following text on 2012-07-0] z=0.827 conf=0.88 \u2014 \n  [After Carry's operational security lapse ('It willbe gun'), Tracy asks] z=0.819 conf=0.92 \u2014 \n  [Keystroke logs from June 28-29 capture Tracy establishing contact with] z=0.740 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 7 | Derived: 0 | Total: 7",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "3429/4375"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Tracy is a National Gallery DC supervisor recruited by Carry as an insider asset. Evidence sourced from two independent channels: (1) keystroke logs captured by LogKext Daemon on Tracy's MacBook Air, exfiltrated hourly via cron+postfix to joe.sum.twelve@gmail.com and recovered from email.zip (Digital Corpora); (2) the outbound side of Tracy's correspondence recovered from EmailProviderBody.db extracted from carry-tablet-2012-07-16-final.E01. Tracy was not the initiator and did not know the real "
+    },
+    "case_id": "VIGIA-NGDC-002",
+    "pipeline_meta": {
+      "artifact_count": 7,
+      "avg_score": "3429/4375",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.4785 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 6 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.4785",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ngdc002_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "Keystroke log captures Tracy composing the following text on 2012-07-03: 'I was told that we are supposed to be receiving a rare collection of stamps. That would explain why the shipping information l",
+        "evidence_type": "keylogger_capture",
+        "source": "LogKext Daemon v? \u2014 MacOS keylogger, cron+postfix exfiltration to joe.sum.twelve@gmail.com \u2014 logfile-2012-07-03-1000.eml",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 517
+        }
+      },
+      {
+        "artifact_id": "ngdc002_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Keystroke logs from June 28-29 capture Tracy establishing contact with Carry via Thunderbird. On June 28: password 'legalBee' entered, email typed to 'coralblue22[corrections]uetwo@hotmail.com' \u2014 Carr",
+        "evidence_type": "keylogger_capture",
+        "source": "LogKext Daemon \u2014 logfile-2012-06-28-1600.eml + logfile-2012-06-29-1100.eml",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1479
+        }
+      },
+      {
+        "artifact_id": "ngdc002_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "Tracy responds to Carry's tablet smuggling request: 'Hey, I can definitely help get your tablet in. Our security guards can be pretty ridiculous sometimes! When would you want to get in and take a loo",
+        "evidence_type": "email_content",
+        "source": "sqlite3 \u2014 EmailProviderBody.db messageKey=23, extracted from carry-tablet-2012-07-16-final.E01",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10000,
+          "num": 8463
+        }
+      },
+      {
+        "artifact_id": "ngdc002_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "Tracy responds to Carry's request for security shift schedules in exchange for cash. Full text: 'Okay carrie I'm going to send this but you need to make sure no one else sees it okay I could get in a ",
+        "evidence_type": "email_content",
+        "source": "sqlite3 \u2014 EmailProviderBody.db messageKey=25",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 558
+        }
+      },
+      {
+        "artifact_id": "ngdc002_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 23
+        },
+        "description": "After Carry's operational security lapse ('It willbe gun'), Tracy asks 'What do you mean by that?' \u2014 showing she perceived the anomaly. Carry corrects to 'It will be fun. Sorry... it's the keyboard on",
+        "evidence_type": "email_content",
+        "source": "sqlite3 \u2014 EmailProviderBody.db messageKey=27",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 2047
+        }
+      },
+      {
+        "artifact_id": "ngdc002_06",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 21
+        },
+        "description": "Final keylogger capture before seizure. Tracy accesses coralblue2@yahoo.com \u2014 Carry's Yahoo operational account (confirmed in carry-tablet EmailProvider.db HostAuth). This is the same account Carry us",
+        "evidence_type": "keylogger_capture",
+        "source": "LogKext Daemon \u2014 logfile-2012-07-12-1200.eml",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 357
+        }
+      },
+      {
+        "artifact_id": "ngdc002_07",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 41
+        },
+        "description": "Keylogger captures Tracy searching 'national gallery exhibit' and 'value of international' on July 2 and 5 respectively \u2014 before Carry's approach and before the stamp identification in ngdc002_01. Tra",
+        "evidence_type": "behavioral_profile",
+        "source": "Digital Corpora scenario documentation + keylogger aggregate",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5000,
+          "num": 3239
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 7,
+    "n_total_signals": 7,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

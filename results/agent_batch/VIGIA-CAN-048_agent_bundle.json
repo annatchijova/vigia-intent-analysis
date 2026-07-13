@@ -1,0 +1,378 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:59:10.511230+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-048",
+    "end_time": "2026-07-13T01:59:10.511237+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "eacb798456b21272dd6e50b503eaa66b37d0a582c23c6c3eb46fbc6aec461f14",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-048"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:59:10.114353+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "7459042ae85044c1be17fb183d581e474267cba8c5e2d77e4adc2f35d06ef106",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:59:10.114436+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "b31d3c67463d9e7c5457e8abfce04c136a6bbca41b53e6d1dfc29a1353c80e94",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: ee68973acb7f9e7a...",
+        "outputs_summary": {
+          "sha256": "ee68973acb7f9e7a562f8e41e82d57cbf050f07deedd3704dacf21eada614415"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:59:10.114533+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "b04c60e7e78cf9137f736fa79a3da0ac49adfe649fc8e34b94c0883cbb6d21ab",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:59:10.114633+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "369850a8ab8a0360990edc4473a72b92b6041d0e314ff83bfeb8e915f05854e5",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "4/5",
+            "confidence": "4/5",
+            "is_conclusive": "True",
+            "narrative": "During a real network incident, multiple accounts send coordinated panic messages ('did you see that too?', 'Were we hacked?') that have no technical correlate. Objective: saturate the SOC's triage ca..."
+          },
+          "case_id": "case_fusion_panico_coordinado",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "63/1250",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.8",
+              "motor_reason": "Intent score 0.3979 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 5 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.3979",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "results": {
+            "caie": {
+              "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+              "fracture_malice_boost": "0.36",
+              "fractures": [
+                {
+                  "interpretation": "Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normalization, fabricated authority, defensive aggression, coordinated panic, instrumenta...",
+                  "severity": "0.8",
+                  "ttp_id": "T1656",
+                  "type": "SOCIAL_ENGINEERING_PATTERN"
+                }
+              ],
+              "fractures_detected": "1",
+              "source": "motor_live_caie",
+              "status": "OK"
+            }
+          },
+          "signals": [
+            {
+              "artifact_id": "f001_chat",
+              "confidence": "3/10",
+              "description": "17 messages in #general within a 90-second window: 'did you see that too?', 'how is it possible you didn't know', 'I already knew something was wrong'.",
+              "evidence_type": "log_entry",
+              "source": "sift_slack_export",
+              "z_score": "21/1000"
+            },
+            {
+              "artifact_id": "f001_tickets",
+              "confidence": "3/10",
+              "description": "12 simultaneous support tickets from different accounts: 'Can't access mail', 'Server is down', 'Were we hacked?'",
+              "evidence_type": "log_entry",
+              "source": "sift_ticket_system",
+              "z_score": "9/500"
+            },
+            {
+              "artifact_id": "f001_o365",
+              "confidence": "9/20",
+              "description": "O365 logs: 11 of 12 reporting accounts have a successful login in the last hour, no failed attempts. 1 account does not exist in AD.",
+              "evidence_type": "log_entry",
+              "source": "sift_o365_audit",
+              "z_score": "9/250"
+            },
+            {
+              "artifact_id": "f001_real",
+              "confidence": "19/20",
+              "description": "During the semantic panic window, process cobalt_strike.beacon active on the file server performing lateral reconnaissance.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "57/1000"
+            },
+            {
+              "artifact_id": "f001_stylometry",
+              "confidence": "3/20",
+              "description": "Stylometric analysis: 15 of 17 Slack messages share an entropy of 0.11 bits and identical punctuation pattern (space before question mark).",
+              "evidence_type": "cultural_marker",
+              "source": "sift_linguistic",
+              "z_score": "3/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:59:10.510656+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "497cd861cdbc2fd78f3a35f8f80929f8ff3a2d21dd73bcb96a84d3b4d99e4109",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:59:10.510786+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-048",
+        "entry_sha256": "b3a72d768d475efdf10787d8d726e071b5227c2b79e13945eaaa9046abbc442a",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:59:10.511022+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:59:10.114128+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-048",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json",
+  "evidence_sha256": "ee68973acb7f9e7a562f8e41e82d57cbf050f07deedd3704dacf21eada614415",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-048 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-048.json\nEvidence SHA-256: ee68973acb7f9e7a562f8e41e82d57cbf050f07deedd3704dacf21eada614415\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 4/5\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_linguistic', 'sift_o365_audit', 'sift_slack_export', 'sift_ticket_system', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Stylometric analysis: 15 of 17 Slack mes=0.12, During the semantic panic window, proces=0.06, O365 logs: 11 of 12 reporting accounts h=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE (viva): 1 fractura(s) cross-artefacto contribuyeron al veredicto (boost +0.36).\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDuring a real network incident, multiple accounts send coordinated panic messages ('did you see that too?', 'Were we hacked?') that have no technical correlate. Objective: saturate the SOC's triage capacity.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Stylometric analysis: 15 of 17 Slack messages share an entropy of 0.11] z=0.120 conf=0.15 \u2014 \n  [During the semantic panic window, process cobalt_strike.beacon active ] z=0.057 conf=0.95 \u2014 \n  [O365 logs: 11 of 12 reporting accounts have a successful login in the ] z=0.036 conf=0.45 \u2014 \n  [17 messages in #general within a 90-second window: 'did you see that t] z=0.021 conf=0.30 \u2014 \n  [12 simultaneous support tickets from different accounts: 'Can't access] z=0.018 conf=0.30 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine \u2014 motor) ---\n  Fractures: 1 | Malice boost aplicado: +0.36\n  Fracture: SOCIAL_ENGINEERING_PATTERN severity=0.8 [T1656] \u2014 Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normaliza\n  1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "4/5",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 4
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "4/5",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "63/1250"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "During a real network incident, multiple accounts send coordinated panic messages ('did you see that too?', 'Were we hacked?') that have no technical correlate. Objective: saturate the SOC's triage capacity."
+    },
+    "case_id": "case_fusion_panico_coordinado",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "63/1250",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.8",
+        "motor_reason": "Intent score 0.3979 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 5 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.3979",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "results": {
+      "caie": {
+        "daubert_note": "1 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.36 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+        "fracture_malice_boost": "0.36",
+        "fractures": [
+          {
+            "interpretation": "Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normalization, fabricated authority, defensive aggression, coordinated panic, instrumental doubt). No cultural-attribution claim is made and no evidence-planting theory is asserted. Peirce Thirdness: the HABIT is to neutralize the human verifier, not to disguise origin.",
+            "severity": 0.8,
+            "ttp_id": "T1656",
+            "type": "SOCIAL_ENGINEERING_PATTERN"
+          }
+        ],
+        "fractures_detected": 1,
+        "source": "motor_live_caie",
+        "status": "OK"
+      }
+    },
+    "signals": [
+      {
+        "artifact_id": "f001_chat",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "17 messages in #general within a 90-second window: 'did you see that too?', 'how is it possible you didn't know', 'I already knew something was wrong'.",
+        "evidence_type": "log_entry",
+        "source": "sift_slack_export",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "f001_tickets",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "12 simultaneous support tickets from different accounts: 'Can't access mail', 'Server is down', 'Were we hacked?'",
+        "evidence_type": "log_entry",
+        "source": "sift_ticket_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "f001_o365",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "O365 logs: 11 of 12 reporting accounts have a successful login in the last hour, no failed attempts. 1 account does not exist in AD.",
+        "evidence_type": "log_entry",
+        "source": "sift_o365_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "f001_real",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "During the semantic panic window, process cobalt_strike.beacon active on the file server performing lateral reconnaissance.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 57
+        }
+      },
+      {
+        "artifact_id": "f001_stylometry",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        },
+        "description": "Stylometric analysis: 15 of 17 Slack messages share an entropy of 0.11 bits and identical punctuation pattern (space before question mark).",
+        "evidence_type": "cultural_marker",
+        "source": "sift_linguistic",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 5,
+    "n_total_signals": 5,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

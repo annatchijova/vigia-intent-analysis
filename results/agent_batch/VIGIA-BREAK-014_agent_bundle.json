@@ -1,0 +1,1856 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:57:41.306455+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-BREAK-014",
+    "end_time": "2026-07-13T01:57:41.306461+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-BREAK-014",
+        "entry_sha256": "2b3bbe27a13317a45dac561d49f7f927abd1666401691b68310b9bf0df3ac25f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-BREAK-014"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:40.616051+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-014",
+        "entry_sha256": "281e9fd7986c7c74205db293cd6ad9a93f062f6d740a7bde08b0029d79304128",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-014.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:40.616234+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-014",
+        "entry_sha256": "3e8927e62d22bd7734ccf6d7f6d1907ba3690f953e24561a13ea7679b1a6e63a",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-014.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: aebd0e949ec8d873...",
+        "outputs_summary": {
+          "sha256": "aebd0e949ec8d873ab31399d14e1ce9b294da46309a37a3ae612919a0159213f"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:40.616465+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-BREAK-014",
+        "entry_sha256": "dfa67077fb3c05ef6df3012888600c186e314d2c82b566e669a3a82c50aaca9c",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-014.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:40.616568+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-BREAK-014",
+        "entry_sha256": "bde7b86108cc341ac77f54f70e621fd42aaf366041bfd8ab3d37c61e0d67b876",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 101 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "23/50",
+            "confidence": "23/50",
+            "is_conclusive": "True",
+            "narrative": "100 legitimate artifacts are generated. 95 are irrelevant. 5 are decisive. The test: can VIG\u00cdA ignore true but irrelevant evidence? Filtering false evidence is easy. Filtering true but irrelevant evid..."
+          },
+          "case_id": "VIGIA-BREAK-014",
+          "pipeline_meta": {
+            "artifact_count": "101",
+            "avg_score": "4807/101000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.46",
+              "motor_reason": "Significant signal with structural support (score=0.2322)",
+              "motor_score": "0.2322",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "b014_01",
+              "confidence": "4/5",
+              "description": "GET /about from IP 190.12.88.1 (legitimate user)",
+              "evidence_type": "log_entry",
+              "source": "sift_apache_access",
+              "z_score": "1/25"
+            },
+            {
+              "artifact_id": "b014_02",
+              "confidence": "4/5",
+              "description": "GET /contact from IP 190.12.88.2 (legitimate user)",
+              "evidence_type": "log_entry",
+              "source": "sift_apache_access",
+              "z_score": "1/25"
+            },
+            {
+              "artifact_id": "b014_03",
+              "confidence": "4/5",
+              "description": "GET /products from IP 190.12.88.3 (legitimate user)",
+              "evidence_type": "log_entry",
+              "source": "sift_apache_access",
+              "z_score": "1/25"
+            },
+            {
+              "artifact_id": "b014_04",
+              "confidence": "4/5",
+              "description": "GET /services from IP 190.12.88.4 (legitimate user)",
+              "evidence_type": "log_entry",
+              "source": "sift_apache_access",
+              "z_score": "1/25"
+            },
+            {
+              "artifact_id": "b014_05",
+              "confidence": "4/5",
+              "description": "GET /team from IP 190.12.88.5 (legitimate user)",
+              "evidence_type": "log_entry",
+              "source": "sift_apache_access",
+              "z_score": "1/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:41.305030+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-BREAK-014",
+        "entry_sha256": "93b9e0fc5f0fb6093907916ab958ad2b2469a420bb3cfd1e6e77644c50efb02c",
+        "inputs_summary": {
+          "n_signals": "101"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:41.305631+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-BREAK-014",
+        "entry_sha256": "f134ae9b81e5a57e37d956b50980947b326df68554764344d1d65480e05eded3",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:41.306391+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:40.615832+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-BREAK-014",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-014.json",
+  "evidence_sha256": "aebd0e949ec8d873ab31399d14e1ce9b294da46309a37a3ae612919a0159213f",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-014 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-014.json\nEvidence SHA-256: aebd0e949ec8d873ab31399d14e1ce9b294da46309a37a3ae612919a0159213f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 23/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 101 se\u00f1al(es): 101 primaria(s) de ['sift_apache_access', 'sift_baseline_analyzer'], 0 derivada(s)/no-analizada(s). Top z: Historical baseline: IT department (10.0=0.78, POST /admin/config.php from internal IP =0.04, POST /admin/config.php from internal IP =0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n100 legitimate artifacts are generated. 95 are irrelevant. 5 are decisive. The test: can VIG\u00cdA ignore true but irrelevant evidence? Filtering false evidence is easy. Filtering true but irrelevant evidence is much harder.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Historical baseline: IT department (10.0.1.0/24) has 0 accesses to /ad] z=0.782 conf=0.85 \u2014 \n  [POST /admin/config.php from internal IP 10.0.1.50, body_size=0] z=0.045 conf=0.30 \u2014 \n  [POST /admin/config.php from internal IP 10.0.1.50, body_size=0] z=0.045 conf=0.30 \u2014 \n  [POST /admin/config.php from internal IP 10.0.1.50, body_size=0] z=0.045 conf=0.30 \u2014 \n  [POST /admin/config.php from internal IP 10.0.1.50, body_size=0] z=0.045 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 101 | Derived: 0 | Total: 101",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "23/50",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 23
+      },
+      "is_conclusive": true,
+      "narrative": "100 legitimate artifacts are generated. 95 are irrelevant. 5 are decisive. The test: can VIG\u00cdA ignore true but irrelevant evidence? Filtering false evidence is easy. Filtering true but irrelevant evidence is much harder."
+    },
+    "case_id": "VIGIA-BREAK-014",
+    "pipeline_meta": {
+      "artifact_count": 101,
+      "avg_score": "4807/101000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.46",
+        "motor_reason": "Significant signal with structural support (score=0.2322)",
+        "motor_score": "0.2322",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "b014_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.1 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.2 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.3 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.4 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.5 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_06",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.6 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_07",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.7 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_08",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.8 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_09",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.9 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_10",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.10 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_11",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.11 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_12",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.12 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_13",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.13 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_14",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.14 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_15",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.15 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_16",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.16 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_17",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.17 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_18",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.18 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_19",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.19 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_20",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.20 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_21",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.21 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_22",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.22 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_23",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.23 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_24",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.24 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_25",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.25 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_26",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.26 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_27",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.27 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_28",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.28 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_29",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.29 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_30",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.30 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_31",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.31 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_32",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.32 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_33",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.33 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_34",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.34 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_35",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.35 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_36",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.36 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_37",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.37 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_38",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.38 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_39",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.39 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_40",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.40 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_41",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.41 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_42",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.42 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_43",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.43 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_44",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.44 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_45",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.45 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_46",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.46 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_47",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.47 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_48",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.48 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_49",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.49 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_50",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.50 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_51",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.51 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_52",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.52 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_53",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.53 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_54",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.54 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_55",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.55 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_56",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.56 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_57",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.57 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_58",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.58 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_59",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.59 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_60",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.60 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_61",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.61 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_62",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.62 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_63",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.63 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_64",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.64 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_65",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.65 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_66",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.66 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_67",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.67 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_68",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.68 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_69",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.69 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_70",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.70 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_71",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.71 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_72",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.72 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_73",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.73 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_74",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.74 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_75",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.75 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_76",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.76 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_77",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.77 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_78",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.78 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_79",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.79 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_80",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.80 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_81",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.81 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_82",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.82 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_83",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.83 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_84",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.84 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_85",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.85 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_86",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.86 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_87",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.87 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_88",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.88 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_89",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.89 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_90",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET / from IP 190.12.88.90 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_91",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /about from IP 190.12.88.91 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_92",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /contact from IP 190.12.88.92 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_93",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /products from IP 190.12.88.93 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_94",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /services from IP 190.12.88.94 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_95",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "GET /team from IP 190.12.88.95 (legitimate user)",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "b014_96",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "POST /admin/config.php from internal IP 10.0.1.50, body_size=0",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "b014_97",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "POST /admin/config.php from internal IP 10.0.1.50, body_size=0",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "b014_98",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "POST /admin/config.php from internal IP 10.0.1.50, body_size=0",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "b014_99",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "POST /admin/config.php from internal IP 10.0.1.50, body_size=0",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "b014_100",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "POST /admin/config.php from internal IP 10.0.1.50, body_size=0",
+        "evidence_type": "log_entry",
+        "source": "sift_apache_access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "b014_meta",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Historical baseline: IT department (10.0.1.0/24) has 0 accesses to /admin/config.php in 2 years. All 5 POSTs have body_size=0 (anomalous for POST).",
+        "evidence_type": "memory_process",
+        "source": "sift_baseline_analyzer",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 391
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 101,
+    "n_total_signals": 101,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

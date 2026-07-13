@@ -1,0 +1,320 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:58:00.380443+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-003",
+    "end_time": "2026-07-13T01:58:00.380449+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-003",
+        "entry_sha256": "9c8d82cc08192547a18b68cb9627a902ec2bd146c0522a4b2a00cf3715cb4125",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-003"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:59.998845+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-003",
+        "entry_sha256": "aab74852aab787b1420c7e6fc5a51a9054c2017235e2b49d27f0a7b539fabf25",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-003.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:59.998928+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-003",
+        "entry_sha256": "b66a03ee5396bd480e01ad1feae23d7fa692dfefa77c534ac124c39561627ae3",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-003.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: e4951d4a4f629b4b...",
+        "outputs_summary": {
+          "sha256": "e4951d4a4f629b4b1f7f146c9f8772687d56f4cdca3f43801d5ab3897148fcf8"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:59.999019+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-003",
+        "entry_sha256": "00088d4510bca47b9a595fd934c6bbc2de817f8f5fb5b6d8fcc031fa50646bc1",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-003.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:59.999140+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-003",
+        "entry_sha256": "61a586a17b0ee31d174e19a22b6c1887eca65b1610a4998a9afabe1f14c454af",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "The web server of a company running Windows Server 2008 Standard and XAMPP was compromised through SQL injection in DVWA. The attacker deployed PHP webshells, created user accounts, and configured RDP..."
+          },
+          "case_id": "VIGIA-REAL-003",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "0",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.4785 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (4 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.4785",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "1/2",
+              "description": "",
+              "evidence_type": "unknown",
+              "source": "unknown",
+              "z_score": "0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:00.379931+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-003",
+        "entry_sha256": "e60389b7732dd1c8e455ef9718007e7f44bddab2b326cf15e168cbce6903a2fe",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:00.380044+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-003",
+        "entry_sha256": "2a9998353e3541c92176c5c88005f529cd9ce2ac0d1a3ef826f864714fe1f287",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:00.380254+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:59.998621+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-003",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-003.json",
+  "evidence_sha256": "e4951d4a4f629b4b1f7f146c9f8772687d56f4cdca3f43801d5ab3897148fcf8",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-003.json\nEvidence SHA-256: e4951d4a4f629b4b1f7f146c9f8772687d56f4cdca3f43801d5ab3897148fcf8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['unknown'], 0 derivada(s)/no-analizada(s). Top z: unknown=0.00, unknown=0.00, unknown=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nThe web server of a company running Windows Server 2008 Standard and XAMPP was compromised through SQL injection in DVWA. The attacker deployed PHP webshells, created user accounts, and configured RDP access from the internal subnet.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n  [unknown] z=0.000 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "0"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "The web server of a company running Windows Server 2008 Standard and XAMPP was compromised through SQL injection in DVWA. The attacker deployed PHP webshells, created user accounts, and configured RDP access from the internal subnet."
+    },
+    "case_id": "VIGIA-REAL-003",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "0",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.4785 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (4 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.4785",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "",
+        "evidence_type": "unknown",
+        "source": "unknown",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1,
+          "num": 0
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

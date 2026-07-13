@@ -1,0 +1,272 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-13T01:58:13.787775+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-SEP800-001",
+    "end_time": "2026-07-13T01:58:13.787781+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-SEP800-001",
+        "entry_sha256": "9496947febb5243f0ff2fc5752cb316ac661fcef0d43d7d7110aa9c31b6bbd74",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-SEP800-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:13.407499+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-SEP800-001",
+        "entry_sha256": "271fce4230f5de9fac055feade59b92748296c23427c89f42420142e305f1653",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SEP800-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:13.407585+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-SEP800-001",
+        "entry_sha256": "e8e4bd30ae3be28553028faec92aa1e602cefd93b7519d1b56de23b3cce929e2",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SEP800-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 3ed496cf7856c35a...",
+        "outputs_summary": {
+          "sha256": "3ed496cf7856c35a96b55c67903b808a0c10375148a967051902adff3c7cb0d1"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:13.407685+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-SEP800-001",
+        "entry_sha256": "17c4c94676b2845aeabdebf24d15d3d9e474dcb64f893103ea99642f2e47e354",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SEP800-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:13.407789+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-SEP800-001",
+        "entry_sha256": "bf3d8a8b07f28ed8a9b4e8951ad86c3e5b2b7dd054759e41c487123ffb941abd",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "ABSTAIN_DETECTED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "Forensic image of Sony Ericsson P800 MCU (microcontroller unit) flash memory (file mcu.bin, 4194304 bytes, SHA-256: 2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34). File date 2004-09..."
+          },
+          "case_id": "VIGIA-SEP800-001",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "67/1200",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "ABSTAIN",
+            "resolve": {
+              "motor_confidence": "0.0",
+              "motor_reason": "INTAKE / INCOMPLETE ANALYSIS: evidence acquired but its content was not extracted/analyzed, or no user evidence was recovered \u2014 insufficient analysis to assert benignity. NOISE would overclaim a clean",
+              "motor_score": "0.0269",
+              "motor_verdict": "ABSTAIN",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "SEP800-ART-001",
+              "confidence": "19/20",
+              "description": "Sony Ericsson P800 MCU firmware image. SHA-256 verified. Size 4194304 bytes (4MB). File date 2004-09-21. Zip container verified at intake.",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "19/400"
+            },
+            {
+              "artifact_id": "SEP800-ART-002",
+              "confidence": "4/5",
+              "description": "String analysis of mcu.bin reveals: GSM stack process table (FrameTick_High_Priority_Process, HW_ADC_Done_Process, SIMRX_Process, LH_RX_Process, LLC_Process, RLC_Uplink_Process, MPH_Process, CB_Proces",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "1/25"
+            },
+            {
+              "artifact_id": "SEP800-ART-003",
+              "confidence": "4/5",
+              "description": "Binary firmware analysis. Mixed binary data (ARM/RISC machine code) and ASCII process name strings. Binary regions consistent with compiled firmware code. No isolated high-entropy blocks suggesting em",
+              "evidence_type": "file_hash",
+              "source": "calculate_shannon_entropy",
+              "z_score": "2/25"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:13.787412+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-SEP800-001",
+        "entry_sha256": "2e24adadf82a9ce88446563bb1671664f4369c027b250546936054d3229f5d96",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:13.787532+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-SEP800-001",
+        "entry_sha256": "33c58556a85d911cd5024ff1481d5cc0c28d810f7373681dbda4a26c01e8af9a",
+        "inputs_summary": {
+          "verdict": "ABSTAIN_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:13.787723+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:13.407268+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-SEP800-001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-SEP800-001.json",
+  "evidence_sha256": "3ed496cf7856c35a96b55c67903b808a0c10375148a967051902adff3c7cb0d1",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-SEP800-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-SEP800-001.json\nEvidence SHA-256: 3ed496cf7856c35a96b55c67903b808a0c10375148a967051902adff3c7cb0d1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: ABSTAIN_DETECTED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['calculate_shannon_entropy', 'generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Binary firmware analysis. Mixed binary d=0.08, Sony Ericsson P800 MCU firmware image. S=0.05, String analysis of mcu.bin reveals: GSM =0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: ABSTAIN_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nForensic image of Sony Ericsson P800 MCU (microcontroller unit) flash memory (file mcu.bin, 4194304 bytes, SHA-256: 2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34). File date 2004-09-21. Examination reveals this is a Sony Ericsson GSM protocol stack firmware binary. The file contains the device's baseband firmware: GSM radio stack processes (FrameTick, SIMRX, LH_RX, LH_TX, LLC, RLC, MPH), SIM management (UICC, SIMTOOL), data processes (SNDCP, PPP, RLPH), phonebook/PB management\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Binary firmware analysis. Mixed binary data (ARM/RISC machine code) an] z=0.080 conf=0.80 \u2014 \n  [Sony Ericsson P800 MCU firmware image. SHA-256 verified. Size 4194304 ] z=0.048 conf=0.95 \u2014 \n  [String analysis of mcu.bin reveals: GSM stack process table (FrameTick] z=0.040 conf=0.80 \u2014 \n\n--- FINAL ALERT LEVEL ---\nINDETERMINATE \u2014 ABSTAIN verdict (ABSTAIN_DETECTED): the evidence was not (fully) analyzed, so no alert level can be asserted.\nReconciliation: ABSTAIN verdict \u2014 the per-signal magnitude level (LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.) describes only the analyzed portion and is not an assessment of the unanalyzed evidence.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "ABSTAIN_DETECTED",
+      "best_posterior": "0",
+      "confidence": {
+        "__fraction__": true,
+        "den": 1,
+        "num": 0
+      },
+      "is_conclusive": false,
+      "narrative": "Forensic image of Sony Ericsson P800 MCU (microcontroller unit) flash memory (file mcu.bin, 4194304 bytes, SHA-256: 2b8054d66bf8c2f1178ed70038fd557d53ab121890f2225ad32cf4a31c8a4b34). File date 2004-09-21. Examination reveals this is a Sony Ericsson GSM protocol stack firmware binary. The file contains the device's baseband firmware: GSM radio stack processes (FrameTick, SIMRX, LH_RX, LH_TX, LLC, RLC, MPH), SIM management (UICC, SIMTOOL), data processes (SNDCP, PPP, RLPH), phonebook/PB management"
+    },
+    "case_id": "VIGIA-SEP800-001",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "67/1200",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "ABSTAIN",
+      "resolve": {
+        "motor_confidence": "0.0",
+        "motor_reason": "INTAKE / INCOMPLETE ANALYSIS: evidence acquired but its content was not extracted/analyzed, or no user evidence was recovered \u2014 insufficient analysis to assert benignity. NOISE would overclaim a clean",
+        "motor_score": "0.0269",
+        "motor_verdict": "ABSTAIN",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "SEP800-ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Sony Ericsson P800 MCU firmware image. SHA-256 verified. Size 4194304 bytes (4MB). File date 2004-09-21. Zip container verified at intake.",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "SEP800-ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "String analysis of mcu.bin reveals: GSM stack process table (FrameTick_High_Priority_Process, HW_ADC_Done_Process, SIMRX_Process, LH_RX_Process, LLC_Process, RLC_Uplink_Process, MPH_Process, CB_Proces",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "SEP800-ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Binary firmware analysis. Mixed binary data (ARM/RISC machine code) and ASCII process name strings. Binary regions consistent with compiled firmware code. No isolated high-entropy blocks suggesting em",
+        "evidence_type": "file_hash",
+        "source": "calculate_shannon_entropy",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 2
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 3,
+    "n_total_signals": 3,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

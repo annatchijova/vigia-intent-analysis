@@ -1,0 +1,320 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:57:54.595923+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-LINUX-008",
+    "end_time": "2026-07-13T01:57:54.595928+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-LINUX-008",
+        "entry_sha256": "1d4088a955f0dcd998a4b45ac4465673d01a13bb9cd9b94021056cd20f709f05",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-LINUX-008"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:54.224179+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-008",
+        "entry_sha256": "8dca1a4554a3b3a01d981cf38ec64267f387d00dfe90d3874b5638519350c2c7",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:54.224265+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-008",
+        "entry_sha256": "4700f0535a59ee2e1252ff88dcfca961863dd1c485ee02c2cb89fcd36796d292",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 3289c53e32080546...",
+        "outputs_summary": {
+          "sha256": "3289c53e320805460dedfaef08dfadf0d845050c66073bdd9a27d5c4e117032c"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:54.224371+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-LINUX-008",
+        "entry_sha256": "7f6bf56a37e82da157f928765f11bfd895228a6c6ff040bac80b4064dc854e89",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:54.224471+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-LINUX-008",
+        "entry_sha256": "fc856900814cb0d39e58d05ed94dcf24085fd5c14d9e5772ba553fc836af07cf",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "3/5",
+            "confidence": "3/5",
+            "is_conclusive": "True",
+            "narrative": "Epistemological boundary test derived from the Huntress multi-actor incident (VIGIA-LINUX-006 + VIGIA-LINUX-007). All signals from Actor A (cryptominer), Actor B/C (botnet + credential harvester), and..."
+          },
+          "case_id": "VIGIA-LINUX-008",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "4481/6250",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.6",
+              "motor_reason": "Significant signal with structural support (score=0.3020)",
+              "motor_score": "0.302",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "linux008_01",
+              "confidence": "9/10",
+              "description": "Full process listing at triage time shows: (1) /var/tmp/systemd-logind at 100% CPU (Actor A miner), (2) multiple processes under /tmp/.xdiag/ initiated by crond (Actor B botnet), (3) connections to ea",
+              "evidence_type": "memory_process",
+              "source": "sift_process_monitor",
+              "z_score": "801/1000"
+            },
+            {
+              "artifact_id": "linux008_02",
+              "confidence": "22/25",
+              "description": "Network connection listing shows simultaneous outbound connections to: (1) 62.60.246[.]210:443 \u2014 Monero mining pool (Actor A), (2) 147.45.41[.]25:80 \u2014 credential exfiltration endpoint (Actor B/C), (3)",
+              "evidence_type": "network_capture",
+              "source": "sift_network_forensics",
+              "z_score": "957/1250"
+            },
+            {
+              "artifact_id": "linux008_03",
+              "confidence": "41/50",
+              "description": "Full persistence enumeration reveals nine entries: (1) root crontab: /var/tmp/systemd-logind restart every 5 min (Actor A), (2) user crontab: download/execute from 162.55.234[.]175:4082 (Actor B), (3)",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "82/125"
+            },
+            {
+              "artifact_id": "linux008_04",
+              "confidence": "7/10",
+              "description": "Bash history for user 'dev' contains interleaved entries: legitimate development commands (npm start, git commit), Codex-generated security audit commands (find / -name '*.sh' -perm /111, netstat -tul",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "21/40"
+            },
+            {
+              "artifact_id": "linux008_05",
+              "confidence": "91/100",
+              "description": "Timeline reconstruction from EDR telemetry shows a critical temporal overlap: at 2025-03-19 10:47 UTC, Codex initiated a security audit command sequence (ls -la /root/.ssh/, cat /etc/passwd). At 2025-",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "2093/2500"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:54.595518+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-LINUX-008",
+        "entry_sha256": "3eeb0dc9c912c4b76ecc08d32f69895c2560d3d26df3cae64ea39ce65e8b827c",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:54.595655+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-LINUX-008",
+        "entry_sha256": "b99d8f10bc51b93a5e1ae09a1ddbabc2c56d443ca753bb9c62831a32d5cbcddd",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:54.595870+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:54.223948+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-LINUX-008",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json",
+  "evidence_sha256": "3289c53e320805460dedfaef08dfadf0d845050c66073bdd9a27d5c4e117032c",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-008 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-008.json\nEvidence SHA-256: 3289c53e320805460dedfaef08dfadf0d845050c66073bdd9a27d5c4e117032c\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 3/5\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_linux_forensics', 'sift_network_forensics', 'sift_process_monitor'], 0 derivada(s)/no-analizada(s). Top z: Timeline reconstruction from EDR telemet=0.84, Full process listing at triage time show=0.80, Network connection listing shows simulta=0.77.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEpistemological boundary test derived from the Huntress multi-actor incident (VIGIA-LINUX-006 + VIGIA-LINUX-007). All signals from Actor A (cryptominer), Actor B/C (botnet + credential harvester), and the legitimate user's Codex-generated commands are presented as an interleaved, unseparated evidence stream \u2014 as they would appear to a SOC analyst during initial triage before attribution. VIG\u00cdA must determine: (1) is this one actor or multiple actors? (2) what is the correct verdict when signals \n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Timeline reconstruction from EDR telemetry shows a critical temporal o] z=0.837 conf=0.91 \u2014 \n  [Full process listing at triage time shows: (1) /var/tmp/systemd-logind] z=0.801 conf=0.90 \u2014 \n  [Network connection listing shows simultaneous outbound connections to:] z=0.766 conf=0.88 \u2014 \n  [Full persistence enumeration reveals nine entries: (1) root crontab: /] z=0.656 conf=0.82 \u2014 \n  [Bash history for user 'dev' contains interleaved entries: legitimate d] z=0.525 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "3/5",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 3
+      },
+      "is_conclusive": true,
+      "narrative": "Epistemological boundary test derived from the Huntress multi-actor incident (VIGIA-LINUX-006 + VIGIA-LINUX-007). All signals from Actor A (cryptominer), Actor B/C (botnet + credential harvester), and the legitimate user's Codex-generated commands are presented as an interleaved, unseparated evidence stream \u2014 as they would appear to a SOC analyst during initial triage before attribution. VIG\u00cdA must determine: (1) is this one actor or multiple actors? (2) what is the correct verdict when signals "
+    },
+    "case_id": "VIGIA-LINUX-008",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "4481/6250",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.6",
+        "motor_reason": "Significant signal with structural support (score=0.3020)",
+        "motor_score": "0.302",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "linux008_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Full process listing at triage time shows: (1) /var/tmp/systemd-logind at 100% CPU (Actor A miner), (2) multiple processes under /tmp/.xdiag/ initiated by crond (Actor B botnet), (3) connections to ea",
+        "evidence_type": "memory_process",
+        "source": "sift_process_monitor",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 801
+        }
+      },
+      {
+        "artifact_id": "linux008_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "Network connection listing shows simultaneous outbound connections to: (1) 62.60.246[.]210:443 \u2014 Monero mining pool (Actor A), (2) 147.45.41[.]25:80 \u2014 credential exfiltration endpoint (Actor B/C), (3)",
+        "evidence_type": "network_capture",
+        "source": "sift_network_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1250,
+          "num": 957
+        }
+      },
+      {
+        "artifact_id": "linux008_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 41
+        },
+        "description": "Full persistence enumeration reveals nine entries: (1) root crontab: /var/tmp/systemd-logind restart every 5 min (Actor A), (2) user crontab: download/execute from 162.55.234[.]175:4082 (Actor B), (3)",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 82
+        }
+      },
+      {
+        "artifact_id": "linux008_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Bash history for user 'dev' contains interleaved entries: legitimate development commands (npm start, git commit), Codex-generated security audit commands (find / -name '*.sh' -perm /111, netstat -tul",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 21
+        }
+      },
+      {
+        "artifact_id": "linux008_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 91
+        },
+        "description": "Timeline reconstruction from EDR telemetry shows a critical temporal overlap: at 2025-03-19 10:47 UTC, Codex initiated a security audit command sequence (ls -la /root/.ssh/, cat /etc/passwd). At 2025-",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 2093
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 5,
+    "n_total_signals": 5,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

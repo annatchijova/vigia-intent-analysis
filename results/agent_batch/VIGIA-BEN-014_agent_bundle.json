@@ -1,0 +1,272 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:58:33.831989+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-BEN-014",
+    "end_time": "2026-07-13T01:58:33.831996+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-BEN-014",
+        "entry_sha256": "8f09e49a1d0d160c71d05a1e13194f445c5c011cd8cca703e539891f59232fcc",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-BEN-014"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:33.435845+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BEN-014",
+        "entry_sha256": "1b1f5e14b68843f5a68c67083fe8ccc4f9cf0913a1c5dcdc89f79df0a73f5988",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-014.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:33.435936+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BEN-014",
+        "entry_sha256": "f19c2c90e9dbc38013f4593511ca5d091610a92ed8688bc97c4dbb9271371352",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-014.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 5112496586c83fe3...",
+        "outputs_summary": {
+          "sha256": "5112496586c83fe3ab2dbb9448e8f25a52d08e85b8ceccacc1cdc9a77a1f704d"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:33.436033+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-BEN-014",
+        "entry_sha256": "eafba18c00bb673d54778f364d8c6f014d1c0b3acdd2529fe63b9469fea26011",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-014.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:33.436143+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-BEN-014",
+        "entry_sha256": "cf22e617e8339cd7e9dc8960c6ef60e90f4f89143c039db7af08b7d850bc5bf8",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "21/100",
+            "confidence": "21/100",
+            "is_conclusive": "False",
+            "narrative": "Investigative journalist's machine connects to Tor. Has written authorization from editor, legally approved source protection policy, and traffic goes only to whistleblower platform .onion."
+          },
+          "case_id": "VIGIA-BEN-014",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "827/1200",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.21",
+              "motor_reason": "Significant signal with structural support (score=0.1066)",
+              "motor_score": "0.1066",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "7/10",
+              "description": "Tor connection established: 10.0.2.15:9050 \u2192 Tor guard node | Process: tor (PID 4455) | User: journalist | Destination: .onion address (whistleblower-platform.onion) | No other destinations",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "49/100"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "17/20",
+              "description": "Authorization memo: 'Journalist Ana Martinez authorized for Tor access for source protection. Valid: 2024-01-01 to 2024-12-31. Approved by: Editor-in-Chief, Legal Counsel.' | Policy: JOURNALIST-ETHICS",
+              "evidence_type": "file_timestamp",
+              "source": "legacy_converter",
+              "z_score": "289/400"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "9/10",
+              "description": "Traffic analysis: 100% to whistleblower-platform.onion | No financial sites | No C&C IPs | No file transfers > 1MB | Session duration: 45 min (consistent with interview) | No repeat connections to sam",
+              "evidence_type": "log_entry",
+              "source": "legacy_converter",
+              "z_score": "171/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:33.831591+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-BEN-014",
+        "entry_sha256": "11457b7a78e4d36f1797ec4aee35d4865ae5db9de11a3755e3ee65a1d9ece41f",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:33.831719+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-BEN-014",
+        "entry_sha256": "c43b83b90a3602a412c9b6943fcdf8092b070e27a6f675fc321855ba78e9c8b4",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:33.831938+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:33.435404+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-BEN-014",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-014.json",
+  "evidence_sha256": "5112496586c83fe3ab2dbb9448e8f25a52d08e85b8ceccacc1cdc9a77a1f704d",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BEN-014 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-BEN-014.json\nEvidence SHA-256: 5112496586c83fe3ab2dbb9448e8f25a52d08e85b8ceccacc1cdc9a77a1f704d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 21/100\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['legacy_converter'], 0 derivada(s)/no-analizada(s). Top z: Traffic analysis: 100% to whistleblower-=0.85, Authorization memo: 'Journalist Ana Mart=0.72, Tor connection established: 10.0.2.15:90=0.49.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\nInvestigative journalist's machine connects to Tor. Has written authorization from editor, legally approved source protection policy, and traffic goes only to whistleblower platform .onion.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Traffic analysis: 100% to whistleblower-platform.onion | No financial ] z=0.855 conf=0.90 \u2014 \n  [Authorization memo: 'Journalist Ana Martinez authorized for Tor access] z=0.723 conf=0.85 \u2014 \n  [Tor connection established: 10.0.2.15:9050 \u2192 Tor guard node | Process:] z=0.490 conf=0.70 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "21/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 21
+      },
+      "is_conclusive": false,
+      "narrative": "Investigative journalist's machine connects to Tor. Has written authorization from editor, legally approved source protection policy, and traffic goes only to whistleblower platform .onion."
+    },
+    "case_id": "VIGIA-BEN-014",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "827/1200",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.21",
+        "motor_reason": "Significant signal with structural support (score=0.1066)",
+        "motor_score": "0.1066",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 7
+        },
+        "description": "Tor connection established: 10.0.2.15:9050 \u2192 Tor guard node | Process: tor (PID 4455) | User: journalist | Destination: .onion address (whistleblower-platform.onion) | No other destinations",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 49
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Authorization memo: 'Journalist Ana Martinez authorized for Tor access for source protection. Valid: 2024-01-01 to 2024-12-31. Approved by: Editor-in-Chief, Legal Counsel.' | Policy: JOURNALIST-ETHICS",
+        "evidence_type": "file_timestamp",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 289
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Traffic analysis: 100% to whistleblower-platform.onion | No financial sites | No C&C IPs | No file transfers > 1MB | Session duration: 45 min (consistent with interview) | No repeat connections to sam",
+        "evidence_type": "log_entry",
+        "source": "legacy_converter",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 171
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 3,
+    "n_total_signals": 3,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

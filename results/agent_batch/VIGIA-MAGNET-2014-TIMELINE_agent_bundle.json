@@ -1,0 +1,296 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:57:55.066639+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+    "end_time": "2026-07-13T01:57:55.066645+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+        "entry_sha256": "cfd236c9899a8675324b334424df7987f987d7d3a503a009c585c24d0af63e4f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-MAGNET-2014-TIMELINE"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:54.699102+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+        "entry_sha256": "7ebfff6ce8a5083d783b1b46aee8ed3e4021d5246f0d80c8f26d9fb5a6f289a5",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-MAGNET-2014-TIMELINE.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:54.699187+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+        "entry_sha256": "3274e2ad03c6fdfb27b0932e5b3f01b95412bb31a2e7c71dd44bd310ee5b0342",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-MAGNET-2014-TIMELINE.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 7511d2353c65540f...",
+        "outputs_summary": {
+          "sha256": "7511d2353c65540f5b306ad7f4c4b779b078bc838d994726914ebe280f59d2c5"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:54.699280+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+        "entry_sha256": "efae56c7ba425fe35713956f80368a9519cf5259fd1191fd84eb9ff92cdec08f",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-MAGNET-2014-TIMELINE.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:54.699379+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+        "entry_sha256": "6b25c47efe658e62d84096abe30b5ce452e46d4634a507249eca548d356b3c3b",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "2/5",
+            "confidence": "2/5",
+            "is_conclusive": "True",
+            "narrative": "Document named Hidden.docx with content 'Super secret document / Trade secrets worth millions' found at C:\\Users\\Public\\ on machine HENRY-PC. Author metadata wiped to literal '-'. LNK artifact records..."
+          },
+          "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "491/800",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.4",
+              "motor_reason": "Significant signal with structural support (score=0.1992)",
+              "motor_score": "0.1992",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "docx_hidden_001",
+              "confidence": "17/20",
+              "description": "Hidden.docx at C:\\Users\\Public\\Hidden.docx. Content: 'Super secret document' + 'Trade secrets worth millions'. Author='-', LastModifiedBy='-', Company=''. Revision=1. TotalTime=2min. Word 2007 (AppVer",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "663/1000"
+            },
+            {
+              "artifact_id": "prefetch_winword_001",
+              "confidence": "9/10",
+              "description": "WINWORD.EXE-CEA9B574.pf \u2014 Windows Prefetch file confirms Microsoft Word was executed on HENRY-PC. Corroborates Hidden.docx was opened in Word.",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "117/200"
+            },
+            {
+              "artifact_id": "lnk_hidden_docx_001",
+              "confidence": "17/20",
+              "description": "LNK Office-Recent/Hidden.docx.lnk \u2014 Windows Shell Link recording recent access to C:\\Users\\Public\\Hidden.docx on \\\\HENRY-PC. Machine name HENRY-PC extracted via strings.",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "119/200"
+            },
+            {
+              "artifact_id": "lnk_usb_drive_001",
+              "confidence": "17/20",
+              "description": "LNK Windows-Recent/Removable Disk (D).lnk \u2014 access to USB drive D:\\ root on HENRY-PC. Drive root access consistent with bulk file copy or browsing for exfiltration target.",
+              "evidence_type": "file_timestamp",
+              "source": "read_evidence",
+              "z_score": "153/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:55.066271+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+        "entry_sha256": "49a3d2fe2317fd46f61e2eaa2e10f51aad704a675e7bc7f777da2cf9676b09b8",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:55.066395+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+        "entry_sha256": "6731043027dacc1e705101308c310b6ad1e8e85c4a41989d7e30689b0a01f721",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:55.066588+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:54.698862+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-MAGNET-2014-TIMELINE.json",
+  "evidence_sha256": "7511d2353c65540f5b306ad7f4c4b779b078bc838d994726914ebe280f59d2c5",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2014-TIMELINE ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-MAGNET-2014-TIMELINE.json\nEvidence SHA-256: 7511d2353c65540f5b306ad7f4c4b779b078bc838d994726914ebe280f59d2c5\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 2/5\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Hidden.docx at C:\\Users\\Public\\Hidden.do=0.66, LNK Windows-Recent/Removable Disk (D).ln=0.61, LNK Office-Recent/Hidden.docx.lnk \u2014 Wind=0.59.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nDocument named Hidden.docx with content 'Super secret document / Trade secrets worth millions' found at C:\\Users\\Public\\ on machine HENRY-PC. Author metadata wiped to literal '-'. LNK artifact records USB drive (D:\\) access. WINWORD.EXE Prefetch confirms execution. Four-artifact cluster consistent with insider threat data staging and possible exfiltration via removable media.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Hidden.docx at C:\\Users\\Public\\Hidden.docx. Content: 'Super secret doc] z=0.663 conf=0.85 \u2014 \n  [LNK Windows-Recent/Removable Disk (D).lnk \u2014 access to USB drive D:\\ ro] z=0.612 conf=0.85 \u2014 \n  [LNK Office-Recent/Hidden.docx.lnk \u2014 Windows Shell Link recording recen] z=0.595 conf=0.85 \u2014 \n  [WINWORD.EXE-CEA9B574.pf \u2014 Windows Prefetch file confirms Microsoft Wor] z=0.585 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "2/5",
+      "confidence": {
+        "__fraction__": true,
+        "den": 5,
+        "num": 2
+      },
+      "is_conclusive": true,
+      "narrative": "Document named Hidden.docx with content 'Super secret document / Trade secrets worth millions' found at C:\\Users\\Public\\ on machine HENRY-PC. Author metadata wiped to literal '-'. LNK artifact records USB drive (D:\\) access. WINWORD.EXE Prefetch confirms execution. Four-artifact cluster consistent with insider threat data staging and possible exfiltration via removable media."
+    },
+    "case_id": "VIGIA-MAGNET-2014-TIMELINE",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "491/800",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.4",
+        "motor_reason": "Significant signal with structural support (score=0.1992)",
+        "motor_score": "0.1992",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "docx_hidden_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Hidden.docx at C:\\Users\\Public\\Hidden.docx. Content: 'Super secret document' + 'Trade secrets worth millions'. Author='-', LastModifiedBy='-', Company=''. Revision=1. TotalTime=2min. Word 2007 (AppVer",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 663
+        }
+      },
+      {
+        "artifact_id": "prefetch_winword_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "WINWORD.EXE-CEA9B574.pf \u2014 Windows Prefetch file confirms Microsoft Word was executed on HENRY-PC. Corroborates Hidden.docx was opened in Word.",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "lnk_hidden_docx_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "LNK Office-Recent/Hidden.docx.lnk \u2014 Windows Shell Link recording recent access to C:\\Users\\Public\\Hidden.docx on \\\\HENRY-PC. Machine name HENRY-PC extracted via strings.",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 119
+        }
+      },
+      {
+        "artifact_id": "lnk_usb_drive_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "LNK Windows-Recent/Removable Disk (D).lnk \u2014 access to USB drive D:\\ root on HENRY-PC. Drive root access consistent with bulk file copy or browsing for exfiltration target.",
+        "evidence_type": "file_timestamp",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 153
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

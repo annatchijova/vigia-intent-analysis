@@ -1,0 +1,272 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:57:50.357316+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FP-003",
+    "end_time": "2026-07-13T01:57:50.357321+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FP-003",
+        "entry_sha256": "07a9518fbfa2ce49b5d69319eb4dbb103dca6e445e0cb2a5388350249856775c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FP-003"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:49.974384+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FP-003",
+        "entry_sha256": "6937e1e9d5e7aac1f39f2509afbabc0376d853e6eb153ea16044e25d63a8427e",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-003.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:49.974468+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FP-003",
+        "entry_sha256": "c1864416a763585568d2070bb70ad9eb1a5b69d5c4d74d19f620fef6a1c370d8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-003.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: cb6536e650f9528f...",
+        "outputs_summary": {
+          "sha256": "cb6536e650f9528f2ba54a1f0fb821ca588a24b618a8b85a0abd027534ca9869"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:49.974559+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FP-003",
+        "entry_sha256": "3237febbabb1a9ee25373af5aaeb29cb9288ad362af2b66491c832a1fcd8cde6",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-003.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:49.974661+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FP-003",
+        "entry_sha256": "d256a000e645e9c08c58214ccd57ae7f465c67a964482fa18e6dde3b8320d699",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "7/20",
+            "confidence": "7/20",
+            "is_conclusive": "True",
+            "narrative": "Finance user writes their password on a post-it visible on a conference room camera. A colleague sees it, sends it via internal chat, the user changes it. No credential abuse occurs."
+          },
+          "case_id": "VIGIA-FP-003",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "271/1000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "BENIGN",
+            "resolve": {
+              "motor_confidence": "0.35",
+              "motor_reason": "Significant signal with structural support (score=0.1762)",
+              "motor_score": "0.1762",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "fp003_01",
+              "confidence": "3/10",
+              "description": "DM: 'Hey, saw your password on the post-it, sending it so you can change it'",
+              "evidence_type": "log_entry",
+              "source": "sift_slack_export",
+              "z_score": "27/125"
+            },
+            {
+              "artifact_id": "fp003_02",
+              "confidence": "9/10",
+              "description": "Password change recorded 5 minutes after the message",
+              "evidence_type": "log_entry",
+              "source": "sift_azure_ad",
+              "z_score": "9/200"
+            },
+            {
+              "artifact_id": "fp003_03",
+              "confidence": "3/5",
+              "description": "Camera CONF-01: post-it visible on monitor with written password",
+              "evidence_type": "memory_process",
+              "source": "sift_vision_ocr",
+              "z_score": "69/125"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:50.356950+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FP-003",
+        "entry_sha256": "07af460a4ebcc0e955944c1c56c6e6c8feeaa3b75a4d34753a23c5fe65a84f8d",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:50.357070+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FP-003",
+        "entry_sha256": "c15a2cd6eefa76e38fe4f61b4ac71aaf3a4abd6795a2ee0a110de546d3b7badb",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:50.357266+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:49.974156+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FP-003",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-003.json",
+  "evidence_sha256": "cb6536e650f9528f2ba54a1f0fb821ca588a24b618a8b85a0abd027534ca9869",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FP-003 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FP-003.json\nEvidence SHA-256: cb6536e650f9528f2ba54a1f0fb821ca588a24b618a8b85a0abd027534ca9869\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 7/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_azure_ad', 'sift_slack_export', 'sift_vision_ocr'], 0 derivada(s)/no-analizada(s). Top z: Camera CONF-01: post-it visible on monit=0.55, DM: 'Hey, saw your password on the post-=0.22, Password change recorded 5 minutes after=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFinance user writes their password on a post-it visible on a conference room camera. A colleague sees it, sends it via internal chat, the user changes it. No credential abuse occurs.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Camera CONF-01: post-it visible on monitor with written password] z=0.552 conf=0.60 \u2014 \n  [DM: 'Hey, saw your password on the post-it, sending it so you can chan] z=0.216 conf=0.30 \u2014 \n  [Password change recorded 5 minutes after the message] z=0.045 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "7/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 7
+      },
+      "is_conclusive": true,
+      "narrative": "Finance user writes their password on a post-it visible on a conference room camera. A colleague sees it, sends it via internal chat, the user changes it. No credential abuse occurs."
+    },
+    "case_id": "VIGIA-FP-003",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "271/1000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "BENIGN",
+      "resolve": {
+        "motor_confidence": "0.35",
+        "motor_reason": "Significant signal with structural support (score=0.1762)",
+        "motor_score": "0.1762",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "fp003_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "DM: 'Hey, saw your password on the post-it, sending it so you can change it'",
+        "evidence_type": "log_entry",
+        "source": "sift_slack_export",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "fp003_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Password change recorded 5 minutes after the message",
+        "evidence_type": "log_entry",
+        "source": "sift_azure_ad",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "fp003_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Camera CONF-01: post-it visible on monitor with written password",
+        "evidence_type": "memory_process",
+        "source": "sift_vision_ocr",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 69
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 3,
+    "n_total_signals": 3,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

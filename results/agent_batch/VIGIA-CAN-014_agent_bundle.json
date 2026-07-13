@@ -1,0 +1,296 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:58:53.406735+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-014",
+    "end_time": "2026-07-13T01:58:53.406741+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-014",
+        "entry_sha256": "d9ead04bdc8c60c67fdb462bc99ba20301722ae69cd23c858592455ddf1090dc",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-014"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:53.022229+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-014",
+        "entry_sha256": "add7ba71b4a106289df410aa671ab538aa5b5cb09323decc79c9f7aac221b546",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-014.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:53.022325+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-014",
+        "entry_sha256": "edc7100319235c406264b39c61cadffe1a299f7e504a3841104ba83916279148",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-014.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: dba6de7ca0015b96...",
+        "outputs_summary": {
+          "sha256": "dba6de7ca0015b965b7b1f0b0f069d9e3381c3759f7d777bc9bcb3d0090d4ed5"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:53.022421+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-014",
+        "entry_sha256": "14314415b141cf35b64cf9ab2037e5a9116e75bf0831e72a695f09e203ab681c",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-014.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:53.022522+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-014",
+        "entry_sha256": "c5db3ed3a69f1f7dacea58a76e4529a99c08a4a9303bdecfc28de35c0b2b84e7",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "27/50",
+            "confidence": "27/50",
+            "is_conclusive": "True",
+            "narrative": "50 fake MFA alerts saturate the administrator in 8 seconds. Admin requests to disable MFA for '5 minutes'. During that window: 3 successful logins from attacker IPs. Disabling MFA does not solve a net..."
+          },
+          "case_id": "case_096_entropia_panico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "23/50",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.54",
+              "motor_reason": "Significant signal with structural support (score=0.2685)",
+              "motor_score": "0.2685",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a096_01",
+              "confidence": "7/20",
+              "description": "50 Telegram/Duo alerts sent to admin in an 8-second window. All with the same text: 'ALERT: Intruder detected'.",
+              "evidence_type": "memory_process",
+              "source": "sift_api_gateway",
+              "z_score": "161/500"
+            },
+            {
+              "artifact_id": "a096_02",
+              "confidence": "3/10",
+              "description": "Admin: 'I'm overwhelmed, disable MFA for 5 minutes so I can quickly get in and block the IPs'.",
+              "evidence_type": "memory_process",
+              "source": "sift_slack_export",
+              "z_score": "69/250"
+            },
+            {
+              "artifact_id": "a096_03",
+              "confidence": "9/20",
+              "description": "MFA disabled. During the 5-minute window: 3 successful logins from attacker IPs.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "207/500"
+            },
+            {
+              "artifact_id": "a096_04",
+              "confidence": "9/10",
+              "description": "Concurrent brute-force attack from 3 IPs with synchronized cadence of 2.1s per IP. Does not stop during or after the MFA-disabled window.",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_netflow",
+              "z_score": "207/250"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:53.406356+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-014",
+        "entry_sha256": "f18b48458dc87ddfdbbedc6d424615e40ebb2f8a2f6597a50334626b58ae7456",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:53.406472+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-014",
+        "entry_sha256": "7065b8e99ca2ab2742b9262fcd2cacf726bcaf2863b86ae865a5637f9d29e408",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:53.406685+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:53.021972+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-014",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-014.json",
+  "evidence_sha256": "dba6de7ca0015b965b7b1f0b0f069d9e3381c3759f7d777bc9bcb3d0090d4ed5",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-014 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-014.json\nEvidence SHA-256: dba6de7ca0015b965b7b1f0b0f069d9e3381c3759f7d777bc9bcb3d0090d4ed5\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 27/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_api_gateway', 'sift_netflow', 'sift_slack_export', 'sift_syslog'], 0 derivada(s)/no-analizada(s). Top z: Concurrent brute-force attack from 3 IPs=0.83, MFA disabled. During the 5-minute window=0.41, 50 Telegram/Duo alerts sent to admin in =0.32.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n50 fake MFA alerts saturate the administrator in 8 seconds. Admin requests to disable MFA for '5 minutes'. During that window: 3 successful logins from attacker IPs. Disabling MFA does not solve a network attack \u2014 it is the goal.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Concurrent brute-force attack from 3 IPs with synchronized cadence of ] z=0.828 conf=0.90 \u2014 \n  [MFA disabled. During the 5-minute window: 3 successful logins from att] z=0.414 conf=0.45 \u2014 \n  [50 Telegram/Duo alerts sent to admin in an 8-second window. All with t] z=0.322 conf=0.35 \u2014 \n  [Admin: 'I'm overwhelmed, disable MFA for 5 minutes so I can quickly ge] z=0.276 conf=0.30 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "27/50",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 27
+      },
+      "is_conclusive": true,
+      "narrative": "50 fake MFA alerts saturate the administrator in 8 seconds. Admin requests to disable MFA for '5 minutes'. During that window: 3 successful logins from attacker IPs. Disabling MFA does not solve a network attack \u2014 it is the goal."
+    },
+    "case_id": "case_096_entropia_panico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "23/50",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.54",
+        "motor_reason": "Significant signal with structural support (score=0.2685)",
+        "motor_score": "0.2685",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a096_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "50 Telegram/Duo alerts sent to admin in an 8-second window. All with the same text: 'ALERT: Intruder detected'.",
+        "evidence_type": "memory_process",
+        "source": "sift_api_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a096_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Admin: 'I'm overwhelmed, disable MFA for 5 minutes so I can quickly get in and block the IPs'.",
+        "evidence_type": "memory_process",
+        "source": "sift_slack_export",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a096_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 9
+        },
+        "description": "MFA disabled. During the 5-minute window: 3 successful logins from attacker IPs.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "a096_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Concurrent brute-force attack from 3 IPs with synchronized cadence of 2.1s per IP. Does not stop during or after the MFA-disabled window.",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 207
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

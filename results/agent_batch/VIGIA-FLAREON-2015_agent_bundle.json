@@ -1,0 +1,472 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:57:44.635732+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FLAREON-2015",
+    "end_time": "2026-07-13T01:57:44.635739+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FLAREON-2015",
+        "entry_sha256": "591ee3fbce742177c97d808cbb51919cd07c3fb398189fc4bb1748488334154c",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FLAREON-2015"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:44.268098+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-2015",
+        "entry_sha256": "b9ff973e610f3bfe7e5882105cbcda69c13e4f3ca7643a6543a86fe28e865d89",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:44.268183+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-2015",
+        "entry_sha256": "0dacd370f7cf4a09d9d39636d305c65a7da45868eb790819d0957b01bee47dcf",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 31eb9841d2f28b02...",
+        "outputs_summary": {
+          "sha256": "31eb9841d2f28b026405d2fcd6a407da3c3e937a6d5f8218f258f65a50877551"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:44.268295+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FLAREON-2015",
+        "entry_sha256": "d27ec3de90f72aea6600782da1cddfcf7c717a30ec90870043c965323b5a6353",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:44.268395+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FLAREON-2015",
+        "entry_sha256": "d55c9b4160b690045dca383479412955328208fd159d89d8e5bb61e26417d425",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 13 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "FireEye FLARE-On CTF 2015 challenge collection. 11 challenges in numbered directories 1-11. Challenge 1 is a directly-extracted Windows PE32+ executable (Flare-On_start_2015.exe, 285184 bytes). Challe..."
+          },
+          "case_id": "VIGIA-FLAREON-2015",
+          "pipeline_meta": {
+            "artifact_count": "13",
+            "avg_score": "13309/26000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5946 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 13 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.5946",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ch01_start_exe_001",
+              "confidence": "9/10",
+              "description": "Flare-On_start_2015.exe \u2014 PE32+ executable (GUI) x86-64, 285184 bytes. Entry-point challenge for FLARE-On 2015. VIG\u00cdA purgatory quarantined on read (binary, non-UTF-8). Byte count matches 2014 C1.exe ",
+              "evidence_type": "pe_executable",
+              "source": "generate_forensic_hash",
+              "z_score": "351/500"
+            },
+            {
+              "artifact_id": "password_txt_001",
+              "confidence": "99/100",
+              "description": "password.txt \u2014 49 bytes. Content: 'the password to the zip archives (2-11) is: flare'. Plaintext credential disclosure is intentional gating mechanism for CTF challenges 2-11.",
+              "evidence_type": "plaintext_credential",
+              "source": "read_evidence",
+              "z_score": "99/1000"
+            },
+            {
+              "artifact_id": "ch03_elfie_001",
+              "confidence": "22/25",
+              "description": "elfie \u2014 Linux ELF binary in challenge 3. Stored in directory named 3BD127AEDB12472EB288DAAFDEE76953 (MD5-based path). Pre-extracted from zip. Name 'elfie' is a pun on ELF format. Cross-platform RE cha",
+              "evidence_type": "elf_executable",
+              "source": "generate_forensic_hash",
+              "z_score": "77/125"
+            },
+            {
+              "artifact_id": "ch09_bonus_binary_001",
+              "confidence": "17/20",
+              "description": "you_are_very_good_at_this \u2014 4608-byte binary in challenge 9 directory alongside ch9 zip. Pre-extracted. VIG\u00cdA purgatory quarantined (non-UTF-8 binary, 0x90 at offset 2). Likely congratulatory small ex",
+              "evidence_type": "pe_executable",
+              "source": "generate_forensic_hash",
+              "z_score": "187/400"
+            },
+            {
+              "artifact_id": "ch02_zip_001",
+              "confidence": "9/10",
+              "description": "599EA8F84AD975CFB07E0E5732C9BA14.zip \u2014 Challenge 2 container. Password-protected (password: flare). MD5-named. Hash integrity verified.",
+              "evidence_type": "container_zip",
+              "source": "generate_forensic_hash",
+              "z_score": "99/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:44.635117+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FLAREON-2015",
+        "entry_sha256": "4d52023d709dd1965bb09118deed812e1846537bd2a3699de16acc3ab15d17b1",
+        "inputs_summary": {
+          "n_signals": "13"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:44.635288+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FLAREON-2015",
+        "entry_sha256": "a9f2507f5d3e249a8809f811bb49cb1aa7ac51e19b0f4685f1c3183c15bac11e",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:44.635548+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:44.267858+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FLAREON-2015",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json",
+  "evidence_sha256": "31eb9841d2f28b026405d2fcd6a407da3c3e937a6d5f8218f258f65a50877551",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-2015 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-2015.json\nEvidence SHA-256: 31eb9841d2f28b026405d2fcd6a407da3c3e937a6d5f8218f258f65a50877551\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 13 se\u00f1al(es): 13 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Flare-On_start_2015.exe \u2014 PE32+ executab=0.70, elfie \u2014 Linux ELF binary in challenge 3.=0.62, 42634F3F5FAF28306EB07675274AA6B6.zip \u2014 C=0.58.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFireEye FLARE-On CTF 2015 challenge collection. 11 challenges in numbered directories 1-11. Challenge 1 is a directly-extracted Windows PE32+ executable (Flare-On_start_2015.exe, 285184 bytes). Challenges 2-11 are password-protected zips (password: 'flare', disclosed in co-located password.txt). Challenge 3 contains pre-extracted ELF binary 'elfie'. Challenge 9 contains pre-extracted binary 'you_are_very_good_at_this' (4608 bytes, quarantined by VIG\u00cdA purgatory). Corpus spans Windows PE, Linux E\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Flare-On_start_2015.exe \u2014 PE32+ executable (GUI) x86-64, 285184 bytes.] z=0.702 conf=0.90 \u2014 \n  [elfie \u2014 Linux ELF binary in challenge 3. Stored in directory named 3BD] z=0.616 conf=0.88 \u2014 \n  [42634F3F5FAF28306EB07675274AA6B6.zip \u2014 Challenge 11 container (final c] z=0.585 conf=0.90 \u2014 \n  [DC682778F53E853B3188AC63EB376D8B.zip \u2014 Challenge 10 container. Passwor] z=0.558 conf=0.90 \u2014 \n  [0CC92381BDCA47754B144A4FC2E41623.zip \u2014 Challenge 7 container. Password] z=0.540 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 13 | Derived: 0 | Total: 13",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "13309/26000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "FireEye FLARE-On CTF 2015 challenge collection. 11 challenges in numbered directories 1-11. Challenge 1 is a directly-extracted Windows PE32+ executable (Flare-On_start_2015.exe, 285184 bytes). Challenges 2-11 are password-protected zips (password: 'flare', disclosed in co-located password.txt). Challenge 3 contains pre-extracted ELF binary 'elfie'. Challenge 9 contains pre-extracted binary 'you_are_very_good_at_this' (4608 bytes, quarantined by VIG\u00cdA purgatory). Corpus spans Windows PE, Linux E"
+    },
+    "case_id": "VIGIA-FLAREON-2015",
+    "pipeline_meta": {
+      "artifact_count": 13,
+      "avg_score": "13309/26000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5946 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 13 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.5946",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ch01_start_exe_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Flare-On_start_2015.exe \u2014 PE32+ executable (GUI) x86-64, 285184 bytes. Entry-point challenge for FLARE-On 2015. VIG\u00cdA purgatory quarantined on read (binary, non-UTF-8). Byte count matches 2014 C1.exe ",
+        "evidence_type": "pe_executable",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 351
+        }
+      },
+      {
+        "artifact_id": "password_txt_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 99
+        },
+        "description": "password.txt \u2014 49 bytes. Content: 'the password to the zip archives (2-11) is: flare'. Plaintext credential disclosure is intentional gating mechanism for CTF challenges 2-11.",
+        "evidence_type": "plaintext_credential",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 1000,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "ch03_elfie_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "elfie \u2014 Linux ELF binary in challenge 3. Stored in directory named 3BD127AEDB12472EB288DAAFDEE76953 (MD5-based path). Pre-extracted from zip. Name 'elfie' is a pun on ELF format. Cross-platform RE cha",
+        "evidence_type": "elf_executable",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 77
+        }
+      },
+      {
+        "artifact_id": "ch09_bonus_binary_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "you_are_very_good_at_this \u2014 4608-byte binary in challenge 9 directory alongside ch9 zip. Pre-extracted. VIG\u00cdA purgatory quarantined (non-UTF-8 binary, 0x90 at offset 2). Likely congratulatory small ex",
+        "evidence_type": "pe_executable",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 187
+        }
+      },
+      {
+        "artifact_id": "ch02_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "599EA8F84AD975CFB07E0E5732C9BA14.zip \u2014 Challenge 2 container. Password-protected (password: flare). MD5-named. Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "ch04_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "CB931CA00859C5D1356CB2733B11EBF2.zip \u2014 Challenge 4 container. Password-protected (password: flare). Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "ch05_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "062FB655852EAF0CD96325631FD90920.zip \u2014 Challenge 5 container. Password-protected (password: flare). Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "ch06_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "63C64502837A89CA0147095726DF8262.zip \u2014 Challenge 6 container. Password-protected (password: flare). Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 261
+        }
+      },
+      {
+        "artifact_id": "ch07_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "0CC92381BDCA47754B144A4FC2E41623.zip \u2014 Challenge 7 container. Password-protected (password: flare). Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "ch08_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "FE9D3BA1789DC6371105042D80291205.zip \u2014 Challenge 8 container. Password-protected (password: flare). Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "ch09_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "4568CB1948CCD11DDB9B90359F7DC79A.zip \u2014 Challenge 9 container. Password-protected (password: flare). Co-located with pre-extracted bonus binary. Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "ch10_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "DC682778F53E853B3188AC63EB376D8B.zip \u2014 Challenge 10 container. Password-protected (password: flare). Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 279
+        }
+      },
+      {
+        "artifact_id": "ch11_zip_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "42634F3F5FAF28306EB07675274AA6B6.zip \u2014 Challenge 11 container (final challenge). Password-protected (password: flare). Hash integrity verified.",
+        "evidence_type": "container_zip",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 13,
+    "n_total_signals": 13,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

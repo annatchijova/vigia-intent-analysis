@@ -1,0 +1,390 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:59:12.654976+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-052",
+    "end_time": "2026-07-13T01:59:12.654983+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-052",
+        "entry_sha256": "1e1d3d2fc351efe5d05dba76fd028237bfab86ac70295001a209d78c5e475f64",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-052"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:59:12.198470+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-052",
+        "entry_sha256": "2879eb5798f70a890bc8bbefa7cd89f9328ac41d8ac29980cfdf2ad738f411ac",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:59:12.198558+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-052",
+        "entry_sha256": "fbeee6e8d63fbcf3ea2c2ead03a1e27ad4e335d11eda6dfa4bc0600efe746fd1",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 6c427fb19acad5f7...",
+        "outputs_summary": {
+          "sha256": "6c427fb19acad5f7f66d8cd71350856a753b55b7f21d7c6386210eb6baa80402"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:59:12.198649+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-052",
+        "entry_sha256": "490a24f219b195f9105704f7fb41255611303769515e528f0c3d6cc734729e57",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:59:12.198749+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-052",
+        "entry_sha256": "86fd8ddda004f6aa724dcee8055499f9dd41e562e94408a5c1525e8f649eaa0f",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 5 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "Combined pattern of controlled confrontation, blame inversion, and hierarchical aggression to nullify forensic investigations and force security concessions."
+          },
+          "case_id": "case_fusion_agresion_defensiva",
+          "pipeline_meta": {
+            "artifact_count": "5",
+            "avg_score": "757/10000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.5520 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 5 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.552",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "results": {
+            "caie": {
+              "daubert_note": "2 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.5 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+              "fracture_malice_boost": "0.5",
+              "fractures": [
+                {
+                  "interpretation": "Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normalization, fabricated authority, defensive aggression, coordinated panic, instrumenta...",
+                  "severity": "0.8",
+                  "ttp_id": "T1656",
+                  "type": "SOCIAL_ENGINEERING_PATTERN"
+                },
+                {
+                  "interpretation": "FABRICATED CORROBORATION: the subject asserts a corroborating fact that the executed record check does not support (claimed_manager_talk vs communication_found). The record is ground truth; the claim ...",
+                  "severity": "0.85",
+                  "ttp_id": "T1565.001",
+                  "type": "CLAIM_VS_RECORD_FABRICATION"
+                }
+              ],
+              "fractures_detected": "2",
+              "source": "motor_live_caie",
+              "status": "OK"
+            }
+          },
+          "signals": [
+            {
+              "artifact_id": "f005_soc",
+              "confidence": "2/5",
+              "description": "Initial SOC inquiry: 'We detected unusual activity on your account yesterday at 03:15. Can you confirm?'",
+              "evidence_type": "log_entry",
+              "source": "sift_chat_system",
+              "z_score": "7/250"
+            },
+            {
+              "artifact_id": "f005_resp1",
+              "confidence": "3/10",
+              "description": "Confrontational response: 'How can you be so wrong? This is not an error, it's a lack of knowledge on your part. You don't understand the protocol.'",
+              "evidence_type": "log_entry",
+              "source": "sift_chat_system",
+              "z_score": "9/500"
+            },
+            {
+              "artifact_id": "f005_resp2",
+              "confidence": "3/10",
+              "description": "Second response with blame inversion: 'Why are you asking me this? Don't you trust my work? I already spoke with the manager about the excessive monitoring.'",
+              "evidence_type": "cultural_marker",
+              "source": "sift_chat_system",
+              "z_score": "27/100"
+            },
+            {
+              "artifact_id": "f005_technical",
+              "confidence": "19/20",
+              "description": "Confirmed malicious activity in memory: powershell.exe process downloading payload from 185.220.101.42 and executing Mimikatz.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "19/400"
+            },
+            {
+              "artifact_id": "f005_manager",
+              "confidence": "3/10",
+              "description": "Management verification: NO communication record between user@corp.com and manager@corp.com in the claimed time window.",
+              "evidence_type": "log_entry",
+              "source": "sift_syslog",
+              "z_score": "3/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:59:12.654337+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-052",
+        "entry_sha256": "0e271d07837ec53d27f9237f2bcf682422830c333ec247d4489a0361967be2c4",
+        "inputs_summary": {
+          "n_signals": "5"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:59:12.654474+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-052",
+        "entry_sha256": "75cc446f05fbbbe71b4a9bf7f63d7012ecdd029088fcd8bc46b580f2aecbae2c",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:59:12.654717+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:59:12.198209+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-052",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json",
+  "evidence_sha256": "6c427fb19acad5f7f66d8cd71350856a753b55b7f21d7c6386210eb6baa80402",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-052 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-052.json\nEvidence SHA-256: 6c427fb19acad5f7f66d8cd71350856a753b55b7f21d7c6386210eb6baa80402\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 5 se\u00f1al(es): 5 primaria(s) de ['sift_chat_system', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Second response with blame inversion: 'W=0.27, Confirmed malicious activity in memory: =0.05, Initial SOC inquiry: 'We detected unusua=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n. CAIE (viva): 2 fractura(s) cross-artefacto contribuyeron al veredicto (boost +0.5).\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nCombined pattern of controlled confrontation, blame inversion, and hierarchical aggression to nullify forensic investigations and force security concessions.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Second response with blame inversion: 'Why are you asking me this? Don] z=0.270 conf=0.30 \u2014 \n  [Confirmed malicious activity in memory: powershell.exe process downloa] z=0.048 conf=0.95 \u2014 \n  [Initial SOC inquiry: 'We detected unusual activity on your account yes] z=0.028 conf=0.40 \u2014 \n  [Confrontational response: 'How can you be so wrong? This is not an err] z=0.018 conf=0.30 \u2014 \n  [Management verification: NO communication record between user@corp.com] z=0.015 conf=0.30 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine \u2014 motor) ---\n  Fractures: 2 | Malice boost aplicado: +0.5\n  Fracture: SOCIAL_ENGINEERING_PATTERN severity=0.8 [T1656] \u2014 Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normaliza\n  Fracture: CLAIM_VS_RECORD_FABRICATION severity=0.85 [T1565.001] \u2014 FABRICATED CORROBORATION: the subject asserts a corroborating fact that the executed record check does not support (clai\n  2 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.5 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 5 | Derived: 0 | Total: 5",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "757/10000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Combined pattern of controlled confrontation, blame inversion, and hierarchical aggression to nullify forensic investigations and force security concessions."
+    },
+    "case_id": "case_fusion_agresion_defensiva",
+    "pipeline_meta": {
+      "artifact_count": 5,
+      "avg_score": "757/10000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.5520 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 5 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.552",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "results": {
+      "caie": {
+        "daubert_note": "2 fractura(s) CAIE viva(s) contribuyeron al veredicto (boost +0.5 aplicado al composite del scorer). Fuente: vigia_scorer._vigia_score (B-094).",
+        "fracture_malice_boost": "0.5",
+        "fractures": [
+          {
+            "interpretation": "Systematic interpersonal-manipulation pattern targeting the human control layer (Carnegie taxonomy: mirroring, normalization, fabricated authority, defensive aggression, coordinated panic, instrumental doubt). No cultural-attribution claim is made and no evidence-planting theory is asserted. Peirce Thirdness: the HABIT is to neutralize the human verifier, not to disguise origin.",
+            "severity": 0.8,
+            "ttp_id": "T1656",
+            "type": "SOCIAL_ENGINEERING_PATTERN"
+          },
+          {
+            "interpretation": "FABRICATED CORROBORATION: the subject asserts a corroborating fact that the executed record check does not support (claimed_manager_talk vs communication_found). The record is ground truth; the claim was manufactured to survive scrutiny. Peirce Secondness: the assertion collides with the observable record. MITRE T1565.001 \u2014 Data Manipulation: Stored Data.",
+            "severity": 0.85,
+            "ttp_id": "T1565.001",
+            "type": "CLAIM_VS_RECORD_FABRICATION"
+          }
+        ],
+        "fractures_detected": 2,
+        "source": "motor_live_caie",
+        "status": "OK"
+      }
+    },
+    "signals": [
+      {
+        "artifact_id": "f005_soc",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "Initial SOC inquiry: 'We detected unusual activity on your account yesterday at 03:15. Can you confirm?'",
+        "evidence_type": "log_entry",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 7
+        }
+      },
+      {
+        "artifact_id": "f005_resp1",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Confrontational response: 'How can you be so wrong? This is not an error, it's a lack of knowledge on your part. You don't understand the protocol.'",
+        "evidence_type": "log_entry",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 9
+        }
+      },
+      {
+        "artifact_id": "f005_resp2",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Second response with blame inversion: 'Why are you asking me this? Don't you trust my work? I already spoke with the manager about the excessive monitoring.'",
+        "evidence_type": "cultural_marker",
+        "source": "sift_chat_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "f005_technical",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Confirmed malicious activity in memory: powershell.exe process downloading payload from 185.220.101.42 and executing Mimikatz.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "f005_manager",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Management verification: NO communication record between user@corp.com and manager@corp.com in the claimed time window.",
+        "evidence_type": "log_entry",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 5,
+    "n_total_signals": 5,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

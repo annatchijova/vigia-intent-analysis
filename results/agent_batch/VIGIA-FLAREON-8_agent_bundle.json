@@ -1,0 +1,440 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:57:47.002968+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-FLAREON-8",
+    "end_time": "2026-07-13T01:57:47.002975+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-FLAREON-8",
+        "entry_sha256": "b5bdbbe9cd722c9daf8e149774b8695d873ac22141701ab8664b22d8ad570664",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-FLAREON-8"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:46.625890+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-8",
+        "entry_sha256": "c8e74961a1686beed9278b5836a53d2e917c300d08b99889509ffae6e18aaca5",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-8.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:46.625977+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-FLAREON-8",
+        "entry_sha256": "593eed5c1dc9e3cf5eca0fd474c0b7c3fa417f7e7aa1978d47ad416def14d3fb",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-8.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: d1549bcac1708d98...",
+        "outputs_summary": {
+          "sha256": "d1549bcac1708d980738e6650f9a95e8bbebe74524f249408ed18500b8b874a8"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:46.626096+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-FLAREON-8",
+        "entry_sha256": "1533066ad208b0712c8a2dc6ac2d95595dd954cb3a11d4fe331370300c11eafc",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-8.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:46.626200+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-FLAREON-8",
+        "entry_sha256": "017e6b6e849032b427dc4797aff62d6239e81080dea05a115c2717e4f12694bf",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 11 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "FLARE-On 8 challenge set released in September 2021 by FireEye FLARE team. The zip archive (333,676,259 bytes, SHA-256: ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb) contains 10 CT..."
+          },
+          "case_id": "VIGIA-FLAREON-8",
+          "pipeline_meta": {
+            "artifact_count": "11",
+            "avg_score": "3159/4400",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.7204 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 11 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.7204",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "flareon8-zip-001",
+              "confidence": "99/100",
+              "description": "Outer zip archive Flare-On8_Challenges.zip. SHA-256 verified against task specification. Size: 333,676,259 bytes. Contains 11 entries: 10 challenge 7z archives + 7zip_password.txt. Archive dated 2021-",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "1881/2000"
+            },
+            {
+              "artifact_id": "flareon8-ch01-credchecker",
+              "confidence": "9/10",
+              "description": "Challenge 01 \u2014 credchecker (132,208 bytes). Credential checking challenge. A binary or script that validates a hardcoded password/username; participants must reverse the check to recover the flag. Tec",
+              "evidence_type": "binary",
+              "source": "list_files",
+              "z_score": "117/200"
+            },
+            {
+              "artifact_id": "flareon8-ch02-known",
+              "confidence": "9/10",
+              "description": "Challenge 02 \u2014 known (88,128 bytes). File format identification and analysis. 'Known' likely references a known-plaintext attack or a file signature puzzle. Technique class: file format analysis / kno",
+              "evidence_type": "binary",
+              "source": "list_files",
+              "z_score": "117/200"
+            },
+            {
+              "artifact_id": "flareon8-ch03-antioch",
+              "confidence": "9/10",
+              "description": "Challenge 03 \u2014 antioch (1,885,074 bytes). Monty Python and the Holy Grail reference ('Holy Hand Grenade of Antioch'). Likely a Docker/container-based challenge where participants navigate a custom env",
+              "evidence_type": "binary",
+              "source": "list_files",
+              "z_score": "63/100"
+            },
+            {
+              "artifact_id": "flareon8-ch04-myaquaticlife",
+              "confidence": "9/10",
+              "description": "Challenge 04 \u2014 myaquaticlife (2,369,123 bytes). Aquatic-themed game or simulation. Likely a .NET or game binary where aquatic-themed logic conceals a key derivation puzzle. Technique class: game rever",
+              "evidence_type": "binary",
+              "source": "list_files",
+              "z_score": "63/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:47.002369+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-FLAREON-8",
+        "entry_sha256": "08d425ab25439f2054469f1ad89c86308a2e3a8891ec3829059dff884cc73ee4",
+        "inputs_summary": {
+          "n_signals": "11"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:47.002530+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-FLAREON-8",
+        "entry_sha256": "40dda8ac4fa86ce7a52c363ef65a9ad897d127006c2ea86efb3799c018e7ceb5",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:47.002786+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:46.625656+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-FLAREON-8",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-8.json",
+  "evidence_sha256": "d1549bcac1708d980738e6650f9a95e8bbebe74524f249408ed18500b8b874a8",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-FLAREON-8 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-FLAREON-8.json\nEvidence SHA-256: d1549bcac1708d980738e6650f9a95e8bbebe74524f249408ed18500b8b874a8\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 11 se\u00f1al(es): 11 primaria(s) de ['generate_forensic_hash', 'list_files'], 0 derivada(s)/no-analizada(s). Top z: Outer zip archive Flare-On8_Challenges.z=0.94, Challenge 05 \u2014 FLARE_Linux_VM (321,916,2=0.81, Challenge 10 \u2014 wizardcult (3,856,291 byt=0.81.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nFLARE-On 8 challenge set released in September 2021 by FireEye FLARE team. The zip archive (333,676,259 bytes, SHA-256: ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb) contains 10 CTF challenges (01\u201310) plus a 7zip_password.txt. Naming convention changed from 2019/2020 to zero-padded numeric prefix + underscore + name. Most notable: challenge 05 is a full Linux VM (321 MB, FLARE_Linux_VM.7z). Other highlights: credchecker (credential checker logic reversal), known (file signatu\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Outer zip archive Flare-On8_Challenges.zip. SHA-256 verified against t] z=0.941 conf=0.99 \u2014 \n  [Challenge 05 \u2014 FLARE_Linux_VM (321,916,242 bytes). Dominant artifact a] z=0.810 conf=0.90 \u2014 \n  [Challenge 10 \u2014 wizardcult (3,856,291 bytes). Final boss challenge. 'Wi] z=0.810 conf=0.90 \u2014 \n  [Challenge 09 \u2014 evil (1,383,970 bytes). The name 'evil' directly signal] z=0.792 conf=0.90 \u2014 \n  [Challenge 07 \u2014 spel (1,041,938 bytes). 'Spel' is Swedish/Dutch for 'ga] z=0.720 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 11 | Derived: 0 | Total: 11",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "3159/4400"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "FLARE-On 8 challenge set released in September 2021 by FireEye FLARE team. The zip archive (333,676,259 bytes, SHA-256: ae776be9dbdff5bddacd19cf367d662c112dccf29c87d38355e56f2d7e6daafb) contains 10 CTF challenges (01\u201310) plus a 7zip_password.txt. Naming convention changed from 2019/2020 to zero-padded numeric prefix + underscore + name. Most notable: challenge 05 is a full Linux VM (321 MB, FLARE_Linux_VM.7z). Other highlights: credchecker (credential checker logic reversal), known (file signatu"
+    },
+    "case_id": "VIGIA-FLAREON-8",
+    "pipeline_meta": {
+      "artifact_count": 11,
+      "avg_score": "3159/4400",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.7204 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 11 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.7204",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "flareon8-zip-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 99
+        },
+        "description": "Outer zip archive Flare-On8_Challenges.zip. SHA-256 verified against task specification. Size: 333,676,259 bytes. Contains 11 entries: 10 challenge 7z archives + 7zip_password.txt. Archive dated 2021-",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1881
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch01-credchecker",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 01 \u2014 credchecker (132,208 bytes). Credential checking challenge. A binary or script that validates a hardcoded password/username; participants must reverse the check to recover the flag. Tec",
+        "evidence_type": "binary",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch02-known",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 02 \u2014 known (88,128 bytes). File format identification and analysis. 'Known' likely references a known-plaintext attack or a file signature puzzle. Technique class: file format analysis / kno",
+        "evidence_type": "binary",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch03-antioch",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 03 \u2014 antioch (1,885,074 bytes). Monty Python and the Holy Grail reference ('Holy Hand Grenade of Antioch'). Likely a Docker/container-based challenge where participants navigate a custom env",
+        "evidence_type": "binary",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch04-myaquaticlife",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 04 \u2014 myaquaticlife (2,369,123 bytes). Aquatic-themed game or simulation. Likely a .NET or game binary where aquatic-themed logic conceals a key derivation puzzle. Technique class: game rever",
+        "evidence_type": "binary",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch05-flare-linux-vm",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 05 \u2014 FLARE_Linux_VM (321,916,242 bytes). Dominant artifact at 322 MB \u2014 a full Linux virtual machine image. Participants must forensically analyze the live system to find the flag. This is an",
+        "evidence_type": "disk_image",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 81
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch06-petkitty",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 06 \u2014 PetTheKitty (675,952 bytes). Network challenge. 'Pet the kitty' likely refers to a SYN-ACK keepalive pattern or a network packet sequence that must be replicated or decoded. Technique c",
+        "evidence_type": "network_traffic",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch07-spel",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 07 \u2014 spel (1,041,938 bytes). 'Spel' is Swedish/Dutch for 'game' and also an anagram of 'piles'. Likely an NES ROM or retro console game challenge requiring knowledge of the 6502 instruction ",
+        "evidence_type": "binary",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch08-beelogin",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 08 \u2014 beelogin (325,746 bytes). JavaScript login form challenge. 'Beelogin' suggests a bee-themed HTML/JS page where the authentication logic is obfuscated in JavaScript. Technique class: Jav",
+        "evidence_type": "binary",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch09-evil",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 09 \u2014 evil (1,383,970 bytes). The name 'evil' directly signals an obfuscated or malicious sample for behavioral analysis. Likely an anti-analysis challenge (packing, VM detection, timing atta",
+        "evidence_type": "binary",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 99
+        }
+      },
+      {
+        "artifact_id": "flareon8-ch10-wizardcult",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 10 \u2014 wizardcult (3,856,291 bytes). Final boss challenge. 'Wizardcult' suggests a fantasy-themed multi-stage challenge with custom encryption, protocol reversing, or a complete malware ecosys",
+        "evidence_type": "binary",
+        "source": "list_files",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 81
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 11,
+    "n_total_signals": 11,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

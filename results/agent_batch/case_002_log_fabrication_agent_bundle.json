@@ -1,0 +1,248 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:58:20.621321+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "case_002_log_fabrication",
+    "end_time": "2026-07-13T01:58:20.621327+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "case_002_log_fabrication",
+        "entry_sha256": "4bbfd6018dff0b5735b4c88de7a05127f7ac0e53c0f47b3ec46c3a69bfb84e02",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "case_002_log_fabrication"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:20.245252+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_002_log_fabrication",
+        "entry_sha256": "9b1b6f5234107a930c147dce4ae5615410ae2ea5eaca37f215825b6930a8db88",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_002_log_fabrication.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:20.245336+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "case_002_log_fabrication",
+        "entry_sha256": "45139d6209fb59334108ee153b6bb9629cc40c4b3e8cda0449e814336005b0dc",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/case_002_log_fabrication.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 04c5e61aa3e02914...",
+        "outputs_summary": {
+          "sha256": "04c5e61aa3e02914ea8e541b5e647085a3ee62a3ff960daf2cf3e366bec14b96"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:20.245554+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "case_002_log_fabrication",
+        "entry_sha256": "c95bc7b8f4d42f46dfa72609c70a56d342c3069f5422e00f3f6e08fa3d228636",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/case_002_log_fabrication.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:20.245664+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "case_002_log_fabrication",
+        "entry_sha256": "acdeb7903e4b2471562d97ebf6a49b75a40c3ad35d39b2d8b3316fa42cae13e9",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "67/100",
+            "confidence": "67/100",
+            "is_conclusive": "True",
+            "narrative": "50 log entries arrive with suspiciously uniform 2-second intervals and identical entropy. Naive system flags MALICE. VIG\u00cdA detects correlation, reduces confidence."
+          },
+          "case_id": "case_002_log_fabrication",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "123/400",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.67",
+              "motor_reason": "Intent score 0.3354 exceeds MALICE threshold but no corroboration branch opens (2 domain(s), 1/1 hard class(es)/artifact(s), 0 per-cost artifact(s)) \u2014 volume within a single soft collection domain doe",
+              "motor_score": "0.3354",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "log_bulk_001",
+              "confidence": "13/20",
+              "description": "50 log entries: AuthFailure events, 2.000s intervals, entropy=3.145 each",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "13/25"
+            },
+            {
+              "artifact_id": "memory_001",
+              "confidence": "19/20",
+              "description": "Memory scan: NO brute force tool running. No network socket matching log source.",
+              "evidence_type": "memory_process",
+              "source": "list_processes",
+              "z_score": "19/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:20.620969+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "case_002_log_fabrication",
+        "entry_sha256": "8545cf41b52749f6267eb1f2603c53d00738e5ea368535dd4957d8d6cd7fbfe9",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:20.621085+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "case_002_log_fabrication",
+        "entry_sha256": "77f56ef036bada4917cdf9e83b7d7c53e5f014e77e64bebf536bb6de1feeab8e",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:20.621269+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:20.245017+00:00",
+    "total_entries": 7
+  },
+  "case_id": "case_002_log_fabrication",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/case_002_log_fabrication.json",
+  "evidence_sha256": "04c5e61aa3e02914ea8e541b5e647085a3ee62a3ff960daf2cf3e366bec14b96",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE case_002_log_fabrication ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/case_002_log_fabrication.json\nEvidence SHA-256: 04c5e61aa3e02914ea8e541b5e647085a3ee62a3ff960daf2cf3e366bec14b96\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 67/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['list_processes', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: 50 log entries: AuthFailure events, 2.00=0.52, Memory scan: NO brute force tool running=0.10.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n50 log entries arrive with suspiciously uniform 2-second intervals and identical entropy. Naive system flags MALICE. VIG\u00cdA detects correlation, reduces confidence.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [50 log entries: AuthFailure events, 2.000s intervals, entropy=3.145 ea] z=0.520 conf=0.65 \u2014 \n  [Memory scan: NO brute force tool running. No network socket matching l] z=0.095 conf=0.95 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "67/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 67
+      },
+      "is_conclusive": true,
+      "narrative": "50 log entries arrive with suspiciously uniform 2-second intervals and identical entropy. Naive system flags MALICE. VIG\u00cdA detects correlation, reduces confidence."
+    },
+    "case_id": "case_002_log_fabrication",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "123/400",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.67",
+        "motor_reason": "Intent score 0.3354 exceeds MALICE threshold but no corroboration branch opens (2 domain(s), 1/1 hard class(es)/artifact(s), 0 per-cost artifact(s)) \u2014 volume within a single soft collection domain doe",
+        "motor_score": "0.3354",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "log_bulk_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 13
+        },
+        "description": "50 log entries: AuthFailure events, 2.000s intervals, entropy=3.145 each",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 13
+        }
+      },
+      {
+        "artifact_id": "memory_001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Memory scan: NO brute force tool running. No network socket matching log source.",
+        "evidence_type": "memory_process",
+        "source": "list_processes",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 19
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 2,
+    "n_total_signals": 2,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

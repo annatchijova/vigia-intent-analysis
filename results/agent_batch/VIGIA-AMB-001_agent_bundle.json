@@ -1,0 +1,272 @@
+{
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-13T01:57:37.571344+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-AMB-001",
+    "end_time": "2026-07-13T01:57:37.571349+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-AMB-001",
+        "entry_sha256": "c05bf4ecf4a3c99cc5eb8ca36d597b4a506c569a8e0ffade481bc3604fab1b98",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-AMB-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:37.192673+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-AMB-001",
+        "entry_sha256": "2c08eb037f083edf6888a77ce6dfc3ec059a4f60d0b3080de03f10f4b4ddada8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:37.192756+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-AMB-001",
+        "entry_sha256": "bea4b6e9f9bce26e1fa24c309e513ee6e652d7b9b13bbbeb2d605e0fb2796d55",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 36ecf813ab87d5b5...",
+        "outputs_summary": {
+          "sha256": "36ecf813ab87d5b5da1fc394d9ee9859095cbd20cea1e5e4479eff61c4d1b57b"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:37.192845+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-AMB-001",
+        "entry_sha256": "e4e5a4aac3cada8ac8fd687e25649d062293898fec581072abe6cdc2f73effe1",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:37.192946+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-AMB-001",
+        "entry_sha256": "6154c2562137657de4e9b612b46bbad6072840cdfcfea3fcc685da3c9ca9bbdd",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "97/100",
+            "confidence": "97/100",
+            "is_conclusive": "True",
+            "narrative": "Anonymous email alleges 'the finance manager is stealing data'. Manager denies. Logs show access to confidential files, but also show the manager had authorisation. No exfiltration detected. Could be:..."
+          },
+          "case_id": "VIGIA-AMB-001",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "59/600",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "NOISE",
+            "resolve": {
+              "motor_confidence": "0.97",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0332)",
+              "motor_score": "0.0332",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "amb001_01",
+              "confidence": "1/5",
+              "description": "Anonymous email: 'The finance manager is stealing data'",
+              "evidence_type": "log_entry",
+              "source": "sift_mail_gateway",
+              "z_score": "1/100"
+            },
+            {
+              "artifact_id": "amb001_02",
+              "confidence": "3/5",
+              "description": "Finance manager accessed confidential client files",
+              "evidence_type": "log_entry",
+              "source": "sift_file_audit",
+              "z_score": "27/100"
+            },
+            {
+              "artifact_id": "amb001_03",
+              "confidence": "3/10",
+              "description": "No exfiltration detected from finance manager workstation",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_netflow",
+              "z_score": "3/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:37.570970+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-AMB-001",
+        "entry_sha256": "51235bac3e356261fde477060d2bf8fbfe36ef84cc483f6c12e016840d31122c",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:37.571089+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-AMB-001",
+        "entry_sha256": "b77570d274a350554283d383d48f118ca902b5998cdb1cb3d14197d1ebe3d3bc",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:37.571291+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:37.192450+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-AMB-001",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json",
+  "evidence_sha256": "36ecf813ab87d5b5da1fc394d9ee9859095cbd20cea1e5e4479eff61c4d1b57b",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-AMB-001 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-AMB-001.json\nEvidence SHA-256: 36ecf813ab87d5b5da1fc394d9ee9859095cbd20cea1e5e4479eff61c4d1b57b\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 97/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['sift_file_audit', 'sift_mail_gateway', 'sift_netflow'], 0 derivada(s)/no-analizada(s). Top z: Finance manager accessed confidential cl=0.27, No exfiltration detected from finance ma=0.01, Anonymous email: 'The finance manager is=0.01.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nAnonymous email alleges 'the finance manager is stealing data'. Manager denies. Logs show access to confidential files, but also show the manager had authorisation. No exfiltration detected. Could be: (1) real theft, (2) employee error, (3) false accusation by a third party.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Finance manager accessed confidential client files] z=0.270 conf=0.60 \u2014 \n  [No exfiltration detected from finance manager workstation] z=0.015 conf=0.30 \u2014 \n  [Anonymous email: 'The finance manager is stealing data'] z=0.010 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "97/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 97
+      },
+      "is_conclusive": true,
+      "narrative": "Anonymous email alleges 'the finance manager is stealing data'. Manager denies. Logs show access to confidential files, but also show the manager had authorisation. No exfiltration detected. Could be: (1) real theft, (2) employee error, (3) false accusation by a third party."
+    },
+    "case_id": "VIGIA-AMB-001",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "59/600",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "NOISE",
+      "resolve": {
+        "motor_confidence": "0.97",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0332)",
+        "motor_score": "0.0332",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "amb001_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "Anonymous email: 'The finance manager is stealing data'",
+        "evidence_type": "log_entry",
+        "source": "sift_mail_gateway",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "amb001_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 3
+        },
+        "description": "Finance manager accessed confidential client files",
+        "evidence_type": "log_entry",
+        "source": "sift_file_audit",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "amb001_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "No exfiltration detected from finance manager workstation",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 3,
+    "n_total_signals": 3,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

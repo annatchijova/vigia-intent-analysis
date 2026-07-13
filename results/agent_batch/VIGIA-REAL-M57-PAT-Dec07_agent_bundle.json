@@ -1,0 +1,248 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:58:05.154682+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+    "end_time": "2026-07-13T01:58:05.154687+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+        "entry_sha256": "9e9be57a07b035063d5ed874a2cf1c41190e09ed62dd7fb4fa8b21c6086c11c0",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-M57-PAT-Dec07"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:04.781872+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+        "entry_sha256": "429203342511d83720994a924941649b949fc4ae30319d0c51004a5c59e18f41",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec07.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:04.781955+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+        "entry_sha256": "1e8f00bda10bdba001653531e0737c2f443bbf22777ae58897696cbd360d9a4b",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec07.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 57ce40715d3876f6...",
+        "outputs_summary": {
+          "sha256": "57ce40715d3876f68e04bdeb7545075a3ce74767dffe857c78f4bb6036fdc74a"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:04.782037+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+        "entry_sha256": "1b06a26bbe570b4d75a9afe450369237894a4355d498c1e1d4e38147eea5640b",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec07.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:04.782153+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+        "entry_sha256": "bab77ae324b21f8c8d0e36011b2738224c9061d9bc0ca1a79b4a4faa1374b1a6",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 2 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "37/100",
+            "confidence": "37/100",
+            "is_conclusive": "True",
+            "narrative": "M57-Patents scenario. Pat (insider threat suspect). Dec-07 baseline: AVG antivirus active, OpenOffice open, cmd.exe spawned mdd_1.3.exe for memory acquisition. No exfiltration indicators this day."
+          },
+          "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+          "pipeline_meta": {
+            "artifact_count": "2",
+            "avg_score": "17/50",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.37",
+              "motor_reason": "Significant signal with structural support (score=0.1870)",
+              "motor_score": "0.187",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "M57-PAT-D07-A01",
+              "confidence": "17/20",
+              "description": "pslist: soffice.bin (OpenOffice) active PID 1608. cmd.exe PID 1860 spawned mdd_1.3.exe PID 2784 at 2009-12-08T00:22:05Z for memory acquisition.",
+              "evidence_type": "memory_process",
+              "source": "vol3_windows_pslist",
+              "z_score": "51/100"
+            },
+            {
+              "artifact_id": "M57-PAT-D07-A02",
+              "confidence": "17/20",
+              "description": "pslist: AVG suite active (avgwdsvc, avgnsx, avgemc, avgrsx, avgchsvx, avgcsrvx) \u2014 antivirus present and running. No suspicious processes beyond baseline.",
+              "evidence_type": "kernel_structure",
+              "source": "vol3_windows_pslist",
+              "z_score": "17/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:05.154338+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+        "entry_sha256": "898da89e359129830553cfc3f8b9b5291e5f1b429f016a297002614fe6bbfd3f",
+        "inputs_summary": {
+          "n_signals": "2"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:05.154447+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+        "entry_sha256": "daec5c6e67863c5b9c82be6a9e433e43851fbc80883f90d876a505ca2dfcc936",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:05.154629+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:04.781648+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec07.json",
+  "evidence_sha256": "57ce40715d3876f68e04bdeb7545075a3ce74767dffe857c78f4bb6036fdc74a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-M57-PAT-Dec07 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-M57-PAT-Dec07.json\nEvidence SHA-256: 57ce40715d3876f68e04bdeb7545075a3ce74767dffe857c78f4bb6036fdc74a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 37/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 2 se\u00f1al(es): 2 primaria(s) de ['vol3_windows_pslist'], 0 derivada(s)/no-analizada(s). Top z: pslist: soffice.bin (OpenOffice) active =0.51, pslist: AVG suite active (avgwdsvc, avgn=0.17.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nM57-Patents scenario. Pat (insider threat suspect). Dec-07 baseline: AVG antivirus active, OpenOffice open, cmd.exe spawned mdd_1.3.exe for memory acquisition. No exfiltration indicators this day.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [pslist: soffice.bin (OpenOffice) active PID 1608. cmd.exe PID 1860 spa] z=0.510 conf=0.85 \u2014 \n  [pslist: AVG suite active (avgwdsvc, avgnsx, avgemc, avgrsx, avgchsvx, ] z=0.170 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 2 | Derived: 0 | Total: 2",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "37/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 37
+      },
+      "is_conclusive": true,
+      "narrative": "M57-Patents scenario. Pat (insider threat suspect). Dec-07 baseline: AVG antivirus active, OpenOffice open, cmd.exe spawned mdd_1.3.exe for memory acquisition. No exfiltration indicators this day."
+    },
+    "case_id": "VIGIA-REAL-M57-PAT-Dec07",
+    "pipeline_meta": {
+      "artifact_count": 2,
+      "avg_score": "17/50",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.37",
+        "motor_reason": "Significant signal with structural support (score=0.1870)",
+        "motor_score": "0.187",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "M57-PAT-D07-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "pslist: soffice.bin (OpenOffice) active PID 1608. cmd.exe PID 1860 spawned mdd_1.3.exe PID 2784 at 2009-12-08T00:22:05Z for memory acquisition.",
+        "evidence_type": "memory_process",
+        "source": "vol3_windows_pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 51
+        }
+      },
+      {
+        "artifact_id": "M57-PAT-D07-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "pslist: AVG suite active (avgwdsvc, avgnsx, avgemc, avgrsx, avgchsvx, avgcsrvx) \u2014 antivirus present and running. No suspicious processes beyond baseline.",
+        "evidence_type": "kernel_structure",
+        "source": "vol3_windows_pslist",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 17
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 2,
+    "n_total_signals": 2,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

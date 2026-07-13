@@ -1,0 +1,320 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:58:48.725582+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-005",
+    "end_time": "2026-07-13T01:58:48.725590+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-005",
+        "entry_sha256": "e28146cceeba76187093979743f013cfcbcb165fb0373fcfd9066710681d4f47",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-005"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:48.320384+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-005",
+        "entry_sha256": "0111a100dad7366e283a54969f8fc71eb322d45e4243db40b7f9f64d23780552",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-005.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:48.320519+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-005",
+        "entry_sha256": "0e29a8ac4be737962e3437aea7fd050327fa92a7a3b257753e171d11440983ef",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-005.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1cb3262a58a8cec0...",
+        "outputs_summary": {
+          "sha256": "1cb3262a58a8cec05453917877dd8af619857d960761fc1322567c9f5a253343"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:48.320641+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-005",
+        "entry_sha256": "8984ff688620c400feb8b34e63c1bba556fbc839ec62864cbae7a17e43ff53db",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-005.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:48.320813+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-005",
+        "entry_sha256": "04268d0c7d38a3c2a9980b4d2104ffc3500de6213d8dfde76225d1e73bec6e4b",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "37/50",
+            "confidence": "37/50",
+            "is_conclusive": "True",
+            "narrative": "External security contractor 'helps' during an incident: blocks a Ukrainian IP and deletes access logs 'to avoid saturating the SIEM'. The deletion occurs 5 minutes before the help message."
+          },
+          "case_id": "case_087_estocolmo_inverso",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "4123/8000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.74",
+              "motor_reason": "Intent score 0.3688 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.3688",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a087_01",
+              "confidence": "3/10",
+              "description": "Slack message: 'Guys, found a Ukrainian IP attacking us. Already blocked it and deleting logs from that region to avoid saturating the SIEM'.",
+              "evidence_type": "memory_process",
+              "source": "sift_slack_export",
+              "z_score": "69/250"
+            },
+            {
+              "artifact_id": "a087_02",
+              "confidence": "19/20",
+              "description": "log_cleaner.exe process executed from contractor's machine 5 minutes BEFORE the Slack message. Not an authorized stack tool.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "323/400"
+            },
+            {
+              "artifact_id": "a087_03",
+              "confidence": "9/10",
+              "description": "2.4GB of access logs deleted with shred -n 7. Forensic-destructive method, not operational.",
+              "evidence_type": "memory_process",
+              "source": "sift_siem",
+              "z_score": "207/250"
+            },
+            {
+              "artifact_id": "a087_04",
+              "confidence": "1/4",
+              "description": "Ukrainian IP flagged as attacker turns out to be a Tor exit node. No evidence of real attack from that IP.",
+              "evidence_type": "cultural_marker",
+              "source": "sift_ip_geolocation",
+              "z_score": "3/20"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:48.724886+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-005",
+        "entry_sha256": "991fec5ae4249b4cc6508316744d30524f0fd2f52d10c1bf634618fb86e1ea84",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:48.725026+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-005",
+        "entry_sha256": "0a6c4f83e74e1df5e995f4f95116fc38a3558efe3dc34485ec17fe38291c8867",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:48.725298+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:48.320037+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-005",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-005.json",
+  "evidence_sha256": "1cb3262a58a8cec05453917877dd8af619857d960761fc1322567c9f5a253343",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-005 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-005.json\nEvidence SHA-256: 1cb3262a58a8cec05453917877dd8af619857d960761fc1322567c9f5a253343\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 37/50\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_ip_geolocation', 'sift_siem', 'sift_slack_export', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: 2.4GB of access logs deleted with shred =0.83, log_cleaner.exe process executed from co=0.81, Slack message: 'Guys, found a Ukrainian =0.28.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nExternal security contractor 'helps' during an incident: blocks a Ukrainian IP and deletes access logs 'to avoid saturating the SIEM'. The deletion occurs 5 minutes before the help message.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [2.4GB of access logs deleted with shred -n 7. Forensic-destructive met] z=0.828 conf=0.90 \u2014 \n  [log_cleaner.exe process executed from contractor's machine 5 minutes B] z=0.807 conf=0.95 \u2014 \n  [Slack message: 'Guys, found a Ukrainian IP attacking us. Already block] z=0.276 conf=0.30 \u2014 \n  [Ukrainian IP flagged as attacker turns out to be a Tor exit node. No e] z=0.150 conf=0.25 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "37/50",
+      "confidence": {
+        "__fraction__": true,
+        "den": 50,
+        "num": 37
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "37/50",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "4123/8000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "External security contractor 'helps' during an incident: blocks a Ukrainian IP and deletes access logs 'to avoid saturating the SIEM'. The deletion occurs 5 minutes before the help message."
+    },
+    "case_id": "case_087_estocolmo_inverso",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "4123/8000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.74",
+        "motor_reason": "Intent score 0.3688 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.3688",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a087_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        },
+        "description": "Slack message: 'Guys, found a Ukrainian IP attacking us. Already blocked it and deleting logs from that region to avoid saturating the SIEM'.",
+        "evidence_type": "memory_process",
+        "source": "sift_slack_export",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 69
+        }
+      },
+      {
+        "artifact_id": "a087_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "log_cleaner.exe process executed from contractor's machine 5 minutes BEFORE the Slack message. Not an authorized stack tool.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 323
+        }
+      },
+      {
+        "artifact_id": "a087_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "2.4GB of access logs deleted with shred -n 7. Forensic-destructive method, not operational.",
+        "evidence_type": "memory_process",
+        "source": "sift_siem",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 207
+        }
+      },
+      {
+        "artifact_id": "a087_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        },
+        "description": "Ukrainian IP flagged as attacker turns out to be a Tor exit node. No evidence of real attack from that IP.",
+        "evidence_type": "cultural_marker",
+        "source": "sift_ip_geolocation",
+        "z_score": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

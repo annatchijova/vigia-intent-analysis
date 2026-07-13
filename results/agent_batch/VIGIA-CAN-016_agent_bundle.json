@@ -1,0 +1,296 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:58:54.423405+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-016",
+    "end_time": "2026-07-13T01:58:54.423410+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-016",
+        "entry_sha256": "b16b63fda2ee93310a0222b38e3bcb628522e475d8279cebcbcc0e72fd89667a",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-016"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:54.010824+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-016",
+        "entry_sha256": "a21090b9db72b51f172b03a6bd233229922bd9cfcc710b9cdfceafd2c743d6fe",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:54.010910+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-016",
+        "entry_sha256": "b75ac6c7f2fddf50bc8779b755d073614760e85d8defbe10ba60b60865d985ac",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 45986df05d53df6c...",
+        "outputs_summary": {
+          "sha256": "45986df05d53df6ca82c11a704812f9c1c9d9965bae8016492d6014dc1b0915d"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:54.011003+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-016",
+        "entry_sha256": "24630993ce562cece9cca42ee6a943ded44ce45c8d2e431a39d3b9a3f31c92ac",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:54.011114+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-016",
+        "entry_sha256": "a89fa5b0db7dd96a7799fc21548546d8fda02c310a99c1f64b3a84ee83929bc7",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "11/20",
+            "confidence": "11/20",
+            "is_conclusive": "True",
+            "narrative": "User types 'ipconfig /all' on an Ubuntu 24.04 LTS server. Fails with 'command not found'. Corrects to 'ip addr' 1.3 seconds later. Cross-platform muscle memory contamination reveals a Windows origin e..."
+          },
+          "case_id": "case_098_anacronismo_plataforma",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "3051/8000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.55",
+              "motor_reason": "Significant signal with structural support (score=0.2733)",
+              "motor_score": "0.2733",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a098_01",
+              "confidence": "7/20",
+              "description": "Failed command: 'ipconfig /all' in Ubuntu 24.04 bash. Exit code 127: command not found.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "161/500"
+            },
+            {
+              "artifact_id": "a098_02",
+              "confidence": "7/20",
+              "description": "Correction 1.3 seconds later: 'ip addr'. Native Linux command.",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "161/500"
+            },
+            {
+              "artifact_id": "a098_03",
+              "confidence": "1/2",
+              "description": "Keystroke sequence: 'ipconfig' space '/' TAB (failed autocomplete) Ctrl+C 'ip addr'.",
+              "evidence_type": "log_entry",
+              "source": "sift_keylogger",
+              "z_score": "11/200"
+            },
+            {
+              "artifact_id": "a098_04",
+              "confidence": "19/20",
+              "description": "SSH session from Windows 11 (PuTTY/0.81) connected to Ubuntu 24.04 Linux server.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "1653/2000"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:54.423015+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-016",
+        "entry_sha256": "5db9137f3ed8a679485a7ec62ffb602cce281b20796a44a7a40e2d624a0320d1",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:54.423140+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-016",
+        "entry_sha256": "08bc40212d1cda26e42b97df7131ee422aab98249c4a571a57a5d89dd7c3a8c7",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:54.423354+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:54.010587+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-016",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json",
+  "evidence_sha256": "45986df05d53df6ca82c11a704812f9c1c9d9965bae8016492d6014dc1b0915d",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-016 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-016.json\nEvidence SHA-256: 45986df05d53df6ca82c11a704812f9c1c9d9965bae8016492d6014dc1b0915d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 11/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_keylogger', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: SSH session from Windows 11 (PuTTY/0.81)=0.83, Failed command: 'ipconfig /all' in Ubunt=0.32, Correction 1.3 seconds later: 'ip addr'.=0.32.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nUser types 'ipconfig /all' on an Ubuntu 24.04 LTS server. Fails with 'command not found'. Corrects to 'ip addr' 1.3 seconds later. Cross-platform muscle memory contamination reveals a Windows origin environment.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SSH session from Windows 11 (PuTTY/0.81) connected to Ubuntu 24.04 Lin] z=0.827 conf=0.95 \u2014 \n  [Failed command: 'ipconfig /all' in Ubuntu 24.04 bash. Exit code 127: c] z=0.322 conf=0.35 \u2014 \n  [Correction 1.3 seconds later: 'ip addr'. Native Linux command.] z=0.322 conf=0.35 \u2014 \n  [Keystroke sequence: 'ipconfig' space '/' TAB (failed autocomplete) Ctr] z=0.055 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "11/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 11
+      },
+      "is_conclusive": true,
+      "narrative": "User types 'ipconfig /all' on an Ubuntu 24.04 LTS server. Fails with 'command not found'. Corrects to 'ip addr' 1.3 seconds later. Cross-platform muscle memory contamination reveals a Windows origin environment."
+    },
+    "case_id": "case_098_anacronismo_plataforma",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "3051/8000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.55",
+        "motor_reason": "Significant signal with structural support (score=0.2733)",
+        "motor_score": "0.2733",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a098_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Failed command: 'ipconfig /all' in Ubuntu 24.04 bash. Exit code 127: command not found.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a098_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "Correction 1.3 seconds later: 'ip addr'. Native Linux command.",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a098_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Keystroke sequence: 'ipconfig' space '/' TAB (failed autocomplete) Ctrl+C 'ip addr'.",
+        "evidence_type": "log_entry",
+        "source": "sift_keylogger",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 11
+        }
+      },
+      {
+        "artifact_id": "a098_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "SSH session from Windows 11 (PuTTY/0.81) connected to Ubuntu 24.04 Linux server.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1653
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

@@ -1,0 +1,408 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:58:34.849934+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+    "end_time": "2026-07-13T01:58:34.849941+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+        "entry_sha256": "7cbb3f157ef2a5831264b66006440a228573f9ae6bc91414e5358b8bddd9640b",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:34.458725+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+        "entry_sha256": "c4f2475afdaa9696996f2bba644664fd69f1648754659fe626dd5bbb35e7712f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:34.458808+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+        "entry_sha256": "80fd868961aca78720b70349f7803ffbf75a08437d92a688d640a7a39e195b18",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 3f1a23d51c331278...",
+        "outputs_summary": {
+          "sha256": "3f1a23d51c3312787db4e4fa6977e88d119d0250399e55602019e86bb6d60783"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:34.458913+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+        "entry_sha256": "3bc40bb0ed6f02a4da5ff36b55471ab180ebe611368d39b1ac1cab4147d0d72e",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:34.459013+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+        "entry_sha256": "982359fbc5d9c4737b42c683aa3daee638330c48a50f6ef07db1291a8470d620",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 9 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "83/100",
+            "confidence": "83/100",
+            "is_conclusive": "True",
+            "narrative": "GrayKey extraction of iPhone 8 (iOS 14.4) belonging to Eli Flatt. Triple encrypted comms stack (Wickr+Psiphon, Signal, ProtonMail) with active recruitment to Wickr, minimal digital footprint, prepaid ..."
+          },
+          "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+          "pipeline_meta": {
+            "artifact_count": "9",
+            "avg_score": "89/360",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "UNKNOWN",
+            "resolve": {
+              "motor_confidence": "0.83",
+              "motor_reason": "Intent score 0.4170 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (4 domains, 9 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.417",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "wickr_app",
+              "confidence": "1/2",
+              "description": "WickrEnterprise (com.mywickr.wickr) with embedded PsiphonTunnel.framework for censorship circumvention VPN. WickrID: eflatt610.",
+              "evidence_type": "registry_key",
+              "source": "filesystem_analysis",
+              "z_score": "7/20"
+            },
+            {
+              "artifact_id": "signal_app",
+              "confidence": "1/2",
+              "description": "Signal v5.4.0 (org.whispersystems.signal) registered 2021-02-16 via SMS code 191-116. Database exists (signal.sqlite, SQLCipher encrypted).",
+              "evidence_type": "registry_key",
+              "source": "filesystem_analysis",
+              "z_score": "1/4"
+            },
+            {
+              "artifact_id": "protonmail_app",
+              "confidence": "1/2",
+              "description": "ProtonMail (ch.protonmail.protonmail) with iCloud sync enabled. Persistent queue directories present.",
+              "evidence_type": "registry_key",
+              "source": "filesystem_analysis",
+              "z_score": "1/4"
+            },
+            {
+              "artifact_id": "wickr_recruitment_sms",
+              "confidence": "1/2",
+              "description": "SMS sent from device recruiting contact +15713106012 to join Wickr: 'Hey! Join me on Wickr for the most secure communications experience - for FREE! Getting started is easy >> https://me-download.wick",
+              "evidence_type": "cultural_marker",
+              "source": "sms_analysis",
+              "z_score": "2/5"
+            },
+            {
+              "artifact_id": "wickr_messages",
+              "confidence": "1/2",
+              "description": "5 encrypted Wickr messages with auto-destruct between 2021-03-04 and 2021-03-07. All ZBODY fields are encrypted blobs. Message 3 is type 7 (media/call). Content irrecoverable without Wickr session key",
+              "evidence_type": "log_entry",
+              "source": "database_analysis",
+              "z_score": "3/10"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:34.849365+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+        "entry_sha256": "1d68c8f751a125120a60fe9e5a9d40c8b3dd571b06707e4a48cad5925f63f617",
+        "inputs_summary": {
+          "n_signals": "9"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:34.849501+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+        "entry_sha256": "fb0fa7a6a3acb27414c0d89a8843002c95352fb66b8552d7437a7e0ebda1014b",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:34.849741+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:34.458496+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json",
+  "evidence_sha256": "3f1a23d51c3312787db4e4fa6977e88d119d0250399e55602019e86bb6d60783",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CTF-2021-iOS-Eli-iPhone8 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/converted/VIGIA-CTF-2021-iOS-Eli-iPhone8.json\nEvidence SHA-256: 3f1a23d51c3312787db4e4fa6977e88d119d0250399e55602019e86bb6d60783\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 83/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 9 se\u00f1al(es): 9 primaria(s) de ['addressbook_analysis', 'database_analysis', 'filesystem_analysis', 'keychain_analysis', 'location_analysis', 'passcode_analysis', 'sms_analysis'], 0 derivada(s)/no-analizada(s). Top z: SMS sent from device recruiting contact =0.40, WickrEnterprise (com.mywickr.wickr) with=0.35, 5 encrypted Wickr messages with auto-des=0.30.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nGrayKey extraction of iPhone 8 (iOS 14.4) belonging to Eli Flatt. Triple encrypted comms stack (Wickr+Psiphon, Signal, ProtonMail) with active recruitment to Wickr, minimal digital footprint, prepaid carrier. SUSPICION verdict \u2014 coherent evasion pattern but each artifact individually explainable.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [SMS sent from device recruiting contact +15713106012 to join Wickr: 'H] z=0.400 conf=0.50 \u2014 \n  [WickrEnterprise (com.mywickr.wickr) with embedded PsiphonTunnel.framew] z=0.350 conf=0.50 \u2014 \n  [5 encrypted Wickr messages with auto-destruct between 2021-03-04 and 2] z=0.300 conf=0.50 \u2014 \n  [Signal v5.4.0 (org.whispersystems.signal) registered 2021-02-16 via SM] z=0.250 conf=0.50 \u2014 \n  [ProtonMail (ch.protonmail.protonmail) with iCloud sync enabled. Persis] z=0.250 conf=0.50 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 9 | Derived: 0 | Total: 9",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "83/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 83
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "83/100",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "89/360"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "GrayKey extraction of iPhone 8 (iOS 14.4) belonging to Eli Flatt. Triple encrypted comms stack (Wickr+Psiphon, Signal, ProtonMail) with active recruitment to Wickr, minimal digital footprint, prepaid carrier. SUSPICION verdict \u2014 coherent evasion pattern but each artifact individually explainable."
+    },
+    "case_id": "VIGIA-CTF-2021-iOS-Eli-iPhone8",
+    "pipeline_meta": {
+      "artifact_count": 9,
+      "avg_score": "89/360",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "UNKNOWN",
+      "resolve": {
+        "motor_confidence": "0.83",
+        "motor_reason": "Intent score 0.4170 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (4 domains, 9 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.417",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "wickr_app",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "WickrEnterprise (com.mywickr.wickr) with embedded PsiphonTunnel.framework for censorship circumvention VPN. WickrID: eflatt610.",
+        "evidence_type": "registry_key",
+        "source": "filesystem_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        }
+      },
+      {
+        "artifact_id": "signal_app",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Signal v5.4.0 (org.whispersystems.signal) registered 2021-02-16 via SMS code 191-116. Database exists (signal.sqlite, SQLCipher encrypted).",
+        "evidence_type": "registry_key",
+        "source": "filesystem_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "protonmail_app",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "ProtonMail (ch.protonmail.protonmail) with iCloud sync enabled. Persistent queue directories present.",
+        "evidence_type": "registry_key",
+        "source": "filesystem_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "wickr_recruitment_sms",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "SMS sent from device recruiting contact +15713106012 to join Wickr: 'Hey! Join me on Wickr for the most secure communications experience - for FREE! Getting started is easy >> https://me-download.wick",
+        "evidence_type": "cultural_marker",
+        "source": "sms_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        }
+      },
+      {
+        "artifact_id": "wickr_messages",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "5 encrypted Wickr messages with auto-destruct between 2021-03-04 and 2021-03-07. All ZBODY fields are encrypted blobs. Message 3 is type 7 (media/call). Content irrecoverable without Wickr session key",
+        "evidence_type": "log_entry",
+        "source": "database_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "prepaid_carrier",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Total Wireless prepaid carrier. No contract. Reduced traceability compared to postpaid carriers.",
+        "evidence_type": "user_agent",
+        "source": "keychain_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "empty_contacts",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "AddressBook contains only 1 contact (Apple Inc / 1-800-MY-APPLE). All personal contacts exist only in ephemeral SMS/iMessage cache.",
+        "evidence_type": "cultural_marker",
+        "source": "addressbook_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "empty_locations",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "routined/Local.sqlite completely empty (0 visits, 0 learned locations, 0 WiFi APs). Only 1 geofence in consolidated.db: Burlington, VT (44.4737N, -73.2134W).",
+        "evidence_type": "cultural_marker",
+        "source": "location_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        }
+      },
+      {
+        "artifact_id": "weak_passcode",
+        "confidence": {
+          "__fraction__": true,
+          "den": 2,
+          "num": 1
+        },
+        "description": "Passcode 185185 \u2014 6-digit numeric, repeating pattern, Shannon entropy 1.585 bits. Inconsistent with privacy-focused app selection.",
+        "evidence_type": "cultural_marker",
+        "source": "passcode_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 3
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 9,
+    "n_total_signals": 9,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

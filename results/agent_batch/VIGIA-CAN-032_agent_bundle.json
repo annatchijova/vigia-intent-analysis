@@ -1,0 +1,296 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:59:02.505848+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-032",
+    "end_time": "2026-07-13T01:59:02.505854+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-032",
+        "entry_sha256": "e8b5f8f7de0233127ef391ae069c65134b84e16b43559720daba81d2c17ab902",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-032"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:59:02.123528+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-032",
+        "entry_sha256": "9612c19ed652e463a88b8c76b06f168d8f20addd8cf1b02e7e725d5267bd4000",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-032.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:59:02.123613+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-032",
+        "entry_sha256": "24d73547b5985d034e55c2768891bc8f75c5ace4b087ae01b4cb278ca30326c8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-032.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: b87242d246b4bc27...",
+        "outputs_summary": {
+          "sha256": "b87242d246b4bc27cdd56c7e2003c5f6ec8d6a1211f591013be781d8dca69fbf"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:59:02.123706+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-032",
+        "entry_sha256": "4cb94101bf59e6d1d670df4df34e9b1f46e804090aca7f9e0927b2762d2668c8",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-032.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:59:02.123806+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-032",
+        "entry_sha256": "f9a968b8e5de50cb85fec09bd277815a9b506baa621114bfa04af28ba6651b53",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "59/100",
+            "confidence": "59/100",
+            "is_conclusive": "True",
+            "narrative": "5,000 failed login alerts from RU/CN toward an irrelevant legacy DB saturate the SOC. Simultaneously, a user with legitimate credentials compresses 12GB of the customer DB with 7z and exfiltrates 847M..."
+          },
+          "case_id": "case_005_ruido_blanco_distractor",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "863/2000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.59",
+              "motor_reason": "Significant signal with structural support (score=0.2948)",
+              "motor_score": "0.2948",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a005_01",
+              "confidence": "7/20",
+              "description": "5,000 Event 4625 in 12 minutes from 847 IPs geolocated in RU/CN toward DB-LEGACY-01 (MySQL 5.6, no sensitive data).",
+              "evidence_type": "memory_process",
+              "source": "sift_syslog",
+              "z_score": "161/500"
+            },
+            {
+              "artifact_id": "a005_02",
+              "confidence": "2/5",
+              "description": "SIEM generates 47 'Brute Force \u2014 High Priority' alerts. Tier-1 analyst assigned. Response SLA activated.",
+              "evidence_type": "memory_process",
+              "source": "sift_siem",
+              "z_score": "46/125"
+            },
+            {
+              "artifact_id": "a005_03",
+              "confidence": "19/20",
+              "description": "7z.exe under finance_user session compressing Customer_DB.mdf in 50MB chunks. Compression ratio 0.12.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "209/250"
+            },
+            {
+              "artifact_id": "a005_04",
+              "confidence": "1/4",
+              "description": "847MB HTTPS outbound traffic from finance_user workstation to a cloud storage IP during the 'fire' window.",
+              "evidence_type": "ip_geolocation",
+              "source": "sift_netflow",
+              "z_score": "1/5"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:59:02.505474+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-032",
+        "entry_sha256": "2b3c913290b1a48d17e3f4fd3e0fbcb2705af30b69685982bfebf36dc2b18279",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:59:02.505587+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-032",
+        "entry_sha256": "e1c2a65d1c489b92bf0cdd15198e8a71147e7b233d2b91cdde1b343b484e3c08",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:59:02.505798+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:59:02.123296+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-032",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-032.json",
+  "evidence_sha256": "b87242d246b4bc27cdd56c7e2003c5f6ec8d6a1211f591013be781d8dca69fbf",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-032 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-032.json\nEvidence SHA-256: b87242d246b4bc27cdd56c7e2003c5f6ec8d6a1211f591013be781d8dca69fbf\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 59/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_netflow', 'sift_siem', 'sift_syslog', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: 7z.exe under finance_user session compre=0.84, SIEM generates 47 'Brute Force \u2014 High Pr=0.37, 5,000 Event 4625 in 12 minutes from 847 =0.32.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n5,000 failed login alerts from RU/CN toward an irrelevant legacy DB saturate the SOC. Simultaneously, a user with legitimate credentials compresses 12GB of the customer DB with 7z and exfiltrates 847MB over HTTPS.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [7z.exe under finance_user session compressing Customer_DB.mdf in 50MB ] z=0.836 conf=0.95 \u2014 \n  [SIEM generates 47 'Brute Force \u2014 High Priority' alerts. Tier-1 analyst] z=0.368 conf=0.40 \u2014 \n  [5,000 Event 4625 in 12 minutes from 847 IPs geolocated in RU/CN toward] z=0.322 conf=0.35 \u2014 \n  [847MB HTTPS outbound traffic from finance_user workstation to a cloud ] z=0.200 conf=0.25 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "59/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 59
+      },
+      "is_conclusive": true,
+      "narrative": "5,000 failed login alerts from RU/CN toward an irrelevant legacy DB saturate the SOC. Simultaneously, a user with legitimate credentials compresses 12GB of the customer DB with 7z and exfiltrates 847MB over HTTPS."
+    },
+    "case_id": "case_005_ruido_blanco_distractor",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "863/2000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.59",
+        "motor_reason": "Significant signal with structural support (score=0.2948)",
+        "motor_score": "0.2948",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a005_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 7
+        },
+        "description": "5,000 Event 4625 in 12 minutes from 847 IPs geolocated in RU/CN toward DB-LEGACY-01 (MySQL 5.6, no sensitive data).",
+        "evidence_type": "memory_process",
+        "source": "sift_syslog",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 161
+        }
+      },
+      {
+        "artifact_id": "a005_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "SIEM generates 47 'Brute Force \u2014 High Priority' alerts. Tier-1 analyst assigned. Response SLA activated.",
+        "evidence_type": "memory_process",
+        "source": "sift_siem",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 46
+        }
+      },
+      {
+        "artifact_id": "a005_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "7z.exe under finance_user session compressing Customer_DB.mdf in 50MB chunks. Compression ratio 0.12.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 209
+        }
+      },
+      {
+        "artifact_id": "a005_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        },
+        "description": "847MB HTTPS outbound traffic from finance_user workstation to a cloud storage IP during the 'fire' window.",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

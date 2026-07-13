@@ -1,0 +1,320 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-13T01:59:04.551921+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-CAN-036",
+    "end_time": "2026-07-13T01:59:04.551929+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-CAN-036",
+        "entry_sha256": "869cd5eae570eb0a4c78d7149cc8dba94ad5c71cc83c526d837449f58779f2f5",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-CAN-036"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:59:04.157561+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-036",
+        "entry_sha256": "56f2e3ba447d830774e79ecaa283bc1ad5dbdf1d0adffcaeaf761c1ebe632c20",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:59:04.157648+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-CAN-036",
+        "entry_sha256": "bf7477b10bd292207e938245cf60f832cf02ff8f409eee29d6d02d068465717f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: e774c9bdb3bf1e10...",
+        "outputs_summary": {
+          "sha256": "e774c9bdb3bf1e10d9419ce3bb159f7dbdebdd8cdb5a4a3dd66792cf2e45fd59"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:59:04.157739+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-CAN-036",
+        "entry_sha256": "cb232f7cfeddc7746fd5a31e139d81ec6f2c32c8e106288c30eefe9a01d35892",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:59:04.157921+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-CAN-036",
+        "entry_sha256": "006d3708c49864438cbdb36d4f1e8b3e3132290a53de1185bac3f7a9417c5cbe",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "71/100",
+            "confidence": "71/100",
+            "is_conclusive": "True",
+            "narrative": "Process 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce ..."
+          },
+          "case_id": "case_010_falso_positivo_empatico",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "583/1250",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.71",
+              "motor_reason": "Intent score 0.3535 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.3535",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "a010_01",
+              "confidence": "17/20",
+              "description": "Update_Fix_For_HR_Payroll.exe: 1.2GB RAM, C:\\Users\\Public\\Documents\\, no digital signature, executed from explorer.exe.",
+              "evidence_type": "memory_process",
+              "source": "sift_volatility",
+              "z_score": "187/250"
+            },
+            {
+              "artifact_id": "a010_02",
+              "confidence": "93/100",
+              "description": "Shannon entropy: 7.8 bits/byte. Legitimate software range: 5.0-6.5. Indicates encrypted or compressed payload.",
+              "evidence_type": "memory_process",
+              "source": "sift_entropy",
+              "z_score": "2139/2500"
+            },
+            {
+              "artifact_id": "a010_03",
+              "confidence": "1/4",
+              "description": "Process establishes persistent connection to 91.108.4.200:8080. Not a Microsoft domain or known HR vendor.",
+              "evidence_type": "memory_process",
+              "source": "sift_netflow",
+              "z_score": "23/100"
+            },
+            {
+              "artifact_id": "a010_04",
+              "confidence": "2/5",
+              "description": "Verification with HR system: NO payroll update is pending or authorized for today.",
+              "evidence_type": "log_entry",
+              "source": "sift_hr_system",
+              "z_score": "4/125"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:59:04.551416+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-CAN-036",
+        "entry_sha256": "a9bc1109991a0c9e6b838880c8ee9dce68aa0b54ba3a1799071e15a9247aaa56",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:59:04.551536+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-CAN-036",
+        "entry_sha256": "752213e61165d3c3bbdab4bf0df4392f9f1914f42383d91d711c8e5766c24460",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:59:04.551737+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:59:04.157324+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-CAN-036",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json",
+  "evidence_sha256": "e774c9bdb3bf1e10d9419ce3bb159f7dbdebdd8cdb5a4a3dd66792cf2e45fd59",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-CAN-036 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/consolidated_canonical/VIGIA-CAN-036.json\nEvidence SHA-256: e774c9bdb3bf1e10d9419ce3bb159f7dbdebdd8cdb5a4a3dd66792cf2e45fd59\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 71/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_entropy', 'sift_hr_system', 'sift_netflow', 'sift_volatility'], 0 derivada(s)/no-analizada(s). Top z: Shannon entropy: 7.8 bits/byte. Legitima=0.86, Update_Fix_For_HR_Payroll.exe: 1.2GB RAM=0.75, Process establishes persistent connectio=0.23.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nProcess 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce doubt before killing the process.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Shannon entropy: 7.8 bits/byte. Legitimate software range: 5.0-6.5. In] z=0.856 conf=0.93 \u2014 \n  [Update_Fix_For_HR_Payroll.exe: 1.2GB RAM, C:\\Users\\Public\\Documents\\, ] z=0.748 conf=0.85 \u2014 \n  [Process establishes persistent connection to 91.108.4.200:8080. Not a ] z=0.230 conf=0.25 \u2014 \n  [Verification with HR system: NO payroll update is pending or authorize] z=0.032 conf=0.40 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "71/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 71
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "71/100",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "583/1250"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "Process 'Update_Fix_For_HR_Payroll.exe' consuming 1.2GB RAM from C:\\Users\\Public\\Documents, without a digital signature. Shannon entropy: 7.8 bits (packed/encrypted). The name appeals to HR to induce doubt before killing the process."
+    },
+    "case_id": "case_010_falso_positivo_empatico",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "583/1250",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.71",
+        "motor_reason": "Intent score 0.3535 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (2 domains, 4 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.3535",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "a010_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Update_Fix_For_HR_Payroll.exe: 1.2GB RAM, C:\\Users\\Public\\Documents\\, no digital signature, executed from explorer.exe.",
+        "evidence_type": "memory_process",
+        "source": "sift_volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 187
+        }
+      },
+      {
+        "artifact_id": "a010_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 93
+        },
+        "description": "Shannon entropy: 7.8 bits/byte. Legitimate software range: 5.0-6.5. Indicates encrypted or compressed payload.",
+        "evidence_type": "memory_process",
+        "source": "sift_entropy",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 2139
+        }
+      },
+      {
+        "artifact_id": "a010_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        },
+        "description": "Process establishes persistent connection to 91.108.4.200:8080. Not a Microsoft domain or known HR vendor.",
+        "evidence_type": "memory_process",
+        "source": "sift_netflow",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 23
+        }
+      },
+      {
+        "artifact_id": "a010_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "Verification with HR system: NO payroll update is pending or authorized for today.",
+        "evidence_type": "log_entry",
+        "source": "sift_hr_system",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 4
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

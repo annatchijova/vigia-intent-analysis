@@ -1,0 +1,576 @@
+{
+  "agent_verdict": "NOISE",
+  "analysis_timestamp": "2026-07-13T01:57:39.540876+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-BREAK-011",
+    "end_time": "2026-07-13T01:57:39.540882+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-BREAK-011",
+        "entry_sha256": "0a5f2890e5fea557f336920c9d4a0a4d743087b1de1b16e7b2a85884b90fdae3",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-BREAK-011"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:39.103740+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-011",
+        "entry_sha256": "bd59c012474175406d628141b30570dc5796bcffad7de45318e9ab85bd7c3fa0",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:39.103821+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-BREAK-011",
+        "entry_sha256": "acc2fc1af921de0053d9106593ac77ceb8c5010f938d838a8507f27b2708f60f",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: ae0f47628122e7b5...",
+        "outputs_summary": {
+          "sha256": "ae0f47628122e7b5bf6047972b3c30dada47916d3213fee0884e42a9caee15e1"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:39.103941+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-BREAK-011",
+        "entry_sha256": "9b4bd4b3155f9fc86ba052b0ef22caf21a1aa4cb041d31dabdc9b9640cee82f1",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:39.104041+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-BREAK-011",
+        "entry_sha256": "d250d8d64932ad98cfbe6fd9a729a783d53252883a9a6f83fafbb7e3b79bdd9a",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 21 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+            "best_posterior": "24/25",
+            "confidence": "24/25",
+            "is_conclusive": "True",
+            "narrative": "20 weak evidence items, none crossing the formal threshold individually, all pointing to the same target. A human expert concludes SUSPICION. VIG\u00cdA might get trapped in ABSTAIN because no individual p..."
+          },
+          "case_id": "VIGIA-BREAK-011",
+          "pipeline_meta": {
+            "artifact_count": "21",
+            "avg_score": "83/2100",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.96",
+              "motor_reason": "Insufficient evidence of malicious intent (score=0.0357)",
+              "motor_score": "0.0357",
+              "motor_verdict": "NOISE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "b011_01",
+              "confidence": "1/5",
+              "description": "SYN packet to port 443 from IP 185.220.101.1",
+              "evidence_type": "log_entry",
+              "source": "sift_firewall",
+              "z_score": "3/100"
+            },
+            {
+              "artifact_id": "b011_02",
+              "confidence": "1/5",
+              "description": "SYN packet to port 443 from IP 185.220.101.2",
+              "evidence_type": "log_entry",
+              "source": "sift_firewall",
+              "z_score": "3/100"
+            },
+            {
+              "artifact_id": "b011_03",
+              "confidence": "1/5",
+              "description": "SYN packet to port 443 from IP 185.220.101.3",
+              "evidence_type": "log_entry",
+              "source": "sift_firewall",
+              "z_score": "3/100"
+            },
+            {
+              "artifact_id": "b011_04",
+              "confidence": "1/5",
+              "description": "SYN packet to port 443 from IP 185.220.101.4",
+              "evidence_type": "log_entry",
+              "source": "sift_firewall",
+              "z_score": "3/100"
+            },
+            {
+              "artifact_id": "b011_05",
+              "confidence": "1/5",
+              "description": "SYN packet to port 443 from IP 185.220.101.5",
+              "evidence_type": "log_entry",
+              "source": "sift_firewall",
+              "z_score": "3/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:39.540223+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-BREAK-011",
+        "entry_sha256": "eaba7609647fdbd8a5b4ff4c1c309f2f373a38e33f1ab367abe3fc2293787dba",
+        "inputs_summary": {
+          "n_signals": "21"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:39.540425+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-BREAK-011",
+        "entry_sha256": "c88e496674b2c59ab4d150b6720a0b0cbb4499979b323fed40c086c5e692256e",
+        "inputs_summary": {
+          "verdict": "NO_SEMIOTIC_ANOMALY_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 0 (NOISE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "NOISE",
+          "exit_code": "0"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:39.540810+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:39.103521+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-BREAK-011",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json",
+  "evidence_sha256": "ae0f47628122e7b5bf6047972b3c30dada47916d3213fee0884e42a9caee15e1",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-BREAK-011 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-BREAK-011.json\nEvidence SHA-256: ae0f47628122e7b5bf6047972b3c30dada47916d3213fee0884e42a9caee15e1\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: NO_SEMIOTIC_ANOMALY_DETECTED\nPosterior confidence: 24/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 21 se\u00f1al(es): 21 primaria(s) de ['sift_firewall', 'sift_zeek'], 0 derivada(s)/no-analizada(s). Top z: All 20 IPs belong to the same bulletproo=0.23, SYN packet to port 443 from IP 185.220.1=0.03, SYN packet to port 443 from IP 185.220.1=0.03.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: NO_SEMIOTIC_ANOMALY_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n20 weak evidence items, none crossing the formal threshold individually, all pointing to the same target. A human expert concludes SUSPICION. VIG\u00cdA might get trapped in ABSTAIN because no individual piece reaches the confidence threshold.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [All 20 IPs belong to the same bulletproof hosting ASN (AS14061, Digita] z=0.230 conf=0.25 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.1] z=0.030 conf=0.20 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.2] z=0.030 conf=0.20 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.3] z=0.030 conf=0.20 \u2014 \n  [SYN packet to port 443 from IP 185.220.101.4] z=0.030 conf=0.20 \u2014 \n\n--- FINAL ALERT LEVEL ---\nLOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 21 | Derived: 0 | Total: 21",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "NO_SEMIOTIC_ANOMALY_DETECTED",
+      "best_posterior": "24/25",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 24
+      },
+      "is_conclusive": true,
+      "narrative": "20 weak evidence items, none crossing the formal threshold individually, all pointing to the same target. A human expert concludes SUSPICION. VIG\u00cdA might get trapped in ABSTAIN because no individual piece reaches the confidence threshold."
+    },
+    "case_id": "VIGIA-BREAK-011",
+    "pipeline_meta": {
+      "artifact_count": 21,
+      "avg_score": "83/2100",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.96",
+        "motor_reason": "Insufficient evidence of malicious intent (score=0.0357)",
+        "motor_score": "0.0357",
+        "motor_verdict": "NOISE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "b011_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.1",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.2",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.3",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.4",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_05",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.5",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_06",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.6",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_07",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.7",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_08",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.8",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_09",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.9",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_10",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.10",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_11",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.11",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_12",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.12",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_13",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.13",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_14",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.14",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_15",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.15",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_16",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.16",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_17",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.17",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_18",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.18",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_19",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.19",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_20",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 1
+        },
+        "description": "SYN packet to port 443 from IP 185.220.101.20",
+        "evidence_type": "log_entry",
+        "source": "sift_firewall",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "b011_meta",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 1
+        },
+        "description": "All 20 IPs belong to the same bulletproof hosting ASN (AS14061, DigitalOcean). Timestamps are spaced exactly 300 seconds apart over 10 hours. No SYN resulted in a completed handshake.",
+        "evidence_type": "ip_geolocation",
+        "source": "sift_zeek",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 23
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 21,
+    "n_total_signals": 21,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

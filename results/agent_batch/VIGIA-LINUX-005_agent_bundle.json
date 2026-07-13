@@ -1,0 +1,296 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:57:53.184928+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-LINUX-005",
+    "end_time": "2026-07-13T01:57:53.184933+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-LINUX-005",
+        "entry_sha256": "cf7bfc732a3149b052c82d8fb8e990ad90529514ff58a84d2c736e6cdc9fe0c2",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-LINUX-005"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:57:52.815906+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-005",
+        "entry_sha256": "1444153868d948e82525728b9f5c51611f74f6cbd6b7310461f50fa95846c033",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-005.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:57:52.815990+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-LINUX-005",
+        "entry_sha256": "d8a711834df9192e34abff2fb352035ed8a11f08856713442569b381de60f1a8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-005.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 925fd7509d1f2acd...",
+        "outputs_summary": {
+          "sha256": "925fd7509d1f2acdcd31002b4a01b6bb491df988a67ffe82f7ce9fec821d1806"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:57:52.816103+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-LINUX-005",
+        "entry_sha256": "dbe5da2dfeed5ae97489672fc8ac780df34123233b66d0cf76dc67a01636bb3e",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-005.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:57:52.816209+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-LINUX-005",
+        "entry_sha256": "2f715149a8131e8dfeacfaf6120b9bbc82537dd0a0ebe3b6eb1b1cb71063a7e4",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 4 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "37/100",
+            "confidence": "37/100",
+            "is_conclusive": "True",
+            "narrative": "Epistemological boundary test derived from VIGIA-LINUX-004. A binary named 'cron' is found on a Linux system with anomalous entropy and size. Without the kernel-level evidence (LKM module, rmdir() abu..."
+          },
+          "case_id": "VIGIA-LINUX-005",
+          "pipeline_meta": {
+            "artifact_count": "4",
+            "avg_score": "5643/20000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.37",
+              "motor_reason": "Significant signal with structural support (score=0.1868)",
+              "motor_score": "0.1868",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "linux005_01",
+              "confidence": "4/5",
+              "description": "Binary named 'cron' found at /opt/services/cron on a production web server. File entropy 7.4/8.0 (high, consistent with packing or compression). File size 1.8MB. UPX packing detected. Not registered i",
+              "evidence_type": "file_metadata",
+              "source": "sift_file_integrity",
+              "z_score": "62/125"
+            },
+            {
+              "artifact_id": "linux005_02",
+              "confidence": "17/20",
+              "description": "Process listing shows /opt/services/cron running as user 'deploy' (UID 1001, non-root) with parent process /usr/bin/supervisord. The process has been running since system boot (uptime 14 days). CPU ut",
+              "evidence_type": "log_entry",
+              "source": "sift_linux_forensics",
+              "z_score": "119/400"
+            },
+            {
+              "artifact_id": "linux005_03",
+              "confidence": "3/4",
+              "description": "Deployment records show that the 'deploy' user account deployed a custom task scheduler on 2024-09-10 at 02:15 UTC via an Ansible playbook. The playbook references a custom Go binary named 'cron' buil",
+              "evidence_type": "osint",
+              "source": "sift_osint",
+              "z_score": "3/16"
+            },
+            {
+              "artifact_id": "linux005_04",
+              "confidence": "41/50",
+              "description": "Static analysis of the unpacked binary reveals: Go runtime metadata confirms compilation with Go 1.22. Import table references standard library packages only (net/http, time, os, encoding/json). No sy",
+              "evidence_type": "malware_static_analysis",
+              "source": "sift_static_analysis",
+              "z_score": "369/2500"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:57:53.184555+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-LINUX-005",
+        "entry_sha256": "c9386fae8bc7eccd132e68752709ea7183d7e5cb6c1660dc2f7d5c3cca1f8b57",
+        "inputs_summary": {
+          "n_signals": "4"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:57:53.184680+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-LINUX-005",
+        "entry_sha256": "346fc22ca9917543af293eabd448d4dc99e3cd21ad4594fa3ee0aac280e9dcb2",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:57:53.184876+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:57:52.815685+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-LINUX-005",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-005.json",
+  "evidence_sha256": "925fd7509d1f2acdcd31002b4a01b6bb491df988a67ffe82f7ce9fec821d1806",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-LINUX-005 ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-LINUX-005.json\nEvidence SHA-256: 925fd7509d1f2acdcd31002b4a01b6bb491df988a67ffe82f7ce9fec821d1806\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 37/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 4 se\u00f1al(es): 4 primaria(s) de ['sift_file_integrity', 'sift_linux_forensics', 'sift_osint', 'sift_static_analysis'], 0 derivada(s)/no-analizada(s). Top z: Binary named 'cron' found at /opt/servic=0.50, Process listing shows /opt/services/cron=0.30, Deployment records show that the 'deploy=0.19.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nEpistemological boundary test derived from VIGIA-LINUX-004. A binary named 'cron' is found on a Linux system with anomalous entropy and size. Without the kernel-level evidence (LKM module, rmdir() abuse, memfd executables), the binary naming alone is ambiguous: custom-compiled cron replacements exist in the wild (busybox, dcron, fcron), and UPX packing is used by some legitimate deployment pipelines. This case isolates the naming signal from the kernel-level signals to test whether VIG\u00cdA correct\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Binary named 'cron' found at /opt/services/cron on a production web se] z=0.496 conf=0.80 \u2014 \n  [Process listing shows /opt/services/cron running as user 'deploy' (UID] z=0.297 conf=0.85 \u2014 \n  [Deployment records show that the 'deploy' user account deployed a cust] z=0.188 conf=0.75 \u2014 \n  [Static analysis of the unpacked binary reveals: Go runtime metadata co] z=0.148 conf=0.82 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 4 | Derived: 0 | Total: 4",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "37/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 37
+      },
+      "is_conclusive": true,
+      "narrative": "Epistemological boundary test derived from VIGIA-LINUX-004. A binary named 'cron' is found on a Linux system with anomalous entropy and size. Without the kernel-level evidence (LKM module, rmdir() abuse, memfd executables), the binary naming alone is ambiguous: custom-compiled cron replacements exist in the wild (busybox, dcron, fcron), and UPX packing is used by some legitimate deployment pipelines. This case isolates the naming signal from the kernel-level signals to test whether VIG\u00cdA correct"
+    },
+    "case_id": "VIGIA-LINUX-005",
+    "pipeline_meta": {
+      "artifact_count": 4,
+      "avg_score": "5643/20000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.37",
+        "motor_reason": "Significant signal with structural support (score=0.1868)",
+        "motor_score": "0.1868",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "linux005_01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "Binary named 'cron' found at /opt/services/cron on a production web server. File entropy 7.4/8.0 (high, consistent with packing or compression). File size 1.8MB. UPX packing detected. Not registered i",
+        "evidence_type": "file_metadata",
+        "source": "sift_file_integrity",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 62
+        }
+      },
+      {
+        "artifact_id": "linux005_02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Process listing shows /opt/services/cron running as user 'deploy' (UID 1001, non-root) with parent process /usr/bin/supervisord. The process has been running since system boot (uptime 14 days). CPU ut",
+        "evidence_type": "log_entry",
+        "source": "sift_linux_forensics",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 119
+        }
+      },
+      {
+        "artifact_id": "linux005_03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "Deployment records show that the 'deploy' user account deployed a custom task scheduler on 2024-09-10 at 02:15 UTC via an Ansible playbook. The playbook references a custom Go binary named 'cron' buil",
+        "evidence_type": "osint",
+        "source": "sift_osint",
+        "z_score": {
+          "__fraction__": true,
+          "den": 16,
+          "num": 3
+        }
+      },
+      {
+        "artifact_id": "linux005_04",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 41
+        },
+        "description": "Static analysis of the unpacked binary reveals: Go runtime metadata confirms compilation with Go 1.22. Import table references standard library packages only (net/http, time, os, encoding/json). No sy",
+        "evidence_type": "malware_static_analysis",
+        "source": "sift_static_analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2500,
+          "num": 369
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 4,
+    "n_total_signals": 4,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

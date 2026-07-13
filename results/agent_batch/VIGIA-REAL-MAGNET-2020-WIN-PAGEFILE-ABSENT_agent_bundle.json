@@ -1,0 +1,272 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-13T01:58:06.122620+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+    "end_time": "2026-07-13T01:58:06.122626+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+        "entry_sha256": "662be0ee305e34a79ce693af7514ad056ec42bfc7e827d1bd157dee2e57ef70d",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-13T01:58:05.747085+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+        "entry_sha256": "7112ac6fbc9d055f9c244502c1adb4567c325ebdc3dc4206ada13b08210c0115",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-13T01:58:05.747180+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+        "entry_sha256": "6705232cc3287a410a53eba973eaf95493731fa147c611375d8786caaa3e2858",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 5274035c996b0fac...",
+        "outputs_summary": {
+          "sha256": "5274035c996b0fac1cc8538fa6d0755dba88742408f74bf7139c3ac0cb36e589"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-13T01:58:05.747272+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+        "entry_sha256": "585e45b536fbe01eb16e891658beb44256ee55536cccfb1d61fc0bee0e0b7880",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-13T01:58:05.747377+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+        "entry_sha256": "f191af42e8d5942582ec243bb5d44df148ad12fd92020546351a8e086d0949da",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 3 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "Windows 10 64-bit memory dump. windows.pslist returns 0 processes while windows.psscan finds 20. Classic EPROCESS doubly-linked list unlink rootkit technique. iexplore.exe running as Wow64 (32-bit on ..."
+          },
+          "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+          "pipeline_meta": {
+            "artifact_count": "3",
+            "avg_score": "87/125",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.4800 exceeds MALICE threshold but no corroboration branch opens (1 domain(s), 2/3 hard class(es)/artifact(s), 0 per-cost artifact(s)) \u2014 volume within a single soft collection domain doe",
+              "motor_score": "0.48",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "WIN2020-A01",
+              "confidence": "23/25",
+              "description": "windows.pslist returns 0 processes. windows.psscan finds 20 processes including chrome.exe, slack.exe, WINWORD.EXE, iexplore.exe. Delta confirms EPROCESS doubly-linked list manipulation \u2014 rootkit unli",
+              "evidence_type": "kernel_structure",
+              "source": "volatility",
+              "z_score": "437/500"
+            },
+            {
+              "artifact_id": "WIN2020-A02",
+              "confidence": "22/25",
+              "description": "iexplore.exe PID 4480 running as Wow64=True (32-bit process on 64-bit OS). Classic technique to evade 64-bit memory scanners and AV. Parent: chrome.exe PID 3384. Spawned at 23:18:35Z.",
+              "evidence_type": "memory_process",
+              "source": "volatility",
+              "z_score": "88/125"
+            },
+            {
+              "artifact_id": "WIN2020-A03",
+              "confidence": "17/20",
+              "description": "FTK Imager.exe PID 4332 active during memory capture \u2014 confirms forensic acquisition in progress. Chrome connecting to 172.253.63.188:443 (Google) and 13.35.82.x:443 (CloudFront/AWS). No malicious C2 ",
+              "evidence_type": "memory_process",
+              "source": "volatility",
+              "z_score": "51/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-13T01:58:06.122257+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+        "entry_sha256": "32a41b6ae6de00c4bc67999e3eeed4094b394768143385fef346b6903c1d81d8",
+        "inputs_summary": {
+          "n_signals": "3"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-13T01:58:06.122374+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+        "entry_sha256": "71ac56d770f3dad612d7e11ebe1c00f806a389c64f0e441f283000d19d1cb6c9",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-13T01:58:06.122568+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-13T01:58:05.746841+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+  "evidence_path": "/home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT.json",
+  "evidence_sha256": "5274035c996b0fac1cc8538fa6d0755dba88742408f74bf7139c3ac0cb36e589",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT ===\nEvidence: /home/labestiadevigia/vigia-repo/data/cases/VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT.json\nEvidence SHA-256: 5274035c996b0fac1cc8538fa6d0755dba88742408f74bf7139c3ac0cb36e589\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 3 se\u00f1al(es): 3 primaria(s) de ['volatility'], 0 derivada(s)/no-analizada(s). Top z: windows.pslist returns 0 processes. wind=0.87, iexplore.exe PID 4480 running as Wow64=T=0.70, FTK Imager.exe PID 4332 active during me=0.51.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\nWindows 10 64-bit memory dump. windows.pslist returns 0 processes while windows.psscan finds 20. Classic EPROCESS doubly-linked list unlink rootkit technique. iexplore.exe running as Wow64 (32-bit on 64-bit). FTK Imager active during capture.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [windows.pslist returns 0 processes. windows.psscan finds 20 processes ] z=0.874 conf=0.92 \u2014 \n  [iexplore.exe PID 4480 running as Wow64=True (32-bit process on 64-bit ] z=0.704 conf=0.88 \u2014 \n  [FTK Imager.exe PID 4332 active during memory capture \u2014 confirms forens] z=0.510 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 3 | Derived: 0 | Total: 3",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "is_conclusive": true,
+      "narrative": "Windows 10 64-bit memory dump. windows.pslist returns 0 processes while windows.psscan finds 20. Classic EPROCESS doubly-linked list unlink rootkit technique. iexplore.exe running as Wow64 (32-bit on 64-bit). FTK Imager active during capture."
+    },
+    "case_id": "VIGIA-REAL-MAGNET-2020-WIN-PAGEFILE-ABSENT",
+    "pipeline_meta": {
+      "artifact_count": 3,
+      "avg_score": "87/125",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.4800 exceeds MALICE threshold but no corroboration branch opens (1 domain(s), 2/3 hard class(es)/artifact(s), 0 per-cost artifact(s)) \u2014 volume within a single soft collection domain doe",
+        "motor_score": "0.48",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "WIN2020-A01",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 23
+        },
+        "description": "windows.pslist returns 0 processes. windows.psscan finds 20 processes including chrome.exe, slack.exe, WINWORD.EXE, iexplore.exe. Delta confirms EPROCESS doubly-linked list manipulation \u2014 rootkit unli",
+        "evidence_type": "kernel_structure",
+        "source": "volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 437
+        }
+      },
+      {
+        "artifact_id": "WIN2020-A02",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "iexplore.exe PID 4480 running as Wow64=True (32-bit process on 64-bit OS). Classic technique to evade 64-bit memory scanners and AV. Parent: chrome.exe PID 3384. Spawned at 23:18:35Z.",
+        "evidence_type": "memory_process",
+        "source": "volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 88
+        }
+      },
+      {
+        "artifact_id": "WIN2020-A03",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "FTK Imager.exe PID 4332 active during memory capture \u2014 confirms forensic acquisition in progress. Chrome connecting to 172.253.63.188:443 (Google) and 13.35.82.x:443 (CloudFront/AWS). No malicious C2 ",
+        "evidence_type": "memory_process",
+        "source": "volatility",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 51
+        }
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 3,
+    "n_total_signals": 3,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
