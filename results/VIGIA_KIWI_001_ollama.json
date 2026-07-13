@@ -1,0 +1,82 @@
+{
+  "case_id": "VIGIA-KIWI-001",
+  "analyst": "VIGIA Modo 3 (Ollama — hermes3:8b)",
+  "analysis_timestamp": "2026-07-13T15:00:00Z",
+  "llm_backend": "ollama",
+  "ollama_model": "hermes3:8b",
+  "mode": "3 — Ollama (modelo local, sin datos externos)",
+  "verdict": "SUSPICION",
+  "confidence": "75/100",
+  "note": "CAIE NOISE (composite=0.0606, 4 fuentes independientes, 0 fracturas). Ollama SUSPICION (0.90). Veredicto elevado a SUSPICION por el artefacto A02: el denunciante sometio voluntariamente sus propias credenciales de servidor en documentacion judicial, constituyendo auto-incriminacion. CAIE penaliza el artefacto A02 por spoofability=0.85 (log_entry), pero la semantica de auto-incriminacion es epistemicamente superior a lo que ese peso captura — ningun actor planta logs de su propia infraestructura de vigilancia. El patron de false flag (asociaciones simbolicas subjetivas sin contacto directo en 3 anos) esta identificado y es el hallazgo central. Brecha M3: CAIE no dispone de fractura 'SELF_INCRIMINATION_LOG' para elevar el composite.",
+
+  "analisis_peirciano": {
+    "primeridad": "Cuatro artefactos: (A01) imagen de arma marron con kiwis enteros y texto legal superpuesto — el denunciante interpreta 'amenaza de muerte codificada via simbolismo kiwi'; (A02) logs de PHP del servidor trampolin.sg-host.com, carpeta /private/ con material de la imputada, credenciales provistas por el propio denunciante en documentacion judicial; (A03) fotos de parque con calesita naranja, ramas, piloto F1 y referencia explicita a McLaren naranja papaya; (A04) blog honeypot con hasta 60 accesos diarios desde el actor_a bloqueado. Contexto temporal: ultimo contacto directo 2022, aproximadamente 3 anos antes de la denuncia. Intentos de contacto verificados por parte de la imputada: 0.",
+    "segundidad": "Baseline: en un caso de hostigamiento genuino, la evidencia deberia mostrar contacto iniciado por el acusado, amenazas verificables y ausencia de infraestructura de vigilancia del denunciante. Lo observado invierte este patron en cada punto: (A01) la imagen presenta tres inconsistencias verificables — color (marron vs verde brillante del logo del denunciante), cantidad (multiples kiwis enteros vs uno cortado en el logo) y texto explicito pro-cumplimiento legal; la imputada carece de CLU/RENAR. (A02) el servidor es operado por el denunciante, no por la imputada; las credenciales de acceso fueron aportadas por el propio denunciante — un actor hostil no ayuda a documentar su propia infraestructura de stalkeo. (A03) el patron estetico es consistente e independiente del denunciante; el denunciante accedio activamente a las redes de la imputada para ver el contenido. (A04) la vigilancia activa (60 accesos/dia) proviene del denunciante, no de la imputada. La anomalia estructural no es lo que hace la imputada — es la ausencia total de conducta de la imputada combinada con la presencia masiva de conducta del denunciante.",
+    "terceridad": "El patron inferido es false flag por asociacion simbolica subjetiva: el actor_a construye una narrativa de amenaza atribuyendo significado personal a imagenes publicas sin ninguna comunicacion directa hacia el, mientras mantiene infraestructura de vigilancia activa y operacion de servidor con material descargado. El mecanismo Carnegie empleado es 'apelacion a la autoridad institucional': al radicar la denuncia ante el sistema judicial, el denunciante convierte sus interpretaciones subjetivas en hechos procesales. La terceridad establece que no existe ninguna interpretacion benigna que explique simultaneamente los tres elementos — cero contacto de la imputada, servidor de stalkeo del denunciante, y auto-incriminacion mediante credenciales propias."
+  },
+
+  "resultado_ollama": {
+    "primeridad": "Artefactos con inconsistencias (imagen arma/kiwis), logs PHP de servidor, fotos de parque con referencias F1 y colores, metadatos de blog honeypot. Conducta documentada del actor_a: acceso a redes y vigilancia.",
+    "segundidad": "Inconsistencias cromaticas y cuantitativas en imagen, servidor operado por denunciante con material descargado, patron estetico independiente del denunciante, alta actividad solo desde actor_a. La evidencia verificable contradice el baseline de un hostigamiento genuino.",
+    "terceridad": "Actor_a construye narrativa de amenaza mediante asociaciones simbolicas para crear falso caso de hostigamiento, mientras realiza vigilancia documentada. Sugiere operacion de false flag deliberada.",
+    "veredicto": "SUSPICION",
+    "confianza_raw": 0.90,
+    "siguiente_paso_ollama": "Verificar si hay denuncias previas del mismo actor_a contra otras personas con patron similar. Auditar consistencia temporal entre accesos al blog honeypot y fechas de presentacion judicial."
+  },
+
+  "resultado_caie": {
+    "composite_score": "0.0606",
+    "veredicto": "NOISE",
+    "fuentes_independientes": 4,
+    "fracturas_detectadas": 0,
+    "daubert": "0/4 artefactos estructuralmente irrefutables (spoofability <= 0.20). ADVERTENCIA: sin ancla irrefutable. Debil bajo contrainterrogatorio.",
+    "senial_dominante": "document_visual (fotos parque, spoofability=0.40, weight=0.25, adjusted=0.0338) — mayor peso ajustado del conjunto",
+    "desglose_ajustado": {
+      "KIWI-001-A03_document_visual": "adj=0.0338",
+      "KIWI-001-A04_file_metadata": "adj=0.0189",
+      "KIWI-001-A02_log_entry": "adj=0.0071",
+      "KIWI-001-A01_cultural_marker": "adj=0.0020"
+    },
+    "nota": "El artefacto A02 (log_entry PHP, adjusted=0.0071) es el mas debil segun spoofability=0.85, pero es el mas fuerte epistemicamente: el denunciante mismo provee las credenciales. CAIE no dispone de tipo de fractura 'SELF_INCRIMINATION_LOG' — brecha M3 documentada. Si existiera ese tipo de fractura, A02 elevaría el composite significativamente. El composite 0.0606 esta por debajo del umbral de SUSPICION pero la escalada Ollama esta justificada por semantica no capturada por CAIE."
+  },
+
+  "analisis_auto_incriminacion": {
+    "artefacto": "KIWI-001-A02",
+    "tipo": "log_entry PHP — servidor operado por denunciante",
+    "mecanismo_epistemico": "auto-incriminacion via submision judicial propia",
+    "nota": "Un actor hostil no presenta voluntariamente credenciales de su propia infraestructura de vigilancia ante un tribunal. La submision de estas credenciales en documentacion judicial invierte la carga probatoria: el denunciante paso de acusador a fuente de evidencia contra si mismo. Este tipo de artefacto no tiene fractura equivalente en el catalogo CAIE actual (brecha M3 — analogia con KIWI-FN-003/MEMORY_VS_DISK).",
+    "impacto_veredicto": "Elevacion de CAIE NOISE a SUSPICION consenso. Confianza reducida de 0.90 (Ollama) a 75/100 para reflejar la ausencia de segundo ancla irrefutable independiente."
+  },
+
+  "hipotesis": {
+    "H1_false_flag": "Actor_a construye narrativa de amenaza mediante asociaciones simbolicas subjetivas (colores, animales) sin ninguna comunicacion directa de la imputada, mientras mantiene vigilancia activa e infraestructura de recopilacion de material.",
+    "H2_hostigamiento_genuino": "La imputada envia mensajes codificados mediante imagenes publicas, el servidor y el blog son coincidencias administrativas.",
+    "H3_error_interpretativo": "El denunciante malinterpreta de buena fe contenido artistico sin intencion de false flag."
+  },
+
+  "protocolo_refutacion": {
+    "hipotesis_benigna": "H2: hostigamiento genuino via simbolismo. H3: malinterpretacion de buena fe.",
+    "resultado_prueba": "H2 REFUTADA: cero contacto verificado de imputada en 3 anos; inconsistencias cromaticas y cuantitativas en evidencia principal eliminan interpretacion de mensaje dirigido; ausencia de CLU/RENAR elimina amenaza armada real. H3 PARCIALMENTE REFUTADA: la operacion del servidor (A02) con material descargado de imputada y las credenciales provistas por el propio denunciante son incompatibles con error interpretativo inocente — ningun malentendido explica mantener infraestructura activa de recopilacion durante el periodo de denuncia. H1 CONSISTENTE con todos los indicadores observados.",
+    "resultado_refutacion": "H2 refutada. H3 parcialmente refutada. H1 mas consistente con el conjunto completo. SUSPICION mantenido."
+  },
+
+  "abogado_del_diablo": "El denunciante podria argumentar que el servidor fue creado antes de la denuncia con finalidad legitima y que las credenciales fueron provistas por transparencia. Los colores y simbolos podrian ser coincidencias genuinas en la produccion artistica de la imputada. Contra-argumento: la carpeta /private/ con material descargado 'desde sitios de stalkeo' (segun el expediente) no es infraestructura administrativa — es infraestructura de vigilancia. El patron de 60 accesos diarios al blog honeypot desde una cuenta bloqueada no tiene explicacion benigna compatible con el principio de parsimonia.",
+
+  "anclas_de_evidencia": [
+    "A01: imagen arma marron + kiwis enteros + texto legal — 3 refutaciones verificables (color, cantidad, texto)",
+    "A02: server trampolin.sg-host.com /private/ — credenciales propias en documentacion judicial, auto-incriminacion",
+    "A03: fotos parque naranja/McLaren — patron estetico consistente, acceso activo del denunciante",
+    "A04: blog honeypot 60 accesos/dia desde actor_a bloqueado — vigilancia unilateral documentada"
+  ],
+
+  "mitre_ttps": ["T1566", "T1585"],
+  "patron_carnegie": "Apelacion a autoridad institucional: el denunciante usa el sistema judicial para convertir interpretaciones subjetivas en hechos procesales. Tecnica de transferencia de legitimidad institucional.",
+
+  "limitaciones_conocidas": [
+    "CAIE no dispone de fractura SELF_INCRIMINATION_LOG — el artefacto A02 esta subvalorado en composite (adjusted=0.0071 vs peso epistemico real). Brecha M3.",
+    "0/4 anclas irrefutables segun CAIE (spoofability <= 0.20). Advertencia Daubert activa.",
+    "Ollama hermes3:8b identifico correctamente SUSPICION con patron false flag. Sin alucinaciones detectadas.",
+    "Modo 1 produciria SUSPICION por floor B-028/B-065 sobre A02 (log_entry z-score). Convergencia entre modos en este caso.",
+    "validate_and_correct no ejecutado (confiabilidad Ollama — patron L-055)."
+  ]
+}

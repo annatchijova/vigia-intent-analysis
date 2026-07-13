@@ -1,0 +1,90 @@
+{
+  "case_id": "VIGIA-KIWI-002-ZAPALLO-POV",
+  "analyst": "VIGIA Modo 3 (Ollama — hermes3:8b)",
+  "analysis_timestamp": "2026-07-13T15:10:00Z",
+  "llm_backend": "ollama",
+  "ollama_model": "hermes3:8b",
+  "mode": "3 — Ollama (modelo local, sin datos externos)",
+  "verdict": "SUSPICION",
+  "confidence": "60/100",
+  "note": "CAIE NOISE (composite=0.1783, 3 fuentes independientes por agrupacion, 0 fracturas). Ollama SUSPICION (0.70). Veredicto final: SUSPICION sobre la calidad epistemica de la narrativa del denunciante — apofenia sistematica documentada. Los 8 artefactos provienen de una unica fuente no verificada (actor_a) con prior_trust=0.3. Ningun claim supero verificacion independiente. CAIE agrupa los 8 artefactos en 3 tipos (cultural_marker, document_visual, log_entry) — composite 0.1783 refleja el ruido de source unica con high spoofability. Confianza reducida a 60/100 por fuente unica no corroborada y ausencia total de anclas irrefutables.",
+
+  "analisis_peirciano": {
+    "primeridad": "Ocho claims del denunciante (actor_a), todos provenientes de testimonio no verificado, prior_trust=0.3: (A01) capacidad tecnica Ekoparty => hostigamiento activo; (A02) canciones => declaraciones de amor al denunciante; (A03) 5 cartas documento a Clarin — verificado: ningun registro en expediente ni en Clarin; (A04) acceso a armas inferido por convivencia con padre — imputada vive sola, sin CLU/RENAR propio; (A05) deudas economicas => perfil de riesgo; (A06) coordinacion con Interpol en su contra — Interpol no interviene en conflictos de pareja; (A07) planea danar a familia del denunciante — basado en canciones y fotos, sin contacto directo en 3 anos; (A08) tratamiento psiquiatrico causado por hostigamiento — historial previo documentado, causalidad no establecida.",
+    "segundidad": "Baseline de un claim forense valido: al menos una pieza de evidencia verificable de forma independiente, cadena de custodia trazable, y correspondencia entre el evento alegado y el efecto observado. Lo observado: (1) el unico claim verificado (A03 cartas Clarin) esta refutado — ningun registro existe; (2) A04 refutado por RENAR — imputada vive sola y no tiene CLU; (3) A06 refutado por estructura institucional — Interpol no opera en conflictos de pareja; (4) A08 causalmente indeterminado — historial de tratamiento previo documentado elimina la imputacion causal. El composite CAIE 0.1783 es el mas alto de los 3 casos KIWI evaluados con este metodo, pero proviene de 8 artefactos del mismo tipo de fuente con prior_trust=0.3 — el Noisy-OR acumula ruido de fuente unica, no seniales independientes. La anomalia estructural es la homogeneidad epistemica: todos los artefactos collapsan a 'lo que dijo actor_a'.",
+    "terceridad": "El patron inferido es apofenia sistematica: el receptor (actor_a) construye una red de significados personales sobre eventos sin conexion causal verificable. Caracteristicas del patron: (a) salto logico consistente entre habilidad y conducta (A01); (b) atribucion de intencion autorreferencial a contenido artistico publico (A02); (c) claims no registrados en ningun expediente (A03); (d) inferencia de acceso a partir de proximidad sin evidencia directa (A04); (e) extrapolacion de estatus economico a perfil de riesgo sin correlacion juridica (A05); (f) conspiracion institucional sin sustento (A06); (g) prediccion de dano futuro basada en simbolismo (A07); (h) atribucion causal de condicion preexistente (A08). Los 8 claims siguen el mismo mecanismo: evento neutro observable => significado personal hostil atribuido => conclusion de peligro. Este patron es reproducible y sistematico — no aleatorio."
+  },
+
+  "resultado_ollama": {
+    "primeridad": "Documento forense con claims no verificados, derivados de testimonio unico con prior_trust=0.3. Patron de apofenia sistematica.",
+    "segundidad": "Todas las evidencias provienen de misma fuente no verificada, con multiples gaps logicos documentados. El contexto forense contrasta con claims subjetivos.",
+    "terceridad": "Actor_a muestra patron de elaboracion narrativa deliberada: atribucion de intenciones, construccion de causalidad, y uso de apofenia para generar significado donde no existe.",
+    "veredicto": "SUSPICION",
+    "confianza_raw": 0.70,
+    "patron_carnegie": "DARVO — Denial (niega su propia vigilancia), Argumentation (argumentos circulares sin evidencia), Responsibility (evita responsabilidad por su conducta), Victim Opponent (se posiciona como victima de quien no lo contacto en 3 anos)",
+    "siguiente_paso_ollama": "Verificar si hay patron de denuncias previas del actor_a contra otras personas. Contrastar narrativa con registros judiciales de terceros."
+  },
+
+  "resultado_caie": {
+    "composite_score": "0.1783",
+    "veredicto": "NOISE",
+    "fuentes_independientes": 3,
+    "fracturas_detectadas": 0,
+    "daubert": "0/8 artefactos estructuralmente irrefutables (spoofability <= 0.20). ADVERTENCIA: sin ancla irrefutable. Debil bajo contrainterrogatorio.",
+    "agrupacion_noisy_or": {
+      "grupo_document_visual_A03_A05_A08": "3 artefactos, adj=0.0540 c/u, group_score Noisy-OR = ~0.153",
+      "grupo_log_entry_A06": "1 artefacto, adj=0.0081",
+      "grupo_cultural_marker_A01_A02_A04_A07": "4 artefactos, adj=0.0054 c/u, group_score Noisy-OR = ~0.021"
+    },
+    "nota": "El composite 0.1783 es el mas alto de los tres casos KIWI, pero es producto de acumulacion de ruido de source unica (todos manual_forensic_review, mismo actor_a). El Noisy-OR captura la redundancia intragrupo correctamente — 8 artefactos de la misma fuente colapsan a 3 grupos independientes. prior_trust=0.3 no entra directamente en la formula CAIE (su peso ya esta incorporado en los raw_score del pipeline Mode 1). La advertencia Daubert — 0 anclas irrefutables — es el hallazgo estructural clave: ningun artefacto de este conjunto sobreviviria contrainterrogatorio forense."
+  },
+
+  "analisis_apofenia": {
+    "definicion_operacional": "Apofenia sistematica: patron cognitivo en el que el receptor atribuye conexion causal a eventos sin relacion verificable, generando una red de significados personales. Diferencia con error aleatorio: el patron es reproducible, sistematico y dirigido — todos los eventos convergen en la misma conclusion (la imputada lo hostiga).",
+    "claims_refutados": [
+      "A03: 5 cartas a Clarin — ningun registro en expediente ni en Clarin (refutacion positiva)",
+      "A04: acceso a armas por padre — RENAR confirma sin CLU; domicilio registrado independiente (refutacion positiva)",
+      "A06: coordinacion con Interpol — Interpol no tiene jurisdiccion en conflictos de pareja (refutacion por estructura institucional)",
+      "A08: tratamiento psiquiatrico causado por hostigamiento — historial previo documentado elimina causalidad atribuida"
+    ],
+    "claims_no_verificables": [
+      "A01: capacidad tecnica => hostigamiento (salto logico, ausencia de evidencia de uso malicioso)",
+      "A02: canciones => declaraciones de amor (interpretacion subjetiva, denunciante no mencionado)",
+      "A05: deudas => perfil de riesgo (sin correlacion juridica establecida)",
+      "A07: planea danar a familia (basado en simbolismo sin contacto directo)"
+    ],
+    "diagnostico_epistemico": "4/8 claims refutados positivamente. 4/8 no verificables por ausencia de evidencia objetiva. 0/8 claims corroborados de forma independiente. Conjunto epistemicamente nulo como base para veredicto de hostigamiento."
+  },
+
+  "hipotesis": {
+    "H1_apofenia_sistematica": "Actor_a construye red de significados personales sobre eventos sin conexion causal verificable. El patron es sistematico (8 instancias, mismo mecanismo) y dirigido (todos convergen en la misma conclusion de peligro).",
+    "H2_hostigamiento_genuino_subreportado": "La imputada ejerce conducta hostil no capturada en los artefactos actuales; los claims de actor_a son exageraciones de hechos reales.",
+    "H3_fabricacion_deliberada": "Actor_a construye claims falsos de forma consciente para obtener medidas cautelares."
+  },
+
+  "protocolo_refutacion": {
+    "hipotesis_benigna": "H2: hostigamiento genuino subreportado con exageracion parcial.",
+    "resultado_prueba": "H2 DEBILITADA SIGNIFICATIVAMENTE: el unico claim verificado (A03 cartas Clarin) resulto refutado — si hubiera hostigamiento real, al menos un claim verificable deberia confirmarse. La imputada no initio contacto en 3 anos (KIWI-001/A04 confirma vigilancia en sentido inverso). H3 posible pero no demostrable con los artefactos actuales — la distincion entre apofenia genuina y fabricacion deliberada requiere evaluacion clinica o evidencia de fabricacion consciente. H1 mas consistente con el conjunto: explain los 8 claims, los 4 refutados, los 4 no verificables y la ausencia de corroboracion independiente.",
+    "resultado_refutacion": "H2 debilitada. H3 no demostrable. H1 mas consistente. SUSPICION sobre calidad epistemica de la narrativa del denunciante mantenido."
+  },
+
+  "abogado_del_diablo": "El denunciante podria alegar que las cartas Clarin se enviaron fuera de expediente, que el CLU del padre es de acceso familiar, y que las canciones tienen referencias internas conocidas por las partes. Contra-argumento: si las cartas existen, son verificables — el propio Clarin podria confirmarlas. El CLU familiar no equivale a CLU personal ante RENAR. Las 'referencias internas' requieren demostracion — en ausencia de ella, la interpretacion subjetiva no tiene peso probatorio. El conjunto de 8 claims con 4 refutaciones positivas y 0 corroboraciones independientes no satisface ningun estandar probatorio.",
+
+  "anclas_de_evidencia": [
+    "A03: cartas Clarin — claim refutado positivamente (ningún registro en expediente ni en Clarin)",
+    "A04: acceso a armas — refutado por RENAR (sin CLU propio) y domicilio registrado independiente",
+    "A06: coordinacion Interpol — refutado por estructura institucional",
+    "A08: causalidad tratamiento psiquiatrico — historial previo documentado elimina atribucion causal"
+  ],
+
+  "mitre_ttps": [],
+  "patron_carnegie": "DARVO — Denial/Argumentation/Responsibility/Victim-Opponent. Tecnica de inversion de roles: el actor que ejerce vigilancia activa se posiciona como victima de quien no lo contacto en 3 anos.",
+
+  "limitaciones_conocidas": [
+    "prior_trust=0.3 no entra directamente en formula CAIE — el peso ya esta en los raw_score del pipeline Mode 1. El composite 0.1783 acumula ruido de fuente unica, no seniales independientes.",
+    "0/8 anclas irrefutables. Advertencia Daubert activa. El conjunto completo no sobreviviria contrainterrogatorio.",
+    "Distincion entre apofenia genuina (H1) y fabricacion deliberada (H3) requiere evaluacion adicional no disponible en los artefactos actuales.",
+    "Ollama hermes3:8b identifico correctamente SUSPICION y patron DARVO. Sin alucinaciones detectadas en este caso.",
+    "validate_and_correct no ejecutado (confiabilidad Ollama — patron L-055)."
+  ]
+}

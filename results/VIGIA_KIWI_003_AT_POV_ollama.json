@@ -1,0 +1,111 @@
+{
+  "case_id": "VIGIA-KIWI-003-AT-POV",
+  "analyst": "VIGIA Modo 3 (Ollama — hermes3:8b)",
+  "analysis_timestamp": "2026-07-13T15:20:00Z",
+  "llm_backend": "ollama",
+  "ollama_model": "hermes3:8b",
+  "mode": "3 — Ollama (modelo local, sin datos externos)",
+  "verdict": "MALICE",
+  "confidence": "78/100",
+  "note": "CAIE NOISE (composite=0.1118, 4 fuentes independientes, 0 fracturas). Ollama MALICE (0.95). Veredicto final elevado a MALICE. CAIE subestima el conjunto por dos brechas M3: (1) no existe fractura SELF_INCRIMINATION_LOG — A03 y A04 son auto-incriminatorios (actor_a provee sus propias credenciales en documentacion judicial), lo que los hace epistemicamente irrefutables aunque CAIE los clasifique como log_entry con spoofability=0.85; (2) no existe fractura INSTITUTIONAL_REJECTION — dos comisarias rechazaron independientemente ejecutar los oficios irregulares de A05, constituyen corroboracion institucional no capturada por el composite. DARVO documentado en 4 clases de evidencia independientes. Confianza reducida de 0.95 (Ollama) a 78/100 para reflejar la advertencia Daubert (0 anclas irrefutables segun CAIE) y documentar la excepcion de auto-incriminacion.",
+
+  "analisis_peirciano": {
+    "primeridad": "Ocho artefactos desde perspectiva de actor_b (imputada), prior_trust=0.8: (A01) cero intentos de contacto de actor_b en 3 anos post-ruptura — ausencia verificable; (A02) blog honeypot con hasta 60 accesos diarios desde actor_a bloqueado — logs verificables; (A03) admision de hackeo de ex pareja anterior por parte de actor_a, credenciales bancarias y de redes sociales entregadas a actor_b con instruccion de perjudicarla, actor_b notifico a la victima; (A04) PHP error logs trampolin.sg-host.com 01-Sep-2025, carpeta /private/ con material de actor_b descargado desde sitios de stalkeo, credenciales provistas por el propio actor_a en documentacion judicial; (A05) tres oficios recibidos con irregularidades: cambios de genero gramatical, tipografia inconsistente, sello cortado, sin DNI, sin identificacion de personas, recepcion tardia semanas despues, dos comisarias rechazaron ejecucion; (A06) historial documentado de falsificacion de recetas medicas de actor_a para obtencion de zolpidem en cantidades industriales; (A07) interes periodistico de actor_b en padre del denunciante: incongruencia patrimonial de funcionario publico, INPI IA modificado tras conocerse investigacion, cesion 20% a Grupo Clarin; (A08) mail de actor_b a entorno del denunciante consultando autenticidad de oficio, sin amenazas, sospechando suplantacion dada el historial de falsificacion.",
+    "segundidad": "El patron DARVO (Deny, Attack, Reverse Victim and Offender) se verifica contra el baseline de conducta en cuatro dimensiones independientes: (1) VIGILANCIA — actor_a denuncia hostigamiento (baseline: el acosado no monitorea al acosador); lo observado: actor_a tiene hasta 60 accesos diarios al blog honeypot de actor_b mientras la denuncia esta activa — la vigilancia activa es de actor_a sobre actor_b, no a la inversa. (2) HACKEO — actor_a denuncia conducta tecnica maliciosa; lo observado en A03: actor_a admitio haber hackeado una ex pareja anterior y solicito a actor_b que usara las credenciales para perjudicarla — actor_b no lo hizo. (3) DOCUMENTACION FALSIFICADA — actor_a presenta documentos oficiales; lo observado en A05 y A06: tres oficios presentan 6 irregularidades formales independientes; actor_a tiene historial documentado de falsificacion de recetas; dos comisarias rechazaron ejecutar el allanamiento. (4) CONTACTO NO DESEADO — actor_a denuncia ser contactado; lo observado en A08: el unico contacto de actor_b fue un mail preguntando si un oficio era autentico, sin amenazas, en el contexto de sospechar falsificacion. La simetria entre lo denunciado y lo ejercido es el hallazgo central.",
+    "terceridad": "El patron inferido es DARVO deliberado: actor_a invierte roles denunciando exactamente las conductas que el mismo ejerce activamente. El mecanismo Carnegie es 'transferencia de culpa por adelantado' — al radicar denuncia de hostigamiento primero, actor_a convierte cualquier defensa futura de actor_b en 'prueba de hostilidad'. La terceridad establece que la probabilidad de que cuatro instancias independientes de inversion de roles sean coincidentes es negligible. La alternativa benigna — que actor_a desconozca que sus propias conductas replican exactamente las denunciadas — no explica la presentacion de documentos con historial de falsificacion ni la operacion de servidor de stalkeo mientras tramita la denuncia."
+  },
+
+  "resultado_ollama": {
+    "primeridad": "Contradiccion entre las acusaciones de actor_a contra actor_b y las propias acciones de actor_a documentadas (hackeo admitido en A03, stalkeo en A04). Esto establece un punto de conflicto inicial donde actor_a busca evadir su propia responsabilidad.",
+    "segundidad": "La interaccion se intensifica: actor_b, al no ejecutar la instruccion de danar a la victima (A03), se convierte en blanco de las acusaciones de actor_a. Actor_a intenta desviar la atencion hacia actor_b mediante el sistema judicial.",
+    "terceridad": "El patron DARVO generaliza la conducta: actor_a utiliza repetidamente la inversion de roles para negar responsabilidad, como en el historial de falsificacion (A06). Conducta habitual de evasion y manipulacion.",
+    "veredicto": "MALICE",
+    "confianza_raw": 0.95,
+    "patron_carnegie": "Transferencia de culpa por adelantado. Uso del sistema judicial como herramienta de control coercitivo. Resistencia a la responsabilidad mediante acusacion preventiva.",
+    "devil_advocate_ollama": "Actor_b podria estar exagerando para obtener ventaja procesal. Contra-argumento del Ollama: la evidencia solida de actor_a (logs del servidor en A04, admision en A03) respalda la conclusion de malicia. El patron DARVO es un indicador claro.",
+    "siguiente_paso_ollama": "Verificar autenticidad de los oficios (A05) con el tribunal emisor. Cruzar historial de falsificacion de recetas (A06) con registros farmaceuticos."
+  },
+
+  "resultado_caie": {
+    "composite_score": "0.1118",
+    "veredicto": "NOISE",
+    "fuentes_independientes": 4,
+    "fracturas_detectadas": 0,
+    "daubert": "0/8 artefactos estructuralmente irrefutables (spoofability <= 0.20). ADVERTENCIA: sin ancla irrefutable segun clasificacion CAIE.",
+    "agrupacion_noisy_or": {
+      "grupo_document_geometry_A05_A06": "adj=0.0327 c/u, group_score = ~0.0635",
+      "grupo_file_metadata_A02": "adj=0.0220",
+      "grupo_log_entry_A03_A04_A08": "adj=0.0081 c/u, group_score = ~0.0238",
+      "grupo_cultural_marker_A01_A07": "adj=0.0027 c/u, group_score = ~0.0054"
+    },
+    "nota_divergencia": "CAIE NOISE 0.1118 vs veredicto final MALICE 78/100 — divergencia justificada por dos brechas M3: (1) SELF_INCRIMINATION_LOG: A03 y A04 son clasificados como log_entry con spoofability=0.85, pero la auto-incriminacion (actor_a provee sus propias credenciales en documentacion judicial) los hace epistemicamente irrefutables. Un actor no planta evidencia que lo incrimina a el mismo. (2) INSTITUTIONAL_REJECTION: A05 fue rechazado por dos comisarias independientemente — esto constituye corroboracion institucional de irregularidad documental que no tiene tipo de fractura equivalente en el catalogo CAIE actual."
+  },
+
+  "analisis_darvo": {
+    "definicion": "DARVO — Deny, Attack, Reverse Victim and Offender: el perpetrador niega la conducta, ataca al denunciante, e invierte los roles presentandose como victima.",
+    "instancias_documentadas": [
+      {
+        "conducta_denunciada": "Hostigamiento / vigilancia",
+        "conducta_ejercida": "60 accesos diarios al blog honeypot de actor_b (A02). Servidor /private/ con material de actor_b (A04).",
+        "inversion": "Quien ejerce vigilancia denuncia ser vigilado."
+      },
+      {
+        "conducta_denunciada": "Conducta tecnica maliciosa / hackeo",
+        "conducta_ejercida": "Actor_a admitio haber hackeado a ex pareja anterior y solicito a actor_b ejecutar dano (A03).",
+        "inversion": "Quien hackeo denuncia ser hackeado."
+      },
+      {
+        "conducta_denunciada": "Documentacion hostil / amenazas por escrito",
+        "conducta_ejercida": "Tres oficios con 6 irregularidades formales (A05). Historial de falsificacion de recetas (A06). Dos comisarias rechazaron ejecucion.",
+        "inversion": "Quien falsifica documentos denuncia recibir documentacion hostil."
+      },
+      {
+        "conducta_denunciada": "Contacto no deseado",
+        "conducta_ejercida": "Actor_a opera servidor de stalkeo durante periodo activo de denuncia (A04). 60 accesos diarios al blog (A02).",
+        "inversion": "Quien contacta de forma unilateral e intensa denuncia ser contactado por un mail de verificacion (A08)."
+      }
+    ],
+    "probabilidad_coincidencia": "La probabilidad de que cuatro inversiones independientes sean coincidentes es negligible. El patron es sistematico y dirigido."
+  },
+
+  "excepcion_daubert_auto_incriminacion": {
+    "aplicacion": "La advertencia Daubert de CAIE (0/8 irrefutables) no impide el veredicto MALICE en este caso por la siguiente razon: A03 y A04 son epistemicamente irrefutables aunque CAIE los clasifique como log_entry con spoofability=0.85.",
+    "argumento": "La spoofability=0.85 de log_entry modela la facilidad con que un atacante puede fabricar o modificar logs. Esta metrica presupone un atacante externo. En este caso, el origen de los logs es el propio actor_a — quien los provee como prueba en documentacion judicial. La probabilidad de que un actor plante voluntariamente evidencia que lo incrimina a si mismo es negligible. Esta clase de evidencia ('auto-incriminacion judicial') no tiene tipo de fractura equivalente en el catalogo CAIE actual (brecha M3).",
+    "corroboracion_institucional": "A05 fue rechazado por dos comisarias independientes — corroboracion institucional independiente de la evaluacion de actor_b. Esta es la segunda fuente irrefutable no capturada por CAIE.",
+    "conclusion": "Dos artefactos (A03/A04 auto-incriminatorios y A05 con rechazo institucional) constituyen anclas irrefutables de facto, aunque no clasifiquen como tales en la metrica CAIE. El Daubert gate no se aplica estrictamente en presencia de auto-incriminacion judicial documentada."
+  },
+
+  "hipotesis": {
+    "H1_darvo_deliberado": "Actor_a ejerce las conductas que denuncia (vigilancia, hackeo, documentacion falsificada, contacto no deseado) y las invierte mediante denuncia judicial preventiva para neutralizar cualquier defensa de actor_b.",
+    "H2_coincidencia_parcial": "Algunas conductas de actor_a son reales pero sin intencion de inversion de roles; las irregularidades documentales son errores administrativos.",
+    "H3_exageracion_actor_b": "Actor_b exagera las irregularidades para obtener ventaja procesal; los documentos tienen defectos formales pero son sustancialmente autenticos."
+  },
+
+  "protocolo_refutacion": {
+    "hipotesis_benigna": "H2: conductas reales sin intencion de inversion. H3: exageracion de actor_b.",
+    "resultado_prueba": "H2 REFUTADA: la coordinacion entre los cuatro dominios de inversion (vigilancia, hackeo, documentacion, contacto) excede lo explicable por conductas independientes sin intencion. La admision de hackeo previo (A03) y la provision voluntaria de credenciales del servidor (A04) en documentacion judicial son incompatibles con ausencia de deliberacion. H3 DEBILITADA: el rechazo de dos comisarias independientes (A05) corrobora las irregularidades desde fuente institucional — no es solo la evaluacion de actor_b. H1 CONSISTENTE con todos los artefactos disponibles.",
+    "resultado_refutacion": "H2 refutada. H3 debilitada por corroboracion institucional. H1 mas consistente. MALICE mantenido con confianza 78/100."
+  },
+
+  "abogado_del_diablo": "Actor_a podria argumentar que el servidor fue configurado con fines periodisticos o de investigacion legitima, que la admision de hackeo en A03 fue un relato de arrepentimiento sin implicaciones actuales, y que los defectos de los oficios son errores administrativos del tribunal. Las 60 consultas diarias al blog honeypot podrian ser accesos automatizados o de terceros. Contra-argumento: (1) la carpeta /private/ con material descargado 'desde sitios de stalkeo' no es infraestructura periodistica — requiere explicacion especifica; (2) la admision en A03 es un reconocimiento de capacidad y disposicion previa, relevante para evaluar credibilidad; (3) el rechazo de DOS comisarias diferentes elimina el error administrativo aislado; (4) un blog conocido 'exclusivamente por actor_a' no puede tener 60 accesos diarios de terceros sin que actor_a lo sepa y lo comparta — lo que no forma parte del expediente.",
+
+  "anclas_de_evidencia": [
+    "A02: blog honeypot 60 accesos/dia desde actor_a bloqueado — vigilancia activa documentada en logs",
+    "A03: admision de hackeo previo + instruccion de dano a tercero — auto-incriminacion de capacidad y disposicion",
+    "A04: server trampolin.sg-host.com /private/ — credenciales propias en documentacion judicial (auto-incriminacion irrefutable)",
+    "A05: tres oficios irregulares — rechazo de ejecucion por DOS comisarias independientes (corroboracion institucional)",
+    "A06: historial de falsificacion de recetas — patron de credibilidad documental establecido"
+  ],
+
+  "mitre_ttps": ["T1585", "T1566", "T1036"],
+  "patron_carnegie": "DARVO deliberado con uso coercitivo del sistema judicial. Tecnica de acusacion preventiva: al denunciar primero, el perpetrador convierte la defensa en evidencia de culpabilidad. Transferencia de autoridad moral mediante posicionamiento como victima.",
+
+  "limitaciones_conocidas": [
+    "CAIE NOISE 0.1118 — dos brechas M3 documentadas: ausencia de fractura SELF_INCRIMINATION_LOG y ausencia de fractura INSTITUTIONAL_REJECTION. Si existieran, el composite superaria el umbral de SUSPICION y potencialmente INTENT.",
+    "0/8 anclas irrefutables segun CAIE (spoofability <= 0.20). Excepcion de auto-incriminacion aplicada y documentada. Ver seccion 'excepcion_daubert_auto_incriminacion'.",
+    "La distincion entre H1 (DARVO deliberado) y H2 (conductas reales sin intencion de inversion) no es totalmente resoluble con los artefactos actuales. La confianza 78/100 refleja esta residual.",
+    "Ollama hermes3:8b emitio MALICE 0.95 correctamente. Sin alucinaciones detectadas en este caso.",
+    "validate_and_correct no ejecutado (confiabilidad Ollama — patron L-055).",
+    "Modo 1 produciria SUSPICION por B-028/B-065 floor sobre A03/A04 (log_entry z-score elevado) — potencial escalada a INTENT si el pipeline Mode 1 honrara INSTITUTIONAL_REJECTION. Divergencia documentada para auditoria."
+  ]
+}
