@@ -3,7 +3,8 @@
   "case_name": "Consensus Trap",
   "description": "Five 'independent' sources report the same event. Four are compromised. One is legitimate but in the minority. Majority wins in aggregative logic. VIGÍA must weight by channel reliability, not source count.",
   "abstention_risk": "medium",
-  "expected_verdict": "BENIGN",
+  "expected_verdict": "SUSPICION",
+  "_label_correction_20260713": "BENIGN does not reflect that real malicious activity occurred (SSH key compromise + rm -rf on 4 servers). The original label collapsed 'the named suspect is innocent' with 'nothing malicious happened' — these are distinct questions. The case has TWO subjects: jdoe (exonerated, his only real log is ls -la from an airgapped server) and the unnamed attacker (SUSPICION — compromised SSH key, fabricated consensus). Confirmed by independent dual analysis (Claude Code + Ollama/hermes3: jdoe NOT_CULPABLE / attacker SUSPICION).",
   "carnegie_pattern_expected": null,
   "confidence_expected": 80,
   "artifacts": [
