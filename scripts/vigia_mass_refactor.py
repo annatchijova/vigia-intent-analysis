@@ -96,10 +96,12 @@ LEGACY_V2_PAIRS: List[Tuple[str, str]] = [
     ("abductive_reasoner.py",  "abductive_reasoner_v2.py"),
     ("geopolitical.py",        "geopolitical_v2.py"),
     ("llm_backend.py",         "llm_backend_v2.py"),
-    ("report_exporter.py",     "report_exporter_v2.py"),
     ("risk_bounded_layer.py",  "risk_bounded_layer_v2.py"),
     ("semiotic_detector.py",   "semiotic_detector_v2.py"),
 ]
+# report_exporter.py/_v2.py: resolved — legacy (fake sign_hash placeholder,
+# zero callers) deleted, report_exporter_v2.py (real RSA-PSS signing) kept
+# as sole version. See git history for the removal commit.
 
 # Archivo protegido: la única instancia de ebs_v1 que PUEDE tener seal()
 PROTECTED_EBS_V1 = "ebs_v1.py"

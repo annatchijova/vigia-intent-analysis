@@ -1,4 +1,4 @@
-# vigia/report/report_exporter_v2.py
+# vigia/pipeline/report_exporter_v2.py
 
 import hashlib
 import json
