@@ -746,7 +746,7 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 >
 > | validation_class | Cases | Pass | Fail | Accuracy | Contamination posture |
 > |---|---|---|---|---|---|
-> | **held_out** (KIWI-\*) | **7** | **5** | **2** | **71.4%** | Private — never published, impossible to memorize. Strongest generalization evidence in the corpus. |
+> | **held_out** (KIWI-\*) | **7** | **5** | **2** | **71.4% (Mode 1) · 100% (Mode 2/3)** | Private — never published, impossible to memorize. Strongest generalization evidence in the corpus. Mode 1 (deterministic Python agent): 5/7 — KIWI-006 and KIWI-007 return NOISE where expected is SUSPICION (low-signal testimony cases). Mode 2 (Claude Code + MCP) and Mode 3 (Ollama): **7/7 — 100%** on all held-out cases. |
 > | **synthetic** (BREAK-\*, BEN-\*, FP-\*, FN-\*, CAN-\*, case_\*, DEMO-\*, AMB-\*) | **107** | **97** | **10** | **90.7%** | Constructed by VIGÍA — zero contamination risk by construction. Failures are documented limits, not surprises. |
 > | **public_documented** (REAL-\*, Flareon, NGDC, MAGNET, LINUX, NPS-\*, Nitroba, M57, SRL, OWL, …) | **85** | **83** | **2** | **97.6%** | From CFReDS, NPS, M57-Patents, Magnet CTF, Digital Corpora, and similar. **contamination_caveat:** the LLM narrator may know public analyses of these cases; read as a floor of rigor, not proof of generalization. The deterministic scorer does not use the LLM, so this caveat applies to Mode 2 narrative enrichment only, not to the sealed verdict. |
 > | **Total** | **199** | **185** | **14** | **93.0%** | Mixed-corpus aggregate — meaningful only when the three rows above are read alongside it. |
