@@ -5843,6 +5843,25 @@ tested, doctrinally correct). NOT candidates for deletion. Blocked until
 
 ---
 
+## B-125 — `vigia/forensics/document_integrity.py` dead duplicate deleted
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P3 (dead duplicate with stale `round(float, 2)` instead of Fraction) |
+| **File** | `vigia/forensics/document_integrity.py` (DELETED) |
+| **Detected in** | Module archaeology audit 2026-07-14 |
+
+### Description
+
+Copy-paste duplicate of `vigia/tools/document_integrity.py` (the live version).
+Internal header literally said `vigia/tools/document_integrity.py`. Retained
+pre-fix code including `round(float, 2)` in `suspicion_score` (determinism
+violation). Deferred from B-121 bulk deletion to avoid confusion with the
+actively-patched live file. Zero callers, full suite 1366 passed.
+
+---
+
 ## B-124 — Verdict/governance cluster: 6 modules designed, NOT wired — same pattern as B-123
 
 | Field | Value |
