@@ -796,7 +796,8 @@ raw artifacts directly (MFT, prefetch, browser, event logs, pcap, memory via vol
 carry sealed bundles in `results/`** (SRL 2018, MUS2019/Narcos, M57, NPS, Magnet
 2020 CTF, Tuck 2019 macOS, Vanko), each an individual investigation with per-case
 verdicts and findings — there is no corpus number for this mode because these are
-investigations, not benchmark rows. Coverage is partial by design: some artifact
+investigations, not benchmark rows. Full per-case catalog: [`RAW_CASES_LOG.md`](./RAW_CASES_LOG.md)
+(Spanish: [`RAW_CASES_LOG_ES.md`](./RAW_CASES_LOG_ES.md)). Coverage is partial by design: some artifact
 classes do not reach the engines yet (USB/shellbag/amcache registry hives are honest
 ABSTAIN stubs; see `KNOWN_LIMITATIONS.md`), and cases whose signal lives in an
 uncovered class degrade to ABSTAIN rather than producing a false NOISE (F7/P1-E

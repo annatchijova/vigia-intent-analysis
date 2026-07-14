@@ -1,0 +1,234 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-14T21:00:38.138422+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "OWL-NEXUS5-RAW-20260714",
+    "end_time": "2026-07-14T21:00:38.138427+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "OWL-NEXUS5-RAW-20260714",
+        "entry_sha256": "466d7e7c0f00b5d8f4d42500580b6ae34c47bb49f0dd30a985cf967b02957f16",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "OWL-NEXUS5-RAW-20260714"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-14T21:00:37.991320+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "OWL-NEXUS5-RAW-20260714",
+        "entry_sha256": "3fbd64134a5c31294f28e156d0bb05d778819d328cf07f4ef7a28f613a013c57",
+        "inputs_summary": {
+          "path": "evidence/owl-2019-nexus5-quick"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-14T21:00:37.991390+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "OWL-NEXUS5-RAW-20260714",
+        "entry_sha256": "4520eb5bf7161dc36da10be1155f2fca4bc544cc7c08c28d1e4fd421ed8c7d2e",
+        "inputs_summary": {
+          "path": "evidence/owl-2019-nexus5-quick"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 1ab8a90ee67f19d0...",
+        "outputs_summary": {
+          "sha256": "1ab8a90ee67f19d03566dc63e29268a4e8da6c8357909ea956a1a75b76443a7a"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-14T21:00:37.993490+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "OWL-NEXUS5-RAW-20260714",
+        "entry_sha256": "49360f8f9790097ec7e57a8383b230ded426935bbd49e1403b2accb84e18aa60",
+        "inputs_summary": {
+          "evidence": "evidence/owl-2019-nexus5-quick",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-14T21:00:37.993597+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "OWL-NEXUS5-RAW-20260714",
+        "entry_sha256": "88896047ad2ec26ba4b10e8b7ebb76a7739b7c5495fca2d21f5823e3efd38225",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 1 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted (engines: ANDROID_FORENSICS). Hallazgos: ANDROID_FORENSICS: 0 finding(s).\n[SECONDNESS] Max z-score: 0.00; se\u00f1ales cr\u00edticas (z>3): 0..."
+          },
+          "case_id": "OWL-NEXUS5-RAW-20260714",
+          "pipeline_meta": {
+            "abductive_reasoner": "NOT_RUN_MOBILE_SINGLE_SOURCE",
+            "max_mobile_z": "0",
+            "n_mobile_signals": "1",
+            "n_mobile_unanalyzed": "0",
+            "n_total_signals": "1",
+            "s94_lim_enforced": "False",
+            "source": "mobile_forensics_adapter",
+            "suspicion_class": "GENERIC"
+          },
+          "results": {},
+          "signals": [
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "android_version": "",
+                "device_model": "",
+                "encrypted_apps_count": "0",
+                "is_rooted": "False",
+                "opsec_indicators_count": "0",
+                "owner_email": "",
+                "root_method": "",
+                "total_calls": "0",
+                "total_contacts": "0",
+                "total_sms": "21"
+              },
+              "tool": "ANDROID_FORENSICS",
+              "value": "0.0",
+              "z_score": "0.0"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-14T21:00:38.138038+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "OWL-NEXUS5-RAW-20260714",
+        "entry_sha256": "69aeb46da2b883981cb3c7477ee0fde84c0e4704c49590c498148a466698e37a",
+        "inputs_summary": {
+          "n_signals": "1"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-14T21:00:38.138187+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "OWL-NEXUS5-RAW-20260714",
+        "entry_sha256": "b6eeffe19a681039c7aac9f02411b3f49967d6b10b9eba9913cd4031331a26ad",
+        "inputs_summary": {
+          "verdict": "MOBILE_EVIDENCE_ANALYZED"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-14T21:00:38.138376+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-14T21:00:37.991128+00:00",
+    "total_entries": 7
+  },
+  "case_id": "OWL-NEXUS5-RAW-20260714",
+  "evidence_path": "evidence/owl-2019-nexus5-quick",
+  "evidence_sha256": "1ab8a90ee67f19d03566dc63e29268a4e8da6c8357909ea956a1a75b76443a7a",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE OWL-NEXUS5-RAW-20260714 ===\nEvidence: evidence/owl-2019-nexus5-quick\nEvidence SHA-256: 1ab8a90ee67f19d03566dc63e29268a4e8da6c8357909ea956a1a75b76443a7a\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MOBILE_EVIDENCE_ANALYZED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 1 se\u00f1al(es): 1 primaria(s) de ['android_forensic'], 0 derivada(s)/no-analizada(s). Top z: ANDROID_FORENSICS=0.00.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MOBILE_EVIDENCE_ANALYZED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\n[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted (engines: ANDROID_FORENSICS). Hallazgos: ANDROID_FORENSICS: 0 finding(s).\n[SECONDNESS] Max z-score: 0.00; se\u00f1ales cr\u00edticas (z>3): 0.\n[THIRDNESS] Hip\u00f3tesis: MOBILE_EVIDENCE_ANALYZED. Sin desviaci\u00f3n sobre umbral \u2014 fuente \u00fanica, sin base para afirmar benignidad concluyente (gate <3 fuentes).\nMotor abductivo v2: NO ejecutado en esta ruta (adaptador mobile de fuente \u00fanica). El razonador requiere \u22653 fuentes primarias independientes y cada engine de dispositivo emite una \u00fanica se\u00f1al agregada. Esto es una limitaci\u00f3n de dise\u00f1o documentada (B-052, AUDITORIA_MACOS_NARRATIVA.md), no un error de pipeline.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [ANDROID_FORENSICS] z=0.000 conf=0.00 \u2014 \n\n--- FINAL ALERT LEVEL ---\nINDETERMINATE \u2014 ABSTAIN verdict (MOBILE_EVIDENCE_ANALYZED): the evidence was not (fully) analyzed, so no alert level can be asserted.\nReconciliation: ABSTAIN verdict \u2014 the per-signal magnitude level (LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.) describes only the analyzed portion and is not an assessment of the unanalyzed evidence.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 1 | Derived: 0 | Total: 1",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MOBILE_EVIDENCE_ANALYZED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": false,
+      "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted (engines: ANDROID_FORENSICS). Hallazgos: ANDROID_FORENSICS: 0 finding(s).\n[SECONDNESS] Max z-score: 0.00; se\u00f1ales cr\u00edticas (z>3): 0.\n[THIRDNESS] Hip\u00f3tesis: MOBILE_EVIDENCE_ANALYZED. Sin desviaci\u00f3n sobre umbral \u2014 fuente \u00fanica, sin base para afirmar benignidad concluyente (gate <3 fuentes).\nMotor abductivo v2: NO ejecutado en esta ruta (adaptador mobile de fuente \u00fanica). El razonador requiere \u22653 fuentes primarias independientes y cada engine de dispositivo emite una \u00fanica se\u00f1al agregada. Esto es una limitaci\u00f3n de dise\u00f1o documentada (B-052, AUDITORIA_MACOS_NARRATIVA.md), no un error de pipeline."
+    },
+    "case_id": "OWL-NEXUS5-RAW-20260714",
+    "pipeline_meta": {
+      "abductive_reasoner": "NOT_RUN_MOBILE_SINGLE_SOURCE",
+      "max_mobile_z": "0",
+      "n_mobile_signals": 1,
+      "n_mobile_unanalyzed": 0,
+      "n_total_signals": 1,
+      "s94_lim_enforced": false,
+      "source": "mobile_forensics_adapter",
+      "suspicion_class": "GENERIC"
+    },
+    "results": {},
+    "signals": [
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "android_version": "",
+          "artifact_reliability": "7/10",
+          "artifact_type": "android_forensic",
+          "chains": 0,
+          "composite_score": "0",
+          "data_minimization": false,
+          "device_model": "",
+          "encrypted_apps_count": 0,
+          "finding_types": [],
+          "findings_count": 0,
+          "is_rooted": false,
+          "opsec_indicators_count": 0,
+          "owner_email": "",
+          "root_method": "",
+          "signal_class": "primary",
+          "total_calls": 0,
+          "total_contacts": 0,
+          "total_sms": 21
+        },
+        "tool": "ANDROID_FORENSICS",
+        "value": 0.0,
+        "z_score": 0.0
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 1,
+    "n_total_signals": 1,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

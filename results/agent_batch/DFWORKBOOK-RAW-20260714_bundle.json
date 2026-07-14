@@ -1,0 +1,168 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-14T21:00:46.670799+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "DFWORKBOOK-RAW-20260714",
+    "end_time": "2026-07-14T21:00:46.670803+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "DFWORKBOOK-RAW-20260714",
+        "entry_sha256": "de76d3ffb2f7b4a43bdeffdd6d07f5c35467889e167f7c93f5ec4b0a834ca44e",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "DFWORKBOOK-RAW-20260714"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-14T21:00:46.232405+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "DFWORKBOOK-RAW-20260714",
+        "entry_sha256": "93a0a98556e9de2dd1a48a7478752f629257a7a0a716ee089e6b0392a8d2e265",
+        "inputs_summary": {
+          "path": "evidence/dfworkbook"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-14T21:00:46.232476+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "DFWORKBOOK-RAW-20260714",
+        "entry_sha256": "8948e43be62cd6cadd6f25936a907dc22d3d2293bb80dade378b16dc457cd40c",
+        "inputs_summary": {
+          "path": "evidence/dfworkbook"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: f402091ecdef6f27...",
+        "outputs_summary": {
+          "sha256": "f402091ecdef6f274a3923d95c2e672e10b28dc813c89839603026c3f3545390"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-14T21:00:46.287687+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "DFWORKBOOK-RAW-20260714",
+        "entry_sha256": "6d6d0ca7de55137c772ca0cd086e05d538b6bfb9ebe56ac7bc95429c687a446f",
+        "inputs_summary": {
+          "evidence": "evidence/dfworkbook",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-14T21:00:46.287843+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "DFWORKBOOK-RAW-20260714",
+        "entry_sha256": "5dad2404e7b7986c5f181b3461b7cbf2abc3de1fc65caa749b6f5be2399d7f64",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 0 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "PIPELINE_ERROR",
+            "is_conclusive": "False",
+            "narrative": "[ERROR] E01 disk image requires prior artifact extraction. Mount with ewfmount and pass registry_hives/event_logs explicitly."
+          },
+          "case_id": "DFWORKBOOK-RAW-20260714",
+          "pipeline_meta": {
+            "error": "E01 disk image requires prior artifact extraction. Mount with ewfmount and pass registry_hives/event_logs explicitly."
+          },
+          "signals": []
+        },
+        "seq": 5,
+        "timestamp": "2026-07-14T21:00:46.670476+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "DFWORKBOOK-RAW-20260714",
+        "entry_sha256": "5d3050abf7b7c2441636750ba1afcb57adbf738f6587aadccc988323bea44cd0",
+        "inputs_summary": {
+          "n_signals": "0"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-14T21:00:46.670618+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "DFWORKBOOK-RAW-20260714",
+        "entry_sha256": "27746104d367c9d9daa8ed198b0d3a72c2120bbc08f44c64a5547611c0a58619",
+        "inputs_summary": {
+          "verdict": "PIPELINE_ERROR"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-14T21:00:46.670753+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-14T21:00:46.232205+00:00",
+    "total_entries": 7
+  },
+  "case_id": "DFWORKBOOK-RAW-20260714",
+  "evidence_path": "evidence/dfworkbook",
+  "evidence_sha256": "f402091ecdef6f274a3923d95c2e672e10b28dc813c89839603026c3f3545390",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE DFWORKBOOK-RAW-20260714 ===\nEvidence: evidence/dfworkbook\nEvidence SHA-256: f402091ecdef6f274a3923d95c2e672e10b28dc813c89839603026c3f3545390\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: PIPELINE_ERROR\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 0 se\u00f1al(es): 0 primaria(s), 0 derivada(s)/no-analizada(s).\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: PIPELINE_ERROR. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\n[ERROR] E01 disk image requires prior artifact extraction. Mount with ewfmount and pass registry_hives/event_logs explicitly.\n\n--- FINAL ALERT LEVEL ---\nINDETERMINATE \u2014 ABSTAIN verdict (PIPELINE_ERROR): the evidence was not (fully) analyzed, so no alert level can be asserted.\nReconciliation: ABSTAIN verdict \u2014 the per-signal magnitude level (LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.) describes only the analyzed portion and is not an assessment of the unanalyzed evidence.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 0 | Derived: 0 | Total: 0",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "PIPELINE_ERROR",
+      "is_conclusive": false,
+      "narrative": "[ERROR] E01 disk image requires prior artifact extraction. Mount with ewfmount and pass registry_hives/event_logs explicitly."
+    },
+    "case_id": "DFWORKBOOK-RAW-20260714",
+    "pipeline_meta": {
+      "error": "E01 disk image requires prior artifact extraction. Mount with ewfmount and pass registry_hives/event_logs explicitly."
+    },
+    "signals": []
+  },
+  "sans_compliance": {
+    "accuracy_validation": false,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 0,
+    "n_total_signals": 0,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

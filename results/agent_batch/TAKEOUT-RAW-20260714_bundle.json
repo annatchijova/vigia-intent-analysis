@@ -1,0 +1,244 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-14T21:00:42.224862+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "TAKEOUT-RAW-20260714",
+    "end_time": "2026-07-14T21:00:42.224867+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "TAKEOUT-RAW-20260714",
+        "entry_sha256": "908d9a63ac0116caf6d441808680064a8769e1aaade019ae77d4f1270b7ad16f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "TAKEOUT-RAW-20260714"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-14T21:00:41.589687+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "TAKEOUT-RAW-20260714",
+        "entry_sha256": "1af00ba6ff91958e3d8be73144329340a25726282812c857fcb2876162127bdf",
+        "inputs_summary": {
+          "path": "evidence/takeout-2020"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-14T21:00:41.589759+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "TAKEOUT-RAW-20260714",
+        "entry_sha256": "c73a4799f42ac56492c55785f303a7aede0350931bc4614366275fa5ffaa43e7",
+        "inputs_summary": {
+          "path": "evidence/takeout-2020"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: ec22e909582c8a89...",
+        "outputs_summary": {
+          "sha256": "ec22e909582c8a8913c65ba4fdd3b624de17b676e1b014a0d7c4e2bd67f5fe1f"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-14T21:00:42.037566+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "TAKEOUT-RAW-20260714",
+        "entry_sha256": "53fe05c10c20f77e8fb3209603a8f0241e52a0cd46b9e7cd36f06b09e824a419",
+        "inputs_summary": {
+          "evidence": "evidence/takeout-2020",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-14T21:00:42.037708+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "TAKEOUT-RAW-20260714",
+        "entry_sha256": "0c55f6c07c3d54a87d93220404dcb0fbe4c05bf59ea3c8ee4e51ff5a244b48b9",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 1 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "INTENT_DETECTED",
+            "best_posterior": "21/25",
+            "confidence": "21/25",
+            "is_conclusive": "True",
+            "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted (engines: GOOGLE_TAKEOUT_FORENSICS). Hallazgos: GOOGLE_TAKEOUT_FORENSICS: 43 finding(s) [BROWSER_EXPLOIT_RESEARCH, LOCATION_HISTORY...",
+            "verdict_ceiling": "SUSPICION",
+            "verdict_ceiling_reason": "\u00a79.4-LIM: evidencia fuerte confinada al canal D3 (sin triangulaci\u00f3n D2/D4/D5) \u2014 techo doctrinal SUSPICION (L-051)."
+          },
+          "case_id": "TAKEOUT-RAW-20260714",
+          "pipeline_meta": {
+            "abductive_reasoner": "NOT_RUN_MOBILE_SINGLE_SOURCE",
+            "max_mobile_z": "21/5",
+            "n_mobile_signals": "1",
+            "n_mobile_unanalyzed": "0",
+            "n_total_signals": "1",
+            "s94_lim_enforced": "True",
+            "source": "mobile_forensics_adapter",
+            "suspicion_class": "D3_RICH_NO_TRIANGULATION"
+          },
+          "results": {},
+          "signals": [
+            {
+              "confidence": "0.95",
+              "metadata": {
+                "account_email": "",
+                "device_model": "Google Pixel 3",
+                "location_date_range": "2020-03-05 to 2020-03-29",
+                "location_gaps_count": "1",
+                "location_unique_days": "17",
+                "total_browser_entries": "161",
+                "total_installed_apps": "70",
+                "total_location_points": "3233",
+                "total_semantic_places": "31",
+                "user_confirmed_places": "10"
+              },
+              "tool": "GOOGLE_TAKEOUT_FORENSICS",
+              "value": "0.84",
+              "z_score": "4.2"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-14T21:00:42.224393+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "TAKEOUT-RAW-20260714",
+        "entry_sha256": "76770d93e49b9f9a21a5974b3e6d286edc1bcac33ee901fe7e82363231730f70",
+        "inputs_summary": {
+          "n_signals": "1"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-14T21:00:42.224538+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "TAKEOUT-RAW-20260714",
+        "entry_sha256": "903764657d5570891798ce81e976cd706b80070917fb127446d31f7d8b2ab49f",
+        "inputs_summary": {
+          "verdict": "INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-14T21:00:42.224813+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-14T21:00:41.589481+00:00",
+    "total_entries": 7
+  },
+  "case_id": "TAKEOUT-RAW-20260714",
+  "evidence_path": "evidence/takeout-2020",
+  "evidence_sha256": "ec22e909582c8a8913c65ba4fdd3b624de17b676e1b014a0d7c4e2bd67f5fe1f",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE TAKEOUT-RAW-20260714 ===\nEvidence: evidence/takeout-2020\nEvidence SHA-256: ec22e909582c8a8913c65ba4fdd3b624de17b676e1b014a0d7c4e2bd67f5fe1f\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: INTENT_DETECTED\nPosterior confidence: 21/25\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 1 se\u00f1al(es): 1 primaria(s) de ['google_takeout'], 0 derivada(s)/no-analizada(s). Top z: GOOGLE_TAKEOUT_FORENSICS=4.20.\n[SECONDNESS] 1 se\u00f1al(es) primaria(s) sobre umbral z>2: GOOGLE_TAKEOUT_FORENSICS (z=4.20).\n[THIRDNESS] Hip\u00f3tesis: INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted (engines: GOOGLE_TAKEOUT_FORENSICS). Hallazgos: GOOGLE_TAKEOUT_FORENSICS: 43 finding(s) [BROWSER_EXPLOIT_RESEARCH, LOCATION_HISTORY_GAP, OPSEC_ROOT_TOOLCHAIN, ROOT_TOOL_INSTALLED].\n[SECONDNESS] Max z-score: 4.20; se\u00f1ales cr\u00edticas (z>3): 1.\n[THIRDNESS] Hip\u00f3tesis: INTENT_DETECTED. Anomal\u00eda estructural en evidencia mobile \u2014 revisi\u00f3n prioritaria.\nMotor abductivo v2: NO ejecutado en esta ruta (adaptador mobile de fuente \u00fanica). El razonador requiere \u22653 fuentes primarias independientes y cada engine de dispositivo emite una \u00fanica se\u00f1al agregada. Esto es una limitaci\u00f3n de dise\u00f1o documentada (B-052, AUDITORIA_MACOS_NARRATIVA.md), no un error de pipeline.\n[\u00a79.4-LIM] SUSPICION \u2014 evidencia de filesystem robusta y multi-vector, pero confinada a un \u00fanico canal f\u00edsico (D3). El motor NO puede confirmar MALICE sin una segunda fuente independiente (memoria, red, o contenido). Se recomienda triangulaci\u00f3n manual urgente antes de descartar el caso.\nREFUTATION GATE LOG \u2014 \u00a79.4-LIM\n  Candidato : INTENT_DETECTED (max_z=4.20)\n  Gate      : techo D3-only sin triangulaci\u00f3n (verdict_ceiling=SUSPICION, L-051)\n  Resultado : candidato CAPEADO pre-emisi\u00f3n \u2192 el veredicto sellado es SUSPICION. La hip\u00f3tesis cruda se preserva arriba; el LLM no puede anular este gate.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [GOOGLE_TAKEOUT_FORENSICS] z=4.200 conf=0.95 \u2014 0.84\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Significant anomalies detected. Priority forensic review recommended.\n\nCritical signals (z>3, primary): 1\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 1 | Derived: 0 | Total: 1",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "INTENT_DETECTED",
+      "best_posterior": "21/25",
+      "confidence": "21/25",
+      "is_conclusive": true,
+      "narrative": "[FIRSTNESS] Mobile forensic evidence analyzed: 1 signal(s) extracted (engines: GOOGLE_TAKEOUT_FORENSICS). Hallazgos: GOOGLE_TAKEOUT_FORENSICS: 43 finding(s) [BROWSER_EXPLOIT_RESEARCH, LOCATION_HISTORY_GAP, OPSEC_ROOT_TOOLCHAIN, ROOT_TOOL_INSTALLED].\n[SECONDNESS] Max z-score: 4.20; se\u00f1ales cr\u00edticas (z>3): 1.\n[THIRDNESS] Hip\u00f3tesis: INTENT_DETECTED. Anomal\u00eda estructural en evidencia mobile \u2014 revisi\u00f3n prioritaria.\nMotor abductivo v2: NO ejecutado en esta ruta (adaptador mobile de fuente \u00fanica). El razonador requiere \u22653 fuentes primarias independientes y cada engine de dispositivo emite una \u00fanica se\u00f1al agregada. Esto es una limitaci\u00f3n de dise\u00f1o documentada (B-052, AUDITORIA_MACOS_NARRATIVA.md), no un error de pipeline.\n[\u00a79.4-LIM] SUSPICION \u2014 evidencia de filesystem robusta y multi-vector, pero confinada a un \u00fanico canal f\u00edsico (D3). El motor NO puede confirmar MALICE sin una segunda fuente independiente (memoria, red, o contenido). Se recomienda triangulaci\u00f3n manual urgente antes de descartar el caso.\nREFUTATION GATE LOG \u2014 \u00a79.4-LIM\n  Candidato : INTENT_DETECTED (max_z=4.20)\n  Gate      : techo D3-only sin triangulaci\u00f3n (verdict_ceiling=SUSPICION, L-051)\n  Resultado : candidato CAPEADO pre-emisi\u00f3n \u2192 el veredicto sellado es SUSPICION. La hip\u00f3tesis cruda se preserva arriba; el LLM no puede anular este gate.",
+      "verdict_ceiling": "SUSPICION",
+      "verdict_ceiling_reason": "\u00a79.4-LIM: evidencia fuerte confinada al canal D3 (sin triangulaci\u00f3n D2/D4/D5) \u2014 techo doctrinal SUSPICION (L-051)."
+    },
+    "case_id": "TAKEOUT-RAW-20260714",
+    "pipeline_meta": {
+      "abductive_reasoner": "NOT_RUN_MOBILE_SINGLE_SOURCE",
+      "max_mobile_z": "21/5",
+      "n_mobile_signals": 1,
+      "n_mobile_unanalyzed": 0,
+      "n_total_signals": 1,
+      "s94_lim_enforced": true,
+      "source": "mobile_forensics_adapter",
+      "suspicion_class": "D3_RICH_NO_TRIANGULATION"
+    },
+    "results": {},
+    "signals": [
+      {
+        "confidence": 0.95,
+        "metadata": {
+          "account_email": "",
+          "artifact_reliability": "13/20",
+          "artifact_type": "google_takeout",
+          "chains": 3,
+          "composite_score": "19/20",
+          "device_model": "Google Pixel 3",
+          "finding_types": [
+            "BROWSER_EXPLOIT_RESEARCH",
+            "LOCATION_HISTORY_GAP",
+            "OPSEC_ROOT_TOOLCHAIN",
+            "ROOT_TOOL_INSTALLED",
+            "SUSPICIOUS_INSTALLED_APP"
+          ],
+          "findings_count": 43,
+          "location_date_range": "2020-03-05 to 2020-03-29",
+          "location_gaps_count": 1,
+          "location_unique_days": 17,
+          "opsec_indicators_count": 3,
+          "signal_class": "primary",
+          "total_browser_entries": 161,
+          "total_installed_apps": 70,
+          "total_location_points": 3233,
+          "total_semantic_places": 31,
+          "user_confirmed_places": 10
+        },
+        "tool": "GOOGLE_TAKEOUT_FORENSICS",
+        "value": 0.84,
+        "z_score": 4.2
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 1,
+    "n_total_signals": 1,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

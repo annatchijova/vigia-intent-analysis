@@ -1,0 +1,1180 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-14T20:57:43.990655+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "OWL-HD1-RAW-20260714",
+    "end_time": "2026-07-14T20:57:43.990659+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "OWL-HD1-RAW-20260714",
+        "entry_sha256": "19abfec59618eeaf0d06e6edf777f704872ecda3c28aa8d756e76b447d34aef7",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "OWL-HD1-RAW-20260714"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-14T20:57:26.016794+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "OWL-HD1-RAW-20260714",
+        "entry_sha256": "86a36ab0fd5b92b294ec1e41ed8c30272dff8bb181befba1ae02e1e07f65861d",
+        "inputs_summary": {
+          "path": "evidence/owl-2019-hd1-windows"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-14T20:57:26.016865+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "OWL-HD1-RAW-20260714",
+        "entry_sha256": "b65ffa75bd67ac1349a1b7ee8fbd4a16165652d3dcfb235fb404682d80eea476",
+        "inputs_summary": {
+          "path": "evidence/owl-2019-hd1-windows"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 9a6c646f07224198...",
+        "outputs_summary": {
+          "sha256": "9a6c646f07224198f4b39d3d8b42c449e026e84a664e71425a070c0a17fc387d"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-14T20:57:26.257120+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "OWL-HD1-RAW-20260714",
+        "entry_sha256": "caddbebb606fbdb6a16d13ff8d4101a8466ec9467128a549b6307b3c36ebf3c4",
+        "inputs_summary": {
+          "evidence": "evidence/owl-2019-hd1-windows",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-14T20:57:26.257274+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "OWL-HD1-RAW-20260714",
+        "entry_sha256": "9b78391f4d4700f2e6a04bdf22e82ba47cd1a15ced01ac7144810b2b19ade89e",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 11 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "ABSTAIN_V2",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] 8 artefactos observados, 0 silencios significativos (Eco). Layers presentes: ['DISK_MFT', 'REGISTRY'].\n[SECONDNESS] 8 anomal\u00edas contrastadas contra baseline. Cada se\u00f1al evaluada en su domi...",
+            "ontological_level": "TECHNIQUE"
+          },
+          "case_id": "OWL-HD1-RAW-20260714",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "OWL-HD1-RAW-20260714",
+            "n_records": "11",
+            "records": [
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-14T20:57:26.735215+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "b7649f4e846c3253f1e618e42abbeb02a49ccabfda80d4c8f21024f9e8da2db2",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-14T20:57:27.121478+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "acf198d2e1fbe64dde9672b0e1cd42c9b19ba5843e2a3707ba7097799ec86c14",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-14T20:57:27.124196+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "c9bb6c54ebce190ecaecebea5ea294161341700c326996158d1f84430e9035dd",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-14T20:57:27.208610+00:00"
+              },
+              {
+                "actor": "REGISTRY_ANALYST",
+                "artifact_hash": "fab00756547761f34d09ad898479ee00c62cf9f2d09d32b8a1ac7fee068f8ed1",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-14T20:57:27.674753+00:00"
+              }
+            ]
+          },
+          "pipeline_meta": {
+            "engines_not_run_no_event_stream": [
+              "behavioral",
+              "metabolic"
+            ],
+            "frs_groups": "4",
+            "gamma_applied": "True",
+            "n_engine_signals": "2",
+            "n_pathguard_rejects": "0",
+            "n_primary_signals": "8",
+            "n_sift_signals": "8",
+            "n_signal_conversion_drops": "0",
+            "n_total_signals": "11",
+            "n_unanalyzed_artifacts": "0"
+          },
+          "results": {
+            "adversarial": {
+              "dominant_pattern": "NONE",
+              "indicators": [],
+              "n_indicators": "0",
+              "n_tools": "10",
+              "sift_critical_active": "1",
+              "signal_class": "derived"
+            },
+            "browser": {
+              "analysis_notes": [
+                "chromium: 24 downloads, 463 urls"
+              ],
+              "artifact_reliability": "13/20",
+              "artifact_type": "browser",
+              "c2_count": "0",
+              "finding_types": [
+                "SUSPICIOUS_DOWNLOAD"
+              ],
+              "source_profile": "/home/labestiadevigia/vigia-repo/evidence/owl-2019-hd1-windows/browser",
+              "suspicious_count": "4",
+              "total_downloads": "24",
+              "unanalyzed": "False"
+            },
+            "caie": {
+              "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+              "artifacts_evaluated": "11",
+              "composite_score": "0.0161",
+              "fracture_bonus_applied": "0.0000",
+              "integrity_check": {
+                "alerts": [],
+                "fpu_native": "False",
+                "internal_precision": "6",
+                "math_engine": "decimal.Decimal",
+                "output_precision": "4"
+              },
+              "probabilistic_score": "0.0161",
+              "probabilistic_verdict": "NOISE",
+              "status": "OK",
+              "structural_verdict": "INCONCLUSIVE",
+              "verdict": "INCONCLUSIVE"
+            },
+            "eventlog": {
+              "artifact_type": "windows_event_log",
+              "chains": "146",
+              "composite_score": "19/20",
+              "finding_types": [
+                "HIGH_SEVERITY_25",
+                "HIGH_SEVERITY_7045",
+                "PASS_THE_HASH"
+              ],
+              "findings": "178",
+              "gaps": "33",
+              "time_range": [
+                "1485484294",
+                "1486476141"
+              ],
+              "timestamp": "1486476141",
+              "total_events": "5908"
+            },
+            "patterns": {
+              "artifact_reliability": "17/20",
+              "artifact_type": "pattern",
+              "best_match": "NONE",
+              "finding_types": [],
+              "match_count": "0",
+              "match_score_by_pattern": {},
+              "missing_signals_by_pattern": {},
+              "signal_class": "derived",
+              "total_patterns": "3"
+            },
+            "prefetch": {
+              "anti_forensic_count": "0",
+              "artifact_reliability": "7/10",
+              "artifact_type": "prefetch",
+              "finding_types": [
+                "SUSPICIOUS_EXECUTION"
+              ],
+              "source_path": "/home/labestiadevigia/vigia-repo/evidence/owl-2019-hd1-windows/prefetch",
+              "suspicious_count": "12",
+              "suspicious_executables": [
+                "RUNDLL32.EXE",
+                "RUNDLL32.EXE",
+                "RUNDLL32.EXE",
+                "RUNDLL32.EXE",
+                "RUNDLL32.EXE"
+              ],
+              "total_files": "225",
+              "unanalyzed": "False",
+              "unparsed_files": "3"
+            },
+            "registry": [
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "9a99d2d6adeb52b994d9293d55d7bd460e948cce63e9b8a848306e8e4603ebdc",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "1559e2531ab47fc7c0e88d556a678ef525a52fdf428b6e31fa3a6aab6dc5d513",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "296c141011687d0f897493e86e395616da8698f92e20d1fa67332e563c560afc",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "hive_sha256": "3efc5e2fbb09e94c7b0a02ab0ffb579051b8d30b32d38b92bdcb174fe561ebcd",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              {
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [
+                  "service"
+                ],
+                "hive_sha256": "dabf4453a5f0426ec0867b0c693397152554d395920671813632e65b321bca42",
+                "persistence_count": "77",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              }
+            ],
+            "resonance": {
+              "artifact_reliability": "4/5",
+              "artifact_type": "resonance",
+              "finding_types": [],
+              "pattern_count": "0",
+              "signal_class": "derived",
+              "total_resonance": "0"
+            }
+          },
+          "signals": [
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+                "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "hive_sha256": "9a99d2d6adeb52b994d9293d55d7bd460e948cce63e9b8a848306e8e4603ebdc",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+                "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "hive_sha256": "1559e2531ab47fc7c0e88d556a678ef525a52fdf428b6e31fa3a6aab6dc5d513",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+                "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "hive_sha256": "296c141011687d0f897493e86e395616da8698f92e20d1fa67332e563c560afc",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+                "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [],
+                "gamma_applied": "True",
+                "hive_sha256": "3efc5e2fbb09e94c7b0a02ab0ffb579051b8d30b32d38b92bdcb174fe561ebcd",
+                "persistence_count": "0",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.7550125",
+              "metadata": {
+                "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+                "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+                "artifact_reliability": "17/20",
+                "artifact_type": "registry",
+                "finding_types": [
+                  "service"
+                ],
+                "gamma_applied": "True",
+                "hive_sha256": "dabf4453a5f0426ec0867b0c693397152554d395920671813632e65b321bca42",
+                "persistence_count": "77",
+                "timestomp_count": "0",
+                "usb_count": "0"
+              },
+              "tool": "REGISTRY_RTR",
+              "value": "0.5599999999999999",
+              "z_score": "1.96"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-14T20:57:43.989802+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "OWL-HD1-RAW-20260714",
+        "entry_sha256": "48a8aa9eb6247a116ec321a886b85873d4aaef673028e6146397660e7e17577f",
+        "inputs_summary": {
+          "n_signals": "11"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-14T20:57:43.990175+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "OWL-HD1-RAW-20260714",
+        "entry_sha256": "639861309fb0ec25e8fdd6c8c0eed7f07cf854d382b9d576d802405980c27ca3",
+        "inputs_summary": {
+          "verdict": "ABSTAIN_V2"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-14T20:57:43.990603+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-14T20:57:26.016595+00:00",
+    "total_entries": 7
+  },
+  "case_id": "OWL-HD1-RAW-20260714",
+  "evidence_path": "evidence/owl-2019-hd1-windows",
+  "evidence_sha256": "9a6c646f07224198f4b39d3d8b42c449e026e84a664e71425a070c0a17fc387d",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE OWL-HD1-RAW-20260714 ===\nEvidence: evidence/owl-2019-hd1-windows\nEvidence SHA-256: 9a6c646f07224198f4b39d3d8b42c449e026e84a664e71425a070c0a17fc387d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: ABSTAIN_V2\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 11 se\u00f1al(es): 8 primaria(s) de ['browser', 'prefetch', 'registry', 'windows_event_log'], 3 derivada(s)/no-analizada(s). Top z: EVENT_LOG=3.04, REGISTRY_RTR=1.96, PREFETCH_ANALYZER=1.75.\n[SECONDNESS] 1 se\u00f1al(es) primaria(s) sobre umbral z>2: EVENT_LOG (z=3.04). CAIE: INCONCLUSIVE (0 fractura(s)).\n[THIRDNESS] Hip\u00f3tesis: ABSTAIN_V2. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\n[FIRSTNESS] 8 artefactos observados, 0 silencios significativos (Eco). Layers presentes: ['DISK_MFT', 'REGISTRY'].\n[SECONDNESS] 8 anomal\u00edas contrastadas contra baseline. Cada se\u00f1al evaluada en su dominio espec\u00edfico. Veredicto v2: ABSTAIN (motivo: EVIDENCE_GAP_CRITICAL). CCS: N/A.\n[THIRDNESS] Empate exacto de CCS (1/2) entre 'H2-BENIGN' y 'H1-MALICIOUS'. Sin mejor explicaci\u00f3n \u00fanica \u2014 ABSTAIN forzado (el desempate lexicogr\u00e1fico est\u00e1 prohibido: sesgar\u00eda el veredicto por nomenclatura). Mapeo VIG\u00cdA: ABSTAIN_V2. Detalle: No se pudo seleccionar hip\u00f3tesis candidata.\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [EVENT_LOG] z=3.040 conf=0.95 \u2014 0.64\n  [REGISTRY_RTR] z=1.960 conf=0.76 \u2014 0.5599999999999999\n  [PREFETCH_ANALYZER] z=1.750 conf=0.73 \u2014 0.5\n  [BROWSER_FORENSICS] z=1.625 conf=0.71 \u2014 0.5\n  [REGISTRY_RTR] z=0.000 conf=0.00 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine) ---\n  Verdict: INCONCLUSIVE | Structural: INCONCLUSIVE | Composite: 0.0161 | Fractures: 0 | Golden Rules: 0\n  Daubert: 0/11 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)\n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 Significant anomalies detected. Priority forensic review recommended. [ABSTAIN verdict (ABSTAIN_V2): this level describes the ANALYZED portion only \u2014 the evidence was not (fully) analyzed.]\nReconciliation: ABSTAIN verdict \u2014 the per-signal magnitude level (HIGH \u2014 Significant anomalies detected. Priority forensic review recommended.) describes only the analyzed portion and is not an assessment of the unanalyzed evidence.\n\nCritical signals (z>3, primary): 1\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 8 | Derived: 3 | Total: 11",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "ABSTAIN_V2",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": false,
+      "narrative": "[FIRSTNESS] 8 artefactos observados, 0 silencios significativos (Eco). Layers presentes: ['DISK_MFT', 'REGISTRY'].\n[SECONDNESS] 8 anomal\u00edas contrastadas contra baseline. Cada se\u00f1al evaluada en su dominio espec\u00edfico. Veredicto v2: ABSTAIN (motivo: EVIDENCE_GAP_CRITICAL). CCS: N/A.\n[THIRDNESS] Empate exacto de CCS (1/2) entre 'H2-BENIGN' y 'H1-MALICIOUS'. Sin mejor explicaci\u00f3n \u00fanica \u2014 ABSTAIN forzado (el desempate lexicogr\u00e1fico est\u00e1 prohibido: sesgar\u00eda el veredicto por nomenclatura). Mapeo VIG\u00cdA: ABSTAIN_V2. Detalle: No se pudo seleccionar hip\u00f3tesis candidata.",
+      "ontological_level": "TECHNIQUE"
+    },
+    "case_id": "OWL-HD1-RAW-20260714",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "OWL-HD1-RAW-20260714",
+      "n_records": 11,
+      "records": [
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:26.735215+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "b7649f4e846c3253f1e618e42abbeb02a49ccabfda80d4c8f21024f9e8da2db2",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:27.121478+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "acf198d2e1fbe64dde9672b0e1cd42c9b19ba5843e2a3707ba7097799ec86c14",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:27.124196+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "c9bb6c54ebce190ecaecebea5ea294161341700c326996158d1f84430e9035dd",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:27.208610+00:00"
+        },
+        {
+          "actor": "REGISTRY_ANALYST",
+          "artifact_hash": "fab00756547761f34d09ad898479ee00c62cf9f2d09d32b8a1ac7fee068f8ed1",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:27.674753+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "efb6b524d660547f5325acf4267385c53a81fe448651c707b3058f2a7fda6a2c",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:28.248377+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "ce94ab3ed493cbe1352fedc343f0dfb67face1bb954d30a64a592da1fa760393",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:33.589064+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "efb6b524d660547f5325acf4267385c53a81fe448651c707b3058f2a7fda6a2c",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:35.780281+00:00"
+        },
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "ce94ab3ed493cbe1352fedc343f0dfb67face1bb954d30a64a592da1fa760393",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:41.393448+00:00"
+        },
+        {
+          "actor": "PREFETCH_ANALYZER",
+          "artifact_hash": "2b977c213de546ed65a0a3c74f2dc13351083866213cce05d93015f0b5c4db74",
+          "metadata": {
+            "data_size": 17,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:43.872556+00:00"
+        },
+        {
+          "actor": "BROWSER_FORENSICS",
+          "artifact_hash": "c8f6d398f1e2db22c978f52d78afc33e4f6965181b67415b7626f63f44a26dbe",
+          "metadata": {
+            "data_size": 16,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T20:57:43.874741+00:00"
+        }
+      ]
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "engines_not_run_no_event_stream": [
+        "behavioral",
+        "metabolic"
+      ],
+      "frs_groups": 4,
+      "gamma_applied": true,
+      "n_engine_signals": 2,
+      "n_pathguard_rejects": 0,
+      "n_primary_signals": 8,
+      "n_sift_signals": 8,
+      "n_signal_conversion_drops": 0,
+      "n_total_signals": 11,
+      "n_unanalyzed_artifacts": 0,
+      "version": "V4-COLECTIVO-2026-07-03"
+    },
+    "results": {
+      "adversarial": {
+        "dominant_pattern": "NONE",
+        "indicators": [],
+        "n_indicators": 0,
+        "n_tools": 10,
+        "sift_critical_active": 1,
+        "signal_class": "derived"
+      },
+      "browser": {
+        "analysis_notes": [
+          "chromium: 24 downloads, 463 urls"
+        ],
+        "artifact_reliability": "13/20",
+        "artifact_type": "browser",
+        "c2_count": 0,
+        "finding_types": [
+          "SUSPICIOUS_DOWNLOAD"
+        ],
+        "source_profile": "/home/labestiadevigia/vigia-repo/evidence/owl-2019-hd1-windows/browser",
+        "suspicious_count": 4,
+        "total_downloads": 24,
+        "unanalyzed": false
+      },
+      "caie": {
+        "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+        "_operation_hmac": "",
+        "artifacts_evaluated": 11,
+        "artifacts_rejected": 0,
+        "chain_of_custody": {
+          "evidence_count": 11,
+          "fracture_count": 0,
+          "processing_timestamp": "2026-07-14T20:57:43.954260Z"
+        },
+        "composite_score": "0.0161",
+        "confidence_penalty_applied": false,
+        "daubert_note": "Daubert: 0/11 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)",
+        "fracture_bonus_applied": "0.0000",
+        "fractures": [],
+        "fractures_detected": 0,
+        "fractures_unique": 0,
+        "golden_rules_triggered": 0,
+        "independent_sources": 7,
+        "integrity_check": {
+          "alerts": [],
+          "fpu_native": false,
+          "internal_precision": 6,
+          "math_engine": "decimal.Decimal",
+          "output_precision": 4
+        },
+        "mitre_ttps": [
+          "T1036.005",
+          "T1059",
+          "T1070.001",
+          "T1070.002",
+          "T1070.006",
+          "T1498",
+          "T1562.001",
+          "T1564",
+          "T1565.001",
+          "T1566.003"
+        ],
+        "peirce_chain": {
+          "firstness": "11 artifacts from 7 tools. Raw scores range: 0.00 to 0.64.",
+          "secondness": "Noisy-OR fusion: 7 independent groups, composite=0.0161. Most reliable: EVENT_LOG (log_entry, adj=0.0047). 0 unique fracture(s), 0 Golden Rule(s).",
+          "thirdness": "Inferred habit: fabrication/staging. No structural discrepancies."
+        },
+        "probabilistic_score": "0.0161",
+        "probabilistic_verdict": "NOISE",
+        "raw_scores": [
+          {
+            "adjusted": "0.0047",
+            "description": "0.64",
+            "raw_score": "0.6400",
+            "spoofability": 0.85,
+            "tool": "EVENT_LOG",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0041",
+            "description": "0.5599999999999999",
+            "raw_score": "0.5600",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0037",
+            "description": "0.5",
+            "raw_score": "0.5000",
+            "spoofability": 0.85,
+            "tool": "PREFETCH_ANALYZER",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0037",
+            "description": "0.5",
+            "raw_score": "0.5000",
+            "spoofability": 0.85,
+            "tool": "BROWSER_FORENSICS",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from REGISTRY_RTR",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "REGISTRY_RTR",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CROSS_RESONANCE",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CROSS_RESONANCE",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CASE_PATTERN_LIBRARY",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CASE_PATTERN_LIBRARY",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from ADV_ROBUST",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "ADV_ROBUST",
+            "type": "log_entry",
+            "weight": 0.15
+          }
+        ],
+        "status": "OK",
+        "structural_verdict": "INCONCLUSIVE",
+        "timestamp": "2026-07-14T20:57:43.954249Z",
+        "ttp_confidences": {
+          "T1036.005": "0.0390",
+          "T1059": "0.0385",
+          "T1070.001": "0.0400",
+          "T1070.002": "0.0400",
+          "T1070.006": "0.0210",
+          "T1498": "0.0680",
+          "T1562.001": "0.0553",
+          "T1564": "0.0292",
+          "T1565.001": "0.0480",
+          "T1566.003": "0.0280"
+        },
+        "verdict": "INCONCLUSIVE",
+        "vigia_verdict": "[VIGIA_CAIE]: INCONCLUSIVE. Structural=INCONCLUSIVE Probabilistic=NOISE (composite=0.0161) from 11 artifacts (7 independent). 0 fracture(s), 0 Golden Rule(s). Daubert: 0/11 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING:"
+      },
+      "eventlog": {
+        "artifact_type": "windows_event_log",
+        "chains": 146,
+        "composite_score": "19/20",
+        "finding_types": [
+          "HIGH_SEVERITY_25",
+          "HIGH_SEVERITY_7045",
+          "PASS_THE_HASH"
+        ],
+        "findings": 178,
+        "gaps": 33,
+        "time_range": [
+          1485484294,
+          1486476141
+        ],
+        "timestamp": 1486476141,
+        "total_events": 5908
+      },
+      "patterns": {
+        "artifact_reliability": "17/20",
+        "artifact_type": "pattern",
+        "best_match": "NONE",
+        "finding_types": [],
+        "match_count": 0,
+        "match_score_by_pattern": {},
+        "missing_signals_by_pattern": {},
+        "signal_class": "derived",
+        "total_patterns": 3
+      },
+      "prefetch": {
+        "anti_forensic_count": 0,
+        "artifact_reliability": "7/10",
+        "artifact_type": "prefetch",
+        "finding_types": [
+          "SUSPICIOUS_EXECUTION"
+        ],
+        "source_path": "/home/labestiadevigia/vigia-repo/evidence/owl-2019-hd1-windows/prefetch",
+        "suspicious_count": 12,
+        "suspicious_executables": [
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE",
+          "RUNDLL32.EXE"
+        ],
+        "total_files": 225,
+        "unanalyzed": false,
+        "unparsed_files": 3
+      },
+      "registry": [
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "9a99d2d6adeb52b994d9293d55d7bd460e948cce63e9b8a848306e8e4603ebdc",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "1559e2531ab47fc7c0e88d556a678ef525a52fdf428b6e31fa3a6aab6dc5d513",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "296c141011687d0f897493e86e395616da8698f92e20d1fa67332e563c560afc",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "hive_sha256": "3efc5e2fbb09e94c7b0a02ab0ffb579051b8d30b32d38b92bdcb174fe561ebcd",
+          "persistence_count": 0,
+          "timestomp_count": 0,
+          "usb_count": 0
+        },
+        {
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [
+            "service"
+          ],
+          "hive_sha256": "dabf4453a5f0426ec0867b0c693397152554d395920671813632e65b321bca42",
+          "persistence_count": 77,
+          "timestomp_count": 0,
+          "usb_count": 0
+        }
+      ],
+      "resonance": {
+        "artifact_reliability": "4/5",
+        "artifact_type": "resonance",
+        "finding_types": [],
+        "pattern_count": 0,
+        "signal_class": "derived",
+        "total_resonance": "0"
+      }
+    },
+    "signals": [
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+          "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/5",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "9a99d2d6adeb52b994d9293d55d7bd460e948cce63e9b8a848306e8e4603ebdc",
+          "persistence_count": 0,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+          "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/5",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "1559e2531ab47fc7c0e88d556a678ef525a52fdf428b6e31fa3a6aab6dc5d513",
+          "persistence_count": 0,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+          "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/5",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "296c141011687d0f897493e86e395616da8698f92e20d1fa67332e563c560afc",
+          "persistence_count": 0,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+          "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [],
+          "frs_applied": true,
+          "frs_factor": "1/5",
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "3efc5e2fbb09e94c7b0a02ab0ffb579051b8d30b32d38b92bdcb174fe561ebcd",
+          "persistence_count": 0,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 0.0
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.7550125,
+        "metadata": {
+          "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+          "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+          "artifact_reliability": "17/20",
+          "artifact_type": "registry",
+          "finding_types": [
+            "service"
+          ],
+          "gamma_applied": true,
+          "gamma_type": "registry",
+          "hive_sha256": "dabf4453a5f0426ec0867b0c693397152554d395920671813632e65b321bca42",
+          "persistence_count": 77,
+          "signal_class": "primary",
+          "timestamp_invalid": true,
+          "timestomp_count": 0,
+          "usb_count": 0,
+          "z_original": 2.8
+        },
+        "tool": "REGISTRY_RTR",
+        "value": 0.5599999999999999,
+        "z_score": 1.96
+      },
+      {
+        "confidence": 0.95,
+        "metadata": {
+          "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+          "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+          "artifact_type": "windows_event_log",
+          "chains": 146,
+          "composite_score": "19/20",
+          "finding_types": [
+            "HIGH_SEVERITY_25",
+            "HIGH_SEVERITY_7045",
+            "PASS_THE_HASH"
+          ],
+          "findings": 178,
+          "gamma_applied": true,
+          "gamma_type": "windows_event_log",
+          "gaps": 33,
+          "signal_class": "primary",
+          "time_range": [
+            1485484294,
+            1486476141
+          ],
+          "timestamp": 1486476141,
+          "total_events": 5908,
+          "z_original": 3.2
+        },
+        "tool": "EVENT_LOG",
+        "value": 0.64,
+        "z_score": 3.04
+      },
+      {
+        "confidence": 0.7315,
+        "metadata": {
+          "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+          "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+          "anti_forensic_count": 0,
+          "artifact_reliability": "7/10",
+          "artifact_type": "prefetch",
+          "finding_types": [
+            "SUSPICIOUS_EXECUTION"
+          ],
+          "gamma_applied": true,
+          "gamma_type": "prefetch",
+          "signal_class": "primary",
+          "source_path": "/home/labestiadevigia/vigia-repo/evidence/owl-2019-hd1-windows/prefetch",
+          "suspicious_count": 12,
+          "suspicious_executables": [
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE",
+            "RUNDLL32.EXE"
+          ],
+          "total_files": 225,
+          "unanalyzed": false,
+          "unparsed_files": 3,
+          "z_original": 2.5
+        },
+        "tool": "PREFETCH_ANALYZER",
+        "value": 0.5,
+        "z_score": 1.75
+      },
+      {
+        "confidence": 0.715,
+        "metadata": {
+          "acquisition_hash": "sha256:027281c1f55fe6bef110ab4a4d35c9403ecaf7cc09f2cab9a83416d607ee885c",
+          "acquisition_timestamp": "2026-07-14T20:57:26.735215+00:00",
+          "analysis_notes": [
+            "chromium: 24 downloads, 463 urls"
+          ],
+          "artifact_reliability": "13/20",
+          "artifact_type": "browser",
+          "c2_count": 0,
+          "finding_types": [
+            "SUSPICIOUS_DOWNLOAD"
+          ],
+          "gamma_applied": true,
+          "gamma_type": "browser",
+          "signal_class": "primary",
+          "source_profile": "/home/labestiadevigia/vigia-repo/evidence/owl-2019-hd1-windows/browser",
+          "suspicious_count": 4,
+          "total_downloads": 24,
+          "unanalyzed": false,
+          "z_original": 2.5
+        },
+        "tool": "BROWSER_FORENSICS",
+        "value": 0.5,
+        "z_score": 1.625
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "4/5",
+          "artifact_type": "resonance",
+          "finding_types": [],
+          "pattern_count": 0,
+          "signal_class": "derived",
+          "total_resonance": "0"
+        },
+        "tool": "CROSS_RESONANCE",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "pattern",
+          "best_match": "NONE",
+          "finding_types": [],
+          "match_count": 0,
+          "match_score_by_pattern": {},
+          "missing_signals_by_pattern": {},
+          "signal_class": "derived",
+          "total_patterns": 3
+        },
+        "tool": "CASE_PATTERN_LIBRARY",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.2945,
+        "metadata": {
+          "dominant_pattern": "NONE",
+          "indicators": [],
+          "n_indicators": 0,
+          "n_tools": 10,
+          "sift_critical_active": 1,
+          "signal_class": "derived"
+        },
+        "tool": "ADV_ROBUST",
+        "value": 0.0,
+        "z_score": 0.0
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 8,
+    "n_total_signals": 11,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
