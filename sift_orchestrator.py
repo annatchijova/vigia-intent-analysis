@@ -1070,6 +1070,46 @@ class SIFTOrchestrator:
         resolve_meta (trazabilidad Daubert: qué decidió y por qué).
         """
         blind = {k: v for k, v in case_data.items() if k != "expected_verdict"}
+
+        # B-127: inject Grice results for testimony-only NOISE cases.
+        # Conditional: only call audit_grice_maxims when the case is
+        # testimony-only (same _TESTIMONY_TYPES as vigia_scorer gate).
+        # This avoids unnecessary Grice calls on cases with hard forensic
+        # artifacts where CAIE already resolves correctly.
+        _B127_TESTIMONY_TYPES = {"cultural_marker", "log_entry", "document_geometry", "testimony"}
+        _b127_arts = blind.get("artifacts", [])
+        if (
+            _b127_arts
+            and all(str(a.get("evidence_type", "")).lower() in _B127_TESTIMONY_TYPES
+                    for a in _b127_arts)
+            and not any(str(a.get("semantic_role", "")).lower() == "exculpatory"
+                        for a in _b127_arts)
+        ):
+            try:
+                _b127_msgs = [a.get("description", "") for a in _b127_arts
+                              if a.get("description")]
+                if _b127_msgs:
+                    import asyncio as _aio
+                    from vigia.vigia_sift_bridge import audit_grice_maxims as _grice
+                    try:
+                        _loop = _aio.get_running_loop()
+                    except RuntimeError:
+                        _loop = None
+                    if _loop and _loop.is_running():
+                        # Inside an existing event loop — run sync via new thread
+                        import concurrent.futures
+                        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as _ex:
+                            _grice_result = _ex.submit(
+                                _aio.run, _grice(_b127_msgs)
+                            ).result(timeout=5)
+                    else:
+                        _grice_result = _aio.run(_grice(_b127_msgs))
+                    blind["grice_verdict"] = _grice_result.get("verdict", "")
+                    blind["grice_deception_probability"] = _grice_result.get(
+                        "probability_deception", 0)
+            except Exception as _e:
+                logger.debug("[B-127] Grice injection failed (non-fatal): %s", _e)
+
         try:
             from vigia_scorer import _vigia_score  # lazy: evita costo/ciclos en import
             motor = _vigia_score(blind)

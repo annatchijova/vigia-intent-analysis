@@ -97,12 +97,43 @@ class TestBlindGate:
         assert hyp != "NO_SEMIOTIC_ANOMALY_DETECTED"
 
     def test_motor_mode_matches_canonical_scorer_on_all_fixtures(self, monkeypatch):
-        """resolve() ES la selección del motor: hipótesis == map(veredicto motor)."""
+        """resolve() ES la selección del motor: hipótesis == map(veredicto motor).
+
+        B-127: resolve() now injects Grice results for testimony-only cases
+        before calling _vigia_score. The canonical scorer is called with
+        the SAME enriched dict that resolve() builds, so the comparison
+        remains valid. We replicate the Grice injection here to keep the
+        test aligned with the real code path.
+        """
         from vigia_scorer import _vigia_score
+
+        _B127_TESTIMONY_TYPES = {"cultural_marker", "log_entry", "document_geometry", "testimony"}
 
         for fixture in sorted(FIXTURES.glob("RT-*.json")):
             case = json.loads(fixture.read_text(encoding="utf-8"))
             blind = {k: v for k, v in case.items() if k != "expected_verdict"}
+
+            # B-127: replicate the Grice injection that resolve() now does,
+            # so _vigia_score sees the same dict as the orchestrator path.
+            _arts = blind.get("artifacts", [])
+            if (
+                _arts
+                and all(str(a.get("evidence_type", "")).lower() in _B127_TESTIMONY_TYPES
+                        for a in _arts)
+                and not any(str(a.get("semantic_role", "")).lower() == "exculpatory"
+                            for a in _arts)
+            ):
+                try:
+                    _msgs = [a.get("description", "") for a in _arts if a.get("description")]
+                    if _msgs:
+                        import asyncio
+                        from vigia.vigia_sift_bridge import audit_grice_maxims
+                        _gr = asyncio.run(audit_grice_maxims(_msgs))
+                        blind["grice_verdict"] = _gr.get("verdict", "")
+                        blind["grice_deception_probability"] = _gr.get("probability_deception", 0)
+                except Exception:
+                    pass
+
             motor_verdict = _vigia_score(blind)["verdict"]
             res = _adapter(monkeypatch, "motor", fixture)
             expected_hyp = so._MOTOR_HYPOTHESIS_MAP[motor_verdict]

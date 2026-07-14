@@ -1356,7 +1356,7 @@ def _vigia_score(case: dict) -> dict:
         and artifacts
         and all(str(a.get("evidence_type", "")).lower() in _TESTIMONY_TYPES for a in artifacts)
         and not any(str(a.get("semantic_role", "")).lower() == "exculpatory" for a in artifacts)
-        and all(_b126_prior_trust(a) < 0.30 for a in artifacts)
+        and all(_b126_prior_trust(a) <= 0.30 for a in artifacts)
     ):
         # Check Grice signals from the case data (pre-computed or inline)
         _grice_signals = case.get("grice_signals", [])
