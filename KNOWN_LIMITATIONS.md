@@ -2329,3 +2329,95 @@ hypothesis. Both are correct by their own contract. Human review is the
 intended resolution layer.
 
 ---
+
+## L-057 — 18 MCP tools without TOOL_INVOKED entry audit log [DOCUMENTED]
+
+**Scope:** Mode 2 (Claude Code + MCP), Mode 5 (OpenWebUI). Modes 1, 3, 4 unaffected.
+
+**Status:** DOCUMENTED — partial mitigation applied in B-122 (2026-07-14).
+
+### What is missing
+
+`vigia/vigia_sift_bridge.py` exposes 22 MCP tools. B-122 added
+`audit_logger.log_info(event_type="TOOL_INVOKED")` at entry to the three
+tools that access raw evidence files:
+
+- `generate_forensic_hash`
+- `read_evidence`
+- `list_files`
+
+The remaining 18 tools have no entry-level audit log call. An agent can
+invoke any of them without leaving a trace in the forensic audit chain:
+
+| Tool | Category |
+|------|----------|
+| `search_pattern` | subprocess execution |
+| `list_processes` | system enumeration |
+| `audit_network` | system enumeration |
+| `mount_sift_evidence` | disk mounting |
+| `calculate_shannon_entropy` | in-memory computation |
+| `audit_image_metadata` | file read (EXIF) |
+| `analyze_stylometry` | in-memory computation |
+| `calculate_human_entropy` | in-memory computation |
+| `infer_intent` | in-memory computation |
+| `detect_habit_incongruence` | in-memory computation |
+| `detect_human_jitter` | in-memory computation |
+| `audit_grice_maxims` | in-memory computation |
+| `detect_eco_overinterpretation` | in-memory computation |
+| `deactivate_honey_token` | file write |
+| `reason_with_llm` | LLM call |
+| `validate_and_correct_analysis` | in-memory computation |
+| `reload_phonetic_dict` | file read |
+| `get_phonetic_dict_stats` | in-memory computation |
+
+### Why this matters (Daubert posture)
+
+The `audit_logger` chain provides chain-of-custody evidence of what tools
+were invoked and with what arguments during an investigation. If a tool
+is called without an entry log, the audit trail can only confirm what
+the tool *returned* (through its own internal logging), not that it was
+*invoked* with a given input. For `search_pattern` and `mount_sift_evidence`
+in particular — which execute subprocesses — a missing invocation log
+means the audit chain has a gap at the decision boundary between the
+analyst instruction and the system action.
+
+### Scope boundary
+
+The three B-122 tools were prioritized because they touch raw evidence
+bytes directly and are the most frequent entry points for any investigation.
+The in-memory computation tools (entropy, stylometry, jitter) do not
+access files independently — they process data already read by `read_evidence`
+or supplied by the agent, so the chain-of-custody gap is lower severity.
+
+`deactivate_honey_token` already has an audit log call at exit (not entry).
+The gap is the invocation record before the operation, not the outcome record.
+
+### Mitigation (follow-up to B-122)
+
+Apply the same B-122 pattern to each remaining tool:
+
+```python
+audit_logger.log_info(
+    event_type="TOOL_INVOKED",
+    tool="<tool_name>",
+    message=f"<primary_arg>={value!r}",  # or f"n_items={len(arg)}" for list args
+)
+```
+
+Insert before the first `_sanitize_path_local()` call (file-touching tools)
+or immediately after `try:` (computation tools with no path argument).
+
+For `search_pattern` and `mount_sift_evidence` the log must precede the
+`sandboxed_execute` call so that blocked or timed-out subprocess attempts
+are also captured.
+
+### Known performance note
+
+`_write_entry` in `SecurityAudit` calls `os.fsync()` synchronously.
+Adding entry logs to high-rate tools increases blocking I/O in the asyncio
+event loop. At current rate limits (max 30 calls/60s for most tools,
+max 10 for entropy/network) the impact is negligible. If rate limits are
+raised in the future, wrapping `_write_entry` in `loop.run_in_executor`
+should be evaluated at that point.
+
+---
