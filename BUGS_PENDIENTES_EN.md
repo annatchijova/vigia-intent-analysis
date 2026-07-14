@@ -5796,3 +5796,47 @@ performance before adding to all 20 tools.
 `geopolitical.py` / `geopolitical_v2.py` (real functionality, preserved).
 
 Full suite: 1366 passed, 0 regressions.
+
+---
+
+## B-123 — Causal Closure Score gate designed and tested, NOT wired — dry-run inviable (0/258 cases have data)
+
+| Field | Value |
+|-------|-------|
+| **Status** | POSTPONED — blocked by full chain of orphaned producer modules |
+| **Severity** | P2 (Daubert gate — prevents MALICE without causal coherence) |
+| **Files** | `vigia/core/causal_closure.py`, `vigia/patterns/adversarial_silence.py`, `vigia/temporal/coherence_validator.py`, `vigia/core/explainable_governance.py` |
+| **Test** | `tests/test_audit_gates.py` (passes in isolation) |
+| **Detected in** | Module archaeology audit 2026-07-14 |
+
+### Description
+
+CCS gate caps verdict at ABSTAIN when causal coherence < 50%:
+
+```
+CCS = 0.3*temporal_coherence + 0.2*semantic_resonance
+    + 0.3*abductive_parsimony + 0.2*adversarial_silence
+```
+
+**Why not wired:** none of the 4 input dimensions exist in any of the 258
+corpus cases. Without data, CCS = 0.50 (all defaults) for every case and
+the gate passes unconditionally. Wiring would be cosmetic.
+
+**Blocking chain:** 4 producer modules all orphaned or incomplete:
+`coherence_validator.py`, `cross_artifact_resonance.py` (live but missing
+field), `hypothesis_lineage.py` (93KB orphaned), `adversarial_silence.py`.
+
+### Comparison with B-116
+
+| | B-116 signal_quality_gate | B-123 causal_closure |
+|---|---|---|
+| Data in corpus | raw_score/source_tool exist | 0/4 dimensions exist |
+| Dry-run | 122/199 degraded | 0/258 (trivial) |
+| Blocker | 1 module | 4 orphaned modules |
+| Effort to unblock | Medium | High |
+
+### Decision
+
+4 files preserved as pending-to-wire capability (real forensic logic,
+tested, doctrinally correct). NOT candidates for deletion. Blocked until
+>= 2 producer modules are wired and corpus includes real CCS values.

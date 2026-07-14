@@ -6070,3 +6070,82 @@ signature or timestamp verification occurred.
 - Full suite: 1366 passed, 0 regressions
 
 ---
+
+## B-123 — Causal Closure Score gate designed and tested, NOT wired — dry-run inviable (0/258 cases have data)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | POSPUESTO — bloqueado por cadena completa de productores huérfanos |
+| **Severidad** | P2 (Daubert gate — prevents MALICE verdicts without causal coherence) |
+| **Archivos** | `vigia/core/causal_closure.py`, `vigia/patterns/adversarial_silence.py`, `vigia/temporal/coherence_validator.py`, `vigia/core/explainable_governance.py` |
+| **Test existente** | `tests/test_audit_gates.py` (pasa en aislamiento) |
+| **Detectado en** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`) |
+
+### Description
+
+Causal Closure Score (CCS) gate that caps the maximum verdict at ABSTAIN
+when the causal coherence of the evidence is below 50%. The formula:
+
+```
+CCS = 0.3 * temporal_coherence
+    + 0.2 * semantic_resonance
+    + 0.3 * abductive_parsimony
+    + 0.2 * adversarial_silence
+
+If CCS < 0.50 -> verdict capped at ABSTAIN
+```
+
+Each dimension defaults to `Fraction(1/2)` (maximum uncertainty) when not
+available. The gate is doctrinally correct: high signal + low causal
+coherence = fabrication profile (Daubert).
+
+### Why not wired today
+
+**The 4 input dimensions do not exist in ANY case of the corpus (0/258).**
+Without real data, CCS = exactly 0.50 for every case (all defaults), and
+the gate passes unconditionally (`>= 0.50`). Wiring the gate today would
+be cosmetic — it would add processing cost without changing a single verdict.
+
+### Blocking dependency chain
+
+The gate requires 4 producer modules, all disconnected from the scoring pipeline:
+
+| CCS dimension | Intended producer | Status |
+|---|---|---|
+| `temporal_coherence` | `vigia/temporal/coherence_validator.py` | Orphaned (this cluster) |
+| `semantic_resonance` | `vigia/inference/cross_artifact_resonance.py` | Live, but does NOT produce this field |
+| `abductive_parsimony` | `vigia/abduction/hypothesis_lineage.py` | Orphaned (93KB, entire namespace disconnected) |
+| `adversarial_silence` | `vigia/patterns/adversarial_silence.py` | Orphaned (this cluster) |
+
+### Comparison with B-116 (signal_quality_gate)
+
+| | B-116 signal_quality_gate | B-123 causal_closure |
+|---|---|---|
+| Data available in corpus | raw_score/source_tool exist | None of the 4 dimensions exist |
+| Dry-run possible | Yes (with rescaling) | No (all default to 0.50) |
+| Measurable impact | 122/199 degraded | 0/258 (trivial — no data) |
+| Blocking dependency | 1 module (fit_calibration.py) | 4 orphaned modules (full chain) |
+| Unblocking effort | Medium (z-score integration) | High (wire 4 producers + schema) |
+
+### Decision on the 4 files
+
+**NOT candidates for deletion.** Unlike the dead weight removed in B-121,
+these files implement real, doctrinally correct forensic logic:
+
+- `causal_closure.py` — the gate itself, Fraction arithmetic, tested
+- `adversarial_silence.py` — adversarial gap detection (CLAUDE.md invariant: "deliberate artifact deletion elevates MALICE signal weight")
+- `coherence_validator.py` — temporal causality violation detection
+- `explainable_governance.py` — ExplanationEngine for ACCEPT/REJECT/ABSTAIN narrative + Daubert compliance section
+
+They are preserved as pending-to-wire capability, not abandoned code.
+
+### Unblocking conditions
+
+The gate can be wired when ALL of the following are met:
+
+1. At least 2 of the 4 producer modules are wired to the scoring pipeline
+   and produce real values for their CCS dimension.
+2. The corpus includes cases with real CCS dimension values (not all defaults).
+3. A meaningful dry-run (with real data) shows acceptable impact on the corpus.
+
+---
