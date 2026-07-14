@@ -6227,3 +6227,38 @@ vigia/patterns/). The full unblocking roadmap is:
 4. Wire narrative_auditor as C3 validation step before bundle sealing
 
 ---
+
+## B-125 — `vigia/forensics/document_integrity.py` dead duplicate deleted (unpatched ancestor of tools/ version)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P3 (dead duplicate with stale code — `round(float, 2)` in `suspicion_score` instead of Fraction) |
+| **Archivo** | `vigia/forensics/document_integrity.py` (DELETED) |
+| **Detectado en** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`, DEAD_WEIGHT category) |
+
+### Description
+
+Copy-paste duplicate of `vigia/tools/document_integrity.py` (the live version
+registered in `vigia_sift_bridge.py`). The internal header literally said
+`vigia/tools/document_integrity.py` — confirming it was a copy artifact.
+
+The live version (`vigia/tools/`) received the `_MAX_IMAGE_PIXELS` fix
+(commit `450d30db`, B-117 session) and uses the correct import from
+`vigia.forensics.vision_audit`. This orphan copy retained the pre-fix code
+including `round(float, 2)` in `suspicion_score` (a determinism violation
+under CLAUDE.md invariant #4 — the live version uses Fraction).
+
+### Why it was pending
+
+Identified in the archaeology report as DEAD_WEIGHT (confirmed duplicate)
+but was not included in the B-121 bulk deletion because the `_MAX_IMAGE_PIXELS`
+fix earlier in that session had touched the live version, and the orphan
+was deferred to avoid confusion with the actively-patched file.
+
+### Verification
+
+- Zero callers confirmed (`grep -rn` across entire repo)
+- Full suite: 1366 passed, 0 regressions
+
+---
