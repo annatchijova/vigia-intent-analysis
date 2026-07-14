@@ -715,7 +715,7 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > | Mode | What it processes | The honest number |
 > |---|---|---|
 > | **Claude/MCP (Domain A)** — primary | real raw evidence, full MCP extraction chain | **Deep per-case analysis — no aggregate number by design.** Record to date: 100% correct verdicts on every investigation run (per-case docs in `evidence/`, `results/`, `reports/`) |
-> | **Agent over JSON (Domain B)** | synthetic/converted JSON cases | **97.5% (158/162) on the detection corpus** — the ONLY mode with a corpus-wide number; mixed-corpus aggregate 184/199 (segmentation below) |
+> | **Agent over JSON (Domain B)** | synthetic/converted JSON cases | **97.5% (158/162) on the detection corpus** — the ONLY mode with a corpus-wide number; mixed-corpus aggregate 185/199 (segmentation below) |
 > | **Agent over RAW (Domain C)** | real public forensic corpora | **43 distinct raw evidence sources with sealed bundles in `results/`** — SRL 2018 (22 memory images), MUS2019/Narcos (13 dumps), M57 (3), NPS 2010/2014, Magnet 2020 CTF, Tuck 2019 macOS, Vanko — plus the Magnet 2022 (Windows/iOS/Android), Owl HD1/Nexus 5 and HMG investigations documented per case. **Each is an individual investigation with its own findings — NOT aggregated as accuracy** |
 >
 > Claude Code / MCP mode (Mode 2) is evaluated separately and per-case:
@@ -726,7 +726,7 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > evidence where Mode 1 said NOISE). See Domain A below.
 >
 > **Agent mode — `run_all_agent.py` over the 199-case JSON corpus —
-> aggregate: 184/199 (92.5%), label-blind, distribution identical to the
+> aggregate: 185/199 (93.0%), label-blind, distribution identical to the
 > standalone scorer run blind.** That aggregate is NOT an accuracy figure on
 > its own: the corpus deliberately mixes evaluation sets with different
 > purposes — including adversarial suites *designed to break the system* and
@@ -739,6 +739,17 @@ These numbers are not inflated. They reflect results on a specific, diverse, doc
 > | Adversarial suites (BREAK 16, KIWI 7, FN-suite 3, FP-suite 5) | 31 | 18/31 | Domain C material, *designed to break*: failures here ARE the documented limits (L-014 emergent constellations, L-016 trust consensus, cultural_marker FP) — resistance data, not accuracy |
 > | Epistemic boundary / intake ABSTAIN | 5 | 2/5 | label review pending (FASE2 §5): the motor clears cases whose labels declare them undecidable |
 > | Aggregate pipeline-error case | 1 | 1/1 | list-shaped legacy aggregate, expected UNKNOWN |
+>
+> **Alternate cut — by `validation_class` (contamination transparency, 2026-07-14):**
+> The 185/199 aggregate mixes cases with very different contamination risk. Reading it
+> as a single number overstates confidence. Broken down by corpus origin:
+>
+> | validation_class | Cases | Pass | Fail | Accuracy | Contamination posture |
+> |---|---|---|---|---|---|
+> | **held_out** (KIWI-\*) | **7** | **5** | **2** | **71.4%** | Private — never published, impossible to memorize. Strongest generalization evidence in the corpus. |
+> | **synthetic** (BREAK-\*, BEN-\*, FP-\*, FN-\*, CAN-\*, case_\*, DEMO-\*, AMB-\*) | **107** | **97** | **10** | **90.7%** | Constructed by VIGÍA — zero contamination risk by construction. Failures are documented limits, not surprises. |
+> | **public_documented** (REAL-\*, Flareon, NGDC, MAGNET, LINUX, NPS-\*, Nitroba, M57, SRL, OWL, …) | **85** | **83** | **2** | **97.6%** | From CFReDS, NPS, M57-Patents, Magnet CTF, Digital Corpora, and similar. **contamination_caveat:** the LLM narrator may know public analyses of these cases; read as a floor of rigor, not proof of generalization. The deterministic scorer does not use the LLM, so this caveat applies to Mode 2 narrative enrichment only, not to the sealed verdict. |
+> | **Total** | **199** | **185** | **14** | **93.0%** | Mixed-corpus aggregate — meaningful only when the three rows above are read alongside it. |
 >
 > Trajectory of the honest aggregate, every step gated: the B-075 flip landed
 > at 143/199; B-076 calibrated the SUSPICION threshold against the 198-case
@@ -775,7 +786,7 @@ not with a single corpus number).
 **Domain B — Autonomous agent, JSON pre-processed cases:** Batch runner over
 structured EBS case bundles — this is the ONLY mode with a corpus-wide number, the
 segmented metric in the note above (**detection corpus: 158/162, 97.5%**; aggregate
-184/199). Since B-075 the verdict comes from the label-blind deterministic scorer;
+185/199). Since B-075 the verdict comes from the label-blind deterministic scorer;
 the previous 165/167 figure measured label reproduction (see metric change note).
 
 **Domain C — Autonomous agent, raw evidence (E01/evtx/memory):** The agent parses
@@ -930,7 +941,7 @@ constitutes the system's accuracy claim.
 > path while the EBS adapter still echoed `expected_verdict` (P2-C label leak), so it
 > measures label reproduction, not detection. It is retained as historical record of
 > the hackathon-time evaluation. The current honest metric for this path is the
-> **184/199 label-blind detection** figure in the metric-change note above.
+> **185/199 label-blind detection** figure in the metric-change note above.
 > `SUBMISSION_COMPLIANCE.md` reflects the claims as submitted and is intentionally
 > left unmodified.
 
@@ -953,7 +964,7 @@ constitutes the system's accuracy claim.
 > false-flag case (counted but never created — only 3 exist: FF-GENUINE-001,
 > FP-CULTURAL-CLEAN-001, FP-CULTURAL-CLEAN).
 
-Reproduce (post-B-075/B-076 + doctrine this yields the honest 184/199, not the
+Reproduce (post-B-075/B-076 + doctrine this yields the honest 185/199, not the
 historical table above): `python3 run_all_agent.py --timeout 90`
 To reproduce the historical label-echo behavior explicitly:
 `VIGIA_EBS_RESOLVE=legacy python3 run_all_agent.py --timeout 90`
@@ -1482,7 +1493,7 @@ or benchmark reports, this section can be ignored entirely.
 
 **Claim (current, post-B-075/B-076 — agent mode / Mode 1; Claude/MCP mode is
 evaluated per-case at 100%, see the accuracy note):** detection corpus 158/162 (97.5%);
-full mixed-corpus aggregate 184/199 — segmentation in the ACCURACY NOTE above.
+full mixed-corpus aggregate 185/199 — segmentation in the ACCURACY NOTE above.
 The historical "129/129, 100%" claim measured label reproduction (pre-B-075
 label leak, P2-C) and is retained only as historical record.
 
@@ -1496,7 +1507,7 @@ boundary sets combined) and prints a cache-provenance census.
 
 Expected output (aggregate over the mixed corpus):
 ```
-Results: 184/199 PASS  15 FAIL
+Results: 185/199 PASS  14 FAIL
 Cache: 199/199 desde bundle sellado (motor: 198, pre-B075: 1)
 ```
 Historical output before B-075 (label echo — retained for the record):
