@@ -6632,7 +6632,7 @@ O extraerlos directamente del E01 con SIFT en una sesión separada.
 | Bundle | Artefactos | PREFETCH z | Veredicto |
 |--------|-----------|------------|-----------|
 | `results/VIGIA-REAL-VANKO-2026_bundle.json` | Solo CyLR: registro, event logs, prefetch (sin sdelete detectado) | 1.75 (post-gamma) | **ABSTAIN** (CCS 1/2) |
-| `results/VIGIA-REAL-VANKO-2026-v2_bundle.json` | CyLR + fix B-132 + LNK copiado | ~2.24 estimado (post-gamma) | _pendiente re-corrida_ |
+| `results/VIGIA-REAL-VANKO-2026-v2_bundle.json` | CyLR + fix B-132 + LNK copiado | **2.24** (post-gamma; z_raw=3.2 × 0.70) | **ABSTAIN** (CCS 1/2 — tie genuino confirmado; bundle SHA-256: `7e0c2eb48479318c...`) |
 
 El bundle ABSTAIN se preserva deliberadamente: demuestra que el motor sabe abstenerse
 genuinamente en vez de alucinar un veredicto cuando la evidencia es insuficiente.
