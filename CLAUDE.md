@@ -50,9 +50,6 @@ directly. The MCP server name is `Vigia_Sift_Bridge`.
 In **Ollama mode**, the LLM backend resolves to the configured local model
 (`hermes3:8b`, `deepseek-r1:8b`, or `gemma3:27b`). Capabilities are equivalent but
 `reason_with_llm` calls the local endpoint instead of the Anthropic API.
-**L-057:** `hermes3:8b` exhibits stochastic reliability failures (empty or malformed
-responses under load). If `reason_with_llm` returns empty in Ollama mode, retry once;
-on second failure, treat as FALLBACK and document the gap.
 
 In **FALLBACK mode** (no LLM backend available), `reason_with_llm` will return an error.
 Deterministic tools remain fully operational. Document this as a known limitation, not
@@ -296,8 +293,7 @@ verdicts it does emit.
 **Mode 1 (`vigia_agent.py`) has no INTENT rung in its deterministic motor** — borderline
 cases that would qualify as INTENT are capped at SUSPICION by the scoring pipeline.
 Mode 2 (Claude Code, this file) can and should emit INTENT when the Refutation Protocol
-and two-source corroboration are met. ABSTAIN in Mode 1 now produces an `INDETERMINATE`
-alert level (not HIGH/MEDIUM/LOW) — introduced in B-100/B-101 (ABSTAIN_V2).
+and two-source corroboration are met.
 
 **The distinction between INTENT and MALICE is the concealment layer.**
 A mistake can produce INTENT signatures. Only deliberate anti-forensics
