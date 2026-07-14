@@ -5561,3 +5561,107 @@ payload is an ebs_v1 schema decision (R3-2 compat) left to the maintainer.
 Also: verifier cache in `_import_verify_bundle` (no per-bundle module
 re-execution in batch loops). Regression:
 `tests/test_h27_internal_drift.py::TestDriftDetailsAndProvenance`.
+
+---
+
+## B-116 — `signal_quality_gate.py` designed and functional in isolation, NOT wired to scorer — dry-run shows 122/199 cases degraded
+
+| Field | Value |
+|-------|-------|
+| **Status** | POSTPONED — blocked by interface mismatch and data quality |
+| **Severity** | P2 (gate-level architectural gap — safety mechanism exists but does not fire) |
+| **File** | `vigia/signal_quality_gate.py` AND `vigia/core/signal_quality_gate.py` (identical duplicates) |
+| **Detected in** | Post-hackathon session 2026-07-14, dry-run script `scripts/dryrun_signal_quality_gate.py` |
+
+### Description
+
+`SignalQualityGate` implements five checks before a verdict can be emitted:
+tool diversity (>= 2 tools), signal strength (z >= 2.0), tool independence
+(<= 60% from same tool), z-score variance (range >= 0.5), and noise inflation
+detection. The module is complete, tested in isolation, and conceptually aligned
+with VIGIA's Daubert corroboration requirements (vigia_scorer.py lines 1194-1240).
+
+However, it has **zero callers** in the codebase. Additionally, the module is
+duplicated: `vigia/signal_quality_gate.py` and `vigia/core/signal_quality_gate.py`
+are byte-identical copies.
+
+### Dry-run results (2026-07-14)
+
+Full corpus dry-run (`scripts/dryrun_signal_quality_gate.py`) against all 199 cases:
+
+| Gate reason | Cases failed |
+|-------------|-------------|
+| `ABSTAIN_INSUFFICIENT_TOOLS` | 67 |
+| `ABSTAIN_WEAK_SIGNALS` | 20 |
+| `ABSTAIN_DEPENDENT_SIGNALS` | 18 |
+| `ABSTAIN_LOW_Z_VARIANCE` | 17 |
+| **Total degraded** | **122** |
+| **Passed gate** | **76** |
+
+Of the 122 degraded, **23 are currently MALICE** — including 11 from the
+VIGIA-REAL-001 to REAL-010 series (the most validated corpus).
+
+### Root cause (three independent blockers)
+
+1. **Interface mismatch**: gate expects `tool_name` + `z_score` (statistical).
+   Scorer produces `source_tool` + `raw_score` in [0.0, 1.0].
+2. **Data quality**: 67/199 cases (33%) have only 1 unique `source_tool`, many
+   with `source_tool=unknown`.
+3. **Duplicate module**: two identical copies exist.
+
+### Decision
+
+Postponed. Blocked until `fit_calibration.py` produces real z-scores. The
+scorer's corroboration gate (lines 1194-1240) partially covers the same
+Daubert requirement but lacks noise inflation detection and z-score variance
+checks unique to `SignalQualityGate`.
+
+---
+
+## B-117 — Inverted posterior semantics in `risk_bounded_layer.py` — `VigiaPipeline` emitted backwards verdicts
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P0 (verdict inversion in governance layer) |
+| **File** | `vigia/core/risk_bounded_layer.py` |
+| **Function** | `RiskBoundedDecisionLayer.compute_risk()` |
+| **Fix commit** | `f8c9f9f1` |
+| **Detected in** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`) |
+
+### Description
+
+`LikelihoodEngine.infer()` emits `posterior` = P(fabrication | evidence).
+`risk_bounded_layer.compute_risk()` calculated:
+
+```python
+r = (1 - P) * (1 + lambda*D) * (1 + gamma*(1-S)) * (1 + omega*(1-I))
+```
+
+With P = P(fabrication), `(1-P)` inverts the semantics:
+- Fabricated case: P = 0.99 -> (1-P) = 0.01 -> r low -> **ACCEPT** (wrong)
+- Genuine case: P = 0.01 -> (1-P) = 0.99 -> r high -> **REJECT** (wrong)
+
+### How it was missed
+
+The orphan `vigia/governance/risk_bounded_layer_v2.py` documented this as fix
+P0-001 by redefining P as P(authenticity), but was never wired. `pipeline.py`
+imports exclusively from `vigia.core.risk_bounded_layer` (the buggy v1).
+`pre_release_check.py` incorrectly declared v2 as "the active version".
+Existing tests all used `posterior=0.5` — invisible to the inversion.
+
+### Fix applied
+
+Changed `r = (1-P) * (...)` to `r = P * (...)`, keeping P = P(fabrication)
+as emitted by LikelihoodEngine. Inline comment and docstring guard cite this bug.
+
+### Impact assessment
+
+- **AFFECTED**: `VigiaPipeline` via `vigia_api.py`, `show_4_hashes.py`
+- **NOT affected**: `vigia_scorer.py`, `vigia_agent.py`, corpus 184/199
+- **Real cases**: confirmed unaffected (all ran via `vigia_agent`/`vigia_scorer`)
+
+### Cleanup
+
+- `vigia/governance/risk_bounded_layer_v2.py` deleted (commit `c46991c4`)
+- `scripts/pre_release_check.py` BANNED_FILENAMES corrected
