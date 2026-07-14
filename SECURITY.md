@@ -302,10 +302,22 @@ The Cross-Artifact Incongruence Engine enforces:
 
 | Date | Auditor | Fixes Applied |
 |------|---------|---------------|
-| 2025-04 | Security audit (DeepSeek) | P0-1 through P0-4, P1-5 through P1-8, P2-9 through P2-13, P3-14 through P3-16 (16 fixes) |
-| 2025-04 | Security audit (round 2) | V-002 MCP transport security, V-003 rate limiting on all 21 tools, V-004 base_dir symlink validation, activate_honey_token env hijack fix, safe_grep total scan volume limit |
-| 2025-04 | Kimi integration (round 3) | CrossArtifactIncongruenceEngine (`vigia/tools/caie.py`) implemented and integrated in PeircePlanner (Rule 10), `load_investigation_state` schema+HMAC validation, canonicalizacion forzada via `Path.resolve()` en todos los entry points, symlink guard con `os.lstat` + `stat.S_ISLNK` (atomico). 100% de hallazgos Kimi P0-P3 mitigados. |
-| 2025-04 | Gemini + Kimi hardening (round 4) | Grep fullmatch (P0), Infinity Guard / math.isfinite (P0), word_search special char support, Prompt Vault with SHA-256 integrity, Dictionary integrity with VIGIA_PHONETIC_HASH, PNG metadata silence detection (P1-7), Windows sandbox fail-safe (P1-8), Atomic image access via O_NOFOLLOW fd (P1-9), LLM signal sanitization stripping XML/control chars (P1-10). 10 fixes. |
+| 2026-04 | Security audit (DeepSeek) | P0-1 through P0-4, P1-5 through P1-8, P2-9 through P2-13, P3-14 through P3-16 (16 fixes) |
+| 2026-04 | Security audit (round 2) | V-002 MCP transport security, V-003 rate limiting on all 21 tools, V-004 base_dir symlink validation, activate_honey_token env hijack fix, safe_grep total scan volume limit |
+| 2026-04 | Kimi integration (round 3) | CrossArtifactIncongruenceEngine (`vigia/tools/caie.py`) implemented and integrated in PeircePlanner (Rule 10), `load_investigation_state` schema+HMAC validation, canonicalizacion forzada via `Path.resolve()` en todos los entry points, symlink guard con `os.lstat` + `stat.S_ISLNK` (atomico). 100% de hallazgos Kimi P0-P3 mitigados. |
+| 2026-04 | Gemini + Kimi hardening (round 4) | Grep fullmatch (P0), Infinity Guard / math.isfinite (P0), word_search special char support, Prompt Vault with SHA-256 integrity, Dictionary integrity with VIGIA_PHONETIC_HASH, PNG metadata silence detection (P1-7), Windows sandbox fail-safe (P1-8), Atomic image access via O_NOFOLLOW fd (P1-9), LLM signal sanitization stripping XML/control chars (P1-10). 10 fixes. |
+| 2026-07 | Module archaeology audit (Claude Code) | B-117: fixed inverted posterior semantics in `risk_bounded_layer.py` (P0 — VigiaPipeline emitted backwards verdicts via `r=(1-P)*...` instead of `r=P*...`). B-118: deleted `vigia/core/signal_contract.py` (name collision that caused BUG-EML-001). B-119: deleted fail-open `vigia_core_semiotic_detector.py` stub (always returned NORMAL). B-120: fixed `vigia/cli.py` false-PASS stubs in pip entry point (signature/timestamp returned True unconditionally). B-121: bulk removed 15 dead-weight files (-5491 lines). B-125: deleted stale duplicate `vigia/forensics/document_integrity.py`. |
+
+### Tool Execution Log Integrity (Chain v2)
+
+Every tool invocation is recorded in `tool_execution_log` using
+`vigia.core.tool_log_chain.ToolExecutionLogChain` (schema v2). Each entry
+contains `entry_hash` (SHA-256 of the full canonical entry including seq
+and prev_hash) and `entry_hmac` (HMAC-SHA256 with `VIGIA_HMAC_KEY`).
+The chain detects both single-entry tampering and full-chain recomputation.
+Bundle-level tail anchors (`chain_tip_sha256`, `chain_tip_hmac`) detect
+truncation attacks. Verification: `python3 verify_tool_log.py <bundle>`.
+See CLAUDE.md "Tool Execution Log Format" for full schema.
 
 ### CAIE — Cross-Artifact Incongruence Engine
 

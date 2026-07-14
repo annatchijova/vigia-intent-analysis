@@ -181,6 +181,17 @@ def _dround(value, precision: int = _DETERMINISTIC_INTERNAL_PREC) -> float:
     return round(float(value), precision)
 
 
+def _b126_prior_trust(artifact: dict) -> float:
+    """Extract prior_trust as float, tolerating string fractions ('1/2')."""
+    raw = artifact.get("prior_trust", 0)
+    if raw is None:
+        return 0.0
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return 1.0  # unrecognized format → assume high trust (safe: blocks gate)
+
+
 def _dsum(values) -> float:
     """
     Sum with decimal.Decimal accumulator to avoid floating-point drift.
@@ -1328,6 +1339,45 @@ def _vigia_score(case: dict) -> dict:
         verdict    = "NOISE"
         confidence = _dround(1.0 - final_score, 2)
         reason     = f"Insufficient evidence of malicious intent (score={final_score:.4f})"
+
+    # -----------------------------------------------------------------------
+    # Step 4b: Grice testimony gate (B-126, defense in depth)
+    # When the motor resolves NOISE for testimony-only evidence with low
+    # prior_trust and no exculpatory artifacts, check whether Grice v3.2
+    # detected evasion phenomena. This gate is a second layer beyond the
+    # improved Grice detector itself: even if v3.2 misses a novel phrasing,
+    # the structural discriminators (semantic_role, prior_trust) prevent
+    # false escalation on benign cases that carry exculpatory artifacts
+    # or high-trust acquisition chains.
+    # -----------------------------------------------------------------------
+    _TESTIMONY_TYPES = {"cultural_marker", "log_entry", "document_geometry", "testimony"}
+    if (
+        verdict == "NOISE"
+        and artifacts
+        and all(str(a.get("evidence_type", "")).lower() in _TESTIMONY_TYPES for a in artifacts)
+        and not any(str(a.get("semantic_role", "")).lower() == "exculpatory" for a in artifacts)
+        and all(_b126_prior_trust(a) < 0.30 for a in artifacts)
+    ):
+        # Check Grice signals from the case data (pre-computed or inline)
+        _grice_signals = case.get("grice_signals", [])
+        _grice_verdict = case.get("grice_verdict", "")
+        _grice_deception = case.get("grice_deception_probability", 0)
+
+        # If no pre-computed Grice, look for it in pipeline metadata
+        if not _grice_verdict:
+            _pipeline_grice = case.get("pipeline_grice", {})
+            _grice_verdict = _pipeline_grice.get("verdict", "")
+            _grice_deception = _pipeline_grice.get("probability_deception", 0)
+
+        if _grice_verdict == "SUSPICION" and _grice_deception >= 0.25:
+            verdict = "SUSPICION"
+            confidence = _dround(min(0.65, _grice_deception * 2), 2)
+            reason = (
+                f"Grice testimony gate (B-126): motor NOISE overridden. "
+                f"Testimony-only evidence with low prior_trust, no exculpatory "
+                f"artifacts, and Grice evasion detected "
+                f"(P(deception)={_grice_deception:.0%})"
+            )
 
     # -----------------------------------------------------------------------
     # Step 5: Quadripartite 8-state cascade (Q1)

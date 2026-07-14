@@ -2424,7 +2424,7 @@ should be evaluated at that point.
 
 ## L-058 — Architectural Tension Between CAIE and Grice for Pure Testimony Evidence [DOCUMENTED]
 
-**Discovered:** 2026-07-14 (B-125, Mode 2 blind re-run of KIWI-006/KIWI-007)
+**Discovered:** 2026-07-14 (B-126, Mode 2 blind re-run of KIWI-006/KIWI-007)
 **Status:** DOCUMENTED — gate proposed as RECOMMENDATION, not implemented, pending refined dry-run.
 
 ### Description
@@ -2485,7 +2485,7 @@ current threshold. CRONOS trace: `3b11e32e-9f39-439a-a819-6a20c8ca35c6`.
 
 ### Structural discriminators (for a refined gate)
 
-Case-by-case audit (B-125) revealed that the 3 FP cases are
+Case-by-case audit (B-126) revealed that the 3 FP cases are
 structurally distinguishable from the 2 TP cases:
 
 | Discriminator | KIWI-006/007 (TP) | BEN-003/010, BREAK-002 (FP) |

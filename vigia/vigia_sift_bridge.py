@@ -2380,21 +2380,178 @@ async def audit_grice_maxims(messages: list) -> dict:
             "weight"        : 20,
         })
 
-    # ── 2. Maxim of Relation ──────────────────────────────────────────────
-    key_topics   = ["evidence", "case", "process", "fact", "data",
-                    "analysis", "result", "log", "file", "evidencia",
-                    "causa", "proceso", "hecho", "datos", "resultado"]
-    irrelevant   = [m for m in messages if not any(_word_search(t, m.lower()) for t in key_topics)]
-    if len(irrelevant) > len(messages) * 0.5:
-        score += 30
+    # ── 2. Maxim of Relation (v3.2 — phenomenon-based, bilingual) ──────
+    # B-126: v1 used a 15-keyword topic list that fired on ~100% of
+    # natural-language testimony (zero discriminating power). v3.2
+    # replaces it with four linguistic phenomena that detect real
+    # evasion: factual impossibility, quantity asymmetry, evidence
+    # withholding, and fundamental ignorance of own identity data.
+    # Threshold=25 requires at least 2 weak phenomena or 1 strong
+    # one (factual impossibility) — a deliberate Daubert-consistent
+    # decision: a single evasion indicator without corroboration
+    # stays at INFERRED, not SUSPICION.
+    #
+    # Negation helpers for EN contracted/uncontracted forms.
+    _neg_en = r"(?:do(?:es)?\s*(?:not|n.t)|did\s*(?:not|n.t)|(?:can|could)\s*(?:not|n.t))"
+    _neg_es = r"(?:no\s*(?:puede|pudo|sabe|supo|tiene|tuvo|logr[oó]))"
+
+    _full_text = " ".join(messages).lower()
+    _evasion_score = 0
+    _evasion_details = []
+
+    # 2a. Factual impossibility (EN + ES)
+    # PHENOMENON: claims access to someone's activity + evidence that
+    # access channels were severed. Order-independent co-occurrence.
+    _access_claims_en = [
+        r"(?:saw|watched|view\w+|observ\w+|monitor\w+|track\w+|follow\w+)\s.*(?:activit|post|feed|content|message)",
+        r"(?:receiv\w+|got|had)\s.*(?:notification|screenshot|capture|alert|update)",
+        r"(?:real.time|in\s*real\s*time|live)",
+        r"(?:kept\s*seeing|was\s*watching|could\s*see)",
+    ]
+    _access_claims_es = [
+        r"(?:vi[oó]|veía|miraba|observ\w+|monitore\w+|segu[ií]\w*)\s.*(?:actividad|publicaci|contenido|mensaje)",
+        r"(?:recibi[oó]|tuvo|tení?a)\s.*(?:notificaci|captura|alerta|aviso)",
+        r"(?:tiempo\s*real|en\s*vivo)",
+        r"(?:descarg[oó].*material|avis[oó].*en\s*tiempo)",
+        r"captura",
+    ]
+    _access_denials_en = [
+        r"(?:block\w+|remov\w+\s.*contact|cut\s*off|no\s*contact|unfriend)",
+        r"(?:chang\w+\s.*privac|restrict\w+|bann\w+|no\s*(?:access|channel|connection))",
+    ]
+    _access_denials_es = [
+        r"(?:bloqueado|bloque[oó]|eliminad[oa]|sin\s*contacto|restringid[oa]|sin\s*acceso)",
+        r"(?:lo\s*tiene\s*bloqueado|la\s*tiene\s*bloqueada)",
+    ]
+    _never_met_any = [
+        r"(?:never\s*met)", r"(?:nunca\s*conoci[oó]?)", r"(?:no\s*(?:la|lo)\s*conoce)",
+        r"(?:" + _neg_en + r"\s*know\s*(?:her|him|them)\s*personally)",
+    ]
+    _accuse_any = [
+        r"(?:harass|threaten|stalk|danger|bother|meddle|afraid|fear|scared)",
+        r"(?:acosa|amenaz|molesta|miedo|peligr|se\s*mete|loca)",
+    ]
+    _nobody_see = [r"(?:nobody\s*(?:outside|can\s*see))", r"(?:nadie\s*(?:fuera|puede\s*ver))"]
+
+    _has_access_claim = (
+        any(re.search(p, _full_text) for p in _access_claims_en)
+        or any(re.search(p, _full_text) for p in _access_claims_es)
+    )
+    _has_access_denial = (
+        any(re.search(p, _full_text) for p in _access_denials_en)
+        or any(re.search(p, _full_text) for p in _access_denials_es)
+        or any(re.search(p, _full_text) for p in _nobody_see)
+    )
+    _has_never_met = any(re.search(p, _full_text) for p in _never_met_any)
+    _has_accuse = any(re.search(p, _full_text) for p in _accuse_any)
+
+    if _has_access_claim and _has_access_denial:
+        _evasion_score += 25
+        _evasion_details.append("factual_impossibility")
+
+    if _has_never_met and _has_accuse:
+        if "factual_impossibility" not in _evasion_details:
+            _evasion_score += 25
+            _evasion_details.append("factual_impossibility")
+        else:
+            _evasion_score += 10
+            _evasion_details.append("impossibility_reinforced")
+
+    # 2b. Quantity asymmetry (EN + ES)
+    # PHENOMENON: the actor who performed an action omits/minimizes
+    # quantity while a less-involved party states specific amounts.
+    _omission_en = [
+        _neg_en + r"\s*(?:recall|remember|know)\s*(?:how\s*(?:many|much)|the\s*(?:amount|number|total|quantity))",
+        r"(?:declar\w+\s*(?:nothing|no\s*(?:quantity|amount)))",
+        _neg_en + r"\s*(?:say|state|mention|declar)\s*(?:how\s*(?:many|much))",
+    ]
+    _omission_es = [
+        r"(?:no\s*declara\s*(?:cantidad|cuánt|monto|total))",
+        r"(?:omite|oculta)\s*(?:la\s*)?(?:cantidad|monto)",
+        r"(?:no\s*(?:sabe|recuerda|indica)\s*(?:cuánt|la\s*cantidad|el\s*monto))",
+        r"(?:activo\s*(?:no\s*declara|omite))",
+    ]
+    _precision_en = [
+        r"\d+\s*(?:gb|mb|tb|files?|transfers?|transactions?|dollars?|euros?)",
+        r"(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|twenty|hundred|thousand)"
+        r"\s+(?:\w+\s+)?(?:transfer|transaction|file|dollar|euro)",
+        r"total(?:ing|ling)\s+[\w\s]*(?:\d+|(?:hundred|thousand))",
+    ]
+    _precision_es = [
+        r"\d+\s*(?:gb|mb|tb|archivos?|transferencias?|veces|pesos|dólares)",
+        r"(?:exactamente|precisamente)\s+\d+",
+        r"(?:declara|dice|afirma)\s+\d+\s*gb",
+        r"(?:periféric\w+|tercero)\s.*\d+\s*gb",
+    ]
+
+    _has_omission = (any(re.search(p, _full_text) for p in _omission_en)
+                     or any(re.search(p, _full_text) for p in _omission_es))
+    _has_precision = (any(re.search(p, _full_text) for p in _precision_en)
+                      or any(re.search(p, _full_text) for p in _precision_es))
+
+    if _has_omission and _has_precision:
+        _evasion_score += 20
+        _evasion_details.append("quantity_asymmetry")
+
+    # 2c. Evidence withholding (EN + ES)
+    # PHENOMENON: evidence was claimed to exist but is now unavailable
+    # for reasons controlled by the claimant.
+    _possession_en = [
+        r"(?:took\s*(?:photo|picture|screenshot|video)|sav\w+\s*(?:them|it|the|photo|to))",
+        r"(?:record\w+\s*(?:it|the|video|audio)|wrote\s*down)",
+        r"(?:receiv\w+\s*(?:screenshot|photo|evidence|proof|copy))",
+        r"(?:kept\s*(?:a\s*)?(?:copy|record|backup|log))",
+    ]
+    _possession_es = [
+        r"(?:(?:tomó|sacó|hizo)\s*(?:foto|captura|screenshot|video))",
+        r"(?:(?:guardó|salvó|recibió)\s*(?:foto|captura|prueba|copia))",
+        r"(?:(?:tenía|tiene)\s*(?:foto|captura|prueba|copia|registro))",
+    ]
+    _unavail_en = [
+        r"(?:(?:is|are|was|were)\s*(?:lost|gone|missing|deleted|corrupted|destroyed))",
+        r"(?:(?:got|was|were)\s*(?:reformatt|format|wip|eras|stolen|broken|crash))",
+        r"(?:threw\s*(?:it\s*)?away)",
+        r"(?:" + _neg_en + r"\s*(?:find|locate|access|recover|produc|present|show|provid))",
+        r"(?:did\s*not\s*(?:back|save|keep|preserv))",
+    ]
+    _unavail_es = [
+        r"(?:" + _neg_es + r"\s*(?:presentar|mostrar|producir|exhibir|encontrar))",
+        r"(?:(?:se\s*)?(?:perdió|borró|rompió|formateó|desapareció))",
+        r"(?:no\s*(?:lo|la|los|las)\s*(?:tiene|tengo|encuentr|conserv))",
+        r"(?:no\s*pudo\s*presentar)",
+    ]
+
+    _ph = sum(1 for p in _possession_en + _possession_es if re.search(p, _full_text))
+    _uh = sum(1 for p in _unavail_en + _unavail_es if re.search(p, _full_text))
+    if _ph > 0 and _uh > 0:
+        _wh_strength = min(_ph, _uh)
+        _wh_score = min(15 + 5 * (_wh_strength - 1), 25)
+        _evasion_score += _wh_score
+        _evasion_details.append("evidence_withholding")
+
+    # 2d. Fundamental ignorance of own identity data (EN + ES)
+    _fund_ig_en = [_neg_en + r"\s*know\s*(?:my|his|her|their)\s*(?:own\s*)?(?:phone|number|address|password|email)"]
+    _fund_ig_es = [
+        r"no\s*sabe\s*(?:el\s*)?(?:número|teléfono|celular)",
+        r"no\s*(?:sabe|conoce)\s*(?:su\s*(?:propio\s*)?)?(?:número|teléfono|celular)",
+    ]
+    if any(re.search(p, _full_text) for p in _fund_ig_en + _fund_ig_es):
+        _evasion_score += 15
+        _evasion_details.append("fundamental_ignorance")
+
+    if _evasion_score >= 25:
+        score += min(_evasion_score, 30)
         signals.append({
             "maxim"         : "RELATION",
             "type"          : "TACTICAL_EVASION",
+            "features"      : _evasion_details,
             "interpretation": (
-                "Interlocutor systematically avoids central topics. "
-                "Persistent irrelevance is a form of Red Herring."
+                "Linguistic evasion phenomena detected: "
+                + ", ".join(_evasion_details) + ". "
+                "Testimony contains structural contradictions or "
+                "strategic information management patterns."
             ),
-            "weight"        : 30,
+            "weight"        : min(_evasion_score, 30),
         })
 
     # ── 3. Maxim of Manner ────────────────────────────────────────────────
@@ -2452,7 +2609,12 @@ async def audit_grice_maxims(messages: list) -> dict:
     adj_density = adj_hits / word_count if word_count > 0 else 0
 
     if adj_density > 0.05:
-        score += 20
+        # B-126: tiered scoring. Extreme adj density (>10%) is a stronger
+        # Carnegie signal than moderate (>5%). With v3.2 RELATION no longer
+        # acting as a catch-all, adj_density alone must be able to reach
+        # SUSPICION (probability >= 0.30) for urgency/authority framing.
+        _adj_weight = 30 if adj_density >= 0.10 else 20
+        score += _adj_weight
         signals.append({
             "maxim"          : "QUALITY",
             "type"           : "HIGH_EVALUATIVE_ADJECTIVE_DENSITY",
@@ -2464,7 +2626,7 @@ async def audit_grice_maxims(messages: list) -> dict:
                 f"Overloaded evaluative language bypasses rational analysis "
                 f"and targets emotional response — Carnegie manipulation."
             ),
-            "weight"         : 20,
+            "weight"         : _adj_weight,
         })
 
     probability = min(score / 100.0, 0.99)
