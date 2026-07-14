@@ -2421,3 +2421,107 @@ raised in the future, wrapping `_write_entry` in `loop.run_in_executor`
 should be evaluated at that point.
 
 ---
+
+## L-058 — Architectural Tension Between CAIE and Grice for Pure Testimony Evidence [DOCUMENTED]
+
+**Discovered:** 2026-07-14 (B-125, Mode 2 blind re-run of KIWI-006/KIWI-007)
+**Status:** DOCUMENTED — gate proposed as RECOMMENDATION, not implemented, pending refined dry-run.
+
+### Description
+
+When all artifacts in a case are pure testimony (evidence_type in
+{cultural_marker, log_entry, document_geometry}) acquired via
+`manual_forensic_review`, the deterministic CAIE pipeline applies
+spoofability penalties of 0.85-0.90 that crush raw scores (0.6-0.8)
+down to adjusted scores of 0.0009-0.0097, producing NOISE composites
+regardless of the pragmatic content.
+
+Meanwhile, `audit_grice_maxims` detects real RELATION and QUANTITY
+maxim violations in the same testimony — violations that represent
+genuine forensic signals at the pragmatic layer (tactical evasion,
+inverse precision patterns).
+
+The autonomous agent (Mode 1/4) resolves verdict primarily via the
+CAIE motor. When CAIE says NOISE, the motor says NOISE — correctly,
+per its design. Mode 2 (interactive) can weight Grice signals via
+analyst judgment, reaching SUSPICION. Both verdicts are architecturally
+correct within their respective modes.
+
+### Affected cases
+
+Two cases in the corpus have expected_verdict=SUSPICION but receive
+NOISE from the autonomous agent due to this tension:
+
+| Case | Expected | Agent | Motor Score | CAIE Composite | Grice |
+|------|----------|-------|-------------|----------------|-------|
+| KIWI-006 | SUSPICION | NOISE | 0.0294 | 0.0040 | SUSPICION (30%) |
+| KIWI-007 | SUSPICION | NOISE | 0.0518 | 0.0104 | SUSPICION (30%) |
+
+Mode 2 re-run (Claude Opus 4.6, 2026-07-14) produced SUSPICION for
+both cases (55/100 and 65/100 confidence), matching expected labels.
+CRONOS trace: `6b81f266-a8e7-4c59-a04e-fff20e9e9e2f`.
+
+### Proposed gate (RECOMMENDATION — not implemented)
+
+A naive Grice override gate (if Grice=SUSPICION and P(deception)>=0.25,
+escalate motor to SUSPICION) was evaluated against the full corpus.
+It would fix 2 cases but cause 3 regressions:
+
+| Case | Expected | Current | With Naive Gate | Classification |
+|------|----------|---------|-----------------|----------------|
+| KIWI-006 | SUSPICION | NOISE | SUSPICION | True positive |
+| KIWI-007 | SUSPICION | NOISE | SUSPICION | True positive |
+| BEN-003 | NOISE | NOISE | SUSPICION | **False positive** |
+| BEN-010 | NOISE | NOISE | SUSPICION | **False positive** |
+| BREAK-002 | NOISE | NOISE | SUSPICION | **False positive** |
+
+### Root cause of false positives
+
+The Grice RELATION/TACTICAL_EVASION detector is a near-constant: it
+fires identically (weight=30, P(deception)=0.30) on ALL testimony
+fragments regardless of content — both genuinely evasive (KIWI) and
+genuinely benign (BEN/BREAK). It has zero discriminating power at the
+current threshold. CRONOS trace: `3b11e32e-9f39-439a-a819-6a20c8ca35c6`.
+
+### Structural discriminators (for a refined gate)
+
+Case-by-case audit (B-125) revealed that the 3 FP cases are
+structurally distinguishable from the 2 TP cases:
+
+| Discriminator | KIWI-006/007 (TP) | BEN-003/010, BREAK-002 (FP) |
+|---------------|--------------------|-----------------------------|
+| Exculpatory artifacts | None | Present (semantic_role=exculpatory) |
+| prior_trust | 0.10-0.15 | 0.70-0.85 |
+| write_blocker_used | false | true |
+| Internal corroboration | None (contradictions instead) | Present (recovery, calendar, ticket) |
+| source_tool | manual_forensic_review | legacy_converter |
+
+A **refined gate** could use these discriminators:
+
+```
+IF evidence_types ALL IN {cultural_marker, log_entry, document_geometry, testimony}
+AND grice_verdict == SUSPICION
+AND NO artifact has semantic_role == "exculpatory"
+AND max(prior_trust) < 0.30
+AND NO internal corroboration detected
+THEN motor_verdict = max(motor_verdict, SUSPICION)
+```
+
+### Status and next steps
+
+1. The naive gate is **not safe** — 3 regressions vs 2 fixes.
+2. The refined gate (with exculpatory/prior_trust/corroboration
+   checks) is **plausible** but has not been implemented or
+   dry-run against the full corpus.
+3. This is documented as a known limitation, not a system defect.
+   The CAIE pipeline is working as designed. The tension is between
+   structural forensics (CAIE) and pragmatic forensics (Grice) for
+   a specific evidence class.
+4. Implementation requires:
+   - Coding the refined gate in `vigia_scorer.py`
+   - Full corpus dry-run (199 cases)
+   - Verification that the refined gate fires ONLY on the intended
+     cases and does not introduce new regressions
+   - Same rigor as B-116/B-123: no wiring without corpus validation
+
+---
