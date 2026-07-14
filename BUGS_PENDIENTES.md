@@ -6392,3 +6392,140 @@ Hypothesis objects for run_bounded_planner(). Output is observation-only
    contradictory evidence) — focus integration design on that
 
 ---
+
+## B-130 — UnifiedTimelineEngine crashes on int epoch timestamps [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P1 (crashes entire engine, silently removes evidence source from verdict) |
+| **Archivo** | `vigia/sift/unified_timeline_engine.py` |
+| **Función** | `UnifiedTimelineEngine._extract_timestamp` (line ~130) |
+| **Detectado en** | VIGIA-REAL-VANKO-2026 corrida RAW 2026-07-14 |
+| **Commit fix** | ver commit "POST HACKATHON: fix B-130 — UnifiedTimelineEngine crashes on int epoch timestamps" |
+
+### Description
+
+`_extract_timestamp` retrieved the raw value from metadata with:
+
+```python
+ts_str = meta.get("timestamp", meta.get("last_execution", "1970-01-01T00:00:00Z"))
+```
+
+The fallback default only applies when the key is **absent**. When the key exists but
+holds an `int` (epoch timestamp, common in Prefetch/Registry metadata), the raw `int`
+is returned as-is and passed directly to `_parse_iso_timestamp`, which assumes a `str`
+and immediately calls `ts_str.replace("Z", "+00:00")`. This raises `AttributeError`
+(int has no `.replace()`), not `ValueError`. The existing `except ValueError` block
+never caught it.
+
+The `AttributeError` propagated to the orchestrator's outer `except Exception`, which
+only logged the crash at `ERROR` level and continued. `build_timeline` never completed;
+the `UNIFIED_TIMELINE` signal was absent from the bundle. In the VIGIA-REAL-VANKO-2026
+RAW run, this removed one evidence source and contributed to an ABSTAIN verdict (exact
+CCS tie 1/2) that may be artefactual.
+
+### Root cause (Peircean)
+
+- **Firstness:** `AttributeError: 'int' object has no attribute 'replace'` in
+  `_parse_iso_timestamp`, line ~206.
+- **Secondness:** `meta.get("timestamp", default)` returns the stored value unchanged
+  when the key exists. Int epoch is a valid, common timestamp format in Prefetch and
+  Registry parsers. The function contract stated `ts_str: str` but the caller never
+  enforced it.
+- **Thirdness:** Any signal whose metadata carries a numeric timestamp (Prefetch,
+  Registry, or any parser that uses `int(epoch)` directly) silently crashes the entire
+  timeline engine.
+
+### Fix applied
+
+In `_extract_timestamp`: added an `isinstance(ts_val, (int, float))` check before
+calling `_parse_iso_timestamp`. If the value is already numeric, it is returned
+directly as `int(ts_val)` without ISO parsing. Widened the except clause to
+`(ValueError, TypeError, AttributeError)` as defense-in-depth.
+
+```python
+if isinstance(ts_val, (int, float)):
+    return int(ts_val)
+try:
+    return _parse_iso_timestamp(ts_val)
+except (ValueError, TypeError, AttributeError):
+    ...
+```
+
+### Regression tests added
+
+`tests/test_pipeline_robustness_narrative.py::TestB090EmptyTimelineExcludedFromGates`:
+
+- `test_int_epoch_timestamp_does_not_crash_timeline` — int timestamps, verifies epoch
+  values are preserved exactly.
+- `test_float_epoch_timestamp_does_not_crash_timeline` — float epoch, verifies
+  truncation to int.
+
+### Verdict impact
+
+VIGIA-REAL-VANKO-2026: ABSTAIN (CCS 1/2 tie) obtained with the timeline engine
+silently absent. After fix, re-run required to determine whether ABSTAIN is genuine
+or artefactual. See notes in project log.
+
+---
+
+## B-131 — Acquisition metadata not propagated to derived engine signals [DOCUMENTADO — fix pendiente]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | DOCUMENTADO — fix pendiente (requiere dry-run de corpus completo) |
+| **Severidad** | P2 (acquisition metadata missing from derived signals, causing honest trust degradation to base_trust=0.10 for those signals) |
+| **Archivos** | `vigia/sift/sift_orchestrator.py` (Gamma loop, steps 6 and 8) |
+| **Detectado en** | VIGIA-REAL-VANKO-2026 corrida RAW 2026-07-14 |
+
+### Description
+
+The Gamma loop (step 4 in `sift_orchestrator._analyze`) injects acquisition metadata
+(`acquisition_tool`, `acquisition_hash`, `acquisition_timestamp`, `examiner_id`,
+`write_blocker_used`) from CLI flags into every signal in `raw_signals`. This produces
+correctly enriched signals in `gamma_adjusted` and then `frs_adjusted`.
+
+However, signals created **after** the Gamma loop bypass it entirely:
+
+- **Step 6** (engine motores): `CrossArtifactResonance` (`CROSS_RESONANCE`),
+  `CasePatternLibrary` (`CASE_PATTERN_LIBRARY`), `MetabolicProfiler`,
+  `BehavioralFingerprint` — all produce new `SignalOutput` objects from
+  `frs_adjusted`. These new objects do NOT inherit `_acq_meta`.
+- **Step 8** (adversarial): `AdversarialRobustnessEngine` (`ADV_ROBUST`) produces
+  a new `SignalOutput`. Same problem.
+
+CAIE degrades `base_trust` to `0.10` for signals missing all acquisition fields
+(NIST SP 800-86 §4.3). In the VIGIA-REAL-VANKO-2026 run:
+
+- `CROSS_RESONANCE`, `CASE_PATTERN_LIBRARY`, `ADV_ROBUST`: lost ALL acquisition
+  fields → degraded to `base_trust=0.10`.
+- `REGISTRY_RTR`, `EVENT_LOG`, `PREFETCH_ANALYZER`: had acquisition fields
+  (from Gamma) but showed `write_blocker_used=False` (correct: examiner passed
+  `--write-blocker-used false`) → mild degradation, expected behavior.
+
+### Root cause
+
+Architecture gap: `_acq_meta` is a local variable in `_analyze` built once during
+step 4 and used only in the Gamma loop. No injection point exists for engine signals
+or the adversarial signal, which are constructed outside the loop.
+
+### Fix approach (to implement after dry-run)
+
+Inject `_acq_meta` into each engine signal and `adv_signal` using the same merge
+pattern as the Gamma loop: `{**_acq_meta, **sig.metadata, ...}` (signal's own
+metadata wins). A helper `_inject_acq_meta(sig, acq_meta)` returning a new
+`SignalOutput` with merged metadata would avoid code duplication.
+
+**Before implementing:** full corpus dry-run to confirm no verdict regressions. Derived
+signals with acquisition metadata may shift base_trust values and move borderline
+SUSPICION/INTENT cases. Treat with the same rigor as B-126/B-127.
+
+### Observation
+
+`write_blocker_used=False` on primary signals (REGISTRY_RTR, EVENT_LOG, PREFETCH_ANALYZER)
+is **correct behavior**, not a bug. The examiner passed `--write-blocker-used false`,
+which is honest: no write blocker was used. CAIE degrades trust accordingly per NIST SP
+800-86. This is the system working as designed.
+
+---

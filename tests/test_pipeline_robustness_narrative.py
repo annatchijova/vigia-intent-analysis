@@ -626,6 +626,57 @@ class TestB090EmptyTimelineExcludedFromGates:
         assert sig is not None
         assert sig.metadata.get("total_events") == 2
 
+    def test_int_epoch_timestamp_does_not_crash_timeline(self):
+        # B-130: Prefetch/Registry metadata carries epoch timestamps as int,
+        # not ISO strings.  metadata.get("timestamp") returns the int AS-IS
+        # (the default only applies when the key is absent).  Passing an int
+        # to _parse_iso_timestamp raised AttributeError (no .replace()) —
+        # not caught by the ValueError except, so build_timeline crashed and
+        # was silently swallowed by the orchestrator's outer except, removing
+        # one evidence source from the verdict.
+        # Confirmed in VIGIA-REAL-VANKO-2026 corrida RAW 2026-07-14.
+        from vigia.sift.unified_timeline_engine import UnifiedTimelineEngine
+        sigs = [
+            SignalOutput(
+                tool_name="PREFETCH_ANALYZER",
+                value=0.5,
+                z_score=2.5,
+                confidence=0.8,
+                metadata={"artifact_type": "prefetch", "timestamp": 1700000000},
+            ),
+            SignalOutput(
+                tool_name="REGISTRY_RTR",
+                value=0.3,
+                z_score=1.5,
+                confidence=0.7,
+                metadata={"artifact_type": "registry", "timestamp": 1700003600},
+            ),
+        ]
+        tl = UnifiedTimelineEngine().build_timeline(sigs)
+        sig = tl.to_signal()
+        assert sig is not None, "build_timeline must not crash on int timestamps"
+        assert sig.metadata.get("total_events") == 2
+        # Both events must land at the correct epoch value, not 0 (fallback).
+        assert tl.timeline[0].timestamp == 1700000000
+        assert tl.timeline[1].timestamp == 1700003600
+
+    def test_float_epoch_timestamp_does_not_crash_timeline(self):
+        # B-130 extension: float epoch (e.g. from json.load of a real bundle)
+        # must also be handled without crash and truncated to int.
+        from vigia.sift.unified_timeline_engine import UnifiedTimelineEngine
+        sigs = [
+            SignalOutput(
+                tool_name="EVENT_LOG",
+                value=0.4,
+                z_score=2.0,
+                confidence=0.75,
+                metadata={"artifact_type": "eventlog", "timestamp": 1700000000.5},
+            ),
+        ]
+        tl = UnifiedTimelineEngine().build_timeline(sigs)
+        assert tl.total_events == 1
+        assert tl.timeline[0].timestamp == 1700000000
+
 
 class TestShimMobileUnanalyzed:
     """B-089 alcance restante (N14, superficie shim): un crash de un analyzer

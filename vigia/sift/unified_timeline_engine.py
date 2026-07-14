@@ -134,11 +134,21 @@ class UnifiedTimelineEngine:
         # build_timeline entero y el wiring tragaba el error: la timeline
         # desaparecía del bundle en silencio.
         meta = signal.metadata if isinstance(signal.metadata, dict) else {}
-        ts_str = meta.get("timestamp", meta.get("last_execution", "1970-01-01T00:00:00Z"))
+        ts_val = meta.get("timestamp", meta.get("last_execution", "1970-01-01T00:00:00Z"))
+        # B-130: metadata.get() returns the value AS-IS when the key exists.
+        # Prefetch/Registry metadata stores epoch timestamps as int/float, not
+        # ISO strings.  Passing an int to _parse_iso_timestamp raises
+        # AttributeError (no .replace()) — which the ValueError except below
+        # never caught, crashing the entire engine silently via the orchestrator's
+        # outer except.  Short-circuit: numeric values are already epoch seconds.
+        if isinstance(ts_val, (int, float)):
+            return int(ts_val)
         try:
-            return _parse_iso_timestamp(ts_str)
-        except ValueError:
-            # FIX P2: Timestamp inválido no detiene el pipeline
+            return _parse_iso_timestamp(ts_val)
+        except (ValueError, TypeError, AttributeError):
+            # Defense-in-depth: TypeError covers non-string/non-numeric ts_val;
+            # AttributeError covers any non-string that slips past the isinstance
+            # guard above (e.g. a bytes object with no .replace()).
             if isinstance(signal.metadata, dict):
                 signal.metadata["timestamp_invalid"] = True
             return 0
