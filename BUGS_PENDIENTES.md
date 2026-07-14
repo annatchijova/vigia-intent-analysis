@@ -6393,16 +6393,16 @@ Hypothesis objects for run_bounded_planner(). Output is observation-only
 
 ---
 
-## B-130 — UnifiedTimelineEngine crashes on int epoch timestamps [RESUELTO]
+## B-130 — UnifiedTimelineEngine crashes on int epoch timestamps [RESOLVED]
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| **Estado** | RESUELTO |
-| **Severidad** | P1 (crashes entire engine, silently removes evidence source from verdict) |
-| **Archivo** | `vigia/sift/unified_timeline_engine.py` |
-| **Función** | `UnifiedTimelineEngine._extract_timestamp` (line ~130) |
-| **Detectado en** | VIGIA-REAL-VANKO-2026 corrida RAW 2026-07-14 |
-| **Commit fix** | ver commit "POST HACKATHON: fix B-130 — UnifiedTimelineEngine crashes on int epoch timestamps" |
+| **Status** | RESOLVED |
+| **Severity** | P1 (crashes entire engine, silently removes evidence source from verdict) |
+| **File** | `vigia/sift/unified_timeline_engine.py` |
+| **Function** | `UnifiedTimelineEngine._extract_timestamp` (line ~130) |
+| **Detected in** | VIGIA-REAL-VANKO-2026 raw run 2026-07-14 |
+| **Fix commit** | see commit "POST HACKATHON: fix B-130 — UnifiedTimelineEngine crashes on int epoch timestamps" |
 
 ### Description
 
@@ -6470,14 +6470,14 @@ or artefactual. See notes in project log.
 
 ---
 
-## B-131 — Acquisition metadata not propagated to derived engine signals [DOCUMENTADO — fix pendiente]
+## B-131 — Acquisition metadata not propagated to derived engine signals [DOCUMENTED — fix pending]
 
-| Campo | Valor |
+| Field | Value |
 |-------|-------|
-| **Estado** | DOCUMENTADO — fix pendiente (requiere dry-run de corpus completo) |
-| **Severidad** | P2 (acquisition metadata missing from derived signals, causing honest trust degradation to base_trust=0.10 for those signals) |
-| **Archivos** | `vigia/sift/sift_orchestrator.py` (Gamma loop, steps 6 and 8) |
-| **Detectado en** | VIGIA-REAL-VANKO-2026 corrida RAW 2026-07-14 |
+| **Status** | DOCUMENTED — fix pending (requires full corpus dry-run before applying) |
+| **Severity** | P2 (acquisition metadata missing from derived signals, causing honest trust degradation to base_trust=0.10 for those signals) |
+| **Files** | `vigia/sift/sift_orchestrator.py` (Gamma loop, steps 6 and 8) |
+| **Detected in** | VIGIA-REAL-VANKO-2026 raw run 2026-07-14 |
 
 ### Description
 
