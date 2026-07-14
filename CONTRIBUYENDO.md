@@ -115,7 +115,6 @@ datasets forenses públicos (NIST, DFRWS, DEF CON DFIR CTF, Digital Corpora).
 **Esto no es toda la vida humana.** La investigación forense abarca dominios que este
 sistema no tocó:
 
-- Forense de dispositivos móviles (artefactos iOS/Android)
 - IoT y evidencia de sistemas embebidos
 - Entornos nativos de nube (contenedores, serverless, identidad gestionada)
 - Sistemas de control industrial (ICS/SCADA)
@@ -170,7 +169,10 @@ Elementos clave todavía abiertos para contribución:
   operaciones intermedias de punto flotante permanecen. La racionalización completa
   es el objetivo.
 - **Expansión de dominio:** Nuevas categorías de casos, especialmente entornos forenses
-  de IoT, nativos de nube, y móviles.
+  de IoT y nativos de nube. Los móviles (Android e iOS) ya tienen cobertura via
+  `vigia/sift/android_forensics.py`, `vigia/sift/ios_forensics.py` y casos validados
+  en el corpus; las contribuciones que amplíen la profundidad de artefactos móviles
+  son bienvenidas, pero el dominio no es un vacío.
 - **Cobertura de idiomas:** La capa de NLP opera principalmente sobre artefactos en
   inglés. Extender la cobertura de patrones a otros idiomas requiere expertise de
   dominio tanto en el idioma como en sus firmas de artefactos forenses.

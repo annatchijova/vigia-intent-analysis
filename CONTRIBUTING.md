@@ -119,7 +119,6 @@ memory-resident malware patterns documented in public forensic datasets
 **This is not all of human life.** Forensic investigation spans domains
 this system has not touched:
 
-- Mobile device forensics (iOS/Android artifacts)
 - IoT and embedded systems evidence
 - Cloud-native environments (containers, serverless, managed identity)
 - Industrial control systems (ICS/SCADA)
@@ -173,8 +172,11 @@ Key items still open for contribution:
 - **FW-008:** Full `Fraction` conversion of intermediate scoring values.
   Currently the verdict decision path is deterministic, but some intermediate
   float operations remain. Full rationalization is the target.
-- **Domain expansion:** New case categories, especially IoT, cloud-native,
-  and mobile forensics environments.
+- **Domain expansion:** New case categories, especially IoT and cloud-native
+  environments. Mobile (Android and iOS) already has coverage via
+  `vigia/sift/android_forensics.py`, `vigia/sift/ios_forensics.py`, and
+  validated corpus cases; contributions that extend mobile artifact depth are
+  welcome but the domain is not a gap.
 - **Language coverage:** The NLP layer operates primarily on English-language
   artifacts. Extending pattern coverage to other languages requires domain
   expertise in both the language and its forensic artifact signatures.
