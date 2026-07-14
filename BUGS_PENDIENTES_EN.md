@@ -5665,3 +5665,30 @@ as emitted by LikelihoodEngine. Inline comment and docstring guard cite this bug
 
 - `vigia/governance/risk_bounded_layer_v2.py` deleted (commit `c46991c4`)
 - `scripts/pre_release_check.py` BANNED_FILENAMES corrected
+
+---
+
+## B-118 — `vigia/core/signal_contract.py` name collision caused BUG-EML-001 — file deleted
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 (confirmed production incident — three modules at 0% coverage) |
+| **File** | `vigia/core/signal_contract.py` (DELETED) |
+| **Detected in** | Module archaeology audit 2026-07-14; original incident in `tests/test_eml_import_regression.py` |
+
+### Description
+
+`vigia/core/signal_contract.py` was a one-line re-export of EBS v1 data models
+that collided by name with `vigia/tools/signal_contract.py` (the real
+`SignalBuilder`). This caused BUG-EML-001: three modules (`eml_symbolic.py`,
+`eml_gci.py`, `signal_adapter.py`) imported from the wrong path, got
+`ImportError`, and sat at 0% coverage until detected.
+
+### Fix
+
+File deleted. Zero callers after the original BUG-EML-001 fix. Its continued
+existence was a latent re-infection risk — any new import of `signal_contract`
+from `vigia.core` would silently get the wrong module. Regression guard
+`tests/test_eml_import_regression.py` passes 3/3 after deletion. Full suite:
+1366 passed, 0 regressions.

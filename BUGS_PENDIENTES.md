@@ -5827,3 +5827,42 @@ variance checks — those are unique to `SignalQualityGate` and will add
 forensic value once the interface is resolved.
 
 ---
+
+## B-118 — `vigia/core/signal_contract.py` name collision caused BUG-EML-001 — file deleted
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P1 (confirmed production incident — three modules at 0% coverage) |
+| **Archivo** | `vigia/core/signal_contract.py` (DELETED) |
+| **Detectado en** | Module archaeology audit 2026-07-14; original incident documented in `tests/test_eml_import_regression.py` |
+
+### Description
+
+`vigia/core/signal_contract.py` was a one-line re-export of EBS v1 data models.
+It collided by name with `vigia/tools/signal_contract.py`, which defines the
+real `SignalBuilder` class (with `from_raw()` and `from_z_score()`).
+
+This collision caused BUG-EML-001: three modules (`eml_symbolic.py`,
+`eml_gci.py`, `signal_adapter.py`) imported `SignalBuilder` from
+`vigia.core.signal_contract` (wrong path), got `ImportError`, and sat
+silently at 0% coverage until someone noticed. The bug was fixed previously
+by correcting the imports to point to `vigia.tools.signal_contract`.
+
+### Why deleted now
+
+The file had zero callers after the BUG-EML-001 fix. Its continued existence
+was a latent re-infection risk: any new module importing `signal_contract`
+from `vigia.core` would silently get the wrong module (EBS v1 re-exports
+instead of `SignalBuilder`). Unlike other orphans that are merely unused,
+this file's NAME is the danger — it actively misleads Python's import
+resolution. The regression guard `tests/test_eml_import_regression.py`
+remains in place and passes (3/3) after deletion.
+
+### Verification
+
+- `grep -rn "from vigia.core.signal_contract import"` — zero live callers
+- `test_eml_import_regression.py` — 3/3 PASSED after deletion
+- Full suite — 1366 passed, 0 regressions
+
+---
