@@ -1,0 +1,564 @@
+<title>VIGÍA — Arqueología de Módulos (60+ días)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+
+:root{
+  --bg:#F1F2EE;
+  --bg-elevated:#FFFFFF;
+  --bg-sunken:#E8E9E3;
+  --ink:#1C2222;
+  --ink-muted:#5B6460;
+  --ink-faint:#8B9490;
+  --rule:#D5D6CE;
+  --rule-strong:#B9BBB0;
+  --accent:#2B5D63;
+  --accent-soft:#DCE7E6;
+  --risk-alto:#A8501C;
+  --risk-alto-bg:#F6E3D5;
+  --risk-alto-ink:#7A3A14;
+  --risk-vivo:#3C7A52;
+  --risk-vivo-bg:#DFEDE2;
+  --risk-vivo-ink:#2A5A3C;
+  --risk-bajo:#54637F;
+  --risk-bajo-bg:#E3E6ED;
+  --risk-bajo-ink:#3A4863;
+  --risk-dead:#867A67;
+  --risk-dead-bg:#EBE6DC;
+  --risk-dead-ink:#5F5646;
+  --serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,"Times New Roman",serif;
+  --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mono: "SF Mono","IBM Plex Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --shadow: 0 1px 2px rgba(28,34,34,.06), 0 4px 14px rgba(28,34,34,.05);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14181A;
+    --bg-elevated:#1C2124;
+    --bg-sunken:#0F1213;
+    --ink:#E6E8E4;
+    --ink-muted:#9BA6A2;
+    --ink-faint:#6E7876;
+    --rule:#2B3234;
+    --rule-strong:#3B4446;
+    --accent:#7CB3B0;
+    --accent-soft:#233333;
+    --risk-alto:#E28A4C;
+    --risk-alto-bg:#3A2A1C;
+    --risk-alto-ink:#F0B27E;
+    --risk-vivo:#7FC299;
+    --risk-vivo-bg:#1E3327;
+    --risk-vivo-ink:#9AD6AE;
+    --risk-bajo:#93A6C9;
+    --risk-bajo-bg:#232A38;
+    --risk-bajo-ink:#AFC0DE;
+    --risk-dead:#B3A78F;
+    --risk-dead-bg:#2A2620;
+    --risk-dead-ink:#CBBFA5;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14181A; --bg-elevated:#1C2124; --bg-sunken:#0F1213; --ink:#E6E8E4; --ink-muted:#9BA6A2; --ink-faint:#6E7876;
+  --rule:#2B3234; --rule-strong:#3B4446; --accent:#7CB3B0; --accent-soft:#233333;
+  --risk-alto:#E28A4C; --risk-alto-bg:#3A2A1C; --risk-alto-ink:#F0B27E;
+  --risk-vivo:#7FC299; --risk-vivo-bg:#1E3327; --risk-vivo-ink:#9AD6AE;
+  --risk-bajo:#93A6C9; --risk-bajo-bg:#232A38; --risk-bajo-ink:#AFC0DE;
+  --risk-dead:#B3A78F; --risk-dead-bg:#2A2620; --risk-dead-ink:#CBBFA5;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 18px rgba(0,0,0,.35);
+}
+:root[data-theme="light"]{
+  --bg:#F1F2EE; --bg-elevated:#FFFFFF; --bg-sunken:#E8E9E3; --ink:#1C2222; --ink-muted:#5B6460; --ink-faint:#8B9490;
+  --rule:#D5D6CE; --rule-strong:#B9BBB0; --accent:#2B5D63; --accent-soft:#DCE7E6;
+  --risk-alto:#A8501C; --risk-alto-bg:#F6E3D5; --risk-alto-ink:#7A3A14;
+  --risk-vivo:#3C7A52; --risk-vivo-bg:#DFEDE2; --risk-vivo-ink:#2A5A3C;
+  --risk-bajo:#54637F; --risk-bajo-bg:#E3E6ED; --risk-bajo-ink:#3A4863;
+  --risk-dead:#867A67; --risk-dead-bg:#EBE6DC; --risk-dead-ink:#5F5646;
+  --shadow: 0 1px 2px rgba(28,34,34,.06), 0 4px 14px rgba(28,34,34,.05);
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+  font-size:16px; line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+::selection{ background:var(--accent-soft); }
+a{ color:var(--accent); }
+.wrap{ max-width:1180px; margin:0 auto; padding:0 28px 96px; }
+.masthead{
+  border-bottom:2px solid var(--ink); padding:40px 0 22px; margin-bottom:36px;
+}
+.masthead-top{ display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:10px 24px; }
+.case-id{
+  font-family:var(--mono); font-size:12.5px; letter-spacing:.06em; color:var(--ink-muted);
+  text-transform:uppercase;
+}
+.masthead h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(28px,4vw,42px);
+  margin:10px 0 6px; text-wrap:balance; letter-spacing:.003em;
+}
+.masthead .sub{ color:var(--ink-muted); font-size:15.5px; max-width:64ch; }
+.meta-row{
+  display:flex; flex-wrap:wrap; gap:22px 34px; margin-top:22px; font-family:var(--mono); font-size:12.5px; color:var(--ink-muted);
+}
+.meta-row dt{ text-transform:uppercase; letter-spacing:.07em; font-size:10.5px; color:var(--ink-faint); margin-bottom:3px;}
+.meta-row dd{ margin:0; color:var(--ink); font-size:13px;}
+.meta-item{ min-width:0; }
+
+section{ margin-bottom:52px; }
+h2.section-title{
+  font-family:var(--serif); font-size:22px; font-weight:600; margin:0 0 6px;
+  padding-bottom:10px; border-bottom:1px solid var(--rule);
+}
+.section-lede{ color:var(--ink-muted); font-size:15px; max-width:72ch; margin:10px 0 24px; }
+
+.stat-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; }
+@media (max-width:820px){ .stat-grid{ grid-template-columns:repeat(2,1fr); } }
+.stat-tile{
+  background:var(--bg-elevated); border:1px solid var(--rule); border-radius:3px; padding:18px 18px 16px;
+  box-shadow:var(--shadow);
+}
+.stat-tile .n{ font-family:var(--serif); font-size:34px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1; }
+.stat-tile .lbl{ margin-top:8px; font-size:12.5px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-muted); }
+.stat-tile.alto{ border-left:4px solid var(--risk-alto); }
+.stat-tile.alto .n{ color:var(--risk-alto); }
+.stat-tile.vivo{ border-left:4px solid var(--risk-vivo); }
+.stat-tile.vivo .n{ color:var(--risk-vivo); }
+.stat-tile.bajo{ border-left:4px solid var(--risk-bajo); }
+.stat-tile.bajo .n{ color:var(--risk-bajo); }
+.stat-tile.dead{ border-left:4px solid var(--risk-dead); }
+.stat-tile.dead .n{ color:var(--risk-dead); }
+
+.callout{
+  background:var(--bg-elevated); border:1px solid var(--rule); border-radius:3px; padding:20px 22px;
+  margin:22px 0; box-shadow:var(--shadow);
+}
+.callout h3{ font-family:var(--serif); font-size:16px; margin:0 0 8px; }
+.callout p{ margin:0; color:var(--ink-muted); font-size:14.5px; }
+.callout p + p{ margin-top:8px; }
+
+.critical-list{ display:flex; flex-direction:column; gap:14px; }
+.crit-card{
+  background:var(--bg-elevated); border:1px solid var(--rule); border-left:4px solid var(--risk-alto);
+  border-radius:3px; padding:18px 22px; box-shadow:var(--shadow);
+}
+.crit-card .tag{
+  display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--risk-alto-ink); background:var(--risk-alto-bg); padding:3px 8px; border-radius:2px; margin-bottom:10px;
+}
+.crit-card .path{ font-family:var(--mono); font-size:14.5px; font-weight:600; margin:0 0 8px; word-break:break-all; }
+.crit-card p{ margin:0; font-size:14.5px; color:var(--ink); }
+.crit-card p.sub{ color:var(--ink-muted); margin-top:8px; font-size:13.5px; }
+
+.cluster-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+@media (max-width:900px){ .cluster-grid{ grid-template-columns:1fr; } }
+.cluster-card{
+  background:var(--bg-elevated); border:1px solid var(--rule); border-radius:3px; padding:16px 20px;
+}
+.cluster-card h4{ font-family:var(--serif); font-size:15.5px; margin:0 0 4px; }
+.cluster-card .count{ font-family:var(--mono); font-size:11.5px; color:var(--risk-alto-ink); margin-bottom:8px; }
+.cluster-card ul{ margin:0; padding-left:18px; font-family:var(--mono); font-size:12.5px; color:var(--ink-muted); }
+.cluster-card li{ margin-bottom:3px; word-break:break-all; }
+.cluster-card p.note{ font-size:13px; color:var(--ink-muted); margin:8px 0 0; font-family:var(--sans); }
+
+.controls{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; align-items:center; }
+.chip{
+  font-family:var(--mono); font-size:12px; letter-spacing:.02em; padding:7px 13px; border-radius:16px;
+  border:1px solid var(--rule-strong); background:var(--bg-elevated); color:var(--ink-muted); cursor:pointer;
+  transition:background .12s ease, color .12s ease, border-color .12s ease;
+}
+.chip:hover{ border-color:var(--ink-faint); }
+.chip.active{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+.chip.active.c-alto{ background:var(--risk-alto); border-color:var(--risk-alto); color:#fff; }
+.chip.active.c-vivo{ background:var(--risk-vivo); border-color:var(--risk-vivo); color:#fff; }
+.chip.active.c-bajo{ background:var(--risk-bajo); border-color:var(--risk-bajo); color:#fff; }
+.chip.active.c-dead{ background:var(--risk-dead); border-color:var(--risk-dead); color:#fff; }
+.search-box{
+  margin-left:auto; font-family:var(--mono); font-size:12.5px; padding:7px 12px; border-radius:16px;
+  border:1px solid var(--rule-strong); background:var(--bg-elevated); color:var(--ink); min-width:220px;
+}
+.search-box:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+.result-count{ font-family:var(--mono); font-size:12px; color:var(--ink-faint); margin:0 0 10px; }
+
+.table-scroll{
+  overflow-x:auto; border:1px solid var(--rule); border-radius:3px; background:var(--bg-elevated); box-shadow:var(--shadow);
+}
+table{ border-collapse:collapse; width:100%; min-width:920px; }
+thead th{
+  position:sticky; top:0; background:var(--bg-sunken); text-align:left; font-family:var(--mono); font-size:11px;
+  text-transform:uppercase; letter-spacing:.06em; color:var(--ink-muted); padding:12px 16px; border-bottom:1px solid var(--rule-strong);
+  white-space:nowrap;
+}
+tbody td{ padding:12px 16px; border-bottom:1px solid var(--rule); font-size:13.5px; vertical-align:top; }
+tbody tr:last-child td{ border-bottom:none; }
+tbody tr:hover{ background:var(--bg-sunken); }
+td.path{ font-family:var(--mono); font-size:12.5px; white-space:nowrap; }
+td.days{ font-family:var(--mono); font-variant-numeric:tabular-nums; color:var(--ink-muted); white-space:nowrap; }
+td.rationale{ max-width:520px; color:var(--ink-muted); font-size:13px; line-height:1.5; }
+td.cluster{ font-size:12px; color:var(--ink-faint); white-space:nowrap; }
+.pill{
+  display:inline-block; font-family:var(--mono); font-size:10.5px; letter-spacing:.05em; padding:3px 9px;
+  border-radius:11px; white-space:nowrap; text-transform:uppercase;
+}
+.pill.alto{ background:var(--risk-alto-bg); color:var(--risk-alto-ink); }
+.pill.vivo{ background:var(--risk-vivo-bg); color:var(--risk-vivo-ink); }
+.pill.bajo{ background:var(--risk-bajo-bg); color:var(--risk-bajo-ink); }
+.pill.dead{ background:var(--risk-dead-bg); color:var(--risk-dead-ink); }
+
+.methodology{ font-size:13.5px; color:var(--ink-muted); }
+.methodology h4{ font-family:var(--serif); font-size:14.5px; color:var(--ink); margin:18px 0 6px; }
+.methodology ul{ padding-left:20px; margin:6px 0; }
+.methodology li{ margin-bottom:4px; }
+.methodology code{ font-family:var(--mono); font-size:12px; background:var(--bg-sunken); padding:1px 5px; border-radius:2px; }
+
+footer{ border-top:1px solid var(--rule); padding-top:20px; margin-top:60px; font-family:var(--mono); font-size:11.5px; color:var(--ink-faint); }
+
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="masthead-top">
+      <span class="case-id">VIGÍA · Auditoría de Repositorio · rama claude/module-archaeology-60-days-7kt1i6</span>
+    </div>
+    <h1>Arqueología completa de módulos sin tocar hace 60–90 días</h1>
+    <p class="sub">Barrido completo de <code>.py</code> trackeados en git con 60+ días sin commit, cruzados contra los 5 entry points de producción, los workflows de CI, y duplicados por nombre de archivo en todo el repo.</p>
+    <dl class="meta-row">
+      <div class="meta-item"><dt>Fecha del corte</dt><dd>2026-07-14</dd></div>
+      <div class="meta-item"><dt>Umbral</dt><dd>≥ 60 días sin commit</dd></div>
+      <div class="meta-item"><dt>Archivos evaluados</dt><dd>402 <code>.py</code> trackeados</dd></div>
+      <div class="meta-item"><dt>Archivos en el corte</dt><dd>112</dd></div>
+      <div class="meta-item"><dt>Método</dt><dd>grafo de imports (AST) + texto de CI + duplicados por basename</dd></div>
+    </dl>
+  </header>
+
+  <section id="resumen">
+    <h2 class="section-title">Resumen ejecutivo</h2>
+    <p class="section-lede">
+      El clon estaba superficial (52 commits, todo dentro de la última semana) — se hizo <code>git fetch --unshallow</code>
+      antes de fechar nada, porque con historia truncada cada archivo aparece falsamente "reciente". Con historia completa
+      (hasta abril), el corte real de 60+ días dio <strong>112 archivos</strong>, no los ~30 esperados. El hallazgo central
+      no es un fósil aislado como el de ayer: es un <strong>patrón sistémico</strong>. 31 archivos implementan lógica que,
+      por nombre, docstring o cita directa en <code>CLAUDE.md</code>, debería estar en el camino de decisión — y no lo está.
+    </p>
+    <div class="stat-grid">
+      <div class="stat-tile alto"><div class="n">31</div><div class="lbl">Fósil de alto riesgo</div></div>
+      <div class="stat-tile vivo"><div class="n">44</div><div class="lbl">Conectado y vivo</div></div>
+      <div class="stat-tile dead"><div class="n">16</div><div class="lbl">Dead weight real</div></div>
+      <div class="stat-tile bajo"><div class="n">21</div><div class="lbl">Fósil de bajo riesgo</div></div>
+    </div>
+    <div class="callout">
+      <h3>Por qué esto es más grande que el caso de <code>signal_quality_gate.py</code> de ayer</h3>
+      <p>Ese caso no era una excepción — es la firma de un patrón que se repite en al menos ocho subsistemas: el gate de
+      Causal Closure Score completo (4 archivos, con test unitario propio que nunca se conecta al scorer), el trío
+      Ockham/dissent/planner-acotado, todo <code>vigia/abduction/</code> (93KB, el núcleo teórico peirceano), el pilar
+      geopolítico de falsa bandera (dos versiones, ambas muertas), y el propio <code>vigia_core_semiotic_detector.py</code>
+      — un stub de 4 líneas que siempre retorna <code>"NORMAL"</code> si algo lo llegara a cablear por error.</p>
+    </div>
+  </section>
+
+  <section id="prioridad">
+    <h2 class="section-title">Prioridad — lo que Anna necesita ver primero</h2>
+    <p class="section-lede">Cuatro hallazgos individuales antes que los clusters temáticos, porque no son "código sin usar" — son riesgos activos o casos con evidencia de daño ya ocurrido.</p>
+    <div class="critical-list">
+
+      <div class="crit-card">
+        <span class="tag">Crítico — semántica de veredicto contradictoria</span>
+        <p class="path">vigia/governance/risk_bounded_layer_v2.py</p>
+        <p><code>pre_release_check.py</code> afirma que <strong>v2 es la versión activa</strong> en producción. No lo es:
+        <code>vigia/pipeline/pipeline.py</code> importa <code>vigia.core.risk_bounded_layer</code> (sin <code>_v2</code>) directamente.
+        Peor — las dos definen <code>posterior</code> con semántica <strong>opuesta</strong>: la versión viva usa
+        P = P(fabricación | evidencia); la huérfana v2 tiene un fix P0-001 documentado que usa
+        P = P(autenticidad | evidencia), con una advertencia explícita en el propio código:
+        "si algún desarrollador futuro interpreta P como P(fabricación), TODOS los veredictos se invertirán."
+        El archivo vivo no tiene ese guard.</p>
+        <p class="sub">Esto es la capa de governance del veredicto en sí misma. Necesita revisión de ingeniería antes que cualquier otro ítem de esta lista.</p>
+      </div>
+
+      <div class="crit-card">
+        <span class="tag">Incidente de producción confirmado — BUG-EML-001</span>
+        <p class="path">vigia/core/signal_contract.py</p>
+        <p>No es hipotético: <code>tests/test_eml_import_regression.py</code> documenta que este archivo —un re-export de una
+        línea que colisiona de nombre con el <code>SignalBuilder</code> real en <code>vigia/tools/signal_contract.py</code>—
+        ya causó que tres módulos vivos (<code>eml_symbolic.py</code>, <code>eml_gci.py</code>, <code>signal_adapter.py</code>)
+        importaran desde el lugar equivocado, recibieran <code>ImportError</code>, y quedaran silenciosamente al 0% de
+        cobertura hasta que alguien lo notó.</p>
+        <p class="sub">Prueba directa de que un huérfano por colisión de nombre no es "inerte" — ya rompió producción una vez.</p>
+      </div>
+
+      <div class="crit-card">
+        <span class="tag">Stub fail-open — riesgo silencioso</span>
+        <p class="path">vigia/core/vigia_core_semiotic_detector.py</p>
+        <p>Cuatro líneas: <code>analyze()</code> retorna incondicionalmente <code>{"alert_level": "NORMAL", ...}</code> —
+        un no-op hardcodeado. Está deprecado según <code>pre_release_check.py</code>, pero si alguna vez se cablea por
+        accidente en lugar del detector real, no falla con error: deshabilita la detección semiótica en completo silencio.</p>
+        <p class="sub">El peor tipo de fósil — uno que falla cerrado hacia "todo normal" en vez de fallar ruidosamente.</p>
+      </div>
+
+      <div class="crit-card">
+        <span class="tag">Verificador legacy peligroso</span>
+        <p class="path">vigia/cli.py</p>
+        <p>Implementa su propio verificador de cadena de hash (<code>verify_manifest</code>, <code>verify_ledger</code>)
+        con un esquema simple, <strong>sin HMAC</strong> — exactamente el patrón "legacy v1" que <code>CLAUDE.md</code>
+        dice que no debe usarse para investigaciones nuevas. No es <code>forensics/verify_ebs_v1.py</code> ni
+        <code>verify_tool_log.py</code> (los canónicos). Alguien podría correrlo esperando protección HMAC equivalente
+        y obtener un falso "verificado" sobre un bundle alterado.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="clusters">
+    <h2 class="section-title">Los 31 fósiles de alto riesgo, agrupados por subsistema</h2>
+    <p class="section-lede">Ninguno es un archivo aislado — cada cluster representa una capacidad completa, con frecuencia testeada de forma aislada, que nunca llegó a conectarse al scorer o al bridge vivos.</p>
+    <div class="cluster-grid">
+
+      <div class="cluster-card">
+        <h4>Causal Closure Score — gate Daubert completo</h4>
+        <div class="count">4 archivos · tiene test unitario propio (tests/test_audit_gates.py) que nunca toca vigia_scorer.py</div>
+        <ul>
+          <li>vigia/core/causal_closure.py</li>
+          <li>vigia/patterns/adversarial_silence.py</li>
+          <li>vigia/temporal/coherence_validator.py</li>
+          <li>vigia/core/explainable_governance.py</li>
+        </ul>
+        <p class="note">El gate matemático que CLAUDE.md describe como "cap en ABSTAIN por debajo del 50% de cierre causal" — construido, testeado, nunca invocado por el scorer real.</p>
+      </div>
+
+      <div class="cluster-card">
+        <h4>Verdict / governance sin cablear</h4>
+        <div class="count">6 archivos</div>
+        <ul>
+          <li>vigia/core/config_sentinel.py</li>
+          <li>vigia/core/dissent_report.py</li>
+          <li>vigia/core/ockham_adversarial.py</li>
+          <li>vigia/core/peirceplanner_bounded.py</li>
+          <li>vigia/core/advanced_signal_router.py</li>
+          <li>vigia/core/narrative_auditor.py</li>
+        </ul>
+        <p class="note">Penalidad Ockham anti-SolarWinds, escalación por disenso minoritario, límite de Miller para abducción, detección de tampering de config — todos invariantes que CLAUDE.md describe como parte de la arquitectura viva.</p>
+      </div>
+
+      <div class="cluster-card">
+        <h4>Gates de calidad sin cablear</h4>
+        <div class="count">5 archivos · mismo patrón que el caso conocido de ayer</div>
+        <ul>
+          <li>vigia/signal_quality_gate.py</li>
+          <li>vigia/core/signal_quality_gate.py</li>
+          <li>vigia/core/normalization_layer.py</li>
+          <li>vigia/scripts/ci_gate.py</li>
+          <li>vigia/tools/picerl_mapping.py</li>
+        </ul>
+        <p class="note">normalization_layer.py se autodocumenta como "el único checkpoint obligatorio" — calco textual del patrón signal_quality_gate.</p>
+      </div>
+
+      <div class="cluster-card">
+        <h4>Capacidades forenses construidas y no cableadas</h4>
+        <div class="count">4 archivos</div>
+        <ul>
+          <li>vigia/forensics/temporal_forensics.py</li>
+          <li>vigia/forensics/pdf_dual_parser.py</li>
+          <li>vigia/forensics/rfc3161_chain.py</li>
+          <li>vigia/tools/entropy_locality.py</li>
+        </ul>
+        <p class="note">Detección de anacronismo/falsificación de fecha, comparación dual fitz/pypdf para evasión de PDF, timestamping RFC 3161 independiente, entropía espacial para esteganografía. Ninguno es un duplicado — cada uno es una capacidad ausente del pipeline vivo.</p>
+      </div>
+
+      <div class="cluster-card">
+        <h4>Pilar geopolítico de falsa bandera</h4>
+        <div class="count">2 archivos · ambas versiones muertas</div>
+        <ul>
+          <li>vigia/tools/geopolitical.py</li>
+          <li>vigia/core/geopolitical_v2.py</li>
+        </ul>
+        <p class="note">Ambas cuelgan de vigia/vigia_core.py, un monolito legacy con cero importadores en todo el repo — el "Quinto Pilar" de atribución APT/falsa-bandera está completamente fuera de producción.</p>
+      </div>
+
+      <div class="cluster-card">
+        <h4>Detección semiótica duplicada / en duda</h4>
+        <div class="count">2 archivos</div>
+        <ul>
+          <li>vigia/tools/pattern_detector.py</li>
+          <li>vigia/core/semiotic_detector.py</li>
+        </ul>
+        <p class="note">semiotic_detector.py es duplicado de semiotic_detector_v2.py, pero el estado "vivo" de v2 mismo depende solo de dev tooling y tests, no confirmado alcanzable desde vigia_scorer.py — vale una verificación adicional de ingeniería.</p>
+      </div>
+
+      <div class="cluster-card">
+        <h4>Pipeline de calibración huérfano</h4>
+        <div class="count">2 archivos</div>
+        <ul>
+          <li>scripts/fit_calibration.py</li>
+          <li>vigia/tools/generate_calibration.py</li>
+        </ul>
+        <p class="note">La cadena generate_calibration.py → fit_calibration.py → calibrated_lr_models.pkl no es alcanzable desde ningún entry point ni CI. Vale confirmar si los .pkl que carga el LikelihoodEngine en producción realmente salieron de este código.</p>
+      </div>
+
+      <div class="cluster-card">
+        <h4>Núcleo teórico peirceano sin cablear</h4>
+        <div class="count">1 entrada de paquete → 93KB de contenido huérfano</div>
+        <ul>
+          <li>vigia/abduction/__init__.py</li>
+          <li>↳ hypothesis_lineage.py</li>
+          <li>↳ vigia_artifact_graph.py</li>
+          <li>↳ vigia_counter_fact.py</li>
+        </ul>
+        <p class="note">Cero importadores del namespace vigia.abduction en todo el repo. Es la maquinaria de linaje de hipótesis y contrafactuales — el corazón teórico peirceano del proyecto — completamente aislado.</p>
+      </div>
+
+      <div class="cluster-card">
+        <h4>Primitivas de seguridad sin cablear</h4>
+        <div class="count">1 archivo</div>
+        <ul>
+          <li>vigia/security/vigia_seguridad.py</li>
+        </ul>
+        <p class="note">Su propio docstring ordena "importar desde vigia_sift_bridge.py; no dispersar lógica de seguridad" — el bridge nunca lo hace. Implementa una whitelist de subprocess sin equivalente confirmado en el sandbox vivo.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="tabla">
+    <h2 class="section-title">Tabla completa — los 112 archivos</h2>
+    <p class="section-lede">Filtrable por categoría y buscable por ruta. Ordenada por prioridad de categoría y luego por antigüedad.</p>
+    <div class="controls">
+      <button class="chip active" data-filter="ALL">Todos <span id="count-ALL"></span></button>
+      <button class="chip c-alto" data-filter="FOSIL_ALTO">Fósil alto riesgo <span id="count-FOSIL_ALTO"></span></button>
+      <button class="chip c-vivo" data-filter="CONECTADO_VIVO">Conectado y vivo <span id="count-CONECTADO_VIVO"></span></button>
+      <button class="chip c-dead" data-filter="DEAD_WEIGHT">Dead weight real <span id="count-DEAD_WEIGHT"></span></button>
+      <button class="chip c-bajo" data-filter="FOSIL_BAJO">Fósil bajo riesgo <span id="count-FOSIL_BAJO"></span></button>
+      <input class="search-box" id="search" type="text" placeholder="Buscar ruta o palabra clave…" />
+    </div>
+    <p class="result-count" id="result-count"></p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Archivo</th>
+            <th>Última modificación</th>
+            <th>Días</th>
+            <th>Categoría</th>
+            <th>Cluster</th>
+            <th>Justificación</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="metodologia">
+    <h2 class="section-title">Metodología</h2>
+    <div class="methodology">
+      <h4>1. Corrección del clon superficial</h4>
+      <p>El repo llegó con <code>git rev-parse --is-shallow-repository → true</code> (52 commits, todos de la última semana).
+      Con esa historia, <code>git log -1</code> sobre cualquier archivo sin cambios desde antes del límite del shallow-clone
+      devuelve la fecha del commit límite, no la fecha real — ocultando exactamente los fósiles que este barrido busca.
+      Se corrió <code>git fetch --unshallow</code> antes de fechar nada; la historia completa retrocede hasta el 21 de abril.</p>
+
+      <h4>2. Grafo de alcanzabilidad por imports</h4>
+      <p>Se parseó con AST cada uno de los 402 <code>.py</code> trackeados, se construyó un grafo dirigido de imports
+      (incluyendo imports relativos resueltos por paquete), y se calculó BFS desde los 5 entry points reales:
+      <code>vigia_agent.py</code>, <code>vigia/core/vigia_scorer.py</code>, <code>vigia/vigia_sift_bridge.py</code>,
+      <code>vigia/tools/vigia_planner.py</code>, <code>vigia/pipeline/pipeline.py</code>. Se corrigió un falso negativo:
+      un <code>__init__.py</code> es cargado implícitamente por Python en cuanto cualquier submódulo del paquete se importa,
+      así que se propagó alcanzabilidad a los <code>__init__.py</code> ancestros de todo módulo alcanzado.</p>
+
+      <h4>3. CI y pytest</h4>
+      <p>Se leyeron los 3 workflows (<code>pytest.yml</code>, <code>vigia-forensic-ci.yml</code>, <code>docker-publish.yml</code>).
+      <code>pytest.yml</code> corre <code>pytest tests/ vigia/tests/</code> sin <code>--ignore</code>, así que todo
+      <code>test_*.py</code> bajo esos árboles se considera "conectado" por auto-discovery, incluso sin importador directo.
+      Se detectó una referencia rota: <code>vigia-forensic-ci.yml</code> invoca <code>tests/test_integration_end_to_end.py</code>
+      (ruta que no existe — el archivo real vive en <code>tests/e2e/</code>), con el fallo silenciado por <code>|| true</code>.</p>
+
+      <h4>4. Duplicados por nombre de archivo</h4>
+      <p>Se agrupó cada basename no-<code>__init__.py</code> del repo; donde ≥2 rutas comparten nombre y al menos una
+      está en el corte de 60 días, se verificó con <code>diff -q</code> si eran idénticas byte a byte, y se leyó el
+      contenido de cada una para distinguir shim deliberado (p. ej. la capa <code>engine/</code>·<code>forensics/</code>·
+      <code>governance/</code>·<code>models/</code> en la raíz, confirmada como re-exports de una línea usados por el
+      verificador EBS v1 independiente y aislados a propósito de <code>vigia/</code>) de duplicado muerto por deriva de código.</p>
+
+      <h4>5. Clasificación de contenido (4 agentes en paralelo)</h4>
+      <p>Los 68 archivos sin señal mecánica clara de "vivo" se repartieron en lotes de 17 para lectura de contenido —
+      docstrings, imports internos, y cruce contra <code>pre_release_check.py</code> / <code>BANNED_MODULES</code> /
+      <code>docs/AUDITORIA_FUGA_INDIRECTA.md</code> donde el propio repo ya documentaba el estado de un archivo.
+      Un caso se reconciliyó entre lotes: <code>vigia/memory/__init__.py</code> se había marcado ALTO RIESGO
+      independientemente hasta cruzar con el hallazgo de que su único contenido, <code>case_pattern_library.py</code>,
+      es un duplicado superado confirmado — se reclasificó a BAJO RIESGO.</p>
+
+      <h4>Limitaciones</h4>
+      <ul>
+        <li>El grafo de imports es estático — no ejecuta el código. Imports dinámicos vía <code>importlib.import_module</code>
+        con nombre construido en runtime no se detectan (se buscó ese patrón específicamente en los entry points y no apareció).</li>
+        <li>"Fósil de alto riesgo" es un juicio de contenido, no solo de grafo — se basa en si el nombre/docstring/cita en
+        CLAUDE.md sugiere un rol de decisión. Vale una segunda lectura de ingeniería antes de borrar cualquier ítem de esa categoría.</li>
+        <li>No se modificó, movió, ni eliminó ningún archivo — este es un mapa, no una limpieza.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    VIGÍA — arqueología de módulos · generado por Claude Code · rama claude/module-archaeology-60-days-7kt1i6 · solo lectura, cero archivos modificados
+  </footer>
+</div>
+
+<script type="application/json" id="report-data">
+[{"file": "vigia/scripts/ci_gate.py", "date": "2026-04-28", "days": 77, "category": "FOSIL_ALTO", "rationale": "Se autodescribe como gate de regresión CI de tolerancia cero ('entregable SANS', MI-drift ≤1/100, 0 FP/FN nuevos). Cero importadores y no aparece en ningún .github/workflows/*.yml — el gate que el proyecto dice tener no corre en CI.", "cluster": "Gates de calidad sin cablear"}, {"file": "scripts/fit_calibration.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_ALTO", "rationale": "`from vigia.core.fit_calibration import *` — shim sobre el pipeline de calibración Daubert-grade del LikelihoodEngine (GridSearchCV KDE bandwidth, Ledoit-Wolf → models/calibrated_lr_models.pkl). Su hermano vigia/core/fit_calibration.py también es inalcanzable desde cualquier entry point de producción — el pathway de generación de calibración detrás de las afirmaciones Daubert del proyecto parece desconectado del scorer vivo.", "cluster": "Pipeline de calibración huérfano"}, {"file": "vigia/forensics/temporal_forensics.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_ALTO", "rationale": "Motor completo de detección de anacronismo/falsificación de fecha ('El Reloj Roto'), diseñado para integrarse con EntanglementEngine + CAIE. Cero importadores; sin referencia a 'temporal_forensics'/'anachronism' en vigia_sift_bridge.py; no está en la tabla de 21 herramientas de CLAUDE.md. Una capacidad real de detección de falsificación parece totalmente desconectada del pipeline vivo.", "cluster": "Capacidades forenses construidas y no cableadas"}, {"file": "vigia/security/vigia_seguridad.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_ALTO", "rationale": "Docstring: 'Importar este módulo desde vigia_sift_bridge.py; no dispersar lógica de seguridad.' Confirmado que el bridge en cambio importa vigia.security.security y vigia.security.sandbox — nunca este archivo. Implementa su propia whitelist de subprocess ALLOWED_COMMANDS sin equivalente confirmado en el sandbox vivo (que usa confinamiento por resource-limits, diseño distinto). Huérfano de primitiva de seguridad de manual.", "cluster": "Primitivas de seguridad sin cablear"}, {"file": "vigia/tools/generate_calibration.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_ALTO", "rationale": "Convierte el dataset etiquetado en input de calibración z-score vía SemioticDetectorV2, alimentando la misma cadena de calibración huérfana que scripts/fit_calibration.py. Cero importadores; la cadena completa generate_calibration.py → fit_calibration.py → calibrated_lr_models.pkl parece desconectada de cualquier entry point vivo o invocado por CI.", "cluster": "Pipeline de calibración huérfano"}, {"file": "vigia/tools/pattern_detector.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_ALTO", "rationale": "SemioticPatternDetector lee la misma tabla forensic_patterns.sqlite/nlp_patterns que semiotic_detector_v2.py (el reemplazo canónico según BANNED_MODULES de pre_release_check.py). Cero importadores. Parece un predecesor superado de lógica relevante para el scoring, no un duplicado exacto confirmado — verificar antes de borrar.", "cluster": "Detección semiótica duplicada"}, {"file": "vigia/tools/picerl_mapping.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_ALTO", "rationale": "Mapeo Peirce/PICERL → hipótesis de intención por fase IR, construido para falsabilidad Daubert. Cero importadores en runtime, PERO listado dos veces en CRITICAL_FILES de tests/vigia_ci_validate.py — y ese validador SÍ se invoca en vigia-forensic-ci.yml (línea 126). CI lo trata como arquitectónicamente crítico para determinismo, pero nada en el decision path runtime lo llama.", "cluster": "Gates de calidad sin cablear"}, {"file": "vigia/signal_quality_gate.py", "date": "2026-04-30", "days": 75, "category": "FOSIL_ALTO", "rationale": "Ejemplo canónico confirmado del brief de la tarea — cero importadores, hermano vigia/core/signal_quality_gate.py también muerto. Implementa el veto ACCEPT de '≥1 señal fuerte + diversidad de herramientas'; su ausencia del scoring vivo es exactamente el tipo de brecha que debe alarmar.", "cluster": "Gates de calidad sin cablear — CASO CONOCIDO"}, {"file": "vigia/tools/geopolitical.py", "date": "2026-04-30", "days": 75, "category": "FOSIL_ALTO", "rationale": "Motor de atribución de falsa bandera/APT ('Quinto Pilar'). Su único importador, vigia/vigia_core.py, es en sí mismo un monolito legacy completamente huérfano (cero importadores en todo el repo, solo mencionado como fragmento deprecado en pre_release_check.py). El sucesor previsto vigia/core/geopolitical_v2.py (fixes DST) también está huérfano. Todo el pilar geopolítico de falsa bandera de la arquitectura está desconectado de producción.", "cluster": "Pilar geopolítico huérfano"}, {"file": "vigia/abduction/__init__.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Archivo vacío, pero gatea un paquete completo huérfano: hypothesis_lineage.py, vigia_artifact_graph.py, vigia_counter_fact.py (93KB combinados) — maquinaria central de linaje de hipótesis/contrafactuales peirceanos, el corazón teórico de VIGÍA. Cero importadores confirmados para todo el namespace vigia.abduction en cualquier parte del repo.", "cluster": "Núcleo teórico peirceano sin cablear"}, {"file": "vigia/core/causal_closure.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Cero importadores de producción — vigia_scorer.py no tiene ninguna referencia a GATE_THRESHOLD/causal_closure/lógica de cap en ABSTAIN. La única referencia en todo el repo es un import de test directo en tests/test_audit_gates.py. Implementa exactamente la arquitectura de 'gate matemático cappea el veredicto en ABSTAIN por debajo del 50% de cierre causal' que el Refutation Protocol de CLAUDE.md describe como gating pre-emisión — está testeado de forma aislada pero desconectado del scorer vivo.", "cluster": "Causal Closure Score gate"}, {"file": "vigia/core/config_sentinel.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Guardián de detección de tampering/integridad de config diseñado explícitamente para vigilar módulos críticos (CAIE, TrustFusion, OckhamAdversarial, SignalRouter) y sellar un audit trail. Cero importadores en todo el repo — la historia de integridad de 'bundle sellado' en CLAUDE.md no tiene punto de enforcement vivo para degradación silenciosa de módulos.", "cluster": "Verdict / governance sin cablear"}, {"file": "vigia/core/dissent_report.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Implementa escalación por señal minoritaria ('9 módulos dicen BENIGN + 1 módulo conductual dice MALICE = escalación requerida'). Cero importadores. Es exactamente el tipo de lógica anti-evasión/veredicto que debería gatear el decision path pero no lo hace.", "cluster": "Verdict / governance sin cablear"}, {"file": "vigia/core/ockham_adversarial.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Penalidad Ockham adversarial para evidencia 'demasiado limpia' (cita explícitamente SolarWinds). Cero importadores. Toca directamente el scoring de veredicto/ponderación de señal MALICE — un invariante central de CLAUDE.md ('artefactos de fabricación elevan el score de intención maliciosa') sin implementación viva encontrada.", "cluster": "Verdict / governance sin cablear"}, {"file": "vigia/core/peirceplanner_bounded.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Acota el razonamiento abductivo con la Ley de Miller (7±2) + detección de oscilación (A→B→A → ABSTAIN). Cero importadores. Es maquinaria central de abducción peirceana — su ausencia significa que nada previene actualmente abducción no acotada/oscilante en el planner vivo.", "cluster": "Verdict / governance sin cablear"}, {"file": "vigia/forensics/pdf_dual_parser.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Detecta evasión deliberada de PDF vía divergencia estructural fitz/pypdf (estilo CVE-2023-21608). Cero importadores; weak refs a sandbox.py son coincidencia, no reales. El vigia/tools/document_integrity.py vivo solo hace parseo fitz-preferido/pypdf-fallback (un parser a la vez) — NO hace comparación de divergencia simultánea, así que representa una capacidad de detección de evasión genuinamente ausente, no un duplicado redundante.", "cluster": "Capacidades forenses construidas y no cableadas"}, {"file": "vigia/forensics/rfc3161_chain.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Sellado de tiempo RFC 3161 independiente (la afirmación Daubert-relevante de 'un tercero vio este hash' vs. HMAC auto-certificado). Su único caller, vigia/forensics/vigia_chain_of_custody.py (comando 'checkpoint --tsa' con import lazy local), es en sí mismo inalcanzable desde los 5 entry points de producción y no está en CI — el timestamping independiente muy probablemente nunca se ejecuta durante una investigación real, socavando una afirmación Daubert específica que CLAUDE.md enfatiza.", "cluster": "Capacidades forenses construidas y no cableadas"}, {"file": "vigia/patterns/adversarial_silence.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Cero importadores. Implementa la dimensión 'adversarial_silence' de un gate de Causal Closure Score — operacionaliza directamente el invariante de CLAUDE.md de que la eliminación deliberada de artefactos eleva el peso de señal MALICE, pero no se llama desde ningún lado.", "cluster": "Causal Closure Score gate"}, {"file": "vigia/temporal/coherence_validator.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Cero importadores. Implementa detección de violación de causalidad/fabricación por clock-skew — exactamente la señal MALICE de 'manipulación de timestamp' que CLAUDE.md menciona — sin cablear al scorer vivo.", "cluster": "Causal Closure Score gate"}, {"file": "vigia/tools/entropy_locality.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_ALTO", "rationale": "Cero importadores, sin reemplazo vivo en ningún lugar (se buscó locality_score/EntropyLocalityAnalyzer, no se encontró nada). Implementa detección de entropía espacial para esteganografía/payloads localizados/shellcode — una capacidad de adquisición de señal de Fase 2 que parece estar totalmente ausente del pipeline vivo, no solo duplicada.", "cluster": "Capacidades forenses construidas y no cableadas"}, {"file": "vigia/cli.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "Docstring dice verifier/cli.py (path no coincide). Implementa su propio verificador de cadena de hash de bundle/ledger (verify_manifest, verify_ledger) usando un esquema más simple, SIN HMAC (prev_hash/hash/event) — exactamente el patrón 'legacy v1' que CLAUDE.md dice que NO DEBE usarse para investigaciones nuevas. Cero importadores, no es el forensics/verify_ebs_v1.py / verify_tool_log.py canónico. Peligroso porque alguien podría correrlo esperando verificación equivalente protegida por HMAC y obtener un falso pass sobre un bundle alterado.", "cluster": "Verificador legacy peligroso"}, {"file": "vigia/core/advanced_signal_router.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "Cero importadores — pipeline.py no tiene ninguna referencia a ROUTING_TABLE/AdvancedSignalRouter/dispatch por tipo de artefacto. Está pensado para rutear objetos SignalOutput al motor sift-forensics correcto según tipo de artefacto; su ausencia plantea la pregunta de cómo se rutea realmente el artefacto en el pipeline vivo.", "cluster": "Verdict / governance sin cablear"}, {"file": "vigia/core/explainable_governance.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "Cero importadores (los 9 weak_refs listados se verificaron falsos). Implementa ExplanationEngine, el generador de narrativa ACCEPT/REJECT/ABSTAIN + sección de compliance Daubert que consume un bundle sellado — la capa de explicación cara al humano/tribunal — pero nada en el pipeline lo llama.", "cluster": "Causal Closure Score gate"}, {"file": "vigia/core/geopolitical_v2.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "'Geopolitical Intent Engine'. Cero importadores. Su único hermano aparentemente vivo, vigia/tools/geopolitical.py, es importado por exactamente un archivo, vigia/vigia_core.py — que a su vez tiene cero importadores en todo el repo. Todo el Geopolitical Intent Engine (ambas copias) está desconectado de los 5 entry points de producción.", "cluster": "Pilar geopolítico huérfano"}, {"file": "vigia/core/narrative_auditor.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "Validador de narrativa del protocolo C3 — la documentación lo describe como validación obligatoria pre-sellado (Claude genera → NarrativeAuditor audita → humano testigo). Cero importadores. scripts/run_demo.py carga dinámicamente una ruta DISTINTA (scripts/narrative_auditor.py / scripts/vigia_prod/security/narrative_auditor.py) que no resuelve a este archivo. Un gate de seguridad documentado que nada llama realmente.", "cluster": "Verdict / governance sin cablear"}, {"file": "vigia/core/normalization_layer.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "La documentación lo llama explícitamente 'el único checkpoint obligatorio — todas las señales deben pasar por él antes de llegar a dashboards analíticos o motores de reporte.' Cero importadores en ningún lugar. Coincidencia de libro de texto con el patrón signal_quality_gate: nombrado/documentado como obligatorio, ausente del grafo vivo.", "cluster": "Gates de calidad sin cablear — mismo patrón que signal_quality_gate"}, {"file": "vigia/core/semiotic_detector.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "Docstring dice vigia/core/semiotic_detector_v2.py — el contenido es un duplicado del detector peirceano determinístico real. Cero importadores. Su aparente gemelo vivo (semiotic_detector_v2.py) solo es importado por vigia/scripts/* de dev tooling y tests, no confirmado alcanzable desde vigia_scorer.py/pipeline.py tampoco — así que esta es lógica de detección central cuyo estado vivo está en duda; marcado conservadoramente.", "cluster": "Detección semiótica duplicada"}, {"file": "vigia/core/signal_contract.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "Re-export de una línea de modelos ebs_v1. El hermano vigia/tools/signal_contract.py (el SignalBuilder real) está confirmado vivo. Verificado vía tests/test_eml_import_regression.py: este archivo exacto causó un incidente real de producción (BUG-EML-001) — tres módulos vivos (eml_symbolic.py, eml_gci.py, signal_adapter.py) importaron SignalBuilder desde acá, obtuvieron ImportError, y quedaron en silencio al 0% de cobertura hasta ser detectado. Prueba de que este duplicado es activamente peligroso por colisión de nombre, no solo inerte.", "cluster": "INCIDENTE DE PRODUCCIÓN CONFIRMADO — BUG-EML-001"}, {"file": "vigia/core/signal_quality_gate.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "Ejemplo canónico confirmado por el brief de la tarea — cero importadores en ningún lugar, emparejado con el hermano muerto vigia/signal_quality_gate.py, pese a estar nombrado/documentado como el gate que previene veredictos ACCEPT con señal débil.", "cluster": "Gates de calidad sin cablear — CASO CONOCIDO"}, {"file": "vigia/core/vigia_core_semiotic_detector.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "Stub de 4 líneas: analyze() retorna incondicionalmente {'alert_level': 'NORMAL', ...} — un no-op hardcodeado que siempre dice 'nada que ver acá'. Oficialmente deprecado según pre_release_check.py, pero el contenido fail-open lo hace peligroso de forma única si algo alguna vez lo cablea por accidente en lugar del detector real — deshabilita silenciosamente la detección semiótica en vez de fallar con error.", "cluster": "STUB FAIL-OPEN — riesgo silencioso"}, {"file": "vigia/governance/risk_bounded_layer_v2.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_ALTO", "rationale": "HALLAZGO MÁS ALARMANTE. Cero importadores — pero pre_release_check.py afirma 'La versión activa es risk_bounded_layer_v2.py' (v2 SERÍA la versión activa). Realidad: vigia/pipeline/pipeline.py importa vigia.core.risk_bounded_layer (sin _v2) directamente. Peor: las dos definen 'posterior' con semántica OPUESTA — el core/risk_bounded_layer.py vivo usa P = P(fabricación|evidencia); el huérfano governance/risk_bounded_layer_v2.py tiene un fix explícito P0-001 documentando P = P(autenticidad|evidencia) y advierte: 'Si algún desarrollador futuro interpreta P como P(fabricación), TODOS los veredictos se invertirán.' El archivo vivo no tiene ese guard. Necesita revisión de ingeniería urgente — es la capa de governance/veredicto en sí misma.", "cluster": "CRÍTICO — semántica de veredicto contradictoria"}, {"file": "vigia/security/__init__.py", "date": "2026-04-28", "days": 77, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "engine/__init__.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Paquete shim raíz — contiene módulos re-export usados por el verificador EBS v1 independiente", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "engine/likelihood_engine.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "`from vigia.core.likelihood_engine import *` — shim deliberado, importado por tests/integration/test_ebs_v1_integration.py (CI: 55/55 tests)", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "engine/resource_optimizer.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "`from vigia.core.resource_optimizer import *` — shim deliberado, mismo test EBS v1", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "forensics/__init__.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Paquete shim raíz para el verificador EBS v1 stdlib-only", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "forensics/bundle_builder.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "`from vigia.core.bundle_builder import *` — shim deliberado, mismo test EBS v1", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "forensics/pki_tools.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "`from vigia.forensics.pki_tools import *` — shim deliberado, mismo test EBS v1", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "governance/__init__.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Paquete shim raíz para el verificador EBS v1 stdlib-only", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "governance/risk_bounded_layer.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "`from vigia.core.risk_bounded_layer import *` — shim deliberado, mismo test EBS v1", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "models/__init__.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Paquete shim raíz para el verificador EBS v1 stdlib-only", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "models/ebs_v1.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "`from vigia.core.ebs_v1 import *` — shim deliberado, mismo test EBS v1", "cluster": "Verificador EBS v1 (aislado a propósito)"}, {"file": "tests/test_evidence_aggregator.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Invocado explícitamente en vigia-forensic-ci.yml (job tests-v23) + auto-discovery pytest.yml", "cluster": "CI / pytest"}, {"file": "tests/test_red_team.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Invocado explícitamente en vigia-forensic-ci.yml (job tests-v23) + auto-discovery pytest.yml", "cluster": "CI / pytest"}, {"file": "vigia/forensics/__init__.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/scripts/__init__.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/tools/forensic_db.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/tools/init_patterns_db.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Invocado directamente 3x en vigia-forensic-ci.yml como paso de setup (init DB)", "cluster": "CI / pytest"}, {"file": "vigia/tools/mitre_mapping.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/tools/nlp_constants.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/tools/vigia_planner.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/tools/visible_variables.py", "date": "2026-04-29", "days": 76, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/core/__init__.py", "date": "2026-05-02", "days": 73, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/core/decision_layer.py", "date": "2026-05-02", "days": 73, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/core/evidence_aggregator.py", "date": "2026-05-02", "days": 73, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/core/semiotic_detector_v2.py", "date": "2026-05-02", "days": 73, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/tools/__init__.py", "date": "2026-05-02", "days": 73, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/tools/entanglement.py", "date": "2026-05-02", "days": 73, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/tools/vision_audit.py", "date": "2026-05-02", "days": 73, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "tests/test_adversarial_suite.py", "date": "2026-05-03", "days": 72, "category": "CONECTADO_VIVO", "rationale": "Invocado 2x en vigia-forensic-ci.yml (pytest directo + script directo) + auto-discovery", "cluster": "CI / pytest"}, {"file": "vigia/verdict/__init__.py", "date": "2026-05-04", "days": 71, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "tests/e2e/test_integration_end_to_end.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Auto-discovery por pytest.yml. Nota: vigia-forensic-ci.yml referencia una ruta rota `tests/test_integration_end_to_end.py` (no existe — el paso falla silenciosamente por `|| true`)", "cluster": "CI / pytest"}, {"file": "tests/test_2_vs_1_pipeline.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Auto-discovery por pytest.yml", "cluster": "CI / pytest"}, {"file": "tests/test_conflict_dominance_stability.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Auto-discovery por pytest.yml", "cluster": "CI / pytest"}, {"file": "tests/test_e2e_pipeline.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Auto-discovery por pytest.yml", "cluster": "CI / pytest"}, {"file": "tests/test_frs_ghost_in_the_shell.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Auto-discovery por pytest.yml", "cluster": "CI / pytest"}, {"file": "tests/test_frs_ghost_in_the_shell_v2.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Auto-discovery por pytest.yml", "cluster": "CI / pytest"}, {"file": "tests/unit/test_m4_floor.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Auto-discovery por pytest.yml (`pytest tests/ vigia/tests/`, sin --ignore)", "cluster": "CI / pytest"}, {"file": "vigia/__init__.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/core/signal_mapper.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/sift/__init__.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/sift/ioc_manager.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/sift/network_forensics.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/tools/adversarial_robustness.py", "date": "2026-05-06", "days": 69, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/pipeline/__init__.py", "date": "2026-05-07", "days": 68, "category": "CONECTADO_VIVO", "rationale": "Alcanzable estáticamente desde un entry point real (vigia_agent.py / vigia_scorer.py / vigia_sift_bridge.py / vigia_planner.py / pipeline.py), vía import directo o import implícito de paquete padre.", "cluster": "Producción"}, {"file": "vigia/forensics/document_integrity.py", "date": "2026-04-25", "days": 80, "category": "DEAD_WEIGHT", "rationale": "Duplicado muerto confirmado — el header interno dice literalmente 'vigia/tools/document_integrity.py' (artefacto de copy-paste). La versión viva es vigia/tools/document_integrity.py, registrada en vigia_sift_bridge.py.", "cluster": "Duplicados confirmados"}, {"file": "tests/temporal_forensics_redteam.py", "date": "2026-04-29", "days": 76, "category": "DEAD_WEIGHT", "rationale": "Idéntico byte a byte (diff -q vacío, 878/878 líneas) a vigia/forensics/temporal_forensics_redteam.py. Cero funciones test_*, solo un runner __main__ mal ubicado bajo tests/.", "cluster": "Duplicados confirmados"}, {"file": "vigia/core/forensic_db.py", "date": "2026-04-29", "days": 76, "category": "DEAD_WEIGHT", "rationale": "Idéntico byte a byte (diff -q vacío, 471/471 líneas) a vigia/tools/forensic_db.py, que es el módulo vivo confirmado (su propio docstring dice: 'Importado por vigia/tools/adversarial_nlp.py, vigia/tools/entanglement.py'). Mismo patrón que document_integrity.py.", "cluster": "Duplicados confirmados"}, {"file": "vigia/core/shadow_mode.py", "date": "2026-04-29", "days": 76, "category": "DEAD_WEIGHT", "rationale": "Suena decision-critical (logger de shadow-validation Daubert) pero está explícitamente PROHIBIDO: BANNED_MODULES de pre_release_check.py dice 'shadow_mode: PROHIBITED — violación Daubert... Decisión arquitectural irrevocable.' Abandono deliberado y documentado, sin ambigüedad — no es un huérfano peligroso, es un diseño rechazado conservado por historia.", "cluster": "Prohibido explícitamente"}, {"file": "vigia/llm_backend_v2.py", "date": "2026-04-30", "days": 75, "category": "DEAD_WEIGHT", "rationale": "Cero importadores reales. Su hermano vigia/core/llm_backend.py (mismas 161 líneas, mismo docstring) también es inalcanzable — ambas mitades huérfanas de un diseño abandonado de 'graceful LLM degradation'. El reason_with_llm vivo en vigia_sift_bridge.py (~línea 2790) implementa selección de backend inline vía CONFIG.llm_backend/LLMShield, superando a ambos archivos.", "cluster": "Duplicados de backend LLM"}, {"file": "vigia/tools/vigia_case_adapter.py", "date": "2026-05-03", "days": 72, "category": "DEAD_WEIGHT", "rationale": "Reimplementación standalone v6 de conversión caso→señal (ensamble ponderado por dominio, lógica propia TYPE_TOOL/z-score). Cero importadores. Confirmado superado: la clase CaseAdapter viva vive en vigia/pipeline/vigia_integration_bridge.py y está cableada en vigia_api.py, scripts/run_calibration.py, scripts/run_vigia_full.py. Este archivo es un duplicado paralelo desconectado de esa etapa del pipeline.", "cluster": "Duplicados confirmados"}, {"file": "vigia/core/negation_handler.py", "date": "2026-05-04", "days": 71, "category": "DEAD_WEIGHT", "rationale": "Cero importadores. Su funcionalidad exacta (ventana de negación bidireccional, listas de palabras de negación fuerte/débil, mismo patrón de diseño) ya está implementada inline como _detect_negation() dentro de vigia/core/semiotic_detector_v2.py (NEGATION_STRONG/NEGATION_WEAK). Duplicado superado genuino.", "cluster": "Duplicados confirmados"}, {"file": "vigia/memory/case_pattern_library.py", "date": "2026-05-04", "days": 71, "category": "DEAD_WEIGHT", "rationale": "Superado por el vigia/inference/case_pattern_library.py vivo, que hace el mismo trabajo de pattern-matching ATT&CK pero está cableado a SignalOutput/ebs_v1; esta copia carece de esa integración y tiene cero importadores.", "cluster": "Duplicados confirmados"}, {"file": "vigia/tools/behavioral_fingerprint.py", "date": "2026-05-04", "days": 71, "category": "DEAD_WEIGHT", "rationale": "Superado por el vigia/inference/behavioral_fingerprint.py vivo (misma clase/propósito, reescrito con integración ebs_v1.SignalOutput y marcadores de mantenimiento 'FIX P0').", "cluster": "Duplicados confirmados"}, {"file": "vigia/tools/cross_artifact_resonance.py", "date": "2026-05-04", "days": 71, "category": "DEAD_WEIGHT", "rationale": "Mismo patrón: superado por el vigia/inference/cross_artifact_resonance.py vivo.", "cluster": "Duplicados confirmados"}, {"file": "vigia/utils/path_guard.py", "date": "2026-05-04", "days": 71, "category": "DEAD_WEIGHT", "rationale": "Superado por el vigia/core/path_guard.py vivo y más endurecido (agrega protecciones TOCTOU/flock/symlink según su propio changelog).", "cluster": "Duplicados confirmados"}, {"file": "scripts/init_patterns_db.py", "date": "2026-05-06", "days": 69, "category": "DEAD_WEIGHT", "rationale": "Idéntico byte a byte (diff confirmado) a vigia/tools/init_patterns_db.py, que es lo que CI realmente invoca (3x en vigia-forensic-ci.yml, líneas 52/81/146). Esta copia en scripts/ es un remanente sin tocar.", "cluster": "Duplicados confirmados"}, {"file": "vigia/core/llm_backend.py", "date": "2026-05-06", "days": 69, "category": "DEAD_WEIGHT", "rationale": "Docstring dice literalmente vigia/engine/llm_backend_v2.py. Marcado explícitamente 'DEPRECATED — usar llm_backend_v2' en pre_release_check.py, con KNOWN_LIMITATIONS.md confirmando contenido duplicado casi idéntico. La selección de backend LLM está explícitamente fuera del decision loop determinístico (invariante 3 de CLAUDE.md), así que el estado huérfano acá es de bajo riesgo aunque el cableado del sucesor nombrado tampoco está confirmado.", "cluster": "Duplicados de backend LLM"}, {"file": "vigia/core/vigia_core_forensic_technical_detector.py", "date": "2026-05-06", "days": 69, "category": "DEAD_WEIGHT", "rationale": "docs/AUDITORIA_FUGA_INDIRECTA.md confirma explícitamente que es un fragmento muerto del monolito ('Copia vigia_core_*, cero importadores') y pre_release_check.py lo marca DEPRECATED — usar forensic_technical_detector. Ya investigado y documentado por el propio proyecto.", "cluster": "Ya documentado por el proyecto"}, {"file": "vigia/pipeline/BRIDGE_PATCH_FINAL.py", "date": "2026-05-06", "days": 69, "category": "DEAD_WEIGHT", "rationale": "Auto-declarado 'NO es ejecutable directamente' — son instrucciones de parche (bloques de texto) para vigia_sift_bridge.py. Su contenido REGISTRO_BLOCK (registros de audit_document_integrity, CAIE, trust_fusion) ya coincide con lo que está vivo en vigia_sift_bridge.py según la tabla de herramientas de CLAUDE.md. Parche ya aplicado, nota histórica ahora obsoleta.", "cluster": "Ya documentado por el proyecto"}, {"file": "vigia/sift/mft_timeline_analyzer.py", "date": "2026-05-06", "days": 69, "category": "DEAD_WEIGHT", "rationale": "Auto-declarado: 'DEPRECATED: usar vigia.sift.disk_forensics.MFTTimelineAnalyzer en su lugar... existe por compatibilidad hacia atrás.' Shim inequívoco.", "cluster": "Duplicados confirmados"}, {"file": "vigia/scripts/top_breaking_phrases.py", "date": "2026-04-28", "days": 77, "category": "FOSIL_BAJO", "rationale": "CLI que rankea regresiones de negation_stress_test.py. Herramienta de reporte para desarrollo, sin rol en el decision path.", "cluster": "Utilidades de desarrollo"}, {"file": "scripts/__init__.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_BAJO", "rationale": "Marcador de paquete vacío, sin contenido, sin riesgo.", "cluster": "Paquetes vacíos"}, {"file": "scripts/generate_release_bundle.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_BAJO", "rationale": "Script de empaquetado de release firmado con HMAC para submission SANS. Tooling de build/ops, no decision-path.", "cluster": "Utilidades de desarrollo"}, {"file": "vigia/core/compare_baseline.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_BAJO", "rationale": "CLI explícitamente de 'demo hackathon' (comparación VIGÍA vs baseline naive para presentaciones); importa helpers de tests/run_vigia_case.py. No forma parte del decision path.", "cluster": "Utilidades de desarrollo"}, {"file": "vigia/scripts/negation_stress_test.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_BAJO", "rationale": "Stress-test CLI standalone (negation handler ON vs OFF). Herramienta manual de dev, cero importadores, fuera de producción y CI.", "cluster": "Utilidades de desarrollo"}, {"file": "vigia/tools/sanitize_judicial.py", "date": "2026-04-29", "days": 76, "category": "FOSIL_BAJO", "rationale": "CLI standalone de redacción PII para PDFs (DNI/CUIT/email/teléfono argentino). Utilidad de preprocesamiento humano, cero importadores, fuera del pipeline de análisis.", "cluster": "Utilidades de desarrollo"}, {"file": "tests/adapt_chatgpt_cases.py", "date": "2026-05-03", "days": 72, "category": "FOSIL_BAJO", "rationale": "Conversor CLI de un solo uso (JSON de casos ChatGPT → formato de artefacto VIGÍA), scoring heurístico simple por keywords. Sin importadores, utilidad standalone de preparación de datos, fuera del decision path.", "cluster": "Utilidades de conversión de datos"}, {"file": "tests/adapt_chatgpt_cases_v2.py", "date": "2026-05-03", "days": 72, "category": "FOSIL_BAJO", "rationale": "v2 del mismo conversor con heurísticas algo mejores ('reglas forenses reales'). Misma naturaleza de CLI standalone, alimenta datos al pipeline real en vez de reemplazar lógica de scoring.", "cluster": "Utilidades de conversión de datos"}, {"file": "vigia/memory/__init__.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_BAJO", "rationale": "Archivo vacío que gatea el paquete vigia/memory/, cuyo único contenido (case_pattern_library.py) resultó ser un duplicado superado confirmado (ver fila correspondiente) — no una capacidad faltante real. Reclasificado de ALTO a BAJO tras la investigación de contenido del paquete.", "cluster": "Paquetes vacíos"}, {"file": "vigia/models/__init__.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_BAJO", "rationale": "Marcador de paquete vacío (0 bytes); el paquete vigia.models no tiene importadores en ningún lugar del repo.", "cluster": "Paquetes vacíos"}, {"file": "vigia/patterns/__init__.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_BAJO", "rationale": "Marcador de paquete vacío (0 bytes), sin comportamiento propio.", "cluster": "Paquetes vacíos"}, {"file": "vigia/scripts/consolidate_cases.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_BAJO", "rationale": "CLI offline de consolidación de corpus (fuentes markdown/JSON → data/cases/consolidated/ canónico). Su propio header dice que su ruta 'prevista' era vigia/pipeline/consolidate_cases.py pero vive en vigia/scripts/ — header desactualizado, no un link real al pipeline. Sin involucramiento en decision path.", "cluster": "Utilidades de conversión de datos"}, {"file": "vigia/temporal/__init__.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_BAJO", "rationale": "Marcador de paquete vacío.", "cluster": "Paquetes vacíos"}, {"file": "vigia/tools/build_calibration_dataset.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_BAJO", "rationale": "Script offline que construye el dataset de calibración para fit_calibration.py. Corre en tiempo de build/entrenamiento, no en tiempo de investigación; sin importadores, CLI standalone. Marcado como adyacente a calibración pero no parte del scoring en runtime.", "cluster": "Pipeline de calibración huérfano"}, {"file": "vigia/utils/__init__.py", "date": "2026-05-04", "days": 71, "category": "FOSIL_BAJO", "rationale": "Marcador de paquete vacío.", "cluster": "Paquetes vacíos"}, {"file": "scripts/convert_break_cases.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_BAJO", "rationale": "Conversor de un solo uso de formato de casos VIGIA_BREAK legacy a EBS v1. Utilidad de migración de datos, no en CI, no cableado al scoring.", "cluster": "Utilidades de conversión de datos"}, {"file": "scripts/convert_synthetic_cases.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_BAJO", "rationale": "Conversor de un solo uso de casos sintéticos VIGIA-SYN legacy a EBS v1. Mismo patrón que convert_break_cases.py.", "cluster": "Utilidades de conversión de datos"}, {"file": "scripts/export_patterns.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_BAJO", "rationale": "Dump CLI trivial de un solo uso de forensic_patterns.sqlite a stdout (ruta de dev personal hardcodeada /home/labestiadevigia/...); sin uso en CI, no toca el decision path.", "cluster": "Utilidades de desarrollo"}, {"file": "scripts/generate_report.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_BAJO", "rationale": "CLI standalone de reporte Amicus Curiae; hack de sys.path importa run_vigia_case desde tests/. Herramienta de reporte manual downstream de scores ya calculados, no en CI, no alimenta el decision path.", "cluster": "Utilidades de desarrollo"}, {"file": "vigia/forensics/temporal_forensics_redteam.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_BAJO", "rationale": "Docstring no coincide, apunta a vigia/tools/vigia_temporal_forensics.py. Nombrado/estructurado como material de test adversarial red-team (reflejado por tests/temporal_forensics_redteam.py), con una implementación to_caie_fracture documentada como divergente de la de temporal_forensics.py. Se lee como fixture de test adversarial, no como decision path de producción.", "cluster": "Fixtures de red-team"}, {"file": "vigia/pipeline/report_builder.py", "date": "2026-05-06", "days": 69, "category": "FOSIL_BAJO", "rationale": "Constructor de gráficos ROC/calibración con matplotlib + texto narrativo ENFSI. Docstring dice vigia/report/report_builder.py. Se encontró una referencia dinámica real pero frágil: vigia_integration_bridge.py:1220 hace `from report_builder import build_report` (import plano) dentro de un try/except Exception amplio, en el path opcional save_report — alcanzable desde vigia_scorer.py, pero un import plano poco probable de resolver sin configuración extra de sys.path, y los fallos se loguean silenciosamente, no se propagan. No toca scoring/veredicto, solo exportación opcional de reporte.", "cluster": "Utilidades de desarrollo"}]
+</script>
+<script>
+(function(){
+  const data = JSON.parse(document.getElementById('report-data').textContent);
+  const CAT_LABEL = {FOSIL_ALTO:'Alto riesgo', CONECTADO_VIVO:'Conectado y vivo', DEAD_WEIGHT:'Dead weight', FOSIL_BAJO:'Bajo riesgo'};
+  const CAT_PILL = {FOSIL_ALTO:'alto', CONECTADO_VIVO:'vivo', DEAD_WEIGHT:'dead', FOSIL_BAJO:'bajo'};
+
+  const counts = {ALL: data.length};
+  data.forEach(r => { counts[r.category] = (counts[r.category]||0) + 1; });
+  Object.keys(counts).forEach(k => {
+    const el = document.getElementById('count-'+k);
+    if (el) el.textContent = '('+counts[k]+')';
+  });
+
+  const tbody = document.getElementById('tbody');
+  const resultCount = document.getElementById('result-count');
+  let activeFilter = 'ALL';
+  let query = '';
+
+  function render(){
+    const q = query.trim().toLowerCase();
+    const rows = data.filter(r => {
+      if (activeFilter !== 'ALL' && r.category !== activeFilter) return false;
+      if (q && !(r.file.toLowerCase().includes(q) || r.rationale.toLowerCase().includes(q) || r.cluster.toLowerCase().includes(q))) return false;
+      return true;
+    });
+    resultCount.textContent = rows.length + ' de ' + data.length + ' archivos';
+    tbody.innerHTML = rows.map(r => (
+      '<tr>' +
+        '<td class="path">' + escapeHtml(r.file) + '</td>' +
+        '<td class="days">' + escapeHtml(r.date) + '</td>' +
+        '<td class="days">' + r.days + 'd</td>' +
+        '<td><span class="pill ' + CAT_PILL[r.category] + '">' + CAT_LABEL[r.category] + '</span></td>' +
+        '<td class="cluster">' + escapeHtml(r.cluster) + '</td>' +
+        '<td class="rationale">' + escapeHtml(r.rationale) + '</td>' +
+      '</tr>'
+    )).join('');
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  document.querySelectorAll('.chip[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.chip[data-filter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilter = btn.getAttribute('data-filter');
+      render();
+    });
+  });
+  document.getElementById('search').addEventListener('input', (e) => {
+    query = e.target.value;
+    render();
+  });
+
+  render();
+})();
+</script>
