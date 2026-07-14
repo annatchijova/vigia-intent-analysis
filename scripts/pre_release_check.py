@@ -100,14 +100,13 @@ BANNED_MODULES: dict[str, str] = {
 
 # Módulos prohibidos por nombre de ARCHIVO (no de módulo en path).
 # Se aplican solo cuando el archivo mismo se llama así, no cuando
-# otro módulo lo importa por path completo (ej: governance.risk_bounded_layer
-# es el path moderno válido; risk_bounded_layer.py en raíz es el legacy).
+# otro módulo lo importa por path completo (ej: vigia.core.risk_bounded_layer
+# es el path canónico vivo; risk_bounded_layer.py en raíz sería legacy).
 BANNED_FILENAMES: dict[str, str] = {
-    "risk_bounded_layer.py": (
-        "DEPRECATED — archivo legacy en raíz. "
-        "La versión activa es 'risk_bounded_layer_v2.py' que aplica parches C4/C5/P1-A/P2. "
-        "Módulo de Capa 3 crítico: una diferencia en la fórmula de riesgo cambia veredictos."
-    ),
+    # B-117 (2026-07-14): risk_bounded_layer.py is the CANONICAL version.
+    # The inverted-posterior bug (P0-001) was fixed in v1 directly (commit
+    # f8c9f9f1). risk_bounded_layer_v2.py was deleted as dead weight —
+    # its only purpose (the P0-001 guard) is now in v1's docstring and code.
 }
 
 # Módulos que DEBEN existir como canónicos (si falta alguno, es señal de problema)

@@ -5663,6 +5663,67 @@ de legitimas.
 
 ---
 
+## B-117 — Inverted posterior semantics in `risk_bounded_layer.py` — `VigiaPipeline` emitted backwards verdicts
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P0 (verdict inversion in governance layer) |
+| **Archivo** | `vigia/core/risk_bounded_layer.py` |
+| **Función** | `RiskBoundedDecisionLayer.compute_risk()` |
+| **Commit fix** | `f8c9f9f1` |
+| **Detectado en** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`) |
+
+### Description
+
+`LikelihoodEngine.infer()` emits `posterior` = P(fabrication | evidence).
+`risk_bounded_layer.compute_risk()` calculated:
+
+```python
+r = (1 - P) * (1 + lambda*D) * (1 + gamma*(1-S)) * (1 + omega*(1-I))
+```
+
+With P = P(fabrication), `(1-P)` inverts the semantics:
+- Fabricated case: P = 0.99 -> (1-P) = 0.01 -> r low -> **ACCEPT** (wrong)
+- Genuine case: P = 0.01 -> (1-P) = 0.99 -> r high -> **REJECT** (wrong)
+
+Every verdict from `VigiaPipeline` through this layer was semantically backwards.
+
+### How it was missed
+
+The orphan `vigia/governance/risk_bounded_layer_v2.py` documented this exact
+bug as fix P0-001, but approached it by redefining P as P(authenticity) — a
+valid alternative fix. However, v2 was never wired: `pipeline.py` imports
+exclusively from `vigia.core.risk_bounded_layer` (v1). Meanwhile,
+`pre_release_check.py` incorrectly declared v2 as "the active version",
+masking the fact that the buggy v1 was the one in production.
+
+Existing tests (T40, T41, T42, T97) all used `posterior=0.5`, which is
+invisible to the inversion (`0.5 == 1 - 0.5`).
+
+### Fix applied
+
+Changed `r = (1-P) * (...)` to `r = P * (...)`, keeping
+P = P(fabrication) as emitted by `LikelihoodEngine`. Added inline comment
+and docstring guard citing this bug.
+
+### Impact assessment
+
+- **AFFECTED entry point**: `VigiaPipeline` via `vigia_api.py`, `show_4_hashes.py`
+- **NOT affected**: `vigia_scorer.py` (own threshold logic, no `risk_bounded_layer`)
+- **NOT affected**: `vigia_agent.py` (uses `vigia_scorer`, not pipeline)
+- **Corpus 184/199**: unaffected (all produced by `vigia_scorer`)
+- **Real cases**: confirmed unaffected (all ran via `vigia_agent`/`vigia_scorer`)
+
+### Cleanup
+
+- `vigia/governance/risk_bounded_layer_v2.py` deleted (dead weight — its
+  P0-001 guard is now resolved in v1).
+- `scripts/pre_release_check.py` BANNED_FILENAMES corrected (v1 is canonical,
+  not deprecated).
+
+---
+
 ## B-116 — `signal_quality_gate.py` designed and functional in isolation, NOT wired to scorer — dry-run shows 122/199 cases degraded
 
 | Campo | Valor |
