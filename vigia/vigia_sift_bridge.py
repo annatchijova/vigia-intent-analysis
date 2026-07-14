@@ -776,6 +776,11 @@ HIGH_RISK_PHONETIC   = HIGH_RISK_SET
 async def list_files(directory: str = ".") -> list:
     """List files and directories. Entry point for filesystem exploration."""
     try:
+        audit_logger.log_info(
+            event_type="TOOL_INVOKED",
+            tool="list_files",
+            message=f"directory={directory!r}",
+        )
         path = _sanitize_path_local(directory)
         return os.listdir(path)
     except (ValueError, OSError) as e:
@@ -1021,6 +1026,11 @@ async def read_evidence(path: str, max_bytes: int = 5000) -> dict:
     ensuring the hash corresponds to the content in the report.
     """
     try:
+        audit_logger.log_info(
+            event_type="TOOL_INVOKED",
+            tool="read_evidence",
+            message=f"path={path!r} max_bytes={max_bytes}",
+        )
         path = _sanitize_path_local(path)
     except ValueError as e:
         return {"error": str(e)}
@@ -1301,6 +1311,11 @@ async def generate_forensic_hash(file_path: str) -> dict:
     If this hash changes by a single bit, evidence was tampered with.
     """
     try:
+        audit_logger.log_info(
+            event_type="TOOL_INVOKED",
+            tool="generate_forensic_hash",
+            message=f"file_path={file_path!r}",
+        )
         file_path = _sanitize_path_local(file_path)
     except ValueError as e:
         return {"error": str(e)}
