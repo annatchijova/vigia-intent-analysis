@@ -5746,6 +5746,29 @@ Full suite: 1366 passed, 0 regressions.
 
 ---
 
+## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging
+
+| Field | Value |
+|-------|-------|
+| **Status** | PARTIALLY RESOLVED — 3 priority tools covered, 20 pending |
+| **Severity** | P2 (Daubert chain-of-custody gap) |
+| **File** | `vigia/vigia_sift_bridge.py` |
+| **Detected in** | Module archaeology audit 2026-07-14 |
+
+### Description
+
+Of 23 MCP tools, only 3 have `audit_logger.log_info(event_type="TOOL_INVOKED")`
+before path sanitization: `generate_forensic_hash`, `read_evidence`, `list_files`.
+These 3 are the evidence-touching tools (chain-of-custody anchor). The remaining
+20 Phase 2-4 analysis tools are not instrumented. Their invocations are recorded
+by the calling agent's `tool_execution_log` chain (v2 with HMAC), but not in the
+per-tool audit log.
+
+Deferred: broader rollout needs to address `audit_logger` synchronous fsync
+performance before adding to all 20 tools.
+
+---
+
 ## B-121 — Bulk removal of 15 confirmed dead-weight files
 
 | Field | Value |

@@ -5903,6 +5903,62 @@ maximum latent risk. Same deletion criterion as B-118 (signal_contract.py).
 
 ---
 
+## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PARCIALMENTE RESUELTO — 3 tools prioritarias ya cubiertas, 20 pendientes |
+| **Severidad** | P2 (Daubert chain-of-custody gap — tool invocations not recorded in audit trail) |
+| **Archivo** | `vigia/vigia_sift_bridge.py` |
+| **Detectado en** | Module archaeology audit 2026-07-14 |
+
+### Description
+
+CLAUDE.md requires every tool call to be logged to `audit_trail` with
+timestamp, tool_name, arguments_hash, and result_summary. Of the 23 MCP
+tools exposed by `Vigia_Sift_Bridge`, only 3 have the `audit_logger.log_info
+(event_type="TOOL_INVOKED", ...)` call that records the invocation attempt
+before path sanitization:
+
+**Already covered (3 — evidence-touching tools):**
+- `generate_forensic_hash` — logs before `_sanitize_path_local()`
+- `read_evidence` — logs before `_sanitize_path_local()`
+- `list_files` — logs before `_sanitize_path_local()`
+
+**NOT covered (20):**
+`activate_honey_token`, `analyze_stylometry`, `audit_grice_maxims`,
+`audit_image_metadata`, `audit_network`, `calculate_human_entropy`,
+`calculate_shannon_entropy`, `check_syscall_latency`, `deactivate_honey_token`,
+`detect_eco_overinterpretation`, `detect_habit_incongruence`,
+`detect_human_jitter`, `get_phonetic_dict_stats`, `infer_intent`,
+`list_processes`, `mount_sift_evidence`, `reason_with_llm`,
+`reload_phonetic_dict`, `search_pattern`, `validate_and_correct_analysis`
+
+### Risk assessment
+
+The 3 covered tools are the highest priority: they touch evidence files
+directly and form the chain-of-custody anchor (hash before read). The 20
+uncovered tools are Phase 2-4 analysis tools — their invocations are
+typically recorded in the `tool_execution_log` chain (v2, with HMAC) by
+the calling agent, but NOT in the per-tool audit log. An examiner auditing
+a specific tool's invocation history would find gaps.
+
+### Known technical debt
+
+`audit_logger.log_info()` uses synchronous `fsync()` on every call. Adding
+it to all 20 tools would add ~20 blocking disk flushes per investigation.
+Acceptable for the 3 evidence tools (correctness > performance), but the
+broader rollout should batch or async the fsync. Documented as accepted
+debt, not a blocker.
+
+### Decision
+
+The 3 prioritized tools are covered. The remaining 20 are deferred to a
+dedicated session where the fsync performance concern can be addressed
+alongside the instrumentation.
+
+---
+
 ## B-120 — `vigia/cli.py` false PASS from unimplemented verification stubs + legacy ledger without HMAC
 
 | Campo | Valor |
