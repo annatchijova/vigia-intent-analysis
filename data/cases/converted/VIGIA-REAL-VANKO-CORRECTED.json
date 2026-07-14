@@ -1,0 +1,203 @@
+{
+  "case_id": "VIGIA-REAL-VANKO-CORRECTED",
+  "case_name": "VANKO (Event 2) — IP Theft via USB Exfiltration, June 29-30 2016",
+  "description": "CORPUS CORRECTION C-001. Anthony Vanko, lead biochemical engineer at Stark Enterprises DC R&D Facility, recruited by Bulgakov (via Merrick) to steal classified research. This case covers Event 2 ONLY (June 29-30 2016): Vanko's own deliberate theft. Event 1 (June 18 Nina's RDP attack) is a separate case: VIGIA-REAL-NINA. Evidence: Microsoft Surface 3 E01 image + CyLR live-response collection. Key artifacts: VeraCrypt execution (6 Prefetch runs), PowerShell file renaming (vacation photos), SDelete runs on Level 7-8 Classified directories (anti-forensic destruction), SanDisk Cruzer USB 'StarkResrch' volume (ShellBags), W Hotel WiFi connection (NetworkList registry), StarkResearch server access via ShellBags. Source: FOR500HANDOUT_Vanko Master Scenario Solution.pdf (Mark Hallman, SANS FOR500, 2018-05-29). Prior JSON case (VIGIA-REAL-VANKO.json) incorrectly attributed Nina's June 18 artifacts to Vanko.",
+  "expected_verdict": "MALICE",
+  "schema_version": "1.1",
+  "correction": {
+    "correction_id": "C-001",
+    "correction_date": "2026-07-14",
+    "correction_source": "FOR500HANDOUT_Vanko Master Scenario Solution.pdf (Mark Hallman, SANS FOR500, created 2018-05-29)",
+    "correction_source_path": "cylr_extracted/vanko-c-drive.CYLR/FOR500HANDOUT_Vanko Master Scenario Solution.pdf",
+    "prior_case_id": "VIGIA-REAL-VANKO",
+    "correction_notes": "Original case conflated Nina's June 18 attack with Vanko's June 29-30 theft. ART-001/002/003/005/007 of the original case are Nina's artifacts (defaultprinter account, RDP session). This corrected case covers only the artifacts attributable to Vanko's own deliberate action."
+  },
+  "acquisition": {
+    "disk_tool": "AccessData FTK Imager 2.9.0.1385",
+    "disk_acquire_date": "2016-11-04",
+    "acquisition_type": "Live Physical (no write blocker)",
+    "examiner": "Ovie Carroll",
+    "case_number": "20161104",
+    "evidence_number": "20161104-HD001",
+    "device": "Microsoft Surface 3, Samsung MDGAGC SSD, 119GB",
+    "md5_stored": "4032d556cc866c23f1e797410e95603c",
+    "md5_verified": false,
+    "sha1_stored": "e0e72dfcef167dd358813726e82f6c235bc85ce7",
+    "sha1_verified": true,
+    "sector_errors": "E10 sectors 70565120-70565183 (64 sectors, ~32KB)",
+    "note": "Live acquisition without write blocker. SHA1 verified by FTK at acquisition time. MD5 fails ewfverify due to sector errors in E10. CAIE trust degradation applies per NIST SP 800-86 §4.3."
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-V001",
+      "evidence_type": "prefetch",
+      "source_tool": "CyLR live-response collection + PrefetchAnalyzer (B-132 fix)",
+      "description": "VeraCrypt.exe Prefetch entry with 6 execution runs. VeraCrypt is volume encryption software. Six executions in close temporal proximity to the classified document access window (June 29-30 2016) is consistent with: creating a new encrypted container, mounting it, copying files in, and unmounting across multiple sessions. VeraCrypt Format.exe Prefetch entry also present (separate artifact: container creation). VIGIA-REAL-VANKO-2026-v2 run detected veracrypt.exe and 'veracrypt format.exe' in Prefetch via B-132 SUSPICIOUS_TOOL_SIGNS list.",
+      "raw_score": 0.89,
+      "prior_trust": 0.80,
+      "provenance_chain": [
+        "CyLR live-response collection (date of collection: 2016-11-04)",
+        "VIGIA PrefetchAnalyzer B-132 fix (SUSPICIOUS_TOOL_SIGNS)",
+        "FOR500HANDOUT solution pages 22-28",
+        "VIGIA-REAL-VANKO-CORRECTED analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-29T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "CyLR_live_response",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "executable": "veracrypt.exe",
+        "run_count": 6,
+        "also_present": "VERACRYPT FORMAT.EXE",
+        "mitre_technique": "T1560.001"
+      }
+    },
+    {
+      "artifact_id": "ART-V002",
+      "evidence_type": "prefetch",
+      "source_tool": "CyLR live-response collection + PrefetchAnalyzer (B-132 fix)",
+      "description": "SDelete.exe and SDelete64.exe Prefetch entries. Sysinternals SDelete performs DOD 5220.22-M compliant secure overwrite (multiple passes, zero-fill). Presence in Prefetch on a corporate research workstation has no legitimate operational justification — it is the canonical anti-forensic tool for evidence destruction. The FOR500 solution documents that Vanko ran SDelete on the Level 7 Classified and Level 8 Classified directories on the StarkResearch server mount after copying files to his USB drive. VIGIA-REAL-VANKO-2026-v2 run detected sdelete.exe in Prefetch via B-132 ANTI_FORENSIC_TOOL_EXECUTION_SIGNS list, emitting z=3.2.",
+      "raw_score": 0.95,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "CyLR live-response collection (date of collection: 2016-11-04)",
+        "VIGIA PrefetchAnalyzer B-132 fix (ANTI_FORENSIC_TOOL_EXECUTION_SIGNS)",
+        "FOR500HANDOUT solution pages 28-30",
+        "VIGIA-REAL-VANKO-CORRECTED analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-30T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "CyLR_live_response",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "executables": ["sdelete.exe", "sdelete64.exe"],
+        "purpose": "DOD 5220.22-M secure wipe — evidence destruction",
+        "targets": "Level 7 Classified and Level 8 Classified directories",
+        "no_legitimate_justification": true,
+        "mitre_technique": "T1070.004",
+        "vigia_z_score": 3.2
+      }
+    },
+    {
+      "artifact_id": "ART-V003",
+      "evidence_type": "registry_hive",
+      "source_tool": "ShellBag analysis — NTUSER.DAT PC User account",
+      "description": "ShellBag entries in Vanko's PC User NTUSER.DAT confirm access to: (1) StarkResearch file server share containing Level 5-8 Classified directories; (2) SanDisk Cruzer USB volume labeled 'StarkResrch'. ShellBags record user navigation via File Explorer — they persist after the files are deleted and after the USB is removed. The 'StarkResrch' volume label is a deliberate abbreviation of 'StarkResearch', suggesting Vanko pre-labeled the drive for this operation. The combination of StarkResearch server access + SanDisk Cruzer navigation immediately preceding SDelete execution is the core behavioral sequence of the theft.",
+      "raw_score": 0.93,
+      "prior_trust": 0.87,
+      "provenance_chain": [
+        "Physical acquisition FTK Imager 2.9 (2016-11-04, examiner Ovie Carroll)",
+        "ewfmount + losetup + ntfs-3g read-only",
+        "ShellBag analysis NTUSER.DAT PC User account",
+        "FOR500HANDOUT solution pages 22-26",
+        "VIGIA-REAL-VANKO-CORRECTED analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-29T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "FTK_Imager_2.9_LivePhysical",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "shellbag_targets": [
+          "StarkResearch file server — Level 5-8 Classified directories",
+          "SanDisk Cruzer USB — volume label 'StarkResrch'"
+        ],
+        "account": "PC User (Vanko's own account — not defaultprinter)",
+        "persistence": "ShellBags persist after file deletion and USB removal",
+        "mitre_technique": "T1005"
+      }
+    },
+    {
+      "artifact_id": "ART-V004",
+      "evidence_type": "registry_key",
+      "source_tool": "NetworkList registry hive — SOFTWARE hive",
+      "description": "NetworkList registry key in SOFTWARE hive records W Hotel WiFi connection in the June 29-30 2016 window. The FOR500 solution documents that Vanko walked the SanDisk Cruzer USB drive to a meeting with Vladimir (Bulgakov's contact) at the W Hotel in Washington DC, where Vladimir copied the files. The W Hotel WiFi connection in the NetworkList provides forensic corroboration of physical presence at the handoff location. This is the delivery phase of the operation.",
+      "raw_score": 0.82,
+      "prior_trust": 0.78,
+      "provenance_chain": [
+        "CyLR live-response collection (SOFTWARE hive)",
+        "Registry analysis NetworkList key",
+        "FOR500HANDOUT solution page 30-31",
+        "VIGIA-REAL-VANKO-CORRECTED analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-30T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "CyLR_live_response",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "network_name": "W Hotel WiFi",
+        "location": "W Hotel, Washington DC",
+        "forensic_significance": "Physical presence corroboration at USB handoff location",
+        "delivery_target": "Vladimir (Bulgakov contact)",
+        "mitre_technique": "T1048"
+      }
+    },
+    {
+      "artifact_id": "ART-V005",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "ntfs-3g read-only mount + istat analysis",
+      "description": "Level 7 Classified and Level 8 Classified directory entries on StarkResearch server mount show istat: Allocated Size 0, Actual Size 0 — consistent with SDelete secure overwrite (file content zeroed, MFT entry preserved). The original classified files (zebrafish DNA, rapid cell regeneration, weaponization research) were deleted by Vanko after copying to the USB drive. SDelete zeros file content on each pass, leaving file system metadata (directory entries, MFT records) but destroying the data. This is the anti-forensic signature confirming deliberate evidence destruction post-exfiltration.",
+      "raw_score": 0.96,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "Physical acquisition FTK Imager 2.9 (2016-11-04, examiner Ovie Carroll)",
+        "ewfmount + losetup + ntfs-3g read-only",
+        "istat analysis on Level 7-8 Classified directory inodes",
+        "FOR500HANDOUT solution pages 28-30",
+        "VIGIA-REAL-VANKO-CORRECTED analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-30T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "FTK_Imager_2.9_LivePhysical",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "istat_allocated_size": 0,
+        "istat_actual_size": 0,
+        "interpretation": "SDelete zeroed file content — secure overwrite confirmed",
+        "directories_wiped": ["Level 7 Classified", "Level 8 Classified"],
+        "mft_entries_preserved": true,
+        "data_recoverable": false,
+        "mitre_technique": "T1070.004"
+      }
+    },
+    {
+      "artifact_id": "ART-V006",
+      "evidence_type": "network_capture",
+      "source_tool": "tshark + strings analysis",
+      "description": "Two IEEE 802.11 monitor-mode packet captures found at C:\\Users\\PC User\\Documents\\: 'starbucks pcap.pcap' (685 packets, 2016-03-04T17:25Z) and 'testpcap.pcap' (510 packets, 2016-03-04T17:30Z). Radiotap headers confirm promiscuous wireless capture. This artifact is attributable to Vanko's PC User account (not the defaultprinter account). Technical capability demonstrated: monitor-mode WiFi capture, 3 months before the theft operation. Consistent with reconnaissance / tradecraft development. This artifact was correctly in the original VIGIA-REAL-VANKO.json and remains valid here.",
+      "raw_score": 0.78,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "Physical acquisition FTK Imager 2.9 (2016-11-04, examiner Ovie Carroll)",
+        "ewfmount + losetup + ntfs-3g read-only",
+        "capinfos + strings analysis",
+        "VIGIA-REAL-VANKO analysis 2026-06-07 (artifact retained from original case)"
+      ],
+      "timestamp": "2016-03-04T17:25:07Z",
+      "metadata": {
+        "acquisition_tool": "FTK_Imager_2.9_LivePhysical",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "pcap_starbucks_sha256": "ff62aa8a277ec945827343379a02785a1bd0fd09b7e7aecebf398d931399abc1",
+        "pcap_test_sha256": "6f27e008d0d6afee2f945f46e9597ce418512fa4ee7c283a060412d44a08a559",
+        "encapsulation": "IEEE 802.11 + radiotap",
+        "capture_location": "Starbucks WiFi",
+        "account": "PC User (Vanko — not defaultprinter)",
+        "months_before_theft": 3,
+        "ssids_visible": ["Starbucks WiFi", "ATT-WIFI-5250", "DRAGONBOY", "DaVita-Guest", "GoWiFi"],
+        "mitre_technique": "T1040"
+      }
+    }
+  ]
+}

@@ -1,0 +1,221 @@
+{
+  "case_id": "VIGIA-REAL-NINA",
+  "case_name": "NINA — External Intrusion via USB Rubber Ducky + RDP Exfiltration (Stark Enterprises, June 18 2016)",
+  "description": "CORPUS CORRECTION C-001 (companion case). Nina (last name not given in SANS solution) was hired by competitors of Stark Enterprises. On 2016-06-18 she conducted a two-phase attack: (1) physical access — inserted a USB Rubber Ducky HID attack device into Anthony Vanko's unattended workstation, which automated keystrokes to create a hidden 'defaultprinter' account and install smallftpd.exe; (2) remote access — RDP'd from IP 173.73.166.249 (Arlington VA, Verizon FiOS residential) logged as Windows Event ID 4624 Type 10, downloaded temp.zip containing 7 classified Stark research documents via FTP at 22:21:49Z. Evidence: Microsoft Surface 3 E01 image (same device as VIGIA-REAL-VANKO-CORRECTED — Nina's artifacts are resident on Vanko's device). Source: FOR500HANDOUT_Vanko Master Scenario Solution.pdf (Mark Hallman, SANS FOR500, 2018-05-29), pages 11-19.",
+  "expected_verdict": "MALICE",
+  "schema_version": "1.1",
+  "correction": {
+    "correction_id": "C-001",
+    "correction_date": "2026-07-14",
+    "correction_source": "FOR500HANDOUT_Vanko Master Scenario Solution.pdf (Mark Hallman, SANS FOR500, created 2018-05-29)",
+    "correction_source_path": "cylr_extracted/vanko-c-drive.CYLR/FOR500HANDOUT_Vanko Master Scenario Solution.pdf",
+    "prior_case_id": "VIGIA-REAL-VANKO",
+    "correction_notes": "Original case VIGIA-REAL-VANKO attributed ART-001/002/003/005/007 to Anthony Vanko. These artifacts are entirely Nina's work, conducted during an unauthorized RDP session under the 'defaultprinter' account she created. This case correctly attributes them to Nina as the perpetrator of Event 1."
+  },
+  "acquisition": {
+    "disk_tool": "AccessData FTK Imager 2.9.0.1385",
+    "disk_acquire_date": "2016-11-04",
+    "acquisition_type": "Live Physical (no write blocker)",
+    "examiner": "Ovie Carroll",
+    "case_number": "20161104",
+    "evidence_number": "20161104-HD001",
+    "device": "Microsoft Surface 3, Samsung MDGAGC SSD, 119GB (Vanko's device — Nina's artifacts are resident here)",
+    "md5_stored": "4032d556cc866c23f1e797410e95603c",
+    "md5_verified": false,
+    "sha1_stored": "e0e72dfcef167dd358813726e82f6c235bc85ce7",
+    "sha1_verified": true,
+    "sector_errors": "E10 sectors 70565120-70565183 (64 sectors, ~32KB)",
+    "note": "Device belongs to Anthony Vanko. Nina's artifacts are resident on this device because: (a) the defaultprinter account she created resides in C:\\Users\\defaultprinter\\; (b) Event logs from the RDP session are in the Windows Event Log on this device. Live acquisition without write blocker. SHA1 verified at acquisition time."
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-N001",
+      "evidence_type": "event_log",
+      "source_tool": "Windows Event Log (Security.evtx) — RegRipper + evtx parser",
+      "description": "Windows Security Event ID 4720 — User Account Created. The 'defaultprinter' account was created by an automated process (USB Rubber Ducky HID attack device) on 2016-06-18 while Vanko was away from his desk. The event records: New Account Name: defaultprinter, Account Domain: STARK-VANKO, Subject Account Name: PC User (the logged-in session at the time the Rubber Ducky executed). The account name 'defaultprinter' is a deliberate social engineering choice: it mimics a Windows printer service account to survive casual inspection by IT staff or Vanko himself. This is the initial access stage of Nina's attack.",
+      "raw_score": 0.94,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "Physical acquisition FTK Imager 2.9 (2016-11-04, examiner Ovie Carroll)",
+        "ewfmount + losetup + ntfs-3g read-only",
+        "evtx parser — Security.evtx — Event ID 4720",
+        "FOR500HANDOUT solution pages 11-14",
+        "VIGIA-REAL-NINA analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-18T20:00:00Z",
+      "metadata": {
+        "acquisition_tool": "FTK_Imager_2.9_LivePhysical",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "event_id": 4720,
+        "new_account": "defaultprinter",
+        "domain": "STARK-VANKO",
+        "attack_vector": "USB Rubber Ducky HID (physical access, automated keystrokes)",
+        "mitre_technique": "T1078.003"
+      }
+    },
+    {
+      "artifact_id": "ART-N002",
+      "evidence_type": "event_log",
+      "source_tool": "Windows Event Log (Security.evtx) — evtx parser",
+      "description": "Windows Security Event ID 4624 — Account Logon, Logon Type 10 (RemoteInteractive = RDP). Nina RDP'd into Vanko's workstation from IP 173.73.166.249 (Arlington, Virginia, US — Verizon FiOS residential, AS701) as user 'defaultprinter'. Logon Type 10 is the definitive indicator of RDP remote desktop access (as opposed to Type 3 network logon or Type 2 interactive/local). The IP 173.73.166.249 geolocates to Arlington VA, which is in the Washington DC metropolitan area — consistent with a local operative conducting targeted corporate espionage. The RDP session window overlaps exactly with the FTP transfer recorded in transfers.log (22:21:49Z).",
+      "raw_score": 0.97,
+      "prior_trust": 0.92,
+      "provenance_chain": [
+        "Physical acquisition FTK Imager 2.9 (2016-11-04, examiner Ovie Carroll)",
+        "ewfmount + losetup + ntfs-3g read-only",
+        "evtx parser — Security.evtx — Event ID 4624 Type 10",
+        "ipinfo.io geolocation of 173.73.166.249",
+        "FOR500HANDOUT solution pages 14-17",
+        "VIGIA-REAL-NINA analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-18T21:55:00Z",
+      "metadata": {
+        "acquisition_tool": "FTK_Imager_2.9_LivePhysical",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "event_id": 4624,
+        "logon_type": 10,
+        "logon_type_name": "RemoteInteractive (RDP)",
+        "account": "defaultprinter",
+        "source_ip": "173.73.166.249",
+        "source_geo": "Arlington, Virginia, US (Verizon FiOS residential)",
+        "source_asn": "AS701 Verizon Business",
+        "mitre_technique": "T1021.001"
+      }
+    },
+    {
+      "artifact_id": "ART-N003",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "ntfs-3g read-only mount + manual analysis",
+      "description": "smallftpd.exe at C:\\Users\\defaultprinter\\smallftpd.exe, SHA-256: 4f1a4c44e268dfb78b8c9a1db6925775925498550e6a717e7576951a076bcd09. VirusTotal 1/72: Jiangmin detects Packed.BDF.en (packed). Size 191KB. Installed by Nina during the Rubber Ducky phase or during the subsequent RDP session. smallftpd is a lightweight FTP server repurposed as an exfiltration channel. The binary is packed to reduce AV detections (1/72 at time of analysis). The account it runs under ('defaultprinter') was designed to be indistinguishable from a Windows service account. This is Nina's persistent data exfiltration infrastructure.",
+      "raw_score": 0.91,
+      "prior_trust": 0.82,
+      "provenance_chain": [
+        "Physical acquisition FTK Imager 2.9 (2016-11-04, examiner Ovie Carroll)",
+        "ewfmount + losetup + ntfs-3g read-only",
+        "sha256sum + VirusTotal lookup",
+        "FOR500HANDOUT solution pages 13-16",
+        "VIGIA-REAL-NINA analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-18T20:00:00Z",
+      "metadata": {
+        "acquisition_tool": "FTK_Imager_2.9_LivePhysical",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "binary_path": "C:\\Users\\defaultprinter\\smallftpd.exe",
+        "binary_sha256": "4f1a4c44e268dfb78b8c9a1db6925775925498550e6a717e7576951a076bcd09",
+        "vt_detections": "1/72",
+        "vt_classification": "Packed.BDF.en (Jiangmin)",
+        "binary_size_kb": 191,
+        "perpetrator": "Nina (installed under defaultprinter account — not Vanko)",
+        "mitre_technique": "T1071.002"
+      }
+    },
+    {
+      "artifact_id": "ART-N004",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "ntfs-3g read-only mount + manual analysis",
+      "description": "ftpd.ini configuration at C:\\Users\\defaultprinter\\ftpd.ini. Critical fields: auto_run=1 (FTP server auto-starts on defaultprinter login), port=21, user_Login=defaultprinter, user_Password=12345, permission_Type_0=LR (list+read), directory_Physical_0=C:\\Users\\PC User (entire Vanko home directory exposed), pasv_url=account.dyndns.org (DynDNS for persistent external access). This configuration constitutes a backdoor: even after Nina's RDP session ends, the FTP server auto-starts whenever the defaultprinter account is logged in remotely. The DynDNS entry allows access regardless of the device's external IP address. Created by Nina; left running on the device as persistent access infrastructure.",
+      "raw_score": 0.96,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "Physical acquisition FTK Imager 2.9 (2016-11-04, examiner Ovie Carroll)",
+        "ewfmount + losetup + ntfs-3g read-only",
+        "FOR500HANDOUT solution pages 13-17",
+        "VIGIA-REAL-NINA analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-18T20:00:00Z",
+      "metadata": {
+        "acquisition_tool": "FTK_Imager_2.9_LivePhysical",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "ftp_port": 21,
+        "auto_run": true,
+        "ftp_user": "defaultprinter",
+        "ftp_password": "12345",
+        "permission_type": "LR (list+read)",
+        "exposed_directory": "C:\\Users\\PC User",
+        "dyndns_configured": true,
+        "passive_ports": "5000-5010",
+        "perpetrator": "Nina (configured under defaultprinter account — not Vanko)",
+        "mitre_technique": "T1071.002"
+      }
+    },
+    {
+      "artifact_id": "ART-N005",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "ntfs-3g read-only mount + manual analysis",
+      "description": "transfers.log at C:\\Users\\defaultprinter\\transfers.log. Single entry: '18/06/2016 18:21:49 Download started by defaultprinter [173.73.166.249] : c:\\Users\\defaultprinter\\Desktop\\temp.zip' / '18/06/2016 18:21:50 Download completed by defaultprinter : 173.73.166.249'. Transfer of temp.zip in approximately 1 second. The remote IP 173.73.166.249 is the same IP that initiated the RDP session (ART-N002). This is Nina downloading the pre-packaged classified documents via the FTP server she installed. Transfer completed at 22:21:49Z. Cross-reference: classified Stark documents appeared on a Chinese university research file share on 2016-06-22/23, four days after this transfer.",
+      "raw_score": 0.98,
+      "prior_trust": 0.92,
+      "provenance_chain": [
+        "Physical acquisition FTK Imager 2.9 (2016-11-04, examiner Ovie Carroll)",
+        "ewfmount + losetup + ntfs-3g read-only",
+        "ipinfo.io geolocation of 173.73.166.249",
+        "FOR500HANDOUT solution pages 17-19",
+        "VIGIA-REAL-NINA analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-18T22:21:49Z",
+      "metadata": {
+        "acquisition_tool": "FTK_Imager_2.9_LivePhysical",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "transfer_date": "2016-06-18",
+        "transfer_time_utc": "22:21:49Z",
+        "remote_ip": "173.73.166.249",
+        "remote_geo": "Arlington, Virginia, US (Verizon FiOS residential)",
+        "remote_asn": "AS701 Verizon Business",
+        "file_transferred": "temp.zip",
+        "duration_seconds": 1,
+        "days_before_chinese_server_posting": 4,
+        "same_ip_as_rdp_session": true,
+        "perpetrator": "Nina (downloading via her FTP server from her RDP session IP)",
+        "mitre_technique": "T1048.003"
+      }
+    },
+    {
+      "artifact_id": "ART-N006",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "ntfs-3g read-only mount — defaultprinter profile contents",
+      "description": "Contents of C:\\Users\\defaultprinter\\ include: smallftpd.exe, ftpd.ini, transfers.log, NinaResearch folder, NinaResearch.zip, starbucks.csv, security.evtx (copied Windows Event Log — anti-forensic: Nina copied the Security event log, possibly to review it before deciding whether to clean up), 7-8-USB-Analysis.pptx (PowerPoint presentation about USB forensic analysis — significant: Nina brought her own forensic reference material). The presence of 'NinaResearch' as a folder and zip name inside the defaultprinter account is operationally significant: it is the account name associated with this investigation's perpetrator and corroborates the attribution to 'Nina'.",
+      "raw_score": 0.90,
+      "prior_trust": 0.83,
+      "provenance_chain": [
+        "Physical acquisition FTK Imager 2.9 (2016-11-04, examiner Ovie Carroll)",
+        "ewfmount + losetup + ntfs-3g read-only",
+        "directory listing C:\\Users\\defaultprinter\\",
+        "FOR500HANDOUT solution pages 12-19",
+        "VIGIA-REAL-NINA analysis 2026-07-14"
+      ],
+      "timestamp": "2016-06-18T22:00:00Z",
+      "metadata": {
+        "acquisition_tool": "FTK_Imager_2.9_LivePhysical",
+        "acquisition_hash": "sha1:e0e72dfcef167dd358813726e82f6c235bc85ce7",
+        "acquisition_timestamp": "2016-11-04T13:47:41Z",
+        "write_blocker_used": false,
+        "examiner_id": "Ovie Carroll / SANS FOR500",
+        "account_name": "defaultprinter",
+        "notable_items": [
+          "NinaResearch/ (folder — name corroborates perpetrator attribution)",
+          "NinaResearch.zip",
+          "starbucks.csv",
+          "security.evtx (event log copy — anti-forensic review)",
+          "7-8-USB-Analysis.pptx (USB forensics reference)"
+        ],
+        "anti_forensic_indicator": "Copied security.evtx — attacker reviewing Windows event log",
+        "mitre_technique": "T1070.001"
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "case": {
+    "analysis_timestamp": "bootstrap_v1",
+    "document_id": "VIGIA-REAL-VANKO-CORRECTED"
+  },
+  "forensic_result": {
+    "enfsi_label": "moderately strong",
+    "likelihood_ratio": 924.9259259259518,
+    "narrative": "El an\u00e1lisis probabil\u00edstico basado en modelos estad\u00edsticos calibrados produce un Likelihood Ratio (LR) de 924.93. De acuerdo con la escala ENFSI, esto corresponde a un nivel de evidencia: 'moderately strong'. Este resultado debe interpretarse en conjunto con el resto de la evidencia del caso.",
+    "posterior_probability": 0.99892
+  },
+  "limitations": [
+    "El modelo est\u00e1 calibrado sobre dataset bootstrap (no corpus real).",
+    "Se asume independencia entre clusters (NLP vs TEMPORAL).",
+    "La covarianza NLP se estima con shrinkage (Ledoit-Wolf).",
+    "Las probabilidades pueden estar sujetas a recalibraci\u00f3n adicional."
+  ],
+  "model_performance": {
+    "auc": null,
+    "auc_confidence_interval": {},
+    "brier_score": null,
+    "expected_calibration_error": null
+  },
+  "model_traceability": {
+    "bandwidths": {},
+    "calibration_date": "2026-07-14T22:54:06.349317+00:00",
+    "covariance_used": false,
+    "dataset_hash": "bootstrap_v1_no_corpus_real",
+    "tools_calibrated": [
+      "SDA",
+      "CLI",
+      "ACP",
+      "ROI",
+      "GCI"
+    ]
+  },
+  "plots": {
+    "calibration_curve": null,
+    "roc_curve": null
+  },
+  "report_version": "v1.0",
+  "signals": []
+}

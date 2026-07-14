@@ -1,0 +1,159 @@
+{
+  "abduction_trace": {
+    "abort_reason": null,
+    "abort_triggered": false,
+    "anomalies_found": [],
+    "cluster_name": null,
+    "clustering_method": "heuristic_default",
+    "correlation_penalties_applied": false,
+    "dominant_signal": null,
+    "dominant_z_score": 0.0,
+    "execution_plan_rationale": [],
+    "inference_mode": "FALLBACK",
+    "peirce_firstness": "0 senal(es) procesadas via FALLBACK. 6 cluster(s) de inferencia. Se\u00f1al dominante: ninguna (z=0.00)",
+    "peirce_secondness": "Sin anomalias significativas (z < 2.0)",
+    "peirce_thirdness": "Patron ambiguo \u2014 posible fabricacion parcial. P(fabricacion)=0.999. Evidencia insuficiente para certeza. Decision: REJECT.",
+    "tools_available": [
+      "GCI",
+      "GCI",
+      "GCI",
+      "SDA",
+      "GCI",
+      "GCI"
+    ],
+    "tools_executed": [],
+    "tools_skipped": [
+      "GCI",
+      "GCI",
+      "GCI",
+      "SDA",
+      "GCI",
+      "GCI"
+    ]
+  },
+  "actions": [],
+  "bundle_id": "b2efe627-5467-46bc-a997-5fd5809f6fa9",
+  "bundle_version": "1.0",
+  "caie_analysis": {
+    "composite_score": "0.3328",
+    "fractures": [],
+    "fractures_detected": 0,
+    "golden_rules_triggered": 0,
+    "key_fractures": [],
+    "structural_verdict": "NOISE",
+    "verdict": "SUSPICION"
+  },
+  "config_attestation": {
+    "caie_enabled": true,
+    "caie_verdict": "SUSPICION",
+    "canonical_version": "1.0.0",
+    "config_hash": "b26906aea450ad6f57cba2554e387a5fc91e11c8b2d09238f9eb2a1cee8ae94a",
+    "deviation_from_canonical": false,
+    "modified_params": [],
+    "vigia_version": "1.0"
+  },
+  "decision_trace": {
+    "abstain_reason": "",
+    "components_used": 6,
+    "consistency_score": 1.0,
+    "decision": "REJECT",
+    "drift_score": 1.0,
+    "epsilon_used": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability": 1.0,
+    "lambda_drift": 2.0,
+    "log_lr": 6.830001,
+    "lr": 925.1917376703337,
+    "omega_intention": 1.0,
+    "posterior": 0.99892,
+    "reason_code": "REJECT_POSTERIOR",
+    "risk": 2.99676,
+    "signal_contributions": []
+  },
+  "evidence_graph": {
+    "bootstrap_rounds": 500,
+    "edges": [],
+    "generated_at": "2026-07-14T22:54:06.115539+00:00",
+    "graph_hash": "94147b51c639cd0c5f361fc885bdd59a257ffaf3f770203ff7b7a3a787b57f53",
+    "nodes": [],
+    "stability_threshold": 0.85
+  },
+  "integrity": {
+    "bundle_hash": "79ea4e4706ed96b534ada287e3494f2ecff5805edb407bce79ca396e29d64c2c",
+    "decision_hash": "5f46f4c927af42e581f1339c06c2aad4488fa2fede19802fb1d0bbd1db5522a0",
+    "ecl_hash": "0882b7702f6c09afd97b3ee0a4ac8ff392585549b956d795bdf2bb4d7f7f73f6",
+    "engine_attestation_hash": "20d3116b31bfa5cc4d3ac036b82c4aa667d191ea89e5d5c5ca7d2c274b8bd3f2",
+    "graph_hash": "94147b51c639cd0c5f361fc885bdd59a257ffaf3f770203ff7b7a3a787b57f53",
+    "policy_hash": "0ab1014d64e939c55cbd9c171bde5a36f13146453f602e9a44ae0b093a49cb69",
+    "sealed_at": "2026-07-14T22:54:06.115825+00:00"
+  },
+  "policy_spec": {
+    "created_at": "2026-07-14T22:54:06.107186+00:00",
+    "description": "VIGIA default policy \u2014 SANS FIND EVIL 2026",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability_init": 2.0,
+    "lambda_drift_init": 2.0,
+    "rules": [
+      {
+        "allowed_roles": [
+          "system",
+          "analyst"
+        ],
+        "description": "Maximum allowed change in posterior probability",
+        "max_delta": 0.1,
+        "requires_approval": false,
+        "variable": "posterior"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Maximum allowed drift correction",
+        "max_delta": 0.15,
+        "requires_approval": false,
+        "variable": "drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Graph stability changes require explicit approval",
+        "max_delta": 0.05,
+        "requires_approval": true,
+        "variable": "graph_stability"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Adaptive drift sensitivity adjustment",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "lambda_drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Adaptive structural sensitivity adjustment",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "gamma_stability"
+      }
+    ],
+    "version": "1.0"
+  },
+  "system_state": {
+    "calibration_model_hash": "",
+    "drift_score": 1.0,
+    "engine_version": "vigia-ebs-v1.0",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability_global": 1.0,
+    "lambda_drift": 2.0,
+    "timestamp": "2026-07-14T22:54:06.115530+00:00"
+  },
+  "timestamp": "2026-07-14T22:54:06.115569+00:00"
+}
