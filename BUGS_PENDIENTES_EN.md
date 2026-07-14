@@ -5743,3 +5743,33 @@ verification retains chain logic but outputs explicit HMAC-absence warning
 directing to `verify_tool_log.py`. Module docstring updated with clear scope.
 Tested: synthetic bundle now correctly returns `overall_status: False`.
 Full suite: 1366 passed, 0 regressions.
+
+---
+
+## B-121 — Bulk removal of 15 confirmed dead-weight files
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P3 (dead weight — repo bloat, confusion potential) |
+| **Detected in** | Module archaeology audit 2026-07-14 |
+
+### Summary
+
+15 files removed in one commit, grouped by reason:
+
+- **3 byte-identical duplicates**: `tests/temporal_forensics_redteam.py`,
+  `vigia/core/forensic_db.py`, `scripts/init_patterns_db.py` — each has a
+  canonical live copy elsewhere.
+- **5 superseded**: `negation_handler.py`, `memory/case_pattern_library.py`,
+  `tools/behavioral_fingerprint.py`, `tools/cross_artifact_resonance.py`,
+  `utils/path_guard.py` — each replaced by a version with real integration.
+- **4 abandoned designs**: `llm_backend_v2.py`, `core/llm_backend.py`,
+  `core/shadow_mode.py` (PROHIBITED), `sift/mft_timeline_analyzer.py` (self-deprecated).
+- **3 legacy artifacts**: `core/vigia_core_forensic_technical_detector.py`,
+  `pipeline/BRIDGE_PATCH_FINAL.py`, `vigia_core.py` (monolith, zero importers).
+
+**NOT removed**: `vigia_case_adapter.py` (has real test caller),
+`geopolitical.py` / `geopolitical_v2.py` (real functionality, preserved).
+
+Full suite: 1366 passed, 0 regressions.

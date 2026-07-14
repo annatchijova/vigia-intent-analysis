@@ -5953,3 +5953,64 @@ signature or timestamp verification occurred.
 - Full suite: 1366 passed, 0 regressions.
 
 ---
+
+## B-121 — Bulk removal of 15 confirmed dead-weight files (duplicates, superseded, prohibited, legacy monolith)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P3 (dead weight — no active risk, but repo bloat and confusion potential) |
+| **Detectado en** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`) |
+
+### Files removed (15)
+
+**Byte-identical duplicates (3):**
+
+| Removed | Canonical copy (live) |
+|---------|----------------------|
+| `tests/temporal_forensics_redteam.py` | `vigia/forensics/temporal_forensics_redteam.py` |
+| `vigia/core/forensic_db.py` | `vigia/tools/forensic_db.py` |
+| `scripts/init_patterns_db.py` | `vigia/tools/init_patterns_db.py` (invoked by CI) |
+
+**Superseded by newer version with real integration (5):**
+
+| Removed | Superseded by |
+|---------|---------------|
+| `vigia/core/negation_handler.py` | `_detect_negation()` inline in `semiotic_detector_v2.py` |
+| `vigia/memory/case_pattern_library.py` | `vigia/inference/case_pattern_library.py` |
+| `vigia/tools/behavioral_fingerprint.py` | `vigia/inference/behavioral_fingerprint.py` |
+| `vigia/tools/cross_artifact_resonance.py` | `vigia/inference/cross_artifact_resonance.py` |
+| `vigia/utils/path_guard.py` | `vigia/core/path_guard.py` (hardened: TOCTOU/flock/symlink) |
+
+**Abandoned designs (4):**
+
+| Removed | Reason |
+|---------|--------|
+| `vigia/llm_backend_v2.py` | Both halves orphaned; `reason_with_llm` in bridge supersedes |
+| `vigia/core/llm_backend.py` | Same — `pre_release_check.py` marks DEPRECATED |
+| `vigia/core/shadow_mode.py` | Explicitly PROHIBITED in `pre_release_check.py` BANNED_MODULES |
+| `vigia/sift/mft_timeline_analyzer.py` | Self-declared shim: "DEPRECATED: use disk_forensics.MFTTimelineAnalyzer" |
+
+**Legacy artifacts (3):**
+
+| Removed | Reason |
+|---------|--------|
+| `vigia/core/vigia_core_forensic_technical_detector.py` | Fragment of monolith, DEPRECATED in `pre_release_check.py` |
+| `vigia/pipeline/BRIDGE_PATCH_FINAL.py` | Patch instructions already applied to bridge, historical note |
+| `vigia/vigia_core.py` | Legacy monolith (202 lines), zero importers in entire repo |
+
+### NOT removed
+
+- `vigia/tools/vigia_case_adapter.py` — has a real caller via subprocess in
+  `tests/unit/test_m4_floor.py:41`. Cannot be deleted without fixing that test.
+- `vigia/tools/geopolitical.py` and `vigia/core/geopolitical_v2.py` — real
+  functionality (APT attribution / false flag detection), disconnected from
+  production but preserved as pending-to-wire capability.
+
+### Verification
+
+- Zero callers confirmed for all 15 files (grep across entire repo)
+- 3 duplicate pairs confirmed byte-identical (diff)
+- Full suite: 1366 passed, 0 regressions
+
+---
