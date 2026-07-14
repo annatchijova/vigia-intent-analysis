@@ -580,6 +580,19 @@ Generate a sealed ForensicBundle and Amicus Curiae narrative.
 
 ![Claude Code investigation in progress](screenshots/claudeinicio.png)
 
+> **No Anthropic API key required.** Mode 2 works with a Claude Code Pro or Max
+> subscription — no separate `ANTHROPIC_API_KEY` needed. Claude Code reads
+> `CLAUDE.md`, calls the 21 MCP tools directly, and conducts the full Peircean
+> investigation interactively. The deterministic scoring core runs locally
+> (Mode 1 under the hood); Claude provides the narrative layer, audit trail
+> generation, Amicus Curiae reports, and interactive reasoning — but never
+> touches the sealed verdict. When `reason_with_llm` is called, it falls back
+> gracefully (FALLBACK mode) since the Anthropic API subprocess is not
+> available in the Claude Code session — this is documented as L-055 and does
+> not affect the deterministic verdict. Complete forensic reports, CRONOS audit
+> trails, and sealed bundles are fully producible in this mode. See
+> `results/kiwi/` and `cronos/` for examples of Mode 2 output.
+
 ---
 
 ### Mode 3 — Ollama (local LLM, no data leaves the machine)

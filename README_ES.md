@@ -582,6 +582,21 @@ Genera un ForensicBundle sellado y una narrativa Amicus Curiae.
 
 ![Investigación de Claude Code en progreso](screenshots/claudeinicio.png)
 
+> **No se necesita API key de Anthropic.** El Modo 2 funciona con una
+> suscripcion Claude Code Pro o Max — no hace falta un `ANTHROPIC_API_KEY`
+> separado. Claude Code lee `CLAUDE.md`, llama a las 21 herramientas MCP
+> directamente y conduce la investigacion peirciana completa de forma
+> interactiva. El motor deterministico de scoring corre localmente (Modo 1
+> internamente); Claude aporta la capa narrativa, la generacion de audit
+> trails, reportes Amicus Curiae y razonamiento interactivo — pero nunca toca
+> el veredicto sellado. Cuando se llama a `reason_with_llm`, degrada
+> gracefully (modo FALLBACK) porque el subproceso de la API de Anthropic no
+> esta disponible dentro de la sesion de Claude Code — esto esta documentado
+> como L-055 y no afecta el veredicto deterministico. Reportes forenses
+> completos, audit trails CRONOS y bundles sellados son completamente
+> producibles en este modo. Ver `results/kiwi/` y `cronos/` para ejemplos
+> de output del Modo 2.
+
 ---
 
 ### Modo 3 — Ollama (LLM local, ningún dato sale de la máquina)
