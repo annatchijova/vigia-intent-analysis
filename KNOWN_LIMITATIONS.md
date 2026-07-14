@@ -2507,21 +2507,50 @@ AND NO internal corroboration detected
 THEN motor_verdict = max(motor_verdict, SUSPICION)
 ```
 
-### Status and next steps
+### Status — B-126 implementation (2026-07-14)
 
-1. The naive gate is **not safe** — 3 regressions vs 2 fixes.
-2. The refined gate (with exculpatory/prior_trust/corroboration
-   checks) is **plausible** but has not been implemented or
-   dry-run against the full corpus.
-3. This is documented as a known limitation, not a system defect.
-   The CAIE pipeline is working as designed. The tension is between
-   structural forensics (CAIE) and pragmatic forensics (Grice) for
-   a specific evidence class.
-4. Implementation requires:
-   - Coding the refined gate in `vigia_scorer.py`
-   - Full corpus dry-run (199 cases)
-   - Verification that the refined gate fires ONLY on the intended
-     cases and does not introduce new regressions
-   - Same rigor as B-116/B-123: no wiring without corpus validation
+**Grice v3.2 (vigia_sift_bridge.py):** IMPLEMENTED. The RELATION
+detector was replaced with a phenomenon-based bilingual (EN+ES)
+detector with four features: factual_impossibility, quantity_asymmetry,
+evidence_withholding, fundamental_ignorance. Threshold=25 (Daubert:
+single phenomenon insufficient). Tiered adj_density (>=10% -> 30).
+Validated against 9 test cases (5 known + 4 adversarial) and 199-case
+corpus (0 regressions). Iteration history: v2.1 (English-only, phrase
+memorization) -> v3 (phenomenon patterns) -> v3.1 (negation fix) ->
+v3.2 (bilingual, EN/ES bug fixed). Commit `2d599b65`.
+
+**Scorer testimony gate (vigia_scorer.py):** IMPLEMENTED as defense
+in depth. Fires only when: verdict=NOISE AND testimony-only AND no
+exculpatory artifacts AND max(prior_trust)<0.30 AND Grice=SUSPICION.
+Currently only active in Mode 2/3 (interactive) where Grice results
+are available in the case data.
+
+**Threshold=25 deliberate non-fires:** ADV-002 (quantity asymmetry
+alone, score=20) and ADV-004 (evidence withholding alone, score=20)
+deliberately stay below threshold. A single evasion phenomenon
+without corroboration is INFERRED, not SUSPICION. This is consistent
+with Daubert corroboration requirements. These 2 cases are documented
+as permanent regression tests — do not lower threshold to capture
+them without re-validating the full corpus.
+
+### Remaining step — pipeline integration (not yet implemented)
+
+The autonomous agent pipeline (`vigia_agent.py`) does not call
+`audit_grice_maxims()` during batch processing. The scorer gate
+reads `grice_verdict` / `grice_deception_probability` from the case
+data, but the pipeline does not produce them. As a result, the batch
+accuracy stays at 185/199, not 187/199.
+
+To close this gap, `vigia_agent.py` needs to:
+
+1. Call `audit_grice_maxims()` inline during autonomous investigation
+2. Persist `grice_verdict` and `grice_deception_probability` in the
+   case data before calling `_vigia_score()`
+3. Decision point: invoke Grice always, or only when CAIE returns
+   NOISE (avoids unnecessary calls for cases already resolved)
+
+This is a pipeline architecture change, not a scorer change. Same
+rigor applies: full test suite + 199-case corpus dry-run before
+wiring. Expected result: 185 -> 187 (KIWI-006, KIWI-007 fixed).
 
 ---
