@@ -5902,3 +5902,54 @@ maximum latent risk. Same deletion criterion as B-118 (signal_contract.py).
 - Full suite: 1366 passed, 0 regressions
 
 ---
+
+## B-120 — `vigia/cli.py` false PASS from unimplemented verification stubs + legacy ledger without HMAC
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P1 (false verification PASS from `pip install -e .` entry point) |
+| **Archivo** | `vigia/cli.py` |
+| **Detectado en** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`) |
+
+### Description
+
+`vigia/cli.py` is the `vigia` entry point registered in `pyproject.toml:69`
+(`vigia = "vigia.cli:main"`). Anyone running `pip install -e .` gets a `vigia`
+command that runs this code.
+
+Three problems:
+
+1. **`verify_signature()` returned `status: True` unconditionally** — no PKI
+   verification was implemented. Any bundle, regardless of signature validity,
+   passed this check.
+2. **`verify_timestamp()` returned `status: True` unconditionally** — no
+   RFC 3161 verification was implemented. Same false PASS.
+3. **`verify_ledger()` uses legacy hash chain without HMAC** — an attacker
+   with write access can rewrite and recompute the entire chain undetected.
+   This is the exact pattern CLAUDE.md says "MUST NOT be used for new
+   investigations."
+
+Because `verify_bundle()` computes `overall_status = all(status for check)`,
+the two false-PASS stubs made the overall result look valid even when no
+signature or timestamp verification occurred.
+
+### Fix applied
+
+1. `verify_signature()`: returns `status: False` with explicit "NOT
+   IMPLEMENTED" note.
+2. `verify_timestamp()`: returns `status: False` with explicit "NOT
+   IMPLEMENTED" note.
+3. `verify_ledger()`: added warning in output clarifying legacy schema
+   without HMAC, directing to `verify_tool_log.py` for new bundles.
+4. Module docstring updated to clearly document what IS and IS NOT verified.
+5. `verify_bundle()` logic unchanged — `all()` now correctly reflects False
+   from the unimplemented checks.
+
+### Verification
+
+- Tested with synthetic bundle: `overall_status` now correctly False (was
+  True before fix with identical bundle).
+- Full suite: 1366 passed, 0 regressions.
+
+---

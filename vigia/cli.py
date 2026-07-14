@@ -1,4 +1,20 @@
-# verifier/cli.py
+# vigia/cli.py — Evidence Bundle Verifier (directory-based manifest format)
+#
+# B-120 (2026-07-14): this is the `vigia` entry point registered in
+# pyproject.toml. It verifies directory-based bundles (manifest.json +
+# ledger.json), NOT the sealed ForensicBundle JSON produced by the pipeline.
+#
+# WHAT THIS VERIFIES:
+#   - File integrity: SHA-256 of each file vs manifest.json declarations
+#   - Ledger chain: prev_hash -> hash chain continuity (legacy schema,
+#     NO HMAC — see warning in verify_ledger)
+#   - Consistency: required files present in manifest
+#
+# WHAT THIS DOES NOT VERIFY:
+#   - PKI signatures (not implemented — returns FAIL, not a false PASS)
+#   - RFC 3161 timestamps (not implemented — returns FAIL, not a false PASS)
+#   - HMAC-protected tool execution chains (use verify_tool_log.py)
+#   - Sealed ForensicBundle integrity (use forensics/verify_ebs_v1.py)
 
 import argparse
 import json
@@ -60,33 +76,48 @@ def verify_manifest(bundle_path: str) -> Dict:
 # ------------------------------------------------------------------
 
 def verify_ledger(bundle_path: str) -> Dict:
+    """Verify ledger hash chain (legacy schema, NO HMAC).
+
+    WARNING: this verifies internal chain consistency only (prev_hash ->
+    hash linkage). It does NOT use HMAC, so an attacker with write access
+    can rewrite and recompute the entire chain undetected. For bundles
+    produced by the current pipeline, use verify_tool_log.py (chain v2
+    with HMAC) instead.
+    """
     ledger_path = os.path.join(bundle_path, "ledger.json")
-    
+
     if not os.path.exists(ledger_path):
         return {"status": False, "error": "ledger missing"}
-    
+
     ledger = load_json(ledger_path)
     prev_hash = "0" * 64
-    
+
     for i, entry in enumerate(ledger):
         data = {
             "timestamp": entry["timestamp"],
             "event": entry["event"],
             "prev_hash": entry["prev_hash"]
         }
-        
+
         serialized = json.dumps(data, sort_keys=True)
         computed = hashlib.sha256(serialized.encode()).hexdigest()
-        
+
         if entry["prev_hash"] != prev_hash:
             return {"status": False, "error": f"broken chain at {i}"}
-        
+
         if entry["hash"] != computed:
             return {"status": False, "error": f"invalid hash at {i}"}
-        
+
         prev_hash = entry["hash"]
-    
-    return {"status": True}
+
+    return {
+        "status": True,
+        "warning": (
+            "Legacy schema (SHA-256 chain without HMAC). An attacker with "
+            "write access can rewrite and recompute this chain undetected. "
+            "For new bundles use verify_tool_log.py (chain v2 with HMAC)."
+        ),
+    }
 
 
 # ------------------------------------------------------------------
@@ -94,21 +125,15 @@ def verify_ledger(bundle_path: str) -> Dict:
 # ------------------------------------------------------------------
 
 def verify_signature(bundle_path: str) -> Dict:
-    manifest = os.path.join(bundle_path, "manifest.json")
-    signature = os.path.join(bundle_path, "manifest.sig")
-    
-    if not os.path.exists(signature):
-        return {"status": False, "error": "signature missing"}
-    
-    # Requiere OpenSSL / DSS / PyKCS11 real en producción
-    # Aquí solo stub controlado
-    
-    # Ejemplo real sería:
-    # openssl cms -verify -in manifest.sig -content manifest.json
-    
+    # B-120: NOT IMPLEMENTED. Previously returned status=True unconditionally,
+    # giving a false PASS to any bundle regardless of signature validity.
     return {
-        "status": True,
-        "note": "signature verification requires external PKI tool"
+        "status": False,
+        "note": (
+            "NOT IMPLEMENTED — requires external PKI tool "
+            "(OpenSSL / DSS / PyKCS11). This check does not verify "
+            "anything; do not treat as PASS."
+        ),
     }
 
 
@@ -117,10 +142,13 @@ def verify_signature(bundle_path: str) -> Dict:
 # ------------------------------------------------------------------
 
 def verify_timestamp(bundle_path: str) -> Dict:
-    # Similar: requiere TSA validation real
+    # B-120: NOT IMPLEMENTED. Previously returned status=True unconditionally.
     return {
-        "status": True,
-        "note": "timestamp validation requires RFC3161 verification"
+        "status": False,
+        "note": (
+            "NOT IMPLEMENTED — requires RFC 3161 verification. "
+            "This check does not verify anything; do not treat as PASS."
+        ),
     }
 
 

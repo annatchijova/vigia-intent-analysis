@@ -5715,3 +5715,31 @@ semiotic detection (fail-open, no error). Deleted — same criterion as B-118.
 ### Verification
 
 - Zero callers, full suite 1366 passed, 0 regressions.
+
+---
+
+## B-120 — `vigia/cli.py` false PASS from unimplemented verification stubs + legacy ledger without HMAC
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 (false verification PASS from `pip install -e .` entry point) |
+| **File** | `vigia/cli.py` |
+| **Detected in** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`) |
+
+### Description
+
+`vigia/cli.py` is the `vigia` entry point in `pyproject.toml`. `verify_signature()`
+and `verify_timestamp()` returned `status: True` unconditionally — no actual
+verification implemented. `verify_ledger()` uses legacy SHA-256 chain without HMAC
+(recomputable by attacker with write access). `verify_bundle()` computed
+`overall_status = all(...)` including the false-PASS stubs, making bundles look
+valid without real verification.
+
+### Fix applied
+
+Both stubs now return `status: False` with "NOT IMPLEMENTED" notes. Ledger
+verification retains chain logic but outputs explicit HMAC-absence warning
+directing to `verify_tool_log.py`. Module docstring updated with clear scope.
+Tested: synthetic bundle now correctly returns `overall_status: False`.
+Full suite: 1366 passed, 0 regressions.
