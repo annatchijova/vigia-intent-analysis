@@ -642,7 +642,8 @@ python3 vigia_agent.py --evidence /evidence/memory.raw --case-id CASE-001
 - Salida: bundle JSON intermedio de señales para la Fase 2
 
 Este modo fue utilizado para procesar el corpus real (casos de hasta 16 GB disco /
-9 GB memoria) en hardware de consumo (ThinkPad T420, Linux Mint).
+9 GB memoria) en hardware de consumo (ThinkPad T420, Linux Mint). Post-presentación,
+VIGÍA también fue validado sobre conjuntos de evidencia raw de 45 GB y 65 GB.
 
 **Fase 2 — Puntuación Determinista de Intencionalidad (CLI)**
 

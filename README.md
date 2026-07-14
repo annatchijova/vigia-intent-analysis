@@ -640,7 +640,8 @@ python3 vigia_agent.py --evidence /evidence/memory.raw --case-id CASE-001
 - Output: intermediate JSON signal bundle for Phase 2
 
 This mode was used to process the real corpus (cases up to 16 GB disk /
-9 GB memory) on commodity hardware (ThinkPad T420, Linux Mint).
+9 GB memory) on commodity hardware (ThinkPad T420, Linux Mint). Post-submission,
+VIGÍA has also been validated on raw evidence sets of 45 GB and 65 GB.
 
 **Phase 2 — Deterministic Intent Scoring (CLI)**
 
