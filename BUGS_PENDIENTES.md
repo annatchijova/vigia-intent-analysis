@@ -6262,3 +6262,133 @@ was deferred to avoid confusion with the actively-patched file.
 - Full suite: 1366 passed, 0 regressions
 
 ---
+
+## B-126 — Grice v3.2 phenomenon-based detector + scorer testimony gate [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P1 (2 casos del corpus corregidos: KIWI-006, KIWI-007) |
+| **Archivos** | `vigia/vigia_sift_bridge.py` (Grice v3.2), `vigia_scorer.py` (gate), `sift_orchestrator.py` (B-127 pipeline injection) |
+| **Detectado en** | Mode 2 blind re-run 2026-07-14 |
+
+### Description
+
+The Grice RELATION detector v1 was a near-constant: it used a 15-keyword
+topic list that fired on ~100% of natural-language testimony with zero
+discriminating power. Replaced with v3.2 phenomenon-based bilingual
+(EN+ES) detector with four linguistic features: factual_impossibility,
+quantity_asymmetry, evidence_withholding, fundamental_ignorance.
+
+Threshold=25 (Daubert: single phenomenon insufficient). Tiered
+adj_density (>=10% -> weight 30) to preserve Carnegie urgency detection.
+
+Scorer gate (defense in depth): fires only when verdict=NOISE AND
+testimony-only AND no exculpatory artifacts AND max(prior_trust)<=0.30
+AND Grice=SUSPICION.
+
+### Iteration history
+
+v2.1 (English-only, phrase memorization) -> v3 (phenomenon patterns) ->
+v3.1 (negation fix) -> v3.2 (bilingual EN/ES bug fixed). Each iteration
+validated against adversarial cases + full corpus.
+
+### Verification
+
+- 1365 tests passed, 0 regressions
+- Corpus: 185/199 -> 187/199 (+2 FIX, 0 regressions)
+- CRONOS traces: 6b81f266, 3b11e32e
+
+---
+
+## B-127 — Pipeline integration for Grice testimony gate [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P2 (enables B-126 to fire in autonomous batch mode) |
+| **Archivos** | `sift_orchestrator.py`, `vigia_scorer.py` (prior_trust boundary fix) |
+| **Detectado en** | B-126 dry-run showed gate inactive in batch (no grice_verdict in case data) |
+
+### Description
+
+`sift_orchestrator.py::_resolve_hypothesis()` now calls
+`audit_grice_maxims()` conditionally before `_vigia_score()` for
+testimony-only cases without exculpatory artifacts. Also fixed
+prior_trust boundary from `< 0.30` to `<= 0.30` (KIWI-007 has
+prior_trust=0.30 on the panic button artifact).
+
+### Verification
+
+- Dry-run: +2 FIX (KIWI-006, KIWI-007), 0 regressions from B-127
+- 9 pre-existing MALICE->SUSPICION divergences confirmed unrelated
+- Batch regenerated: 187/199 PASS, 12 FAIL (full 199 cases)
+
+---
+
+## B-128 — Delete dead duplicate vigia/core/semiotic_detector.py [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P3 (dead duplicate with pre-hardening code) |
+| **Archivo** | `vigia/core/semiotic_detector.py` (DELETED) |
+| **Detectado en** | Verification audit 2026-07-14 |
+
+### Description
+
+Orphan copy of semiotic_detector_v2.py (v2.1, pre-hardening). Header
+says 'semiotic_detector_v2.py' but file named without _v2. Missing
+NEGATION_STRONG, _sanitize_text — known vulnerabilities already fixed
+in the live v2.2. Zero callers confirmed. Same pattern as B-125a.
+
+---
+
+## B-129 — PeircePlanner bounded: Fase 1 observation adapter [PENDIENTE Fase 2]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | FASE 1 COMPLETADA — pendiente Fase 2 (calibracion) y Fase 3 (integracion) |
+| **Severidad** | P3 (no afecta veredictos, modulo de observacion) |
+| **Archivos** | `vigia/core/planner_adapter.py` (nuevo), `vigia/core/peirceplanner_bounded.py` (existente) |
+| **Detectado en** | Investigation 2026-07-14 |
+
+### Description
+
+Adapter that translates VIGIA case artifacts into EvidenceSignal and
+Hypothesis objects for run_bounded_planner(). Output is observation-only
+— does NOT feed the scorer or verdict path.
+
+### Investigation findings
+
+1. AbductiveIntentEngine (vigia/inference/) is partially wired (L-027)
+   but its HYPOTHESIS_TEMPLATES require MITRE artifact names that real
+   cases do not have. Translation layer never written.
+2. peirceplanner_bounded and AbductiveIntentEngine are compatible with
+   a ~15 line adapter (cost:int -> ockham_cost:Fraction).
+3. Both share the same unwired gap (L-027).
+
+### Observation baseline (198/199 cases)
+
+- Agreement with scorer: 22% (44 cases) — severely miscalibrated
+- Under-alerts (planner NOISE, scorer SUSPICION+): 90 cases
+- Root cause: confidence-as-weight is wrong indicator (measures
+  certainty, not anomaly severity). z_score or raw_score better.
+
+### Pending (Fase 2 — calibration, NOT before 2026-08-14)
+
+1. Calibrate weight: experiment with z_score, raw_score * (1 - spoofability),
+   or a composite
+2. Resolve L-027 or bypass with generic hypotheses (not MITRE-specific)
+3. Re-run against corpus, target >70% agreement before considering Fase 3
+4. 30-day observation period before any gate that moves verdicts
+
+### Pending (Fase 3 — integration, NOT before Fase 2 validated)
+
+1. Architecture decision: parallel signal (like Grice gate) vs replacement
+   of classify_agent_verdict vs scorer factor
+2. Full corpus dry-run with same rigor as B-126/B-127
+3. Oscillation detection is the primary value-add (ABSTAIN for
+   contradictory evidence) — focus integration design on that
+
+---
