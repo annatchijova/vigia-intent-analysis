@@ -5692,3 +5692,26 @@ existence was a latent re-infection risk — any new import of `signal_contract`
 from `vigia.core` would silently get the wrong module. Regression guard
 `tests/test_eml_import_regression.py` passes 3/3 after deletion. Full suite:
 1366 passed, 0 regressions.
+
+---
+
+## B-119 — `vigia/core/vigia_core_semiotic_detector.py` fail-open stub deleted
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 (fail-open stub — silent false-negative if wired by accident) |
+| **File** | `vigia/core/vigia_core_semiotic_detector.py` (DELETED) |
+| **Detected in** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`) |
+
+### Description
+
+4-line stub: `SemioticDetectorV2.analyze()` unconditionally returned
+`{"alert_level": "NORMAL"}`. Zero callers. The real detector is
+`vigia/core/semiotic_detector_v2.py`. The shared class name made this
+uniquely dangerous: importing from the wrong path would silently disable
+semiotic detection (fail-open, no error). Deleted — same criterion as B-118.
+
+### Verification
+
+- Zero callers, full suite 1366 passed, 0 regressions.

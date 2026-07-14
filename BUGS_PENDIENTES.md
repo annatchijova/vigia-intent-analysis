@@ -5866,3 +5866,39 @@ remains in place and passes (3/3) after deletion.
 - Full suite — 1366 passed, 0 regressions
 
 ---
+
+## B-119 — `vigia/core/vigia_core_semiotic_detector.py` fail-open stub deleted
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P2 (fail-open stub — silent false-negative if wired by accident) |
+| **Archivo** | `vigia/core/vigia_core_semiotic_detector.py` (DELETED) |
+| **Detectado en** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`) |
+
+### Description
+
+4-line stub: `SemioticDetectorV2.analyze()` unconditionally returned
+`{"alert_level": "NORMAL", ...}` — a hardcoded no-op. Zero callers in the
+codebase. Already marked DEPRECATED in `pre_release_check.py`.
+
+The real semiotic detector lives in `vigia/core/semiotic_detector_v2.py` (the
+canonical version with pattern matching, FSV computation, and forensic DB
+lookup). The stub shared the class name `SemioticDetectorV2`, making it
+uniquely dangerous: if any module imported from the wrong path, the entire
+semiotic detection layer would silently return NORMAL for all inputs —
+fail-open, no error, no warning.
+
+### Why deleted
+
+Unlike unused-but-harmless modules, this file's danger IS its existence.
+A stub that always says "nothing to see here" is strictly worse than a missing
+file (which would at least raise ImportError). Zero callers, zero value,
+maximum latent risk. Same deletion criterion as B-118 (signal_contract.py).
+
+### Verification
+
+- Zero callers confirmed (`grep -rn` excluding pre_release_check and tests)
+- Full suite: 1366 passed, 0 regressions
+
+---
