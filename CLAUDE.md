@@ -50,6 +50,9 @@ directly. The MCP server name is `Vigia_Sift_Bridge`.
 In **Ollama mode**, the LLM backend resolves to the configured local model
 (`hermes3:8b`, `deepseek-r1:8b`, or `gemma3:27b`). Capabilities are equivalent but
 `reason_with_llm` calls the local endpoint instead of the Anthropic API.
+**L-057:** `hermes3:8b` exhibits stochastic reliability failures (empty or malformed
+responses under load). If `reason_with_llm` returns empty in Ollama mode, retry once;
+on second failure, treat as FALLBACK and document the gap.
 
 In **FALLBACK mode** (no LLM backend available), `reason_with_llm` will return an error.
 Deterministic tools remain fully operational. Document this as a known limitation, not
@@ -117,7 +120,7 @@ All 21 tools are exposed by `Vigia_Sift_Bridge`. Tool names use underscores.
 |------|---------|
 | `infer_intent` | **Primary Peirce inference engine.** Analyzes the full trajectory of evidence to infer real intent. Apply to every artifact that showed anomalies in Phase 2. |
 | `detect_eco_overinterpretation` | Detect when evidence is **too perfect** — a sign of fabrication or false-flag staging. |
-| `audit_grice_maxims` | Analyze text for violations of Grice's 4 maxims (quantity, quality, relation, manner). Deceptive text systematically violates at least one. |
+| `audit_grice_maxims` | Analyze text for violations of Grice's 4 maxims (quantity, quality, relation, manner). Deceptive text systematically violates at least one. **v3.2 (B-126):** phenomenon-based detector, bilingual EN+ES, 4 features: factual_impossibility, quantity_asymmetry, evidence_withholding, fundamental_ignorance. Auto-invoked in the autonomous pipeline (`sift_orchestrator._resolve_hypothesis`) for testimony-only cases — call explicitly for other text artifacts. |
 | `analyze_stylometry` | Determine whether multiple accounts or documents share a common author. Attribution forensics. |
 | `calculate_human_entropy` | Quantify whether a sequence of actions has human timing variance or scripted regularity. |
 | `detect_human_jitter` | Timing forensics. Scripted automation produces sub-millisecond regularity humans cannot replicate. |
@@ -155,7 +158,7 @@ part of the deterministic core.
 | `analyze_image_layers` | `vigia.tools.document_integrity` | always (if module present) |
 | `detect_document_geometry` | `vigia.tools.document_integrity` | always (if module present) |
 | `ocr_semantic_validator` | `vigia.tools.document_integrity` | always (if module present) |
-| `vision_intent_audit` | `vigia.tools.vision_audit` | always (if module present) |
+| `vision_intent_audit` | `vigia.tools.vision_audit` | always (if module present) — **B-114:** now runs real CLIP inference; requires GPU + CLIP model loaded. Was silently broken before B-114. |
 | `cross_artifact_analysis` | `vigia.tools.caie` | `VIGIA_CAIE_ENABLED` |
 | `trust_fusion_analysis` | `vigia.core.trust_fusion` | `VIGIA_TRUST_FUSION_ENABLED` |
 | `analyze_document_register` | `vigia.tools.adversarial_nlp` | `VIGIA_NLP_ENABLED` |
@@ -289,6 +292,12 @@ verdicts it does emit.
 | `INTENT` | Evidence that deliberate decisions were made to produce this outcome | Two independent sources + Refutation Protocol |
 | `MALICE` | Active concealment of intent — the attacker is hiding that they are hiding | Two independent sources + Refutation Protocol + `devil_advocate` populated |
 | `ABSTAIN` | Insufficient evidence for classification | Document gap explicitly as a limitation |
+
+**Mode 1 (`vigia_agent.py`) has no INTENT rung in its deterministic motor** — borderline
+cases that would qualify as INTENT are capped at SUSPICION by the scoring pipeline.
+Mode 2 (Claude Code, this file) can and should emit INTENT when the Refutation Protocol
+and two-source corroboration are met. ABSTAIN in Mode 1 now produces an `INDETERMINATE`
+alert level (not HIGH/MEDIUM/LOW) — introduced in B-100/B-101 (ABSTAIN_V2).
 
 **The distinction between INTENT and MALICE is the concealment layer.**
 A mistake can produce INTENT signatures. Only deliberate anti-forensics
@@ -427,7 +436,7 @@ rather than duplicating their content here:
 |----------|---------|
 | `README.md` | Authoritative description of the five deployment modes and corpus accuracy. |
 | `INSTALL.md` | Setup and installation guide (English; `INSTALL_ES.md` for Spanish). |
-| `KNOWN_LIMITATIONS.md` | Documented limitations L-001..L-030 — required reading for Daubert scope. |
+| `KNOWN_LIMITATIONS.md` | Documented limitations L-001..L-058 — required reading for Daubert scope. |
 | `SUBMISSION_COMPLIANCE.md` | SANS submission compliance checklist. |
 | `SECURITY.md` | Security policy and hardening notes. |
 | `docs/ENGINEERING_DISCIPLINE.md` | Development-discipline guide for any agent working *on* this code (abductive method, git hygiene, surgical patching, determinism invariants). Distinct from this runtime manual — that file governs the engineer, this one governs VIGÍA's investigative behavior. Do not conflate them. |
