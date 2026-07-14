@@ -147,6 +147,34 @@ correct Daubert posture. The ABSTAIN result is preserved in
 `results/VIGIA-REAL-VANKO-2026-v2_bundle.json` as evidence of honest
 calibration.
 
+### Mode 2 interactive confirmation (2026-07-14)
+
+Both corrected cases were also investigated in **Mode 2 (Claude Code + MCP
+interactive)** with the full Peircean protocol (Firstness/Secondness/Thirdness +
+Eco's Razor mandatory refutation) and independent CRONOS traces. Results:
+
+| Case | Mode 2 verdict | Confidence | CRONOS trace | Chain |
+|------|----------------|------------|--------------|-------|
+| VIGIA-REAL-VANKO-CORRECTED | MALICE | 17/20 (85%) | `0ff8668d-1bc2-4cc8-abce-54fc225c1f86` | OK |
+| VIGIA-REAL-NINA | MALICE | 17/20 (85%) | `46d19100-45f1-4123-94b8-8d0c48707a78` | OK |
+
+Both verdicts agree with the deterministic engine (Mode 1). Full comparative
+summary: `cronos/cronos_C001_modo2_comparativo_Claude_julio_2026-07-14.md`.
+CRONOS audit trails saved to Desktop as `cronos_audit_VANKO-CORRECTED_Claude_julio_2026-07-14.md`
+and `cronos_audit_NINA_Claude_julio_2026-07-14.md`.
+
+Key MALICE differentiators confirmed in Mode 2:
+- **VANKO-CORRECTED:** SDelete on Level 7-8 Classified server directories post-extraction
+  (istat Allocated=0/Actual=0) — destruction of evidence, not mere exfiltration.
+  Attributed to PC User account (not defaultprinter), refuting the Nina-planted argument.
+- **NINA:** `security.evtx` copied to defaultprinter profile — Nina actively reviewed
+  her own Windows Security Event Log traces (deliberate concealment). Corroborated by
+  `7-8-USB-Analysis.pptx` (operational anti-detection reference material).
+
+Known limitation: `validate_and_correct_analysis` Ollama backend degraded during Nina
+investigation. Structural self-correction applied manually (4 Peirce checks passed).
+Documented per Daubert honest-degradation posture.
+
 ---
 
 *This file tracks corrections to case ground truth, not code defects.
