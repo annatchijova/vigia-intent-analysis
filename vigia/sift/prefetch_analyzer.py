@@ -23,10 +23,32 @@ from vigia.core.chain_of_custody import ChainOfCustody
 TOOL_NAME = "PREFETCH_ANALYZER"
 ARTIFACT_RELIABILITY = Fraction(70, 100)
 
-# Hash de archivos prefetch conocidos por ser borrados en anti-forense
+# LOL-bins y herramientas de hacking cuya ejecución es sospechosa.
+# Ruta: suspicious_executions → z=2.5 si >=3 hits, z=1.8 si 1-2 hits.
 ANTI_FORENSIC_PREFETCH_SIGNS = [
     "mimikatz.exe", "psexec.exe", "procdump.exe", "nc.exe", "netcat.exe",
     "rundll32.exe", "regsvr32.exe", "mshta.exe", "certutil.exe",
+]
+
+# B-132: Herramientas de borrado seguro cuya presencia en Prefetch confirma
+# comportamiento anti-forense activo (destrucción de evidencia).
+# Ruta: anti_forensic_deletions → z=3.2 (el z más alto del analyzer).
+# Separadas de ANTI_FORENSIC_PREFETCH_SIGNS porque rundll32/regsvr32 están
+# en entornos benignos; sdelete en Prefetch NO tiene justificación forense
+# legítima en un caso de exfiltración.
+ANTI_FORENSIC_TOOL_EXECUTION_SIGNS = [
+    "sdelete.exe",    # Sysinternals SDelete: borrado seguro de archivos — destrucción de evidencia
+    "sdelete64.exe",  # Variante 64-bit del mismo
+]
+
+# B-132: Herramientas especializadas que indican reconocimiento o exfiltración.
+# Ruta: suspicious_executions → mismo z que ANTI_FORENSIC_PREFETCH_SIGNS.
+SUSPICIOUS_TOOL_SIGNS = [
+    "smallftpd.exe",                  # Servidor FTP no autorizado — vector de exfiltración
+    "netstumbler.exe",                # Herramienta de war-driving WiFi — reconocimiento de red
+    "netstumblerinstaller_0_4_0 (1",  # Instalador de NetStumbler (nombre extraído del stem .pf)
+    "veracrypt format.exe",           # Creación de volumen VeraCrypt — posible ocultamiento (con espacio)
+    "veracrypt.exe",                  # Ejecutable principal de VeraCrypt
 ]
 
 
@@ -96,6 +118,10 @@ class PrefetchAnalyzer:
 
     def __init__(self):
         self._suspicious_names = {n.lower() for n in ANTI_FORENSIC_PREFETCH_SIGNS}
+        # B-132: herramientas de borrado seguro → anti_forensic_deletions → z=3.2
+        self._anti_forensic_exec_names = {n.lower() for n in ANTI_FORENSIC_TOOL_EXECUTION_SIGNS}
+        # B-132: herramientas especializadas sospechosas → suspicious_executions
+        self._suspicious_tool_names = {n.lower() for n in SUSPICIOUS_TOOL_SIGNS}
 
     def analyze_directory(
         self,
@@ -126,7 +152,17 @@ class PrefetchAnalyzer:
                 # el análisis como parcial en vez de "0 hallazgos = limpio".
                 unparsed += 1
                 continue
-            if record.filename.lower() in self._suspicious_names:
+            name_lower = record.filename.lower()
+            if name_lower in self._anti_forensic_exec_names:
+                # B-132: herramienta de borrado seguro → anti_forensic bucket → z=3.2
+                anti_forensic.append({
+                    "type": "ANTI_FORENSIC_TOOL_EXECUTION",
+                    "filename": record.filename,
+                    "run_count": record.run_count,
+                    "last_execution": record.last_execution_time,
+                    "severity": str(Fraction(90, 100)),
+                })
+            elif name_lower in self._suspicious_names or name_lower in self._suspicious_tool_names:
                 suspicious.append({
                     "type": "SUSPICIOUS_EXECUTION",
                     "filename": record.filename,

@@ -6533,3 +6533,108 @@ PREFETCH_ANALYZER) es **comportamiento correcto**, no un bug. El examinador pas�
 el trust correspondiente según NIST SP 800-86. El sistema funciona como fue diseñado.
 
 ---
+
+## B-132 — PREFETCH_ANALYZER lista anti-forense incompleta: sdelete.exe no reconocido [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P1 (herramienta anti-forense activa no detectada → z sub-óptimo → contribuyó al ABSTAIN de VIGIA-REAL-VANKO-2026) |
+| **Archivo** | `vigia/sift/prefetch_analyzer.py` |
+| **Detectado en** | VIGIA-REAL-VANKO-2026 corrida RAW 2026-07-14 |
+| **Commit fix** | ver commit "POST HACKATHON: fix B-132 — prefetch anti-forensic calibration..." |
+
+### Descripción
+
+`PrefetchAnalyzer` tenía una sola lista de herramientas sospechosas
+(`ANTI_FORENSIC_PREFETCH_SIGNS`) que contenía LOL-bins genéricos (rundll32, regsvr32,
+mshta, certutil) más herramientas de hacking conocidas (mimikatz, psexec, procdump).
+Esta lista **no incluía** herramientas específicas del caso Vanko:
+
+| Herramienta encontrada en prepared/prefetch/ | En lista antes del fix | Ruta correcta |
+|------|------|------|
+| `SDELETE.EXE` (borrado seguro — destrucción de evidencia) | NO | `anti_forensic_deletions` → z=3.2 |
+| `SMALLFTPD.EXE` (servidor FTP — vector de exfiltración) | NO | `suspicious_executions` → z=2.5 |
+| `NETSTUMBLER.EXE` (war-driving WiFi — reconocimiento) | NO | `suspicious_executions` → z=2.5 |
+| `VERACRYPT FORMAT.EXE` (cifrado de volúmenes — ocultamiento) | NO | `suspicious_executions` → z=2.5 |
+
+Consecuencia: el analizador producía z=1.75 (post-gamma) basado únicamente en 34 hits
+de RUNDLL32.EXE genérico. Con sdelete correctamente rutado a `anti_forensic_deletions`,
+z pre-gamma sube de 2.5 a 3.2 → post-gamma estimado ~2.24 (cruza umbral z>2).
+
+### Causa raíz (Peircean)
+
+- **Firstness:** `PREFETCH_ANALYZER z=1.75`, `anti_forensic_count=0` pese a que
+  `SDELETE.EXE-FBA93810.pf` existía en `prepared/prefetch/`.
+- **Secondness:** Las tres herramientas clave (`SDELETE.EXE`, `SMALLFTPD.EXE`,
+  `NETSTUMBLER.EXE`) no estaban en ninguna lista del analizador. La detección de
+  `anti_forensic_deletions` solo cubría PREFETCH_WIPE (menos de 10 archivos .pf
+  totales) — no la presencia de herramientas de borrado seguro.
+- **Thirdness:** Lista calibrada para casos genéricos de malware LOL-bin, no para
+  casos de insider threat con herramientas específicas de exfiltración/reconocimiento.
+
+### Fix aplicado
+
+Tres listas separadas con routing diferenciado:
+
+1. **`ANTI_FORENSIC_PREFETCH_SIGNS`** (sin cambios) — LOL-bins → `suspicious_executions`
+2. **`ANTI_FORENSIC_TOOL_EXECUTION_SIGNS`** (nueva) — herramientas de borrado seguro →
+   `anti_forensic_deletions` → z=3.2:
+   - `"sdelete.exe"`, `"sdelete64.exe"`
+3. **`SUSPICIOUS_TOOL_SIGNS`** (nueva) — herramientas especializadas →
+   `suspicious_executions`:
+   - `"smallftpd.exe"`, `"netstumbler.exe"`,
+     `"netstumblerinstaller_0_4_0 (1"`, `"veracrypt format.exe"`, `"veracrypt.exe"`
+
+En el loop de detección: guard `_anti_forensic_exec_names` tiene precedencia sobre
+`_suspicious_names | _suspicious_tool_names` para evitar doble-conteo.
+
+### Tests de regresión agregados (8 nuevos tests)
+
+`tests/test_prefetch_real.py::TestB132CalibrationFix`:
+
+- `test_sdelete_goes_to_anti_forensic_not_suspicious` — sdelete en `anti_forensic_deletions`, NO en `suspicious_executions`
+- `test_sdelete_triggers_z32_path` — `to_signal()` produce z=3.2 cuando sdelete está presente
+- `test_sdelete64_also_anti_forensic` — variante 64-bit también detectada
+- `test_smallftpd_goes_to_suspicious` — smallftpd en `suspicious_executions`
+- `test_netstumbler_goes_to_suspicious` — netstumbler en `suspicious_executions`
+- `test_veracrypt_format_goes_to_suspicious` — veracrypt format.exe (con espacio) en `suspicious_executions`
+- `test_existing_mimikatz_still_in_suspicious` — regresión: mimikatz sigue en `suspicious_executions`
+- `test_finding_type_in_metadata` — `finding_types` incluye ambos tipos cuando ambos disparan
+
+Suite completa: **1376 passed, 0 failures** (vs 1368 antes del fix = +8 nuevos tests).
+
+### Artefacto faltante en prepared/ — también corregido
+
+`smallftpd-1.0.3-fix.lnk` existía en `cylr_extracted/.../Recent/` pero no había sido
+copiado a `prepared/`. Copiado a `prepared/lnk_files/` como evidencia adicional.
+
+### Gap permanente documentado — transfers.log / ftpd.ini / pcaps WiFi
+
+Los siguientes artefactos **NO existen en la extracción CyLR** ni en el montaje del E01:
+- `transfers.log` — log de transferencias FTP
+- `ftpd.ini` — configuración del servidor FTP con `auto_run=1`
+- WiFi pcaps — capturas de tráfico de red
+
+Estos artefactos aparecen en el bundle del análisis Mode 2 de junio
+(`results/agent_batch/VIGIA-REAL-VANKO_agent_bundle.json`) porque ese análisis
+usó un case JSON pre-construido (`data/cases/converted/VIGIA-REAL-VANKO.json`) con 7
+señales extraídas manualmente del E01 montado con ntfs-3g. **No vinieron del CyLR.**
+
+Para obtenerlos de la extracción CyLR, buscar manualmente en:
+- `cylr_extracted/.../Users/defaultprinter/` — posible ubicación de transfers.log y ftpd.ini
+- `cylr_extracted/.../Users/PC User/` — posible ubicación alternativa
+
+O extraerlos directamente del E01 con SIFT en una sesión separada.
+
+### Comparación de veredictos — dos bundles preservados
+
+| Bundle | Artefactos | PREFETCH z | Veredicto |
+|--------|-----------|------------|-----------|
+| `results/VIGIA-REAL-VANKO-2026_bundle.json` | Solo CyLR: registro, event logs, prefetch (sin sdelete detectado) | 1.75 (post-gamma) | **ABSTAIN** (CCS 1/2) |
+| `results/VIGIA-REAL-VANKO-2026-v2_bundle.json` | CyLR + fix B-132 + LNK copiado | ~2.24 estimado (post-gamma) | _pendiente re-corrida_ |
+
+El bundle ABSTAIN se preserva deliberadamente: demuestra que el motor sabe abstenerse
+genuinamente en vez de alucinar un veredicto cuando la evidencia es insuficiente.
+
+---

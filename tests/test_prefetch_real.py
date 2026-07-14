@@ -81,6 +81,89 @@ class TestFormatAcceptance:
         assert r.to_signal().metadata["unanalyzed"] is False
 
 
+class TestB132CalibrationFix:
+    """B-132: sdelete → anti_forensic_deletions (z=3.2); smallftpd/netstumbler/
+    veracrypt → suspicious_executions.  Confirmed missing from lists in
+    VIGIA-REAL-VANKO-2026 corrida RAW 2026-07-14, causing PREFETCH_ANALYZER
+    to miss anti-forensic evidence and contributing to ABSTAIN verdict."""
+
+    def test_sdelete_goes_to_anti_forensic_not_suspicious(self, tmp_path):
+        # sdelete.exe must route to anti_forensic_deletions (z=3.2 path),
+        # NOT suspicious_executions (which was already saturated with RUNDLL32 hits).
+        _scca(tmp_path, "SDELETE.EXE-FBA93810.pf")
+        for i in range(12):  # avoid PREFETCH_WIPE heuristic
+            _scca(tmp_path, f"BENIGN{i}.EXE-{i:08X}.pf")
+        r = PrefetchAnalyzer().analyze_directory(str(tmp_path))
+        af_names = [a["filename"].lower() for a in r.anti_forensic_deletions]
+        susp_names = [s["filename"].lower() for s in r.suspicious_executions]
+        assert "sdelete.exe" in af_names, "sdelete must be in anti_forensic_deletions"
+        assert "sdelete.exe" not in susp_names, "sdelete must NOT double-count in suspicious"
+        assert any(a["type"] == "ANTI_FORENSIC_TOOL_EXECUTION" for a in r.anti_forensic_deletions)
+
+    def test_sdelete_triggers_z32_path(self, tmp_path):
+        # anti_forensic_deletions non-empty → to_signal() must emit z=3.2
+        _scca(tmp_path, "SDELETE.EXE-FBA93810.pf")
+        for i in range(12):
+            _scca(tmp_path, f"BENIGN{i}.EXE-{i:08X}.pf")
+        r = PrefetchAnalyzer().analyze_directory(str(tmp_path))
+        sig = r.to_signal()
+        assert sig.z_score == 3.2, f"Expected z=3.2 got z={sig.z_score}"
+
+    def test_sdelete64_also_anti_forensic(self, tmp_path):
+        _scca(tmp_path, "SDELETE64.EXE-AABBCCDD.pf")
+        for i in range(12):
+            _scca(tmp_path, f"BENIGN{i}.EXE-{i:08X}.pf")
+        r = PrefetchAnalyzer().analyze_directory(str(tmp_path))
+        af_names = [a["filename"].lower() for a in r.anti_forensic_deletions]
+        assert "sdelete64.exe" in af_names
+
+    def test_smallftpd_goes_to_suspicious(self, tmp_path):
+        _scca(tmp_path, "SMALLFTPD.EXE-CF55BE9B.pf")
+        for i in range(12):
+            _scca(tmp_path, f"BENIGN{i}.EXE-{i:08X}.pf")
+        r = PrefetchAnalyzer().analyze_directory(str(tmp_path))
+        susp_names = [s["filename"].lower() for s in r.suspicious_executions]
+        assert "smallftpd.exe" in susp_names
+
+    def test_netstumbler_goes_to_suspicious(self, tmp_path):
+        _scca(tmp_path, "NETSTUMBLER.EXE-C14B26F4.pf")
+        for i in range(12):
+            _scca(tmp_path, f"BENIGN{i}.EXE-{i:08X}.pf")
+        r = PrefetchAnalyzer().analyze_directory(str(tmp_path))
+        susp_names = [s["filename"].lower() for s in r.suspicious_executions]
+        assert "netstumbler.exe" in susp_names
+
+    def test_veracrypt_format_goes_to_suspicious(self, tmp_path):
+        # Stem has a space: "VERACRYPT FORMAT.EXE-6EA86AF5"
+        _scca(tmp_path, "VERACRYPT FORMAT.EXE-6EA86AF5.pf")
+        for i in range(12):
+            _scca(tmp_path, f"BENIGN{i}.EXE-{i:08X}.pf")
+        r = PrefetchAnalyzer().analyze_directory(str(tmp_path))
+        susp_names = [s["filename"].lower() for s in r.suspicious_executions]
+        assert "veracrypt format.exe" in susp_names
+
+    def test_existing_mimikatz_still_in_suspicious(self, tmp_path):
+        # Regression: adding new lists must not remove mimikatz from suspicious_executions
+        _scca(tmp_path, "MIMIKATZ.EXE-1A2B3C4D.pf")
+        for i in range(12):
+            _scca(tmp_path, f"BENIGN{i}.EXE-{i:08X}.pf")
+        r = PrefetchAnalyzer().analyze_directory(str(tmp_path))
+        susp_names = [s["filename"].lower() for s in r.suspicious_executions]
+        assert "mimikatz.exe" in susp_names
+
+    def test_finding_type_in_metadata(self, tmp_path):
+        # to_signal() metadata must include ANTI_FORENSIC_TOOL_EXECUTION
+        # and SUSPICIOUS_EXECUTION in finding_types when both fire
+        _scca(tmp_path, "SDELETE.EXE-FBA93810.pf")
+        _scca(tmp_path, "SMALLFTPD.EXE-CF55BE9B.pf")
+        for i in range(12):
+            _scca(tmp_path, f"BENIGN{i}.EXE-{i:08X}.pf")
+        r = PrefetchAnalyzer().analyze_directory(str(tmp_path))
+        meta = r.to_signal().metadata
+        assert "ANTI_FORENSIC_TOOL_EXECUTION" in meta["finding_types"]
+        assert "SUSPICIOUS_EXECUTION" in meta["finding_types"]
+
+
 class TestAgentWiring:
     def test_build_kwargs_detects_prefetch_dir(self, tmp_path):
         from vigia_agent import _build_orchestrator_kwargs
