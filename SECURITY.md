@@ -333,3 +333,24 @@ Fracture detection identifies cross-artifact discrepancies:
 - `VERDICT_CONFLICT`: contradictory verdicts between tools (requires deeper analysis)
 
 Daubert admissibility assessment included in every CAIE result.
+
+## Bug Registry and Audit Documentation
+
+Every security-relevant bug, fix, and architectural decision is tracked with
+full audit trail in two registries (identical content, maintained in parallel):
+
+- **[BUGS_PENDIENTES.md](BUGS_PENDIENTES.md)** (Spanish) -- B-001 through B-126+
+- **[BUGS_PENDIENTES_EN.md](BUGS_PENDIENTES_EN.md)** (English) -- same entries
+
+Each entry documents: severity, affected file, root cause, fix applied,
+impact assessment, and verification steps. Entries are never deleted --
+resolved bugs remain as permanent audit trail. The registries include
+confirmed production incidents (BUG-EML-001), verdict inversions (B-117),
+fail-open stubs (B-119), and architectural gaps (B-116, B-123, B-124).
+
+Additional red-team audits, adversarial robustness reports, and architectural
+dossiers are available under `docs/` -- including multi-model adversarial
+reviews (DeepSeek, Kimi, Gemini, Claude), scorer architecture analysis,
+dataset calibration records, and the module archaeology report
+(`docs/module_archaeology.html`) that identified 31 high-risk orphaned
+modules in the July 2026 audit.
