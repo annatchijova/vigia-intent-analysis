@@ -13,7 +13,7 @@ COMPONENTES:
 
 FUNCIÓN DE RIESGO (formulación final acordada por colectivo):
 
-    r_total = (1 - P) · (1 + λ·D) · (1 + γ·(1 - S)) · (1 + ω·(1 - I))
+    r_total = P · (1 + λ·D) · (1 + γ·(1 - S)) · (1 + ω·(1 - I))
 
     Donde:
         P = posterior ∈ [0, 1]      — P(fabricación | evidencia)
@@ -24,8 +24,21 @@ FUNCIÓN DE RIESGO (formulación final acordada por colectivo):
         γ = sensibilidad a inestabilidad estructural (adaptativo)
         ω = sensibilidad a disonancia de intención (adaptativo, default 1.0)
 
+    SEMÁNTICA CRÍTICA (B-117, fix de inversión 2026-07-14):
+        P = P(fabricación | evidencia) — emitido por LikelihoodEngine.infer().
+        r = riesgo de fabricación = P * factores_de_inflación.
+        Caso fabricado:  P alto (~0.99) -> r alto -> REJECT.
+        Caso genuino:    P bajo (~0.01) -> r bajo -> ACCEPT.
+
+        BUG ORIGINAL: la fórmula usaba (1-P), lo que INVERTÍA los veredictos:
+        P alto (fabricado) producía r bajo -> ACCEPT el fabricado.
+        El huérfano governance/risk_bounded_layer_v2.py documentaba este bug
+        como fix P0-001 cambiando la semántica de P a P(autenticidad), pero
+        nunca se cableó. El fix correcto es mantener P = P(fabricación) (que
+        es lo que emite el LikelihoodEngine) y usar r = P * (...), no (1-P).
+
     PROPIEDADES MATEMÁTICAS:
-        - D=0, S=1 → r = (1-P)       — riesgo base puro
+        - D=0, S=1 → r = P            — riesgo base puro
         - D alto → r inflado          — drift infla incertidumbre
         - S bajo → r inflado          — grafo caótico fuerza ABSTAIN
         - r nunca → 0 por S alto      — sin sobreconfianza estructural
@@ -345,7 +358,7 @@ class RiskBoundedDecisionLayer:
     Capa de decisión con límites formales de riesgo.
 
     Implementa la función de riesgo acordada por el colectivo:
-        r_total = (1 - P) · (1 + λ·D) · (1 + γ·(1 - S))
+        r_total = P · (1 + λ·D) · (1 + γ·(1 - S))
 
     PROPIEDAD FORMAL:
         Bajo drift acotado D ≤ δ, se garantiza:
@@ -410,7 +423,7 @@ class RiskBoundedDecisionLayer:
         Calcula r_total usando aritmética de punto fijo (Decimal) para
         determinismo cross-plataforma (Intel x86 / ARM / RISC-V).
 
-        r = (1-P) · (1+λD) · (1+γ(1-S)) · (1+ω(1-I))
+        r = P · (1+λD) · (1+γ(1-S)) · (1+ω(1-I))
 
         Args:
             posterior        : P(fabricación | evidencia) ∈ [0, 1]
@@ -446,9 +459,15 @@ class RiskBoundedDecisionLayer:
 
         # Aritmética Decimal — 28 dígitos significativos, ROUND_HALF_EVEN
         # Elimina variación de FPU entre arquitecturas (H3 — Daubert determinismo)
+        #
+        # B-117 (2026-07-14): r = P * (...), NOT (1-P) * (...).
+        # P = P(fabricación | evidencia) from LikelihoodEngine.
+        # P alto (fabricado) -> r alto -> REJECT.
+        # The original (1-P) INVERTED this: P alto -> r bajo -> ACCEPT.
+        # See module docstring for full derivation of the fix.
         _D = Decimal
         r = (
-            (_D(1) - _D(str(p)))
+            _D(str(p))
             * (_D(1) + _D(str(lam)) * _D(str(d)))
             * (_D(1) + _D(str(gam)) * (_D(1) - _D(str(s))))
             * (_D(1) + _D(str(ome)) * (_D(1) - _D(str(i_score))))
