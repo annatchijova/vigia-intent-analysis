@@ -5840,3 +5840,32 @@ field), `hypothesis_lineage.py` (93KB orphaned), `adversarial_silence.py`.
 4 files preserved as pending-to-wire capability (real forensic logic,
 tested, doctrinally correct). NOT candidates for deletion. Blocked until
 >= 2 producer modules are wired and corpus includes real CCS values.
+
+---
+
+## B-124 — Verdict/governance cluster: 6 modules designed, NOT wired — same pattern as B-123
+
+| Field | Value |
+|-------|-------|
+| **Status** | POSTPONED — same blocking pattern as B-123 |
+| **Severity** | P2 (governance gates not firing) |
+| **Detected in** | Module archaeology audit 2026-07-14 |
+
+### The 6 files
+
+1. **`ockham_adversarial.py`** (224 lines) — penalizes "too simple" benign
+   hypotheses in presence of malice signals. Concept exists inline in
+   `abductive_intent_engine.py` but as separate implementation.
+2. **`dissent_report.py`** (305 lines) — minority signal escalation.
+   Needs ALL governance module results (circular dep).
+3. **`config_sentinel.py`** — config tampering detection for critical modules.
+4. **`narrative_auditor.py`** (283 lines) — C3 narrative injection validator.
+   `run_demo.py` loads from DIFFERENT paths that don't resolve to this file.
+5. **`peirceplanner_bounded.py`** (375 lines) — Miller's Law bound +
+   oscillation detection for abduction.
+6. **`advanced_signal_router.py`** — signal routing, conceptually superseded
+   by scorer's inline evidence_type lookup.
+
+All 6: zero production callers, all depend on orphaned producer chain
+(vigia/abduction/, vigia/temporal/, vigia/patterns/). Dry-run inviable.
+Preserved as pending-to-wire capability, NOT deletion candidates.

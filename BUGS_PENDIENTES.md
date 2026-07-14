@@ -6149,3 +6149,81 @@ The gate can be wired when ALL of the following are met:
 3. A meaningful dry-run (with real data) shows acceptable impact on the corpus.
 
 ---
+
+## B-124 — Verdict/governance cluster: 6 modules designed, tested, NOT wired — same pattern as B-123
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | POSPUESTO — same blocking pattern as B-123 (cadena de productores huérfanos) |
+| **Severidad** | P2 (governance gates not firing — safety mechanisms exist but are disconnected) |
+| **Detectado en** | Module archaeology audit 2026-07-14 (`docs/module_archaeology.html`) |
+
+### The 6 files
+
+**Scoring-adjacent (highest conceptual severity):**
+
+1. **`vigia/core/ockham_adversarial.py`** (224 lines) — Adversarial simplicity
+   penalty: penalizes benign hypotheses that are "too simple" in the presence
+   of malice signals (SolarWinds pattern). Needs `candidate_cost` /
+   `next_best_cost` (Fraction) + `malice_signal_strength` from
+   `hypothesis_lineage.py` (orphaned, vigia/abduction/). The concept "ockham"
+   exists live in `abductive_intent_engine.py` (`_build_ockham_rationale`) but
+   as a SEPARATE inline implementation — this module is NOT invoked by it.
+
+2. **`vigia/core/dissent_report.py`** (305 lines) — Minority signal escalation:
+   "9 modules say BENIGN + 1 behavioral module says MALICE = escalation
+   required." Needs results from ALL cluster modules to generate a dissent
+   report. Zero callers.
+
+**Defensive / security:**
+
+3. **`vigia/core/config_sentinel.py`** — Config tampering guardian: monitors
+   critical modules (CAIE, TrustFusion, OckhamAdversarial, SignalRouter) for
+   silent degradation. Zero callers. Its absence means no runtime detection
+   of module configuration drift.
+
+4. **`vigia/core/narrative_auditor.py`** (283 lines) — C3 multi-agent narrative
+   injection validator (OWASP LLM 2025 taxonomy + Carnegie patterns). Zero
+   production callers. `scripts/run_demo.py` loads dynamically from DIFFERENT
+   paths (`scripts/narrative_auditor.py`, `scripts/vigia_prod/security/
+   narrative_auditor.py`) that do NOT resolve to this file.
+
+**Abduction infrastructure:**
+
+5. **`vigia/core/peirceplanner_bounded.py`** (375 lines) — Miller's Law (7+2)
+   bound on abductive reasoning + oscillation detection (A->B->A -> ABSTAIN).
+   Needs `AbductiveHypothesis` with `ockham_cost` from `hypothesis_lineage.py`
+   (orphaned). Without this, nothing prevents unbounded/oscillating abduction
+   in the live planner.
+
+6. **`vigia/core/advanced_signal_router.py`** — Signal routing by artifact type.
+   Conceptually superseded by the scorer's inline `evidence_type` lookup in
+   `effective_trusts`, but not confirmed identical in behavior. Zero callers.
+
+### Why not wired today (same pattern as B-123)
+
+All 6 depend on inputs that do not exist in the current pipeline or corpus:
+- Ockham needs hypothesis costs from the orphaned abduction namespace
+- Dissent needs results from ALL governance modules (circular dependency)
+- Config sentinel monitors modules that are themselves not wired
+- Narrative auditor is unreachable from any production path
+- PeircePlanner bounded needs the orphaned hypothesis lineage tracker
+- Signal router is conceptually superseded
+
+A dry-run is inviable: without real input data, every module would operate
+on defaults or empty inputs, producing no meaningful impact measurement.
+
+### Decision
+
+All 6 preserved as pending-to-wire capability. NOT candidates for deletion
+(real forensic logic, Fraction arithmetic, doctrinally correct). Blocked by
+the same orphaned producer chain as B-123 (vigia/abduction/, vigia/temporal/,
+vigia/patterns/). The full unblocking roadmap is:
+
+1. Wire `vigia/abduction/` namespace (hypothesis_lineage, artifact_graph,
+   counter_fact) — unblocks ockham_adversarial + peirceplanner_bounded
+2. Wire CCS producers (B-123) — unblocks causal_closure gate
+3. Wire governance modules in order: ockham -> dissent -> config_sentinel
+4. Wire narrative_auditor as C3 validation step before bundle sealing
+
+---
