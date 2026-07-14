@@ -5660,3 +5660,109 @@ la fuente correcta es la unica legitima). Amerita dossier propio —
 la pregunta no es si el motor falla sino si BENIGN es la etiqueta
 correcta cuando el motor no puede distinguir fuentes comprometidas
 de legitimas.
+
+---
+
+## B-116 — `signal_quality_gate.py` designed and functional in isolation, NOT wired to scorer — dry-run shows 122/199 cases degraded
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | POSPUESTO — bloqueado por desajuste de interfaz y calidad de datos |
+| **Severidad** | P2 (gate-level architectural gap — safety mechanism exists but does not fire) |
+| **Archivo** | `vigia/signal_quality_gate.py` AND `vigia/core/signal_quality_gate.py` (identical duplicates) |
+| **Detectado en** | Post-hackathon session 2026-07-14, dry-run script `scripts/dryrun_signal_quality_gate.py` |
+
+### Description
+
+`SignalQualityGate` implements five checks before a verdict can be emitted:
+tool diversity (>= 2 tools), signal strength (z >= 2.0), tool independence
+(<= 60% from same tool), z-score variance (range >= 0.5), and noise inflation
+detection. The module is complete, tested in isolation, and conceptually aligned
+with VIGIA's Daubert corroboration requirements (vigia_scorer.py lines 1194-1240).
+
+However, it has **zero callers** in the codebase. No import of
+`SignalQualityGate` exists anywhere outside its own file. Additionally, the
+module is duplicated: `vigia/signal_quality_gate.py` and
+`vigia/core/signal_quality_gate.py` are byte-identical copies.
+
+### Dry-run results (2026-07-14)
+
+A full corpus dry-run (`scripts/dryrun_signal_quality_gate.py`) tested the gate
+against all 199 cases using two signal-mapping modes:
+
+**MODE A** (raw_score passed directly as z_score):
+198/199 cases fail — unusable. raw_score lives in [0.0, 0.98]; gate demands
+z >= 2.0 for "strong". Pure unit mismatch.
+
+**MODE B** (raw_score * 4.0 as z_score — generous rescaling):
+
+| Gate reason | Cases failed | Detail |
+|-------------|-------------|--------|
+| `ABSTAIN_INSUFFICIENT_TOOLS` | 67 | Only 1 unique `source_tool` in case |
+| `ABSTAIN_WEAK_SIGNALS` | 20 | No raw_score >= 0.50 |
+| `ABSTAIN_DEPENDENT_SIGNALS` | 18 | > 60% artifacts from same tool |
+| `ABSTAIN_LOW_Z_VARIANCE` | 17 | raw_scores too uniform |
+| **Total degraded** | **122** | |
+| **Passed gate** | **76** | |
+
+Of the 122 degraded cases, **23 are currently MALICE** — including 11 from the
+VIGIA-REAL-001 to REAL-010 series (the most validated corpus in the project).
+These cases have `source_tool=unknown` because the field was never populated
+during conversion, not because they lack forensic provenance.
+
+### Root cause (three independent blockers)
+
+1. **Interface mismatch**: gate expects `tool_name` + `z_score` (statistical
+   z-scores from a calibrated distribution). The scorer produces `source_tool` +
+   `raw_score` in [0.0, 1.0]. No z-score computation exists in the current
+   scoring pipeline — `fit_calibration.py` produces z_scores per tool
+   (`z_scores` dict in sample schema, line 41) but is not yet wired into the
+   main scoring path.
+
+2. **Data quality**: 67/199 cases (33%) have only 1 unique `source_tool`,
+   and many of those use `source_tool=unknown`. The field does not reflect
+   the actual diversity of forensic tools that produced the evidence.
+
+3. **Duplicate module**: `vigia/signal_quality_gate.py` and
+   `vigia/core/signal_quality_gate.py` are identical. The `vigia.core.*` path
+   is the modern convention; the root copy should be removed when wiring.
+
+### Unblocking conditions
+
+This gate can be wired when ALL of the following are met:
+
+1. `fit_calibration.py` is integrated into the scoring pipeline, producing
+   real z-scores per signal (not raw_scores in [0,1]).
+2. The z-score output schema includes a `tool_name` field compatible with
+   `SignalQualityGate._get_tool_name()`, or the gate is adapted to read
+   `evidence_type` (which IS reliably populated).
+3. The `source_tool=unknown` problem in legacy cases is resolved (either by
+   backfilling from bundle metadata or by having the gate fall back to
+   `evidence_type` diversity instead of `source_tool` diversity).
+4. A new dry-run confirms 0 true-positive MALICE cases are degraded.
+
+**NOTE for `fit_calibration.py` roadmap**: when z-score output is finalized,
+verify compatibility with `SignalQualityGate.evaluate()` input schema. The
+gate's `_get_z_score()` reads `signal.z_score` (attribute) or
+`signal["z_score"]` (dict key). The calibrator's sample schema uses
+`z_scores` (plural, nested dict by tool). These must align before wiring.
+
+### Why not adapt the gate instead
+
+The gate's checks are doctrinally correct as designed. Adapting it to accept
+raw_score instead of z_score would weaken its statistical meaning: a raw_score
+of 0.8 from `read_evidence` and a raw_score of 0.8 from `Volatility3/malfind`
+have vastly different forensic weight, but the gate would treat them identically.
+The right fix is upstream: produce calibrated z-scores, then the gate works
+as intended.
+
+### Decision
+
+Postponed. Gate remains unwired. Documented as B-116 for tracking. The
+`vigia_scorer.py` corroboration gate (lines 1194-1240) partially covers the
+same Daubert requirement using `evidence_type` diversity and domain-based
+counting, but does not implement noise inflation detection or z-score
+variance checks — those are unique to `SignalQualityGate` and will add
+forensic value once the interface is resolved.
+
+---
