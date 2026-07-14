@@ -39,6 +39,7 @@ from typing import Any, Final
 
 from vigia.security import _sanitize_path, audit_logger
 from vigia.config import CONFIG
+from vigia.forensics.vision_audit import MAX_IMAGE_PIXELS
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -373,7 +374,7 @@ async def analyze_image_layers(image_path: str, ela_quality: int = ELA_QUALITY) 
     try:
         # P1-12: validar dimensiones antes de decodificar
         with Image.open(path) as _img_check:
-            if _img_check.width * _img_check.height > _MAX_IMAGE_PIXELS:
+            if _img_check.width * _img_check.height > MAX_IMAGE_PIXELS:
                 raise ValueError(f"Imagen excede límite de píxeles: {_img_check.width}x{_img_check.height}")
         original = Image.open(path).convert("RGB")
     except Exception as exc:
@@ -692,7 +693,7 @@ async def ocr_semantic_validator(
             else:
                 # P1-12: validar dimensiones
                 with Image.open(path) as _dim_check:
-                    if _dim_check.width * _dim_check.height > _MAX_IMAGE_PIXELS:
+                    if _dim_check.width * _dim_check.height > MAX_IMAGE_PIXELS:
                         raise ValueError(f"Imagen excede límite: {_dim_check.width}x{_dim_check.height}")
                 img = Image.open(path)
                 text_by_page.append(pytesseract.image_to_string(img, lang=language))
