@@ -2533,24 +2533,26 @@ with Daubert corroboration requirements. These 2 cases are documented
 as permanent regression tests — do not lower threshold to capture
 them without re-validating the full corpus.
 
-### Remaining step — pipeline integration (not yet implemented)
+### Pipeline integration — B-127 (2026-07-14) [RESOLVED]
 
-The autonomous agent pipeline (`vigia_agent.py`) does not call
-`audit_grice_maxims()` during batch processing. The scorer gate
-reads `grice_verdict` / `grice_deception_probability` from the case
-data, but the pipeline does not produce them. As a result, the batch
-accuracy stays at 185/199, not 187/199.
+`sift_orchestrator.py::_resolve_hypothesis()` now calls
+`audit_grice_maxims()` conditionally before invoking `_vigia_score()`:
 
-To close this gap, `vigia_agent.py` needs to:
+- Only for testimony-only cases (all evidence_types in
+  {cultural_marker, log_entry, document_geometry, testimony})
+- Only when no artifact has semantic_role=exculpatory
+- Persists `grice_verdict` and `grice_deception_probability` in the
+  blind dict so the scorer gate finds them
 
-1. Call `audit_grice_maxims()` inline during autonomous investigation
-2. Persist `grice_verdict` and `grice_deception_probability` in the
-   case data before calling `_vigia_score()`
-3. Decision point: invoke Grice always, or only when CAIE returns
-   NOISE (avoids unnecessary calls for cases already resolved)
+Fix for prior_trust boundary: `< 0.30` changed to `<= 0.30`
+(KIWI-007 has prior_trust=0.30 on the panic button artifact).
 
-This is a pipeline architecture change, not a scorer change. Same
-rigor applies: full test suite + 199-case corpus dry-run before
-wiring. Expected result: 185 -> 187 (KIWI-006, KIWI-007 fixed).
+Dry-run verification: +2 FIX (KIWI-006, KIWI-007), 0 regressions
+attributable to B-127. 9 pre-existing MALICE->SUSPICION divergences
+between cached bundles and re-scored cases confirmed unrelated
+(identical results without B-127 changes). Commit `815352bf`.
+
+Corpus accuracy: 185/199 -> **187/199** (pending batch cache refresh
+with `run_all_agent.py --rerun --filter KIWI`).
 
 ---
