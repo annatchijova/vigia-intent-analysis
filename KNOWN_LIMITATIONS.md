@@ -2556,3 +2556,128 @@ Corpus accuracy: 185/199 -> **187/199** (pending batch cache refresh
 with `run_all_agent.py --rerun --filter KIWI`).
 
 ---
+
+## L-059 — SAFARI_SUSPICIOUS Detector Cannot Distinguish Attacker Research from Victim Remediation Searches [DOCUMENTED]
+
+**Registered 2026-07-14. Status: DOCUMENTED — temporal context limitation.**
+**Mode affected:** Mode 1 (ios_forensics.py). Mode 2 resolves via analyst temporal reasoning.
+**Discovered:** VIGIA-MAGNET-2022-iOS-JESS investigation, 2026-07-14.
+
+### Description
+
+`ios_forensics.py::_analyze_safari` applies the `SAFARI_SUSPICIOUS` pattern set
+against all Safari history entries without regard for temporal ordering relative
+to other artifacts. The pattern `r"(?i)fix.*hacked.*computer"` and similar
+remediation-language patterns fire identically on:
+
+1. **Attacker pre-operational research** — searching for hacking tools, attack vectors,
+   or target reconnaissance before an incident.
+2. **Victim post-incident remediation** — searching for how to fix a device after
+   discovering it was compromised.
+
+### Real case demonstrating the gap
+
+VIGIA-MAGNET-2022-iOS-JESS (iPhone 8, GrayKey, Magnet CTF 2022):
+
+- 2022-02-09: Victim receives phishing SMS from `ow.ly` shortened URL.
+- 2022-02-11: Safari history shows `r"(?i)fix.*hacked.*computer"` searches.
+
+Temporal ordering is unambiguous: the phishing SMS precedes the searches by 48 hours.
+The searches are victim-response (remediation research), not attacker pre-operational
+research. `ios_forensics.py` correctly flags them (the z-score contribution is valid
+as a structural signal), but the forensic interpretation in automated analysis
+cannot distinguish the two scenarios.
+
+The June 2026 Mode 2 run (Ollama backend) reached INTENT verdict by misidentifying
+these searches as attacker research, without cross-referencing the SMS timestamp.
+The July 2026 Mode 2 re-run (Claude Code, B-126/B-130 applied) correctly identified
+the temporal ordering and reduced the verdict to SUSPICION.
+
+### Root cause
+
+`_analyze_safari` has access to individual Safari entry timestamps but does not
+cross-reference them against SMS timestamps from `sms.db`. Each database is parsed
+independently in ios_forensics.py. Cross-artifact temporal analysis — "is this search
+temporally downstream of a phishing SMS targeting this device?" — requires joint
+reasoning across multiple evidence sources that the single-module architecture
+does not perform.
+
+### Forensic implication
+
+Any iOS device belonging to a victim of phishing, smishing, or malware infection
+will likely produce SAFARI_SUSPICIOUS findings from post-incident remediation
+searches. These are true positives from the detector's perspective (anomalous
+searches are anomalous) but false positives from the verdict perspective (the
+device user is a victim, not a perpetrator).
+
+**Mode 1 behavior is correct by its own contract**: flagging anomalous searches is
+appropriate. The limitation is that SUSPICION (the correct verdict for the combined
+evidence) cannot be reliably distinguished from INTENT at the ios_forensics.py
+layer without temporal cross-artifact reasoning.
+
+### Mitigation
+
+In Mode 2 analysis, always cross-reference SAFARI_SUSPICIOUS findings against SMS
+timestamps before interpreting direction of causality. The temporal ordering
+phishing SMS → remediation search is the canonical victim pattern.
+
+For Mode 1, the SAFARI_SUSPICIOUS finding carries the right evidential weight; the
+interpretation layer (Mode 2 analyst or Mode 2 LLM) must apply the temporal context.
+Document the finding with its timestamp and the SMS that precedes it.
+
+**Fix path (if desired):** Extend `_analyze_safari` to accept a list of known
+phishing timestamps (from `_analyze_sms` output) and flag any SAFARI_SUSPICIOUS hit
+within N hours after a phishing-candidate SMS as `VICTIM_RESPONSE` rather than
+`SUSPICIOUS_SEARCH`. Requires calibration of N (48h is empirically correct for
+this case; may not generalize). Deferred — requires cross-module data flow
+change and calibration corpus.
+
+---
+
+## L-060 — `SecurityAudit` Writes `security_audit.log` Into `VIGIA_EVIDENCE_DIR` [DOCUMENTED]
+
+**Registered 2026-07-14. Status: DOCUMENTED — fix tracked as B-135.**
+**Mode affected:** Mode 1 (`vigia_agent.py`) when `VIGIA_EVIDENCE_DIR` is set.
+**Discovered:** VIGIA-MAGNET-2022-iOS-JESS Mode 1 runs, 2026-07-14.
+
+### Description
+
+`vigia/security/security.py` line 47:
+
+```python
+_DEFAULT_LOG_DIR: Final[str] = os.getenv("VIGIA_EVIDENCE_DIR", "/var/log/vigia")
+```
+
+When `VIGIA_EVIDENCE_DIR` is set (required for all investigations), `SecurityAudit`
+defaults its log path to `Path(VIGIA_EVIDENCE_DIR) / "security_audit.log"`, writing
+an audit log file directly into the evidence directory.
+
+This violates the VIGÍA evidence read-only invariant: "Evidence is read-only.
+Never write to `VIGIA_EVIDENCE_DIR`." (CLAUDE.md §5.1, VIGÍA CLAUDE.md Invariant 1).
+
+### Forensic implication
+
+The written `security_audit.log` modifies the evidence directory's mtime and
+directory listing, potentially invalidating any directory-level hash taken before
+the run. If the investigation uses forensic hash verification at the directory level
+(e.g., for Daubert chain-of-custody purposes), the post-run hash will not match the
+pre-run hash due to this added file.
+
+Note: The file is an audit trail, not forged evidence. Its presence does not
+affect the correctness of VIGÍA's analysis. The risk is Daubert credibility: a
+defense expert could point to the modified evidence directory as a chain-of-custody
+gap.
+
+### Mitigation
+
+Set `VIGIA_LOG_DIR` before running `vigia_agent.py`:
+
+```bash
+export VIGIA_LOG_DIR="/tmp/vigia_logs"
+python3 vigia_agent.py --evidence "$VIGIA_EVIDENCE_DIR" --case-id CASE-001
+```
+
+See B-135 for the planned fix (changing `_DEFAULT_LOG_DIR` to use `VIGIA_LOG_DIR`
+instead of `VIGIA_EVIDENCE_DIR`).
+
+---

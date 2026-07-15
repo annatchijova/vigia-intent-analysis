@@ -1,0 +1,751 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-14T23:42:21.893109+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+    "end_time": "2026-07-14T23:42:21.893113+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+        "entry_sha256": "f1c61f8bb6bf88b80bf7496378130880f850af82432694aaf9333ad8c1ae0bfb",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: 303875284b7873bf...",
+        "outputs_summary": {
+          "agent_sha256": "303875284b7873bffed00aa0ec5a56462cf23cf359f4158378b7cd37d2b13120",
+          "agent_version": "1.0.0-SANS-2026"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-14T23:42:21.444478+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+        "entry_sha256": "1ed7b45eabdbfd557daa36beb0d94258b2a818ca0c42cf3829cf555c675cd9c6",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted_full"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-14T23:42:21.444565+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+        "entry_sha256": "c77f5eb5cd3816907414e7234c54a1771c57585cad14ef3a4c07d422520409d6",
+        "inputs_summary": {
+          "path": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted_full"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 9c279850eb339128...",
+        "outputs_summary": {
+          "sha256": "9c279850eb339128127f334f9729035d9dde3444625c7cb9e786717c08e51628"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-14T23:42:21.447402+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+        "entry_sha256": "0aca5c677dc3e3a089a4e3e27a64bfa0ed8060aa8efca9460899b888b662c1d1",
+        "inputs_summary": {
+          "evidence": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted_full",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-14T23:42:21.447497+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+        "entry_sha256": "e2134c2b7cf82cfe7b7e12dfc6e311b981cc849474fdecfe4aa57e34d46875cb",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 6 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "UNDETERMINED",
+            "best_posterior": "0",
+            "confidence": "0",
+            "is_conclusive": "False",
+            "narrative": "[FIRSTNESS] Se\u00f1ales primarias insuficientes: 1 primaria(s) de 5 totales.\n[SECONDNESS] El gate de corroboraci\u00f3n Daubert (\u22653 fuentes primarias) no se satisface \u2014 las se\u00f1ales derivadas de motores engine ...",
+            "ontological_level": "None"
+          },
+          "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+          "custody": {
+            "artifact_id": "UNKNOWN",
+            "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+            "n_records": "1",
+            "records": [
+              {
+                "actor": "EVENTLOG_ANALYST",
+                "artifact_hash": "89d249c828195cfeea2f8ee9ec537bf9401e0ef5023e404ae3b3e2ed53c690a4",
+                "metadata": {
+                  "data_size": "4096",
+                  "timestamp_utc": "1970-01-01T00:00:00Z"
+                },
+                "operation": "ACQUIRE",
+                "timestamp": "2026-07-14T23:42:21.843295+00:00"
+              }
+            ]
+          },
+          "pipeline_meta": {
+            "engines_not_run_no_event_stream": [
+              "behavioral",
+              "metabolic"
+            ],
+            "frs_groups": "1",
+            "gamma_applied": "True",
+            "n_engine_signals": "2",
+            "n_pathguard_rejects": "0",
+            "n_primary_signals": "1",
+            "n_sift_signals": "1",
+            "n_signal_conversion_drops": "0",
+            "n_total_signals": "6",
+            "n_unanalyzed_artifacts": "0"
+          },
+          "results": {
+            "adversarial": {
+              "dominant_pattern": "COORDINATED_EVASION",
+              "indicators": [
+                {
+                  "affected_tools": [
+                    "EVENT_LOG",
+                    "CROSS_RESONANCE",
+                    "CASE_PATTERN_LIBRARY",
+                    "UNIFIED_TIMELINE"
+                  ],
+                  "confidence": "7/10",
+                  "description": "z_scores uniformemente bajos. media=0.00",
+                  "pattern": "COORDINATED_EVASION",
+                  "score": "3.5",
+                  "score_frac": "7/2"
+                }
+              ],
+              "n_indicators": "1",
+              "n_tools": "4",
+              "sift_critical_active": "0",
+              "signal_class": "derived"
+            },
+            "caie": {
+              "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+              "artifacts_evaluated": "5",
+              "composite_score": "0.0022",
+              "fracture_bonus_applied": "0.0000",
+              "integrity_check": {
+                "alerts": [],
+                "fpu_native": "False",
+                "internal_precision": "6",
+                "math_engine": "decimal.Decimal",
+                "output_precision": "4"
+              },
+              "probabilistic_score": "0.0022",
+              "probabilistic_verdict": "NOISE",
+              "status": "OK",
+              "structural_verdict": "INCONCLUSIVE",
+              "verdict": "INCONCLUSIVE"
+            },
+            "eventlog": {
+              "artifact_type": "windows_event_log",
+              "chains": "0",
+              "composite_score": "0",
+              "finding_types": [],
+              "findings": "0",
+              "gaps": "0",
+              "time_range": [
+                "0",
+                "0"
+              ],
+              "timestamp": "0",
+              "total_events": "0"
+            },
+            "patterns": {
+              "artifact_reliability": "17/20",
+              "artifact_type": "pattern",
+              "best_match": "NONE",
+              "finding_types": [],
+              "match_count": "0",
+              "match_score_by_pattern": {},
+              "missing_signals_by_pattern": {},
+              "signal_class": "derived",
+              "timestamp_invalid": "True",
+              "total_patterns": "3"
+            },
+            "resonance": {
+              "artifact_reliability": "4/5",
+              "artifact_type": "resonance",
+              "finding_types": [],
+              "pattern_count": "0",
+              "signal_class": "derived",
+              "timestamp_invalid": "True",
+              "total_resonance": "0"
+            },
+            "timeline": {
+              "anomaly_count": "0",
+              "artifact_reliability": "4/5",
+              "artifact_type": "timeline",
+              "finding_types": [],
+              "gap_count": "0",
+              "signal_class": "derived",
+              "total_events": "3"
+            }
+          },
+          "signals": [
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "acquisition_hash": "sha256:89d249c828195cfeea2f8ee9ec537bf9401e0ef5023e404ae3b3e2ed53c690a4",
+                "acquisition_timestamp": "2026-07-14T23:42:21.843295+00:00",
+                "acquisition_tool": "graykey",
+                "artifact_type": "windows_event_log",
+                "examiner_id": "magnet-ctf-2022",
+                "findings": "0",
+                "time_range": [
+                  "0",
+                  "0"
+                ],
+                "timestamp": "0",
+                "total_events": "0",
+                "write_blocker_used": "False"
+              },
+              "tool": "EVENT_LOG",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "artifact_reliability": "4/5",
+                "artifact_type": "resonance",
+                "finding_types": [],
+                "pattern_count": "0",
+                "signal_class": "derived",
+                "timestamp_invalid": "True",
+                "total_resonance": "0"
+              },
+              "tool": "CROSS_RESONANCE",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "artifact_reliability": "17/20",
+                "artifact_type": "pattern",
+                "best_match": "NONE",
+                "finding_types": [],
+                "match_count": "0",
+                "match_score_by_pattern": {},
+                "missing_signals_by_pattern": {},
+                "signal_class": "derived",
+                "timestamp_invalid": "True",
+                "total_patterns": "3"
+              },
+              "tool": "CASE_PATTERN_LIBRARY",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.0",
+              "metadata": {
+                "anomaly_count": "0",
+                "artifact_reliability": "4/5",
+                "artifact_type": "timeline",
+                "finding_types": [],
+                "gap_count": "0",
+                "signal_class": "derived",
+                "total_events": "3"
+              },
+              "tool": "UNIFIED_TIMELINE",
+              "value": "0.0",
+              "z_score": "0.0"
+            },
+            {
+              "confidence": "0.2",
+              "metadata": {
+                "dominant_pattern": "COORDINATED_EVASION",
+                "indicators": [
+                  {
+                    "affected_tools": [
+                      "EVENT_LOG",
+                      "CROSS_RESONANCE",
+                      "CASE_PATTERN_LIBRARY",
+                      "UNIFIED_TIMELINE"
+                    ],
+                    "confidence": "7/10",
+                    "description": "z_scores uniformemente bajos. media=0.00",
+                    "pattern": "COORDINATED_EVASION",
+                    "score": "3.5",
+                    "score_frac": "7/2"
+                  }
+                ],
+                "n_indicators": "1",
+                "n_tools": "4",
+                "sift_critical_active": "0",
+                "signal_class": "derived"
+              },
+              "tool": "ADV_ROBUST",
+              "value": "1.0",
+              "z_score": "3.5"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-14T23:42:21.892498+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+        "entry_sha256": "1fc4f87e1f12fbf3da3e495cbcdc8ff7f8545679596f0c0d0fa96570022b2abb",
+        "inputs_summary": {
+          "n_signals": "6"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-14T23:42:21.892771+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+        "entry_sha256": "499293e06c8da3f9645def8b1ae6cd8e7033927fd3ff3ee5a3fa8e6631fe1d54",
+        "inputs_summary": {
+          "verdict": "UNDETERMINED"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-14T23:42:21.893063+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-14T23:42:21.444280+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+  "evidence_path": "evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted_full",
+  "evidence_sha256": "9c279850eb339128127f334f9729035d9dde3444625c7cb9e786717c08e51628",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-MAGNET-2022-iOS-JESS-FULL ===\nEvidence: evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted_full\nEvidence SHA-256: 9c279850eb339128127f334f9729035d9dde3444625c7cb9e786717c08e51628\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: UNDETERMINED\nPosterior confidence: 0\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 2 primaria(s) de ['ios_forensic', 'windows_event_log'], 4 derivada(s)/no-analizada(s). Top z: ADV_ROBUST=3.50, IOS_FORENSICS=2.80, EVENT_LOG=0.00.\n[SECONDNESS] 1 se\u00f1al(es) primaria(s) sobre umbral z>2: IOS_FORENSICS (z=2.80). CAIE: INCONCLUSIVE (0 fractura(s)).\n[THIRDNESS] Hip\u00f3tesis: UNDETERMINED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\n[FIRSTNESS] Se\u00f1ales primarias insuficientes: 1 primaria(s) de 5 totales.\n[SECONDNESS] El gate de corroboraci\u00f3n Daubert (\u22653 fuentes primarias) no se satisface \u2014 las se\u00f1ales derivadas de motores engine no cuentan como corroboraci\u00f3n.\n[THIRDNESS] Sin base para inferencia abductiva. Veredicto: UNDETERMINED (\u2192 ABSTAIN en el agente).\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [ADV_ROBUST] [DERIVED] z=3.500 conf=0.20 \u2014 1.0\n  [IOS_FORENSICS] z=2.800 conf=0.95 \u2014 0.56\n  [EVENT_LOG] z=0.000 conf=0.00 \u2014 \n  [CROSS_RESONANCE] [DERIVED] z=0.000 conf=0.00 \u2014 \n  [CASE_PATTERN_LIBRARY] [DERIVED] z=0.000 conf=0.00 \u2014 \n\n--- CAIE (Cross-Artifact Incongruence Engine) ---\n  Verdict: INCONCLUSIVE | Structural: INCONCLUSIVE | Composite: 0.0022 | Fractures: 0 | Golden Rules: 0\n  Daubert: 0/5 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)\n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 Moderate anomalies. Additional investigation recommended. [ABSTAIN verdict (UNDETERMINED): this level describes the ANALYZED portion only \u2014 the evidence was not (fully) analyzed.]\nReconciliation: ABSTAIN verdict \u2014 the per-signal magnitude level (MEDIUM \u2014 Moderate anomalies. Additional investigation recommended.) describes only the analyzed portion and is not an assessment of the unanalyzed evidence.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 1\nPrimary signals: 2 | Derived: 4 | Total: 6",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "UNDETERMINED",
+      "best_posterior": "0",
+      "confidence": "0",
+      "is_conclusive": false,
+      "narrative": "[FIRSTNESS] Se\u00f1ales primarias insuficientes: 1 primaria(s) de 5 totales.\n[SECONDNESS] El gate de corroboraci\u00f3n Daubert (\u22653 fuentes primarias) no se satisface \u2014 las se\u00f1ales derivadas de motores engine no cuentan como corroboraci\u00f3n.\n[THIRDNESS] Sin base para inferencia abductiva. Veredicto: UNDETERMINED (\u2192 ABSTAIN en el agente).",
+      "ontological_level": null
+    },
+    "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+    "custody": {
+      "artifact_id": "UNKNOWN",
+      "case_id": "VIGIA-MAGNET-2022-iOS-JESS-FULL",
+      "n_records": 1,
+      "records": [
+        {
+          "actor": "EVENTLOG_ANALYST",
+          "artifact_hash": "89d249c828195cfeea2f8ee9ec537bf9401e0ef5023e404ae3b3e2ed53c690a4",
+          "metadata": {
+            "data_size": 4096,
+            "timestamp_utc": "1970-01-01T00:00:00Z"
+          },
+          "operation": "ACQUIRE",
+          "timestamp": "2026-07-14T23:42:21.843295+00:00"
+        }
+      ]
+    },
+    "pipeline_meta": {
+      "anti_silencing": true,
+      "engines_not_run_no_event_stream": [
+        "behavioral",
+        "metabolic"
+      ],
+      "frs_groups": 1,
+      "gamma_applied": true,
+      "n_engine_signals": 2,
+      "n_mobile_signals": 1,
+      "n_pathguard_rejects": 0,
+      "n_primary_signals": 1,
+      "n_sift_signals": 1,
+      "n_signal_conversion_drops": 0,
+      "n_total_signals": 6,
+      "n_unanalyzed_artifacts": 0,
+      "version": "V4-COLECTIVO-2026-07-03"
+    },
+    "results": {
+      "adversarial": {
+        "dominant_pattern": "COORDINATED_EVASION",
+        "indicators": [
+          {
+            "affected_tools": [
+              "EVENT_LOG",
+              "CROSS_RESONANCE",
+              "CASE_PATTERN_LIBRARY",
+              "UNIFIED_TIMELINE"
+            ],
+            "confidence": {
+              "__fraction__": true,
+              "den": 10,
+              "num": 7
+            },
+            "description": "z_scores uniformemente bajos. media=0.00",
+            "pattern": "COORDINATED_EVASION",
+            "score": 3.5,
+            "score_frac": {
+              "__fraction__": true,
+              "den": 2,
+              "num": 7
+            }
+          }
+        ],
+        "n_indicators": 1,
+        "n_tools": 4,
+        "sift_critical_active": 0,
+        "signal_class": "derived"
+      },
+      "caie": {
+        "_determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+        "_operation_hmac": "",
+        "artifacts_evaluated": 5,
+        "artifacts_rejected": 0,
+        "chain_of_custody": {
+          "evidence_count": 5,
+          "fracture_count": 0,
+          "processing_timestamp": "2026-07-14T23:42:21.879038Z"
+        },
+        "composite_score": "0.0022",
+        "confidence_penalty_applied": false,
+        "daubert_note": "Daubert: 0/5 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: No irrefutable anchor. Weak under cross-examination. CDL: INCONCLUSIVE: Coverage too low (16.7%)",
+        "fracture_bonus_applied": "0.0000",
+        "fractures": [],
+        "fractures_detected": 0,
+        "fractures_unique": 0,
+        "golden_rules_triggered": 0,
+        "independent_sources": 5,
+        "integrity_check": {
+          "alerts": [],
+          "fpu_native": false,
+          "internal_precision": 6,
+          "math_engine": "decimal.Decimal",
+          "output_precision": 4
+        },
+        "mitre_ttps": [
+          "T1036.005",
+          "T1059",
+          "T1070.001",
+          "T1070.002",
+          "T1070.006",
+          "T1498",
+          "T1562.001",
+          "T1564",
+          "T1565.001",
+          "T1566.003"
+        ],
+        "peirce_chain": {
+          "firstness": "5 artifacts from 5 tools. Raw scores range: 0.00 to 1.00.",
+          "secondness": "Noisy-OR fusion: 5 independent groups, composite=0.0022. Most reliable: ADV_ROBUST (log_entry, adj=0.0022). 0 unique fracture(s), 0 Golden Rule(s).",
+          "thirdness": "Inferred habit: fabrication/staging. No structural discrepancies."
+        },
+        "probabilistic_score": "0.0022",
+        "probabilistic_verdict": "NOISE",
+        "raw_scores": [
+          {
+            "adjusted": "0.0022",
+            "description": "1.0",
+            "raw_score": "1.0000",
+            "spoofability": 0.85,
+            "tool": "ADV_ROBUST",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from EVENT_LOG",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "EVENT_LOG",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CROSS_RESONANCE",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CROSS_RESONANCE",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from CASE_PATTERN_LIBRARY",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "CASE_PATTERN_LIBRARY",
+            "type": "log_entry",
+            "weight": 0.15
+          },
+          {
+            "adjusted": "0.0000",
+            "description": "Signal from UNIFIED_TIMELINE",
+            "raw_score": "0.0000",
+            "spoofability": 0.85,
+            "tool": "UNIFIED_TIMELINE",
+            "type": "log_entry",
+            "weight": 0.15
+          }
+        ],
+        "status": "OK",
+        "structural_verdict": "INCONCLUSIVE",
+        "timestamp": "2026-07-14T23:42:21.879023Z",
+        "ttp_confidences": {
+          "T1036.005": "0.0390",
+          "T1059": "0.0385",
+          "T1070.001": "0.0400",
+          "T1070.002": "0.0400",
+          "T1070.006": "0.0210",
+          "T1498": "0.0680",
+          "T1562.001": "0.0553",
+          "T1564": "0.0292",
+          "T1565.001": "0.0480",
+          "T1566.003": "0.0280"
+        },
+        "verdict": "INCONCLUSIVE",
+        "vigia_verdict": "[VIGIA_CAIE]: INCONCLUSIVE. Structural=INCONCLUSIVE Probabilistic=NOISE (composite=0.0022) from 5 artifacts (5 independent). 0 fracture(s), 0 Golden Rule(s). Daubert: 0/5 artifacts structurally irrefutable (spoofability \u2264 0.20). WARNING: "
+      },
+      "eventlog": {
+        "artifact_type": "windows_event_log",
+        "chains": 0,
+        "composite_score": "0",
+        "finding_types": [],
+        "findings": 0,
+        "gaps": 0,
+        "time_range": [
+          0,
+          0
+        ],
+        "timestamp": 0,
+        "total_events": 0
+      },
+      "patterns": {
+        "artifact_reliability": "17/20",
+        "artifact_type": "pattern",
+        "best_match": "NONE",
+        "finding_types": [],
+        "match_count": 0,
+        "match_score_by_pattern": {},
+        "missing_signals_by_pattern": {},
+        "signal_class": "derived",
+        "timestamp_invalid": true,
+        "total_patterns": 3
+      },
+      "resonance": {
+        "artifact_reliability": "4/5",
+        "artifact_type": "resonance",
+        "finding_types": [],
+        "pattern_count": 0,
+        "signal_class": "derived",
+        "timestamp_invalid": true,
+        "total_resonance": "0"
+      },
+      "timeline": {
+        "anomaly_count": 0,
+        "artifact_reliability": "4/5",
+        "artifact_type": "timeline",
+        "finding_types": [],
+        "gap_count": 0,
+        "signal_class": "derived",
+        "total_events": 3
+      }
+    },
+    "signals": [
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "acquisition_hash": "sha256:89d249c828195cfeea2f8ee9ec537bf9401e0ef5023e404ae3b3e2ed53c690a4",
+          "acquisition_timestamp": "2026-07-14T23:42:21.843295+00:00",
+          "acquisition_tool": "graykey",
+          "artifact_type": "windows_event_log",
+          "chains": 0,
+          "composite_score": "0",
+          "examiner_id": "magnet-ctf-2022",
+          "finding_types": [],
+          "findings": 0,
+          "gamma_applied": true,
+          "gamma_type": "windows_event_log",
+          "gaps": 0,
+          "signal_class": "primary",
+          "time_range": [
+            0,
+            0
+          ],
+          "timestamp": 0,
+          "total_events": 0,
+          "write_blocker_used": false,
+          "z_original": 0.0
+        },
+        "tool": "EVENT_LOG",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "4/5",
+          "artifact_type": "resonance",
+          "finding_types": [],
+          "pattern_count": 0,
+          "signal_class": "derived",
+          "timestamp_invalid": true,
+          "total_resonance": "0"
+        },
+        "tool": "CROSS_RESONANCE",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "artifact_reliability": "17/20",
+          "artifact_type": "pattern",
+          "best_match": "NONE",
+          "finding_types": [],
+          "match_count": 0,
+          "match_score_by_pattern": {},
+          "missing_signals_by_pattern": {},
+          "signal_class": "derived",
+          "timestamp_invalid": true,
+          "total_patterns": 3
+        },
+        "tool": "CASE_PATTERN_LIBRARY",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.0,
+        "metadata": {
+          "anomaly_count": 0,
+          "artifact_reliability": "4/5",
+          "artifact_type": "timeline",
+          "finding_types": [],
+          "gap_count": 0,
+          "signal_class": "derived",
+          "total_events": 3
+        },
+        "tool": "UNIFIED_TIMELINE",
+        "value": 0.0,
+        "z_score": 0.0
+      },
+      {
+        "confidence": 0.2,
+        "metadata": {
+          "dominant_pattern": "COORDINATED_EVASION",
+          "indicators": [
+            {
+              "affected_tools": [
+                "EVENT_LOG",
+                "CROSS_RESONANCE",
+                "CASE_PATTERN_LIBRARY",
+                "UNIFIED_TIMELINE"
+              ],
+              "confidence": {
+                "__fraction__": true,
+                "den": 10,
+                "num": 7
+              },
+              "description": "z_scores uniformemente bajos. media=0.00",
+              "pattern": "COORDINATED_EVASION",
+              "score": 3.5,
+              "score_frac": {
+                "__fraction__": true,
+                "den": 2,
+                "num": 7
+              }
+            }
+          ],
+          "n_indicators": 1,
+          "n_tools": 4,
+          "sift_critical_active": 0,
+          "signal_class": "derived"
+        },
+        "tool": "ADV_ROBUST",
+        "value": 1.0,
+        "z_score": 3.5
+      },
+      {
+        "confidence": 0.95,
+        "metadata": {
+          "artifact_reliability": "7/10",
+          "artifact_type": "ios_forensic",
+          "chains": 3,
+          "composite_score": "19/20",
+          "data_minimization": true,
+          "device_name": "",
+          "encrypted_apps_count": 1,
+          "finding_types": [
+            "EMPTY_CALL_HISTORY",
+            "EMPTY_CONTACTS",
+            "OPSEC_DATA_MINIMIZATION",
+            "SAFARI_SUSPICIOUS",
+            "SMS_PHISHING_RECEIVED",
+            "WEAK_PASSCODE"
+          ],
+          "findings_count": 22,
+          "ios_version": "",
+          "opsec_indicators_count": 2,
+          "owner_name": "",
+          "signal_class": "primary",
+          "total_calls": 0,
+          "total_contacts": 0,
+          "total_safari_entries": 26,
+          "total_sms": 13
+        },
+        "tool": "IOS_FORENSICS",
+        "value": 0.56,
+        "z_score": 2.8
+      }
+    ]
+  },
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": false,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 2,
+    "n_total_signals": 6,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

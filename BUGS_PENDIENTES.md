@@ -6638,3 +6638,220 @@ El bundle ABSTAIN se preserva deliberadamente: demuestra que el motor sabe abste
 genuinamente en vez de alucinar un veredicto cuando la evidencia es insuficiente.
 
 ---
+
+## B-133 — `knowledgeC.db` en `_MACOS_MARKER_FILES` activa la guarda B-048 y omite el motor iOS [PENDIENTE — fix diseñado]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — fix diseñado, requiere dry-run corpus antes de aplicar |
+| **Severidad** | P1 — el motor iOS se omite silenciosamente en cualquier extracción iOS que contenga knowledgeC.db |
+| **Archivos** | `vigia/sift/macos_forensics.py` (`_MACOS_MARKER_FILES`), `vigia/sift/ios_forensics.py` (`_IOS_MARKER_FILES`), `vigia_agent.py` (guarda B-048) |
+| **Detectado en** | VIGIA-MAGNET-2022-iOS-JESS, corrida RAW 2026-07-14 |
+| **Síntoma observado** | `[SIFT_SHIM] iOS engine skipped for _extracted_full: directory also matched macOS strong markers; macOS engine takes precedence (B-048)` |
+
+### Descripción
+
+`vigia_agent.py` contiene una guarda B-048 que da precedencia al motor macOS cuando
+el directorio de evidencia contiene archivos exclusivos de macOS:
+
+```python
+if all_names & (_MACOS_MARKER_FILES - _IOS_MARKER_FILES):
+    kwargs["macos_evidence_path"] = str(evidence_path)
+```
+
+`_MACOS_MARKER_FILES` incluye `knowledgeC.db`. Este archivo **también existe en iOS**
+(ruta: `/private/var/mobile/Library/CoreDuet/Knowledge/knowledgeC.db` — base de datos
+de actividad de apps del subsistema CoreDuet). Cuando una extracción iOS contiene
+`knowledgeC.db`, la diferencia `_MACOS_MARKER_FILES - _IOS_MARKER_FILES` no es vacía
+y la guarda B-048 activa el motor macOS, dejando el motor iOS sin ejecutarse.
+
+### Causa raíz (Peircean)
+
+- **Firstness:** Motor iOS omitido con mensaje explícito B-048; `ios_evidence_path`
+  no en kwargs; cero señales IOS_FORENSICS en el bundle.
+- **Secondness:** `knowledgeC.db` está en `_MACOS_MARKER_FILES` como marcador de
+  sistema macOS, pero en iOS sirve una función idéntica (timeline de actividad por app).
+  El artefacto es multiplataforma; la lista de marcadores asume exclusividad.
+- **Thirdness:** La guarda B-048 fue diseñada para evitar que extracción macOS
+  con `History.db` sea procesada como iOS. La presencia de `knowledgeC.db` en
+  `_MACOS_MARKER_FILES` pero no en `_IOS_MARKER_FILES` es un gap de cobertura:
+  cualquier extracción iOS completa (GrayKey, UFED, etc.) que incluya el path de
+  CoreDuet activa el motor equivocado.
+
+### Fix diseñado
+
+Agregar `knowledgeC.db` a `_IOS_MARKER_FILES` en `vigia/sift/ios_forensics.py`:
+
+```python
+_IOS_MARKER_FILES = {
+    "sms.db", "AddressBook.sqlitedb", "CallHistory.storedata",
+    "History.db", "Info.plist", "keychain-2.db",
+    "signal.sqlite",
+    "knowledgeC.db",  # B-133: iOS CoreDuet activity database — also present on iOS
+}
+```
+
+Con este cambio, `_MACOS_MARKER_FILES - _IOS_MARKER_FILES` ya no incluye
+`knowledgeC.db`, y la guarda B-048 solo activa el motor macOS para archivos
+genuinamente exclusivos de macOS (TCC.db, .Spotlight-V100, etc.).
+
+**Precaución:** Requiere dry-run completo sobre los 199 casos antes de aplicar —
+existe riesgo de que algún caso macOS del corpus tenga `knowledgeC.db` como único
+marcador y pase a procesar como iOS erróneamente.
+
+### Workaround (sesión 2026-07-14)
+
+Mover `knowledgeC.db` y `knowledgeC.db-wal` a un subdirectorio `_mode2_only/`
+fuera del path de evidencia de Mode 1. Permite que el motor iOS se ejecute
+correctamente. No modifica código.
+
+### Impacto documentado en el caso VIGIA-MAGNET-2022-iOS-JESS
+
+Primera corrida Mode 1 contra `_extracted_full/` (con `knowledgeC.db`): motor iOS
+omitido, bundle con cero señales de ios_forensics, ABSTAIN por falta de señales.
+Segunda corrida (después de mover `knowledgeC.db` a `_mode2_only/`): motor iOS
+correctamente invocado, 22 findings, IOS_FORENSICS z=2.80, bundle sealed.
+
+---
+
+## B-134 — `_detect_installed_apps` no detecta Wire via `store.wiredatabase` — brecha UUID de iOS [PENDIENTE — fix diseñado]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — fix diseñado, requiere dry-run corpus antes de aplicar |
+| **Severidad** | P2 — falso negativo en detección de Wire; WeChat requiere análisis separado |
+| **Archivo** | `vigia/sift/ios_forensics.py::_detect_installed_apps` |
+| **Detectado en** | VIGIA-MAGNET-2022-iOS-JESS, análisis Mode 2 2026-07-14 |
+
+### Descripción
+
+`_detect_installed_apps` detecta aplicaciones instaladas en iOS mediante dos mecanismos:
+
+1. Búsqueda de directorio con nombre de bundle ID (ej. `"com.wire"`, `"com.tencent.xin"`)
+2. Caso especial para Signal: presencia del archivo `signal.sqlite` independientemente
+   del nombre de directorio
+
+iOS almacena apps de terceros en directorios nombrados con UUID, no con bundle ID:
+`/private/var/mobile/Containers/Data/Application/<UUID>/`. Ningún directorio tiene
+nombre `com.wire` ni `com.tencent.xin` — la búsqueda por bundle ID produce cero
+resultados para ambas apps.
+
+**Wire:** La extracción del caso VIGIA-MAGNET-2022-iOS-JESS contiene
+`store.wiredatabase` (base de datos de mensajes de Wire). Este archivo existe porque
+ios_forensics.py tiene lógica para buscarlo y extraerlo: la app está instalada y
+tiene datos. Sin embargo, no hay mecanismo para que este hallazgo se retroalimente
+a `_detect_installed_apps` como señal de app instalada.
+
+**WeChat:** Únicamente presente como residuo en `keychain-2.db` (credenciales
+guardadas). Sin contenedor de app ni base de datos de mensajes en la extracción —
+WeChat probablemente fue desinstalada o el GrayKey no extrajo su contenedor.
+`_detect_installed_apps` no tiene lógica de keychain.
+
+### Causa raíz
+
+La detección de Signal mediante `signal.sqlite` es un caso especial hardcodeado.
+El mecanismo general (búsqueda por nombre de directorio con bundle ID) no funciona
+en iOS porque el sistema operativo usa UUIDs para los contenedores de apps.
+Cada app de mensajería adicional requiere su propio caso especial filename-based.
+
+### Fix diseñado — Wire
+
+Agregar detección por filename en `_detect_installed_apps`:
+
+```python
+# B-134: Wire detection via store.wiredatabase (same pattern as signal.sqlite)
+if (evidence_path / "store.wiredatabase").exists():
+    apps.append("Wire")
+```
+
+**Precaución:** Requiere dry-run corpus. `store.wiredatabase` es específico de Wire
+y no es un nombre de archivo ambiguo, por lo que el riesgo de falso positivo es bajo.
+
+### Fix diseñado — WeChat (parcial)
+
+WeChat no tiene un nombre de archivo de base de datos único y portátil que sea
+confiable entre versiones. La detección via keychain requiere parsear
+`keychain-2.db` y cruzar los `server` fields contra dominios WeChat conocidos.
+Más complejo que el fix de Wire — documentar como limitación separada (L-059 o
+nueva entrada) hasta tener casos de calibración.
+
+### Gap de cobertura permanente — apps con UUID container solamente
+
+Apps que no dejan ningún archivo con nombre distintivo fuera de su contenedor UUID
+son indetectables por `_detect_installed_apps` sin acceso al manifiesto de
+instalación (`applicationState.db` o `MobileInstallation.plist`). Estos archivos
+sí existen en extracciones completas pero no son parseados por ios_forensics.py.
+Documentado como limitación de cobertura, no bug a resolver en esta tanda.
+
+---
+
+## B-135 — `SecurityAudit` defaultea `_DEFAULT_LOG_DIR` a `VIGIA_EVIDENCE_DIR` — escribe `security_audit.log` en directorio de evidencia [PENDIENTE — fix diseñado]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — fix diseñado, bajo impacto en producción |
+| **Severidad** | P2 — violación del principio de evidencia read-only; no afecta la integridad del análisis |
+| **Archivo** | `vigia/security/security.py`, línea 47: `_DEFAULT_LOG_DIR` |
+| **Detectado en** | VIGIA-MAGNET-2022-iOS-JESS, dos corridas Mode 1 RAW 2026-07-14 |
+| **Síntoma observado** | `security_audit.log` creado en `evidence/magnet-2022-ios-jess/Jess_CTF_iPhone8/_extracted_full/` tras cada corrida `vigia_agent.py` |
+
+### Descripción
+
+```python
+# vigia/security/security.py línea 47
+_DEFAULT_LOG_DIR: Final[str] = os.getenv("VIGIA_EVIDENCE_DIR", "/var/log/vigia")
+```
+
+Cuando `VIGIA_EVIDENCE_DIR` está configurado (requerido por la guía de investigación
+del CLAUDE.md), `SecurityAudit.__init__` construye la ruta del log como:
+
+```
+Path(VIGIA_EVIDENCE_DIR) / "security_audit.log"
+```
+
+Esto escribe el archivo de audit directamente en el directorio de evidencia, violando
+el principio "Evidence is read-only. Never write to VIGIA_EVIDENCE_DIR." (CLAUDE.md §5.1,
+VIGÍA CLAUDE.md Invariante 1).
+
+### Causa raíz
+
+`_DEFAULT_LOG_DIR` usa `VIGIA_EVIDENCE_DIR` como ruta de fallback conveniente —
+en el contexto original (pre-SIFT), este valor siempre era `/var/log/vigia` o
+similar. Cuando el investigador configura `VIGIA_EVIDENCE_DIR` a un directorio de
+evidencia forense real, el log termina en ese directorio.
+
+### Fix diseñado
+
+Separar `_DEFAULT_LOG_DIR` de `VIGIA_EVIDENCE_DIR`:
+
+```python
+# Opción A — nueva variable de entorno
+_DEFAULT_LOG_DIR: Final[str] = os.getenv("VIGIA_LOG_DIR", "/var/log/vigia")
+
+# Opción B — ruta fija relativa al repo
+_DEFAULT_LOG_DIR: Final[str] = os.getenv("VIGIA_LOG_DIR", str(Path(__file__).parents[2] / "logs"))
+```
+
+La Opción A es preferible: respeta la configuración existente vía entorno, no
+asume la estructura del repo, y da al operador control explícito. `VIGIA_LOG_DIR`
+debería documentarse en INSTALL.md y en la sección de variables de entorno del CLAUDE.md.
+
+**Precaución:** Cambio de comportamiento observable para cualquier instalación donde
+`VIGIA_LOG_DIR` no está configurado y `VIGIA_EVIDENCE_DIR` apunta a `/var/log/vigia`
+(instalaciones por defecto antiguas). Verificar que ningún test hardcodea la ruta del
+log de auditoría como dependiente de `VIGIA_EVIDENCE_DIR`.
+
+### Mitigación hasta que el fix esté aplicado
+
+Configurar `VIGIA_LOG_DIR` explícitamente antes de invocar `vigia_agent.py`:
+
+```bash
+export VIGIA_LOG_DIR="/tmp/vigia_logs"
+python3 vigia_agent.py --evidence "$VIGIA_EVIDENCE_DIR" --case-id CASE-001
+```
+
+O eliminar manualmente `security_audit.log` del directorio de evidencia después
+de cada corrida (workaround del caso VIGIA-MAGNET-2022-iOS-JESS: eliminado manualmente
+dos veces durante la sesión 2026-07-14).
+
+---
