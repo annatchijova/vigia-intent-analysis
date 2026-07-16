@@ -5549,11 +5549,11 @@ Observar el patron en un segundo expediente judicial independiente (distinto a M
 
 ---
 
-## B-114 — `add_from_tool_result()` en CAIE construye `Artifact` sin pasar por los guardrails de `add_artifact()`
+## B-114 — `add_from_tool_result()` en CAIE construye `Artifact` sin pasar por los guardrails de `add_artifact()` [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | OBSERVADO — no explotado, revisar más adelante |
+| **Estado** | RESUELTO — 2026-07-16, sesión post-hackathon (delegación a `add_artifact()`; ver B-136 para el hallazgo mayor de la misma auditoría) |
 | **Severidad** | P3 (guardrail bypass, no explotado en el caso probado) |
 | **Archivo** | `vigia/tools/caie.py` |
 | **Función** | `CrossArtifactIncongruenceEngine.add_from_tool_result()` (línea ~1135) vs `add_artifact()` (línea ~1089) |
@@ -5588,13 +5588,36 @@ Si es así, escalar a P1/P2 — es una vía de bypass del whitelist con
 influencia de atacante. Fix candidato: que `add_from_tool_result()` delegue
 a `add_artifact()` en vez de appendear directo.
 
+### Fix aplicado (2026-07-16)
+
+El fix candidato del párrafo anterior, tal cual: `add_from_tool_result()`
+construye el `Artifact` y retorna `self.add_artifact(...)` (bool), con lo que
+`_MAX_ARTIFACTS` y la whitelist de `evidence_type` aplican también a este
+camino. Efecto lateral intencional de la delegación: los artifacts del wrapper
+ahora se indexan en `_temporal_index`/`_network_index` como los de cualquier
+otro caller (antes eran invisibles para las reglas TCV y NETWORK_VS_HOST).
+
+Censo de callers ejecutado (criterio de escalada de esta entrada): 4 sitios —
+`vision_audit` (firma correcta, tipos whitelisted, no explotable) y 3 sitios
+con la llamada rota que nunca llegaba al append (ver B-136). El scorer
+(`vigia_scorer.py:652`) alimenta CAIE vía `add_artifact()` directo, así que
+este fix no toca el camino de veredicto.
+
+### Verificación
+
+- Red tests: `tests/test_b114_caie_guardrail_delegation.py` (6 tests):
+  flooding rechazado en `_MAX_ARTIFACTS`, `evidence_type` fuera de whitelist
+  rechazado, adición whitelisted intacta (extracción de score, override
+  digital_perfection), indexación temporal ahora aplicada.
+- Gate comparativo de corpus: sin cambios de veredicto (ver commit).
+
 ---
 
-## B-115 — `VigiaAdversarialNLP._inject_caie_fractures()` llama a `add_from_tool_result()` con kwargs inexistentes — nunca inyectó nada a CAIE
+## B-115 — `VigiaAdversarialNLP._inject_caie_fractures()` llama a `add_from_tool_result()` con kwargs inexistentes — nunca inyectó nada a CAIE [SUBSUMIDO EN B-136]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | OBSERVADO — no arreglado en esta sesión, requiere decisión de normalización |
+| **Estado** | SUBSUMIDO EN B-136 (2026-07-16) — alcance real: 3 sitios con la misma llamada rota, y el engine destino se descarta igual. El fix mecánico de kwargs fue evaluado y REFUTADO (empeoraría el trail: éxito falso hacia un objeto descartado). La "decisión de normalización" se disolvió: `verdict.confidence` YA ES `(mcp-1)/4` (adversarial_nlp.py:1131) |
 | **Severidad** | P2 (silenciosamente roto desde su introducción — misma clase de bug que el `await` faltante en `vision_intent_audit`) |
 | **Archivo** | `vigia/tools/adversarial_nlp.py:1585-1604` (`_inject_caie_fractures`) |
 | **Detectado en** | Cableado del PDF pericial al pipeline (2026-07-13), branch `claude/clip-pipeline-sanity-check-roh22k` |
@@ -5807,6 +5830,49 @@ verify compatibility with `SignalQualityGate.evaluate()` input schema. The
 gate's `_get_z_score()` reads `signal.z_score` (attribute) or
 `signal["z_score"]` (dict key). The calibrator's sample schema uses
 `z_scores` (plural, nested dict by tool). These must align before wiring.
+
+### Avance parcial (2026-07-16) — el gate sigue SIN cablear
+
+Tres de los cuatro ítems de desbloqueo avanzaron; el gate permanece sin
+callers de producción por diseño (la condición 4 — dry-run con 0 casos MALICE
+verdaderos degradados — sigue sin cumplirse):
+
+1. **Duplicado eliminado** (blocker 3): `vigia/signal_quality_gate.py` borrado;
+   `vigia/core/signal_quality_gate.py` es la única copia (eran byte-idénticas,
+   mismo md5, cero imports del path raíz).
+2. **Fallback de diversidad implementado** (condición de desbloqueo 3, opción
+   B): `_get_tool_name()` ahora resuelve `tool_name` → `source_tool` →
+   `evidence_type`, tratando `"unknown"` como ausente. Tests:
+   `tests/test_b116_quality_gate_fallback.py` (8 tests).
+3. **Dry-run reconstruido y versionado**: el script original del 2026-07-14
+   nunca se commiteó; `scripts/dryrun_signal_quality_gate.py` lo reconstruye
+   (mismos MODE A/B) y queda en el repo para que la medición sea reproducible.
+
+**Medición fresca (2026-07-16, corpus 202 casos evaluables):**
+
+| | MODE A (z=raw) | MODE B (z=raw*4) |
+|---|---|---|
+| Pasan gate | 0 | 77 |
+| Degradados | 202 | 125 |
+| `ABSTAIN_INSUFFICIENT_TOOLS` | 66 | 66 |
+| Degradados con expected_verdict=MALICE | 104 | 46 |
+
+(Los números del 2026-07-14 contaban 199 casos y "23 currently MALICE" —
+métrica distinta: veredicto emitido vs `expected_verdict` que usa el script
+versionado. No son comparables uno a uno.)
+
+**Hallazgo del censo de `source_tool` en los 66 casos INSUFFICIENT_TOOLS:**
+los valores dominantes son placeholders de conversión/adquisición, no
+herramientas de análisis: `None` (91 artifacts), `legacy_converter` (88),
+`manual_forensic_review` (43), `generate_forensic_hash` (35),
+`read_evidence` (8). El fallback conservador (solo `"unknown"` tratado como
+ausente) no los cubre: 31 de los 66 casos tienen >= 2 `evidence_type`
+distintos y pasarían el check de diversidad si esos placeholders se trataran
+como ausentes. **Decisión pendiente (Anna):** definir el set de placeholders
+de conversión que no cuentan como herramienta (`legacy_converter`,
+`manual_forensic_review`, `generate_forensic_hash`, `read_evidence`) — es
+política de datos, no código; con esa decisión el fallback existente los
+cubre con un cambio de una línea.
 
 ### Why not adapt the gate instead
 
@@ -6954,5 +7020,83 @@ cambio de comportamiento para instalaciones que ya seteaban `log_path` explícit
   byte a byte intacto, y `log_path` explícito sigue ganando.
 - Precaución del diseño verificada: ningún test del repo hardcodea la ruta del
   audit log como dependiente de `VIGIA_EVIDENCE_DIR` (suite completa verde).
+
+---
+
+## B-136 — El patrón "inyección a CAIE" fuera del scorer es un no-op estructural: engines locales descartados + kwargs inexistentes en 3 de 4 sitios
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | DOCUMENTADO — fix arquitectónico pendiente (decisión de diseño: routing al engine del scorer + perfiles de evidencia nuevos) |
+| **Severidad** | P2 — dead code que emite logs de auditoría falsos (`CAIE_ARTIFACT_INJECTED` sin efecto real); ninguna fractura de estos tools llegó jamás al veredicto |
+| **Archivos** | `vigia/tools/adversarial_nlp.py:1595`, `vigia/core/entanglement.py:597`, `vigia/forensics/temporal_forensics_redteam.py:740`, `vigia/forensics/vision_audit.py:514` |
+| **Detectado en** | Sesión post-hackathon 2026-07-16, auditoría B-114/B-115 |
+
+### Descripción (Peirceana)
+
+- **Firstness:** Cuatro sitios construyen `caie = CrossArtifactIncongruenceEngine()`
+  como variable local, agregan artifacts, y la función retorna sin que nada lea el
+  engine (`detect_fractures()` nunca se llama sobre esa instancia; el objeto se
+  descarta). No existe ningún singleton ni engine compartido en el repo: censo de
+  instanciaciones = scorer (`vigia_scorer.py:652`, construye el suyo desde las
+  señales del caso), self-tests de caie.py, y estos 4 sitios.
+- **Secondness:** El único consumidor real de CAIE es el scorer, que construye su
+  engine desde los artifacts sellados del caso vía `add_artifact()`. Una API de
+  inyección solo tiene efecto si alguien lee el engine inyectado. El baseline
+  correcto (vision_audit docstring: "Produces DOCUMENT_FORGERY fractures
+  automatically") nunca fue verdad: la fractura se produciría solo dentro del
+  objeto descartado.
+- **Thirdness:** La ley: "inyectar en un engine efímero es código muerto que
+  además produce trail de auditoría engañoso". `vision_audit` loguea
+  `CAIE_ARTIFACT_INJECTED` como éxito; `entanglement` loguea
+  `ENTANGLEMENT_CAIE_INJECTED`. Para una herramienta que reclama trail Daubert,
+  un log de auditoría que afirma una inyección sin efecto es un problema de
+  integridad del trail, no solo deuda técnica.
+
+### Censo de los 4 sitios
+
+| Sitio | Firma de llamada | evidence_type pasado | ¿En whitelist? | Doble rotura |
+|-------|------------------|----------------------|----------------|--------------|
+| `vision_audit.py:543,552` | CORRECTA (`tool_name=`, `result=`) | `document_visual` / `document_geometry` | Sí | Solo engine descartado |
+| `adversarial_nlp.py:1597` (B-115) | ROTA (`source_tool=`, `raw_score=`, ...) → TypeError silenciado | `linguistic_forensics` | **NO** | kwargs + engine descartado + tipo fuera de whitelist |
+| `entanglement.py:599` | ROTA (mismos kwargs inexistentes) | `batch_forensics` | **NO** | kwargs + engine descartado + tipo fuera de whitelist |
+| `temporal_forensics_redteam.py:741` | ROTA (mismos kwargs inexistentes) | `temporal_fraud` | **NO** | kwargs + engine descartado + tipo fuera de whitelist |
+
+### Por qué NO se aplicó el fix mecánico de B-115 (refutación tipo Eco)
+
+El fix "obvio" (corregir kwargs) fue evaluado y **rechazado**: hoy la llamada rota
+lanza TypeError y queda logueada honestamente como `CAIE_INJECTION_FAILED`.
+Corregir solo los kwargs convertiría ese fallo honesto en un **éxito falso**
+(inyección a objeto descartado, sin efecto, con log de éxito) — estrictamente
+peor bajo el estándar de honestidad del trail. El fix real es arquitectónico.
+
+### Hallazgo lateral que disuelve la "decisión de normalización" de B-115
+
+`adversarial_nlp.py:1131` ya define `confidence = min(1.0, (mcp - 1.0) / 4.0)` —
+las dos opciones que B-115 contraponía (`(mcp-1)/4` vs `verdict.confidence`)
+son el mismo valor. Cuando se cablee el fix arquitectónico, `verdict.confidence`
+es el `raw_score` correcto sin necesidad de decisión adicional.
+
+### Fix diseñado (pendiente de decisión de Anna)
+
+1. **Routing:** las fracturas de estos tools deben llegar al engine que el scorer
+   construye — la vía natural es que los tools emitan sus hallazgos como
+   artifacts/señales del caso (mismo camino que todo lo demás), NO que mantengan
+   engines paralelos. Eliminar los 4 bloques de inyección local y sus logs.
+2. **Perfiles:** si se desea que estos artifacts pesen en CAIE, agregar
+   `linguistic_forensics`, `batch_forensics`, `temporal_fraud` a
+   `EVIDENCE_PROFILES` con spoofability calibrada (decisión de calibración
+   forense — misma clase que B-092).
+3. **Gate:** cualquier cableado real requiere corrida comparativa de corpus
+   (regla `fixed>=1 AND broken==0`), porque fracturas nuevas mueven veredictos.
+
+### Relación con B-114 y B-115
+
+- B-114 (bypass de guardrails en `add_from_tool_result`) queda RESUELTO — el
+  wrapper ahora delega en `add_artifact()`. Esto NO arregla B-136 (el engine
+  sigue siendo descartado), pero cierra el hueco estructural para cualquier
+  caller futuro del wrapper.
+- B-115 queda SUBSUMIDO en esta entrada: su alcance real es 3 sitios, no 1, y
+  el fix mecánico está refutado (ver arriba).
 
 ---

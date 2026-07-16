@@ -109,10 +109,19 @@ class SignalQualityGate:
         )
 
     def _get_tool_name(self, signal) -> str:
-        if hasattr(signal, 'tool_name'):
-            return signal.tool_name
-        elif isinstance(signal, dict):
-            return signal.get("tool_name", "unknown")
+        # B-116 (unblocking condition 3): the scorer's artifacts carry
+        # `source_tool` (often the literal string "unknown" in legacy cases)
+        # and a reliably populated `evidence_type` — not `tool_name`. The
+        # diversity/independence checks fall back along that chain so that
+        # provenance-rich cases are not degraded just because the tool-name
+        # field was never populated during conversion. "unknown" is treated
+        # as absent: it must never count as a distinct tool.
+        for field in ("tool_name", "source_tool", "evidence_type"):
+            value = getattr(signal, field, None)
+            if value is None and isinstance(signal, dict):
+                value = signal.get(field)
+            if value and value != "unknown":
+                return str(value)
         return "unknown"
 
     def _get_z_score(self, signal) -> float:
