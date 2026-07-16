@@ -78,6 +78,13 @@ _IOS_MARKER_FILES = {
     "sms.db", "AddressBook.sqlitedb", "CallHistory.storedata",
     "History.db", "Info.plist", "keychain-2.db",
     "signal.sqlite",
+    # B-133: CoreDuet app-activity database. Present on BOTH macOS and iOS
+    # (/private/var/mobile/Library/CoreDuet/Knowledge/knowledgeC.db), so it
+    # must not count as a macOS-exclusive marker: the B-048 precedence guard
+    # (_MACOS_MARKER_FILES - _IOS_MARKER_FILES) would otherwise route every
+    # full iOS extraction containing it to the macOS engine and silently
+    # skip the iOS engine (observed: VIGIA-MAGNET-2022-iOS-JESS).
+    "knowledgeC.db",
 }
 
 
@@ -644,6 +651,28 @@ class iOSForensicsAnalyzer:
                 "description": "Signal — end-to-end encrypted messaging (filename detection)",
                 "severity": str(Fraction(60, 100)),
                 "paths_found": len(signal_db_matches),
+            })
+
+        # B-134: Wire detection by filename — iOS stores third-party apps in
+        # UUID-named containers (Containers/Data/Application/<UUID>/), so the
+        # bundle-ID directory scan above never matches "com.wire". Wire's
+        # message database (store.wiredatabase) is app-specific and already
+        # extracted by this engine; its presence proves the app is installed.
+        # Same pattern and weight as the signal.sqlite special case.
+        wire_db_matches = (
+            list(evidence_path.glob("store.wiredatabase"))
+            + [p for d in evidence_path.iterdir() if d.is_dir()
+               for p in d.glob("store.wiredatabase")]
+        )
+        if wire_db_matches and not any(
+            app["bundle_id"] == "com.wire"
+            for app in self._encrypted_apps
+        ):
+            self._encrypted_apps.append({
+                "bundle_id": "com.wire",
+                "description": "Wire — E2E encrypted messaging (filename detection)",
+                "severity": str(Fraction(60, 100)),
+                "paths_found": len(wire_db_matches),
             })
 
         # Psiphon tunneling framework

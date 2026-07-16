@@ -6470,11 +6470,11 @@ no artefactual (empate persiste con la timeline funcionando).
 
 ---
 
-## B-131 — Metadata de adquisición no se propaga a señales derivadas de los motores [DOCUMENTADO — fix pendiente]
+## B-131 — Metadata de adquisición no se propaga a señales derivadas de los motores [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | DOCUMENTADO — fix pendiente (requiere dry-run de corpus completo antes de aplicar) |
+| **Estado** | RESUELTO — 2026-07-16, sesión post-hackathon (helper `_inject_acq_meta` + gate comparativo de corpus) |
 | **Severidad** | P2 (metadata de adquisición ausente en señales derivadas; degradación honesta de base_trust a 0.10 para esas señales) |
 | **Archivos** | `vigia/sift/sift_orchestrator.py` (Gamma loop, pasos 6 y 8) |
 | **Detectado en** | VIGIA-REAL-VANKO-2026 corrida RAW 2026-07-14 |
@@ -6531,6 +6531,32 @@ el mismo rigor que B-126/B-127.
 PREFETCH_ANALYZER) es **comportamiento correcto**, no un bug. El examinador pasó
 `--write-blocker-used false`, lo que es honesto: no se usó write blocker. CAIE degrada
 el trust correspondiente según NIST SP 800-86. El sistema funciona como fue diseñado.
+
+### Fix aplicado (2026-07-16)
+
+Helper estático `SIFTOrchestrator._inject_acq_meta(sig, acq_meta)` en
+`vigia/sift/sift_orchestrator.py`, aplicado en los 6 puntos de creación de señales
+post-Gamma: paso 6 (Metabolic, Resonance, Behavioral, Patterns), paso 7
+(UnifiedTimeline — mismo gap, no listado en el reporte original pero misma ley) y
+paso 8 (AdversarialRobustness). Merge con la misma precedencia del Gamma loop:
+`{**_acq_meta, **sig.metadata}` — la metadata propia de la señal gana.
+`acq_meta` vacío o `sig=None` son no-ops.
+
+### Verificación
+
+- Reproducción en vivo pre-fix: `run_full_analysis(event_stream=...)` con
+  `acquisition_overrides` seteados → METABOLIC_PROFILER, BEHAVIORAL_FINGERPRINT,
+  UNIFIED_TIMELINE y ADV_ROBUST sin `acquisition_tool`/`examiner_id`/`write_blocker_used`,
+  CAIE disparando ACQUISITION_METADATA_MISSING_CRITICAL (base_trust 0.10).
+- Post-fix: las 4 señales derivadas llevan los 3 campos declarados. CAIE solo
+  reclama `acquisition_hash`/`acquisition_timestamp`, honestamente ausentes en una
+  corrida sintética sin registros ACQUIRE en la cadena (degradación honesta, correcta).
+- Red tests: `tests/test_b131_acq_meta_propagation.py` (6 tests — propagación,
+  precedencia, no-op, passthrough de None).
+- Gate comparativo de corpus (`run_all_agent.py --rerun`, 201 casos): baseline
+  pre-fix 189/201 PASS, post-fix 189/201 PASS, cero flips de veredicto por caso
+  (diff campo a campo del `_batch_summary.json`). Suite completa: 1376 → 1397
+  passed (+21 tests nuevos B-131/B-133/B-134/B-135), 0 regresiones.
 
 ---
 
@@ -6639,11 +6665,11 @@ genuinamente en vez de alucinar un veredicto cuando la evidencia es insuficiente
 
 ---
 
-## B-133 — `knowledgeC.db` en `_MACOS_MARKER_FILES` activa la guarda B-048 y omite el motor iOS [PENDIENTE — fix diseñado]
+## B-133 — `knowledgeC.db` en `_MACOS_MARKER_FILES` activa la guarda B-048 y omite el motor iOS [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — fix diseñado, requiere dry-run corpus antes de aplicar |
+| **Estado** | RESUELTO — 2026-07-16, sesión post-hackathon (`knowledgeC.db` agregado a `_IOS_MARKER_FILES` + dry-run de routing) |
 | **Severidad** | P1 — el motor iOS se omite silenciosamente en cualquier extracción iOS que contenga knowledgeC.db |
 | **Archivos** | `vigia/sift/macos_forensics.py` (`_MACOS_MARKER_FILES`), `vigia/sift/ios_forensics.py` (`_IOS_MARKER_FILES`), `vigia_agent.py` (guarda B-048) |
 | **Detectado en** | VIGIA-MAGNET-2022-iOS-JESS, corrida RAW 2026-07-14 |
@@ -6712,13 +6738,45 @@ omitido, bundle con cero señales de ios_forensics, ABSTAIN por falta de señale
 Segunda corrida (después de mover `knowledgeC.db` a `_mode2_only/`): motor iOS
 correctamente invocado, 22 findings, IOS_FORENSICS z=2.80, bundle sealed.
 
+### Fix aplicado (2026-07-16)
+
+`knowledgeC.db` agregado a `_IOS_MARKER_FILES` en `vigia/sift/ios_forensics.py`
+(con comentario B-133 explicando la colisión multiplataforma). Con esto,
+`_MACOS_MARKER_FILES - _IOS_MARKER_FILES` queda con marcadores genuinamente
+exclusivos de macOS (TCC.db, .fseventsd, .Spotlight-V100, system.log,
+QuarantineEventsV2, plists) y la guarda B-048 de `vigia_agent.py` ya no
+secuestra extracciones iOS completas.
+
+### Verificación
+
+- Red tests: `tests/test_b133_knowledgec_ios_marker.py` (6 tests):
+  - extracción iOS completa (sms.db + knowledgeC.db + Info.plist) → routing iOS,
+    macOS NO activado;
+  - extracción macOS real (History.db + knowledgeC.db + TCC.db + system.log) →
+    routing macOS intacto;
+  - directorio que matchea ambos motores → ambos paths al mismo directorio, que
+    es exactamente el caso que la guarda de precedencia del shim
+    (`sift_orchestrator.py`, iOS skipped) sigue resolviendo;
+  - regresión B-048: el set exclusivo macOS sigue no-vacío (>= 5 marcadores).
+- Dry-run de routing sobre los directorios con marcadores presentes en el repo
+  (2 directorios: `cases/tuck-2019-macos/Preferences`, `cases/tuck-2019-macos/Safari`):
+  cero flips pre/post.
+- **Cobertura honesta del dry-run:** los casos JSON del corpus (201) no ejercitan
+  el routing por marcadores (son archivos únicos, no directorios de evidencia), y
+  el repo no contiene extracciones raw macOS/iOS completas (JESS/VANKO viven fuera
+  del repo). El riesgo residual documentado en el diseño — un caso macOS cuyo
+  ÚNICO marcador exclusivo sea `knowledgeC.db` — no tiene instancia en el repo;
+  toda extracción macOS real del corpus usado hasta ahora incluye TCC.db o
+  .fseventsd. Si apareciera un caso así, flipearía a iOS: queda anotado como
+  limitación de cobertura del gate, no como regresión observada.
+
 ---
 
-## B-134 — `_detect_installed_apps` no detecta Wire via `store.wiredatabase` — brecha UUID de iOS [PENDIENTE — fix diseñado]
+## B-134 — `_detect_installed_apps` no detecta Wire via `store.wiredatabase` — brecha UUID de iOS [RESUELTO — Wire; WeChat documentado como limitación]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — fix diseñado, requiere dry-run corpus antes de aplicar |
+| **Estado** | RESUELTO (Wire) — 2026-07-16, sesión post-hackathon. WeChat via keychain sigue como limitación documentada (sin fix portátil entre versiones) |
 | **Severidad** | P2 — falso negativo en detección de Wire; WeChat requiere análisis separado |
 | **Archivo** | `vigia/sift/ios_forensics.py::_detect_installed_apps` |
 | **Detectado en** | VIGIA-MAGNET-2022-iOS-JESS, análisis Mode 2 2026-07-14 |
@@ -6783,13 +6841,33 @@ instalación (`applicationState.db` o `MobileInstallation.plist`). Estos archivo
 sí existen en extracciones completas pero no son parseados por ios_forensics.py.
 Documentado como limitación de cobertura, no bug a resolver en esta tanda.
 
+### Fix aplicado (2026-07-16) — Wire
+
+Detección por filename de `store.wiredatabase` en `_detect_installed_apps`
+(`vigia/sift/ios_forensics.py`), mismo patrón y peso que el caso especial de
+`signal.sqlite`: raíz del directorio de evidencia + un nivel de subdirectorio,
+guard anti doble-conteo si el contenedor `com.wire` ya fue detectado por
+bundle ID. Severidad `Fraction(60, 100)`, consistente con la entrada
+`com.wire` de `ENCRYPTED_APPS`.
+
+WeChat NO se toca en esta tanda (sin filename portátil entre versiones;
+requiere parseo de keychain — sigue como limitación documentada arriba).
+
+### Verificación
+
+- Red tests: `tests/test_b134_wire_filename_detection.py` (5 tests): detección
+  en raíz y en subdirectorio, no doble-conteo con contenedor bundle-ID presente,
+  regresión del caso Signal, directorio vacío sin falsos positivos.
+- `store.wiredatabase` es un nombre específico de Wire (riesgo de falso positivo
+  bajo, igual que el diseño preveía). Gate de corpus sin cambios de veredicto.
+
 ---
 
-## B-135 — `SecurityAudit` defaultea `_DEFAULT_LOG_DIR` a `VIGIA_EVIDENCE_DIR` — escribe `security_audit.log` en directorio de evidencia [PENDIENTE — fix diseñado]
+## B-135 — `SecurityAudit` defaultea `_DEFAULT_LOG_DIR` a `VIGIA_EVIDENCE_DIR` — escribe `security_audit.log` en directorio de evidencia [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — fix diseñado, bajo impacto en producción |
+| **Estado** | RESUELTO — 2026-07-16, sesión post-hackathon (Opción A: `VIGIA_LOG_DIR`, consistente con `vigia/config.py`) |
 | **Severidad** | P2 — violación del principio de evidencia read-only; no afecta la integridad del análisis |
 | **Archivo** | `vigia/security/security.py`, línea 47: `_DEFAULT_LOG_DIR` |
 | **Detectado en** | VIGIA-MAGNET-2022-iOS-JESS, dos corridas Mode 1 RAW 2026-07-14 |
@@ -6853,5 +6931,28 @@ python3 vigia_agent.py --evidence "$VIGIA_EVIDENCE_DIR" --case-id CASE-001
 O eliminar manualmente `security_audit.log` del directorio de evidencia después
 de cada corrida (workaround del caso VIGIA-MAGNET-2022-iOS-JESS: eliminado manualmente
 dos veces durante la sesión 2026-07-14).
+
+### Fix aplicado (2026-07-16)
+
+Opción A del diseño: `_DEFAULT_LOG_DIR = os.getenv("VIGIA_LOG_DIR", "/var/log/vigia")`
+en `vigia/security/security.py`. Hipótesis benigna ("el default era intencional")
+refutada empíricamente: `vigia/config.py` ya resolvía `log_dir` desde
+`VIGIA_LOG_DIR` con el mismo default — el uso de `VIGIA_EVIDENCE_DIR` en
+security.py era una inconsistencia, no una decisión. `VIGIA_LOG_DIR` documentado
+en INSTALL.md (sección 7, campos opcionales) y en la sección Environment
+Prerequisites del CLAUDE.md.
+
+El fallback seguro existente (`_create_secure_fallback_log`, tempdir 0o700 +
+mkstemp 0o600) cubre el caso donde `/var/log/vigia` no es escribible — sin
+cambio de comportamiento para instalaciones que ya seteaban `log_path` explícito.
+
+### Verificación
+
+- Red tests: `tests/test_b135_security_log_dir.py` (5 tests): el default ignora
+  `VIGIA_EVIDENCE_DIR`, honra `VIGIA_LOG_DIR`, fallback `/var/log/vigia`,
+  end-to-end `SecurityAudit()` + `log_info()` deja el directorio de evidencia
+  byte a byte intacto, y `log_path` explícito sigue ganando.
+- Precaución del diseño verificada: ningún test del repo hardcodea la ruta del
+  audit log como dependiente de `VIGIA_EVIDENCE_DIR` (suite completa verde).
 
 ---

@@ -378,6 +378,30 @@ class SIFTOrchestrator:
         sig.metadata = meta
         return sig
 
+    @staticmethod
+    def _inject_acq_meta(
+        sig: Optional[SignalOutput], acq_meta: Dict[str, Any]
+    ) -> Optional[SignalOutput]:
+        """
+        B-131: merge acquisition metadata into a signal created AFTER the
+        Gamma loop (engine motors, unified timeline, adversarial robustness).
+
+        The Gamma loop injects _acq_meta into every raw SIFT signal, but the
+        post-Gamma signals are brand-new SignalOutput objects that never pass
+        through it, so CAIE degraded their base_trust to 0.10 for missing
+        chain-of-custody fields (NIST SP 800-86 §4.3) even when the examiner
+        had declared them (observed: VIGIA-REAL-VANKO-2026, CROSS_RESONANCE /
+        CASE_PATTERN_LIBRARY / ADV_ROBUST at base_trust=0.10).
+
+        Same merge precedence as the Gamma loop: the signal's own metadata
+        wins over injected acquisition fields.
+        """
+        if sig is None or not acq_meta:
+            return sig
+        meta = dict(sig.metadata) if isinstance(sig.metadata, dict) else {}
+        sig.metadata = {**acq_meta, **meta}
+        return sig
+
     def run_full_analysis(
         self,
         memory_dump_path: Optional[str] = None,
@@ -759,7 +783,11 @@ class SIFTOrchestrator:
         if event_stream and self.metabolic:
             try:
                 meta_result = self.metabolic.analyze(event_stream)
-                sig = self._mark_derived(self._to_signal_safe(meta_result, "metabolic"))
+                # B-131: engine signals are created after the Gamma loop and
+                # must receive the acquisition metadata explicitly.
+                sig = self._inject_acq_meta(
+                    self._mark_derived(self._to_signal_safe(meta_result, "metabolic")),
+                    _acq_meta)
                 if sig:
                     engine_signals.append(sig)
                     results["metabolic"] = sig.metadata
@@ -770,7 +798,9 @@ class SIFTOrchestrator:
         if frs_adjusted and self.resonance:
             try:
                 res_result = self.resonance.analyze(frs_adjusted)
-                sig = self._mark_derived(self._to_signal_safe(res_result, "resonance"))
+                sig = self._inject_acq_meta(
+                    self._mark_derived(self._to_signal_safe(res_result, "resonance")),
+                    _acq_meta)
                 if sig:
                     engine_signals.append(sig)
                     results["resonance"] = sig.metadata
@@ -784,7 +814,9 @@ class SIFTOrchestrator:
                     self.behavioral.train_baseline(normal_events)
                 if event_stream:
                     beh_result = self.behavioral.analyze(event_stream)
-                    sig = self._mark_derived(self._to_signal_safe(beh_result, "behavioral"))
+                    sig = self._inject_acq_meta(
+                        self._mark_derived(self._to_signal_safe(beh_result, "behavioral")),
+                        _acq_meta)
                     if sig:
                         engine_signals.append(sig)
                         results["behavioral"] = sig.metadata
@@ -795,7 +827,9 @@ class SIFTOrchestrator:
         if frs_adjusted and self.patterns:
             try:
                 pat_result = self.patterns.match(frs_adjusted)
-                sig = self._mark_derived(self._to_signal_safe(pat_result, "patterns"))
+                sig = self._inject_acq_meta(
+                    self._mark_derived(self._to_signal_safe(pat_result, "patterns")),
+                    _acq_meta)
                 if sig:
                     engine_signals.append(sig)
                     results["patterns"] = sig.metadata
@@ -811,7 +845,11 @@ class SIFTOrchestrator:
         if all_signals and self.timeline_engine:
             try:
                 tl_result = self.timeline_engine.build_timeline(all_signals)
-                sig = self._mark_derived(self._to_signal_safe(tl_result, "timeline"))
+                # B-131: the timeline signal (step 7) shares the same gap as
+                # the engine motors — created post-Gamma, never enriched.
+                sig = self._inject_acq_meta(
+                    self._mark_derived(self._to_signal_safe(tl_result, "timeline")),
+                    _acq_meta)
                 if sig:
                     all_signals.append(sig)
                     results["timeline"] = sig.metadata
@@ -824,7 +862,9 @@ class SIFTOrchestrator:
         adv_signal: Optional[SignalOutput] = None
         if all_signals and self.adv_robust:
             try:
-                adv_signal = self._mark_derived(self.adv_robust.analyze(all_signals))
+                adv_signal = self._inject_acq_meta(
+                    self._mark_derived(self.adv_robust.analyze(all_signals)),
+                    _acq_meta)
                 if adv_signal:
                     all_signals.append(adv_signal)
                     results["adversarial"] = adv_signal.metadata

@@ -142,6 +142,17 @@ VIGIA_LLM_BACKEND=anthropic
 > `/var/lib/vigia/evidence` which requires root permissions. Always replace it
 > with a path inside the repo directory for development.
 
+Optional fields:
+
+```
+VIGIA_LOG_DIR=/var/log/vigia           # Where security_audit.log is written
+```
+
+> **Note (B-135):** `VIGIA_LOG_DIR` controls where `SecurityAudit` writes
+> `security_audit.log` (default: `/var/log/vigia`, with a secure temp
+> fallback when that path is not writable). It must NEVER point inside
+> `VIGIA_EVIDENCE_DIR` — evidence is read-only.
+
 ---
 
 ## 8. Verify the installation
