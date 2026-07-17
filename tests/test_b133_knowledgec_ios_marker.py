@@ -16,9 +16,13 @@ ios_forensics signals (observed: VIGIA-MAGNET-2022-iOS-JESS, 2026-07-14).
 Fix: add knowledgeC.db to _IOS_MARKER_FILES so the macOS-exclusive set
 no longer contains a file that ships on every full iOS extraction.
 Real macOS evidence keeps triggering the macOS engine through genuinely
-exclusive markers (TCC.db, .fseventsd, .Spotlight-V100, system.log, ...),
-and the shim same-directory precedence guard still prevents double
-processing when both engines match.
+exclusive markers (.fseventsd, .Spotlight-V100, system.log,
+QuarantineEventsV2, ...), and the shim same-directory precedence guard
+still prevents double processing when both engines match.
+
+Note: TCC.db is no longer a valid witness of macOS-exclusivity — B-137
+moved it to _IOS_MARKER_FILES for the same reason B-133 moved
+knowledgeC.db, so this test uses system.log instead.
 """
 
 from pathlib import Path
@@ -52,7 +56,8 @@ class TestB133Markers:
         """Regression guard for B-048 itself: the macOS detector must keep a
         non-empty exclusive marker set after the B-133 change."""
         exclusive = _MACOS_MARKER_FILES - _IOS_MARKER_FILES
-        assert "TCC.db" in exclusive
+        # system.log is macOS-only (TCC.db was moved to iOS markers by B-137).
+        assert "system.log" in exclusive
         assert ".fseventsd" in exclusive
         assert len(exclusive) >= 5
 

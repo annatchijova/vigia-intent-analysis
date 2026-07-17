@@ -7100,3 +7100,83 @@ es el `raw_score` correcto sin necesidad de decisión adicional.
   el fix mecánico está refutado (ver arriba).
 
 ---
+
+## B-137 — `TCC.db` en `_MACOS_MARKER_FILES` activa la guarda B-048 y omite el motor iOS (residual de B-048, hermano de B-133) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-17 (`TCC.db` agregado a `_IOS_MARKER_FILES`, mismo patrón que B-133) |
+| **Severidad** | P2 — el motor iOS se omite silenciosamente en cualquier extracción iOS full-filesystem que contenga TCC.db |
+| **Archivos** | `vigia/sift/ios_forensics.py` (`_IOS_MARKER_FILES`), `vigia_agent.py` (comentario de la guarda B-048) |
+| **Detectado por** | Auditoría adversaria de Kimi K-1 (2026-07-17) sobre el branch `claude/unresolved-bugs-1231gn` |
+| **Documentado previamente como** | "Riesgo residual documentado" bajo la entrada B-048 (nunca cerrado, sin ID propio) |
+
+### Descripción
+
+Idéntica clase de bug que B-133. La guarda B-048 da precedencia al motor macOS
+cuando el directorio de evidencia contiene marcadores exclusivos de macOS:
+
+```python
+if all_names & (_MACOS_MARKER_FILES - _IOS_MARKER_FILES):
+    kwargs["macos_evidence_path"] = str(evidence_path)
+```
+
+`_MACOS_MARKER_FILES` incluía `TCC.db`. Este archivo **también existe en iOS**
+(ruta: `/private/var/mobile/Library/TCC/TCC.db` — base de datos del subsistema
+de privacidad Transparency, Consent & Control). Una extracción iOS full-filesystem
+que contenga `TCC.db` hace que la diferencia `_MACOS_MARKER_FILES - _IOS_MARKER_FILES`
+no sea vacía → se activa el motor macOS → el motor iOS no se ejecuta → se pierden
+los findings iOS-específicos (SMS, contacts, calls).
+
+### Causa raíz (Peircean)
+
+- **Firstness:** `macos_evidence_path` seteado y `ios_evidence_path` presente para
+  el mismo directorio; la precedencia del shim corre solo macOS; cero señales
+  IOS_FORENSICS.
+- **Secondness:** `TCC.db` estaba en `_MACOS_MARKER_FILES` como marcador macOS,
+  pero TCC es un subsistema de Apple presente en ambas plataformas. El artefacto
+  es multiplataforma; la lista de marcadores asumía exclusividad.
+- **Thirdness:** Misma ley que B-133 — cualquier artefacto cross-platform presente
+  en exactamente uno de los dos sets rompe la resta de exclusividad. El propio
+  comentario de la guarda B-048 (`vigia_agent.py`) admitía este residual para
+  TCC.db pero delegaba en el "shim precedence guard", que solo cubre el caso
+  same-directory, no la atribución de plataforma equivocada.
+
+### Fix aplicado (2026-07-17)
+
+`TCC.db` agregado a `_IOS_MARKER_FILES` en `vigia/sift/ios_forensics.py` (con
+comentario B-137 explicando la colisión). Con esto,
+`_MACOS_MARKER_FILES - _IOS_MARKER_FILES` conserva 7 marcadores genuinamente
+exclusivos de macOS (`.fseventsd`, `.Spotlight-V100`, `system.log`,
+`QuarantineEventsV2`, `com.apple.loginitems.plist`, `com.apple.recentitems.plist`,
+`SystemVersion.plist`) y la guarda B-048 ya no secuestra extracciones iOS. El
+comentario de la guarda en `vigia_agent.py` se actualizó (ya no describe TCC.db
+como residual abierto).
+
+### Riesgo simétrico (aceptado, misma clase que B-133)
+
+Un directorio macOS cuyo ÚNICO marcador exclusivo fuera `TCC.db` ahora ruteaería a
+iOS. Tan hipotético como el caso de knowledgeC.db: toda extracción macOS real del
+corpus incluye `.fseventsd`/`system.log`/etc., y el motor iOS sobre un TCC.db
+macOS-only produce ~cero findings (benigno y visible). La solución de fondo
+(routing por layout de directorios en vez de por nombres) queda para cuando exista
+un caso macOS real en el corpus que lo ejercite.
+
+### Verificación
+
+- `tests/test_b137_tcc_ios_marker.py` (6 tests): extracción iOS con TCC.db → routing
+  iOS, macOS NO activado; extracción macOS real → routing macOS intacto; knowledgeC.db
+  (B-133) + TCC.db (B-137) juntos con marcador iOS → routing iOS puro; regresión B-048:
+  el set exclusivo macOS sigue >= 5.
+- **Inducción pre/post:** contra el estado pre-fix (TCC.db fuera de `_IOS`), 4 de 6
+  tests fallan — el fallo de routing muestra `macos_evidence_path` seteado para una
+  extracción iOS con TCC.db, exactamente el hijack. Post-fix: 12/12 (B-137 + B-133).
+- El testigo `assert "TCC.db" in exclusive` del test de B-133 se corrigió a
+  `system.log` (TCC.db dejó de ser marcador macOS-exclusivo; la aserción codificaba
+  la creencia falsa que B-137 corrige — el invariante protegido, set exclusivo >= 5,
+  se conserva).
+- **Cobertura honesta:** igual que B-133, los 201 casos JSON del corpus no ejercitan
+  el routing por marcadores; no hay extracción raw iOS/macOS full en el repo. El fix
+  se sostiene por la clase de bug ya confirmada en B-133, no por un caso raw nuevo.
+
+---

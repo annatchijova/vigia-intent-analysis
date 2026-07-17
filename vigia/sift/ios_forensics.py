@@ -85,6 +85,14 @@ _IOS_MARKER_FILES = {
     # full iOS extraction containing it to the macOS engine and silently
     # skip the iOS engine (observed: VIGIA-MAGNET-2022-iOS-JESS).
     "knowledgeC.db",
+    # B-137: TCC (Transparency, Consent & Control) privacy database. Same
+    # class as B-133 — present on BOTH macOS and iOS
+    # (/private/var/mobile/Library/TCC/TCC.db), documented as the residual
+    # risk of B-048. Kept macOS-exclusive, it hijacked any full iOS
+    # extraction carrying it to the macOS engine (silent loss of the
+    # iOS-specific findings: SMS, contacts, calls). Adding it here closes
+    # the same subtraction hole B-133 closed for knowledgeC.db.
+    "TCC.db",
 }
 
 

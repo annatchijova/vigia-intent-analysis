@@ -1625,10 +1625,12 @@ def _build_orchestrator_kwargs(evidence_path: Path, params: Dict) -> Dict:
         # Collision guard: History.db (Safari) also lives in _IOS_MARKER_FILES,
         # and every real macOS evidence set has one — detecting macOS on shared
         # names would run both engines over the same artifacts (double count).
-        # macOS therefore requires a marker NOT shared with iOS. Residual risk
-        # (documented in B-048): full iOS extractions containing TCC.db may
-        # still trigger this detector; the shim precedence guard handles the
-        # same-directory case.
+        # macOS therefore requires a marker NOT shared with iOS. The two
+        # cross-platform databases that used to leak into this exclusive set —
+        # knowledgeC.db (B-133) and TCC.db (B-137) — are now iOS markers too,
+        # so a full iOS extraction carrying them no longer routes to macOS;
+        # the shim precedence guard still resolves any genuine same-directory
+        # dual match.
         try:
             from vigia.sift.macos_forensics import _MACOS_MARKER_FILES
             from vigia.sift.ios_forensics import _IOS_MARKER_FILES
