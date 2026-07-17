@@ -5566,6 +5566,21 @@ re-execution in batch loops). Regression:
 
 ## B-116 — `signal_quality_gate.py` designed and functional in isolation, NOT wired to scorer — dry-run shows 122/199 cases degraded
 
+> **Update 2026-07-17 (condition 4 re-measured, Kimi-endorsed placeholder
+> policy applied):** the four acquisition/conversion placeholders
+> (`legacy_converter`, `manual_forensic_review`, `generate_forensic_hash`,
+> `read_evidence`) no longer count as analysis tools — they are skipped in
+> the `tool_name -> source_tool -> evidence_type` fallback, exactly like the
+> literal "unknown". Single source of truth: `_NON_ANALYSIS_PLACEHOLDERS`
+> in `vigia/core/signal_quality_gate.py` (not replicated in scripts).
+> Re-measured dry-run (corpus grew 202 -> 205 evaluable): MODE B passed
+> 77 -> 87; ABSTAIN_INSUFFICIENT_TOOLS 66 -> 40 (the -26 matches the
+> census: 31/66 had >=2 distinct evidence_type; the uncovered cases now
+> land honestly in the next checks — DEPENDENT_SIGNALS/LOW_Z_VARIANCE);
+> degraded-with-expected-MALICE 46 -> 42. Gate remains UNWIRED (zero
+> production callers): no verdict moved. Tests:
+> `tests/test_b116_placeholder_tools.py` (9, red-first).
+
 | Field | Value |
 |-------|-------|
 | **Status** | POSTPONED — blocked by interface mismatch and data quality |

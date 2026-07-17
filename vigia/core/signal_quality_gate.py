@@ -24,6 +24,23 @@ from __future__ import annotations
 from fractions import Fraction
 from typing import List, Optional, Tuple
 
+# B-116 (condition 4, Kimi-endorsed placeholder policy): source_tool values
+# that name acquisition/conversion utilities, not analysis tools. The B-116
+# census over the 66 ABSTAIN_INSUFFICIENT_TOOLS cases showed these four
+# strings (plus None) dominate legacy artifacts: legacy_converter(88),
+# manual_forensic_review(43), generate_forensic_hash(35), read_evidence(8).
+# Counting them as distinct tools made the diversity check measure
+# conversion pipelines instead of analytic independence. They are treated
+# exactly like the literal "unknown": skipped in the tool_name ->
+# source_tool -> evidence_type fallback chain. SINGLE SOURCE OF TRUTH —
+# do not replicate this set in scripts (dryrun imports it from here).
+_NON_ANALYSIS_PLACEHOLDERS: frozenset = frozenset({
+    "legacy_converter",
+    "manual_forensic_review",
+    "generate_forensic_hash",
+    "read_evidence",
+})
+
 
 class QualityGateResult:
     def __init__(self, passed: bool, reason_code: str, reason_detail: str, metrics: dict):
@@ -115,12 +132,15 @@ class SignalQualityGate:
         # diversity/independence checks fall back along that chain so that
         # provenance-rich cases are not degraded just because the tool-name
         # field was never populated during conversion. "unknown" is treated
-        # as absent: it must never count as a distinct tool.
+        # as absent: it must never count as a distinct tool — and so are the
+        # acquisition/conversion placeholders (condition 4): a utility that
+        # copied or hashed the artifact is not the analysis that produced
+        # the signal.
         for field in ("tool_name", "source_tool", "evidence_type"):
             value = getattr(signal, field, None)
             if value is None and isinstance(signal, dict):
                 value = signal.get(field)
-            if value and value != "unknown":
+            if value and value != "unknown" and value not in _NON_ANALYSIS_PLACEHOLDERS:
                 return str(value)
         return "unknown"
 
