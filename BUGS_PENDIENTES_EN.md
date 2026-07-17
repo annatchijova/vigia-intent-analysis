@@ -5037,7 +5037,7 @@ namespaces remain); closes the silent drift.
 
 | Field | Value |
 |-------|-------|
-| **Status** | NOT APPLIED — the pre-registered gate (Anna's rule: `fixed>=1 AND broken==0`) rejected the change with fixed=30 / **broken=3**. Fix implemented, measured, and **reverted**. `xfail(strict=True)` sentinels in `tests/test_b097_motor_suspicion_verdict.py`. |
+| **Status** | APPLIED — 2026-07-10 with Anna's signature (triple independent-source validation), after the pre-registered gate (`fixed>=1 AND broken==0`) initially rejected the change with fixed=30 / broken=3 and the fix was reverted in that first session. The `xfail(strict=True)` sentinels in `tests/test_b097_motor_suspicion_verdict.py` became normal regression guards. See the "UPDATE 2026-07-10" block below; the rejection record is preserved as audit history. |
 | **Severity** | P1 (corpus metric and verdict semantics) — documented negative result |
 | **File** | `vigia_agent.py` (`classify_agent_verdict`) — edited and reverted |
 | **Detected in** | Recorded observation in `docs/B052_P2_DESIGN.md` §10.1 (§9.4-LIM enforcement session) |
@@ -6250,3 +6250,158 @@ to system.log (the protected invariant, exclusive set >= 5, holds).
 Verified by induction: 4/6 tests red pre-fix (showing macos_evidence_path
 set for an iOS extraction), 12/12 green after
 (`tests/test_b137_tcc_ios_marker.py`).
+
+---
+
+## B-138 — Two tests outside `tests/e2e` hard-imported `mcp` and broke the entire pytest collection in mcp-less environments [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-17 (`pytest.importorskip("mcp")` at the 4 dependent points) |
+| **Severity** | P3 (suite hygiene — no verdict impact) |
+| **Files** | `tests/test_grupob_b9_honey_token_lifecycle.py`, `vigia/tests/adversarial/test_human_jitter_deterministic_bypass.py`, `tests/test_h4_grep_sanitizer_unification.py`, `tests/test_b10_comparator_reads_sealed_verdict.py` |
+| **Detected in** | Abductive review session 2026-07-17 (suite run in an mcp-less environment) |
+
+### Description
+
+L-045 documents that `mcp` is not installable in minimal CI environments,
+and the suite doctrine excludes `tests/e2e` for that reason. But two files
+outside `tests/e2e` imported the bridge (which imports `mcp`) at module
+level: the whole pytest collection aborted with "Interrupted: 3 errors
+during collection" before a single test ran. Additionally, 5 tests in two
+other files imported the bridge (directly or via `run_llm_cases`) inside
+the test body and showed up as FAILED instead of skipping.
+
+### Fix
+
+`pytest.importorskip("mcp")` before the bridge import in the two
+collection-breaking files; a targeted skip in
+`test_bridge_reexports_canonical` (h4) and an autouse fixture in
+`TestLlmFallbackReadsSealedVerdict` (b10). With `mcp` installed nothing
+changes (importorskip is a no-op and the tests run exactly as before).
+
+### Verification
+
+- Pre-fix (induction, mcp-less environment): collection interrupted with
+  3 errors; with those 2 files manually excluded, 5 FAILED with
+  `ModuleNotFoundError: mcp`.
+- Post-fix: the 4 files report 22 passed / 7 skipped / 0 failed, and the
+  full suite (without `tests/integration` and `tests/e2e`) collects and
+  runs green in the same environment.
+
+---
+
+## B-139 — Unbounded `rglob("*")` marker scans in the three mobile/macOS engines (WHAT_IS_NEXT §1.3 residual) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-17 (bounded `scan_marker_names()` in `vigia/sift/_fs_utils.py`, 3 call sites migrated) |
+| **Severity** | P3 (resource robustness — no verdict impact for trees within the bound, which is all real ones) |
+| **Files** | `vigia/sift/ios_forensics.py`, `vigia/sift/android_forensics.py`, `vigia/sift/macos_forensics.py`, `vigia/sift/_fs_utils.py` (new) |
+| **Detected in** | Residual documented in WHAT_IS_NEXT §1.3 (S4 / AUDITORIA_COBERTURA_MOBILE_SIFT §C); picked up in the 2026-07-17 abductive review session |
+
+### Description
+
+S4 bounded the pattern-specific lookups with `_safe_rglob`
+(heapq.nsmallest, O(limit) memory), but the marker-validation step of the
+three engines still materialized EVERY name in the evidence tree
+(`{f.name for f in evidence_path.rglob("*")}`) before intersecting with
+the marker set: O(tree) memory and an unbounded walk on a hostile or giant
+evidence tree — the same class S4 closed everywhere else.
+
+### Fix
+
+Shared helper `scan_marker_names()` (same module pattern as
+`_math_utils`/`_sql_utils`): retains only names that ARE markers
+(O(markers) memory), filters symlinks, counts directories only with
+`include_dirs=True` (macOS: `.fseventsd` is a directory marker), and stops
+the walk at `MARKER_SCAN_MAX_ENTRIES` (500k) with a visible WARNING —
+honest degradation, never silent. For trees within the bound the result is
+identical to the old pattern (equivalence pin in the tests).
+
+**Refutation applied (scope):** the Magisk block in `_detect_root`
+(`list(evidence_path.rglob("com.topjohnwu.magisk"))` etc.) is deliberately
+left untouched: its `len()` values feed the finding's evidence string
+(changing them would alter emitted narrative) and they are name-specific
+lookups — not `rglob("*")` — with a handful of matches in practice.
+
+### Verification
+
+- `tests/test_b139_bounded_marker_scan.py` (15 tests, red first): helper
+  contract (equivalence with the old pattern, symlinks, dirs/include_dirs,
+  truncation WARNING and no WARNING within the bound) + engine pins
+  (marker detected / "No *-specific artifacts" note intact in both
+  directions, including `.fseventsd` as a directory).
+- Existing mobile pins (B-086/B-133/B-137 and related): 256 passed.
+- **Honest coverage (same caveat as B-133/B-137):** the 201 JSON corpus
+  cases do not exercise the marker scan over raw trees; equivalence rests
+  on the equivalence pin and the engine pins, not on a corpus run (which
+  would trivially show 0 flips).
+
+---
+
+## B-140 — L-029/FW-009 Fase 1: the DARVO detector was structurally blind to the motor path; annotation wired with zero verdict effect [RESOLVED — Fase 1]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED (Fase 1: annotation) — 2026-07-17. The verdict effect, `false_flag` as a verdict type, and the cross-bundle paired review remain open as doctrine/architecture (see L-029) |
+| **Severity** | P2 (the oldest HIGH pattern in the limitations registry with no code progress since 2026-06-24) |
+| **Files** | `vigia/core/darvo_detector.py`, `vigia_scorer.py` (Step 4c), `sift_orchestrator.py` (`_motor_darvo_summary` + channel), `vigia_agent.py` (narrative section) |
+| **Detected in** | Abductive review session 2026-07-17 (verifying L-029 against live code) |
+
+### Description (Peircean)
+
+- **Firstness:** `compute_darvo_penalty` reads fields with `getattr()` only.
+  Mode 1 (EBS JSON) artifacts are plain dicts → `getattr` returns the
+  default → the detector returns 0 ALWAYS outside the pipeline.
+  KIWI-001-A02 ("PHP error ... trampolin", log_entry) and A04 ("Blog
+  honeypot ... accesos ... bloqueado", file_metadata) carry exactly the
+  detector's keywords and never fired on the motor path.
+- **Secondness:** The only caller was `VigiaPipeline` (SignalOutput
+  objects). The canonical L-029 case (KIWI) runs through the motor path —
+  where the detector was invisible by construction. The limitation said
+  "not wired to the orchestrator/agent"; reality was worse: even wired, it
+  could not fire on dicts.
+- **Thirdness:** The law: a detector that assumes ONE caller's shape goes
+  silently mute for every other — same class as B-136 (injection into a
+  discarded engine) and B-063 (metadata=None): the silent structural
+  failure at a format boundary.
+
+### Fix (Fase 1 — annotation, zero verdict movement)
+
+1. `_field()` in the detector: reads dict OR object; total against
+   malformed fields (str() coercion, non-dict metadata). Object (pipeline)
+   behavior is PINNED unchanged.
+2. Structured `detect_darvo_pattern()`: counts, Fraction penalty, matched
+   artifact ids (Daubert traceability).
+   **Annotation calibration (measured refutation):** `pattern_present`
+   demands the FULL asymmetry (surveillance AND zero-contact). With
+   surveillance keywords alone ('log', 'server'...) 52/201 corpus cases
+   (incl. benign) would carry the block — misleading narrative; with both
+   sides, exactly the right 5 (KIWI-001/003/004/005 +
+   MAGNET-2021-IOS-ELI — the latter already a label-review candidate in
+   B-097). The penalty keeps its original formula: it is the pipeline's
+   consistency_score contract and was not touched.
+3. `_vigia_score` Step 4c: `darvo_pattern` block in the sealed output
+   (penalty as str, counts, ids, `verdict_effect: none`). ANNOTATION ONLY —
+   neither verdict nor score moves.
+4. Narrative channel: `_motor_darvo_summary` (same B-094 shape) →
+   `results["darvo"]` → "DARVO PATTERN" section in the sealed narrative,
+   which states explicitly that the verdict was NOT modified.
+
+### Verification
+
+- `tests/test_b140_darvo_motor_annotation.py` (17 tests, red first): dict
+  support + object pins (exact pre-B-140 values), full asymmetry required,
+  malformed inputs safe, faithful scorer annotation, verdict/score/
+  confidence equality pin against a keyword-scrubbed twin, orchestrator
+  helper, and the real KIWI-001 case (2 surveillance + zero-contact,
+  penalty 3/5).
+- **Comparative gate (clean HEAD worktree vs changed tree, full
+  `run_all_agent --rerun` on both):** 201 common cases, **ZERO verdict
+  flips**. A first baseline was discarded as contaminated (it ran while
+  the tree was mid-edit — the per-case subprocess re-imports from disk);
+  the valid gate used an isolated worktree.
+- Full suite green (see commit).
+- `results/` restored via `git checkout -- results/` after the gate
+  (B-097 practice: regenerated bundles are not committed).

@@ -150,6 +150,12 @@ def test_corrupt_bundle_still_error(tmp_path):
 # sellado en vez del agent_verdict sellado (post-gate) — misma clase que B10.
 
 class TestLlmFallbackReadsSealedVerdict:
+    @pytest.fixture(autouse=True)
+    def _requires_mcp(self):
+        # L-045: run_llm_cases imports the bridge, which imports `mcp` —
+        # not installable in minimal CI environments; skip there (B-138).
+        pytest.importorskip("mcp")
+
     def _bundle(self, tmp_path, case_id, body):
         (tmp_path / f"{case_id}_agent_bundle.json").write_text(json.dumps(body))
 

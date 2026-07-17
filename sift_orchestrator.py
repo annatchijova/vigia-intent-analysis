@@ -160,6 +160,37 @@ def _motor_caie_summary(motor: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     }
 
 
+def _motor_darvo_summary(motor: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """
+    B-140 (L-029 / FW-009 Fase 1): traduce la anotación DARVO del scorer
+    (`darvo_pattern` en la salida de _vigia_score) al canal de narrativa —
+    el mismo shape/canal que B-094 abrió para la CAIE viva. Devuelve None si
+    el scorer no anotó el patrón (la narrativa no inventa bloques vacíos).
+
+    Fiel a lo que el scorer computó: la anotación NO movió el veredicto
+    (Fase 1), y la nota lo dice explícitamente — un lector del bundle no
+    debe inferir un efecto que no existió.
+    """
+    if not isinstance(motor, dict):
+        return None
+    block = motor.get("darvo_pattern")
+    if not isinstance(block, dict):
+        return None
+    return {
+        "status": "OK",
+        "source": "motor_darvo_annotation",
+        **block,
+        "daubert_note": (
+            "DARVO asymmetry annotated: "
+            f"{block.get('surveillance_count', 0)} surveillance-infrastructure "
+            f"signal(s) coexisting with {block.get('zero_contact_count', 0)} "
+            f"zero-contact claim(s); penalty {block.get('penalty', '0')} recorded "
+            "for visibility only — verdict NOT modified (L-029 / FW-009 Fase 1, "
+            "B-140). Fuente: vigia_scorer._vigia_score."
+        ),
+    }
+
+
 def _mobile_hypothesis(mobile_signals: List[Dict[str, Any]]) -> tuple:
     """
     F6 (AUDITORIA_PIPELINE_ROBUSTEZ, N5): deriva la hipótesis mobile de los
@@ -1149,6 +1180,9 @@ class SIFTOrchestrator:
             "resolve_meta": resolve_meta,
             # B-094: CAIE viva del scorer — se surfacéa en el bundle/narrativa.
             "caie_summary": _motor_caie_summary(motor),
+            # B-140: anotación DARVO del scorer — mismo canal, sin efecto en
+            # veredicto (L-029 / FW-009 Fase 1).
+            "darvo_summary": _motor_darvo_summary(motor),
         }
 
     def _analyze_ebs_json(self, json_path: str) -> Dict[str, Any]:
@@ -1264,8 +1298,14 @@ class SIFTOrchestrator:
             "pipeline_meta": pipeline_meta,
         }
         _caie_summary = resolved.get("caie_summary") if mode == "motor" and resolved else None
-        if _caie_summary:
-            _out["results"] = {"caie": _caie_summary}
+        # B-140: anotación DARVO — mismo canal de narrativa que la CAIE viva.
+        _darvo_summary = resolved.get("darvo_summary") if mode == "motor" and resolved else None
+        if _caie_summary or _darvo_summary:
+            _out["results"] = {}
+            if _caie_summary:
+                _out["results"]["caie"] = _caie_summary
+            if _darvo_summary:
+                _out["results"]["darvo"] = _darvo_summary
         return _out
 
     def _analyze_memory_vol3(self, memory_path: str) -> Dict[str, Any]:

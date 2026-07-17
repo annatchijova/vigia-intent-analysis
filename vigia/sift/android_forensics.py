@@ -27,6 +27,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
+from vigia.sift._fs_utils import scan_marker_names
 from vigia.sift._math_utils import build_correlation_groups, noisy_or_correlated
 from vigia.sift._sql_utils import safe_sqlite_connect
 
@@ -237,9 +238,11 @@ class AndroidForensicsAnalyzer:
 
         result = AndroidAnalysisResult(source_path=str(evidence_path))
 
-        # Validate Android evidence (BUG-007 fix)
-        all_files = {f.name for f in evidence_path.rglob("*") if f.is_file() and not f.is_symlink()}
-        android_markers = all_files & _ANDROID_MARKER_FILES
+        # Validate Android evidence (BUG-007 fix).
+        # B-139: bounded scan — O(markers) memory, capped walk with WARNING.
+        android_markers = scan_marker_names(
+            evidence_path, _ANDROID_MARKER_FILES, engine="ANDROID", logger=logger
+        )
         if not android_markers:
             logger.warning("[ANDROID] No Android artifacts found in %s", evidence_path)
             result.analysis_notes.append(

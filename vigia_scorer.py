@@ -1431,6 +1431,31 @@ def _vigia_score(case: dict) -> dict:
     }
 
     # -----------------------------------------------------------------------
+    # Step 4c: DARVO pattern annotation (L-029 / FW-009 Fase 1, B-140)
+    # Surfaces the role-inversion asymmetry — surveillance infrastructure
+    # signals coexisting with zero-contact claims — in the sealed output,
+    # same Daubert rationale as B-094 for CAIE fractures. ANNOTATION ONLY:
+    # it modifies neither verdict nor score; the verdict effect and the
+    # false_flag relational verdict remain doctrine decisions (L-029).
+    # -----------------------------------------------------------------------
+    try:
+        from vigia.core.darvo_detector import detect_darvo_pattern
+        _darvo = detect_darvo_pattern(artifacts)
+    except ImportError:
+        # Standalone mode (same fallback semantics as the CAIE import above):
+        # the annotation degrades, the core keeps working, the gap is logged.
+        logging.warning("DARVO annotation skipped — vigia.core.darvo_detector not importable")
+        _darvo = {"pattern_present": False}
+    if _darvo["pattern_present"]:
+        base_result["darvo_pattern"] = {
+            "penalty": str(_darvo["penalty"]),
+            "surveillance_count": _darvo["surveillance_count"],
+            "zero_contact_count": _darvo["zero_contact_count"],
+            "matched_artifacts": _darvo["matched_artifacts"],
+            "verdict_effect": "none (FW-009 Fase 1 — annotation only)",
+        }
+
+    # -----------------------------------------------------------------------
     # Intake-abstain gate (2026-07-12, docs/CASE_RECOVERY_20260712.md)
     #
     # A NOISE verdict claims "analyzed and found clean". That claim is

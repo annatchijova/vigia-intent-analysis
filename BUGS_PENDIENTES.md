@@ -4787,7 +4787,7 @@ estructural (siguen los dos namespaces); cierra la deriva silenciosa.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | NO APLICADO — gate pre-registrado (firma Anna: `fixed>=1 AND broken==0`) rechazó el cambio con fixed=30 / **broken=3**. Fix implementado, medido y **revertido**. Sentinelas `xfail(strict=True)` en `tests/test_b097_motor_suspicion_verdict.py`. |
+| **Estado** | APLICADO — 2026-07-10 con firma de Anna (validación por triple fuente independiente), tras el rechazo inicial del gate pre-registrado (`fixed>=1 AND broken==0`, fixed=30 / broken=3, fix revertido en esa primera sesión). Los sentinelas `xfail(strict=True)` de `tests/test_b097_motor_suspicion_verdict.py` pasaron a guardas de regresión normales. Ver "ACTUALIZACIÓN 2026-07-10" abajo; el rastro del rechazo se conserva como historia de auditoría. |
 | **Severidad** | P1 (métrica de corpus y semántica de veredicto) — resultado negativo documentado |
 | **Archivo** | `vigia_agent.py` (`classify_agent_verdict`) — editado y revertido |
 | **Detectado en** | Observación registrada en `docs/B052_P2_DESIGN.md` §10.1 (sesión enforcement §9.4-LIM) |
@@ -7084,7 +7084,7 @@ cambio de comportamiento para instalaciones que ya seteaban `log_path` explícit
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | DOCUMENTADO — fix arquitectónico pendiente (decisión de diseño: routing al engine del scorer + perfiles de evidencia nuevos) |
+| **Estado** | RESUELTO — Opción 1 aplicada 2026-07-17 en tres fases (perfiles de dominio documento, wiring de las 4 tools a `caie_artifacts`, absorción en el ensamblador de casos); ver bloque de resolución arriba |
 | **Severidad** | P2 — dead code que emite logs de auditoría falsos (`CAIE_ARTIFACT_INJECTED` sin efecto real); ninguna fractura de estos tools llegó jamás al veredicto |
 | **Archivos** | `vigia/tools/adversarial_nlp.py:1595`, `vigia/core/entanglement.py:597`, `vigia/forensics/temporal_forensics_redteam.py:740`, `vigia/forensics/vision_audit.py:514` |
 | **Detectado en** | Sesión post-hackathon 2026-07-16, auditoría B-114/B-115 |
@@ -7235,5 +7235,160 @@ un caso macOS real en el corpus que lo ejercite.
 - **Cobertura honesta:** igual que B-133, los 201 casos JSON del corpus no ejercitan
   el routing por marcadores; no hay extracción raw iOS/macOS full en el repo. El fix
   se sostiene por la clase de bug ya confirmada en B-133, no por un caso raw nuevo.
+
+---
+
+## B-138 — Dos tests fuera de `tests/e2e` importaban `mcp` en duro y rompían la colección completa de pytest en entornos sin `mcp` [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-17 (`pytest.importorskip("mcp")` en los 4 puntos dependientes) |
+| **Severidad** | P3 (higiene de suite — sin efecto en veredictos) |
+| **Archivos** | `tests/test_grupob_b9_honey_token_lifecycle.py`, `vigia/tests/adversarial/test_human_jitter_deterministic_bypass.py`, `tests/test_h4_grep_sanitizer_unification.py`, `tests/test_b10_comparator_reads_sealed_verdict.py` |
+| **Detectado en** | Sesión de revisión abductiva 2026-07-17 (corrida de suite en entorno sin `mcp`) |
+
+### Descripción
+
+L-045 documenta que `mcp` no es instalable en entornos CI mínimos, y la
+doctrina de suite excluye `tests/e2e` por esa razón. Pero dos archivos fuera
+de `tests/e2e` importaban el bridge (que importa `mcp`) a nivel de módulo:
+la colección entera de pytest abortaba con "Interrupted: 3 errors during
+collection" antes de correr un solo test. Además, 5 tests en otros dos
+archivos importaban el bridge (directo o vía `run_llm_cases`) dentro del
+cuerpo del test y fallaban como FAILED en vez de saltearse.
+
+### Fix
+
+`pytest.importorskip("mcp")` antes del import del bridge en los dos archivos
+que rompían la colección; skip puntual en `test_bridge_reexports_canonical`
+(h4) y fixture autouse en `TestLlmFallbackReadsSealedVerdict` (b10). En
+entornos con `mcp` instalado nada cambia (importorskip es no-op y los tests
+corren igual que antes).
+
+### Verificación
+
+- Pre-fix (inducción, entorno sin `mcp`): colección interrumpida con 3
+  errores; con esos 2 archivos excluidos a mano, 5 FAILED por
+  `ModuleNotFoundError: mcp`.
+- Post-fix: los 4 archivos dan 22 passed / 7 skipped / 0 failed y la suite
+  completa (sin `tests/integration` ni `tests/e2e`) colecciona y corre
+  verde en el mismo entorno.
+
+---
+
+## B-139 — Scans de marcadores `rglob("*")` sin acotar en los tres motores mobile/macOS (residuo §1.3 de WHAT_IS_NEXT) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-17 (`scan_marker_names()` acotado en `vigia/sift/_fs_utils.py`, 3 call-sites migrados) |
+| **Severidad** | P3 (robustez de recursos — sin efecto en veredictos para árboles dentro del límite, que son todos los reales) |
+| **Archivos** | `vigia/sift/ios_forensics.py`, `vigia/sift/android_forensics.py`, `vigia/sift/macos_forensics.py`, `vigia/sift/_fs_utils.py` (nuevo) |
+| **Detectado en** | Residuo documentado en WHAT_IS_NEXT §1.3 (S4 / AUDITORIA_COBERTURA_MOBILE_SIFT §C); retomado en la sesión de revisión abductiva 2026-07-17 |
+
+### Descripción
+
+S4 acotó los lookups por patrón con `_safe_rglob` (heapq.nsmallest, memoria
+O(limit)), pero la validación de marcadores de los tres motores seguía
+materializando TODOS los nombres del árbol
+(`{f.name for f in evidence_path.rglob("*")}`) antes de intersecar con el
+set de marcadores: memoria O(árbol) y caminata sin límite ante un árbol de
+evidencia hostil o gigante — la misma clase que S4 cerró para el resto.
+
+### Fix
+
+Helper compartido `scan_marker_names()` (mismo patrón de módulo que
+`_math_utils`/`_sql_utils`): retiene solo nombres que SON marcadores
+(memoria O(markers)), filtra symlinks, cuenta directorios solo con
+`include_dirs=True` (macOS: `.fseventsd` es marcador de directorio), y
+corta la caminata en `MARKER_SCAN_MAX_ENTRIES` (500k) con WARNING visible
+— degradación honesta, nunca silenciosa. Para árboles dentro del límite el
+resultado es idéntico al patrón viejo (pin de equivalencia en los tests).
+
+**Refutación aplicada (alcance):** el bloque Magisk de `_detect_root`
+(`list(evidence_path.rglob("com.topjohnwu.magisk"))` etc.) se deja
+deliberadamente intacto: sus `len()` alimentan el string de evidencia del
+finding (cambiarlos alteraría narrativa emitida) y son lookups por nombre
+específico — no `rglob("*")` — con puñados de matches en la práctica.
+
+### Verificación
+
+- `tests/test_b139_bounded_marker_scan.py` (15 tests, rojos primero):
+  contrato del helper (equivalencia con el patrón viejo, symlinks,
+  dirs/include_dirs, truncado con WARNING y sin WARNING dentro del límite)
+  + pins de los tres motores (marcador detectado / nota de "No *-specific
+  artifacts" intacta en ambas direcciones, incluido `.fseventsd` como dir).
+- Pins mobile existentes (B-086/B-133/B-137 y afines): 256 passed.
+- **Cobertura honesta (misma salvedad que B-133/B-137):** los 201 casos
+  JSON del corpus no ejercitan el scan de marcadores sobre árboles raw; la
+  equivalencia se sostiene por el pin de equivalencia y los pins de motor,
+  no por una corrida de corpus (que trivialmente daría 0 flips).
+
+---
+
+## B-140 — L-029/FW-009 Fase 1: el detector DARVO era estructuralmente ciego al path motor; anotación cableada sin efecto en veredicto [RESUELTO — Fase 1]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO (Fase 1: anotación) — 2026-07-17. El efecto en veredicto, `false_flag` como tipo de veredicto y la revisión pareada cross-bundle siguen abiertos como doctrina/arquitectura (ver L-029) |
+| **Severidad** | P2 (el patrón HIGH más antiguo del registro de limitaciones sin progreso de código desde 2026-06-24) |
+| **Archivos** | `vigia/core/darvo_detector.py`, `vigia_scorer.py` (Step 4c), `sift_orchestrator.py` (`_motor_darvo_summary` + canal), `vigia_agent.py` (sección de narrativa) |
+| **Detectado en** | Sesión de revisión abductiva 2026-07-17 (verificación de L-029 contra código vivo) |
+
+### Descripción (Peirceana)
+
+- **Firstness:** `compute_darvo_penalty` lee campos con `getattr()` únicamente.
+  Los artefactos del path Modo 1 (EBS JSON) son dicts planos → `getattr`
+  devuelve default → el detector retorna 0 SIEMPRE fuera del pipeline.
+  KIWI-001-A02 ("PHP error ... trampolin", log_entry) y A04 ("Blog honeypot
+  ... accesos ... bloqueado", file_metadata) contienen exactamente los
+  keywords del detector y jamás dispararon en el path motor.
+- **Secondness:** El único caller era `VigiaPipeline` (objetos SignalOutput).
+  El caso canónico de L-029 (KIWI) corre por el path motor — donde el
+  detector era invisible por construcción. La limitación decía "no cableado
+  al orchestrator/agente"; la realidad era peor: aunque se cableara, con
+  dicts no podía disparar.
+- **Thirdness:** La ley: un detector que asume el shape de UN caller queda
+  mudo en silencio frente a los demás — misma clase que B-136 (inyección a
+  engine efímero) y B-063 (metadata=None): el fallo estructural silencioso
+  en la frontera de formatos.
+
+### Fix (Fase 1 — anotación, cero movimiento de veredicto)
+
+1. `_field()` en el detector: lee dict O objeto; total frente a campos
+   malformados (str() coercion, metadata no-dict). El comportamiento con
+   objetos (pipeline) queda PINEADO sin cambios.
+2. `detect_darvo_pattern()` estructurado: conteos, penalidad Fraction, ids
+   de artefactos disparadores (trazabilidad Daubert).
+   **Calibración de la anotación (refutación medida):** `pattern_present`
+   exige la asimetría COMPLETA (vigilancia Y cero-contacto). Con keywords
+   de vigilancia solos ('log', 'server'...) anotaban 52/201 casos del
+   corpus (incluidos benignos) — narrativa engañosa; con ambos lados,
+   exactamente los 5 correctos (KIWI-001/003/004/005 +
+   MAGNET-2021-IOS-ELI, este último ya candidato a revisión de etiqueta en
+   B-097). La penalidad conserva la fórmula original: es el contrato del
+   pipeline (consistency_score) y no se tocó.
+3. `_vigia_score` Step 4c: bloque `darvo_pattern` en la salida sellada
+   (penalidad como str, conteos, ids, `verdict_effect: none`). SOLO
+   anotación — ni veredicto ni score cambian.
+4. Canal de narrativa: `_motor_darvo_summary` (mismo shape B-094) →
+   `results["darvo"]` → sección "DARVO PATTERN" en la narrativa sellada,
+   que declara explícitamente que el veredicto NO fue modificado.
+
+### Verificación
+
+- `tests/test_b140_darvo_motor_annotation.py` (17 tests, rojos primero):
+  soporte dict + pin de objetos (valores pre-B-140 exactos), asimetría
+  completa requerida, malformados no crashean, anotación fiel en el scorer,
+  pin de igualdad veredicto/score/confianza contra gemelo sin keywords,
+  helper del orchestrator, y el caso real KIWI-001 (2 vigilancia +
+  cero-contacto, penalidad 3/5).
+- **Gate comparativo (worktree limpio en HEAD vs árbol con el cambio,
+  `run_all_agent --rerun` completo en ambos):** 201 casos comunes,
+  **CERO flips de veredicto**. Un primer baseline se descartó por
+  contaminación (corrió con el árbol a mitad de edición — subprocess por
+  caso re-importa de disco); el gate válido usó worktree aislado.
+- Suite completa verde (ver commit).
+- `results/` restaurado vía `git checkout -- results/` tras el gate
+  (práctica B-097: los bundles regenerados no se commitean).
 
 ---
