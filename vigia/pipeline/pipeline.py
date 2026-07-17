@@ -1298,24 +1298,27 @@ class VigiaPipeline:
 
     def _compute_attestation(self) -> str:
         """
-        Calcula engine_attestation_hash basado en el código fuente disponible.
-        En producción debería incluir hash del repo + deps + build.
+        Computes engine_attestation_hash via the single, complete implementation
+        (BundleBuilder.compute_engine_attestation).
+
+        The previous local body was a dead-duplicate that re-walked ONLY this
+        package (vigia/pipeline/): a change to the scoring core (vigia/tools/
+        caie.py, vigia/core/, ...) left the attestation byte-identical — an
+        incomplete attestation presented as complete — and it captured no
+        dependency versions at all (H32: a sklearn/numpy change alters KDE output
+        with the same source). Delegating removes the duplicate and covers the
+        whole vigia/ engine tree plus dependency manifests, with fail-visible
+        handling of unreadable files.
+
+        Known residual boundary (documented, not silent): the shared attestation
+        walks the vigia/ package (_ROOT); vigia_scorer.py at the repository root
+        sits outside that tree. Widening the boundary is tracked separately.
         """
         try:
-            here = os.path.dirname(os.path.abspath(__file__))
-            sources = []
-            for root, _, files in os.walk(here):
-                for fname in sorted(files):
-                    if fname.endswith(".py"):
-                        fpath = os.path.join(root, fname)
-                        try:
-                            with open(fpath, "rb") as f:
-                                sources.append(f.read())
-                        except OSError:
-                            pass
-            combined = b"".join(sources)
-            return hashlib.sha256(combined).hexdigest()
+            from vigia.core.bundle_builder import BundleBuilder
+            return BundleBuilder.compute_engine_attestation()
         except Exception:
+            logger.exception("engine attestation computation failed")
             return ""
 
     def save_bundle(self, bundle: ForensicBundle, path: str) -> str:

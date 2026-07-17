@@ -39,6 +39,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import logging
 import os
 import sys
 from datetime import datetime, timezone
@@ -50,6 +51,8 @@ from typing import Any, Dict, Optional
 # ---------------------------------------------------------------------------
 _HERE = os.path.dirname(os.path.abspath(__file__))
 _ROOT = os.path.dirname(_HERE)  # <repo>/vigia — used ONLY for the attestation
+
+logger = logging.getLogger(__name__)
 # source scan below. B-097 root cause: this used to be sys.path.insert(0,
 # _ROOT), which shadowed every top-level package sharing a name with a
 # vigia/ subpackage (forensics, pki_tools, ...) for the whole process. All
@@ -411,8 +414,21 @@ class BundleBuilder:
                         try:
                             with open(fpath, "rb") as f:
                                 sources.append(f.read())
-                        except OSError:
-                            pass
+                        except OSError as exc:
+                            # Honest degradation: an in-scope source file that
+                            # cannot be read must PERTURB the attestation, never
+                            # vanish silently. A silently dropped file lets two
+                            # different engine states hash identically (coverage
+                            # reduction presented as a complete attestation) and
+                            # lets a file made unreadable escape the seal. Fold a
+                            # deterministic unreadable-marker (path only, relative
+                            # for reproducibility) into the hash and log it loud.
+                            marker = f"UNREADABLE_SOURCE:{os.path.relpath(fpath, d)}\n"
+                            sources.append(marker.encode("utf-8"))
+                            logger.warning(
+                                "engine attestation: source unreadable, folded "
+                                "into hash as %s (%s)", marker.strip(), exc,
+                            )
 
             # 2. Archivos de dependencias (H32)
             dep_paths = dep_files if dep_files is not None else _DEFAULT_DEP_FILES
@@ -429,13 +445,24 @@ class BundleBuilder:
                                 dep_content = f.read()
                             # Prefijo para distinguir deps de código fuente
                             sources.append(f"DEP:{dep_name}\n".encode("utf-8") + dep_content)
-                        except OSError:
-                            pass
+                        except OSError as exc:
+                            # Same honest-degradation rule as source files: a dep
+                            # manifest that is present but unreadable must perturb
+                            # the hash, not silently drop out of the attestation.
+                            sources.append(f"UNREADABLE_DEP:{dep_name}\n".encode("utf-8"))
+                            logger.warning(
+                                "engine attestation: dep %s present but unreadable, "
+                                "folded into hash (%s)", dep_name, exc,
+                            )
                         break  # Solo una vez por archivo
 
             combined = b"".join(sources)
             return hashlib.sha256(combined).hexdigest()
         except Exception:
+            # A total attestation failure must not be silent: "" downstream reads
+            # as "attestation unavailable" (R4 unreachable), which is the honest
+            # outcome, but the failure itself must be logged, not swallowed.
+            logger.exception("engine attestation computation failed — returning empty")
             return ""
 
 
