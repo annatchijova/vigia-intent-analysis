@@ -259,6 +259,21 @@ def main():
     dirs = [Path(args.dir)] if args.dir else CASES_DIRS
     cases = find_cases(dirs, args.filter)
 
+    # F2 (L-029): pase de linkage cross-bundle — anotación pura, CERO
+    # autoridad de veredicto. Un fallo acá degrada la feature, nunca el
+    # batch (ENGINEERING_DISCIPLINE §5.3).
+    try:
+        from vigia.core.case_linkage import (
+            emit_linkage_records, write_linkage_records,
+        )
+        _linkage = emit_linkage_records(cases)
+        if _linkage:
+            _n = write_linkage_records(_linkage, REPO / "results" / "linkage")
+            print(f"  Linkage F2: {_n} grupo(s) cross-bundle documentado(s) "
+                  f"en results/linkage/ (sin autoridad de veredicto)")
+    except Exception as _linkage_err:  # noqa: BLE001 — degradación honesta
+        print(f"{RED}[F2] Linkage pass falló (no fatal): {_linkage_err}{RST}")
+
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     print(f"\n{'='*70}")

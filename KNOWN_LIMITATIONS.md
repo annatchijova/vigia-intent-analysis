@@ -1261,6 +1261,18 @@ retired with a schema tripwire, and B-141 (run_vigia signal drop) was fixed
 in both deployments. The verdict-effect reopening conditions are
 pre-registered in the dossier §4.
 
+**F1+F2 (2026-07-17, same session — B-143/B-144):** the sealed annotation
+now carries a machine-readable L-004 caveat, a MANDATORY deterministic
+devil_advocate, and per-keyword matched_spans (FIRMA: spans yes), with no
+nominal attribution ever entering the sealed block. Pairing exists as
+architecture with zero verdict authority: `compare_paired_bundles` (MCP,
+deterministic sub-metrics; Thirdness belongs to the calling analyst) and
+signed cross-bundle linkage records in the batch runner (copy-dedup,
+collision caveats — RT-FN-COLLUSION-001 as permanent fixture, label-blind,
+HMAC-sealed, timestamp-free). Still open: item 3's full paired scoring
+(N=1 self-referential blocker) and everything gated on F3 data
+acquisition.
+
 **Still open (doctrine / architecture, NOT engineering):**
 1. Verdict effect of the DARVO pattern in the motor path (would move
    verdicts → requires calibration decision + comparative gate sign-off).

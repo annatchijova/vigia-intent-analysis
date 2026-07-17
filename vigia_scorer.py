@@ -1452,7 +1452,28 @@ def _vigia_score(case: dict) -> dict:
             "surveillance_count": _darvo["surveillance_count"],
             "zero_contact_count": _darvo["zero_contact_count"],
             "matched_artifacts": _darvo["matched_artifacts"],
+            # F1: per-keyword Daubert traceability (FIRMA: spans YES — the
+            # keyword list is already public in the repo; transparency wins).
+            "matched_spans": _darvo["matched_spans"],
             "verdict_effect": "none (FW-009 Fase 1 — annotation only)",
+            # F1: machine-readable L-004 caveat sealed WITH the block — a
+            # disclaimer outside the sealed record is the pattern courts
+            # discount; inside, it travels with the claim.
+            "trigger_class": (
+                "examiner-authored free text (L-004 applies); "
+                "no assertion force"
+            ),
+            # F1: mandatory refutation (Eco's razor, Refutation Protocol)
+            # for the only sealed output aimed at a human role. Never
+            # optional, never attributed to a named actor.
+            "devil_advocate": (
+                "Benign hypothesis (mandatory, Eco's razor): the matched "
+                "keywords are examiner-authored narration; security jargon "
+                "reused by a careless complainant, or a defensive honeypot "
+                "operated by a genuine victim, produces the same matches. "
+                "The detector measures the narration of conduct, not "
+                "conduct; this block carries no assertion force."
+            ),
         }
 
     # -----------------------------------------------------------------------

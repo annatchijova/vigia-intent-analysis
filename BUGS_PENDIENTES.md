@@ -7461,3 +7461,88 @@ que fije que `run_vigia` construye señales desde dicts. Ver dossier §5-F0.4.
    es falso** y debe corregirse junto con el registro B-140 (nunca en silencio).
 
 ---
+
+## B-143 — F1 (L-029): endurecimiento de la anotación DARVO sellada — caveat L-004 + devil_advocate obligatorio + matched_spans [RESUELTO — F1]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-17, tanda F1 (dossier §5-F1 + refutaciones FF-1/F2 de los jueces) |
+| **Severidad** | P2 (la anotación sellada porta fuerza prejudicial ante un jurado aunque `verdict_effect: none`) |
+| **Archivos** | `vigia/core/darvo_detector.py` (matched_spans), `vigia_scorer.py` (Step 4c), `vigia_agent.py` (narrativa) |
+
+### Qué cambia
+
+1. **Caveat L-004 legible por máquina DENTRO del bloque sellado**
+   (`trigger_class`): un disclaimer fuera del registro sellado es el patrón
+   que las cortes descuentan; adentro, viaja con el claim.
+2. **`devil_advocate` OBLIGATORIO** en el bloque (Protocolo de Refutación
+   aplicado a la única salida sellada apuntada a un rol humano): la
+   hipótesis benigna se genera y sella siempre, determinista.
+3. **`matched_spans`** por keyword (familia + keyword + ventana de
+   contexto) — decisión FIRMA: spans SÍ (la lista de keywords ya es
+   pública en el repo; la transparencia gana).
+4. **Sin atribución nominal**: `attributed_actor`/`role_attribution` NO
+   entran al bloque sellado (refutación F1 del juez Daubert: atribución
+   HMAC-sellada desde texto libre = vector de difamación realizado).
+5. La narrativa sellada surfacea caveat + devil_advocate junto al bloque.
+
+### Verificación
+
+`tests/test_f1_darvo_annotation_hardening.py` (8 tests, rojos primero);
+pin de igualdad veredicto/score intacto (B-140); gate 0-flips compartido
+con F2 (ver B-144).
+
+---
+
+## B-144 — F2 (L-029): pareo cross-bundle como arquitectura — tool MCP + registros de linkage firmados, CERO autoridad de veredicto [RESUELTO — F2]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-17, tanda F2 (dossier §5-F2 + trampa de metadata del veredicto de Kimi §6) |
+| **Severidad** | P2 (arquitectura: la inversión de roles DARVO solo es expresable ENTRE bundles — L-029 causa raíz 1) |
+| **Archivos** | `vigia/tools/paired_review.py` (nuevo), `vigia/core/case_linkage.py` (nuevo), `vigia/vigia_sift_bridge.py` (registro opcional `VIGIA_PAIRED_REVIEW_ENABLED`), `run_all_agent.py` (pase de linkage) |
+
+### Qué entrega
+
+1. **`compare_paired_bundles(path_a, path_b)`** (tool MCP, Modo 2):
+   sub-métricas deterministas — igualdad de `case_origin` leída de
+   `artifacts[].metadata` (trampa de Kimi: top-level es None en todos los
+   KIWI), delta de `prior_trust` en Fraction (0.3 vs 0.8 ES la señal
+   L-029), `detect_darvo_pattern` sobre la unión (dispara en la unión
+   aunque KIWI-002 solo sea ciego — el valor del pareo), framing
+   complementario, solapamiento de provenance. La Terceridad la hace el
+   analista/LLM que llama, FUERA del loop de decisión (invariante 3).
+   Caveats adversariales obligatorios en el propio output;
+   `verdict_authority: "none"`.
+2. **Registros de linkage** (`emit_linkage_records`, pase en el batch
+   junto a `check_label_consistency`): un registro firmado por grupo de
+   `case_origin` con (a) dedup de copias por SHA256 del array de
+   artifacts — sin él, UN expediente emitiría múltiples linkages contra
+   evidencia duplicada (L-016, juez 12); (b) caveat de colisión SIEMPRE
+   que hay evidencia duplicada — el registro reporta el hecho sin juzgar
+   intención: KIWI-004/005 se declaran copias, RT-FN-COLLUSION-001 no (y
+   eso ES el patrón de colusión), pero "declararse copia" también es
+   narrativa; (c) label-blind por construcción; (d) sin timestamps en el
+   registro (replay determinista) + HMAC-SHA256 sobre el registro
+   canónico cuando hay `VIGIA_HMAC_KEY`.
+3. **Fixture permanente**: RT-FN-COLLUSION-001 (case_origin MPF7779408 +
+   artifact_ids de KIWI-006 reusados, byte-idéntico a nivel artifacts) —
+   el ataque de join-key forjado preexistente en el repo; el test fija
+   que su inclusión produce caveat de colisión, nunca certificación de
+   limpieza.
+
+### Diferido (sin cambio)
+
+Scoring pareado completo / tipo de bundle nuevo: bloqueado por N=1
+auto-referencial (un solo par POV genuino, ambas mitades de la misma
+examinadora). Ver dossier §5-F2.3.
+
+### Verificación
+
+`tests/test_f2_paired_review.py` (11 tests, rojos primero: pareo real
+KIWI-002↔003, label-blind en ambas APIs, dedup, fixture RT, HMAC,
+determinismo orden-independiente); registro del bridge con py_compile (el
+smoke test MCP requiere entorno con `mcp` — L-045; pendiente para la
+próxima sesión con bridge vivo); gate 0-flips compartido con F1.
+
+---

@@ -1162,6 +1162,15 @@ class VIGIAAgent:
                     "  Artefactos disparadores: "
                     + ", ".join(str(x) for x in _darvo_matched[:6])
                 )
+            # F1: el caveat L-004 y la refutación obligatoria viajan CON el
+            # bloque hasta la narrativa sellada — nunca como nota al pie
+            # externa que un lector pueda no ver.
+            if darvo.get("trigger_class"):
+                narrative_parts.append(f"  Caveat: {str(darvo['trigger_class'])[:160]}")
+            if darvo.get("devil_advocate"):
+                narrative_parts.append(
+                    f"  Devil's advocate: {str(darvo['devil_advocate'])[:240]}"
+                )
             if darvo.get("daubert_note"):
                 narrative_parts.append(f"  {str(darvo['daubert_note'])[:250]}")
             narrative_parts.append("")

@@ -70,6 +70,18 @@ def detect_darvo_pattern(artifacts: List[Any]) -> Dict[str, Any]:
     surveillance_count = 0
     zero_contact_count = 0
     matched: List[str] = []
+    spans: List[Dict[str, str]] = []
+
+    def _span(art_id: str, family: str, keyword: str, desc: str, m) -> Dict[str, str]:
+        # F1: trazabilidad Daubert por keyword — familia, keyword y ventana
+        # de contexto (decisión FIRMA: spans SÍ; la lista de keywords ya es
+        # pública en el repo, la transparencia gana).
+        return {
+            "artifact_id": art_id,
+            "family": family,
+            "keyword": keyword,
+            "context": desc[max(0, m.start() - 30):m.end() + 30],
+        }
 
     for idx, a in enumerate(artifacts):
         desc = str(_field(a, 'description', '') or '').lower()
@@ -77,18 +89,32 @@ def detect_darvo_pattern(artifacts: List[Any]) -> Dict[str, Any]:
         if not isinstance(meta, dict):
             meta = {}
         etype = _field(a, 'evidence_type', None) or meta.get('evidence_type', '')
+        art_id = str(_field(a, 'artifact_id', None) or f'#{idx}')
 
         hit = False
-        if etype in _SURVEILLANCE_TYPES and any(
-            rx.search(desc) for rx in _SURVEILLANCE_RES
-        ):
-            surveillance_count += 1
-            hit = True
-        if any(rx.search(desc) for rx in _ZERO_CONTACT_RES):
+        if etype in _SURVEILLANCE_TYPES:
+            surv_matches = [
+                (kw, rx.search(desc))
+                for kw, rx in zip(SURVEILLANCE_KEYWORDS, _SURVEILLANCE_RES)
+            ]
+            surv_matches = [(kw, m) for kw, m in surv_matches if m]
+            if surv_matches:
+                surveillance_count += 1
+                hit = True
+                for kw, m in surv_matches:
+                    spans.append(_span(art_id, "surveillance", kw, desc, m))
+        zc_matches = [
+            (kw, rx.search(desc))
+            for kw, rx in zip(ZERO_CONTACT_KEYWORDS, _ZERO_CONTACT_RES)
+        ]
+        zc_matches = [(kw, m) for kw, m in zc_matches if m]
+        if zc_matches:
             zero_contact_count += 1
             hit = True
+            for kw, m in zc_matches:
+                spans.append(_span(art_id, "zero_contact", kw, desc, m))
         if hit:
-            matched.append(str(_field(a, 'artifact_id', None) or f'#{idx}'))
+            matched.append(art_id)
 
     if surveillance_count == 0:
         penalty = Fraction(0)
@@ -119,4 +145,5 @@ def detect_darvo_pattern(artifacts: List[Any]) -> Dict[str, Any]:
         "surveillance_count": surveillance_count,
         "zero_contact_count": zero_contact_count,
         "matched_artifacts": matched,
+        "matched_spans": spans,
     }
