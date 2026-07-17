@@ -6405,3 +6405,42 @@ lookups — not `rglob("*")` — with a handful of matches in practice.
 - Full suite green (see commit).
 - `results/` restored via `git checkout -- results/` after the gate
   (B-097 practice: regenerated bundles are not committed).
+
+---
+
+## B-141 — `run_vigia` silently drops ALL signals via TypeError (`description=` passed to a `SignalOutput` that has no such field) [PENDING]
+
+| Field | Value |
+|-------|-------|
+| **Status** | PENDING — found by an adversarial refuter during the L-029 investigation (2026-07-17), verified by execution |
+| **Severity** | P1 — the `run_vigia` path executes the pipeline with ZERO signals in the dataclass deployment |
+| **File** | `vigia/pipeline/pipeline.py:1382-1392` |
+| **Detected in** | L-029 abductive investigation (`docs/PROPUESTA_L029_DARVO_20260717.md` §6) |
+
+`run_vigia`'s dict→SignalOutput conversion passes `description=d.get("description")`,
+but `SignalOutput` only has `tool_name, signal_id, value, z_score, confidence,
+metadata`. In the dataclass deployment construction raises TypeError; the
+per-signal `try/except` logs "Señal inválida ignorada" and drops the signal —
+every signal, always. Verified by execution. Under pydantic v2 the signal
+survives but `description` is silently discarded. Fix pending (red test first).
+
+---
+
+## B-142 — Pipeline DARVO penalty channel dead at runtime + ELI false positive + false in-code comment [DOCUMENTED — decision in the L-029 dossier]
+
+| Field | Value |
+|-------|-------|
+| **Status** | DOCUMENTED — fixes proposed in `docs/PROPUESTA_L029_DARVO_20260717.md` §5-F0, pending signature |
+| **Severity** | P2 — B-140 record integrity + latent surface in the pipeline decision path |
+| **Files** | `vigia/core/darvo_detector.py`, `vigia/pipeline/pipeline.py:629-630`, `data/cases/VIGIA-REAL-MAGNET-2021-IOS-ELI.json` |
+
+Three execution-verified facts: (1) the pipeline `adjust_consistency_score`
+channel is dead code at runtime — real `SignalOutput` objects carry no
+`description`/`evidence_type` attributes, so the penalty is unconditionally 0;
+the channel would silently wake on any signal-contract refactor, with the loose
+surveillance-only formula and no asymmetry gate — proposal: remove it, do not
+narrow it. (2) The ELI annotation is a pure keyword coincidence ('server' inside
+"4 S3 server list URLs"; 'no contact' inside "no contacts database") — the true
+annotation census is 4 (1 expediente + 2 declared copies), not 5. (3) The
+in-code claim "exactamente los 5 casos correctos" in `darvo_detector.py` is
+false and must be corrected together with the B-140 record — never silently.
