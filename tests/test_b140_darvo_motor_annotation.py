@@ -33,11 +33,7 @@ import json
 from fractions import Fraction
 from pathlib import Path
 
-from vigia.core.darvo_detector import (
-    adjust_consistency_score,
-    compute_darvo_penalty,
-    detect_darvo_pattern,
-)
+from vigia.core.darvo_detector import detect_darvo_pattern
 from vigia_scorer import _vigia_score
 
 REPO = Path(__file__).resolve().parent.parent
@@ -140,14 +136,17 @@ class TestDetectorDictSupport:
         r = detect_darvo_pattern(weird)
         assert r["penalty"] == Fraction(0)
 
-    def test_object_behavior_pinned_unchanged(self):
-        # The pipeline decision path consumes objects; these values are the
-        # exact pre-B-140 outputs and must not move.
+    def test_object_path_still_detected(self):
+        # F0 note: the pipeline penalty APIs (compute_darvo_penalty,
+        # adjust_consistency_score) were RETIRED in the F0 signed batch
+        # (B-142 — the channel was dead at runtime). Object-shaped
+        # artifacts must still be readable by the annotation detector.
         one = [_ObjArt("log_entry", "server log de stalkeo")]
-        assert compute_darvo_penalty(one) == Fraction(1, 10)
+        assert detect_darvo_pattern(one)["penalty"] == Fraction(1, 10)
         both = one + [_ObjArt("file_metadata", "honeypot accesos, bloqueado")]
-        assert compute_darvo_penalty(both) == Fraction(6, 10)
-        assert adjust_consistency_score(1.0, one) == 0.9
+        r = detect_darvo_pattern(both)
+        assert r["penalty"] == Fraction(6, 10)
+        assert r["pattern_present"] is True
 
     def test_metadata_evidence_type_fallback(self):
         art = {"artifact_id": "M1", "description": "honeypot accesos",

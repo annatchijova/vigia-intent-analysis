@@ -626,8 +626,16 @@ class VigiaPipeline:
             # Ver KNOWN_LIMITATIONS.md L-027 para detalle.
             # Estado anterior conocido: consistency_score=1.0 (regla de
             # disonancia semántica inactiva, documentado desde 2026-05-06).
-            from vigia.core.darvo_detector import adjust_consistency_score
-            consistency_score = adjust_consistency_score(1.0, signals)
+            #
+            # B-142 (F0, 2026-07-17): el hook de penalidad DARVO que vivía acá
+            # fue RETIRADO. Era código muerto en runtime — SignalOutput no
+            # porta `description` ni `evidence_type`, así que la penalidad era
+            # incondicionalmente 0 — y dejarlo vivo permitía que cualquier
+            # refactor del contrato de señales despertara en silencio un
+            # efecto por keywords de descripción en el decision path, sin
+            # gate de asimetría (doctrina L-004/B-070). DARVO queda
+            # anotación-only en el path motor (B-140); el tripwire de esquema
+            # vive en tests/test_f0_l029_darvo_hardening.py.
             abductive_result = None
 
         # ── GOBERNANZA: RiskBoundedDecisionLayer con factor ω ──────────────
@@ -1340,6 +1348,33 @@ class VigiaPipeline:
 # Función de entrada rápida para Claude Code / MCP
 # ---------------------------------------------------------------------------
 
+def _signals_from_dicts(signals_data: List[Dict[str, Any]]) -> List[SignalOutput]:
+    """B-141 (F0, 2026-07-17): conversión dict→SignalOutput de run_vigia.
+
+    El loop original pasaba `description=d.get("description")` — un kwarg
+    que SignalOutput nunca tuvo. En el deployment dataclass (sin pydantic)
+    eso lanzaba TypeError en CADA dict, el except por señal lo tragaba con
+    "Señal inválida ignorada" y run_vigia corría con cero señales. En el
+    deployment pydantic v2 (extra='ignore' default) no había error pero la
+    descripción se perdía en silencio. Fix: no pasar nunca el kwarg
+    inexistente. Verificado en ambos modos por
+    tests/test_f0_l029_darvo_hardening.py (Kimi, veredicto §1).
+    """
+    signals: List[SignalOutput] = []
+    for d in signals_data:
+        try:
+            signals.append(SignalOutput(
+                tool_name=d["tool_name"],
+                value=float(d.get("value", 0.0)),
+                z_score=float(d.get("z_score", 0.0)),
+                confidence=float(d.get("confidence", 1.0)),
+                metadata=d.get("metadata"),
+            ))
+        except Exception as e:
+            logger.warning("[run_vigia] Señal inválida ignorada: %s — %s", d, e)
+    return signals
+
+
 def run_vigia(
     signals_data: List[Dict[str, Any]],
     drift_score: float = 0.0,
@@ -1375,21 +1410,9 @@ def run_vigia(
             "verify"      : dict
         }
     """
-    # Construir SignalOutput desde dicts
-    signals = []
-    for d in signals_data:
-        try:
-            s = SignalOutput(
-                tool_name=d["tool_name"],
-                value=float(d.get("value", 0.0)),
-                z_score=float(d.get("z_score", 0.0)),
-                confidence=float(d.get("confidence", 1.0)),
-                description=d.get("description"),
-                metadata=d.get("metadata"),
-            )
-            signals.append(s)
-        except Exception as e:
-            logger.warning("[run_vigia] Señal inválida ignorada: %s — %s", d, e)
+    # Construir SignalOutput desde dicts (B-141: helper compartido, sin el
+    # kwarg `description` que el esquema nunca tuvo)
+    signals = _signals_from_dicts(signals_data)
 
     # H27/H28 note (B-102, code review 2026-07-10): this function used to carry
     # its OWN drift recomputation and its OWN per-signal z-score calibration.

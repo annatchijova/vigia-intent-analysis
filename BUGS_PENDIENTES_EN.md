@@ -6406,13 +6406,28 @@ lookups — not `rglob("*")` — with a handful of matches in practice.
 - `results/` restored via `git checkout -- results/` after the gate
   (B-097 practice: regenerated bundles are not committed).
 
+### F0 correction (2026-07-17, signed batch — never silently)
+
+The calibration claim "exactly the 5 right cases" was **false**: the L-029
+investigation (dossier + Kimi's independent audit, both execution-verified)
+showed MAGNET-2021-IOS-ELI was a substring false positive — `'server'`
+matched inside "4 S3 server list URLs" and `'no contact'` inside "no
+messages, no contactS database" (an English plural); the case is
+single-actor, with no DARVO structure. Observed pre-F0 rate: 1 FP / 5
+firings. F0 introduced word-boundary matching (B-142): the honest census is
+**exactly 4 annotated = KIWI-001/003/004/005, i.e. ONE expediente
+(MPF7779408) + 2 declared copies — real N=1**. ELI's B-097 divergence
+(blind Claude INTENT vs SUSPICION label) concerns evasion intent, not DARVO
+— independent issues. See `docs/PROPUESTA_L029_DARVO_20260717.md` §1 and
+B-142.
+
 ---
 
-## B-141 — `run_vigia` silently drops ALL signals via TypeError (`description=` passed to a `SignalOutput` that has no such field) [PENDING]
+## B-141 — `run_vigia` silently drops ALL signals via TypeError (`description=` passed to a `SignalOutput` that has no such field) [RESOLVED — F0]
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING — found by an adversarial refuter during the L-029 investigation (2026-07-17), verified by execution |
+| **Status** | RESOLVED — F0 (2026-07-17, signed batch): `_signals_from_dicts` helper without the nonexistent `description` kwarg; tested in BOTH deployments (pydantic in-process + dataclass via subprocess with pydantic masked, Kimi's audit addition §1) in `tests/test_f0_l029_darvo_hardening.py` |
 | **Severity** | P1 — the `run_vigia` path executes the pipeline with ZERO signals in the dataclass deployment |
 | **File** | `vigia/pipeline/pipeline.py:1382-1392` |
 | **Detected in** | L-029 abductive investigation (`docs/PROPUESTA_L029_DARVO_20260717.md` §6) |
@@ -6426,11 +6441,11 @@ survives but `description` is silently discarded. Fix pending (red test first).
 
 ---
 
-## B-142 — Pipeline DARVO penalty channel dead at runtime + ELI false positive + false in-code comment [DOCUMENTED — decision in the L-029 dossier]
+## B-142 — Pipeline DARVO penalty channel dead at runtime + ELI false positive + false in-code comment [RESOLVED — F0]
 
 | Field | Value |
 |-------|-------|
-| **Status** | DOCUMENTED — fixes proposed in `docs/PROPUESTA_L029_DARVO_20260717.md` §5-F0, pending signature |
+| **Status** | RESOLVED — F0 (2026-07-17, signed batch): pipeline penalty channel RETIRED (not narrowed) + word-boundary matching correcting the ELI FP + false in-code comment corrected. Schema tripwire in `tests/test_f0_l029_darvo_hardening.py` (if `SignalOutput` ever gains `description`/`evidence_type`, the test fails and forces re-evaluating the decision). Post-F0 census: exactly 4 annotated (KIWI-001/003/004/005) |
 | **Severity** | P2 — B-140 record integrity + latent surface in the pipeline decision path |
 | **Files** | `vigia/core/darvo_detector.py`, `vigia/pipeline/pipeline.py:629-630`, `data/cases/VIGIA-REAL-MAGNET-2021-IOS-ELI.json` |
 
@@ -6444,3 +6459,75 @@ narrow it. (2) The ELI annotation is a pure keyword coincidence ('server' inside
 annotation census is 4 (1 expediente + 2 declared copies), not 5. (3) The
 in-code claim "exactamente los 5 casos correctos" in `darvo_detector.py` is
 false and must be corrected together with the B-140 record — never silently.
+
+---
+
+## B-143 — F1 (L-029): sealed DARVO annotation hardening — L-004 caveat + mandatory devil_advocate + matched_spans [RESOLVED — F1]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-17, F1 batch (dossier §5-F1 + judges' FF-1/F2 refutations) |
+| **Severity** | P2 (the sealed annotation carries prejudicial force in front of a jury even with `verdict_effect: none`) |
+| **Files** | `vigia/core/darvo_detector.py` (matched_spans), `vigia_scorer.py` (Step 4c), `vigia_agent.py` (narrative) |
+
+1. Machine-readable L-004 caveat INSIDE the sealed block (`trigger_class`)
+   — a disclaimer outside the sealed record is the pattern courts
+   discount; inside, it travels with the claim.
+2. `devil_advocate` MANDATORY in the block (Refutation Protocol applied to
+   the only sealed output aimed at a human role): the benign hypothesis is
+   generated and sealed always, deterministically.
+3. `matched_spans` per keyword (family + keyword + context window) —
+   FIRMA decision: spans YES (the keyword list is already public in the
+   repo; transparency wins).
+4. NO nominal attribution (`attributed_actor`/`role_attribution` never
+   enter the sealed block — Daubert judge F1: an HMAC-sealed attribution
+   from free text is the realized defamation vector).
+5. The sealed narrative surfaces caveat + devil_advocate with the block.
+
+Verification: `tests/test_f1_darvo_annotation_hardening.py` (8 tests,
+red first); B-140 verdict/score equality pin intact; 0-flip gate shared
+with F2 (see B-144).
+
+---
+
+## B-144 — F2 (L-029): cross-bundle pairing as architecture — MCP tool + signed linkage records, ZERO verdict authority [RESOLVED — F2]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-17, F2 batch (dossier §5-F2 + the metadata trap from Kimi's verdict §6) |
+| **Severity** | P2 (architecture: the DARVO role inversion is only expressible BETWEEN bundles — L-029 root cause 1) |
+| **Files** | `vigia/tools/paired_review.py` (new), `vigia/core/case_linkage.py` (new), `vigia/vigia_sift_bridge.py` (optional registration `VIGIA_PAIRED_REVIEW_ENABLED`), `run_all_agent.py` (linkage pass) |
+
+1. `compare_paired_bundles(path_a, path_b)` (MCP tool, Mode 2):
+   deterministic sub-metrics — case_origin equality read from
+   `artifacts[].metadata` (Kimi's trap: top-level is None in every KIWI
+   file), Fraction prior_trust delta (0.3 vs 0.8 IS the L-029 signal),
+   `detect_darvo_pattern` over the union (fires on the union even though
+   KIWI-002 alone is blind — the pairing value), complementary framing,
+   provenance overlap. The Thirdness reasoning belongs to the calling
+   analyst/LLM, OUTSIDE the decision loop (invariant 3). Mandatory
+   adversarial caveats in the tool's own output; verdict_authority: none.
+2. Linkage records (`emit_linkage_records`, batch pass beside
+   `check_label_consistency`): one signed record per case_origin group
+   with (a) copy-dedup by artifact-array SHA256 (without it ONE
+   expediente emits multiple linkages against duplicated evidence —
+   L-016, judge 12); (b) a collision caveat WHENEVER duplicated evidence
+   exists — the record reports the fact without adjudicating intent:
+   KIWI-004/005 declare themselves copies, RT-FN-COLLUSION-001 does not
+   (that IS the collusion pattern), but "declares itself a copy" is
+   narrative too; (c) label-blind by construction; (d) no timestamps in
+   the record (deterministic replay) + HMAC-SHA256 over the canonical
+   record when VIGIA_HMAC_KEY is set.
+3. Permanent fixture: RT-FN-COLLUSION-001 (case_origin MPF7779408 +
+   KIWI-006 artifact_ids reused, artifact-level byte-identical) — the
+   pre-existing forged-join-key attack; the test pins that its inclusion
+   produces a collision caveat, never a cleanliness certificate.
+
+Deferred (unchanged): full paired scoring / new bundle type — blocked by
+the self-referential N=1 (one genuine POV pair, both halves by the same
+examiner). See dossier §5-F2.3.
+
+Verification: `tests/test_f2_paired_review.py` (11 tests, red first);
+bridge registration py_compile-checked (the MCP smoke test needs an
+mcp-enabled environment — L-045; pending for the next live-bridge
+session); 0-flip gate shared with F1.

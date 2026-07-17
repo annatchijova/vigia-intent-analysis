@@ -1248,6 +1248,31 @@ surveillance-infrastructure artifacts (A02 PHP-error/trampolin logs, A04
 honeypot access log) + zero-contact claim, penalty 3/5 — recorded, not
 applied.
 
+**F0 update (2026-07-17, signed batch — dossier
+`docs/PROPUESTA_L029_DARVO_20260717.md` + independent audit
+`docs/VEREDICTO_KIMI_L029_20260717.md`):** the multi-agent investigation
+plus adversarial audit confirmed the three open items' direction (no verdict
+effect from description keywords; no `false_flag` verdict rung; pairing as
+architecture without verdict authority) and corrected the B-140 record:
+MAGNET-2021-IOS-ELI was a substring false positive (de-annotated by
+word-boundary matching, B-142), the honest annotation census is 4 cases =
+ONE expediente + 2 copies (real N=1), the dead pipeline penalty channel was
+retired with a schema tripwire, and B-141 (run_vigia signal drop) was fixed
+in both deployments. The verdict-effect reopening conditions are
+pre-registered in the dossier §4.
+
+**F1+F2 (2026-07-17, same session — B-143/B-144):** the sealed annotation
+now carries a machine-readable L-004 caveat, a MANDATORY deterministic
+devil_advocate, and per-keyword matched_spans (FIRMA: spans yes), with no
+nominal attribution ever entering the sealed block. Pairing exists as
+architecture with zero verdict authority: `compare_paired_bundles` (MCP,
+deterministic sub-metrics; Thirdness belongs to the calling analyst) and
+signed cross-bundle linkage records in the batch runner (copy-dedup,
+collision caveats — RT-FN-COLLUSION-001 as permanent fixture, label-blind,
+HMAC-sealed, timestamp-free). Still open: item 3's full paired scoring
+(N=1 self-referential blocker) and everything gated on F3 data
+acquisition.
+
 **Still open (doctrine / architecture, NOT engineering):**
 1. Verdict effect of the DARVO pattern in the motor path (would move
    verdicts → requires calibration decision + comparative gate sign-off).

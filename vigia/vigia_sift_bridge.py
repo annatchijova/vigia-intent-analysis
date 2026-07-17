@@ -3236,6 +3236,27 @@ if os.getenv("VIGIA_TRUST_FUSION_ENABLED", "true").lower() == "true":
         )
 
 # ---------------------------------------------------------------------------
+# PAIRED REVIEW — compare_paired_bundles (L-029 F2 / FW-009)
+# Sub-métricas deterministas de revisión pareada cross-bundle; la Terceridad
+# la hace el analista/LLM que llama (Modo 2), fuera del loop de decisión.
+# Activar: VIGIA_PAIRED_REVIEW_ENABLED=true
+# ---------------------------------------------------------------------------
+if os.getenv("VIGIA_PAIRED_REVIEW_ENABLED", "true").lower() == "true":
+    try:
+        from vigia.tools.paired_review import compare_paired_bundles
+        mcp.tool()(compare_paired_bundles)
+        audit_logger.log_info(
+            event_type="PAIRED_REVIEW_REGISTERED",
+            tool="vigia_sift_bridge",
+            message="compare_paired_bundles registered (L-029 F2: deterministic sub-metrics, zero verdict authority).",
+        )
+    except ImportError as _paired_err:
+        print(
+            f"[VIGIA] WARNING: vigia.tools.paired_review unavailable ({_paired_err}).",
+            file=sys.stderr, flush=True,
+        )
+
+# ---------------------------------------------------------------------------
 # NLP FORENSE — analyze_document_register (SDA + CLI + ACP + ROI + MCP)
 # Activar: VIGIA_NLP_ENABLED=true
 # ---------------------------------------------------------------------------
