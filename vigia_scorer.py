@@ -1519,6 +1519,38 @@ def _vigia_score(case: dict) -> dict:
                 "extraction required before a benignity verdict)."
             )
 
+    # Normalization-integrity gate (P1, 2026-07-17, evidence integrity)
+    #
+    # If any artifact's metadata arrived malformed and was coerced during intake
+    # (normalization_failures marker from the bridge), a forensic assertion that
+    # participates in scoring may have been silently discarded — e.g. a temporal
+    # field CAIE reads for its causality rule. Surface that loss in the sealed
+    # result so it is auditable, and if the verdict is NOISE, refuse it: a clean
+    # bill of health on partially-discarded evidence is unsupportable. Fires ONLY
+    # on NOISE, so a failed-normalization artifact can never soften a
+    # SUSPICION/MALICE finding — it can never REDUCE a case's severity, only
+    # convert a false-clean NOISE into an honest ABSTAIN.
+    _norm_failures = [
+        {"artifact_id": a.get("artifact_id"), **f}
+        for a in artifacts
+        for f in (a.get("normalization_failures") or [])
+    ]
+    if _norm_failures:
+        base_result["normalization_failures"] = _norm_failures
+        if base_result["verdict"] == "NOISE":
+            verdict = "ABSTAIN"
+            confidence = 0.0
+            base_result["verdict"] = "ABSTAIN"
+            base_result["confidence"] = 0.0
+            base_result["reason"] = (
+                "NORMALIZATION INTEGRITY LOSS: an artifact's metadata arrived "
+                "malformed and was coerced during intake, which can silently drop "
+                "a forensic assertion that participates in scoring. NOISE would "
+                "overclaim a clean finding on partially discarded evidence; "
+                "ABSTAIN documents the gap (re-submit the artifact with "
+                "well-formed metadata). See normalization_failures."
+            )
+
     base_result["quadripartite_state"] = _apply_quadripartite(
         verdict=verdict,
         confidence=confidence,
