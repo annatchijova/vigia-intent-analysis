@@ -40,10 +40,6 @@ _MODE_DIVERGENCE = ("data repaired (retype+rubric 2026-07-12): motor seals "
                     "because its 0.5/0.2 Noisy-OR thresholds are structurally "
                     "unreachable on the adjusted scale — pending D-G mode "
                     "unification, not a data fix")
-_HONEST_SUSPICION = ("re-scoring session resolved this case as honest "
-                     "SUSPICION (no re-score; rubric band cannot defensibly "
-                     "reach MALICE); expected_verdict relabel decision "
-                     "pending (CAN-026 criterion)")
 KNOWN_PENDING = {
     # case_004_incompetencia_armamentizada and case_012_camuflaje_simbiotico
     # were removed from this list on 2026-07-12: the new canonical TTP
@@ -51,6 +47,14 @@ KNOWN_PENDING = {
     # docs/CASE_RECOVERY_20260712.md) now fire on their real attack signal, so
     # they seal MALICE at the motor layer and SUSPICION at the CAIE-tool layer
     # (both accepted for MALICE-expected). They pass; they must NOT be xfail.
+    #
+    # case_111_falso_rastro_incompetencia and case_024_paracaidista were
+    # removed on 2026-07-17: both seal SUSPICION at the CAIE-tool layer today,
+    # which the MALICE-expected acceptance already admits. They had been
+    # invisible passes: the old imperative `pytest.xfail(...)` aborted the
+    # test BEFORE running the engine, so no entry in this map could ever
+    # reach XPASS (see the marker-based parametrization below, which fixed
+    # the mechanism).
     **{cid: _B115 for cid in (
         "case_005_ruido_blanco_distractor",
         "case_007_insomnio_tactico",
@@ -75,12 +79,30 @@ KNOWN_PENDING = {
         "case_103_cebo_vulnerabilidad_autoinfligida",
         "case_105_disonancia_ritmo_procesamiento",
         "case_109_silencio_estadistico_log",
-        "case_111_falso_rastro_incompetencia",
     )},
     "case_090_anacronismo_herramienta": _MODE_DIVERGENCE,
-    "case_024_paracaidista": _HONEST_SUSPICION,
     "case_026_ventrilocuo": _MODE_DIVERGENCE,
 }
+
+
+def canonical_case_params():
+    """One pytest.param per case, with KNOWN_PENDING as a real xfail MARKER.
+
+    The previous mechanism called `pytest.xfail(reason)` imperatively inside
+    the test body, which aborts the test immediately: pending cases never
+    executed, so a repaired case could never surface as XPASS and stale
+    entries accumulated silently (case_111 and case_024 were passing
+    unnoticed). strict=True enforces the documented contract: the moment a
+    pending case passes (e.g. after the D-2 data repair), the suite fails
+    until its entry is removed from KNOWN_PENDING.
+    """
+    for case in load_canonical_cases():
+        marks = []
+        if case["case_id"] in KNOWN_PENDING:
+            marks.append(
+                pytest.mark.xfail(reason=KNOWN_PENDING[case["case_id"]], strict=True)
+            )
+        yield pytest.param(case, id=case["case_id"], marks=marks)
 
 def load_canonical_cases():
     """Load all VIGIA-CAN-*.json files."""
@@ -130,11 +152,9 @@ class TestCanonicalCases:
             assert "artifacts" in case
             assert len(case["artifacts"]) > 0
 
-    @pytest.mark.parametrize("case", load_canonical_cases(), ids=lambda c: c["case_id"])
+    @pytest.mark.parametrize("case", canonical_case_params())
     def test_case_caie_verdict(self, case):
         """Run each case through CAIE and compare with expected_verdict."""
-        if case["case_id"] in KNOWN_PENDING:
-            pytest.xfail(KNOWN_PENDING[case["case_id"]])
         engine = CrossArtifactIncongruenceEngine()
         artifacts = case_to_artifacts(case)
 
@@ -181,8 +201,10 @@ if __name__ == "__main__":
         ok = (expected == "MALICE" and actual in ("MALICE", "SUSPICION")) or              (expected == "SUSPICION" and actual in ("SUSPICION", "MALICE")) or              (actual == expected)
 
         status = "PASS" if ok else "FAIL"
+        # composite_score is serialized as a string in current CAIE output;
+        # print it verbatim instead of assuming a float (crashed with ':.4f').
         print(f"[{status}] {case['case_id']}: expected={expected} actual={actual} "
-              f"composite={result.get('composite_score', 0):.4f} "
+              f"composite={result.get('composite_score', 0)} "
               f"fractures={result.get('fractures_detected', 0)}")
 
         if ok:

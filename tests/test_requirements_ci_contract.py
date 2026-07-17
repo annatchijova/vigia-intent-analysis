@@ -26,6 +26,16 @@ test también falla.
 Limitación conocida: los imports dinámicos (importlib.import_module con
 string, __import__) no se detectan estáticamente. Ninguno de los tres casos
 históricos era dinámico.
+
+Cuarta ocurrencia de deriva (2026-07-17, falso positivo del propio scanner):
+si el virtualenv vive DENTRO del repo (p.ej. ./.venv), el clasificador
+"origen dentro del repo == módulo local" trataba site-packages como código
+local y recorría fuentes third-party. Ahí encontraba imports condicionados
+por versión/plataforma que el AST walker ve como incondicionales
+(`annotationlib` bajo `sys.version_info >= (3, 14)` en typing_extensions;
+`apport_python_hook`, hook de Ubuntu) y los declaraba irresolubles. Fix:
+`_is_repo_local` excluye site-packages/dist-packages y cualquier directorio
+con pyvenv.cfg — un venv dentro del repo es third-party, no repo.
 """
 
 from __future__ import annotations
@@ -88,6 +98,33 @@ def _covered_distributions(entries: set[str]) -> set[str]:
             if m:
                 stack.append(_canon(m.group(1)))
     return covered
+
+
+_ENV_DIR_MARKERS = frozenset({"site-packages", "dist-packages"})
+
+
+def _is_repo_local(origin: Path, repo: Path) -> bool:
+    """¿`origin` es código DEL repo (a recorrer) o de un entorno instalado?
+
+    Un venv creado dentro del repo (./.venv) queda bajo la raíz del repo,
+    pero su contenido es third-party: recorrerlo produce falsos positivos
+    con imports condicionados por versión/plataforma (annotationlib,
+    apport_python_hook — ver docstring del módulo).
+    """
+    resolved = origin.resolve()
+    try:
+        rel = resolved.relative_to(repo.resolve())
+    except ValueError:
+        return False
+    if _ENV_DIR_MARKERS.intersection(rel.parts):
+        return False
+    # Cualquier ancestro (dentro del repo) que contenga pyvenv.cfg es un venv.
+    probe = repo.resolve()
+    for part in rel.parts[:-1]:
+        probe = probe / part
+        if (probe / "pyvenv.cfg").exists():
+            return False
+    return True
 
 
 def _module_files(spec) -> list[Path]:
@@ -248,7 +285,7 @@ def test_all_test_imports_resolve_with_requirements_ci():
                         p
                         for pat in (f"{root}.py", f"{root}/__init__.py")
                         for p in REPO.rglob(pat)
-                        if ".git" not in p.parts
+                        if ".git" not in p.parts and _is_repo_local(p, REPO)
                     ]
                     if hits:
                         local_roots.add(root)
@@ -261,7 +298,7 @@ def test_all_test_imports_resolve_with_requirements_ci():
                 if spec.submodule_search_locations
                 else None
             )
-            if origin and str(REPO) in str(Path(origin).resolve()):
+            if origin and _is_repo_local(Path(origin), REPO):
                 mod_pkg = (
                     dotted
                     if spec.submodule_search_locations
@@ -302,3 +339,40 @@ def test_all_test_imports_resolve_with_requirements_ci():
             "existe en KNOWN_LIMITATIONS.md — la excepción quedó sin respaldo "
             "documental."
         )
+
+
+def test_is_repo_local_excludes_in_repo_virtualenvs(tmp_path):
+    """Regresión del falso positivo 2026-07-17 (annotationlib/apport_python_hook).
+
+    Reproduce sintéticamente un venv dentro del repo: sus fuentes NO deben
+    clasificarse como locales (recorrerlas escanea third-party con imports
+    condicionados por versión/plataforma), mientras el código real del repo
+    sí debe recorrerse.
+    """
+    repo = tmp_path / "repo"
+    # Código genuino del repo — local.
+    real = repo / "vigia" / "tools" / "caie.py"
+    real.parent.mkdir(parents=True)
+    real.write_text("", encoding="utf-8")
+    assert _is_repo_local(real, repo)
+
+    # Venv dentro del repo (marcador site-packages) — third-party.
+    sp = repo / ".venv" / "lib" / "python3.12" / "site-packages"
+    sp.mkdir(parents=True)
+    (repo / ".venv" / "pyvenv.cfg").write_text("home = /usr/bin\n", encoding="utf-8")
+    te = sp / "typing_extensions.py"
+    te.write_text("import annotationlib\n", encoding="utf-8")
+    assert not _is_repo_local(te, repo)
+
+    # Venv sin el layout site-packages pero con pyvenv.cfg — third-party.
+    odd = repo / "env" / "weird_layout" / "mod.py"
+    odd.parent.mkdir(parents=True)
+    odd.write_text("", encoding="utf-8")
+    (repo / "env" / "pyvenv.cfg").write_text("home = /usr/bin\n", encoding="utf-8")
+    assert not _is_repo_local(odd, repo)
+
+    # Fuera del repo — nunca local.
+    outside = tmp_path / "elsewhere" / "x.py"
+    outside.parent.mkdir(parents=True)
+    outside.write_text("", encoding="utf-8")
+    assert not _is_repo_local(outside, repo)

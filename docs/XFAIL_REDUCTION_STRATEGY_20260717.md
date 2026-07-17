@@ -1,0 +1,218 @@
+# Estrategia de reducción de xfails — 2026-07-17
+
+Investigación sobre la corrida `pytest tests/` del 2026-07-17
+(`1 failed, 1502 passed, 188 skipped, 33 xfailed, 1 xpassed`) y el batch
+`run_all_agent.py` (187/201). Objetivo: que los tests que hoy no pasan vayan
+desapareciendo **por tandas y con decisiones explícitas**, sin ocultar cambios
+de doctrina ni forzar datos.
+
+Todo lo afirmado abajo fue reproducido empíricamente en esta sesión (mismo
+estado: 33 xfailed + 1 xpassed antes de los cambios de esta tanda).
+
+---
+
+## 1. Diagnóstico — el FAIL, el XPASS y los 33 xfails no son un solo problema
+
+Son **cuatro clases** distintas:
+
+| Clase | Ítems | Naturaleza |
+|---|---|---|
+| A. Falso positivo del propio harness | 1 FAIL (`test_requirements_ci_contract`) + mecanismo xfail imperativo | Bug del test, no del motor |
+| B. Propiedad ya implementada, test desactualizado | 1 XPASS (H-05) + 2 canonical que ya pasaban | Deuda de mantenimiento de markers |
+| C. Feature/contrato pendiente, chico y autocontenido | H-04 (2), H-10 (1), H-01 (2) | Fix de código con decisión menor |
+| D. Decisión de datos/doctrina pendiente | 23 × D-2 (B-115), 2 × D-G, 1 × BUG-NLP-002, 14 FAILs del batch | No se arregla tocando tests |
+
+---
+
+## 2. Tanda 1 — ejecutada en esta rama (clases A y B)
+
+### 2.1 FAIL del contrato CI (`annotationlib`, `apport_python_hook`) — RESUELTO
+
+No era una dependencia faltante y **no había que agregar nada a
+requirements-ci.txt**. Causa raíz: el venv del entorno local vive dentro del
+repo (`~/vigia-repo/.venv`), y el clasificador del scanner usaba
+"origen dentro del repo ⇒ módulo local a recorrer". Con eso recorría
+`site-packages` como si fuera código propio y escaneaba fuentes third-party,
+donde el AST walker ve como incondicionales los imports condicionados por
+versión/plataforma:
+
+- `annotationlib`: stdlib de Python ≥ 3.14, importado bajo
+  `if sys.version_info >= (3, 14):` (p.ej. typing_extensions) — irresoluble
+  en 3.12.
+- `apport_python_hook`: hook específico de Ubuntu, presente solo en algunos
+  árboles de sistema.
+
+Fix aplicado (cuarta ocurrencia de deriva documentada en el docstring del
+test): `_is_repo_local()` excluye `site-packages`/`dist-packages` y cualquier
+ancestro con `pyvenv.cfg`, tanto en la clasificación de specs como en el
+fallback `rglob` de módulos bare. Regresión cubierta por
+`test_is_repo_local_excludes_in_repo_virtualenvs` (venv sintético dentro de
+un repo de prueba). Ninguno de los dos nombres aparece en el código del repo;
+la clase entera de imports condicionales queda fuera del alcance del scanner.
+
+### 2.2 El mecanismo de xfail canonical estaba roto — RESUELTO
+
+`test_canonical_cases.py` usaba `pytest.xfail(reason)` **imperativo dentro del
+cuerpo**: eso aborta el test antes de ejecutar el motor. Consecuencia: ningún
+caso de `KNOWN_PENDING` podía jamás llegar a XPASS, contradiciendo el contrato
+documentado ("when the underlying data is repaired the case flips to XPASS and
+must be removed from this map"). El mapa acumulaba entradas muertas sin que
+nadie lo viera.
+
+Verificación empírica (los 52 casos ejecutados de verdad): de los 27
+"pendientes", **2 ya pasaban hoy** —
+
+- `case_111_falso_rastro_incompetencia` (MALICE esperado, CAIE da SUSPICION —
+  aceptado por la regla del test),
+- `case_024_paracaidista` (ídem; consistente con la resolución "honest
+  SUSPICION" de la sesión de re-scoring 2026-07-12).
+
+Fix aplicado: parametrización con `pytest.param(..., marks=pytest.mark.xfail(
+reason, strict=True))`. Ahora los pendientes **se ejecutan** y `strict=True`
+hace que el suite falle en cuanto un caso reparado empiece a pasar, forzando a
+retirar su entrada (exactamente la disciplina que el comentario pedía). Las 2
+entradas muertas fueron retiradas. Estado del archivo: 28 passed, 25 xfailed.
+
+### 2.3 El XPASS de H-05 era GENUINO — test reescrito como guard
+
+`test_malice_requires_independent_sources` no estaba pasando "de casualidad
+por score bajo": el caso de 4 clones (mismo tool, mismo tipo) puntúa
+**0.4638 > 0.33** (umbral MALICE) y es el **gate de corroboración B-068 /
+R4-3 v2** el que capa el veredicto en SUSPICION ("volume within a single soft
+collection domain does not corroborate MALICE"). Es decir: la propiedad que el
+hallazgo H-05 exigía ya está implementada y funcionando.
+
+Fix aplicado: se quitó el xfail y el test es ahora un guard directo con tres
+aserciones: (1) el score cruza el umbral (si una recalibración lo baja, el
+test avisa que hay que subir los raw_scores del fixture — cierra la trampa que
+la nota del xfail describía), (2) el veredicto no es MALICE, (3) el `reason`
+atribuye el cap al gate de corroboración.
+
+**Balance Tanda 1: 1 FAIL → 0; 1 XPASS → 0; 33 xfails → 31; y los 25
+canonical restantes ahora se ejecutan bajo strict.**
+
+---
+
+## 3. Tandas siguientes (clase C) — fixes chicos con decisión menor
+
+### Tanda 2 — H-04: CCS debe ABSTAIN sin información (−2 xfails, riesgo ~nulo)
+
+`vigia/core/causal_closure.py` sustituye cada dimensión `None` por `1/2`; con
+las 4 en `None`, CCS = 1/2 ≥ threshold y habilita `MALICE_HIGH` con cero
+información. Los dos xfails (`test_ccs_no_information_forces_abstain`,
+`test_ccs_insufficient_coverage_abstains`) piden: cobertura mínima antes de
+evaluar el gate.
+
+Hallazgo clave de esta investigación: **`compute_causal_closure` no tiene
+consumidores de producción** (solo el runner adversarial referencia nombres de
+métricas). El cambio es autocontenido: contar dimensiones provistas
+(`not None`) y, si `provided < 2` (o el criterio que se decida),
+`verdict_cap = "ABSTAIN"` sin importar el score. `test_ccs_all_none_sits_exactly_on_threshold`
+ya pinea la frontera actual y habrá que actualizarlo junto con el fix — está
+diseñado para eso ("pins the boundary so the fix is visible").
+
+Decisión requerida: umbral de cobertura (recomendado: ≥ 2 dimensiones reales;
+con 0–1 dimensiones, ABSTAIN).
+
+### Tanda 3 — H-10: `artifacts_rejected` en el veredicto (−1 xfail)
+
+En la rama CAIE viva, un artefacto malformado se descarta con
+`except Exception: continue` sin dejar rastro. El fix es de contrato de
+salida: contar los descartes y exponer `artifacts_rejected` en el dict del
+veredicto (y en la narrativa). No cambia ningún score; cambia la
+reproducibilidad/completitud Daubert. Riesgo: bajo — agregar una clave nueva
+al resultado; verificar que el sellado/canonicalización la incluya de forma
+determinista.
+
+### Tanda 4 — H-01: ventana de tolerancia temporal (−2 xfails, decisión doctrinal)
+
+Dos paths: el hard gate del scorer (EFFECT_BEFORE_CAUSE ⇒ MALICE
+incondicional, confidence 0.95) y la regla TCV de CAIE (severity 1.0 para
+cualquier delta negativo). 2 segundos de drift NTP entre relojes distintos no
+es una violación de las leyes de la física.
+
+Lo que ya existe a favor: el control positivo **no-xfail**
+`test_large_negative_delta_still_flags` (−3600s debe seguir detectándose)
+protege contra sobre-corrección, y los tests pasan `delta_seconds` y
+`clock_source` en los fixtures — el dato para decidir está disponible.
+
+Decisión requerida (explícita, sellada en PolicySpec como piden los tests):
+el tamaño de la ventana. Referencias razonables: 5–30 s cubre drift NTP
+degradado; elegir, documentar en KNOWN_LIMITATIONS y aplicar en ambos paths
+(escalar severity con |delta| en vez de binario 1.0 es la variante más
+defendible: dentro de ventana → severity baja/no fracture; fuera → como hoy).
+
+### Pendiente deliberado — BUG-NLP-002 (tokenizer): NO tocar en estas tandas
+
+`test_analyze_surfaces_l33tspeak_as_oov` ya está en el estado correcto:
+`strict=True`, documentado como D4 diferido, con su gemelo no-xfail que
+caracteriza el hueco. Arreglarlo cambia la salida del tokenizer y exige
+revalidar umbrales del corpus NLP — es un proyecto, no una tanda. Se queda
+como xfail estricto hasta esa revalidación.
+
+---
+
+## 4. Clase D — los 25 canonical restantes y los 14 FAILs del batch
+
+### 4.1 D-2 (B-115): 23 casos con `metadata.*_time` rotos
+
+Los veredictos CAIE-layer de esos casos estaban sostenidos por TCV fósiles
+sobre timestamps de metadata escritos ~90 días fuera de la línea temporal
+coherente (docs/FOSSIL_HUNT_20260711_PASS2.md §3). No es un fix de motor: es
+**reparación de datos** (re-anclar `metadata.*_time` en canonical_v2 + re-sello)
+pendiente de la decisión D-2 (docs/CASE_RECOVERY_20260712.md §7.3,
+docs/IMPL_20260712_M1_M3_M2.md). Cuando se ejecute, los casos que se
+recuperen romperán el suite vía `strict=True` — ese es el mecanismo correcto:
+cada recuperación obliga a retirar su entrada de `KNOWN_PENDING` en el mismo
+commit que repara el dato.
+
+Advertencia de esta investigación: no asumir que D-2 recupera los 23. Varios
+esperan MALICE y hoy dan NOISE con composite ~0.09 contra umbrales Noisy-OR
+0.5/0.2 — parte del residuo es D-G (escala), no timestamps. Ejecutar D-2 y
+medir; lo que no flipee se re-clasifica honestamente como D-G.
+
+### 4.2 D-G: divergencia de modos (case_090, case_026 + residuo de 4.1)
+
+El dossier (docs/SCORER_ARCHITECTURE_DOSSIER_20260712.md D-G) ya decidió la
+dirección: unificar hacia el motor — `evaluate()` de CAIE deja de emitir
+veredicto standalone y delega en la capa de decisión del motor (costo estimado
+3–4 h). Cuando eso ocurra, `test_canonical_cases.py` debe dejar de comparar
+contra el veredicto tool-layer y comparar contra el sellado — los 2 xfails
+D-G (y el residuo D-2 que no flipee) se resuelven ahí. No intentar "calibrar"
+los umbrales 0.5/0.2 para que alcancen: el dossier documenta que esa escala es
+estructuralmente inalcanzable tras el ajuste — sería tuning cosmético.
+
+### 4.3 Los 14 FAILs del batch (187/201) — pista separada, no confundir con xfails
+
+docs/CASE_RECOVERY_20260712.md ya adjudicó la mayoría:
+
+- **Decisiones de etiqueta/doctrina** (no bugs): FP-003 (BENIGN vs SUSPICION),
+  KIWI-006/007, OWL-NEXUS5, BREAK-011/015, NPS-2009, BEN-012/014.
+- **UNFIXABLE sin forzar** (§5 del doc): FP-CULTURAL-CLEAN, FP-002 — gemelos
+  estructurales de casos NOISE correctos; recuperarlos rompería 4 NOISE.
+- **FN-001/002/003**: falsos negativos reales del motor — la única sub-pista
+  de esta lista que amerita trabajo de detector.
+
+Techo realista documentado sin forzar labels: ~167/193. Recomendación: mantener
+este contador fuera del suite de pytest (como está) y no convertir estos casos
+en xfails — son ground-truth en disputa, no contratos de código.
+
+---
+
+## 5. Orden recomendado y balance proyectado
+
+| Tanda | Contenido | Costo | xfails/fails que cierra | Decisión previa |
+|---|---|---|---|---|
+| 1 (esta rama) | Scanner CI, mecanismo xfail canonical, guard H-05 | hecho | FAIL 1→0, XPASS 1→0, 33→31 | ninguna |
+| 2 | CCS coverage → ABSTAIN (H-04) | ~1 h | 31→29 | umbral de cobertura |
+| 3 | `artifacts_rejected` (H-10) | ~1–2 h | 29→28 | ninguna |
+| 4 | Tolerancia temporal (H-01), ambos paths | ~2–3 h | 28→26 | ventana en PolicySpec |
+| 5 | D-2 data repair + retiro strict de recuperados | 2 h + re-sello | 26→~10±? (medir) | D-2 (datos) |
+| 6 | D-G unificación de modos | 3–4 h | resto canonical | doctrina ya decidida en dossier |
+| — | BUG-NLP-002 | proyecto D4 | 1 (queda último) | revalidación tokenizer |
+
+Qué **no** hacer (confirmado por esta investigación): agregar `annotationlib`/
+`apport_python_hook` a requirements-ci.txt (ocultaría el bug del scanner y no
+instalaría nada útil); forzar los 33 de golpe (23 dependen de una decisión de
+datos y 2 de una unificación de doctrina); convertir los FAILs del batch en
+xfails de pytest (son disputas de etiqueta, no contratos).
