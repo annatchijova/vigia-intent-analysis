@@ -7392,3 +7392,57 @@ específico — no `rglob("*")` — con puñados de matches en la práctica.
   (práctica B-097: los bundles regenerados no se commitean).
 
 ---
+
+## B-141 — `run_vigia` descarta TODAS las señales por TypeError silencioso (`description=` a un `SignalOutput` que no tiene ese campo) [PENDIENTE]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PENDIENTE — detectado por refutador adversarial en la investigación L-029 (2026-07-17), verificado por ejecución |
+| **Severidad** | P1 — el camino `run_vigia` ejecuta el pipeline con CERO señales en el deployment dataclass |
+| **Archivo** | `vigia/pipeline/pipeline.py:1382-1392` |
+| **Detectado en** | Investigación abductiva L-029 (`docs/PROPUESTA_L029_DARVO_20260717.md` §6), juez de ingeniería, verificado por el sintetizador |
+
+### Descripción
+
+La conversión dict→SignalOutput de `run_vigia` pasa `description=d.get("description")`,
+pero `SignalOutput` (`vigia/tools/signal_contract.py`) solo tiene
+`tool_name, signal_id, value, z_score, confidence, metadata`. En el deployment
+dataclass la construcción lanza `TypeError: unexpected keyword argument
+'description'`; el `try/except` por señal loguea "Señal inválida ignorada" y
+descarta la señal — TODAS las señales, siempre. Verificado por ejecución en este
+árbol. Bajo pydantic v2 (extra ignorado) la señal sobrevive pero `description` se
+descarta en silencio.
+
+### Fix pendiente
+
+Retirar el kwarg inexistente (o mover description a metadata), test rojo primero
+que fije que `run_vigia` construye señales desde dicts. Ver dossier §5-F0.4.
+
+---
+
+## B-142 — Canal de penalidad DARVO del pipeline muerto en runtime + ELI falso positivo + comentario in-code falso [DOCUMENTADO — decisión en dossier L-029]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | DOCUMENTADO — fixes propuestos en `docs/PROPUESTA_L029_DARVO_20260717.md` §5-F0, pendientes de firma |
+| **Severidad** | P2 — integridad del registro B-140 + superficie latente en el decision path del pipeline |
+| **Archivos** | `vigia/core/darvo_detector.py`, `vigia/pipeline/pipeline.py:629-630`, `data/cases/VIGIA-REAL-MAGNET-2021-IOS-ELI.json` |
+| **Detectado en** | Investigación abductiva L-029 (censo de 201 casos + 6 refutadores), verificado por ejecución |
+
+### Tres hechos verificados
+
+1. **El canal `adjust_consistency_score` del pipeline es código muerto en
+   runtime**: los `SignalOutput` reales no tienen `description` ni
+   `evidence_type` como atributos → el detector devuelve penalidad 0
+   incondicionalmente. El "efecto vivo en 45/200 casos" que sugería el censo
+   proxy sobre artifacts JSON no ocurre en el camino real. Riesgo: el canal se
+   DESPERTARÍA con cualquier refactor del contrato de señales, sin gate de
+   asimetría (fórmula surveillance-only). Propuesta: retirarlo, no estrecharlo.
+2. **ELI es falso positivo del detector B-140**: `'server'` matchea dentro de
+   "4 S3 server list URLs" y `'no contact'` dentro de "no contacts database".
+   Caso mono-actor de evasión de comunicaciones — sin estructura DARVO. El
+   censo real de anotaciones verdaderas es 4 (1 expediente + 2 copias), no 5.
+3. **El comentario "exactamente los 5 casos correctos" en `darvo_detector.py`
+   es falso** y debe corregirse junto con el registro B-140 (nunca en silencio).
+
+---
