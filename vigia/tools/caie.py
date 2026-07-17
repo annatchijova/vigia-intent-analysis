@@ -1118,6 +1118,11 @@ class CrossArtifactIncongruenceEngine:
         self._fractures: list[Fracture] = []
         self._temporal_index: dict[str, list[Artifact]] = {}  # For TCV rule
         self._network_index: dict[str, list[Artifact]] = {}   # For NETWORK_VS_HOST
+        # P1 (evidence integrity): TCV pairs omitted because a required event
+        # timestamp was present but unparseable/out-of-range. Recorded here so
+        # the omission is surfaced in the (signed) result and can drive an
+        # honest disposition, instead of only living in the HMAC audit log.
+        self._temporal_pairs_skipped: list[dict] = []
 
     def add_artifact(self, artifact: Artifact) -> bool:
         """
@@ -1239,6 +1244,7 @@ class CrossArtifactIncongruenceEngine:
         8. CRYPTOGRAPHIC_INCONSISTENCY (NEW): Signature/hash mismatch
         """
         self._fractures.clear()
+        self._temporal_pairs_skipped.clear()
 
         # Group artifacts by evidence type category
         technical = [a for a in self._artifacts if a.evidence_type in
@@ -1679,6 +1685,13 @@ class CrossArtifactIncongruenceEngine:
                 return None
             return cmp_dt
 
+        # P1 (evidence integrity): dedup set for genuinely-unparseable event
+        # timestamps recorded as skipped TCV comparisons. Scoped per
+        # detect_fractures() call. Out-of-range values are deliberately NOT
+        # recorded here — R3-1 treats an implausible endpoint as missing data
+        # (inert), never a signal, to avoid fabricating a false fracture.
+        _tcv_skip_seen: set = set()
+
         def _parse_ts_tcv(ts_str: object, artifact_tool: str, field: str) -> "datetime | None":
             """
             Robust ISO 8601 timestamp parser for TCV rule.
@@ -1739,6 +1752,20 @@ class CrossArtifactIncongruenceEngine:
                     "Expected formats: YYYY-MM-DDTHH:MM:SS[.ffffff][Z|+HH:MM]"
                 ),
             )
+            # P1: a *present but unparseable* required event time means a
+            # decision-relevant temporal comparison could not run. Record it once
+            # so the result cannot read as clean/no-fracture without disclosing
+            # the gap (the omission was previously only in the HMAC audit log).
+            _sk = (artifact_tool, field, str(ts_str))
+            if _sk not in _tcv_skip_seen:
+                _tcv_skip_seen.add(_sk)
+                self._temporal_pairs_skipped.append({
+                    "source_tool": artifact_tool,
+                    "field":       field,
+                    "value":       ts_str if isinstance(ts_str, str) else repr(ts_str),
+                    "reason":      "unparseable",
+                    "rule":        "TEMPORAL_CAUSALITY_VIOLATION",
+                })
             return None
 
         for net in network_artifacts:
@@ -2699,6 +2726,15 @@ class CrossArtifactIncongruenceEngine:
             "fracture_count"      : len(filtered_fractures),
             "processing_timestamp": _utcnow(),
         }
+
+        # P1 (evidence integrity): a required TCV event timestamp that was present
+        # but unparseable/out-of-range omits the pair from the temporal-causality
+        # rule. That omission previously lived only in the HMAC audit log, so a
+        # returned result could read as clean/no-fracture with no signal that a
+        # decision-relevant comparison was skipped (confirmed: it flipped a sealed
+        # verdict SUSPICION -> NOISE). Surface it inside the signed result.
+        result["temporal_pairs_skipped"] = list(self._temporal_pairs_skipped)
+        result["temporal_pairs_skipped_count"] = len(self._temporal_pairs_skipped)
 
         # HMAC sign for chain of custody
         result["_operation_hmac"] = self._sign_result(result)
