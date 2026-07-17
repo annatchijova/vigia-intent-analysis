@@ -293,9 +293,55 @@ class ForensicAdapter:
             consistent_with_hypothesis=consistent, is_broken=False,
         )
 
+    # B-136 phase 3: keys a tool-exposed caie_artifact dict must carry.
+    # Matches the shape the four document-forensics tools build (see
+    # vision_audit._build_caie_artifacts and siblings).
+    _CAIE_ARTIFACT_KEYS = frozenset({
+        "source_tool", "evidence_type", "raw_score",
+        "description", "metadata", "provenance_chain",
+    })
+
+    @classmethod
+    def _caie_artifacts_from_raw_results(cls, raw_results: Dict[str, Any]) -> list:
+        """B-136 phase 3: absorb the case-ready artifacts the document-
+        forensics tools expose in their results under "caie_artifacts".
+
+        Fail-closed: malformed entries are skipped, raw_score is clamped to
+        [0,1], and custody metadata is never synthesized — an artifact
+        without acquisition metadata self-degrades inside CAIE (B-131 law),
+        which is the honest outcome.
+        """
+        absorbed = []
+        for result in (raw_results or {}).values():
+            if not isinstance(result, dict):
+                continue
+            entries = result.get("caie_artifacts")
+            if not isinstance(entries, list):
+                continue
+            for entry in entries:
+                if not isinstance(entry, dict) or not cls._CAIE_ARTIFACT_KEYS <= set(entry):
+                    continue
+                try:
+                    absorbed.append(CAIEArtifact(
+                        source_tool=str(entry["source_tool"]),
+                        evidence_type=str(entry["evidence_type"]),
+                        raw_score=min(1.0, max(0.0, float(entry["raw_score"]))),
+                        description=str(entry["description"])[:500],
+                        metadata=entry["metadata"] if isinstance(entry["metadata"], dict) else {},
+                        provenance_chain=list(entry["provenance_chain"] or []),
+                    ))
+                except (TypeError, ValueError):
+                    continue
+        return absorbed
+
     @classmethod
     def build_context(cls, signals: List[SignalOutput], raw_results: Dict[str, Any] = None) -> ForensicContext:
         caie = [cls.signal_to_caie_artifact(s) for s in signals]
+        # B-136 phase 3: tool results may carry case-ready caie_artifacts
+        # (linguistic_forensics, batch_forensics, temporal_fraud,
+        # document_visual/geometry) — this is the single incorporation
+        # point for both assemblers (pipeline and sift orchestrator).
+        caie.extend(cls._caie_artifacts_from_raw_results(raw_results or {}))
         abductive = [cls.signal_to_abductive_record(s) for s in signals]
         links = [cls.signal_to_causal_link(s) for s in signals]
         return ForensicContext(

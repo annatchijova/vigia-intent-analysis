@@ -7070,6 +7070,18 @@ cambio de comportamiento para instalaciones que ya seteaban `log_path` explícit
 > resultado de cada tool a `case["artifacts"]` — punto único de integración,
 > fuera del alcance de este fix.
 
+> **Fase 3 (2026-07-17): ensamblador cerrado.** `ForensicAdapter.build_context`
+> ahora absorbe los `caie_artifacts` que las tools exponen en `raw_results`
+> (punto único para ambos ensambladores: pipeline y sift orchestrator), con
+> contrato fail-closed: entradas malformadas se saltean, raw_score clampeado
+> a [0,1], custody metadata jamás sintetizada (ley B-131: degradación honesta
+> dentro de CAIE). `vigia/pipeline/pipeline.py` pasa los resultados de visión
+> (única de las 4 tools que invoca directamente). Tests:
+> `tests/test_b136_case_assembly.py` (6, red-first). Suite 1455/0. Corpus
+> gate: 189/201, CERO flips — esperado y honesto: los casos JSON no ejercitan
+> el loop de visión con imágenes; el primer caso con evidencia visual real
+> ejercitará el camino completo.
+
 | Campo | Valor |
 |-------|-------|
 | **Estado** | DOCUMENTADO — fix arquitectónico pendiente (decisión de diseño: routing al engine del scorer + perfiles de evidencia nuevos) |

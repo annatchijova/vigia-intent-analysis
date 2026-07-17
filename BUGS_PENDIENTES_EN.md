@@ -6213,6 +6213,14 @@ flips across the 199 baseline-shared cases (fixed==0 expected: the new
 types do not yet occur in the corpus). Downstream pending: the case
 assembler incorporating `caie_artifacts` into `case["artifacts"]`.
 
+> **Phase 3 (2026-07-17): assembler closed.** ForensicAdapter.build_context
+> now absorbs tool-exposed caie_artifacts from raw_results (single point for
+> both assemblers), fail-closed (malformed skipped, raw_score clamped,
+> custody metadata never synthesized per B-131). pipeline.py passes its
+> vision results through. 6 red-first tests; suite 1455/0; corpus gate
+> 189/201 with ZERO flips (expected: JSON corpus cases do not exercise the
+> vision loop with real images).
+
 ---
 
 ## B-137 — `TCC.db` in `_MACOS_MARKER_FILES` triggers the B-048 guard and skips the iOS engine (B-048 residual, sibling of B-133)

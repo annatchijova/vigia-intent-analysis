@@ -492,6 +492,9 @@ class VigiaPipeline:
         # señales adicionales antes de que entren al LikelihoodEngine.
         vision_signals: List[SignalOutput] = []
         vision_metadata: Dict[str, Any] = {}
+        # B-136 phase 3: keep the raw vision results so build_context can
+        # absorb their case-ready caie_artifacts (document_visual/geometry).
+        vision_raw_results: Dict[str, Any] = {}
         if _exec_log:
             _exec_log.log_event(
                 phase=detected_phase or "UNKNOWN",
@@ -537,6 +540,7 @@ class VigiaPipeline:
                         )
                         vision_signals.append(vsig)
                         vision_metadata[_vid] = vision_result.get("peirce_chain", {})
+                        vision_raw_results[f"vision:{_vid}"] = vision_result
                         logger.info(
                             "[Pipeline] Primeridad visual: img=%s vms=%.4f z=%.4f",
                             img_path[-32:], vms, vsig.z_score,
@@ -677,7 +681,8 @@ class VigiaPipeline:
         try:
             from vigia.core.forensic_adapter import ForensicAdapter
             from vigia.tools.caie import cross_artifact_analysis
-            context = ForensicAdapter.build_context(filtered_signals, raw_results={})
+            context = ForensicAdapter.build_context(
+                filtered_signals, raw_results=vision_raw_results)
             if context.caie_artifacts:
                 caie_input = [
                     {
