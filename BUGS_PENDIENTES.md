@@ -7324,3 +7324,71 @@ específico — no `rglob("*")` — con puñados de matches en la práctica.
   no por una corrida de corpus (que trivialmente daría 0 flips).
 
 ---
+
+## B-140 — L-029/FW-009 Fase 1: el detector DARVO era estructuralmente ciego al path motor; anotación cableada sin efecto en veredicto [RESUELTO — Fase 1]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO (Fase 1: anotación) — 2026-07-17. El efecto en veredicto, `false_flag` como tipo de veredicto y la revisión pareada cross-bundle siguen abiertos como doctrina/arquitectura (ver L-029) |
+| **Severidad** | P2 (el patrón HIGH más antiguo del registro de limitaciones sin progreso de código desde 2026-06-24) |
+| **Archivos** | `vigia/core/darvo_detector.py`, `vigia_scorer.py` (Step 4c), `sift_orchestrator.py` (`_motor_darvo_summary` + canal), `vigia_agent.py` (sección de narrativa) |
+| **Detectado en** | Sesión de revisión abductiva 2026-07-17 (verificación de L-029 contra código vivo) |
+
+### Descripción (Peirceana)
+
+- **Firstness:** `compute_darvo_penalty` lee campos con `getattr()` únicamente.
+  Los artefactos del path Modo 1 (EBS JSON) son dicts planos → `getattr`
+  devuelve default → el detector retorna 0 SIEMPRE fuera del pipeline.
+  KIWI-001-A02 ("PHP error ... trampolin", log_entry) y A04 ("Blog honeypot
+  ... accesos ... bloqueado", file_metadata) contienen exactamente los
+  keywords del detector y jamás dispararon en el path motor.
+- **Secondness:** El único caller era `VigiaPipeline` (objetos SignalOutput).
+  El caso canónico de L-029 (KIWI) corre por el path motor — donde el
+  detector era invisible por construcción. La limitación decía "no cableado
+  al orchestrator/agente"; la realidad era peor: aunque se cableara, con
+  dicts no podía disparar.
+- **Thirdness:** La ley: un detector que asume el shape de UN caller queda
+  mudo en silencio frente a los demás — misma clase que B-136 (inyección a
+  engine efímero) y B-063 (metadata=None): el fallo estructural silencioso
+  en la frontera de formatos.
+
+### Fix (Fase 1 — anotación, cero movimiento de veredicto)
+
+1. `_field()` en el detector: lee dict O objeto; total frente a campos
+   malformados (str() coercion, metadata no-dict). El comportamiento con
+   objetos (pipeline) queda PINEADO sin cambios.
+2. `detect_darvo_pattern()` estructurado: conteos, penalidad Fraction, ids
+   de artefactos disparadores (trazabilidad Daubert).
+   **Calibración de la anotación (refutación medida):** `pattern_present`
+   exige la asimetría COMPLETA (vigilancia Y cero-contacto). Con keywords
+   de vigilancia solos ('log', 'server'...) anotaban 52/201 casos del
+   corpus (incluidos benignos) — narrativa engañosa; con ambos lados,
+   exactamente los 5 correctos (KIWI-001/003/004/005 +
+   MAGNET-2021-IOS-ELI, este último ya candidato a revisión de etiqueta en
+   B-097). La penalidad conserva la fórmula original: es el contrato del
+   pipeline (consistency_score) y no se tocó.
+3. `_vigia_score` Step 4c: bloque `darvo_pattern` en la salida sellada
+   (penalidad como str, conteos, ids, `verdict_effect: none`). SOLO
+   anotación — ni veredicto ni score cambian.
+4. Canal de narrativa: `_motor_darvo_summary` (mismo shape B-094) →
+   `results["darvo"]` → sección "DARVO PATTERN" en la narrativa sellada,
+   que declara explícitamente que el veredicto NO fue modificado.
+
+### Verificación
+
+- `tests/test_b140_darvo_motor_annotation.py` (17 tests, rojos primero):
+  soporte dict + pin de objetos (valores pre-B-140 exactos), asimetría
+  completa requerida, malformados no crashean, anotación fiel en el scorer,
+  pin de igualdad veredicto/score/confianza contra gemelo sin keywords,
+  helper del orchestrator, y el caso real KIWI-001 (2 vigilancia +
+  cero-contacto, penalidad 3/5).
+- **Gate comparativo (worktree limpio en HEAD vs árbol con el cambio,
+  `run_all_agent --rerun` completo en ambos):** 201 casos comunes,
+  **CERO flips de veredicto**. Un primer baseline se descartó por
+  contaminación (corrió con el árbol a mitad de edición — subprocess por
+  caso re-importa de disco); el gate válido usó worktree aislado.
+- Suite completa verde (ver commit).
+- `results/` restaurado vía `git checkout -- results/` tras el gate
+  (práctica B-097: los bundles regenerados no se commitean).
+
+---

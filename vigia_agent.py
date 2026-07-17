@@ -1143,6 +1143,29 @@ class VIGIAAgent:
             narrative_parts.append("  La correlación cross-artefacto NO está disponible para este caso.")
             narrative_parts.append("")
 
+        # B-140 (L-029 / FW-009 Fase 1): surfacear la anotación DARVO del
+        # scorer — asimetría de inversión de roles (infraestructura de
+        # vigilancia operada por el actor acusador + reclamo de cero
+        # contacto). SOLO anotación: el veredicto no fue modificado, y la
+        # narrativa lo dice explícitamente.
+        darvo = inner.get("darvo", {}) if isinstance(inner, dict) else {}
+        if darvo and darvo.get("status") == "OK":
+            narrative_parts.append("--- DARVO PATTERN (asimetría de inversión de roles — anotación) ---")
+            narrative_parts.append(
+                f"  Señales de vigilancia: {darvo.get('surveillance_count', 0)} "
+                f"| Reclamos de cero contacto: {darvo.get('zero_contact_count', 0)} "
+                f"| Penalidad registrada (NO aplicada): {darvo.get('penalty', '0')}"
+            )
+            _darvo_matched = darvo.get("matched_artifacts") or []
+            if _darvo_matched:
+                narrative_parts.append(
+                    "  Artefactos disparadores: "
+                    + ", ".join(str(x) for x in _darvo_matched[:6])
+                )
+            if darvo.get("daubert_note"):
+                narrative_parts.append(f"  {str(darvo['daubert_note'])[:250]}")
+            narrative_parts.append("")
+
         # F7 (N8): sección explícita de artefactos no analizados — "no
         # analizado" nunca más enterrado en el JSON del bundle.
         _unanalyzed = inner.get("unanalyzed_artifacts", []) if isinstance(inner, dict) else []

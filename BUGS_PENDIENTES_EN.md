@@ -6337,3 +6337,71 @@ lookups — not `rglob("*")` — with a handful of matches in practice.
   cases do not exercise the marker scan over raw trees; equivalence rests
   on the equivalence pin and the engine pins, not on a corpus run (which
   would trivially show 0 flips).
+
+---
+
+## B-140 — L-029/FW-009 Fase 1: the DARVO detector was structurally blind to the motor path; annotation wired with zero verdict effect [RESOLVED — Fase 1]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED (Fase 1: annotation) — 2026-07-17. The verdict effect, `false_flag` as a verdict type, and the cross-bundle paired review remain open as doctrine/architecture (see L-029) |
+| **Severity** | P2 (the oldest HIGH pattern in the limitations registry with no code progress since 2026-06-24) |
+| **Files** | `vigia/core/darvo_detector.py`, `vigia_scorer.py` (Step 4c), `sift_orchestrator.py` (`_motor_darvo_summary` + channel), `vigia_agent.py` (narrative section) |
+| **Detected in** | Abductive review session 2026-07-17 (verifying L-029 against live code) |
+
+### Description (Peircean)
+
+- **Firstness:** `compute_darvo_penalty` reads fields with `getattr()` only.
+  Mode 1 (EBS JSON) artifacts are plain dicts → `getattr` returns the
+  default → the detector returns 0 ALWAYS outside the pipeline.
+  KIWI-001-A02 ("PHP error ... trampolin", log_entry) and A04 ("Blog
+  honeypot ... accesos ... bloqueado", file_metadata) carry exactly the
+  detector's keywords and never fired on the motor path.
+- **Secondness:** The only caller was `VigiaPipeline` (SignalOutput
+  objects). The canonical L-029 case (KIWI) runs through the motor path —
+  where the detector was invisible by construction. The limitation said
+  "not wired to the orchestrator/agent"; reality was worse: even wired, it
+  could not fire on dicts.
+- **Thirdness:** The law: a detector that assumes ONE caller's shape goes
+  silently mute for every other — same class as B-136 (injection into a
+  discarded engine) and B-063 (metadata=None): the silent structural
+  failure at a format boundary.
+
+### Fix (Fase 1 — annotation, zero verdict movement)
+
+1. `_field()` in the detector: reads dict OR object; total against
+   malformed fields (str() coercion, non-dict metadata). Object (pipeline)
+   behavior is PINNED unchanged.
+2. Structured `detect_darvo_pattern()`: counts, Fraction penalty, matched
+   artifact ids (Daubert traceability).
+   **Annotation calibration (measured refutation):** `pattern_present`
+   demands the FULL asymmetry (surveillance AND zero-contact). With
+   surveillance keywords alone ('log', 'server'...) 52/201 corpus cases
+   (incl. benign) would carry the block — misleading narrative; with both
+   sides, exactly the right 5 (KIWI-001/003/004/005 +
+   MAGNET-2021-IOS-ELI — the latter already a label-review candidate in
+   B-097). The penalty keeps its original formula: it is the pipeline's
+   consistency_score contract and was not touched.
+3. `_vigia_score` Step 4c: `darvo_pattern` block in the sealed output
+   (penalty as str, counts, ids, `verdict_effect: none`). ANNOTATION ONLY —
+   neither verdict nor score moves.
+4. Narrative channel: `_motor_darvo_summary` (same B-094 shape) →
+   `results["darvo"]` → "DARVO PATTERN" section in the sealed narrative,
+   which states explicitly that the verdict was NOT modified.
+
+### Verification
+
+- `tests/test_b140_darvo_motor_annotation.py` (17 tests, red first): dict
+  support + object pins (exact pre-B-140 values), full asymmetry required,
+  malformed inputs safe, faithful scorer annotation, verdict/score/
+  confidence equality pin against a keyword-scrubbed twin, orchestrator
+  helper, and the real KIWI-001 case (2 surveillance + zero-contact,
+  penalty 3/5).
+- **Comparative gate (clean HEAD worktree vs changed tree, full
+  `run_all_agent --rerun` on both):** 201 common cases, **ZERO verdict
+  flips**. A first baseline was discarded as contaminated (it ran while
+  the tree was mid-edit — the per-case subprocess re-imports from disk);
+  the valid gate used an isolated worktree.
+- Full suite green (see commit).
+- `results/` restored via `git checkout -- results/` after the gate
+  (B-097 practice: regenerated bundles are not committed).

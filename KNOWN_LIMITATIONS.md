@@ -1146,7 +1146,7 @@ to both vigia/tools/caie.py and vigia/tools/caie_legacy_root.py.
 ## L-029 — DARVO_FALSE_FLAG_VICTIM_SIGNAL_DILUTION
 
 **Affects:** Agent fallback (deterministic, no LLM) — full failure; Scorer mode — partial
-**Status:** IN_PROGRESS — DARVO pattern detector implementation in pipeline (FW-009)
+**Status:** IN_PROGRESS — FW-009 Fase 1 landed 2026-07-17 (B-140: motor-path annotation, see progress block below); verdict effect and `false_flag` vocabulary remain open doctrine decisions
 **Severity:** HIGH
 **Discovered:** 2026-06-24 via VIGIA-KIWI trilogy stress test
 **Test cases:** `VIGIA-KIWI-001`, `VIGIA-KIWI-002-ZAPALLO-POV`, `VIGIA-KIWI-003-AT-POV`
@@ -1232,6 +1232,29 @@ fields, `prior_trust` asymmetry, temporal context (`contact_attempts_by_actor_b:
 0` over 3 years), honeypot access logs. Output: `DARVO_PATTERN` fracture feeding
 back into CAIE before final verdict emission. Secondary roadmap item: extend
 verdict vocabulary to include `false_flag` as a relational verdict type.
+
+**Progress 2026-07-17 (B-140 — FW-009 Fase 1, annotation only):** the
+detector (`vigia/core/darvo_detector.py`) now reads dict artifacts — the
+Mode 1 (EBS JSON) format — in addition to the pipeline's SignalOutput
+objects; it was structurally blind to dicts (getattr-only access), so it
+had never fired outside `VigiaPipeline`. `_vigia_score` annotates the
+sealed output with a `darvo_pattern` block (counts, Fraction penalty as
+string, matched artifact ids), and the orchestrator/agent surface it in
+the sealed narrative through the same channel B-094 opened for live CAIE
+fractures. The annotation modifies NEITHER verdict NOR score (equality pin
+in `tests/test_b140_darvo_motor_annotation.py`; comparative corpus gate).
+On KIWI-001 the motor path now reports the canonical asymmetry: 2
+surveillance-infrastructure artifacts (A02 PHP-error/trampolin logs, A04
+honeypot access log) + zero-contact claim, penalty 3/5 — recorded, not
+applied.
+
+**Still open (doctrine / architecture, NOT engineering):**
+1. Verdict effect of the DARVO pattern in the motor path (would move
+   verdicts → requires calibration decision + comparative gate sign-off).
+2. `false_flag` as a relational verdict type in the scorer vocabulary
+   (sealed-verdict schema change — maintainer signature required).
+3. Cross-bundle paired review (KIWI-002 + KIWI-003 role inversion) — the
+   Mode 1 pipeline has no paired-bundle concept; architecture work.
 
 **Discovered by:** Anna Tchijova, 2026-06-24, via VIGIA-KIWI trilogy stress test.
 

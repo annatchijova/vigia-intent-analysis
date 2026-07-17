@@ -204,9 +204,12 @@ entrada correcta; no se borró, para conservar el rastro de auditoría.
 ### 1.5 Abiertos de larga data (sin cambio de estado)
 
 - **B-010** — migrar `forensic_technical_detector.py` a SemioticDetectorV2 (TODO).
-- **L-029 / FW-009** — detector DARVO: `vigia/core/darvo_detector.py` existe
-  pero no está cableado al orchestrator/agente; `false_flag` sigue sin ser tipo
-  de veredicto del scorer. IN_PROGRESS.
+- **L-029 / FW-009** — detector DARVO: **Fase 1 CERRADA (B-140, 2026-07-17)** —
+  anotación en el path motor (scorer → orchestrator → narrativa sellada, canal
+  B-094), sin efecto en veredicto. Quedan abiertas (doctrina/arquitectura):
+  efecto en veredicto, `false_flag` como tipo de veredicto del scorer, y la
+  revisión pareada cross-bundle (KIWI-002+003). Ver L-029 en
+  KNOWN_LIMITATIONS.md, bloque "Progress 2026-07-17".
 - **L-040** — `likelihood_ratio.py` opera en float: limitación documentada,
   0 flips empíricos; revisar solo si el corpus crece cerca de los bordes de
   decisión (mapa de cierre en `docs/AUDITORIA_L040_LIKELIHOOD_RATIO.md` §4).
