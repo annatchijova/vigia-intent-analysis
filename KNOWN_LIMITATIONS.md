@@ -1248,6 +1248,19 @@ surveillance-infrastructure artifacts (A02 PHP-error/trampolin logs, A04
 honeypot access log) + zero-contact claim, penalty 3/5 — recorded, not
 applied.
 
+**F0 update (2026-07-17, signed batch — dossier
+`docs/PROPUESTA_L029_DARVO_20260717.md` + independent audit
+`docs/VEREDICTO_KIMI_L029_20260717.md`):** the multi-agent investigation
+plus adversarial audit confirmed the three open items' direction (no verdict
+effect from description keywords; no `false_flag` verdict rung; pairing as
+architecture without verdict authority) and corrected the B-140 record:
+MAGNET-2021-IOS-ELI was a substring false positive (de-annotated by
+word-boundary matching, B-142), the honest annotation census is 4 cases =
+ONE expediente + 2 copies (real N=1), the dead pipeline penalty channel was
+retired with a schema tripwire, and B-141 (run_vigia signal drop) was fixed
+in both deployments. The verdict-effect reopening conditions are
+pre-registered in the dossier §4.
+
 **Still open (doctrine / architecture, NOT engineering):**
 1. Verdict effect of the DARVO pattern in the motor path (would move
    verdicts → requires calibration decision + comparative gate sign-off).

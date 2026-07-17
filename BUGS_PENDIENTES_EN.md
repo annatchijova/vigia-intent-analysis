@@ -6406,13 +6406,28 @@ lookups — not `rglob("*")` — with a handful of matches in practice.
 - `results/` restored via `git checkout -- results/` after the gate
   (B-097 practice: regenerated bundles are not committed).
 
+### F0 correction (2026-07-17, signed batch — never silently)
+
+The calibration claim "exactly the 5 right cases" was **false**: the L-029
+investigation (dossier + Kimi's independent audit, both execution-verified)
+showed MAGNET-2021-IOS-ELI was a substring false positive — `'server'`
+matched inside "4 S3 server list URLs" and `'no contact'` inside "no
+messages, no contactS database" (an English plural); the case is
+single-actor, with no DARVO structure. Observed pre-F0 rate: 1 FP / 5
+firings. F0 introduced word-boundary matching (B-142): the honest census is
+**exactly 4 annotated = KIWI-001/003/004/005, i.e. ONE expediente
+(MPF7779408) + 2 declared copies — real N=1**. ELI's B-097 divergence
+(blind Claude INTENT vs SUSPICION label) concerns evasion intent, not DARVO
+— independent issues. See `docs/PROPUESTA_L029_DARVO_20260717.md` §1 and
+B-142.
+
 ---
 
-## B-141 — `run_vigia` silently drops ALL signals via TypeError (`description=` passed to a `SignalOutput` that has no such field) [PENDING]
+## B-141 — `run_vigia` silently drops ALL signals via TypeError (`description=` passed to a `SignalOutput` that has no such field) [RESOLVED — F0]
 
 | Field | Value |
 |-------|-------|
-| **Status** | PENDING — found by an adversarial refuter during the L-029 investigation (2026-07-17), verified by execution |
+| **Status** | RESOLVED — F0 (2026-07-17, signed batch): `_signals_from_dicts` helper without the nonexistent `description` kwarg; tested in BOTH deployments (pydantic in-process + dataclass via subprocess with pydantic masked, Kimi's audit addition §1) in `tests/test_f0_l029_darvo_hardening.py` |
 | **Severity** | P1 — the `run_vigia` path executes the pipeline with ZERO signals in the dataclass deployment |
 | **File** | `vigia/pipeline/pipeline.py:1382-1392` |
 | **Detected in** | L-029 abductive investigation (`docs/PROPUESTA_L029_DARVO_20260717.md` §6) |
@@ -6426,11 +6441,11 @@ survives but `description` is silently discarded. Fix pending (red test first).
 
 ---
 
-## B-142 — Pipeline DARVO penalty channel dead at runtime + ELI false positive + false in-code comment [DOCUMENTED — decision in the L-029 dossier]
+## B-142 — Pipeline DARVO penalty channel dead at runtime + ELI false positive + false in-code comment [RESOLVED — F0]
 
 | Field | Value |
 |-------|-------|
-| **Status** | DOCUMENTED — fixes proposed in `docs/PROPUESTA_L029_DARVO_20260717.md` §5-F0, pending signature |
+| **Status** | RESOLVED — F0 (2026-07-17, signed batch): pipeline penalty channel RETIRED (not narrowed) + word-boundary matching correcting the ELI FP + false in-code comment corrected. Schema tripwire in `tests/test_f0_l029_darvo_hardening.py` (if `SignalOutput` ever gains `description`/`evidence_type`, the test fails and forces re-evaluating the decision). Post-F0 census: exactly 4 annotated (KIWI-001/003/004/005) |
 | **Severity** | P2 — B-140 record integrity + latent surface in the pipeline decision path |
 | **Files** | `vigia/core/darvo_detector.py`, `vigia/pipeline/pipeline.py:629-630`, `data/cases/VIGIA-REAL-MAGNET-2021-IOS-ELI.json` |
 

@@ -7391,13 +7391,28 @@ específico — no `rglob("*")` — con puñados de matches en la práctica.
 - `results/` restaurado vía `git checkout -- results/` tras el gate
   (práctica B-097: los bundles regenerados no se commitean).
 
+### Corrección F0 (2026-07-17, tanda firmada — nunca en silencio)
+
+El claim de calibración "exactamente los 5 correctos" era **falso**: la
+investigación L-029 (dossier + auditoría independiente de Kimi, ambas
+verificadas por ejecución) demostró que MAGNET-2021-IOS-ELI era un falso
+positivo de substrings — `'server'` matcheaba dentro de "4 S3 server list
+URLs" y `'no contact'` dentro de "no messages, no contactS database" (un
+plural inglés); el caso es mono-actor, sin estructura DARVO. Tasa observada
+pre-F0: 1 FP / 5 disparos. F0 introdujo matching con word-boundaries
+(B-142): el censo honesto es **exactamente 4 anotados = KIWI-001/003/004/005,
+o sea UN expediente (MPF7779408) + 2 copias declaradas — N=1 real**. La
+divergencia B-097 de ELI (Claude ciego INTENT vs etiqueta SUSPICION) es de
+intención de evasión, no de DARVO — issues independientes. Ver
+`docs/PROPUESTA_L029_DARVO_20260717.md` §1 y B-142.
+
 ---
 
-## B-141 — `run_vigia` descarta TODAS las señales por TypeError silencioso (`description=` a un `SignalOutput` que no tiene ese campo) [PENDIENTE]
+## B-141 — `run_vigia` descarta TODAS las señales por TypeError silencioso (`description=` a un `SignalOutput` que no tiene ese campo) [RESUELTO — F0]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — detectado por refutador adversarial en la investigación L-029 (2026-07-17), verificado por ejecución |
+| **Estado** | RESUELTO — F0 (2026-07-17, tanda firmada): helper `_signals_from_dicts` sin el kwarg `description` inexistente; test en AMBOS deployments (pydantic in-process + dataclass vía subprocess con pydantic enmascarado, adición del veredicto de Kimi §1) en `tests/test_f0_l029_darvo_hardening.py` |
 | **Severidad** | P1 — el camino `run_vigia` ejecuta el pipeline con CERO señales en el deployment dataclass |
 | **Archivo** | `vigia/pipeline/pipeline.py:1382-1392` |
 | **Detectado en** | Investigación abductiva L-029 (`docs/PROPUESTA_L029_DARVO_20260717.md` §6), juez de ingeniería, verificado por el sintetizador |
@@ -7420,11 +7435,11 @@ que fije que `run_vigia` construye señales desde dicts. Ver dossier §5-F0.4.
 
 ---
 
-## B-142 — Canal de penalidad DARVO del pipeline muerto en runtime + ELI falso positivo + comentario in-code falso [DOCUMENTADO — decisión en dossier L-029]
+## B-142 — Canal de penalidad DARVO del pipeline muerto en runtime + ELI falso positivo + comentario in-code falso [RESUELTO — F0]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | DOCUMENTADO — fixes propuestos en `docs/PROPUESTA_L029_DARVO_20260717.md` §5-F0, pendientes de firma |
+| **Estado** | RESUELTO — F0 (2026-07-17, tanda firmada): canal de penalidad del pipeline RETIRADO (no estrechado) + matching word-boundary que corrige el FP ELI + comentario in-code falso corregido. Tripwire de esquema en `tests/test_f0_l029_darvo_hardening.py` (si `SignalOutput` gana `description`/`evidence_type`, el test truena y fuerza re-evaluar la decisión). Censo post-F0: exactamente 4 anotados (KIWI-001/003/004/005) |
 | **Severidad** | P2 — integridad del registro B-140 + superficie latente en el decision path del pipeline |
 | **Archivos** | `vigia/core/darvo_detector.py`, `vigia/pipeline/pipeline.py:629-630`, `data/cases/VIGIA-REAL-MAGNET-2021-IOS-ELI.json` |
 | **Detectado en** | Investigación abductiva L-029 (censo de 201 casos + 6 refutadores), verificado por ejecución |
