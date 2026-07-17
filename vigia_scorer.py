@@ -643,6 +643,7 @@ def _vigia_score(case: dict) -> dict:
     # -----------------------------------------------------------------------
     fractures    = []
     _caie_source = "json_fallback"
+    _temporal_pairs_skipped: list = []  # P1: TCV pairs CAIE could not evaluate
     try:
         from vigia.tools.caie import CrossArtifactIncongruenceEngine, Artifact as CaieArtifact
         _valid_fields = {
@@ -661,6 +662,11 @@ def _vigia_score(case: dict) -> dict:
                 )
                 continue
         raw_fractures = engine.detect_fractures()
+        # P1 (evidence integrity): temporal pairs CAIE skipped because a required
+        # event timestamp was present but unparseable/out-of-range. detect_fractures
+        # records these on the engine; capture them so a skipped-but-decision-
+        # relevant comparison cannot be sealed as a clean NOISE.
+        _temporal_pairs_skipped = list(getattr(engine, "_temporal_pairs_skipped", []))
         fractures = [
             {
                 "fracture_type":  f.fracture_type,
@@ -1549,6 +1555,34 @@ def _vigia_score(case: dict) -> dict:
                 "overclaim a clean finding on partially discarded evidence; "
                 "ABSTAIN documents the gap (re-submit the artifact with "
                 "well-formed metadata). See normalization_failures."
+            )
+
+    # Temporal-integrity gate (P1, 2026-07-17, evidence integrity)
+    #
+    # CAIE's temporal-causality rule silently omits a pair when a required event
+    # timestamp (network_log_time / process_creation_time) is present but
+    # unparseable or out-of-range: it logs to the HMAC audit and returns no
+    # fracture, with no marker in the result. Confirmed by induction: a single
+    # unparseable timestamp on an artifact that otherwise carries a real temporal
+    # fracture flipped a sealed verdict SUSPICION -> NOISE — a false clean bill on
+    # a comparison that never ran. Surface the skipped pairs in the sealed result,
+    # and if the verdict is NOISE, abstain: a clean finding cannot rest on a
+    # decision-relevant comparison that was skipped. Fires ONLY on NOISE, so it
+    # can never soften a SUSPICION/MALICE finding — it cannot reduce severity.
+    if _temporal_pairs_skipped:
+        base_result["temporal_pairs_skipped"] = _temporal_pairs_skipped
+        if base_result["verdict"] == "NOISE":
+            verdict = "ABSTAIN"
+            confidence = 0.0
+            base_result["verdict"] = "ABSTAIN"
+            base_result["confidence"] = 0.0
+            base_result["reason"] = (
+                "TEMPORAL ANALYSIS INCOMPLETE: a required event timestamp was "
+                "present but unparseable/out-of-range, so CAIE skipped a "
+                "temporal-causality comparison without evaluating it. NOISE would "
+                "overclaim a clean finding on a comparison that never ran; ABSTAIN "
+                "documents the gap (re-submit with a well-formed ISO-8601 "
+                "timestamp). See temporal_pairs_skipped."
             )
 
     base_result["quadripartite_state"] = _apply_quadripartite(
