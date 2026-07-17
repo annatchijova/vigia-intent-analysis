@@ -585,40 +585,55 @@ class EntanglementCAIEIntegration:
     def __init__(self, engine: EntanglementEngine) -> None:
         self.engine = engine
 
-    def analyze_and_inject(
+    def build_caie_artifacts(self, report: EntanglementReport) -> List[Dict]:
+        """B-136: build case-ready CAIE artifacts from a batch report.
+
+        The previous analyze_and_inject fed a LOCAL engine that was discarded
+        without detect_fractures() (structural no-op), and its call shape
+        raised TypeError against the real wrapper signature — the honest
+        ENTANGLEMENT_CAIE_FAILED log was the only observable effect (Kimi
+        audit, CONFIRMED BY INDUCTION). The fractures now route through the
+        tool result so the case assembler can add them to the case artifact
+        stream (batch_forensics profile, CONTEXTUAL role). severity is
+        clamped to [0,1] before it can feed the composite formula.
+        """
+        if not report.is_factory_production:
+            return []
+        return [
+            {
+                "source_tool": "vigia_entanglement",
+                "evidence_type": "batch_forensics",
+                "raw_score": min(1.0, max(0.0, float(fracture["severity"]))),
+                "description": fracture["type"],
+                "metadata": fracture,
+                "provenance_chain": [report.batch_id],
+            }
+            for fracture in report.to_caie_fractures()
+        ]
+
+    def analyze_and_build_artifacts(
         self,
         document_paths: List[str],
         batch_id: Optional[str] = None,
-    ) -> EntanglementReport:
+    ) -> tuple:
+        """Analyze a batch and return (report, case-ready CAIE artifacts).
+
+        Renamed from analyze_and_inject (zero callers at rename time): the
+        old name promised an injection that never structurally happened.
+        """
         report = self.engine.analyze_batch(document_paths, batch_id)
-
-        if _CAIE_AVAILABLE and report.is_factory_production:
-            try:
-                caie = CrossArtifactIncongruenceEngine()
-                for fracture in report.to_caie_fractures():
-                    caie.add_from_tool_result(
-                        source_tool="vigia_entanglement",
-                        evidence_type="batch_forensics",
-                        raw_score=fracture["severity"],
-                        description=fracture["type"],
-                        metadata=fracture,
-                    )
-                audit_logger.log_info(
-                    event_type="ENTANGLEMENT_CAIE_INJECTED",
-                    tool="EntanglementCAIEIntegration",
-                    message=(
-                        f"batch_id={report.batch_id} "
-                        f"fractures={len(report.to_caie_fractures())}"
-                    ),
-                )
-            except Exception as exc:
-                audit_logger.log_info(
-                    event_type="ENTANGLEMENT_CAIE_FAILED",
-                    tool="EntanglementCAIEIntegration",
-                    message=str(exc),
-                )
-
-        return report
+        artifacts = self.build_caie_artifacts(report)
+        if artifacts:
+            audit_logger.log_info(
+                event_type="ENTANGLEMENT_CAIE_ARTIFACTS_BUILT",
+                tool="EntanglementCAIEIntegration",
+                message=(
+                    f"batch_id={report.batch_id} "
+                    f"artifacts={len(artifacts)} (routed via tool result, "
+                    f"pending case-stream incorporation)"
+                ),
+            )
+        return report, artifacts
 
 
 # ============================================================================

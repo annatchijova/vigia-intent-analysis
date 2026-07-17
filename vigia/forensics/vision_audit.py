@@ -11,7 +11,7 @@ FORENSIC GRADE ENHANCEMENTS (Kimi P1-10, SANS Hackathon 2026):
 * Digital Perfection Detection: Local variance analysis to detect resolution
   discrepancies between document elements (seals, signatures vs background).
 * CAIE Integration: Automatic injection of DOCUMENT_FORGERY fractures into
-  CrossArtifactIncongruenceEngine via add_from_tool_result().
+  the case artifact stream via case-ready caie_artifacts (B-136).
 * Silent Metadata Analysis: EXIF/XMP forensic analysis with compression artifact
   detection and software tampering indicators.
 * Deterministic 100%: No LLM hallucinations — only local variance, 
@@ -488,94 +488,59 @@ class ForensicImageAnalyzer:
 
 
 # ---------------------------------------------------------------------------
-# Kimi P1-10: CAIE Integration via add_from_tool_result
+# B-136: CAIE routing via case-ready artifacts (was: Kimi P1-10 injection)
 # ---------------------------------------------------------------------------
 
-async def _inject_caie_artifact(
+def _build_caie_artifacts(
     image_path: str,
     forensic_result: dict,
     clip_verdict: str,
     malice_score: float,
-    label_scores: dict,
     exif_forensics: dict,
-) -> None:
+) -> list:
+    """B-136: build case-ready CAIE artifacts from the vision analysis.
+
+    The previous _inject_caie_artifact fed a LOCAL CrossArtifactIncongruence-
+    Engine that was discarded without detect_fractures() — its kwargs and
+    evidence types were valid, so the CAIE_ARTIFACT_INJECTED success log was
+    a false assertion in the audit trail (Kimi audit, CONFIRMED BY
+    INDUCTION: accepted=True into a discarded engine). The artifacts are now
+    exposed in the tool result under "caie_artifacts" so the case assembler
+    routes them into the case artifact stream, where the scorer consumes
+    them with the document_visual / document_geometry profiles.
     """
-    Inject forensic findings into CAIE using add_from_tool_result().
-
-    CAIE P3 Integration:
-    - Uses evidence_type "document_visual" for CLIP-based analysis
-    - Uses evidence_type "document_geometry" for forensic analysis
-    - CAIE auto-detects digital_perfection_detected and metadata_concealment_detected
-    - Produces DOCUMENT_FORGERY and METADATA_CONCEALMENT fractures automatically
-    """
-    try:
-        from vigia.tools.caie import CrossArtifactIncongruenceEngine
-
-        caie = CrossArtifactIncongruenceEngine()
-
-        # Prepare tool result for CAIE.add_from_tool_result()
-        # CAIE will auto-extract scores and detect forensic signals
-        tool_result = {
-            "verdict": clip_verdict,
-            "vigia_verdict": f"[VIGIA_VISION] {clip_verdict} - {image_path}",
-            "visual_malice_score": malice_score,
-            "digital_perfection_detected": forensic_result.get("digital_perfection_detected", False),
-            "metadata_concealment_detected": exif_forensics.get("metadata_suspicious", False),
-            "forensic_confidence": forensic_result.get("confidence", 0.0),
-            "anomaly_regions": forensic_result.get("anomaly_regions", []),
-            "signals": [
-                {"type": "DIGITAL_PERFECTION_ANOMALY"} if forensic_result.get("digital_perfection_detected") else None,
-                {"type": "METADATA_CONCEALMENT"} if exif_forensics.get("metadata_suspicious") else None,
-                {"type": "DOCUMENT_FORGERY"} if malice_score >= MALICE_THRESHOLD else None,
-            ],
-            "findings": {
-                "variance_ratio": forensic_result.get("variance_ratio"),
-                "edge_sharpness_ratio": forensic_result.get("edge_sharpness_ratio"),
-                "exif_tag_count": exif_forensics.get("exif_tag_count"),
-                "software_stripped": exif_forensics.get("software_stripped"),
-            }
-        }
-
-        # Remove None signals
-        tool_result["signals"] = [s for s in tool_result["signals"] if s is not None]
-
-        # Inject as document_visual (CLIP analysis)
-        caie.add_from_tool_result(
-            tool_name="vision_intent_audit",
-            result=tool_result,
-            evidence_type="document_visual",
-            provenance_chain=[hashlib.sha256(image_path.encode()).hexdigest()[:16]]
-        )
-
-        # If forensic analysis available, also inject as document_geometry
-        if forensic_result.get("digital_perfection_detected"):
-            caie.add_from_tool_result(
-                tool_name="forensic_image_analyzer",
-                result=tool_result,
-                evidence_type="document_geometry",
-                provenance_chain=[hashlib.sha256(image_path.encode()).hexdigest()[:16]]
-            )
-
-        audit_logger.log_info(
-            event_type="CAIE_ARTIFACT_INJECTED",
-            tool="vision_intent_audit",
-            message=f"CAIE artifacts injected for {image_path}: "
-                    f"visual={malice_score:.3f}, "
-                    f"forensic={forensic_result.get('confidence', 0):.3f}",
-        )
-
-    except ImportError:
-        audit_logger.log_info(
-            event_type="CAIE_NOT_AVAILABLE",
-            tool="vision_intent_audit",
-            message="CrossArtifactIncongruenceEngine not available for integration",
-        )
-    except Exception as exc:
-        audit_logger.log_info(
-            event_type="CAIE_INJECTION_ERROR",
-            tool="vision_intent_audit",
-            message=f"Failed to inject CAIE artifact: {exc}",
-        )
+    tool_result_metadata = {
+        "verdict": clip_verdict,
+        "digital_perfection_detected": forensic_result.get("digital_perfection_detected", False),
+        "metadata_concealment_detected": exif_forensics.get("metadata_suspicious", False),
+        "forensic_confidence": forensic_result.get("confidence", 0.0),
+        "anomaly_regions": forensic_result.get("anomaly_regions", []),
+        "findings": {
+            "variance_ratio": forensic_result.get("variance_ratio"),
+            "edge_sharpness_ratio": forensic_result.get("edge_sharpness_ratio"),
+            "exif_tag_count": exif_forensics.get("exif_tag_count"),
+            "software_stripped": exif_forensics.get("software_stripped"),
+        },
+    }
+    provenance = [hashlib.sha256(image_path.encode()).hexdigest()[:16]]
+    artifacts = [{
+        "source_tool": "vision_intent_audit",
+        "evidence_type": "document_visual",
+        "raw_score": min(1.0, max(0.0, float(malice_score))),
+        "description": f"[VIGIA_VISION] {clip_verdict} - {image_path}",
+        "metadata": tool_result_metadata,
+        "provenance_chain": provenance,
+    }]
+    if forensic_result.get("digital_perfection_detected"):
+        artifacts.append({
+            "source_tool": "forensic_image_analyzer",
+            "evidence_type": "document_geometry",
+            "raw_score": min(1.0, max(0.0, float(forensic_result.get("confidence", 0.0)))),
+            "description": f"[VIGIA_VISION_FORENSIC] digital perfection - {image_path}",
+            "metadata": tool_result_metadata,
+            "provenance_chain": provenance,
+        })
+    return artifacts
 
 
 # ---------------------------------------------------------------------------
@@ -721,7 +686,7 @@ class CLIPVisualAuditor:
         -------
         dict with keys: status, verdict, visual_malice_score,
                         top_signals, peirce_chain, timestamp, vigia_verdict,
-                        forensic_analysis, caie_injected
+                        forensic_analysis, caie_artifacts
         """
         import clip as _clip
         from PIL import Image
@@ -1106,39 +1071,21 @@ class CLIPVisualAuditor:
                 "exif_forensics": exif_forensics,
                 "xmp_data": xmp_data,
             },
-            "caie_injected": False,  # Will be set after async injection
+            # B-136: case-ready artifacts for the case assembler (was
+            # caie_injected, which claimed an injection that landed in a
+            # discarded local engine). Pure construction — no IO, no engine,
+            # so the old timeout/except scaffolding has nothing to guard.
+            "caie_artifacts": [],
         }
 
-        # Kimi P1-10: Inject into CAIE using add_from_tool_result
-        # P0: NO fire-and-forget. Await explícito con timeout para capturar errores.
         if verdict in ("MALICE", "SUSPICION") or forensic_result.get("digital_perfection_detected"):
-            try:
-                await asyncio.wait_for(
-                    _inject_caie_artifact(
-                        safe_path,
-                        forensic_result,
-                        verdict,
-                        malice_score,
-                        label_scores,
-                        exif_forensics,
-                    ),
-                    timeout=10.0,
-                )
-                result["caie_injected"] = True
-            except asyncio.TimeoutError:
-                audit_logger.log_info(
-                    event_type="CAIE_INJECTION_TIMEOUT",
-                    tool="vision_intent_audit",
-                    message=f"CAIE injection timed out for {safe_path}",
-                )
-                result["caie_injected"] = False
-            except Exception as exc:
-                audit_logger.log_info(
-                    event_type="CAIE_INJECTION_FAILED",
-                    tool="vision_intent_audit",
-                    message=f"CAIE injection failed: {exc}",
-                )
-                result["caie_injected"] = False
+            result["caie_artifacts"] = _build_caie_artifacts(
+                safe_path,
+                forensic_result,
+                verdict,
+                malice_score,
+                exif_forensics,
+            )
 
         return result
 

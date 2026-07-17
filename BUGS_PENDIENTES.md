@@ -7023,7 +7023,37 @@ cambio de comportamiento para instalaciones que ya seteaban `log_path` explícit
 
 ---
 
-## B-136 — El patrón "inyección a CAIE" fuera del scorer es un no-op estructural: engines locales descartados + kwargs inexistentes en 3 de 4 sitios
+## B-136 — El patrón "inyección a CAIE" fuera del scorer es un no-op estructural: engines locales descartados + kwargs inexistentes en 3 de 4 sitios [RESUELTO — Opción 1 aplicada]
+
+> **Resolución (2026-07-17, decisión delegada por la mantenedora, calibración
+> en docs/PROPUESTA_B136_CAIE_WIRING_20260717.md):** Opción 1 en dos fases.
+> **Fase 1:** perfiles `linguistic_forensics` (0.60/0.18), `batch_forensics`
+> (0.45/0.22), `temporal_fraud` (0.55/0.20) en `EVIDENCE_PROFILES` (analogía
+> con la escala existente, método B-066; cero apariciones en corpus =
+> extensión sin efecto retroactivo); rol B-070 `CONTEXTUAL` para los tres
+> (informan el composite, NO corroboran el gate DEVICE); dominio de
+> recolección `content_artifact`/`D5-soft` (N fracturas del MISMO documento
+> o lote están correlacionadas — exentarlas del decay de cola dejaría que un
+> solo documento infle el composite: el drowning que R4-3 mató).
+> `document_visual`/`document_geometry` quedan DEVICE (asimetría documentada;
+> reclasificar tiene efecto retroactivo y exige su propia corrida).
+> **Fase 2:** los cuatro sitios ya no instancian engines efímeros: cada tool
+> CONSTRUYE artefactos listos-para-caso y los expone en su resultado bajo
+> `caie_artifacts` (raw_score clampeado a [0,1]; adversarial_nlp normaliza
+> con min(1,(mcp-1)/4) — la decisión B-115 disuelta es ahora el único punto
+> de conversión; el diseño original pasaba mcp∈[1,5] crudo). Los logs de
+> éxito falsos (`CAIE_ARTIFACT_INJECTED`, `ENTANGLEMENT_CAIE_INJECTED`)
+> fueron eliminados; `analyze_and_inject` → `analyze_and_build_artifacts`
+> (cero callers al renombrar). **Verificación:** 23 tests nuevos
+> (`tests/test_b136_document_domain_profiles.py`,
+> `tests/test_b136_caie_wiring.py`, red-first: 12 y 9 en rojo pre-fix);
+> suite completa 1440 passed / 0 failed; corpus gate en vivo 189/201 PASS,
+> 199 casos comunes vs baseline, CERO flips (`fixed==0` es lo esperado: los
+> tipos nuevos no existen en el corpus; el cableado no mueve veredictos
+> hasta que el ensamblador de casos incorpore `caie_artifacts`). Pendiente
+> aguas abajo: que el ensamblador de casos incorpore `caie_artifacts` del
+> resultado de cada tool a `case["artifacts"]` — punto único de integración,
+> fuera del alcance de este fix.
 
 | Campo | Valor |
 |-------|-------|
