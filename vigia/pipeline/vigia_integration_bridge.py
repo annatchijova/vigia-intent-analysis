@@ -276,6 +276,34 @@ _ANOMALY_SCALE = 2
 _FLAG_BONUS_PER_FLAG = 5   # = 5/100 = 0.05 por flag
 
 
+def _record_metadata_loss(art: Dict[str, Any]) -> None:
+    """
+    P1 (evidence integrity): a *present but non-dict* ``metadata`` (e.g. ``[]``)
+    must never be silently replaced by ``{}``. That coercion previously
+    discarded forensic assertions carried in metadata — a
+    ``process_creation_time`` feeding CAIE's temporal-causality rule — with no
+    rejection, no counter and no marker, which dropped a live verdict from
+    SUSPICION to NOISE on otherwise real evidence (confirmed by induction).
+
+    This records a structured, provenance-preserving failure on the artifact
+    (``normalization_failures``) and only then coerces to ``{}`` so downstream
+    acquisition metadata can still be attached. The disposition gate in
+    ``vigia_scorer`` turns that marker into an explicit ABSTAIN rather than a
+    false-clean NOISE. A well-formed dict is left untouched; an absent/``None``
+    metadata is legitimately empty (no evidence to lose) and is coerced quietly.
+    """
+    _orig_md = art.get("metadata")
+    if isinstance(_orig_md, dict):
+        return
+    if _orig_md is not None:
+        art.setdefault("normalization_failures", []).append({
+            "field": "metadata",
+            "original_type": type(_orig_md).__name__,
+            "reason": "metadata_type_invalid",
+        })
+    art["metadata"] = {}
+
+
 def _normalize_artifact_legacy(artifact: Dict[str, Any], idx: int) -> Dict[str, Any]:
     """
     Normaliza un artefacto legacy al schema EBS v1.
@@ -314,8 +342,7 @@ def _normalize_artifact_legacy(artifact: Dict[str, Any], idx: int) -> Dict[str, 
             art["acquisition_timestamp"] = _acq_ts
             art["examiner_id"] = "legacy_dataset_converter"
             art["write_blocker_used"] = True
-            if not isinstance(art.get("metadata"), dict):
-                art["metadata"] = {}
+            _record_metadata_loss(art)
             art["metadata"].update({
                 "acquisition_tool":      art["acquisition_tool"],
                 "acquisition_hash":      art["acquisition_hash"],
@@ -400,8 +427,7 @@ def _normalize_artifact_legacy(artifact: Dict[str, Any], idx: int) -> Dict[str, 
         # CRÍTICO: CAIE lee de self.metadata (no de top-level).
         # _compute_acquisition_assurance(_meta) donde _meta = self.metadata or {}
         # Los campos deben estar en art["metadata"] para que los gates los vean.
-        if not isinstance(art.get("metadata"), dict):
-            art["metadata"] = {}
+        _record_metadata_loss(art)
         art["metadata"].update({
             "acquisition_tool":      art["acquisition_tool"],
             "acquisition_hash":      art["acquisition_hash"],
@@ -546,6 +572,18 @@ def validate_case_schema(case: Dict[str, Any]) -> None:
         if not isinstance(raw, (int, float)) or not math.isfinite(float(raw)):
             raise CaseSchemaError(
                 f"Artefacto '{art.get('artifact_id')}': raw_score debe ser número finito"
+            )
+        # P1 (evidence integrity): a present-but-non-dict metadata (e.g. []) must
+        # be rejected loudly, never silently coerced to {} — that coercion can
+        # drop forensic assertions that participate in scoring. No-op once
+        # normalization has already run (metadata is a dict by then); fails
+        # closed for any caller that validates raw intake before normalizing.
+        md = art.get("metadata")
+        if md is not None and not isinstance(md, dict):
+            raise CaseSchemaError(
+                f"Artefacto '{art.get('artifact_id')}': metadata debe ser "
+                f"objeto/dict (recibido {type(md).__name__}); una normalización "
+                f"no puede sustituir evidencia malformada en silencio"
             )
         # FASE 2: semantic_role es opcional (default incriminatory) pero si
         # está presente debe ser un valor del contrato — un typo silencioso
