@@ -95,3 +95,39 @@ class TestFailClosed:
         meta = ctx.caie_artifacts[0].metadata
         for forbidden in ("acquisition_tool", "write_blocker_used", "examiner_id"):
             assert forbidden not in meta
+
+
+class TestOrchestratorPathIntegration:
+    """The sift orchestrator already called build_context with
+    raw_results=results (its engines' result dict) BEFORE phase 3, so the
+    absorption path is live there with zero extra plumbing. These tests
+    freeze that contract against the orchestrator's real calling shape."""
+
+    def test_engine_results_dict_shape_is_absorbed(self):
+        """An orchestrator-style results dict — engine name -> result dict,
+        one of them exposing caie_artifacts — contributes its artifacts."""
+        results = {
+            "metabolic": {"verdict": "OK", "signals": []},
+            "unified_forensic": {
+                "document_id": "abc123",
+                "unified_mcp": 2.4,
+                "caie_artifacts": [_tool_artifact(
+                    source_tool="vigia_temporal",
+                    evidence_type="temporal_fraud",
+                    raw_score=0.8,
+                    description="TEMPORAL_ANACHRONISM")],
+            },
+            "caie": {"verdict": "NOISE", "composite_score": 0.1},
+        }
+        ctx = ForensicAdapter.build_context([], raw_results=results)
+        assert [a.evidence_type for a in ctx.caie_artifacts] == ["temporal_fraud"]
+
+    def test_caie_own_result_cannot_feed_back(self):
+        """No self-ingestion loop: cross_artifact_analysis results carry
+        verdict/composite/fractures, never caie_artifacts — and even a
+        hostile result claiming that key with a bad shape is skipped."""
+        results = {"caie": {"verdict": "MALICE", "composite_score": 0.9,
+                            "fractures_detected": 3,
+                            "caie_artifacts": [{"verdict": "MALICE"}]}}
+        ctx = ForensicAdapter.build_context([], raw_results=results)
+        assert ctx.caie_artifacts == []
