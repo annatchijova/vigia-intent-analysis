@@ -46,7 +46,13 @@ import math
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
+
+# L-045: the bridge imports `mcp`, which is not installable in minimal CI
+# environments. Skip instead of breaking the whole collection run (B-138).
+pytest.importorskip("mcp")
 
 from vigia.vigia_sift_bridge import detect_human_jitter  # noqa: E402
 

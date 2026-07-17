@@ -7237,3 +7237,41 @@ un caso macOS real en el corpus que lo ejercite.
   se sostiene por la clase de bug ya confirmada en B-133, no por un caso raw nuevo.
 
 ---
+
+## B-138 — Dos tests fuera de `tests/e2e` importaban `mcp` en duro y rompían la colección completa de pytest en entornos sin `mcp` [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-17 (`pytest.importorskip("mcp")` en los 4 puntos dependientes) |
+| **Severidad** | P3 (higiene de suite — sin efecto en veredictos) |
+| **Archivos** | `tests/test_grupob_b9_honey_token_lifecycle.py`, `vigia/tests/adversarial/test_human_jitter_deterministic_bypass.py`, `tests/test_h4_grep_sanitizer_unification.py`, `tests/test_b10_comparator_reads_sealed_verdict.py` |
+| **Detectado en** | Sesión de revisión abductiva 2026-07-17 (corrida de suite en entorno sin `mcp`) |
+
+### Descripción
+
+L-045 documenta que `mcp` no es instalable en entornos CI mínimos, y la
+doctrina de suite excluye `tests/e2e` por esa razón. Pero dos archivos fuera
+de `tests/e2e` importaban el bridge (que importa `mcp`) a nivel de módulo:
+la colección entera de pytest abortaba con "Interrupted: 3 errors during
+collection" antes de correr un solo test. Además, 5 tests en otros dos
+archivos importaban el bridge (directo o vía `run_llm_cases`) dentro del
+cuerpo del test y fallaban como FAILED en vez de saltearse.
+
+### Fix
+
+`pytest.importorskip("mcp")` antes del import del bridge en los dos archivos
+que rompían la colección; skip puntual en `test_bridge_reexports_canonical`
+(h4) y fixture autouse en `TestLlmFallbackReadsSealedVerdict` (b10). En
+entornos con `mcp` instalado nada cambia (importorskip es no-op y los tests
+corren igual que antes).
+
+### Verificación
+
+- Pre-fix (inducción, entorno sin `mcp`): colección interrumpida con 3
+  errores; con esos 2 archivos excluidos a mano, 5 FAILED por
+  `ModuleNotFoundError: mcp`.
+- Post-fix: los 4 archivos dan 22 passed / 7 skipped / 0 failed y la suite
+  completa (sin `tests/integration` ni `tests/e2e`) colecciona y corre
+  verde en el mismo entorno.
+
+---

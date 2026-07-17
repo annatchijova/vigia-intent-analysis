@@ -6250,3 +6250,41 @@ to system.log (the protected invariant, exclusive set >= 5, holds).
 Verified by induction: 4/6 tests red pre-fix (showing macos_evidence_path
 set for an iOS extraction), 12/12 green after
 (`tests/test_b137_tcc_ios_marker.py`).
+
+---
+
+## B-138 — Two tests outside `tests/e2e` hard-imported `mcp` and broke the entire pytest collection in mcp-less environments [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-17 (`pytest.importorskip("mcp")` at the 4 dependent points) |
+| **Severity** | P3 (suite hygiene — no verdict impact) |
+| **Files** | `tests/test_grupob_b9_honey_token_lifecycle.py`, `vigia/tests/adversarial/test_human_jitter_deterministic_bypass.py`, `tests/test_h4_grep_sanitizer_unification.py`, `tests/test_b10_comparator_reads_sealed_verdict.py` |
+| **Detected in** | Abductive review session 2026-07-17 (suite run in an mcp-less environment) |
+
+### Description
+
+L-045 documents that `mcp` is not installable in minimal CI environments,
+and the suite doctrine excludes `tests/e2e` for that reason. But two files
+outside `tests/e2e` imported the bridge (which imports `mcp`) at module
+level: the whole pytest collection aborted with "Interrupted: 3 errors
+during collection" before a single test ran. Additionally, 5 tests in two
+other files imported the bridge (directly or via `run_llm_cases`) inside
+the test body and showed up as FAILED instead of skipping.
+
+### Fix
+
+`pytest.importorskip("mcp")` before the bridge import in the two
+collection-breaking files; a targeted skip in
+`test_bridge_reexports_canonical` (h4) and an autouse fixture in
+`TestLlmFallbackReadsSealedVerdict` (b10). With `mcp` installed nothing
+changes (importorskip is a no-op and the tests run exactly as before).
+
+### Verification
+
+- Pre-fix (induction, mcp-less environment): collection interrupted with
+  3 errors; with those 2 files manually excluded, 5 FAILED with
+  `ModuleNotFoundError: mcp`.
+- Post-fix: the 4 files report 22 passed / 7 skipped / 0 failed, and the
+  full suite (without `tests/integration` and `tests/e2e`) collects and
+  runs green in the same environment.
