@@ -25,6 +25,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
+from vigia.sift._fs_utils import scan_marker_names
 from vigia.sift._math_utils import build_correlation_groups, noisy_or_correlated
 from vigia.sift._sql_utils import safe_sqlite_connect
 
@@ -281,9 +282,11 @@ class iOSForensicsAnalyzer:
 
         result = iOSAnalysisResult(source_path=str(evidence_path))
 
-        # Validate this looks like iOS evidence (BUG-007 fix)
-        all_files = {f.name for f in evidence_path.rglob("*") if f.is_file() and not f.is_symlink()}
-        ios_markers = all_files & _IOS_MARKER_FILES
+        # Validate this looks like iOS evidence (BUG-007 fix).
+        # B-139: bounded scan — O(markers) memory, capped walk with WARNING.
+        ios_markers = scan_marker_names(
+            evidence_path, _IOS_MARKER_FILES, engine="IOS", logger=logger
+        )
         if not ios_markers:
             logger.warning("[IOS] No iOS artifacts found in %s", evidence_path)
             result.analysis_notes.append(

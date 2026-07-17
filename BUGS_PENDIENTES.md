@@ -7275,3 +7275,52 @@ corren igual que antes).
   verde en el mismo entorno.
 
 ---
+
+## B-139 — Scans de marcadores `rglob("*")` sin acotar en los tres motores mobile/macOS (residuo §1.3 de WHAT_IS_NEXT) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-17 (`scan_marker_names()` acotado en `vigia/sift/_fs_utils.py`, 3 call-sites migrados) |
+| **Severidad** | P3 (robustez de recursos — sin efecto en veredictos para árboles dentro del límite, que son todos los reales) |
+| **Archivos** | `vigia/sift/ios_forensics.py`, `vigia/sift/android_forensics.py`, `vigia/sift/macos_forensics.py`, `vigia/sift/_fs_utils.py` (nuevo) |
+| **Detectado en** | Residuo documentado en WHAT_IS_NEXT §1.3 (S4 / AUDITORIA_COBERTURA_MOBILE_SIFT §C); retomado en la sesión de revisión abductiva 2026-07-17 |
+
+### Descripción
+
+S4 acotó los lookups por patrón con `_safe_rglob` (heapq.nsmallest, memoria
+O(limit)), pero la validación de marcadores de los tres motores seguía
+materializando TODOS los nombres del árbol
+(`{f.name for f in evidence_path.rglob("*")}`) antes de intersecar con el
+set de marcadores: memoria O(árbol) y caminata sin límite ante un árbol de
+evidencia hostil o gigante — la misma clase que S4 cerró para el resto.
+
+### Fix
+
+Helper compartido `scan_marker_names()` (mismo patrón de módulo que
+`_math_utils`/`_sql_utils`): retiene solo nombres que SON marcadores
+(memoria O(markers)), filtra symlinks, cuenta directorios solo con
+`include_dirs=True` (macOS: `.fseventsd` es marcador de directorio), y
+corta la caminata en `MARKER_SCAN_MAX_ENTRIES` (500k) con WARNING visible
+— degradación honesta, nunca silenciosa. Para árboles dentro del límite el
+resultado es idéntico al patrón viejo (pin de equivalencia en los tests).
+
+**Refutación aplicada (alcance):** el bloque Magisk de `_detect_root`
+(`list(evidence_path.rglob("com.topjohnwu.magisk"))` etc.) se deja
+deliberadamente intacto: sus `len()` alimentan el string de evidencia del
+finding (cambiarlos alteraría narrativa emitida) y son lookups por nombre
+específico — no `rglob("*")` — con puñados de matches en la práctica.
+
+### Verificación
+
+- `tests/test_b139_bounded_marker_scan.py` (15 tests, rojos primero):
+  contrato del helper (equivalencia con el patrón viejo, symlinks,
+  dirs/include_dirs, truncado con WARNING y sin WARNING dentro del límite)
+  + pins de los tres motores (marcador detectado / nota de "No *-specific
+  artifacts" intacta en ambas direcciones, incluido `.fseventsd` como dir).
+- Pins mobile existentes (B-086/B-133/B-137 y afines): 256 passed.
+- **Cobertura honesta (misma salvedad que B-133/B-137):** los 201 casos
+  JSON del corpus no ejercitan el scan de marcadores sobre árboles raw; la
+  equivalencia se sostiene por el pin de equivalencia y los pins de motor,
+  no por una corrida de corpus (que trivialmente daría 0 flips).
+
+---

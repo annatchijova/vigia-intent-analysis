@@ -28,6 +28,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
+from vigia.sift._fs_utils import scan_marker_names
 from vigia.sift._math_utils import build_correlation_groups, noisy_or_correlated
 from vigia.sift._sql_utils import safe_sqlite_connect
 
@@ -288,17 +289,16 @@ class MacOSForensicsAnalyzer:
 
         result = MacOSAnalysisResult(source_path=str(evidence_path))
 
-        # Validate macOS evidence
-        all_files = set()
-        all_dirs = set()
-        for p in evidence_path.rglob("*"):
-            if p.is_symlink():
-                continue
-            if p.is_file():
-                all_files.add(p.name)
-            elif p.is_dir():
-                all_dirs.add(p.name)
-        macos_markers = (all_files | all_dirs) & _MACOS_MARKER_FILES
+        # Validate macOS evidence.
+        # B-139: bounded scan — O(markers) memory, capped walk with WARNING.
+        # include_dirs: .fseventsd is a directory marker.
+        macos_markers = scan_marker_names(
+            evidence_path,
+            _MACOS_MARKER_FILES,
+            engine="MACOS",
+            logger=logger,
+            include_dirs=True,
+        )
         if not macos_markers:
             logger.warning("[MACOS] No macOS artifacts found in %s", evidence_path)
             result.analysis_notes.append(

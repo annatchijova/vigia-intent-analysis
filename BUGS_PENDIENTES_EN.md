@@ -6288,3 +6288,52 @@ changes (importorskip is a no-op and the tests run exactly as before).
 - Post-fix: the 4 files report 22 passed / 7 skipped / 0 failed, and the
   full suite (without `tests/integration` and `tests/e2e`) collects and
   runs green in the same environment.
+
+---
+
+## B-139 — Unbounded `rglob("*")` marker scans in the three mobile/macOS engines (WHAT_IS_NEXT §1.3 residual) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-17 (bounded `scan_marker_names()` in `vigia/sift/_fs_utils.py`, 3 call sites migrated) |
+| **Severity** | P3 (resource robustness — no verdict impact for trees within the bound, which is all real ones) |
+| **Files** | `vigia/sift/ios_forensics.py`, `vigia/sift/android_forensics.py`, `vigia/sift/macos_forensics.py`, `vigia/sift/_fs_utils.py` (new) |
+| **Detected in** | Residual documented in WHAT_IS_NEXT §1.3 (S4 / AUDITORIA_COBERTURA_MOBILE_SIFT §C); picked up in the 2026-07-17 abductive review session |
+
+### Description
+
+S4 bounded the pattern-specific lookups with `_safe_rglob`
+(heapq.nsmallest, O(limit) memory), but the marker-validation step of the
+three engines still materialized EVERY name in the evidence tree
+(`{f.name for f in evidence_path.rglob("*")}`) before intersecting with
+the marker set: O(tree) memory and an unbounded walk on a hostile or giant
+evidence tree — the same class S4 closed everywhere else.
+
+### Fix
+
+Shared helper `scan_marker_names()` (same module pattern as
+`_math_utils`/`_sql_utils`): retains only names that ARE markers
+(O(markers) memory), filters symlinks, counts directories only with
+`include_dirs=True` (macOS: `.fseventsd` is a directory marker), and stops
+the walk at `MARKER_SCAN_MAX_ENTRIES` (500k) with a visible WARNING —
+honest degradation, never silent. For trees within the bound the result is
+identical to the old pattern (equivalence pin in the tests).
+
+**Refutation applied (scope):** the Magisk block in `_detect_root`
+(`list(evidence_path.rglob("com.topjohnwu.magisk"))` etc.) is deliberately
+left untouched: its `len()` values feed the finding's evidence string
+(changing them would alter emitted narrative) and they are name-specific
+lookups — not `rglob("*")` — with a handful of matches in practice.
+
+### Verification
+
+- `tests/test_b139_bounded_marker_scan.py` (15 tests, red first): helper
+  contract (equivalence with the old pattern, symlinks, dirs/include_dirs,
+  truncation WARNING and no WARNING within the bound) + engine pins
+  (marker detected / "No *-specific artifacts" note intact in both
+  directions, including `.fseventsd` as a directory).
+- Existing mobile pins (B-086/B-133/B-137 and related): 256 passed.
+- **Honest coverage (same caveat as B-133/B-137):** the 201 JSON corpus
+  cases do not exercise the marker scan over raw trees; equivalence rests
+  on the equivalence pin and the engine pins, not on a corpus run (which
+  would trivially show 0 flips).

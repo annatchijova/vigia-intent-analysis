@@ -135,9 +135,13 @@ macos 44.5% (desde ≈15%). El arnés para B-052-P2 existe.
 2. ~~Bordes de banda de timestamps~~ — 28 pins (cada borde exacto de los 3
    conversores + acuerdo iOS≡macOS + ts≤0/None).
 3. `_safe_rglob` **acotado** (heapq.nsmallest, salida idéntica, 18 pins).
-   **Residuo para la sesión B-052-P2:** migrar los call-sites con
-   `Path.rglob` directo (ios:269/604/608/641, android:240/360-362) — cambia
-   semántica de detección; hacerlo con el arnés puesto.
+   ~~Residuo: migrar los call-sites con `Path.rglob` directo~~ — **CERRADO
+   (B-139, 2026-07-17):** los tres scans de marcadores `rglob("*")`
+   (ios/android/macos) migrados a `scan_marker_names()` acotado
+   (`vigia/sift/_fs_utils.py`, 15 pins rojos primero). El bloque Magisk
+   conserva sus listas deliberadamente: los `len()` alimentan el string de
+   evidencia del finding y son lookups por nombre específico, no
+   `rglob("*")` (refutación documentada en la entrada B-139).
 4. ~~`_safe_plist_load` con límite~~ — `_PLIST_MAX_BYTES=8MiB`, rechazo antes
    de parsear, WARNING visible (rojo primero).
 
