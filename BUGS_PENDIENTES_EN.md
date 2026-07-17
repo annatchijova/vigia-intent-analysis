@@ -5037,7 +5037,7 @@ namespaces remain); closes the silent drift.
 
 | Field | Value |
 |-------|-------|
-| **Status** | NOT APPLIED — the pre-registered gate (Anna's rule: `fixed>=1 AND broken==0`) rejected the change with fixed=30 / **broken=3**. Fix implemented, measured, and **reverted**. `xfail(strict=True)` sentinels in `tests/test_b097_motor_suspicion_verdict.py`. |
+| **Status** | APPLIED — 2026-07-10 with Anna's signature (triple independent-source validation), after the pre-registered gate (`fixed>=1 AND broken==0`) initially rejected the change with fixed=30 / broken=3 and the fix was reverted in that first session. The `xfail(strict=True)` sentinels in `tests/test_b097_motor_suspicion_verdict.py` became normal regression guards. See the "UPDATE 2026-07-10" block below; the rejection record is preserved as audit history. |
 | **Severity** | P1 (corpus metric and verdict semantics) — documented negative result |
 | **File** | `vigia_agent.py` (`classify_agent_verdict`) — edited and reverted |
 | **Detected in** | Recorded observation in `docs/B052_P2_DESIGN.md` §10.1 (§9.4-LIM enforcement session) |

@@ -17,6 +17,19 @@
 | Trackers | `BUGS_PENDIENTES.md` (ES) y `BUGS_PENDIENTES_EN.md` sincronizados hasta **B-084** | este commit |
 | Última tanda cerrada | TANDAS 1–4, Fase 2 semantic_role, LaBestia, Q2/Q4, Round 2/2.1, Round 3, censo P0-001 + fixes adyacentes | B-077..B-084 |
 
+> **Actualización 2026-07-17 (sesión de revisión abductiva de trackers):** la
+> tabla de arriba quedó histórica. Estado vigente: corpus batch committeado
+> **187/199** (2026-07-14, `results/agent_batch/_batch_summary.json`); gate
+> vivo de B-136 Fase 3 **189/201** (2026-07-17); suite **1455 passed / 0
+> failed** (registro B-136; en entornos sin `mcp` los módulos que lo importan
+> se excluyen — L-045). Trackers ES/EN sincronizados hasta **B-137**.
+> Cerrados desde la última edición de este documento: B-085..B-137 (detalle
+> en trackers), incluidos B-097 (aplicado con firma de Anna el 2026-07-10),
+> B-136 (Opción 1 en tres fases) y el cierre NOT ADOPTED de B-052-P2 (§1.2).
+> Pendientes vigentes verificados contra código: B-010, B-111..B-113
+> (candidatos), B-116 (pospuesto), B-122 (parcial), B-123/B-124 (pospuestos),
+> B-129 (Fase 2 no antes de 2026-08-14), L-029/FW-009, L-033/A3, L-041/A7.
+
 Trayectoria del corpus en la semana: 143 → 153 (B-076, umbral SUSPICION) →
 165 (B-077, semantic_role) → 163 (B-081, monotonicidad con gate) → **166**
 (Round 2.1, relabel de 3 etiquetas que codificaban la dilución).
@@ -85,12 +98,13 @@ que ya se cerró desde entonces. La Fase 0 (sorpresas protegidas) y la Fase 1
 
 En orden de dependencia:
 
-1. **A2 / B-052-P2** — granularidad mobile/macOS: `to_signal()` →
-   `to_signals()` por dominio, ruteo V4 con ≥3 señales. Cambia TODOS los
-   veredictos mobile → corpus gate obligatorio. **Antes de esto, escribir los
-   pins de Grupo C (§1.3) — son el arnés de la migración.**
-2. **A5 / B-041b** — CAIE retroalimenta el veredicto: DIFERIDO, se desbloquea
-   con A2 (necesita artefactos multi-capa).
+1. ~~**A2 / B-052-P2** — granularidad mobile/macOS~~ — **CERRADO 2026-07-10,
+   NOT ADOPTED** por decisión sellada §9.4-LIM (L-051): SUSPICION es el techo
+   doctrinal para casos mobile/macOS D3-only; la migración `to_signals()` no
+   se adopta. Los pins de Grupo C (§1.3) quedan como arnés de regresión.
+2. ~~**A5 / B-041b** — CAIE retroalimenta el veredicto~~ — **CERRADO**:
+   B-041b superado por B-075/B-076 (ver tracker B-041); su prerequisito A2
+   se cerró NOT ADOPTED.
 3. **A4 / B-069** — re-fit de perfiles. **MEDIDO 2026-07-09: resultado NEUTRO,
    NO APLICADO.** Con el dataset (979 señales) se corrió el re-fit dataset-driven
    detrás del gate comparativo (`scripts/experiment_a4_profile_refit.py`, solo

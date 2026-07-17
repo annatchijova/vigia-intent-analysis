@@ -4787,7 +4787,7 @@ estructural (siguen los dos namespaces); cierra la deriva silenciosa.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | NO APLICADO — gate pre-registrado (firma Anna: `fixed>=1 AND broken==0`) rechazó el cambio con fixed=30 / **broken=3**. Fix implementado, medido y **revertido**. Sentinelas `xfail(strict=True)` en `tests/test_b097_motor_suspicion_verdict.py`. |
+| **Estado** | APLICADO — 2026-07-10 con firma de Anna (validación por triple fuente independiente), tras el rechazo inicial del gate pre-registrado (`fixed>=1 AND broken==0`, fixed=30 / broken=3, fix revertido en esa primera sesión). Los sentinelas `xfail(strict=True)` de `tests/test_b097_motor_suspicion_verdict.py` pasaron a guardas de regresión normales. Ver "ACTUALIZACIÓN 2026-07-10" abajo; el rastro del rechazo se conserva como historia de auditoría. |
 | **Severidad** | P1 (métrica de corpus y semántica de veredicto) — resultado negativo documentado |
 | **Archivo** | `vigia_agent.py` (`classify_agent_verdict`) — editado y revertido |
 | **Detectado en** | Observación registrada en `docs/B052_P2_DESIGN.md` §10.1 (sesión enforcement §9.4-LIM) |
@@ -7084,7 +7084,7 @@ cambio de comportamiento para instalaciones que ya seteaban `log_path` explícit
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | DOCUMENTADO — fix arquitectónico pendiente (decisión de diseño: routing al engine del scorer + perfiles de evidencia nuevos) |
+| **Estado** | RESUELTO — Opción 1 aplicada 2026-07-17 en tres fases (perfiles de dominio documento, wiring de las 4 tools a `caie_artifacts`, absorción en el ensamblador de casos); ver bloque de resolución arriba |
 | **Severidad** | P2 — dead code que emite logs de auditoría falsos (`CAIE_ARTIFACT_INJECTED` sin efecto real); ninguna fractura de estos tools llegó jamás al veredicto |
 | **Archivos** | `vigia/tools/adversarial_nlp.py:1595`, `vigia/core/entanglement.py:597`, `vigia/forensics/temporal_forensics_redteam.py:740`, `vigia/forensics/vision_audit.py:514` |
 | **Detectado en** | Sesión post-hackathon 2026-07-16, auditoría B-114/B-115 |
