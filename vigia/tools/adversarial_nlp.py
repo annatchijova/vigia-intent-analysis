@@ -1562,10 +1562,14 @@ class VigiaAdversarialNLP:
             language=force_language,
         )
 
-        if auto_inject_caie and verdict.fracturas:
-            self._inject_caie_fractures(verdict)
-
         result = verdict.to_dict()
+        # B-136: expose case-ready artifacts instead of feeding a discarded
+        # local engine. The parameter keeps its historical name for caller
+        # compatibility; it now gates artifact construction.
+        result["caie_artifacts"] = (
+            self._build_caie_fractures(verdict)
+            if auto_inject_caie and verdict.fracturas else []
+        )
         pdf_path = self._export_pdf(verdict, document_path, case_number)
         if pdf_path:
             result["pericial_pdf_path"] = pdf_path
@@ -1588,26 +1592,38 @@ class VigiaAdversarialNLP:
             )
             return ""
 
-    def _inject_caie_fractures(self, verdict: ForensicVerdict) -> None:
-        if not _CAIE_AVAILABLE or CrossArtifactIncongruenceEngine is None:
-            return
-        try:
-            caie = CrossArtifactIncongruenceEngine()
-            for fractura in verdict.fracturas:
-                caie.add_from_tool_result(
-                    source_tool="vigia_adversarial_nlp",
-                    evidence_type="linguistic_forensics",
-                    raw_score=verdict.mcp,
-                    description=fractura,
-                    metadata={"mcp": verdict.mcp, "language": verdict.language,
-                              "verdict": verdict.final_verdict},
-                )
-        except Exception as exc:
-            audit_logger.log_info(
-                event_type="CAIE_INJECTION_FAILED",
-                tool="VigiaAdversarialNLP",
-                message=str(exc),
-            )
+    def _build_caie_fractures(self, verdict: ForensicVerdict) -> list:
+        """B-136: build case-ready CAIE artifacts from stylometric fractures.
+
+        The previous version instantiated a LOCAL CrossArtifactIncongruence-
+        Engine that was discarded without detect_fractures() — a structural
+        no-op — and its call shape raised TypeError against the real wrapper
+        signature anyway (Kimi audit, CONFIRMED BY INDUCTION). It also passed
+        raw_score=verdict.mcp, which is 1.0-5.0 and would have poisoned the
+        [0,1] composite formula even if wired.
+
+        Now the fractures are exposed in the tool result under
+        "caie_artifacts" so the case assembler can route them into the case
+        artifact stream, where the scorer consumes them with the
+        linguistic_forensics profile (CONTEXTUAL role: informs the composite,
+        never corroborates the device gate). raw_score is the canonical
+        normalization min(1, (mcp-1)/4) — the formerly dissolved B-115
+        decision, now the single conversion point.
+        """
+        raw_score = min(1.0, max(0.0, (verdict.mcp - 1.0) / 4.0))
+        return [
+            {
+                "source_tool": "vigia_adversarial_nlp",
+                "evidence_type": "linguistic_forensics",
+                "raw_score": raw_score,
+                "description": fractura,
+                "metadata": {"mcp": verdict.mcp, "language": verdict.language,
+                             "verdict": verdict.final_verdict,
+                             "document_id": verdict.document_id},
+                "provenance_chain": [verdict.document_id],
+            }
+            for fractura in verdict.fracturas
+        ]
 
     def _export_pdf(
         self, verdict: ForensicVerdict, document_path: str, case_number: Optional[str],

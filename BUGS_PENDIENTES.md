@@ -5549,11 +5549,11 @@ Observar el patron en un segundo expediente judicial independiente (distinto a M
 
 ---
 
-## B-114 — `add_from_tool_result()` en CAIE construye `Artifact` sin pasar por los guardrails de `add_artifact()`
+## B-114 — `add_from_tool_result()` en CAIE construye `Artifact` sin pasar por los guardrails de `add_artifact()` [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | OBSERVADO — no explotado, revisar más adelante |
+| **Estado** | RESUELTO — 2026-07-16, sesión post-hackathon (delegación a `add_artifact()`; ver B-136 para el hallazgo mayor de la misma auditoría) |
 | **Severidad** | P3 (guardrail bypass, no explotado en el caso probado) |
 | **Archivo** | `vigia/tools/caie.py` |
 | **Función** | `CrossArtifactIncongruenceEngine.add_from_tool_result()` (línea ~1135) vs `add_artifact()` (línea ~1089) |
@@ -5588,13 +5588,36 @@ Si es así, escalar a P1/P2 — es una vía de bypass del whitelist con
 influencia de atacante. Fix candidato: que `add_from_tool_result()` delegue
 a `add_artifact()` en vez de appendear directo.
 
+### Fix aplicado (2026-07-16)
+
+El fix candidato del párrafo anterior, tal cual: `add_from_tool_result()`
+construye el `Artifact` y retorna `self.add_artifact(...)` (bool), con lo que
+`_MAX_ARTIFACTS` y la whitelist de `evidence_type` aplican también a este
+camino. Efecto lateral intencional de la delegación: los artifacts del wrapper
+ahora se indexan en `_temporal_index`/`_network_index` como los de cualquier
+otro caller (antes eran invisibles para las reglas TCV y NETWORK_VS_HOST).
+
+Censo de callers ejecutado (criterio de escalada de esta entrada): 4 sitios —
+`vision_audit` (firma correcta, tipos whitelisted, no explotable) y 3 sitios
+con la llamada rota que nunca llegaba al append (ver B-136). El scorer
+(`vigia_scorer.py:652`) alimenta CAIE vía `add_artifact()` directo, así que
+este fix no toca el camino de veredicto.
+
+### Verificación
+
+- Red tests: `tests/test_b114_caie_guardrail_delegation.py` (6 tests):
+  flooding rechazado en `_MAX_ARTIFACTS`, `evidence_type` fuera de whitelist
+  rechazado, adición whitelisted intacta (extracción de score, override
+  digital_perfection), indexación temporal ahora aplicada.
+- Gate comparativo de corpus: sin cambios de veredicto (ver commit).
+
 ---
 
-## B-115 — `VigiaAdversarialNLP._inject_caie_fractures()` llama a `add_from_tool_result()` con kwargs inexistentes — nunca inyectó nada a CAIE
+## B-115 — `VigiaAdversarialNLP._inject_caie_fractures()` llama a `add_from_tool_result()` con kwargs inexistentes — nunca inyectó nada a CAIE [SUBSUMIDO EN B-136]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | OBSERVADO — no arreglado en esta sesión, requiere decisión de normalización |
+| **Estado** | SUBSUMIDO EN B-136 (2026-07-16) — alcance real: 3 sitios con la misma llamada rota, y el engine destino se descarta igual. El fix mecánico de kwargs fue evaluado y REFUTADO (empeoraría el trail: éxito falso hacia un objeto descartado). La "decisión de normalización" se disolvió: `verdict.confidence` YA ES `(mcp-1)/4` (adversarial_nlp.py:1131) |
 | **Severidad** | P2 (silenciosamente roto desde su introducción — misma clase de bug que el `await` faltante en `vision_intent_audit`) |
 | **Archivo** | `vigia/tools/adversarial_nlp.py:1585-1604` (`_inject_caie_fractures`) |
 | **Detectado en** | Cableado del PDF pericial al pipeline (2026-07-13), branch `claude/clip-pipeline-sanity-check-roh22k` |
@@ -5726,6 +5749,21 @@ and docstring guard citing this bug.
 
 ## B-116 — `signal_quality_gate.py` designed and functional in isolation, NOT wired to scorer — dry-run shows 122/199 cases degraded
 
+> **Update 2026-07-17 (condition 4 re-measured, Kimi-endorsed placeholder
+> policy applied):** the four acquisition/conversion placeholders
+> (`legacy_converter`, `manual_forensic_review`, `generate_forensic_hash`,
+> `read_evidence`) no longer count as analysis tools — they are skipped in
+> the `tool_name -> source_tool -> evidence_type` fallback, exactly like the
+> literal "unknown". Single source of truth: `_NON_ANALYSIS_PLACEHOLDERS`
+> in `vigia/core/signal_quality_gate.py` (not replicated in scripts).
+> Re-measured dry-run (corpus grew 202 -> 205 evaluable): MODE B passed
+> 77 -> 87; ABSTAIN_INSUFFICIENT_TOOLS 66 -> 40 (the -26 matches the
+> census: 31/66 had >=2 distinct evidence_type; the uncovered cases now
+> land honestly in the next checks — DEPENDENT_SIGNALS/LOW_Z_VARIANCE);
+> degraded-with-expected-MALICE 46 -> 42. Gate remains UNWIRED (zero
+> production callers): no verdict moved. Tests:
+> `tests/test_b116_placeholder_tools.py` (9, red-first).
+
 | Campo | Valor |
 |-------|-------|
 | **Estado** | POSPUESTO — bloqueado por desajuste de interfaz y calidad de datos |
@@ -5807,6 +5845,49 @@ verify compatibility with `SignalQualityGate.evaluate()` input schema. The
 gate's `_get_z_score()` reads `signal.z_score` (attribute) or
 `signal["z_score"]` (dict key). The calibrator's sample schema uses
 `z_scores` (plural, nested dict by tool). These must align before wiring.
+
+### Avance parcial (2026-07-16) — el gate sigue SIN cablear
+
+Tres de los cuatro ítems de desbloqueo avanzaron; el gate permanece sin
+callers de producción por diseño (la condición 4 — dry-run con 0 casos MALICE
+verdaderos degradados — sigue sin cumplirse):
+
+1. **Duplicado eliminado** (blocker 3): `vigia/signal_quality_gate.py` borrado;
+   `vigia/core/signal_quality_gate.py` es la única copia (eran byte-idénticas,
+   mismo md5, cero imports del path raíz).
+2. **Fallback de diversidad implementado** (condición de desbloqueo 3, opción
+   B): `_get_tool_name()` ahora resuelve `tool_name` → `source_tool` →
+   `evidence_type`, tratando `"unknown"` como ausente. Tests:
+   `tests/test_b116_quality_gate_fallback.py` (8 tests).
+3. **Dry-run reconstruido y versionado**: el script original del 2026-07-14
+   nunca se commiteó; `scripts/dryrun_signal_quality_gate.py` lo reconstruye
+   (mismos MODE A/B) y queda en el repo para que la medición sea reproducible.
+
+**Medición fresca (2026-07-16, corpus 202 casos evaluables):**
+
+| | MODE A (z=raw) | MODE B (z=raw*4) |
+|---|---|---|
+| Pasan gate | 0 | 77 |
+| Degradados | 202 | 125 |
+| `ABSTAIN_INSUFFICIENT_TOOLS` | 66 | 66 |
+| Degradados con expected_verdict=MALICE | 104 | 46 |
+
+(Los números del 2026-07-14 contaban 199 casos y "23 currently MALICE" —
+métrica distinta: veredicto emitido vs `expected_verdict` que usa el script
+versionado. No son comparables uno a uno.)
+
+**Hallazgo del censo de `source_tool` en los 66 casos INSUFFICIENT_TOOLS:**
+los valores dominantes son placeholders de conversión/adquisición, no
+herramientas de análisis: `None` (91 artifacts), `legacy_converter` (88),
+`manual_forensic_review` (43), `generate_forensic_hash` (35),
+`read_evidence` (8). El fallback conservador (solo `"unknown"` tratado como
+ausente) no los cubre: 31 de los 66 casos tienen >= 2 `evidence_type`
+distintos y pasarían el check de diversidad si esos placeholders se trataran
+como ausentes. **Decisión pendiente (Anna):** definir el set de placeholders
+de conversión que no cuentan como herramienta (`legacy_converter`,
+`manual_forensic_review`, `generate_forensic_hash`, `read_evidence`) — es
+política de datos, no código; con esa decisión el fallback existente los
+cubre con un cambio de una línea.
 
 ### Why not adapt the gate instead
 
@@ -6470,11 +6551,11 @@ no artefactual (empate persiste con la timeline funcionando).
 
 ---
 
-## B-131 — Metadata de adquisición no se propaga a señales derivadas de los motores [DOCUMENTADO — fix pendiente]
+## B-131 — Metadata de adquisición no se propaga a señales derivadas de los motores [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | DOCUMENTADO — fix pendiente (requiere dry-run de corpus completo antes de aplicar) |
+| **Estado** | RESUELTO — 2026-07-16, sesión post-hackathon (helper `_inject_acq_meta` + gate comparativo de corpus) |
 | **Severidad** | P2 (metadata de adquisición ausente en señales derivadas; degradación honesta de base_trust a 0.10 para esas señales) |
 | **Archivos** | `vigia/sift/sift_orchestrator.py` (Gamma loop, pasos 6 y 8) |
 | **Detectado en** | VIGIA-REAL-VANKO-2026 corrida RAW 2026-07-14 |
@@ -6531,6 +6612,32 @@ el mismo rigor que B-126/B-127.
 PREFETCH_ANALYZER) es **comportamiento correcto**, no un bug. El examinador pasó
 `--write-blocker-used false`, lo que es honesto: no se usó write blocker. CAIE degrada
 el trust correspondiente según NIST SP 800-86. El sistema funciona como fue diseñado.
+
+### Fix aplicado (2026-07-16)
+
+Helper estático `SIFTOrchestrator._inject_acq_meta(sig, acq_meta)` en
+`vigia/sift/sift_orchestrator.py`, aplicado en los 6 puntos de creación de señales
+post-Gamma: paso 6 (Metabolic, Resonance, Behavioral, Patterns), paso 7
+(UnifiedTimeline — mismo gap, no listado en el reporte original pero misma ley) y
+paso 8 (AdversarialRobustness). Merge con la misma precedencia del Gamma loop:
+`{**_acq_meta, **sig.metadata}` — la metadata propia de la señal gana.
+`acq_meta` vacío o `sig=None` son no-ops.
+
+### Verificación
+
+- Reproducción en vivo pre-fix: `run_full_analysis(event_stream=...)` con
+  `acquisition_overrides` seteados → METABOLIC_PROFILER, BEHAVIORAL_FINGERPRINT,
+  UNIFIED_TIMELINE y ADV_ROBUST sin `acquisition_tool`/`examiner_id`/`write_blocker_used`,
+  CAIE disparando ACQUISITION_METADATA_MISSING_CRITICAL (base_trust 0.10).
+- Post-fix: las 4 señales derivadas llevan los 3 campos declarados. CAIE solo
+  reclama `acquisition_hash`/`acquisition_timestamp`, honestamente ausentes en una
+  corrida sintética sin registros ACQUIRE en la cadena (degradación honesta, correcta).
+- Red tests: `tests/test_b131_acq_meta_propagation.py` (6 tests — propagación,
+  precedencia, no-op, passthrough de None).
+- Gate comparativo de corpus (`run_all_agent.py --rerun`, 201 casos): baseline
+  pre-fix 189/201 PASS, post-fix 189/201 PASS, cero flips de veredicto por caso
+  (diff campo a campo del `_batch_summary.json`). Suite completa: 1376 → 1397
+  passed (+21 tests nuevos B-131/B-133/B-134/B-135), 0 regresiones.
 
 ---
 
@@ -6639,11 +6746,11 @@ genuinamente en vez de alucinar un veredicto cuando la evidencia es insuficiente
 
 ---
 
-## B-133 — `knowledgeC.db` en `_MACOS_MARKER_FILES` activa la guarda B-048 y omite el motor iOS [PENDIENTE — fix diseñado]
+## B-133 — `knowledgeC.db` en `_MACOS_MARKER_FILES` activa la guarda B-048 y omite el motor iOS [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — fix diseñado, requiere dry-run corpus antes de aplicar |
+| **Estado** | RESUELTO — 2026-07-16, sesión post-hackathon (`knowledgeC.db` agregado a `_IOS_MARKER_FILES` + dry-run de routing) |
 | **Severidad** | P1 — el motor iOS se omite silenciosamente en cualquier extracción iOS que contenga knowledgeC.db |
 | **Archivos** | `vigia/sift/macos_forensics.py` (`_MACOS_MARKER_FILES`), `vigia/sift/ios_forensics.py` (`_IOS_MARKER_FILES`), `vigia_agent.py` (guarda B-048) |
 | **Detectado en** | VIGIA-MAGNET-2022-iOS-JESS, corrida RAW 2026-07-14 |
@@ -6712,13 +6819,45 @@ omitido, bundle con cero señales de ios_forensics, ABSTAIN por falta de señale
 Segunda corrida (después de mover `knowledgeC.db` a `_mode2_only/`): motor iOS
 correctamente invocado, 22 findings, IOS_FORENSICS z=2.80, bundle sealed.
 
+### Fix aplicado (2026-07-16)
+
+`knowledgeC.db` agregado a `_IOS_MARKER_FILES` en `vigia/sift/ios_forensics.py`
+(con comentario B-133 explicando la colisión multiplataforma). Con esto,
+`_MACOS_MARKER_FILES - _IOS_MARKER_FILES` queda con marcadores genuinamente
+exclusivos de macOS (TCC.db, .fseventsd, .Spotlight-V100, system.log,
+QuarantineEventsV2, plists) y la guarda B-048 de `vigia_agent.py` ya no
+secuestra extracciones iOS completas.
+
+### Verificación
+
+- Red tests: `tests/test_b133_knowledgec_ios_marker.py` (6 tests):
+  - extracción iOS completa (sms.db + knowledgeC.db + Info.plist) → routing iOS,
+    macOS NO activado;
+  - extracción macOS real (History.db + knowledgeC.db + TCC.db + system.log) →
+    routing macOS intacto;
+  - directorio que matchea ambos motores → ambos paths al mismo directorio, que
+    es exactamente el caso que la guarda de precedencia del shim
+    (`sift_orchestrator.py`, iOS skipped) sigue resolviendo;
+  - regresión B-048: el set exclusivo macOS sigue no-vacío (>= 5 marcadores).
+- Dry-run de routing sobre los directorios con marcadores presentes en el repo
+  (2 directorios: `cases/tuck-2019-macos/Preferences`, `cases/tuck-2019-macos/Safari`):
+  cero flips pre/post.
+- **Cobertura honesta del dry-run:** los casos JSON del corpus (201) no ejercitan
+  el routing por marcadores (son archivos únicos, no directorios de evidencia), y
+  el repo no contiene extracciones raw macOS/iOS completas (JESS/VANKO viven fuera
+  del repo). El riesgo residual documentado en el diseño — un caso macOS cuyo
+  ÚNICO marcador exclusivo sea `knowledgeC.db` — no tiene instancia en el repo;
+  toda extracción macOS real del corpus usado hasta ahora incluye TCC.db o
+  .fseventsd. Si apareciera un caso así, flipearía a iOS: queda anotado como
+  limitación de cobertura del gate, no como regresión observada.
+
 ---
 
-## B-134 — `_detect_installed_apps` no detecta Wire via `store.wiredatabase` — brecha UUID de iOS [PENDIENTE — fix diseñado]
+## B-134 — `_detect_installed_apps` no detecta Wire via `store.wiredatabase` — brecha UUID de iOS [RESUELTO — Wire; WeChat documentado como limitación]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — fix diseñado, requiere dry-run corpus antes de aplicar |
+| **Estado** | RESUELTO (Wire) — 2026-07-16, sesión post-hackathon. WeChat via keychain sigue como limitación documentada (sin fix portátil entre versiones) |
 | **Severidad** | P2 — falso negativo en detección de Wire; WeChat requiere análisis separado |
 | **Archivo** | `vigia/sift/ios_forensics.py::_detect_installed_apps` |
 | **Detectado en** | VIGIA-MAGNET-2022-iOS-JESS, análisis Mode 2 2026-07-14 |
@@ -6783,13 +6922,33 @@ instalación (`applicationState.db` o `MobileInstallation.plist`). Estos archivo
 sí existen en extracciones completas pero no son parseados por ios_forensics.py.
 Documentado como limitación de cobertura, no bug a resolver en esta tanda.
 
+### Fix aplicado (2026-07-16) — Wire
+
+Detección por filename de `store.wiredatabase` en `_detect_installed_apps`
+(`vigia/sift/ios_forensics.py`), mismo patrón y peso que el caso especial de
+`signal.sqlite`: raíz del directorio de evidencia + un nivel de subdirectorio,
+guard anti doble-conteo si el contenedor `com.wire` ya fue detectado por
+bundle ID. Severidad `Fraction(60, 100)`, consistente con la entrada
+`com.wire` de `ENCRYPTED_APPS`.
+
+WeChat NO se toca en esta tanda (sin filename portátil entre versiones;
+requiere parseo de keychain — sigue como limitación documentada arriba).
+
+### Verificación
+
+- Red tests: `tests/test_b134_wire_filename_detection.py` (5 tests): detección
+  en raíz y en subdirectorio, no doble-conteo con contenedor bundle-ID presente,
+  regresión del caso Signal, directorio vacío sin falsos positivos.
+- `store.wiredatabase` es un nombre específico de Wire (riesgo de falso positivo
+  bajo, igual que el diseño preveía). Gate de corpus sin cambios de veredicto.
+
 ---
 
-## B-135 — `SecurityAudit` defaultea `_DEFAULT_LOG_DIR` a `VIGIA_EVIDENCE_DIR` — escribe `security_audit.log` en directorio de evidencia [PENDIENTE — fix diseñado]
+## B-135 — `SecurityAudit` defaultea `_DEFAULT_LOG_DIR` a `VIGIA_EVIDENCE_DIR` — escribe `security_audit.log` en directorio de evidencia [RESUELTO]
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | PENDIENTE — fix diseñado, bajo impacto en producción |
+| **Estado** | RESUELTO — 2026-07-16, sesión post-hackathon (Opción A: `VIGIA_LOG_DIR`, consistente con `vigia/config.py`) |
 | **Severidad** | P2 — violación del principio de evidencia read-only; no afecta la integridad del análisis |
 | **Archivo** | `vigia/security/security.py`, línea 47: `_DEFAULT_LOG_DIR` |
 | **Detectado en** | VIGIA-MAGNET-2022-iOS-JESS, dos corridas Mode 1 RAW 2026-07-14 |
@@ -6853,5 +7012,228 @@ python3 vigia_agent.py --evidence "$VIGIA_EVIDENCE_DIR" --case-id CASE-001
 O eliminar manualmente `security_audit.log` del directorio de evidencia después
 de cada corrida (workaround del caso VIGIA-MAGNET-2022-iOS-JESS: eliminado manualmente
 dos veces durante la sesión 2026-07-14).
+
+### Fix aplicado (2026-07-16)
+
+Opción A del diseño: `_DEFAULT_LOG_DIR = os.getenv("VIGIA_LOG_DIR", "/var/log/vigia")`
+en `vigia/security/security.py`. Hipótesis benigna ("el default era intencional")
+refutada empíricamente: `vigia/config.py` ya resolvía `log_dir` desde
+`VIGIA_LOG_DIR` con el mismo default — el uso de `VIGIA_EVIDENCE_DIR` en
+security.py era una inconsistencia, no una decisión. `VIGIA_LOG_DIR` documentado
+en INSTALL.md (sección 7, campos opcionales) y en la sección Environment
+Prerequisites del CLAUDE.md.
+
+El fallback seguro existente (`_create_secure_fallback_log`, tempdir 0o700 +
+mkstemp 0o600) cubre el caso donde `/var/log/vigia` no es escribible — sin
+cambio de comportamiento para instalaciones que ya seteaban `log_path` explícito.
+
+### Verificación
+
+- Red tests: `tests/test_b135_security_log_dir.py` (5 tests): el default ignora
+  `VIGIA_EVIDENCE_DIR`, honra `VIGIA_LOG_DIR`, fallback `/var/log/vigia`,
+  end-to-end `SecurityAudit()` + `log_info()` deja el directorio de evidencia
+  byte a byte intacto, y `log_path` explícito sigue ganando.
+- Precaución del diseño verificada: ningún test del repo hardcodea la ruta del
+  audit log como dependiente de `VIGIA_EVIDENCE_DIR` (suite completa verde).
+
+---
+
+## B-136 — El patrón "inyección a CAIE" fuera del scorer es un no-op estructural: engines locales descartados + kwargs inexistentes en 3 de 4 sitios [RESUELTO — Opción 1 aplicada]
+
+> **Resolución (2026-07-17, decisión delegada por la mantenedora, calibración
+> en docs/PROPUESTA_B136_CAIE_WIRING_20260717.md):** Opción 1 en dos fases.
+> **Fase 1:** perfiles `linguistic_forensics` (0.60/0.18), `batch_forensics`
+> (0.45/0.22), `temporal_fraud` (0.55/0.20) en `EVIDENCE_PROFILES` (analogía
+> con la escala existente, método B-066; cero apariciones en corpus =
+> extensión sin efecto retroactivo); rol B-070 `CONTEXTUAL` para los tres
+> (informan el composite, NO corroboran el gate DEVICE); dominio de
+> recolección `content_artifact`/`D5-soft` (N fracturas del MISMO documento
+> o lote están correlacionadas — exentarlas del decay de cola dejaría que un
+> solo documento infle el composite: el drowning que R4-3 mató).
+> `document_visual`/`document_geometry` quedan DEVICE (asimetría documentada;
+> reclasificar tiene efecto retroactivo y exige su propia corrida).
+> **Fase 2:** los cuatro sitios ya no instancian engines efímeros: cada tool
+> CONSTRUYE artefactos listos-para-caso y los expone en su resultado bajo
+> `caie_artifacts` (raw_score clampeado a [0,1]; adversarial_nlp normaliza
+> con min(1,(mcp-1)/4) — la decisión B-115 disuelta es ahora el único punto
+> de conversión; el diseño original pasaba mcp∈[1,5] crudo). Los logs de
+> éxito falsos (`CAIE_ARTIFACT_INJECTED`, `ENTANGLEMENT_CAIE_INJECTED`)
+> fueron eliminados; `analyze_and_inject` → `analyze_and_build_artifacts`
+> (cero callers al renombrar). **Verificación:** 23 tests nuevos
+> (`tests/test_b136_document_domain_profiles.py`,
+> `tests/test_b136_caie_wiring.py`, red-first: 12 y 9 en rojo pre-fix);
+> suite completa 1440 passed / 0 failed; corpus gate en vivo 189/201 PASS,
+> 199 casos comunes vs baseline, CERO flips (`fixed==0` es lo esperado: los
+> tipos nuevos no existen en el corpus; el cableado no mueve veredictos
+> hasta que el ensamblador de casos incorpore `caie_artifacts`). Pendiente
+> aguas abajo: que el ensamblador de casos incorpore `caie_artifacts` del
+> resultado de cada tool a `case["artifacts"]` — punto único de integración,
+> fuera del alcance de este fix.
+
+> **Fase 3 (2026-07-17): ensamblador cerrado.** `ForensicAdapter.build_context`
+> ahora absorbe los `caie_artifacts` que las tools exponen en `raw_results`
+> (punto único para ambos ensambladores: pipeline y sift orchestrator), con
+> contrato fail-closed: entradas malformadas se saltean, raw_score clampeado
+> a [0,1], custody metadata jamás sintetizada (ley B-131: degradación honesta
+> dentro de CAIE). `vigia/pipeline/pipeline.py` pasa los resultados de visión
+> (única de las 4 tools que invoca directamente). Tests:
+> `tests/test_b136_case_assembly.py` (6, red-first). Suite 1455/0. Corpus
+> gate: 189/201, CERO flips — esperado y honesto: los casos JSON no ejercitan
+> el loop de visión con imágenes; el primer caso con evidencia visual real
+> ejercitará el camino completo.
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | DOCUMENTADO — fix arquitectónico pendiente (decisión de diseño: routing al engine del scorer + perfiles de evidencia nuevos) |
+| **Severidad** | P2 — dead code que emite logs de auditoría falsos (`CAIE_ARTIFACT_INJECTED` sin efecto real); ninguna fractura de estos tools llegó jamás al veredicto |
+| **Archivos** | `vigia/tools/adversarial_nlp.py:1595`, `vigia/core/entanglement.py:597`, `vigia/forensics/temporal_forensics_redteam.py:740`, `vigia/forensics/vision_audit.py:514` |
+| **Detectado en** | Sesión post-hackathon 2026-07-16, auditoría B-114/B-115 |
+
+### Descripción (Peirceana)
+
+- **Firstness:** Cuatro sitios construyen `caie = CrossArtifactIncongruenceEngine()`
+  como variable local, agregan artifacts, y la función retorna sin que nada lea el
+  engine (`detect_fractures()` nunca se llama sobre esa instancia; el objeto se
+  descarta). No existe ningún singleton ni engine compartido en el repo: censo de
+  instanciaciones = scorer (`vigia_scorer.py:652`, construye el suyo desde las
+  señales del caso), self-tests de caie.py, y estos 4 sitios.
+- **Secondness:** El único consumidor real de CAIE es el scorer, que construye su
+  engine desde los artifacts sellados del caso vía `add_artifact()`. Una API de
+  inyección solo tiene efecto si alguien lee el engine inyectado. El baseline
+  correcto (vision_audit docstring: "Produces DOCUMENT_FORGERY fractures
+  automatically") nunca fue verdad: la fractura se produciría solo dentro del
+  objeto descartado.
+- **Thirdness:** La ley: "inyectar en un engine efímero es código muerto que
+  además produce trail de auditoría engañoso". `vision_audit` loguea
+  `CAIE_ARTIFACT_INJECTED` como éxito; `entanglement` loguea
+  `ENTANGLEMENT_CAIE_INJECTED`. Para una herramienta que reclama trail Daubert,
+  un log de auditoría que afirma una inyección sin efecto es un problema de
+  integridad del trail, no solo deuda técnica.
+
+### Censo de los 4 sitios
+
+| Sitio | Firma de llamada | evidence_type pasado | ¿En whitelist? | Doble rotura |
+|-------|------------------|----------------------|----------------|--------------|
+| `vision_audit.py:543,552` | CORRECTA (`tool_name=`, `result=`) | `document_visual` / `document_geometry` | Sí | Solo engine descartado |
+| `adversarial_nlp.py:1597` (B-115) | ROTA (`source_tool=`, `raw_score=`, ...) → TypeError silenciado | `linguistic_forensics` | **NO** | kwargs + engine descartado + tipo fuera de whitelist |
+| `entanglement.py:599` | ROTA (mismos kwargs inexistentes) | `batch_forensics` | **NO** | kwargs + engine descartado + tipo fuera de whitelist |
+| `temporal_forensics_redteam.py:741` | ROTA (mismos kwargs inexistentes) | `temporal_fraud` | **NO** | kwargs + engine descartado + tipo fuera de whitelist |
+
+### Por qué NO se aplicó el fix mecánico de B-115 (refutación tipo Eco)
+
+El fix "obvio" (corregir kwargs) fue evaluado y **rechazado**: hoy la llamada rota
+lanza TypeError y queda logueada honestamente como `CAIE_INJECTION_FAILED`.
+Corregir solo los kwargs convertiría ese fallo honesto en un **éxito falso**
+(inyección a objeto descartado, sin efecto, con log de éxito) — estrictamente
+peor bajo el estándar de honestidad del trail. El fix real es arquitectónico.
+
+### Hallazgo lateral que disuelve la "decisión de normalización" de B-115
+
+`adversarial_nlp.py:1131` ya define `confidence = min(1.0, (mcp - 1.0) / 4.0)` —
+las dos opciones que B-115 contraponía (`(mcp-1)/4` vs `verdict.confidence`)
+son el mismo valor. Cuando se cablee el fix arquitectónico, `verdict.confidence`
+es el `raw_score` correcto sin necesidad de decisión adicional.
+
+### Fix diseñado (pendiente de decisión de Anna)
+
+1. **Routing:** las fracturas de estos tools deben llegar al engine que el scorer
+   construye — la vía natural es que los tools emitan sus hallazgos como
+   artifacts/señales del caso (mismo camino que todo lo demás), NO que mantengan
+   engines paralelos. Eliminar los 4 bloques de inyección local y sus logs.
+2. **Perfiles:** si se desea que estos artifacts pesen en CAIE, agregar
+   `linguistic_forensics`, `batch_forensics`, `temporal_fraud` a
+   `EVIDENCE_PROFILES` con spoofability calibrada (decisión de calibración
+   forense — misma clase que B-092).
+3. **Gate:** cualquier cableado real requiere corrida comparativa de corpus
+   (regla `fixed>=1 AND broken==0`), porque fracturas nuevas mueven veredictos.
+
+### Relación con B-114 y B-115
+
+- B-114 (bypass de guardrails en `add_from_tool_result`) queda RESUELTO — el
+  wrapper ahora delega en `add_artifact()`. Esto NO arregla B-136 (el engine
+  sigue siendo descartado), pero cierra el hueco estructural para cualquier
+  caller futuro del wrapper.
+- B-115 queda SUBSUMIDO en esta entrada: su alcance real es 3 sitios, no 1, y
+  el fix mecánico está refutado (ver arriba).
+
+---
+
+## B-137 — `TCC.db` en `_MACOS_MARKER_FILES` activa la guarda B-048 y omite el motor iOS (residual de B-048, hermano de B-133) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — 2026-07-17 (`TCC.db` agregado a `_IOS_MARKER_FILES`, mismo patrón que B-133) |
+| **Severidad** | P2 — el motor iOS se omite silenciosamente en cualquier extracción iOS full-filesystem que contenga TCC.db |
+| **Archivos** | `vigia/sift/ios_forensics.py` (`_IOS_MARKER_FILES`), `vigia_agent.py` (comentario de la guarda B-048) |
+| **Detectado por** | Auditoría adversaria de Kimi K-1 (2026-07-17) sobre el branch `claude/unresolved-bugs-1231gn` |
+| **Documentado previamente como** | "Riesgo residual documentado" bajo la entrada B-048 (nunca cerrado, sin ID propio) |
+
+### Descripción
+
+Idéntica clase de bug que B-133. La guarda B-048 da precedencia al motor macOS
+cuando el directorio de evidencia contiene marcadores exclusivos de macOS:
+
+```python
+if all_names & (_MACOS_MARKER_FILES - _IOS_MARKER_FILES):
+    kwargs["macos_evidence_path"] = str(evidence_path)
+```
+
+`_MACOS_MARKER_FILES` incluía `TCC.db`. Este archivo **también existe en iOS**
+(ruta: `/private/var/mobile/Library/TCC/TCC.db` — base de datos del subsistema
+de privacidad Transparency, Consent & Control). Una extracción iOS full-filesystem
+que contenga `TCC.db` hace que la diferencia `_MACOS_MARKER_FILES - _IOS_MARKER_FILES`
+no sea vacía → se activa el motor macOS → el motor iOS no se ejecuta → se pierden
+los findings iOS-específicos (SMS, contacts, calls).
+
+### Causa raíz (Peircean)
+
+- **Firstness:** `macos_evidence_path` seteado y `ios_evidence_path` presente para
+  el mismo directorio; la precedencia del shim corre solo macOS; cero señales
+  IOS_FORENSICS.
+- **Secondness:** `TCC.db` estaba en `_MACOS_MARKER_FILES` como marcador macOS,
+  pero TCC es un subsistema de Apple presente en ambas plataformas. El artefacto
+  es multiplataforma; la lista de marcadores asumía exclusividad.
+- **Thirdness:** Misma ley que B-133 — cualquier artefacto cross-platform presente
+  en exactamente uno de los dos sets rompe la resta de exclusividad. El propio
+  comentario de la guarda B-048 (`vigia_agent.py`) admitía este residual para
+  TCC.db pero delegaba en el "shim precedence guard", que solo cubre el caso
+  same-directory, no la atribución de plataforma equivocada.
+
+### Fix aplicado (2026-07-17)
+
+`TCC.db` agregado a `_IOS_MARKER_FILES` en `vigia/sift/ios_forensics.py` (con
+comentario B-137 explicando la colisión). Con esto,
+`_MACOS_MARKER_FILES - _IOS_MARKER_FILES` conserva 7 marcadores genuinamente
+exclusivos de macOS (`.fseventsd`, `.Spotlight-V100`, `system.log`,
+`QuarantineEventsV2`, `com.apple.loginitems.plist`, `com.apple.recentitems.plist`,
+`SystemVersion.plist`) y la guarda B-048 ya no secuestra extracciones iOS. El
+comentario de la guarda en `vigia_agent.py` se actualizó (ya no describe TCC.db
+como residual abierto).
+
+### Riesgo simétrico (aceptado, misma clase que B-133)
+
+Un directorio macOS cuyo ÚNICO marcador exclusivo fuera `TCC.db` ahora ruteaería a
+iOS. Tan hipotético como el caso de knowledgeC.db: toda extracción macOS real del
+corpus incluye `.fseventsd`/`system.log`/etc., y el motor iOS sobre un TCC.db
+macOS-only produce ~cero findings (benigno y visible). La solución de fondo
+(routing por layout de directorios en vez de por nombres) queda para cuando exista
+un caso macOS real en el corpus que lo ejercite.
+
+### Verificación
+
+- `tests/test_b137_tcc_ios_marker.py` (6 tests): extracción iOS con TCC.db → routing
+  iOS, macOS NO activado; extracción macOS real → routing macOS intacto; knowledgeC.db
+  (B-133) + TCC.db (B-137) juntos con marcador iOS → routing iOS puro; regresión B-048:
+  el set exclusivo macOS sigue >= 5.
+- **Inducción pre/post:** contra el estado pre-fix (TCC.db fuera de `_IOS`), 4 de 6
+  tests fallan — el fallo de routing muestra `macos_evidence_path` seteado para una
+  extracción iOS con TCC.db, exactamente el hijack. Post-fix: 12/12 (B-137 + B-133).
+- El testigo `assert "TCC.db" in exclusive` del test de B-133 se corrigió a
+  `system.log` (TCC.db dejó de ser marcador macOS-exclusivo; la aserción codificaba
+  la creencia falsa que B-137 corrige — el invariante protegido, set exclusivo >= 5,
+  se conserva).
+- **Cobertura honesta:** igual que B-133, los 201 casos JSON del corpus no ejercitan
+  el routing por marcadores; no hay extracción raw iOS/macOS full en el repo. El fix
+  se sostiene por la clase de bug ya confirmada en B-133, no por un caso raw nuevo.
 
 ---

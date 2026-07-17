@@ -78,6 +78,21 @@ _IOS_MARKER_FILES = {
     "sms.db", "AddressBook.sqlitedb", "CallHistory.storedata",
     "History.db", "Info.plist", "keychain-2.db",
     "signal.sqlite",
+    # B-133: CoreDuet app-activity database. Present on BOTH macOS and iOS
+    # (/private/var/mobile/Library/CoreDuet/Knowledge/knowledgeC.db), so it
+    # must not count as a macOS-exclusive marker: the B-048 precedence guard
+    # (_MACOS_MARKER_FILES - _IOS_MARKER_FILES) would otherwise route every
+    # full iOS extraction containing it to the macOS engine and silently
+    # skip the iOS engine (observed: VIGIA-MAGNET-2022-iOS-JESS).
+    "knowledgeC.db",
+    # B-137: TCC (Transparency, Consent & Control) privacy database. Same
+    # class as B-133 — present on BOTH macOS and iOS
+    # (/private/var/mobile/Library/TCC/TCC.db), documented as the residual
+    # risk of B-048. Kept macOS-exclusive, it hijacked any full iOS
+    # extraction carrying it to the macOS engine (silent loss of the
+    # iOS-specific findings: SMS, contacts, calls). Adding it here closes
+    # the same subtraction hole B-133 closed for knowledgeC.db.
+    "TCC.db",
 }
 
 
@@ -644,6 +659,31 @@ class iOSForensicsAnalyzer:
                 "description": "Signal — end-to-end encrypted messaging (filename detection)",
                 "severity": str(Fraction(60, 100)),
                 "paths_found": len(signal_db_matches),
+            })
+
+        # B-134: Wire detection by filename — iOS stores third-party apps in
+        # UUID-named containers (Containers/Data/Application/<UUID>/), so the
+        # bundle-ID directory scan above never matches "com.wire". The presence
+        # of Wire's message database (store.wiredatabase) in the extraction is
+        # a specific witness that the app is installed. This engine does NOT
+        # parse or recover its contents — Wire messages are not recoverable
+        # from the extracted database (JESS L-002); only the filename is used
+        # as an installation marker. Same pattern and weight as the
+        # signal.sqlite special case (K-4, Kimi audit 2026-07-17).
+        wire_db_matches = (
+            list(evidence_path.glob("store.wiredatabase"))
+            + [p for d in evidence_path.iterdir() if d.is_dir()
+               for p in d.glob("store.wiredatabase")]
+        )
+        if wire_db_matches and not any(
+            app["bundle_id"] == "com.wire"
+            for app in self._encrypted_apps
+        ):
+            self._encrypted_apps.append({
+                "bundle_id": "com.wire",
+                "description": "Wire — E2E encrypted messaging (filename detection)",
+                "severity": str(Fraction(60, 100)),
+                "paths_found": len(wire_db_matches),
             })
 
         # Psiphon tunneling framework

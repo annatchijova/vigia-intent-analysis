@@ -604,12 +604,20 @@ class CrossArtifactIncongruenceEngine:
         result: dict,
         evidence_type: str = "log_entry",
         provenance_chain: list[str] | None = None,
-    ) -> None:
+    ) -> bool:
         """
         Convenience: extract an artifact from a standard VIGIA tool result dict.
 
         Looks for 'suspicion_score', 'probability_*', or 'visual_malice_score'
         to derive the raw score. Falls back to 0.0 if no score field found.
+
+        B-114 / K-2: delegates to add_artifact() so the Kimi P0 guardrails
+        (_MAX_ARTIFACTS anti-flooding limit, evidence_type whitelist) apply
+        here too. This mirrors the B-114 fix already applied to the live copy
+        (vigia/tools/caie.py); this file is a dead twin (zero importers), kept
+        in sync so it cannot become a reactivation landmine (Kimi audit K-2,
+        2026-07-17). Returns add_artifact's verdict: True if added, False if
+        rejected.
         """
         raw_score = 0.0
         for key in ("suspicion_score", "visual_malice_score",
@@ -632,13 +640,13 @@ class CrossArtifactIncongruenceEngine:
             evidence_type = "cryptographic_hash"
             description = f"[CRYPTO_MISMATCH] {description}"
 
-        self._artifacts.append(Artifact(
+        return self.add_artifact(Artifact(
             source_tool=tool_name,
             evidence_type=evidence_type,
             raw_score=raw_score,
             description=str(description)[:500],
             metadata={k: v for k, v in result.items()
-                      if k in ("verdict", "signals", "findings", "anomalies", 
+                      if k in ("verdict", "signals", "findings", "anomalies",
                                "digital_perfection_detected", "signature_mismatch",
                                "hash_mismatch", "timestamp", "process_creation_time",
                                "network_log_time", "firewall_claim", "host_reality")},

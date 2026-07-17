@@ -44,7 +44,12 @@ from typing import Callable, Final
 # Module-level constants
 # ---------------------------------------------------------------------------
 
-_DEFAULT_LOG_DIR: Final[str] = os.getenv("VIGIA_EVIDENCE_DIR", "/var/log/vigia")
+# B-135: the audit log must NEVER default into the evidence directory —
+# evidence is read-only (Invariant 1). VIGIA_LOG_DIR is the same variable
+# vigia/config.py already resolves for log_dir; the old fallback to
+# VIGIA_EVIDENCE_DIR wrote security_audit.log into the forensic evidence
+# tree on every default SecurityAudit() when that variable was set.
+_DEFAULT_LOG_DIR: Final[str] = os.getenv("VIGIA_LOG_DIR", "/var/log/vigia")
 
 # Maximum bytes stored per field to prevent log flooding
 _MAX_PREVIEW_BYTES: Final[int] = 200

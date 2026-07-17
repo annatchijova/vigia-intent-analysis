@@ -65,6 +65,10 @@ Before any investigation begins, verify:
 # Required
 export VIGIA_EVIDENCE_DIR="/path/to/read-only/evidence"
 
+# Optional — where SecurityAudit writes security_audit.log (B-135).
+# Default: /var/log/vigia. Must NEVER point inside VIGIA_EVIDENCE_DIR.
+export VIGIA_LOG_DIR="/var/log/vigia"
+
 # Optional — enables LLM semantic analysis
 export ANTHROPIC_API_KEY="sk-..."          # Claude Code / API mode
 export VIGIA_LLM_BACKEND=ollama            # local mode

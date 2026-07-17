@@ -36,6 +36,24 @@ from vigia.security import _utcnow, audit_logger
 from vigia.tools.vigia_adversarial_nlp import ForensicDatabaseManager, LanguageDetector
 
 
+def _build_temporal_caie_artifact(fracture: Dict, document_id: str) -> Dict:
+    """B-136: shape a temporal-fraud fracture as a case-ready CAIE artifact.
+
+    Exposed in the tool result under "caie_artifacts" so the case assembler
+    routes it into the case artifact stream (temporal_fraud profile,
+    CONTEXTUAL role). severity is clamped to [0,1] before it can feed the
+    raw x (1-spoofability) x weight x trust composite formula.
+    """
+    return {
+        "source_tool": "vigia_temporal",
+        "evidence_type": "temporal_fraud",
+        "raw_score": min(1.0, max(0.0, float(fracture.get("severity", 0.0)))),
+        "description": fracture.get("type", "TEMPORAL_FRAUD"),
+        "metadata": fracture,
+        "provenance_chain": [document_id],
+    }
+
+
 # ============================================================================
 # DICCIONARIO TEMPORAL FORENSE (ES/EN)
 # ============================================================================
@@ -731,22 +749,18 @@ class UnifiedForensicEngine:
                 [document_path] + batch_context
             )
         
-        # Agregar fracturas temporales a CAIE
+        # B-136: expose temporal fractures as case-ready CAIE artifacts.
+        # The previous block fed a LOCAL engine discarded without
+        # detect_fractures() (structural no-op) and its call shape raised
+        # TypeError against the real wrapper anyway (Kimi audit, CONFIRMED
+        # BY INDUCTION). Routing now happens through the returned result.
+        caie_artifacts = []
         if temporal_report.is_temporally_fraudulent:
             temporal_fracture = temporal_report.to_caie_fracture()
-            if temporal_fracture and _CAIE_AVAILABLE:
-                try:
-                    from vigia.tools.caie import CrossArtifactIncongruenceEngine
-                    caie = CrossArtifactIncongruenceEngine()
-                    caie.add_from_tool_result(
-                        source_tool="vigia_temporal",
-                        evidence_type="temporal_fraud",
-                        raw_score=temporal_fracture["severity"],
-                        description=temporal_fracture["type"],
-                        metadata=temporal_fracture,
-                    )
-                except Exception as e:
-                    audit_logger.log_error(f"Temporal CAIE injection failed: {e}")
+            if temporal_fracture:
+                caie_artifacts.append(
+                    _build_temporal_caie_artifact(temporal_fracture, doc_hash)
+                )
         
         # MCP unificado
         unified_mcp = self._calculate_unified_mcp(
@@ -766,6 +780,8 @@ class UnifiedForensicEngine:
             "entanglement": entanglement_report.to_dict() if entanglement_report else None,
             "unified_mcp": unified_mcp,
             "verdict": self._unified_verdict(unified_mcp),
+            # B-136: case-ready artifacts for the case assembler.
+            "caie_artifacts": caie_artifacts,
         }
     
     def _calculate_unified_mcp(self, pericial, temporal, entanglement) -> float:

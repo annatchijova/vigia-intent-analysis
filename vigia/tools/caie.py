@@ -230,6 +230,16 @@ _DOMAIN_MAP: dict = {
     "git_forensics":                ("content_artifact", "D5-media"),
     "cultural_marker":              ("content_artifact", "D5-soft"),
     "osint":                        ("content_artifact", "D5-soft"),
+    # B-136: fracturas documentales. D5-soft y NO D5-media deliberadamente:
+    # la exención D5-media asume costo por-artefacto ("10 binarios SON 10
+    # actos de fabricación"), pero estos tipos emiten N fracturas del MISMO
+    # documento/lote analizado (adversarial_nlp: una por fractura del mismo
+    # verdict; entanglement: N del mismo batch) — correlacionadas, no actos
+    # independientes. Exentarlas del decay de cola dejaría que un solo
+    # documento infle el composite sin límite (el drowning que R4-3 mató).
+    "linguistic_forensics":         ("content_artifact", "D5-soft"),
+    "batch_forensics":              ("content_artifact", "D5-soft"),
+    "temporal_fraud":               ("content_artifact", "D5-soft"),
     # D0 — assurance_context (describe la ADQUISICIÓN, no el ataque;
     # alineado con _EVIDENCE_ROLE de B-070)
     "acquisition_context":          ("assurance_context", "D0"),
@@ -398,6 +408,19 @@ EVIDENCE_PROFILES: Final[dict[str, EvidenceProfile]] = {
     "social_media":         EvidenceProfile(0.55, 0.22, "Social app client cache -- editable, server-side correlation out of local exam scope"),
     "location_data":        EvidenceProfile(0.30, 0.30, "Location history (GPS/Takeout) -- consistent forgery vs cell towers is hard"),
     "contact_data":         EvidenceProfile(0.60, 0.20, "contacts2.db -- trivially editable with root; value is structural (empty/unknown-sender)"),
+
+    # B-136 (docs/PROPUESTA_B136_CAIE_WIRING_20260717.md): document-domain
+    # types used by the three orphan CAIE injection sites (adversarial_nlp,
+    # entanglement, temporal_forensics_redteam). Calibrated by analogy with
+    # the existing scale — the same method B-066 used for the mobile band.
+    # Anchors: document_visual 0.40, document_geometry 0.45 ("harder to fake
+    # than text"), file_timestamp 0.70. Zero corpus occurrences at the time
+    # of addition — extension with no retroactive effect. Their B-070 role
+    # is CONTEXTUAL (see _EVIDENCE_ROLE below): they inform the composite
+    # but never corroborate the device gate.
+    "linguistic_forensics": EvidenceProfile(0.60, 0.18, "Stylometric/linguistic incongruence -- text is the most fakeable document layer (imitable style, LLM laundering); a DETECTED incongruence is real but single-modality"),
+    "batch_forensics":      EvidenceProfile(0.45, 0.22, "Cross-document batch entanglement -- retroactively forging statistical independence across a batch is hard; analogous to document_geometry"),
+    "temporal_fraud":       EvidenceProfile(0.55, 0.20, "Intra-document temporal contradiction -- document date claims are spoofable (cf. file_timestamp), but an engineered self-consistent contradiction is harder than a single timestamp"),
 }
 
 # B-067: tipos EN USO en el corpus que nunca fueron perfilados. Hasta este
@@ -473,6 +496,16 @@ _EVIDENCE_ROLE: Final[dict[str, str]] = {
     "osint":                       EVIDENCE_ROLE_CONTEXTUAL,
     "acquisition_context":         EVIDENCE_ROLE_CONTEXTUAL,
     "device_acquisition_timeline": EVIDENCE_ROLE_CONTEXTUAL,
+    # B-136: forense documental — informa el composite (una fractura
+    # estilométrica/de lote/temporal es señal real de malicia) pero NO es
+    # una fuente independiente de dispositivo: una fractura single-modality
+    # no debe desbloquear el gate de corroboración. Asimetría documentada:
+    # document_visual/document_geometry siguen DEVICE por ahora (moverlos
+    # tiene efecto retroactivo sobre el corpus; decisión aparte con su
+    # propia corrida comparativa — PROPUESTA_B136 §2).
+    "linguistic_forensics":        EVIDENCE_ROLE_CONTEXTUAL,
+    "batch_forensics":             EVIDENCE_ROLE_CONTEXTUAL,
+    "temporal_fraud":              EVIDENCE_ROLE_CONTEXTUAL,
     # (todo lo demás → DEVICE por defecto, incluido cualquier tipo desconocido)
 }
 
@@ -1138,12 +1171,18 @@ class CrossArtifactIncongruenceEngine:
         result: dict,
         evidence_type: str = "log_entry",
         provenance_chain: list[str] | None = None,
-    ) -> None:
+    ) -> bool:
         """
         Convenience: extract an artifact from a standard VIGIA tool result dict.
 
         Looks for 'suspicion_score', 'probability_*', or 'visual_malice_score'
         to derive the raw score. Falls back to 0.0 if no score field found.
+
+        B-114: delegates to add_artifact() so the Kimi P0 guardrails
+        (_MAX_ARTIFACTS anti-flooding limit, evidence_type whitelist) apply
+        to this path too — the previous direct append bypassed both, and any
+        MCP tool using this wrapper inherited the hole. Returns add_artifact's
+        verdict: True if added, False if rejected.
         """
         raw_score = 0.0
         for key in ("suspicion_score", "visual_malice_score",
@@ -1166,13 +1205,13 @@ class CrossArtifactIncongruenceEngine:
             evidence_type = "cryptographic_hash"
             description = f"[CRYPTO_MISMATCH] {description}"
 
-        self._artifacts.append(Artifact(
+        return self.add_artifact(Artifact(
             source_tool=tool_name,
             evidence_type=evidence_type,
             raw_score=raw_score,
             description=str(description)[:500],
             metadata={k: v for k, v in result.items()
-                      if k in ("verdict", "signals", "findings", "anomalies", 
+                      if k in ("verdict", "signals", "findings", "anomalies",
                                "digital_perfection_detected", "signature_mismatch",
                                "hash_mismatch", "timestamp", "process_creation_time",
                                "network_log_time", "firewall_claim", "host_reality")},
