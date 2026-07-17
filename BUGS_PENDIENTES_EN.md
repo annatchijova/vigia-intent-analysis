@@ -5888,3 +5888,342 @@ actively-patched live file. Zero callers, full suite 1366 passed.
 All 6: zero production callers, all depend on orphaned producer chain
 (vigia/abduction/, vigia/temporal/, vigia/patterns/). Dry-run inviable.
 Preserved as pending-to-wire capability, NOT deletion candidates.
+
+---
+
+## B-126 — Grice v3.2 phenomenon-based detector + scorer testimony gate
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — 2 corpus cases corrected (KIWI-006, KIWI-007) |
+| **Files** | `vigia/vigia_sift_bridge.py` (Grice v3.2), `vigia_scorer.py` (gate) |
+| **Detected** | Mode 2 blind re-run 2026-07-14 |
+
+### Description
+
+The Grice RELATION detector v1 was a near-constant: a 15-keyword topic list
+that fired on ~100% of natural-language testimony with zero discriminating
+power. Replaced with a v3.2 phenomenon-based bilingual (EN+ES) detector with
+four linguistic features: factual_impossibility, quantity_asymmetry,
+evidence_withholding, fundamental_ignorance. Threshold=25 (Daubert: a single
+phenomenon is insufficient). Tiered adj_density (>=10% -> weight 30)
+preserves Carnegie urgency detection.
+
+Scorer gate (defense in depth) fires only when verdict=NOISE AND
+testimony-only AND no exculpatory artifacts AND max(prior_trust)<=0.30 AND
+Grice=SUSPICION.
+
+### Verification
+
+1365 tests passed, 0 regressions. Corpus: 185/199 -> 187/199 (+2 FIX,
+0 regressions). CRONOS traces 6b81f266, 3b11e32e. Iterations v2.1 -> v3 ->
+v3.1 (negation) -> v3.2 (EN/ES bug) each validated against adversarial
+cases plus the full corpus.
+
+---
+
+## B-127 — Pipeline integration for the Grice testimony gate
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 — enables B-126 to fire in autonomous batch mode |
+| **Files** | `sift_orchestrator.py`, `vigia_scorer.py` (prior_trust boundary) |
+| **Detected** | B-126 dry-run showed the gate inactive in batch mode |
+
+### Description
+
+`sift_orchestrator.py::_resolve_hypothesis()` now calls
+`audit_grice_maxims()` conditionally before `_vigia_score()` for
+testimony-only cases without exculpatory artifacts. Also fixed the
+prior_trust boundary from `< 0.30` to `<= 0.30` (KIWI-007 carries
+prior_trust=0.30 on the panic-button artifact).
+
+### Verification
+
+Dry-run: +2 FIX (KIWI-006, KIWI-007), 0 regressions from B-127; 9
+pre-existing MALICE->SUSPICION divergences confirmed unrelated. Batch
+regenerated: 187/199 PASS across the full 199 cases.
+
+---
+
+## B-128 — Dead duplicate `vigia/core/semiotic_detector.py` deleted
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P3 — dead duplicate carrying pre-hardening code |
+| **File** | `vigia/core/semiotic_detector.py` (DELETED) |
+| **Detected** | Verification audit 2026-07-14 |
+
+### Description
+
+Orphan copy of `semiotic_detector_v2.py` (v2.1, pre-hardening): missing
+NEGATION_STRONG and `_sanitize_text`, i.e. known vulnerabilities already
+fixed in the live v2.2. Zero callers confirmed. Same divergent-twin pattern
+as B-125a.
+
+---
+
+## B-129 — PeircePlanner bounded: Phase 1 observation adapter [PHASE 2 PENDING]
+
+| Field | Value |
+|-------|-------|
+| **Status** | PHASE 1 COMPLETE — Phase 2 (calibration) and Phase 3 (integration) pending |
+| **Severity** | P3 — observation-only module, does not affect verdicts |
+| **Files** | `vigia/core/planner_adapter.py` (new), `vigia/core/peirceplanner_bounded.py` |
+| **Detected** | Investigation 2026-07-14 |
+
+### Description
+
+Adapter translating VIGIA case artifacts into EvidenceSignal and Hypothesis
+objects for `run_bounded_planner()`. Output is observation-only — it does
+NOT feed the scorer or the verdict path.
+
+Observation baseline over 198/199 cases: 22% agreement with the scorer
+(severely miscalibrated), 90 under-alerts (planner NOISE where the scorer
+says SUSPICION+). Root cause: confidence-as-weight measures certainty, not
+anomaly severity. Phase 2 (not before 2026-08-14) must recalibrate the
+weight (z_score or raw_score x (1 - spoofability)) and reach >70% agreement
+before Phase 3 integration is even considered; oscillation detection
+(ABSTAIN on contradictory evidence) is the primary value-add.
+
+---
+
+## B-130 — UnifiedTimelineEngine crashes on int epoch timestamps
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — crashes the whole engine; silently removes an evidence source from the verdict |
+| **File** | `vigia/sift/unified_timeline_engine.py` (`_extract_timestamp`) |
+| **Detected** | VIGIA-REAL-VANKO-2026 RAW run 2026-07-14 |
+
+### Description
+
+`meta.get("timestamp", default)` only applies the default when the key is
+ABSENT. When the key held an `int` epoch (common in Prefetch/Registry
+metadata), the raw int reached `_parse_iso_timestamp`, whose immediate
+`ts_str.replace("Z", "+00:00")` raised `AttributeError` — not `ValueError`,
+so the existing handler never caught it. The orchestrator's outer
+`except Exception` logged the crash and continued: `build_timeline` never
+completed and the UNIFIED_TIMELINE signal was silently absent from the
+bundle.
+
+### Forensic impact
+
+In the VIGIA-REAL-VANKO-2026 RAW run this removed an evidence source and
+contributed to an ABSTAIN (exact CCS 1/2 tie) that could have been
+artifactual. After the fix, the re-run confirmed the ABSTAIN is GENUINE —
+the tie persists with the timeline working.
+
+### Fix
+
+`isinstance(ts_val, (int, float))` guard returning `int(ts_val)` directly;
+handler widened to `(ValueError, TypeError, AttributeError)`. Regression
+tests cover int and float epochs (values preserved exactly / truncated).
+
+---
+
+## B-131 — Acquisition metadata not propagated to engine-derived signals
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — custody metadata silently lost on six post-Gamma signal paths |
+| **File** | `vigia/sift/sift_orchestrator.py` |
+| **Detected** | Abductive audit session 2026-07-16; adversarially verified by Kimi 2026-07-17 |
+
+### Description
+
+The Gamma loop attached acquisition/custody metadata (`_acq_meta`) to its
+own signals, but the six post-Gamma signal creations (metabolic, resonance,
+behavioral, patterns, timeline, adversarial-robustness) built SignalOutput
+objects with no acquisition metadata at all. Downstream trust computation
+treats missing custody metadata as a critical degradation
+(ACQUISITION_METADATA_MISSING_CRITICAL, base_trust 1.00 -> 0.10), so
+engine-derived signals arrived self-degraded.
+
+### Fix
+
+`_inject_acq_meta` staticmethod wrapping all six sites with the same
+precedence as the Gamma loop (`{**acq_meta, **signal_meta}` — the signal's
+own metadata wins). `acquisition_tool`, `write_blocker_used`, `examiner_id`
+are never synthesized: their absence keeps degrading honestly.
+
+### Verification
+
+`tests/test_b131_acq_meta_propagation.py` (5 tests) red on the pre-fix
+commit, green after. Kimi's independent audit re-ran the red/green pair in
+a separate worktree: CONFIRMED BY INDUCTION.
+
+---
+
+## B-132 — PREFETCH_ANALYZER anti-forensics list incomplete: sdelete.exe not recognized
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 — a canonical anti-forensics tool escaped the detector |
+| **File** | `vigia/sift/` prefetch analyzer rules |
+| **Detected** | Session 2026-07-16 |
+
+### Description
+
+The anti-forensics executable list used by the Prefetch analyzer omitted
+`sdelete.exe` (Sysinternals secure-delete, the textbook wiping tool cited
+in anti-forensics literature). Execution evidence of sdelete in Prefetch
+produced no ANTI_FORENSICS finding. Fixed by extending the rule list; a
+regression test pins the detection.
+
+---
+
+## B-133 — `knowledgeC.db` in `_MACOS_MARKER_FILES` triggers the B-048 guard and skips the iOS engine
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — the iOS engine is silently skipped for any full iOS extraction containing knowledgeC.db |
+| **Files** | `vigia/sift/ios_forensics.py`, `vigia/sift/macos_forensics.py`, `vigia_agent.py` |
+| **Detected** | VIGIA-MAGNET-2022-iOS-JESS RAW run 2026-07-14 |
+
+### Description
+
+The B-048 routing guard gives macOS precedence when a directory contains
+macOS-exclusive markers (`_MACOS_MARKER_FILES - _IOS_MARKER_FILES`).
+knowledgeC.db (CoreDuet app-activity database) ships on BOTH macOS and iOS
+but was listed only as a macOS marker, so every full iOS extraction
+carrying it routed to the macOS engine and sealed with zero ios_forensics
+signals (observed: JESS, first run ABSTAIN for lack of signals; after the
+workaround, 22 findings and IOS_FORENSICS z=2.80).
+
+### Fix
+
+knowledgeC.db added to `_IOS_MARKER_FILES`, restoring genuinely-exclusive
+semantics to the subtraction. 6 regression tests
+(`tests/test_b133_knowledgec_ios_marker.py`) cover marker sets and routing;
+routing dry-run over the repo's marker-bearing directories: zero flips.
+Kimi's audit: CONFIRMED BY INDUCTION.
+
+---
+
+## B-134 — `_detect_installed_apps` misses Wire via `store.wiredatabase` — iOS UUID container gap
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — Wire; WeChat documented as limitation |
+| **Severity** | P2 — an installed E2E messenger absent from encrypted_apps |
+| **File** | `vigia/sift/ios_forensics.py` |
+| **Detected** | Session 2026-07-16 (JESS extraction) |
+
+### Description
+
+iOS stores third-party apps in UUID-named containers, so the bundle-ID
+directory scan never matches "com.wire". Detection added by filename:
+the presence of Wire's message database (`store.wiredatabase`) in the
+extraction is a specific witness that the app is installed — same pattern
+and weight (Fraction(60,100)) as the signal.sqlite special case, with a
+double-count guard. NOTE (K-4, Kimi audit): nothing in the repo parses
+store.wiredatabase — Wire messages are not recoverable (JESS L-002); the
+filename is purely an installation marker. 5 regression tests.
+
+---
+
+## B-135 — `SecurityAudit` defaulted `_DEFAULT_LOG_DIR` to `VIGIA_EVIDENCE_DIR` — audit log written into the evidence directory
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — the tool contaminated the evidence directory it was auditing |
+| **Files** | `vigia/security.py`, INSTALL.md, CLAUDE.md |
+| **Detected** | Abductive audit session 2026-07-16 |
+
+### Description
+
+`_DEFAULT_LOG_DIR = os.getenv("VIGIA_EVIDENCE_DIR", "/var/log/vigia")`
+wrote `security_audit.log` inside the evidence directory whenever
+VIGIA_EVIDENCE_DIR was set — a chain-of-custody violation (the examiner
+tool mutating the evidence tree). `vigia/config.py` already resolved the
+audit log dir from VIGIA_LOG_DIR; the inconsistency was real, not a
+decision. Fixed to `os.getenv("VIGIA_LOG_DIR", "/var/log/vigia")`, with
+the variable documented. 5 regression tests. Kimi: CONFIRMED BY INDUCTION.
+
+---
+
+## B-136 — CAIE injection outside the scorer was a structural no-op: discarded local engines + nonexistent kwargs at 3 of 4 sites [RESOLVED — Option 1]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — Option 1 (route to the case stream) applied 2026-07-17 |
+| **Severity** | P1 — real forensic signal (stylometry, batch entanglement, temporal fraud) silently lost, with false success logs |
+| **Files** | `vigia/tools/caie.py`, `vigia/tools/adversarial_nlp.py`, `vigia/core/entanglement.py`, `vigia/forensics/temporal_forensics_redteam.py`, `vigia/forensics/vision_audit.py` |
+| **Detected** | Session 2026-07-16; adversarially verified by Kimi (TypeError and false-success both CONFIRMED BY INDUCTION) |
+
+### Description
+
+Four sites instantiated a LOCAL CrossArtifactIncongruenceEngine, added
+artifacts, and discarded it without ever calling detect_fractures().
+Three of the four also passed kwargs that do not exist in the real wrapper
+signature (TypeError on every call, swallowed); the fourth (vision_audit)
+used correct kwargs and valid types, so its CAIE_ARTIFACT_INJECTED success
+log was a false assertion in the audit trail — artifacts accepted into an
+engine that was thrown away. The mechanical kwargs fix was refuted: it
+converts honest failure into false success (vision_audit proved that mode).
+
+### Fix (two phases, calibration in docs/PROPUESTA_B136_CAIE_WIRING_20260717.md)
+
+Phase 1: EVIDENCE_PROFILES entries — linguistic_forensics (0.60/0.18),
+batch_forensics (0.45/0.22), temporal_fraud (0.55/0.20), calibrated by
+analogy (the B-066 method); zero corpus occurrences = no retroactive
+effect. B-070 role CONTEXTUAL for all three (they inform the malice
+composite, never corroborate the device gate). Collection domain
+content_artifact/D5-soft: N fractures of the SAME document/batch are
+correlated, not independent fabrication acts — exempting them from tail
+decay would let one document inflate the composite (the drowning R4-3
+killed). document_visual/document_geometry stay DEVICE (documented
+asymmetry; reclassifying has retroactive corpus effect).
+
+Phase 2: the four sites now BUILD case-ready artifact dicts exposed in
+each tool's result under `caie_artifacts` (raw_score clamped to [0,1];
+adversarial_nlp normalizes via min(1,(mcp-1)/4) — the original design
+passed raw mcp in [1,5]). False success logs removed;
+analyze_and_inject renamed analyze_and_build_artifacts (zero callers).
+
+### Verification
+
+23 new tests written red-first (12 + 9 observed failing pre-fix); full
+suite 1440 passed / 0 failed; live corpus gate 189/201 PASS with ZERO
+flips across the 199 baseline-shared cases (fixed==0 expected: the new
+types do not yet occur in the corpus). Downstream pending: the case
+assembler incorporating `caie_artifacts` into `case["artifacts"]`.
+
+---
+
+## B-137 — `TCC.db` in `_MACOS_MARKER_FILES` triggers the B-048 guard and skips the iOS engine (B-048 residual, sibling of B-133)
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 — iOS engine silently skipped for full iOS extractions carrying TCC.db |
+| **Files** | `vigia/sift/ios_forensics.py`, `vigia_agent.py` |
+| **Detected** | Kimi adversarial audit K-1, 2026-07-17 |
+
+### Description
+
+Same bug class as B-133. TCC.db (Transparency, Consent & Control privacy
+database) ships on iOS at /private/var/mobile/Library/TCC/TCC.db but was
+listed only as a macOS marker, so a full iOS extraction carrying it made
+the exclusive-marker subtraction non-empty and routed to the macOS engine
+— losing the iOS-specific findings (SMS, contacts, calls). This was the
+exact residual the B-048 entry documented but never closed with its own ID.
+
+### Fix
+
+TCC.db added to `_IOS_MARKER_FILES` (macOS keeps 7 genuinely exclusive
+markers, so its routing is unaffected); the stale B-048 comment updated;
+the B-133 test witness that asserted TCC.db as macOS-exclusive corrected
+to system.log (the protected invariant, exclusive set >= 5, holds).
+Verified by induction: 4/6 tests red pre-fix (showing macos_evidence_path
+set for an iOS extraction), 12/12 green after
+(`tests/test_b137_tcc_ios_marker.py`).
