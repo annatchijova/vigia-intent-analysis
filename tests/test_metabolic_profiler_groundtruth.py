@@ -19,6 +19,7 @@ its docstring for the full analysis.
 """
 from __future__ import annotations
 
+import sys
 from fractions import Fraction
 from pathlib import Path
 
@@ -202,8 +203,16 @@ class TestProfileEndToEnd:
         with pytest.raises(dataclasses.FrozenInstanceError):
             sig.verdict = "TAMPERED"
 
-    def test_pdf_fallback_counts_objects(self, profiler, tmp_path):
-        # Without fitz the fallback counts "N 0 obj" markers exactly.
+    def test_pdf_fallback_counts_objects(self, profiler, tmp_path, monkeypatch):
+        # This test exercises the no-fitz fallback, which counts "N 0 obj"
+        # markers exactly. It must be hermetic: with PyMuPDF installed,
+        # _parse_pdf_structure would take the fitz branch and report
+        # xref_length() (21 for a 20-object PDF, since xref 0 is the free
+        # head), so the assertion would flip on environment alone. Force the
+        # ImportError branch by masking fitz in sys.modules (a None entry
+        # makes `import fitz` raise ImportError) so the fallback runs
+        # regardless of whether PyMuPDF is present (K-3, Kimi audit 2026-07-17).
+        monkeypatch.setitem(sys.modules, "fitz", None)
         sig = profiler.profile(self._make_pdf(tmp_path, 20))
         assert sig.object_count == 20
 
