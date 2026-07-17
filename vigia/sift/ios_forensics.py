@@ -663,10 +663,13 @@ class iOSForensicsAnalyzer:
 
         # B-134: Wire detection by filename — iOS stores third-party apps in
         # UUID-named containers (Containers/Data/Application/<UUID>/), so the
-        # bundle-ID directory scan above never matches "com.wire". Wire's
-        # message database (store.wiredatabase) is app-specific and already
-        # extracted by this engine; its presence proves the app is installed.
-        # Same pattern and weight as the signal.sqlite special case.
+        # bundle-ID directory scan above never matches "com.wire". The presence
+        # of Wire's message database (store.wiredatabase) in the extraction is
+        # a specific witness that the app is installed. This engine does NOT
+        # parse or recover its contents — Wire messages are not recoverable
+        # from the extracted database (JESS L-002); only the filename is used
+        # as an installation marker. Same pattern and weight as the
+        # signal.sqlite special case (K-4, Kimi audit 2026-07-17).
         wire_db_matches = (
             list(evidence_path.glob("store.wiredatabase"))
             + [p for d in evidence_path.iterdir() if d.is_dir()
