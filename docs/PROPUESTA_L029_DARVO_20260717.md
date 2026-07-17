@@ -281,3 +281,38 @@ refutación fatal fue de premisas de implementación, todas incorporadas en §5.
 abducción por 3 lentes rivales, deducción de consecuencias por 5 investigadores,
 inducción por censo/simulación de 201 casos y 6 refutaciones adversariales
 verificadas por ejecución). Las decisiones FIRMA quedan abiertas para Anna.*
+
+---
+
+## ADDENDUM 2026-07-17 — Auditoría adversarial independiente (Kimi) — CONFIRMADO
+
+Veredicto completo: `docs/VEREDICTO_KIMI_L029_20260717.md`. Las tres respuestas de
+cabecera sobrevivieron; la espina empírica §2.1/§2.2 fue **reproducida de forma
+independiente con el gate B-068 REAL** (no una réplica): scores base exactos
+(0.2872 / 0.2696 / 0.4360) y las filas boost/penalty fila por fila (2 regresiones
+en boost k=0.20 atravesando el gate real; 3 en penalty k=0.20). Correcciones que
+este addendum incorpora al registro (la sustancia de las decisiones no cambia):
+
+1. **B-141 son dos síntomas del mismo defecto, por deployment.** Dataclass (sin
+   pydantic): TypeError incondicional → todas las señales descartadas con log
+   "Señal inválida ignorada". Pydantic v2 (extra='ignore' default): sin error —
+   la señal sobrevive pero `description` se pierde EN SILENCIO, sin log. El fix
+   correcto es dejar de pasar `description=` (el canal que la quería se retira
+   por B-142) y el test debe cubrir ambos modos.
+2. **Ancla stale en §3**: `sift_orchestrator.py:1149-1155` no existe en main
+   post-merges. La ruta 1 real: `vigia_api.py` no atrapa el ValueError → crash
+   RUIDOSO (no ABSTAIN silencioso); las rutas silenciosas reales son
+   bundle_builder (default ABSTAIN + devil_advocate salteado) y la re-lectura
+   UNKNOWN del runner — ambas verificadas verbatim.
+3. **Precisión de wording §1.2**: KIWI-004/005 son copias byte-idénticas **al
+   nivel de artifacts** (la evidencia, que es lo que cuenta para N); los archivos
+   difieren en case_id/wrapper.
+4. **Trampa de implementación F2 (nueva, de Kimi)**: `case_origin` vive en
+   `artifacts[].metadata.case_origin`, NO top-level (top-level es None en todos
+   los KIWI); `framing` SÍ es top-level. El pase de linkage debe leer la join-key
+   de metadata; test obligatorio del gate F2: leerla de top-level debe fallar.
+5. **Observación colateral de Kimi (P3, fuera de L-029)**: `_VERDICT_MAP` de
+   bundle_builder tampoco contiene INTENT (cae al default ABSTAIN en ese path);
+   puede ser intencional (vocabulario EBS) — para revisión del colectivo.
+6. Capa honesta compartida: la fila "fractura CAIE simétrica" de §2.2 queda
+   PLAUSIBLE (mecanismo + precedente E2), no re-ejecutada por el auditor.
