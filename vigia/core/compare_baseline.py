@@ -34,6 +34,18 @@ from run_vigia_case import _vigia_score, _naive_score, _verdict_color
 VERDICT_ORDER = {"MALICE": 2, "SUSPICION": 1, "NOISE": 0}
 
 
+def _fmt_sev(value) -> str:
+    """S-4 (docs/PATTERN_HUNT_20260718.md): format a severity for display
+    without crashing on the real malformed inputs this corpus carries.
+    `f"{v:.2f}"` raised TypeError on severity=None and ValueError on a string
+    severity ("alto", "nan" — the B-057 class). Display-only, but a comparator
+    that dies mid-listing hides the rest of the comparison."""
+    try:
+        return f"{float(value):.2f}"
+    except (TypeError, ValueError):
+        return f"{value!r}?"  # surface the malformed value instead of crashing
+
+
 def verdict_changed(naive_score: float, vigia_verdict: str) -> bool:
     naive_verdict = "MALICE" if naive_score > 0.65 else "SUSPICION" if naive_score > 0.35 else "NOISE"
     return naive_verdict != vigia_verdict
@@ -65,11 +77,11 @@ def print_comparison(case: dict, vigia: dict, naive: float) -> None:
 
     if case.get("temporal_violations"):
         for v in case["temporal_violations"]:
-            print(f"  {YEL}  → [{v.get('type')}] severity={v.get('severity'):.2f}: {str(v.get('interpretation',''))[:70]}{RST}")
+            print(f"  {YEL}  → [{v.get('type')}] severity={_fmt_sev(v.get('severity'))}: {str(v.get('interpretation',''))[:70]}{RST}")
 
     if case.get("caie_fractures"):
         for f in case["caie_fractures"]:
-            print(f"  {CYA}  → FRACTURE [{f.get('fracture_type')}] sev={f.get('severity'):.2f}{RST}")
+            print(f"  {CYA}  → FRACTURE [{f.get('fracture_type')}] sev={_fmt_sev(f.get('severity'))}{RST}")
 
     pc = case.get("peirce_chain", {})
     if pc.get("thirdness"):

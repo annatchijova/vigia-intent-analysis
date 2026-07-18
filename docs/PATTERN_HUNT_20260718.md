@@ -412,7 +412,27 @@ Prioridad elegida por Anna: **primero el cluster del verificador "independiente"
   el fix es honestidad del anillo MCP (Modo 2), no cambio de la matemática de
   trust (eso sería doctrina, fuera de scope).
 
-Pendientes de S: S-3 (MFT `int()` sin guard, caie.py), S-4 (crash de formato
-severity en compare_baseline, display-only), S-menor. Luego clase T
-(candidatos L-* hermanos de L-062: T-1/T-2/T-3) y clase U — todo según "y luego
-todo lo que dijiste".
+### Clase S — segunda tanda (2026-07-18)
+
+- **S-3 CERRADO** — regla MFT_ENTRY_ANOMALY (caie.py). `int(mft_entry_number,
+  0)` tenía dos fallos silenciosos: missing→entry 0 (dos colapsan a 0, la
+  fractura sev-0.90 no puede disparar) y unparseable ("abc")→ValueError sin
+  guard que tumbaba detect_fractures entero al json_fallback. Fix: parseo
+  seguro que EXCLUYE el artefacto y registra el skip en `temporal_pairs_skipped`
+  (ya surfaced al resultado + leído por el gate ABSTAIN del scorer), nunca
+  fabrica entry 0. Verificado: no crashea, la anomalía real sigue disparando
+  limpia (sin falsos skips), missing/unparseable se disclosean. Guard:
+  tests/test_caie_mft_entry_guard.py.
+- **S-4 CERRADO** — crash de formato severity en compare_baseline.py (`:68,72`).
+  `f"{sev:.2f}"` moría con None (TypeError) y string ("alto"/B-057, ValueError).
+  Helper `_fmt_sev` (float con fallback que superficie el valor malformado en
+  vez de crashear). Display-only (CLI comparador); verificado en aislamiento
+  — el módulo no es importable standalone por un acoplamiento de import
+  preexistente (`run_vigia_case` vive en tests/), separado de S-4.
+- **S-menor** (`trust_fusion.py:296-297`, default 0.5 en dirección mixta):
+  queda como el único S abierto, prioridad baja (no reads-cleaner).
+
+Pendientes: clase T (candidatos L-* hermanos de L-062: T-1/T-2/T-3 — decisión
+de Anna, no de un agente) y clase U (tests que no testean — U-1 el archivo de
+integración que traga asserts, U-2/U-3 batch runners, U-4 red_team print-only).
+Todo según "y luego todo lo que dijiste".

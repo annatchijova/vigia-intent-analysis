@@ -1952,16 +1952,36 @@ class CrossArtifactIncongruenceEngine:
         # spoofability=0.05 — el MFT ID es inalterable en user-space.
         mft_artifacts = [a for a in self._artifacts if a.evidence_type == "mft_entry"
                          or a.metadata.get("mft_entry_number") is not None]
-        if len(mft_artifacts) >= 2:
-            mft_sorted = sorted(
-                mft_artifacts,
-                key=lambda a: int(a.metadata.get("mft_entry_number", 0))
-            )
+        # S-3 (docs/PATTERN_HUNT_20260718.md, 2026-07-18): parse mft_entry_number
+        # SAFELY. `int(a.metadata.get("mft_entry_number", 0))` had two silent
+        # failure modes: (a) a missing number defaulted to entry 0, so two such
+        # artifacts collapsed to 0 and `curr > prev` was never true — the
+        # MFT_ENTRY_ANOMALY (sev 0.90) could not fire, silently; (b) a present-
+        # but-unparseable value ("abc") raised ValueError with no local guard,
+        # toppling the whole detect_fractures() into the scorer's json_fallback
+        # (one bad field degrading the entire mode). Mirror the TCV doctrine: an
+        # entry number that is missing or unparseable is decision-relevant
+        # MISSING DATA, never entry "0" — exclude the artifact from the
+        # monotonicity check and record the skip (surfaced via
+        # temporal_pairs_skipped → ABSTAIN gate), never fabricate an ordering.
+        _mft_valid: list = []
+        for a in mft_artifacts:
+            raw_entry = a.metadata.get("mft_entry_number")
+            try:
+                _mft_valid.append((int(raw_entry), a))
+            except (TypeError, ValueError):
+                self._temporal_pairs_skipped.append({
+                    "source_tool": a.source_tool,
+                    "field": "mft_entry_number",
+                    "value": repr(raw_entry)[:64],
+                    "reason": "missing" if raw_entry is None else "unparseable",
+                    "rule": "MFT_ENTRY_ANOMALY",
+                })
+        if len(_mft_valid) >= 2:
+            mft_sorted = sorted(_mft_valid, key=lambda t: t[0])
             for i in range(1, len(mft_sorted)):
-                prev = mft_sorted[i - 1]
-                curr = mft_sorted[i]
-                prev_entry = int(prev.metadata.get("mft_entry_number", 0))
-                curr_entry = int(curr.metadata.get("mft_entry_number", 0))
+                prev_entry, prev = mft_sorted[i - 1]
+                curr_entry, curr = mft_sorted[i]
                 prev_ts = _parse_ts_tcv(prev.timestamp, prev.source_tool, f"mft#{prev_entry}.timestamp")
                 curr_ts = _parse_ts_tcv(curr.timestamp, curr.source_tool, f"mft#{curr_entry}.timestamp")
                 if prev_ts is None or curr_ts is None:
