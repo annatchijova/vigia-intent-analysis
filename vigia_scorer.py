@@ -644,6 +644,7 @@ def _vigia_score(case: dict) -> dict:
     fractures    = []
     _caie_source = "json_fallback"
     _temporal_pairs_skipped: list = []  # P1: TCV pairs CAIE could not evaluate
+    _caie_artifacts_rejected: list = []  # H-10 / S-2: artifacts CAIE dropped
     try:
         from vigia.tools.caie import CrossArtifactIncongruenceEngine, Artifact as CaieArtifact
         _valid_fields = {
@@ -653,14 +654,34 @@ def _vigia_score(case: dict) -> dict:
         engine = CrossArtifactIncongruenceEngine()
         for art in artifacts:
             filtered = {k: v for k, v in art.items() if k in _valid_fields}
+            # H-10 / S-2 (docs/PATTERN_HUNT_20260718.md): a dropped artifact was
+            # invisible in the result. Two drop mechanisms, both now recorded:
+            # (1) CaieArtifact construction raises (schema/type failure), and
+            # (2) add_artifact() returns False (evidence_type not in whitelist,
+            # or artifact-limit/DoS guard) — the return value was ignored, so the
+            # verdict read as fully analyzed while an artifact was omitted. The
+            # public caie.evaluate() path already surfaces artifacts_rejected;
+            # this wiring lacked it. Surface only (no verdict change): a
+            # whitelist rejection of an unknown type is by-design (B-067), NOT a
+            # reason to abstain — the disclosure preserves reproducibility/
+            # completeness without altering the finding.
             try:
-                engine.add_artifact(CaieArtifact(**filtered))
+                _added = engine.add_artifact(CaieArtifact(**filtered))
             except Exception as _caie_skip_exc:
                 logging.warning(
                     "CAIE: artifact %s skipped — schema validation failed: %s",
                     art.get("artifact_id", "unknown"), _caie_skip_exc
                 )
+                _caie_artifacts_rejected.append({
+                    "artifact_id": str(art.get("artifact_id", "unknown")),
+                    "reason": f"construction_failed: {str(_caie_skip_exc)[:100]}",
+                })
                 continue
+            if not _added:
+                _caie_artifacts_rejected.append({
+                    "artifact_id": str(art.get("artifact_id", "unknown")),
+                    "reason": "rejected_by_add_artifact (whitelist/limit)",
+                })
         raw_fractures = engine.detect_fractures()
         # P1 (evidence integrity): temporal pairs CAIE skipped because a required
         # event timestamp was present but unparseable/out-of-range. detect_fractures
@@ -1584,6 +1605,22 @@ def _vigia_score(case: dict) -> dict:
                 "documents the gap (re-submit with a well-formed ISO-8601 "
                 "timestamp). See temporal_pairs_skipped."
             )
+
+    # Rejected-artifact disclosure (H-10 / S-2, 2026-07-18, evidence integrity).
+    #
+    # Surface the count/details of artifacts CAIE dropped so a verdict is never
+    # SILENTLY computed over fewer artifacts than submitted — the reproducibility/
+    # completeness requirement H-10 asked for. Deliberately does NOT change the
+    # verdict: unlike the temporal-skip gate (a skipped comparison on a KNOWN
+    # artifact), a rejection here is dominated by whitelist rejection of an
+    # UNKNOWN evidence_type, which is by-design (B-067) and a legitimate NOISE —
+    # forcing ABSTAIN there would contradict L-018 / the FN-regression doctrine
+    # (a low-score unknown-type artifact is honestly benign-by-score, not
+    # indeterminate). Whether a rejection should ever move the verdict is a
+    # separate doctrine call; this fix is the honest disclosure only.
+    if _caie_artifacts_rejected:
+        base_result["artifacts_rejected"] = len(_caie_artifacts_rejected)
+        base_result["rejected_details"] = _caie_artifacts_rejected
 
     base_result["quadripartite_state"] = _apply_quadripartite(
         verdict=verdict,

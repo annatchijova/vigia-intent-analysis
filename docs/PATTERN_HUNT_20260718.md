@@ -414,6 +414,21 @@ Prioridad elegida por Anna: **primero el cluster del verificador "independiente"
 
 ### Clase S — segunda tanda (2026-07-18)
 
+- **S-2 / H-10 CERRADO (cierra un xfail del protocolo original)** — el
+  `except: continue` del wiring del scorer (vigia_scorer.py) descartaba
+  artefactos sin contador; además ignoraba el `return False` de add_artifact
+  (rechazo por whitelist/límite, B-067). Ahora ambos mecanismos se registran y
+  el resultado superficie `artifacts_rejected` + `rejected_details`. Decisión
+  clave verificada con datos: NO se agrega gate ABSTAIN — un intento inicial de
+  espejar el gate temporal regresionó test_ebs_adapter_label_malice_but_low_score
+  (rechazar un tipo desconocido es NOISE legítimo por B-067/L-018, no
+  indeterminación). Disclosure only. Convierte el xfail
+  test_rejected_artifact_is_surfaced_in_verdict (H-10) en guard real — su vector
+  original (raw_score="not_a_number") estaba obsoleto (CAIE lo acepta hoy);
+  reescrito con evidence_type fuera de whitelist (rechazo determinista). Cierra
+  la Tanda 3 del XFail Reduction Protocol. Total xfail 31→30.
+
+
 - **S-3 CERRADO** — regla MFT_ENTRY_ANOMALY (caie.py). `int(mft_entry_number,
   0)` tenía dos fallos silenciosos: missing→entry 0 (dos colapsan a 0, la
   fractura sev-0.90 no puede disparar) y unparseable ("abc")→ValueError sin
