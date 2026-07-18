@@ -85,13 +85,25 @@ exclude = ["*__pycache__*", "*.pyc", "tests*", "data*", "docs*"]
 # ---------------------------------------------------------------------------
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# V-2 (docs/PATTERN_HUNT_20260718.md, 2026-07-18): testpaths was ["tests"],
+# so a bare `pytest` and the coverage config silently dropped vigia/tests/
+# (test_b047_correlation_groups.py, test_lr_calibrator_serialization.py) —
+# only the full CLAUDE.md command line reached them. Both suites are now in
+# testpaths so the default invocation matches the documented "full suite"
+# (CLAUDE.md §"Running Tests"). tests/integration is ignored here for the
+# same reason the documented command --ignore's it: it holds the standalone
+# @test-decorator runner (run as `python3 tests/integration/...`, not a
+# pytest module — see tests/integration/conftest.py). tests/e2e is NOT
+# ignored: it is part of the suite where `mcp` is installable; its
+# collection depends on mcp availability (KNOWN_LIMITATIONS L-045), not on
+# this config — silencing it here would be the very scope-drop V-2 is about.
+testpaths = ["tests", "vigia/tests"]
 python_files = ["test_*.py", "*_test.py"]
 python_functions = ["test_*"]
 # Coverage scope includes the root decision-path modules (vigia_scorer,
 # vigia_agent, sift_orchestrator) that live outside the vigia/ package. They
 # ARE the sealed verdict pipeline — measuring only vigia/ hid the primary core.
-addopts = "-v --tb=short --cov=vigia --cov=vigia_scorer --cov=vigia_agent --cov=sift_orchestrator --cov-report=term-missing --cov-report=html:htmlcov"
+addopts = "-v --tb=short --ignore=tests/integration --cov=vigia --cov=vigia_scorer --cov=vigia_agent --cov=sift_orchestrator --cov-report=term-missing --cov-report=html:htmlcov"
 asyncio_mode = "auto"
 markers = [
     "asyncio: mark test as async",
