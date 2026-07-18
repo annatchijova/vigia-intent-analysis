@@ -6531,3 +6531,123 @@ Verification: `tests/test_f2_paired_review.py` (11 tests, red first);
 bridge registration py_compile-checked (the MCP smoke test needs an
 mcp-enabled environment — L-045; pending for the next live-bridge
 session); 0-flip gate shared with F1.
+
+---
+
+## B-145 — VIGIA-REAL-007 (Nitroba) `expected_verdict`: LABEL-INTEGRITY finding, not a scoring defect — MALICE was wrong from the case's first commit, corrected 2026-07-12; `cases/input/` copy still uncorrected [PARTIALLY RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | PARTIALLY RESOLVED — 3 of 4 on-disk copies corrected 2026-07-12 (`cf8a37c5`, `3f3a271f`); `cases/input/VIGIA-REAL-007.json` still reads `MALICE` as of this audit (2026-07-18) |
+| **Severity** | P2 — ground-truth **label** integrity. Classified separately from a scoring-engine defect: no site in `vigia_scorer.py` ever produced an incorrect verdict against this evidence. |
+| **File** | `data/cases/VIGIA-REAL-007.json`, `data/cases/converted/VIGIA-REAL-007.json`, `data/cases/legacy/VIGIA-REAL-007.json`, `cases/input/VIGIA-REAL-007.json` (4 tracked copies of the case, per the R3-3/R3-3b/R3-3c shadow-copy pattern) |
+| **Detected in** | Git-history archaeology requested by @annatchijova, 2026-07-18 — full `git log -p --follow` trace of `expected_verdict` across all 4 copies, all branches, after unshallowing the clone (`git fetch --unshallow`; the shallow clone in the working session only exposed one squashed commit). |
+
+**Claim under investigation:** the case was reported as having `expected_verdict:
+SUSPICION` "desde siempre" on an independently-hosted copy (approved by Rob T.
+Lee), diverging to `MALICE` in this repo "en algún momento" via an edit outside
+normal write authorization, later restored to `SUSPICION`.
+
+**What the git history actually shows (Daubert-scoped — stated only where
+directly evidenced):**
+
+1. **No corruption commit exists in this repo's tracked history.** `MALICE`
+   is present at the *first* commit that introduces each copy:
+   - `f4e8946d` (2026-04-28 23:48:59 -0300, "data: agregar 71 casos SYN + 15
+     casos BEN al corpus") creates `data/cases/VIGIA-REAL-007.json` fresh
+     (61 insertions, 0 deletions) with `"expected_verdict": "MALICE"` already
+     present. (Note: the commit message describes SYN/BEN cases; it also
+     silently added this REAL case — a minor commit-message/content mismatch,
+     not itself evidence of tampering.)
+   - `4016b39b` (2026-05-18) creates `data/cases/converted/VIGIA-REAL-007.json`
+     via `scripts/convert_legacy_cases.py`, already `MALICE`.
+   - `05956f77` (2026-05-19) creates `data/cases/legacy/VIGIA-REAL-007.json`
+     (`_consolidation.consolidated_at: 2026-04-28T05:51:15Z`, matching the
+     `f4e8946d` source), already `MALICE`.
+   - `bde03ae2` (2026-05-02) is the commit that introduces the ur-source,
+     `data/vigia_forensic_cases.json` ("Digital Corpora Nitroba Harassment"),
+     and it too already reads `"expected_verdict": "MALICE"`.
+   - There is no commit anywhere in `git log --all` that changes this field
+     FROM `SUSPICION` TO `MALICE`. If the independently-hosted copy was
+     genuinely `SUSPICION` from creation, the divergence predates this
+     repo's git history — it did not happen as an in-repo edit event, and
+     cannot be forensically reconstructed further from this codebase alone.
+   - **Correction to the original claim:** "restaurado hace días" is only
+     accurate for `data/cases/{,converted/,legacy/}VIGIA-REAL-007.json`. It
+     does not describe an act of *restoring* a prior SUSPICION value — the
+     git record shows a *first-time correction* of a label that was `MALICE`
+     from the moment each copy entered this repository.
+
+2. **The correction (2026-07-12) was a deliberate, documented, single-author
+   relabel — not an unsupervised write.**
+   - `cf8a37c5447f60a64bd69f597aff28101965115f` (Anna Tchijova, 2026-07-12
+     20:14:03 -0300): `data/cases/VIGIA-REAL-007.json`
+     ```
+     -  "expected_verdict": "MALICE",
+     +  "expected_verdict": "SUSPICION",
+     ```
+     Commit message: *"anonymous harassment via willselfdestruct.com shows
+     clear intentionality but NO concealment layer (no log deletion, no
+     timestamp manipulation, no process masquerading). Under VIGIA's verdict
+     scale, SUSPICION is correct — MALICE requires active anti-forensics.
+     The motor already sealed SUSPICION correctly."* Scope: 3 files
+     (`README.md`, `README_ES.md`, this one case file). Also updates
+     published corpus metrics 167/199 → 174/199.
+   - `3f3a271f12d64bbd26c4687a9390e92e167920da` (Anna Tchijova, 2026-07-12
+     23:05:51 -0300): same `MALICE → SUSPICION` diff applied to
+     `data/cases/converted/VIGIA-REAL-007.json` and
+     `data/cases/legacy/VIGIA-REAL-007.json`, inside a much larger commit
+     that regenerated all 199 agent bundles post-M1/M2/M3/Rule-16. Commit
+     message: *"Also syncs Nitroba MALICE->SUSPICION relabel in converted/
+     and legacy/ copies (missed in the original relabel commit)."* Every
+     other `expected_verdict` line touched by this commit is a pure
+     addition (`+` only, new regenerated bundle files under
+     `results/agent_batch/`) — confirmed by diffing the full commit: no
+     other case's *source* label was silently changed. This rules out the
+     B-095/case_008 "systemic silent divergence" pattern for this event —
+     the relabel was scoped to Nitroba only, both times.
+
+3. **Residual gap — `cases/input/VIGIA-REAL-007.json` still reads `MALICE`.**
+   Created at `625f293e` (2026-07-02, "move case JSONs from evidence/ to
+   cases/input/"), never touched by either relabel commit. Confirmed by
+   direct read as of this audit (2026-07-18): line 95,
+   `"expected_verdict": "MALICE"`. Per
+   `docs/AUDITORIA_FALSOS_NEGATIVOS_MODO_AGENTE.md:149,486`, `cases/input/`
+   is flagged `OUTSIDE_ALLOWLIST` by PathGuard — it is not consumed by the
+   active scoring/corpus pipeline, so this residual does **not** affect any
+   published metric. It is a live inconsistency, not currently fixed (this
+   audit is read-only per instructions; no case file was modified).
+
+**Classification: LABEL INTEGRITY, not a scoring-engine bug.** At every point
+in this history, the deterministic motor's own verdict for this evidence was
+never shown to be wrong — the finding is that the *ground-truth comparator*
+(`expected_verdict`) it was measured against carried an incorrect value from
+the moment the case entered version control. Framed in `cf8a37c5`'s own
+language: "the motor already sealed SUSPICION correctly." No `vigia_scorer.py`
+code path, gate, or Fraction computation is implicated.
+
+**REFUTATION GATE LOG — B-145**
+```
+Candidate verdict : label was corrupted by an unauthorized/unsupervised
+                     write at some point after initial (correct) creation
+Gate applied       : full-history git archaeology (git log -p --follow,
+                     --all, post-unshallow) across all 4 tracked copies
+Gate rule          : a corruption event requires a commit transitioning
+                     SUSPICION -> MALICE; none exists in `git log --all`
+Gate result        : Candidate REJECTED. Evidence instead shows MALICE
+                     present at first commit of every copy (f4e8946d,
+                     4016b39b, 05956f77, bde03ae2); no prior SUSPICION
+                     value is recorded in this repository's history.
+Forensic note      : the independently-hosted copy's claimed SUSPICION
+                     origin cannot be confirmed or refuted from this
+                     repo's git history alone — it is outside this
+                     evidence set. Documented as an open gap, not
+                     asserted either way.
+```
+
+**Verification:** `git log --all --follow -p -- <each of the 4 paths>`,
+diff hunks and full commit metadata reproduced above; `git show cf8a37c5
+--stat` and `git show 3f3a271f --stat` confirm file scope; `grep -n
+expected_verdict` re-run against all 4 live copies confirms current
+on-disk state (`SUSPICION` ×3, `MALICE` ×1 in `cases/input/`). No case
+file was modified as part of this entry.
