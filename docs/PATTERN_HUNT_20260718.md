@@ -432,7 +432,39 @@ Prioridad elegida por Anna: **primero el cluster del verificador "independiente"
 - **S-menor** (`trust_fusion.py:296-297`, default 0.5 en dirección mixta):
   queda como el único S abierto, prioridad baja (no reads-cleaner).
 
-Pendientes: clase T (candidatos L-* hermanos de L-062: T-1/T-2/T-3 — decisión
-de Anna, no de un agente) y clase U (tests que no testean — U-1 el archivo de
-integración que traga asserts, U-2/U-3 batch runners, U-4 red_team print-only).
-Todo según "y luego todo lo que dijiste".
+### Clase U — primera tanda (2026-07-18)
+
+- **U-2 CERRADO (impacto de performance real)** — los tres batch runners
+  (`test_batch_cases.py`, `test_batch_cases_v2.py`, `test_real_cases.py`)
+  corrían un loop `subprocess.run` A NIVEL DE MÓDULO en la colección de pytest:
+  **~60s de subprocess en cada corrida de la suite** (colección de tests/caie/
+  bajó de 64s a 0.08s; suite completa de ~86s a ~25s). Cero funciones de test,
+  cero referencias externas, redundantes con run_all_agent.py. Renombrados
+  (sin `test_` → no colectados; conservador, reversibles, no borrados como el
+  m4_floor de d0c953c porque no mutan source). Igual `test_2_vs_1_pipeline.py`
+  (U-3: 0 tests, asserts a nivel módulo, `sys.path` /mnt hardcodeado) →
+  `manual_2_vs_1_pipeline_probe.py`.
+- **U-5 CERRADO — y reveló que default=str NO era una mentira.**
+  `test_merge_is_json_serializable` no asertaba nada (`json.dumps(result,
+  default=str)` sin assert). Al investigar: `default=str` ES el contrato de
+  serialización real del sistema — el orquestador trabaja en Fraction
+  internamente (invariante 4) y TODA serialización de producción usa default=str
+  (pipeline.py:1477, bridge:1248/1282). Quitarlo (mi hipótesis inicial)
+  sobre-ajustaba a un contrato nativo que el sistema deliberadamente no usa. Fix
+  correcto: mantener default=str (producción) + aserción real de round-trip a
+  dict no vacío. El "hallazgo" se corrigió a sí mismo con el dato.
+- **U-1 CERRADO (belt-and-suspenders)** — el archivo de integración traga sus
+  55 checks bajo pytest (decorador que captura AssertionError a lista solo leída
+  bajo `__main__`). Estado real: CI lo corre STANDALONE
+  (`python3 tests/integration/...`, gate correcto, vigia-forensic-ci.yml) y V-2
+  lo --ignore-a de la suite pytest (sin polución). Agregado un gate pytest real
+  (`test_ebs_v1_integration_all_checks_passed`: `assert not FAILED`) para que SI
+  alguna vez se colecta, un fallo tragado salga rojo. Verificado: gate pasa bajo
+  pytest, standalone sigue 55/55.
+
+Pendientes: **U-4** (red_team: 2 tests print-only sin assert + gate real
+recall>=0.10 vs banner "min required 0.60" — el umbral es decisión de Anna),
+**U-6/U-7** (skip-gate de substrings, inertes agrupados — higiene menor). Y la
+**clase T** entera (T-1/T-2/T-3: candidatos L-* hermanos de L-062 — autoridad
+de veredicto, decisión de doctrina de Anna, no de un agente). Todo según "y
+luego todo lo que dijiste".
