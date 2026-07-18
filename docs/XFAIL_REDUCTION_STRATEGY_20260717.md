@@ -375,3 +375,40 @@ Qué **no** hacer (confirmado por esta investigación): agregar `annotationlib`/
 instalaría nada útil); forzar los 33 de golpe (23 dependen de una decisión de
 datos y 2 de una unificación de doctrina); convertir los FAILs del batch en
 xfails de pytest (son disputas de etiqueta, no contratos).
+
+---
+
+## Backlog — Tanda 1.7 (DIFERIDA por decisión del revisor, 2026-07-17)
+
+El revisor identificó que este documento entró en un loop de governance (cada
+pasada de pulido genera nuevos pedidos) y decidió: la Tanda 1.6 es suficiente
+para operar; abrir el PR y dejar que el review real decida si la 1.7 hace
+falta. Estos 5 ítems quedan **guardados, no ejecutados** — para que no se
+pierdan y para que el review pueda priorizarlos:
+
+1. **Mecanismo de convocatoria de la decisión H-01.** El trigger define la
+   *condición* de desbloqueo pero no el *canal/proceso* de convocatoria
+   (¿thread del colectivo? ¿sesión de scoring? ¿issue?). Definirlo cuando el
+   colectivo acuerde su proceso de decisión doctrinal.
+2. **Reevaluación de severidad de L-061 (P2 → ¿P1?).** PREGUNTA ABIERTA DE
+   SEGURIDAD, no resuelta aquí a propósito: la clasificación P2 asume que el
+   JSON del caso es input confiable. Si un actor puede manipular el JSON antes
+   del scorer (examinador malicioso, compromiso de cuenta), el hard gate
+   dispara MALICE 0.95 sobre input controlado por el atacante — eso sería una
+   superficie de integridad de evidencia (P1). Requiere modelar el trust
+   boundary del input de construcción del caso. Decisión de seguridad, no de
+   un agente solo.
+3. **Referenciar los tickets de deuda de detector** (FN-001/002/003,
+   KIWI-006/007) en `BUGS_PENDIENTES.md` con ID explícito; crearlos si no
+   existen. Hoy la deuda está adjudicada (§4.3) pero sin ID de ticket.
+4. **Changelog de commits en el header** (hash · tanda · descripción) para no
+   depender de `git log`.
+5. **Matriz de riesgo tandas × superficie** (motor / datos / doctrina / solo
+   harness), para que la línea roja "qué toca el motor" sea legible de un
+   vistazo. Adelanto: Tandas 1/1.5/1.6 = solo harness+docs; Tanda 2/3/4 =
+   motor; Tanda 5 = datos; Tanda 6 = motor+doctrina.
+
+Regla del protocolo aplicada aquí (§0, paso 6 + anti-parálisis): el pulido de
+governance se detiene cuando el documento es operable por un tercero sin el
+autor presente. Ese umbral se alcanzó en 1.6. Lo demás se decide con feedback
+de review, no con otra pasada de auto-crítica.
