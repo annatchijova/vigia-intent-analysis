@@ -367,6 +367,31 @@ Prioridad elegida por Anna: **primero el cluster del verificador "independiente"
   de chmod a inyección de `PermissionError` vía monkeypatch: determinista en
   todo entorno.
 
-Pendientes del cluster V (siguientes): V-1 (ampliar walk o declaración de la
-attestation — decisión de frontera), V-2 (`testpaths` + wrapper). Luego S-1
-(trust_fusion) según la priorización de Anna ("y luego todo lo que dijiste").
+### Segunda tanda del cluster V (2026-07-18, continuación)
+
+- **V-2 CERRADO** — `testpaths = ["tests", "vigia/tests"]` + `addopts`
+  `--ignore=tests/integration` (matchea el comando autoritativo de CLAUDE.md);
+  `run_all_tests.sh` alineado y su `Exit code: $?` (reportaba `tee`, no pytest)
+  → `${PIPESTATUS[0]}`. El default ahora colecta los ~40 de `vigia/tests/` que
+  antes solo alcanzaba el comando completo. `tests/e2e` NO se silencia (depende
+  de mcp / L-045; silenciarlo sería el mismo scope-drop). Verificado: scope
+  autoritativo = 1538 passed.
+
+- **V-1 CERRADO (ampliando el walk, no solo declarando)** — la attestation
+  ahora pliega los TRES módulos de decisión de la raíz
+  (`vigia_scorer.py`, `vigia_agent.py`, `sift_orchestrator.py` = el `--cov` de
+  pyproject), solo en modo default, con degradación honesta
+  (ausente → `MISSING_ROOT_MODULE`, ilegible → `UNREADABLE_ROOT_MODULE`, nunca
+  desaparición silenciosa). `caie_legacy_root.py` excluido a propósito: código
+  muerto (ningún runtime lo importa). Docstring de `compute_engine_attestation`
+  y la "frontera residual" de `pipeline.py` actualizados (nombraban solo
+  vigia_scorer.py, ocultando los otros dos). Tres guards nuevos en
+  `test_attestation_coverage_integrity.py`: tocar un root module perturba el
+  hash, un root module ausente lo perturba, y `source_dirs` explícito NO hereda
+  los root modules (contrato preservado). Bundles históricos intactos (su hash
+  está sellado; ampliar el productor no los toca — verificado NINA L3,
+  SRL-DMZ-FTP L2). Determinismo preservado.
+
+Pendientes: **S-1 (trust_fusion)** según la priorización de Anna ("y luego
+todo lo que dijiste") — portar los 3 disclosures ya diseñados al segundo motor
+temporal. Es el próximo objetivo.

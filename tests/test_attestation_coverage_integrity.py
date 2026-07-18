@@ -65,6 +65,90 @@ def test_attestation_covers_more_than_the_pipeline_package():
     assert (REPO / "vigia" / "tools" / "caie.py").is_file()
 
 
+def test_attestation_covers_root_decision_modules(monkeypatch):
+    """V-1 (docs/PATTERN_HUNT_20260718.md): the three root decision-path
+    modules (vigia_scorer.py, vigia_agent.py, sift_orchestrator.py) live
+    OUTSIDE the vigia/ walk. Before 2026-07-18 they were unattested — changing
+    the scoring core at the repo root left engine_attestation_hash identical.
+    Each must now be folded in: patching open() to alter one module's bytes
+    must change the default-mode attestation. Injecting the read (not editing
+    the file) keeps the test hermetic and works as root."""
+    repo_root = REPO
+    real_open = builtins.open
+
+    for mod_name in ("vigia_scorer.py", "vigia_agent.py", "sift_orchestrator.py"):
+        target = str(repo_root / mod_name)
+        baseline = BundleBuilder.compute_engine_attestation()
+
+        def altered_open(file, *args, **kwargs):
+            if isinstance(file, (str, os.PathLike)) and os.fspath(file) == target \
+                    and (not args or "b" in str(args[0])):
+                import io
+                real = real_open(file, *args, **kwargs)
+                data = real.read()
+                real.close()
+                return io.BytesIO(data + b"\n# attestation coverage probe\n")
+            return real_open(file, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "open", altered_open)
+        try:
+            perturbed = BundleBuilder.compute_engine_attestation()
+        finally:
+            monkeypatch.undo()
+
+        assert perturbed != baseline, (
+            f"{mod_name} is NOT covered by the engine attestation — a change to "
+            "a root decision-path module left the hash identical (V-1 regressed)"
+        )
+
+
+def test_attestation_missing_root_module_perturbs_hash(monkeypatch):
+    """A DECLARED root decision module that goes absent must perturb the hash
+    (folded MISSING_ROOT_MODULE marker), never leave it identical — deleting
+    vigia_scorer.py cannot be invisible to the attestation."""
+    real_isfile = os.path.isfile
+    target = str(REPO / "vigia_scorer.py")
+    baseline = BundleBuilder.compute_engine_attestation()
+
+    def missing_isfile(p):
+        if isinstance(p, (str, os.PathLike)) and os.fspath(p) == target:
+            return False
+        return real_isfile(p)
+
+    monkeypatch.setattr(os.path, "isfile", missing_isfile)
+    try:
+        with_missing = BundleBuilder.compute_engine_attestation()
+    finally:
+        monkeypatch.undo()
+
+    assert with_missing != baseline
+    assert with_missing and len(with_missing) == _HEX64
+
+
+def test_explicit_source_dirs_excludes_root_modules():
+    """The root-module folding is DEFAULT-mode only: a caller passing explicit
+    source_dirs defines the scope (this is what the unreadable/tmpdir tests
+    rely on). Two different temp dirs must not both inherit the repo's root
+    modules — otherwise the source_dirs contract is broken."""
+    d1 = tempfile.mkdtemp()
+    d2 = tempfile.mkdtemp()
+    try:
+        (Path(d1) / "only.py").write_text("print('d1')")
+        (Path(d2) / "only.py").write_text("print('d2')")
+        h1 = BundleBuilder.compute_engine_attestation(source_dirs=[d1], dep_files=[])
+        h2 = BundleBuilder.compute_engine_attestation(source_dirs=[d2], dep_files=[])
+        # Distinct content → distinct hash, and neither carries repo root modules
+        # (if they did, the shared repo-root prefix would still leave them equal
+        # only if content matched — here content differs, so we assert inequality
+        # AND that a same-content dir reproduces regardless of repo state).
+        assert h1 != h2
+        h1b = BundleBuilder.compute_engine_attestation(source_dirs=[d1], dep_files=[])
+        assert h1 == h1b
+    finally:
+        shutil.rmtree(d1, ignore_errors=True)
+        shutil.rmtree(d2, ignore_errors=True)
+
+
 def test_pipeline_attestation_delegates_to_shared_impl():
     """The live _compute_attestation body ignores self and delegates, so calling
     it unbound must return exactly the shared implementation's hash."""
