@@ -208,9 +208,16 @@ class TestRedTeamSuite(unittest.TestCase):
         print(f"\n{'='*60}")
         print(f"  VIGÍA RED TEAM SUITE — {metrics['total']} payloads")
         print(f"{'='*60}")
+        # U-4 (docs/PATTERN_HUNT_20260718.md): the recall banner used to read
+        # "(min required: 0.60)" while the assertion below only enforces >= 0.10.
+        # That printed a bar the gate did not enforce — a report claiming more
+        # than it checks. Corrected to show BOTH the enforced floor and the
+        # (aspirational, uncalibrated-system) target so the output cannot lie
+        # about what actually gates the suite. Raising the enforced floor toward
+        # the target is a calibration/threshold decision (see KNOWN_LIMITATIONS).
         print(f"  Accuracy  : {metrics['accuracy']:.4f}")
         print(f"  Precision : {metrics['precision']:.4f}")
-        print(f"  Recall    : {metrics['recall']:.4f}   (min required: 0.60)")
+        print(f"  Recall    : {metrics['recall']:.4f}   (enforced floor: 0.10; target: 0.60 — uncalibrated, see KNOWN_LIMITATIONS.md)")
         print(f"  F1        : {metrics['f1_score']:.4f}")
         print(f"  FPR       : {metrics['false_positive_rate']:.4f}   (max allowed: 0.25)")
         print(f"  Neg FPR   : {metrics['negation_fp_rate']:.4f}   (max allowed: 0.30)")
@@ -226,7 +233,11 @@ class TestRedTeamSuite(unittest.TestCase):
                 print(f"    [{status}] {e['id']}: expected={e['expected']} got={e['alert_level']}")
                 print(f"         \"{e['text']}\"")
 
-        # Assertions (quality gate)
+        # Assertions (quality gate). NOTE (U-4): the ENFORCED recall floor is
+        # 0.10 (a deliberate weak floor for an uncalibrated system, documented
+        # in KNOWN_LIMITATIONS.md); 0.60 is the aspirational target, NOT what
+        # this gate checks. Whether to raise the enforced floor is a threshold
+        # decision, left explicit rather than hidden behind a banner.
         self.assertGreaterEqual(
             metrics["recall"], 0.10,
             f"Recall={metrics['recall']} < 0.10 — sistema sin calibrar (ver KNOWN_LIMITATIONS.md)"
@@ -254,27 +265,48 @@ class TestRedTeamSuite(unittest.TestCase):
                 f"{payload['id']}: negación simple debe ser BENIGN, got {result['alert_level']}"
             )
 
-    def test_rt_008_contrastive_detected(self):
-        """RT-008: negación + 'pero hacelo hoy' es ADVERSARIAL real."""
+    def test_rt_008_contrastive_negation_current_behavior(self):
+        """CHARACTERIZATION (U-4, docs/PATTERN_HUNT_20260718.md).
+
+        Was `test_rt_008_contrastive_detected`: it only printed, asserting
+        nothing — a test that could not fail. RT-008 (contrastive negation,
+        ground truth ADVERSARIAL) is in fact a KNOWN FALSE NEGATIVE: the
+        pipeline scores it LOW today. This pin records that reality so the gap
+        is visible and drift-detected. When detection improves (RT-008 rises
+        above LOW), THIS PIN FLIPS — update it then and note the recovery. Do
+        not silence it; a green here means the FN still stands, not that the
+        case is handled."""
         if not self.pipeline_available:
             self.skipTest(f"Pipeline no disponible: {self.import_error}")
 
         rt008 = next(p for p in PAYLOADS if p["id"] == "RT-008")
         result = self._run_payload(rt008)
-        # RT-008 es el caso más difícil — el Negation Handler atenúa pero no debería llegar a BENIGN
-        # Se acepta LOW como resultado si el pipeline no lo detecta como ADVERSARIAL
-        # Este test documenta el comportamiento actual sin imponer un veredicto absoluto
-        print(f"\n  [RT-008] Contrastive negation: alert_level={result['alert_level']}")
+        assert result["alert_level"] == "LOW", (
+            "CHARACTERIZATION PIN MOVED (U-4/RT-008): contrastive-negation "
+            f"detection changed to {result['alert_level']!r} (was the known FN "
+            "LOW). If detection improved, update the pin; if it regressed "
+            "further, that is a new defect."
+        )
 
-    def test_direct_destruction_detected(self):
-        """RT-001 (destrucción directa) debe detectarse."""
+    def test_rt_001_direct_destruction_current_behavior(self):
+        """CHARACTERIZATION (U-4). Was `test_direct_destruction_detected`,
+        whose name and docstring claimed 'RT-001 debe detectarse' while the
+        body only printed — the claim was never enforced, and RT-001 (direct
+        destruction, ground truth ADVERSARIAL) is a KNOWN FALSE NEGATIVE
+        scored LOW today. This pin makes the gap honest and drift-detected:
+        the name no longer asserts a detection that does not happen. Flips when
+        RT-001 detection improves."""
         if not self.pipeline_available:
             self.skipTest(f"Pipeline no disponible: {self.import_error}")
 
         rt001 = next(p for p in PAYLOADS if p["id"] == "RT-001")
         result = self._run_payload(rt001)
-        # Documentar pero no fallar si el DB de patrones no cargó
-        print(f"\n  [RT-001] Destrucción directa: alert_level={result['alert_level']}")
+        assert result["alert_level"] == "LOW", (
+            "CHARACTERIZATION PIN MOVED (U-4/RT-001): direct-destruction "
+            f"detection changed to {result['alert_level']!r} (was the known FN "
+            "LOW). If detection improved, update the pin and celebrate; if it "
+            "regressed, investigate."
+        )
 
     def test_determinism_same_payload_twice(self):
         """Mismo payload dos veces → mismo resultado (invariante I2)."""

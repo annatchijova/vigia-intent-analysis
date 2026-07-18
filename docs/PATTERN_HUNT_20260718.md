@@ -477,12 +477,24 @@ Prioridad elegida por Anna: **primero el cluster del verificador "independiente"
   alguna vez se colecta, un fallo tragado salga rojo. Verificado: gate pasa bajo
   pytest, standalone sigue 55/55.
 
-Pendientes: **U-4** (red_team: 2 tests print-only sin assert + gate real
-recall>=0.10 vs banner "min required 0.60" — el umbral es decisión de Anna),
-**U-6/U-7** (skip-gate de substrings, inertes agrupados — higiene menor). Y la
-**clase T** entera (T-1/T-2/T-3: candidatos L-* hermanos de L-062 — autoridad
-de veredicto, decisión de doctrina de Anna, no de un agente). Todo según "y
-luego todo lo que dijiste".
+### Clase U — segunda tanda (U-4, 2026-07-18)
+
+- **U-4 CERRADO (mitad segura; el umbral queda para Anna)** — los dos tests
+  print-only de red_team no asertaban nada. Dato: RT-001 (destrucción directa)
+  y RT-008 (negación contrastiva), ambos ground-truth ADVERSARIAL, son **falsos
+  negativos conocidos** — el pipeline los da LOW hoy. Reescritos como pins de
+  caracterización que asertan la realidad (LOW) y documentan el FN: el nombre
+  ya no afirma una detección que no ocurre, y el pin flipea cuando la detección
+  mejore. Y la mentira del banner: imprimía "min required: 0.60" mientras el
+  gate real asertaba recall>=0.10 (recall real hoy=0.79, pasa ambos). Corregido
+  el banner para mostrar piso-exigido (0.10) vs objetivo (0.60, sin calibrar) —
+  el reporte deja de reclamar un umbral que no exige. Subir el piso hacia 0.60
+  es decisión de umbral (de Anna), dejada explícita.
+
+Pendientes: **U-6/U-7** (skip-gate de substrings que erosiona, 8 archivos
+inertes con lógica bajo `__main__` — higiene menor, mismo patrón de renombre
+que U-2/U-3). Y las **decisiones de doctrina** ya con datos y guards listos:
+clase T (L-063/064/065), y el umbral de recall de U-4.
 
 
 ---
