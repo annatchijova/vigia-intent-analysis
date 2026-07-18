@@ -1,4 +1,11 @@
-# Estrategia de reducción de xfails — 2026-07-17
+# Protocolo de reducción de xfails (XFail Reduction Protocol) — 2026-07-17
+
+> El objetivo NO es bajar un contador. Es que el suite no mienta: cada test
+> que hoy no pasa debe tener una causa raíz clasificada y un criterio de
+> cierre explícito. Bajar de 33 a 20 xfails marcando tests o relajando
+> aserciones sería un retroceso, no un avance. El nombre del documento
+> cambió por eso (era "Estrategia de reducción"): lo que sigue es un
+> protocolo de ingeniería reutilizable, no una campaña contra un número.
 
 Investigación sobre la corrida `pytest tests/` del 2026-07-17
 (`1 failed, 1502 passed, 188 skipped, 33 xfailed, 1 xpassed`) y el batch
@@ -8,6 +15,40 @@ de doctrina ni forzar datos.
 
 Todo lo afirmado abajo fue reproducido empíricamente en esta sesión (mismo
 estado: 33 xfailed + 1 xpassed antes de los cambios de esta tanda).
+
+Registro de la discusión que refinó este protocolo (auditoría externa Kimi +
+contrapunto con datos del repo): `docs/REVIEWS/XFAIL_REDUCTION_REVIEW_20260717.md`.
+
+---
+
+## 0. El protocolo (reutilizable)
+
+Seis pasos. Si dentro de seis meses aparecen otros 20 xfails, el procedimiento
+sigue siendo válido — no depende de este corpus ni de esta corrida.
+
+1. **Clasificar cada test por causa raíz** (clases A–D, §1). Nunca mezclar
+   deuda técnica con deuda epistemológica.
+2. **Reparar primero la infraestructura** (harness, CI, mecanismos de xfail).
+   Un bug del harness contamina toda métrica aguas abajo.
+3. **Convertir propiedades ya implementadas en guards permanentes** (retirar
+   el xfail, no relajar la aserción).
+4. **Implementar únicamente features autocontenidas** (sin consumidores de
+   producción o con contrato de salida acotado).
+5. **Posponer decisiones doctrinales hasta que exista una especificación
+   explícita** — y cuando haga falta, generar el dato antes de decidir
+   (test de caracterización), no decidir por intuición.
+6. **Medir de nuevo y reclasificar antes de la siguiente tanda.** El estado
+   cambia con cada tanda; la clasificación de ayer puede estar obsoleta.
+
+### Mecanismo de protección — cableado, no solo escrito
+
+La defensa contra "cerrar xfails bajo presión" no es una advertencia en prosa:
+está **en el código**. `strict=True` en `test_canonical_cases.py` hace que
+reparar datos (D-2) **rompa el suite** hasta que alguien retire la entrada de
+`KNOWN_PENDING` caso por caso. No existe un camino mecánico de 33 → 0 sin
+adjudicación explícita: el suite lo impide. Lo mismo aplica al guard H-05
+(exige que el score cruce el umbral antes de testear el gate: una
+recalibración que lo baje falla ruidosamente en vez de dejar de testear).
 
 ---
 
@@ -142,6 +183,35 @@ degradado; elegir, documentar en KNOWN_LIMITATIONS y aplicar en ambos paths
 (escalar severity con |delta| en vez de binario 1.0 es la variante más
 defendible: dentro de ventana → severity baja/no fracture; fuera → como hoy).
 
+**Dato ya generado (Tanda 1.5, ejecutada):**
+`tests/characterization/test_temporal_gate_curve.py` pinea la curva actual
+(deltas −3600 s … +2 s × `clock_source` ∈ {host_ntp, ids_sensor}, ambos
+paths). Resultados que fijan el diseño del fix, no la intuición:
+
+- **`clock_source` es metadata muerta:** ningún path de producción la lee.
+  La distinción "mismo reloj vs relojes distintos" que la ventana necesita
+  hoy no existe como concepto operativo; hay que introducirla.
+- **Path (a) — scorer hard gate — no lee los timestamps en absoluto.** Da
+  MALICE para *todo* delta, incluido `0` y `+2` (evento después del proceso,
+  sin violación real), porque confía verbatim en la lista
+  `temporal_violations` pre-computada (L1120-1122). Corolario duro: la
+  ventana de tolerancia **no puede vivir en el hard gate del scorer** — no
+  tiene delta que testear. Debe vivir donde se *puebla* `temporal_violations`
+  aguas arriba, o el gate debe empezar a validar el par contra los
+  timestamps reales.
+- **Path (b) — CAIE TCV — computa el signo bien pero la severity es binaria
+  1.0** para cualquier delta negativo (L1790): −0.1 s y −3600 s son
+  indistinguibles. Ahí sí vive el escalado por |delta|.
+- **Control positivo confirmado plano:** `test_large_negative_delta_still_flags`
+  (−3600 s) pasa hoy trivialmente porque la curva es binaria, no porque
+  proteja contra sobre-corrección. Cuando la ventana escale la severity, ese
+  control recién empieza a tener sentido.
+
+El test es un **pin, no una aspiración**: cuando la ventana se implemente,
+esas 35 celdas fallan a propósito y obligan a actualizarlas junto con el
+cambio (misma disciplina que `strict=True`). La decisión de ventana ahora
+espera con datos en la mano, no con intuición.
+
 ### Pendiente deliberado — BUG-NLP-002 (tokenizer): NO tocar en estas tandas
 
 `test_analyze_surfaces_l33tspeak_as_oov` ya está en el estado correcto:
@@ -182,20 +252,59 @@ D-G (y el residuo D-2 que no flipee) se resuelven ahí. No intentar "calibrar"
 los umbrales 0.5/0.2 para que alcancen: el dossier documenta que esa escala es
 estructuralmente inalcanzable tras el ajuste — sería tuning cosmético.
 
-### 4.3 Los 14 FAILs del batch (187/201) — pista separada, no confundir con xfails
+### 4.3 Los 14 FAILs del batch (187/201) — adjudicación caso por caso
 
-docs/CASE_RECOVERY_20260712.md ya adjudicó la mayoría:
+Denominadores distintos, no confundir: el batch es **201 casos** (14 FAILs);
+el "~167/193" del dossier es una cifra de corpus in-sample con su propio
+denominador y su propia advertencia (accuracy in-sample,
+docs/SCORER_ARCHITECTURE_DOSSIER_20260712.md §3). Abajo se adjudican los 14
+FAILs concretos del batch, cada uno contra su procedencia documentada. Ninguno
+es un xfail de pytest ni debe serlo: son ground-truth en disputa o modos
+distintos del motor, no contratos de código.
 
-- **Decisiones de etiqueta/doctrina** (no bugs): FP-003 (BENIGN vs SUSPICION),
-  KIWI-006/007, OWL-NEXUS5, BREAK-011/015, NPS-2009, BEN-012/014.
-- **UNFIXABLE sin forzar** (§5 del doc): FP-CULTURAL-CLEAN, FP-002 — gemelos
-  estructurales de casos NOISE correctos; recuperarlos rompería 4 NOISE.
-- **FN-001/002/003**: falsos negativos reales del motor — la única sub-pista
-  de esta lista que amerita trabajo de detector.
+| Caso | got/exp | Clase | Referencia |
+|---|---|---|---|
+| OWL-NEXUS5-CASE | NOISE/SUSPICION | Etiqueta (20 artefactos narrativos sin `artifact_id`) | BUGS_PENDIENTES §4152 |
+| VIGIA-BREAK-011 | NOISE/SUSPICION | Doctrina — límite epistemológico | KNOWN_LIMITATIONS L-015 |
+| VIGIA-BREAK-015 | SUSPICION/MALICE | Doctrina — tensión "evidencia abrumadora" | KNOWN_LIMITATIONS L-016; BUGS_PENDIENTES §4948 |
+| VIGIA-BEN-014 | SUSPICION/NOISE | Doctrina — frontera NOISE vs ABSTAIN (design decision) | KNOWN_LIMITATIONS L-012 |
+| VIGIA-FP-002 | NOISE/ABSTAIN | UNFIXABLE-NO-FORCE — ambigüedad de autorización | CASE_RECOVERY §5 |
+| FP-CULTURAL-CLEAN | ABSTAIN/NOISE | UNFIXABLE-NO-FORCE — gemelo `n_signals<3` de NOISE correctos | CASE_RECOVERY §5 |
+| VIGIA-FP-003 | SUSPICION/BENIGN | Deuda de calibración — floor effect (shared password, 0.176) | KNOWN_LIMITATIONS §2174 |
+| NPS-2009-DOMEXUSERS | SUSPICION/NOISE | Deuda de calibración — floor B-028/B-065 (9 art., top z=0.18) | KNOWN_LIMITATIONS §2339 |
+| VIGIA-BEN-012 | SUSPICION/NOISE | Deuda de calibración — floor (kworker, 0.125) | KNOWN_LIMITATIONS §2172 |
+| VIGIA-FN-001 | NOISE/MALICE | Deuda de detector — exige contexto externo (RRHH) | BUGS_PENDIENTES §4940 |
+| VIGIA-FN-002 | NOISE/MALICE | Deuda de detector — exige contexto externo | BUGS_PENDIENTES §4941 |
+| VIGIA-FN-003 | SUSPICION/MALICE | Deuda de detector — exige análisis de memoria profundo (RWX) | BUGS_PENDIENTES §4955 |
+| VIGIA_KIWI_006 | NOISE/SUSPICION | Testimony-path / modo LLM — raíz sin adjudicar | BUGS_PENDIENTES §5452 |
+| VIGIA_KIWI_007 | NOISE/SUSPICION | Testimony-path / modo LLM — raíz sin adjudicar | BUGS_PENDIENTES §5453 |
 
-Techo realista documentado sin forzar labels: ~167/193. Recomendación: mantener
-este contador fuera del suite de pytest (como está) y no convertir estos casos
-en xfails — son ground-truth en disputa, no contratos de código.
+Consolidado por acción:
+
+- **Doctrina / etiqueta (anotación, no motor) — 6:** OWL-NEXUS5, BREAK-011,
+  BREAK-015, BEN-014, FP-002, FP-CULTURAL-CLEAN. Acción: formalizar como
+  entradas L-* donde falte; no tocar el motor. Los dos UNFIXABLE ya están en
+  CASE_RECOVERY §5 (recuperarlos rompería 4 NOISE correctos).
+- **Deuda de calibración (floor effect) — 3:** FP-003, NPS-2009, BEN-012.
+  Acción: ticket de calibración del piso B-028/B-065; NO es xfail.
+- **Deuda de detector — 3:** FN-001, FN-002, FN-003. Acción: ticket en
+  BUGS_PENDIENTES (dos exigen contexto externo, uno exige análisis de memoria
+  profundo). Única sub-pista que amerita código de detector nuevo.
+- **Sin adjudicar — 2:** KIWI-006/007 (testimonio puro; el motor da NOISE
+  donde se espera SUSPICION, y existe además una observación separada de
+  alucinación en modo Ollama). No asignar causa raíz sin reproducir cuál de
+  los dos modos manda. Acción: reproducir en modo motor aislado antes de
+  clasificar.
+
+Nota sobre estabilidad del batch (respuesta al riesgo de "race conditions en
+el batch, no en el motor"): 199/201 casos leen bundles sellados
+(`[CACHED:motor]`), así que la salida es cache-estable por construcción — la
+inestabilidad entre corridas es casi imposible salvo `--rerun`. El diff entre
+corridas **ya es factible sin trabajo nuevo de motor**:
+`vigia/scripts/compare_runs.py` es un comparador determinista con etiquetado
+IMPROVEMENT / REGRESSION / VERDICT_SHIFT y deltas en fracciones; lo único que
+falta es cablear un snapshot de `_batch_summary.json` + un flag `--diff` que
+delegue en él. Tarea chica, no proyecto.
 
 ---
 
@@ -204,12 +313,21 @@ en xfails — son ground-truth en disputa, no contratos de código.
 | Tanda | Contenido | Costo | xfails/fails que cierra | Decisión previa |
 |---|---|---|---|---|
 | 1 (esta rama) | Scanner CI, mecanismo xfail canonical, guard H-05 | hecho | FAIL 1→0, XPASS 1→0, 33→31 | ninguna |
+| 1.5 (esta rama) | Caracterización curva temporal H-01 (pin, no juzga) | hecho | 0 (genera el dato para Tanda 4) | ninguna |
 | 2 | CCS coverage → ABSTAIN (H-04) | ~1 h | 31→29 | umbral de cobertura |
 | 3 | `artifacts_rejected` (H-10) | ~1–2 h | 29→28 | ninguna |
-| 4 | Tolerancia temporal (H-01), ambos paths | ~2–3 h | 28→26 | ventana en PolicySpec |
+| 4 | Tolerancia temporal (H-01), ambos paths | ~2–3 h | 28→26 | ventana en PolicySpec (dato ya en Tanda 1.5) |
 | 5 | D-2 data repair + retiro strict de recuperados | 2 h + re-sello | 26→~10±? (medir) | D-2 (datos) |
-| 6 | D-G unificación de modos | 3–4 h | resto canonical | doctrina ya decidida en dossier |
+| 6 | D-G unificación de modos | 3–4 h código + ~igual validación | resto canonical | doctrina decidida; validación con harness corpus-wide (ya corrido 1 vez a mano en el dossier) |
 | — | BUG-NLP-002 | proyecto D4 | 1 (queda último) | revalidación tokenizer |
+
+Nota sobre la Tanda 6: "3–4 h" es estimación de código, no de validación.
+Cuando `evaluate()` deje de emitir veredicto standalone y delegue en la capa
+de decisión del motor, hay que correr el corpus completo contra ambas
+versiones y **explicar y aceptar cada divergencia** — el dossier ya corrió esa
+comparación una vez a mano (55/193 de acuerdo, 40 flips duros unidireccionales,
+docs/SCORER_ARCHITECTURE_DOSSIER_20260712.md D-G), ese es el harness de
+migración. Duplicar la estimación: código + validación de divergencias.
 
 Qué **no** hacer (confirmado por esta investigación): agregar `annotationlib`/
 `apport_python_hook` a requirements-ci.txt (ocultaría el bug del scanner y no
