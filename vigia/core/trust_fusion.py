@@ -412,20 +412,55 @@ class TrustFusionEngine:
         self._bayesian_cache.clear()
 
 
-def create_artifact_from_caie_result(result: dict, evidence_type: str, source_tool: str) -> TemporalArtifact:
+def create_artifact_from_caie_result(
+    result: dict, evidence_type: str, source_tool: str,
+    disclosures: Optional[list] = None,
+) -> TemporalArtifact:
+    """Construye un TemporalArtifact desde un dict de resultado.
+
+    S-1 (docs/PATTERN_HUNT_20260718.md, 2026-07-18): este motor reproducía los
+    dos triggers de omisión silenciosa ya parchados en CAIE/bridge (ac48177 /
+    ad7e41f) sin ninguno de sus disclosures — un timestamp presente-pero-
+    imparseable se coercionaba a `now()` (peor que descartar: fabrica proximidad
+    temporal con el reloj de la corrida) y una metadata presente-pero-no-dict se
+    vaciaba, ambos sin dejar rastro en el resultado que llega al investigador
+    (composite_trust / daubert_admissible). Si `disclosures` es una lista, cada
+    coerción decision-relevante se registra ahí para que el llamador la
+    superficie. `disclosures=None` preserva el comportamiento previo (ningún
+    otro llamador la usa).
+    """
+    content_hash = hashlib.sha256(json.dumps(result, sort_keys=True, default=str).encode()).hexdigest()[:16]
+    artifact_id = result.get("artifact_id", f"{source_tool}_{evidence_type}_{content_hash}")
+
+    ts_present = "timestamp" in result
     ts_str = result.get("timestamp", _utcnow())
     try:
         timestamp = datetime.fromisoformat(str(ts_str).replace("Z", "+00:00"))
     except (ValueError, TypeError):
         timestamp = datetime.now(timezone.utc)
-    content_hash = hashlib.sha256(json.dumps(result, sort_keys=True, default=str).encode()).hexdigest()[:16]
-    artifact_id = result.get("artifact_id", f"{source_tool}_{evidence_type}_{content_hash}")
+        # Solo es una pérdida si el campo ESTABA presente: un timestamp ausente
+        # cae en _utcnow() por diseño y no es dato degradado.
+        if disclosures is not None and ts_present:
+            disclosures.append({
+                "artifact_id": artifact_id, "field": "timestamp",
+                "issue": "present_but_unparseable_coerced_to_now",
+                "value": str(ts_str)[:64],
+            })
     provenance = result.get("provenance_chain", [])
     provenance = tuple(str(h) for h in provenance) if isinstance(provenance, list) else ()
+    raw_meta = result.get("metadata", {})
     try:
-        metadata = frozenset(result.get("metadata", {}).items())
+        metadata = frozenset(raw_meta.items())
     except (AttributeError, TypeError):
         metadata = frozenset()
+        # Metadata presente-pero-no-dict (p.ej. []) borrada silenciosamente: el
+        # vector exacto de ad7e41f. Ausencia (no está la clave) no es pérdida.
+        if disclosures is not None and "metadata" in result:
+            disclosures.append({
+                "artifact_id": artifact_id, "field": "metadata",
+                "issue": "present_but_non_dict_dropped",
+                "type": type(raw_meta).__name__,
+            })
     return TemporalArtifact(
         artifact_id=artifact_id, timestamp=timestamp, evidence_type=evidence_type,
         source_tool=source_tool, raw_score=float(result.get("raw_score", 0.0)),
@@ -442,6 +477,12 @@ async def trust_fusion_analysis(
     engine = TrustFusionEngine(temporal_window_seconds=temporal_window_seconds)
     violations = temporal_violations or []
     temporal_artifacts = []
+    # S-1: disclosure sinks. Coerciones decision-relevantes (timestamp/metadata)
+    # y artefactos descartados deben llegar al resultado — un composite_trust /
+    # daubert_admissible calculado sobre input degradado no puede leerse como
+    # "analizado y limpio" sin decir qué se perdió.
+    _disclosures: list = []
+    _rejected: list = []
 
     for i, art_dict in enumerate(artifacts):
         try:
@@ -466,19 +507,36 @@ async def trust_fusion_analysis(
                 prov = float(art_dict.get("base_trust", art_dict.get("prior_trust", 1.0)))
                 art_dict["prior_trust"] = _dround(prov * factor)
             temporal_artifacts.append(create_artifact_from_caie_result(
-                art_dict, art_dict.get("evidence_type", "unknown"), art_dict.get("source_tool", "unknown")
+                art_dict, art_dict.get("evidence_type", "unknown"),
+                art_dict.get("source_tool", "unknown"), disclosures=_disclosures,
             ))
         except Exception as exc:
             audit_logger.log_info("TRUST_FUSION_ARTIFACT_SKIP", "trust_fusion_analysis", f"Skip {i}: {exc}")
+            # H-10: no puede desaparecer sin contador. artifact_count reportaba
+            # solo sobrevivientes; descartar uno subía el composite en silencio.
+            _rejected.append({"index": i, "reason": str(exc)[:120]})
     engine.add_artifacts_batch(temporal_artifacts)
     ids = list(engine._artifacts.keys())
     if not ids:
-        return {"status": "ERROR", "error": "No valid artifacts", "composite_trust": 0.0, "daubert_admissible": False}
+        return {
+            "status": "ERROR", "error": "No valid artifacts",
+            "composite_trust": 0.0, "daubert_admissible": False,
+            "artifacts_submitted": len(artifacts),
+            "artifacts_rejected": len(_rejected), "rejected_details": _rejected,
+            "normalization_disclosures": _disclosures,
+            "input_degraded": bool(_rejected or _disclosures),
+        }
     composite = engine.calculate_composite_trust(ids, aggregation_method)
     daubert = engine.generate_daubert_report(ids)
     return {
         "status": "OK", "composite_trust": composite["composite_trust"],
         "aggregation_method": aggregation_method, "artifact_count": len(ids),
+        # S-1 / H-10: submitted vs analizados, y qué se degradó. `input_degraded`
+        # es el flag que un consumidor puede gatear junto a daubert_admissible.
+        "artifacts_submitted": len(artifacts),
+        "artifacts_rejected": len(_rejected), "rejected_details": _rejected,
+        "normalization_disclosures": _disclosures,
+        "input_degraded": bool(_rejected or _disclosures),
         "temporal_violations_applied": len(violations) > 0,
         "individual_results": [{"artifact_id": a, "bayesian_update": engine.bayesian_update(a).to_dict()} for a in ids],
         "composite_details": composite, "daubert_report": daubert,

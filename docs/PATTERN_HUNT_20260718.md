@@ -392,6 +392,27 @@ Prioridad elegida por Anna: **primero el cluster del verificador "independiente"
   está sellado; ampliar el productor no los toca — verificado NINA L3,
   SRL-DMZ-FTP L2). Determinismo preservado.
 
-Pendientes: **S-1 (trust_fusion)** según la priorización de Anna ("y luego
-todo lo que dijiste") — portar los 3 disclosures ya diseñados al segundo motor
-temporal. Es el próximo objetivo.
+### Clase S — primera tanda (2026-07-18)
+
+- **S-1 CERRADO** — `trust_fusion.py` ya no reproduce los triggers sin
+  disclosure. `create_artifact_from_caie_result` acepta un sink opcional
+  `disclosures` (backward-compat: `None` = comportamiento previo, único llamador
+  interno) y registra las dos coerciones decision-relevantes: timestamp
+  presente-pero-imparseable coercionado a `now()` (distingue ausente, que cae en
+  `_utcnow()` por diseño y NO es pérdida) y metadata presente-pero-no-dict
+  vaciada (distingue ausente). `trust_fusion_analysis` acumula los descartes de
+  artefactos (rama `except`, antes solo log) en `rejected_details` con contador,
+  y superficie en el resultado: `artifacts_submitted`, `artifacts_rejected`,
+  `rejected_details`, `normalization_disclosures`, y el flag `input_degraded`
+  que un consumidor puede gatear junto a `daubert_admissible`. La rama de error
+  temprana ("No valid artifacts") también deja de ser ciega. Guard nuevo:
+  `tests/test_trust_fusion_disclosure.py` (unit del sink + e2e async por los
+  tres vectores, incluido "clean input → not degraded" y "composite sobre input
+  degradado nunca sin el flag"). El motor no toca el bundle sellado de Modo 1;
+  el fix es honestidad del anillo MCP (Modo 2), no cambio de la matemática de
+  trust (eso sería doctrina, fuera de scope).
+
+Pendientes de S: S-3 (MFT `int()` sin guard, caie.py), S-4 (crash de formato
+severity en compare_baseline, display-only), S-menor. Luego clase T
+(candidatos L-* hermanos de L-062: T-1/T-2/T-3) y clase U — todo según "y luego
+todo lo que dijiste".
