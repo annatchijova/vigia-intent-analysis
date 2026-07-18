@@ -17,6 +17,7 @@ in-scope files perturb the hash (fold a deterministic marker) instead of
 vanishing. Determinism (Daubert bit-for-bit) is preserved.
 """
 
+import builtins
 import hashlib
 import logging
 import os
@@ -71,7 +72,7 @@ def test_pipeline_attestation_delegates_to_shared_impl():
     assert delegated == BundleBuilder.compute_engine_attestation()
 
 
-def test_unreadable_source_perturbs_hash_not_silently_dropped():
+def test_unreadable_source_perturbs_hash_not_silently_dropped(monkeypatch):
     d = tempfile.mkdtemp()
     try:
         (Path(d) / "a.py").write_text("print(1)")
@@ -79,11 +80,26 @@ def test_unreadable_source_perturbs_hash_not_silently_dropped():
         bad.write_text("print(2)")
 
         readable = BundleBuilder.compute_engine_attestation(source_dirs=[d], dep_files=[])
-        os.chmod(bad, 0)
+
+        # 2026-07-18: the read failure is INJECTED instead of chmod(bad, 0).
+        # Running as root (CI containers, remote runners) chmod 000 does not
+        # block reads, so the permission-based simulation degenerated into
+        # unreadable == readable and this test failed for environment reasons,
+        # not product reasons. Patching open() reproduces the exact failure
+        # mode the impl guards (OSError at open) in every environment.
+        real_open = builtins.open
+        bad_str = str(bad)
+
+        def failing_open(file, *args, **kwargs):
+            if isinstance(file, (str, os.PathLike)) and os.fspath(file) == bad_str:
+                raise PermissionError(13, "simulated unreadable source", bad_str)
+            return real_open(file, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "open", failing_open)
         try:
             unreadable = BundleBuilder.compute_engine_attestation(source_dirs=[d], dep_files=[])
         finally:
-            os.chmod(bad, 0o644)
+            monkeypatch.undo()
         bad.unlink()
         absent = BundleBuilder.compute_engine_attestation(source_dirs=[d], dep_files=[])
 

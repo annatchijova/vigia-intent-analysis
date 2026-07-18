@@ -41,13 +41,30 @@ from vigia.core.bundle_builder import (
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 # Standalone scripts (stdlib-only, __main__-guarded) loaded by file path.
+#
+# V-5 (docs/PATTERN_HUNT_20260718.md, 2026-07-18): the three test-dir copies of
+# the verifier (tests/forensics/verify_ebs_v1.py, tests/integration/verify_ebs.py,
+# tests/verify_ebs_v1_parcheado.py) were DELETED, not kept in lockstep. This
+# file only guarded their _canonicalize; the rest of each copy rotted (the
+# tests/forensics copy had already lost the R3-2 dual-canon fallback, so it
+# would have REJECTED historical v1 bundles if ever run as a verifier, and
+# tests/integration/verify_ebs.py was the pre-v1 version explicitly banned by
+# scripts/pre_release_check.py). Nothing imported them as verifiers — every
+# consumer (README, vigia/cli.py, integration tests, R3-2 CLI test) uses
+# forensics/verify_ebs_v1.py. Deletion is the stronger lockstep: see
+# TestRetiredCopiesStayDeleted below.
 _SCRIPT_COPIES = {
     "forensics_verifier": "forensics/verify_ebs_v1.py",
     "tool_log_verifier": "verify_tool_log.py",
-    "tests_forensics_copy": "tests/forensics/verify_ebs_v1.py",
-    "tests_integration_copy": "tests/integration/verify_ebs.py",
-    "tests_parcheado_copy": "tests/verify_ebs_v1_parcheado.py",
 }
+
+# Paths retired under V-5. A revival must consciously re-register the copy in
+# _SCRIPT_COPIES (restoring the lockstep guard) — it cannot come back silently.
+_RETIRED_COPIES = (
+    "tests/forensics/verify_ebs_v1.py",
+    "tests/integration/verify_ebs.py",
+    "tests/verify_ebs_v1_parcheado.py",
+)
 
 
 def _load_script(rel_path: str, name: str):
@@ -190,3 +207,21 @@ class TestUnreachableCopiesSourceTripwire:
         )
         assert 'f"{obj + 0.0:.8f}"' in src
         assert 'f"{obj:.8f}"' not in src
+
+
+class TestRetiredCopiesStayDeleted:
+    """V-5: a stale verifier copy is a court-facing contradiction waiting to
+    happen (the tests/forensics copy had already diverged semantically). The
+    copies were deleted; this tripwire keeps them deleted. If one reappears,
+    either delete it again or re-register it in _SCRIPT_COPIES so the
+    lockstep guard covers it — never both absent."""
+
+    @pytest.mark.parametrize("rel", _RETIRED_COPIES)
+    def test_retired_copy_absent_or_registered(self, rel):
+        path = REPO_ROOT / rel
+        if path.exists():
+            assert rel in _SCRIPT_COPIES.values(), (
+                f"{rel} reappeared WITHOUT re-registering in _SCRIPT_COPIES — "
+                "an unguarded verifier copy can drift silently (V-5, "
+                "docs/PATTERN_HUNT_20260718.md). Delete it or register it."
+            )

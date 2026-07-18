@@ -329,3 +329,44 @@ main, como pasó con L-061: la asigna quien mergea).
 **Nota de estabilidad:** suites mergeadas verificadas verdes en esta rama antes
 de la cacería (67 passed, 28 xfailed en los archivos tocados por el merge del
 17-07); identidad de la rama = `origin/main` reiniciada post-merge.
+
+
+---
+
+## Estado de ejecución (actualizado 2026-07-18, segunda pasada)
+
+Prioridad elegida por Anna: **primero el cluster del verificador "independiente"**
+(V-3 / V-4 / V-5). Ejecutado en esta rama:
+
+- **V-3 CERRADO** — `_check_decision_hash` agregado a `forensics/verify_ebs_v1.py`,
+  cableado como `R1_DECISION_HASH` (severidad ERROR, bloquea Level 2), con
+  backward-compat dual-canon v2/v1. Verificado: los 3 bundles históricos
+  EBS-shaped de `results/` conservan su nivel exacto (SRL-DMZ-FTP L2, NINA L3,
+  VANKO-CORRECTED L3) y su `decision_hash` re-deriva; el tamper de 64-hex que
+  antes era invisible ahora falla. Header R1 actualizado (los CUATRO hashes).
+- **V-4 CERRADO (como honestidad, no como re-derivación)** — R4 documenta en
+  header, docstring y MENSAJE DE ÉXITO que verifica presencia+formato
+  solamente y que el origen no se re-deriva en modo standalone (eso vive en
+  `test_attestation_coverage_integrity.py`). El mensaje es load-bearing: un
+  test asserta las palabras para que el overclaim no pueda volver en silencio.
+  La frontera queda pineada como HECHO: una attestation fabricada de 64 hex
+  pasa R4 por diseño (test explícito de la frontera).
+- **V-5 CERRADO** — las 3 copias borradas (`tests/forensics/verify_ebs_v1.py`
+  ya había perdido el dual-canon R3-2: habría rechazado bundles históricos;
+  `tests/integration/verify_ebs.py` era la versión pre-v1 baneada por
+  `pre_release_check`; `verify_ebs_v1_parcheado.py`, variante vieja).
+  Arqueología previa: ningún consumidor fuera del lockstep de `_canonicalize`.
+  Lockstep actualizado + tripwire `TestRetiredCopiesStayDeleted` (si una copia
+  reaparece sin re-registrarse, el suite rompe).
+- **Guards nuevos en pytest real**: `tests/test_verify_ebs_v1_contract.py`
+  (21 checks colectados de verdad — deliberadamente FUERA del archivo de
+  integración tragado U-1).
+- **Bonus (clase A, entorno)**: `test_unreadable_source_perturbs_hash...`
+  fallaba como root (chmod 000 no bloquea a root — preexistente de main,
+  invisible hasta hoy porque la base de ayer era anterior a 31bba81). Migrado
+  de chmod a inyección de `PermissionError` vía monkeypatch: determinista en
+  todo entorno.
+
+Pendientes del cluster V (siguientes): V-1 (ampliar walk o declaración de la
+attestation — decisión de frontera), V-2 (`testpaths` + wrapper). Luego S-1
+(trust_fusion) según la priorización de Anna ("y luego todo lo que dijiste").

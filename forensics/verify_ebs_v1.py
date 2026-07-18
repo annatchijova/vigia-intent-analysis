@@ -17,10 +17,19 @@ CONSTANTES LOCALES:
     no debe depender de que el codigo de produccion este disponible.
 
 VALIDACIONES R1-R5:
-    R1 — Integridad de hashes (bundle_hash, graph_hash, policy_hash)
+    R1 — Integridad de hashes (bundle_hash, graph_hash, policy_hash,
+         decision_hash — los CUATRO hashes de contenido del IntegrityBlock
+         se re-derivan; antes del 2026-07-18 decision_hash se sellaba pero
+         ningun verificador lo recomputaba: era un campo decorativo)
     R2 — Cumplimiento de politica (max_delta, allowed_roles)
     R3 — Coherencia de decision (risk <-> epsilon <-> ACCEPT/REJECT/ABSTAIN)
-    R4 — engine_attestation_hash (si presente)
+    R4 — engine_attestation_hash: PRESENCIA + FORMATO solamente. Este
+         verificador es stdlib-only y no puede re-derivar el hash del motor
+         sin el arbol fuente pinneado + manifiesto de dependencias; la
+         re-derivacion de origen vive en el repo
+         (tests/test_attestation_coverage_integrity.py). R4 NO prueba que
+         el bundle fue producido por el motor atestado — solo que el campo
+         existe y tiene forma de SHA-256.
     R5 — Anclaje ECL (External Constraint Layer, si presente)
 
 NIVELES DE CONFORMIDAD:
@@ -28,6 +37,8 @@ NIVELES DE CONFORMIDAD:
     Level 1 — Structurally valid:    esquema correcto
     Level 2 — Cryptographically valid: hashes consistentes + politica OK
     Level 3 — Fully compliant EBS v1:  R1-R5 + ECL presente
+                (R4 dentro de este nivel = formato verificado, origen NO
+                re-derivado — ver nota R4 arriba)
 
 USO:
     python3 verify_ebs_v1.py bundle.json
@@ -251,6 +262,30 @@ def _check_policy_hash(bundle: Dict) -> Tuple[bool, str]:
     return True, "policy_hash integro"
 
 
+def _check_decision_hash(bundle: Dict) -> Tuple[bool, str]:
+    """decision_hash = SHA256(decision_trace), sin exclusion de campos
+    (espejo exacto del sellado: bundle_builder.seal() hace
+    `decision_hash = _sha256_dict(decision_dict)`).
+
+    V-3 (docs/PATTERN_HUNT_20260718.md, 2026-07-18): este hash se sellaba en
+    CADA bundle como uno de los cuatro hashes de contenido del IntegrityBlock,
+    pero ningun verificador lo re-derivaba — garbage de 64 hex en
+    integrity.decision_hash pasaba todos los checks. El CONTENIDO de
+    decision_trace siempre estuvo cubierto por bundle_hash (no habia agujero
+    de contenido); el defecto era presentar como "integridad" un campo que
+    nada validaba. Backward-compat via _sha256_dict_matches (v2 O v1), igual
+    que graph/policy/bundle.
+    """
+    decision = bundle.get("decision_trace", {})
+    stored = bundle.get("integrity", {}).get("decision_hash", "")
+    if not stored:
+        return False, "decision_hash ausente en integrity"
+    if not _sha256_dict_matches(decision, stored):
+        recomputed = _sha256_dict(decision)
+        return False, f"decision_hash NO coincide: {recomputed[:16]}... != {stored[:16]}..."
+    return True, "decision_hash integro (re-derivado de decision_trace)"
+
+
 def _check_bundle_hash(bundle: Dict) -> Tuple[bool, str]:
     """
     bundle_hash = SHA256(todo el contenido incluyendo evidence_graph con graph_hash asignado).
@@ -378,12 +413,26 @@ def _check_decision_coherence(bundle: Dict) -> Tuple[bool, str]:
 # ---------------------------------------------------------------------------
 
 def _check_engine_attestation(bundle: Dict) -> Tuple[bool, str]:
+    """R4 — presencia + formato SOLAMENTE (V-4, docs/PATTERN_HUNT_20260718.md).
+
+    Este verificador es stdlib-only por diseño: no puede re-derivar el hash
+    del motor sin el arbol fuente pinneado + manifiesto de dependencias. Un
+    valor de 64 hex plausible-pero-fabricado PASA este check. La re-derivacion
+    de origen es responsabilidad del repo (compute_engine_attestation +
+    tests/test_attestation_coverage_integrity.py), no de este script. El
+    mensaje de exito lo declara para que ningun reporte pueda leer R4 como
+    prueba de origen.
+    """
     att = bundle.get("integrity", {}).get("engine_attestation_hash", "")
     if not att:
         return False, "engine_attestation_hash ausente — Level 3 no alcanzable"
     if len(att) != 64 or not all(c in "0123456789abcdef" for c in att.lower()):
         return False, f"engine_attestation_hash formato invalido"
-    return True, f"engine_attestation_hash presente: {att[:16]}..."
+    return True, (
+        f"engine_attestation_hash presente: {att[:16]}... "
+        "[solo formato verificado — el origen NO se re-deriva en modo "
+        "standalone; ver test_attestation_coverage_integrity.py]"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -464,10 +513,13 @@ def verify_bundle(
     ok_p, msg_p = _check_policy_hash(bundle)
     result.add("R1_POLICY_HASH", ok_p, msg_p, severity="ERROR" if not ok_p else "INFO")
 
+    ok_d, msg_d = _check_decision_hash(bundle)
+    result.add("R1_DECISION_HASH", ok_d, msg_d, severity="ERROR" if not ok_d else "INFO")
+
     ok_b, msg_b = _check_bundle_hash(bundle)
     result.add("R1_BUNDLE_HASH", ok_b, msg_b, severity="ERROR" if not ok_b else "INFO")
 
-    hash_ok = ok_g and ok_p and ok_b
+    hash_ok = ok_g and ok_p and ok_d and ok_b
 
     # R2: cumplimiento de politica
     ok_pc, msg_pc, violations = _check_policy_compliance(bundle)
