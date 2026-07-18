@@ -108,6 +108,15 @@ def test_large_negative_delta_still_flags():
     detected. This test is NOT xfail — it protects against over-correction
     (the tolerance fix must not nullify real timestomp detection).
     Adjust the threshold if your final tolerance differs.
+
+    FIXME (H-01, 2026-07-17): today this control passes TRIVIALLY. The scorer's
+    hard gate is flat — it fires MALICE for EVERY delta because it never reads
+    the timestamps (see L-062 and tests/characterization/test_temporal_gate_curve.py,
+    which pins the flat curve). So this assertion is currently a false-confidence
+    pass: it gives the illusion of protecting against over-correction without
+    protecting anything. It becomes meaningful ONLY after Tanda 4 (the tolerance
+    window) makes the gate delta-sensitive. Do not read a green here as evidence
+    that timestomp detection is guarded until then.
     """
     result = _vigia_score(_skew_case(delta_seconds=-3600))
     assert result.get("verdict") in ("MALICE", "SUSPICION"), (

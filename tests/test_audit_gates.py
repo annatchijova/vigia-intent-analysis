@@ -116,25 +116,41 @@ def _single_source_clones() -> dict:
     }
 
 
-@pytest.mark.xfail(
-    reason="H-05: the corroboration gate accepts MALICE with _n_arts>=4 from the same "
-           "tool/type. MALICE should require >=2 independent source_tools. "
-           "NOTE: if the score does not cross 0.33, the verdict will not be MALICE and the test "
-           "XPASSes without testing the gate — that only means the score landed low in this "
-           "config, not that the gate is safe.",
-    strict=False,
-)
 def test_malice_requires_independent_sources():
+    """H-05 — RESOLVED (B-068 gate, R4-3 v2): this test now guards the gate.
+
+    History: the original version was xfail(strict=False) and only asserted
+    when the verdict was already MALICE, so it sat permanently in XPASS
+    without exercising anything. Verified 2026-07-17: the clone case scores
+    0.4638 — ABOVE the 0.33 MALICE threshold — and it is the R4-3 v2
+    corroboration gate (single soft collection domain, same tool/type) that
+    caps the verdict at SUSPICION. That is exactly the property H-05
+    demanded, so the test is rewritten as a direct, always-armed guard:
+
+    1. The score must stay above the MALICE threshold — otherwise the gate
+       is not the deciding factor and the guard silently stops testing it
+       (the trap the old NOTE warned about). If a recalibration drops the
+       clone score below 0.33, raise the fixture's raw_scores.
+    2. Four same-tool same-type artifacts must NOT reach MALICE, and the
+       reason must attribute the cap to the corroboration gate.
+    """
     result = _vigia_score(_single_source_clones())
-    verdict = result.get("verdict")
-    if verdict == "MALICE":
-        arts = _single_source_clones()["artifacts"]
-        n_tools = len({a["source_tool"] for a in arts})
-        assert n_tools >= 2, (
-            "MALICE was reached with a single source repeated 4 times. "
-            "Corroboration must count independent sources, not artifact quantity "
-            f"or labels. Distinct source_tools: {n_tools}."
-        )
+    score = float(result.get("score", 0))
+    assert score > 0.33, (
+        "The clone fixture no longer crosses the MALICE threshold "
+        f"(score={score}); the corroboration gate is not being exercised. "
+        "Raise the fixture's raw_scores so this guard keeps testing the gate."
+    )
+    assert result.get("verdict") != "MALICE", (
+        "MALICE was reached with a single source repeated 4 times. "
+        "Corroboration must count independent sources, not artifact quantity "
+        f"or labels. reason={result.get('reason')!r}."
+    )
+    assert "corroborat" in str(result.get("reason", "")).lower(), (
+        "The verdict was capped below MALICE but not by the corroboration "
+        "gate — the H-05 property is not what is being tested. "
+        f"reason={result.get('reason')!r}."
+    )
 
 
 # ===========================================================================
