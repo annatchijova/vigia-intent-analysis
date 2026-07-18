@@ -2821,3 +2821,114 @@ when the fix lands, those pins fail on purpose and must be updated with the
 window decision.
 
 ---
+
+## L-063 — Fallback-Mode `caie_fractures` Carry Verdict Authority From Case JSON (Recognised Types) [DOCUMENTED]
+
+**Registered 2026-07-18. Status: DOCUMENTED — doctrine decision pending (T cluster, docs/PATTERN_HUNT_20260718.md). L-number PROVISIONAL until merge (see L-061/L-062 collision).**
+**Mode affected:** `vigia_scorer._vigia_score` when `from vigia.tools.caie import ...` fails (standalone / CAIE-unavailable mode — a documented, supported mode, file header §"Deployment Modes").**
+**Discovered:** 2026-07-18 pattern hunt (T-1), characterized in `tests/characterization/test_verdict_authority_inputs.py`.
+**Severity class:** integrity/contract gap (P2-class, sibling of L-062) — requires control of the case-construction input, not a runtime attack surface.
+
+### Description
+
+When live CAIE is importable, the scorer **recomputes** fractures from the
+evidence and discards any `caie_fractures` supplied in the case JSON
+(`caie_fractures_source == "live_caie"`). When the import fails, it falls back
+to `case.get("caie_fractures", [])` (`vigia_scorer.py:684`) and consumes them
+directly: a fabricated fracture whose `fracture_type` is in
+`MALICIOUS_FRACTURE_TYPES` adds `sev*0.45` to the malice boost and can flip a
+NOISE verdict to SUSPICION.
+
+Characterized bound (verified 2026-07-18): the exposure requires a
+**recognised** type. A fabricated fracture with an unrecognised type is inert
+(no boost, stays NOISE). `caie_fractures_source == "json_fallback"` is sealed,
+so the degraded mode is disclosed — but the disclosure does not remove the
+authority the fabricated fracture carries.
+
+### Forensic implication
+
+In standalone mode, an examiner-authored `caie_fractures` entry with a known
+type name influences the verdict with no validating producer. The mitigating
+facts: (a) live mode ignores it entirely; (b) the fallback is disclosed via
+`caie_fractures_source`; (c) only recognised types work.
+
+### Doctrine decision (pending, Anna)
+
+Options: (a) cap the verdict in fallback mode (fabricated fractures cannot
+exceed SUSPICION without live corroboration); (b) treat `json_fallback` as
+narrative-only for fracture authority; (c) accept as documented and rely on
+the `caie_fractures_source` disclosure. Behavior is pinned unchanged until
+decided.
+
+---
+
+## L-064 — `STATISTICAL_UNIFORMITY` Malice Boost Has No Runtime Producer (All Modes) [DOCUMENTED]
+
+**Registered 2026-07-18. Status: DOCUMENTED — doctrine decision pending (T cluster). L-number PROVISIONAL until merge.**
+**Mode affected:** all modes calling `vigia_scorer._vigia_score` (NOT gated by CAIE availability — worse reach than L-063).**
+**Discovered:** 2026-07-18 pattern hunt (T-2), characterized in `tests/characterization/test_verdict_authority_inputs.py`.
+**Severity class:** integrity/contract gap (P2-class, sibling of L-062).
+
+### Description
+
+`case["temporal_violations"]` entries of `type == "STATISTICAL_UNIFORMITY"` add
+`sev*0.35` to `fracture_malice_boost` (`vigia_scorer.py`, SU-terms block),
+**unconditionally in every mode**. A fabricated entry (severity 1.0) flips a
+NOISE case to SUSPICION (measured: score 0.055 -> 0.375).
+
+Data-flow finding (verified 2026-07-18): **no runtime module emits
+`STATISTICAL_UNIFORMITY`.** A grep of `vigia/` finds it only as a weight-table
+key (`vigia_scorer.py:328`, `trust_fusion.py`) and in corpus-conversion
+scripts (`scripts/convert_break_cases.py`, `convert_synthetic_cases.py`) that
+author it into case JSON. An in-code comment previously described it as coming
+"from the temporal engine" — a producer that does not exist; the comment has
+been corrected (honesty fix, behavior unchanged).
+
+### Forensic implication
+
+Same class as L-062 (the hard temporal gate), one rung lower in severity
+(boost, not unconditional MALICE), but with wider reach: it is not gated by
+CAIE availability, so it fires in standalone mode too.
+
+### Doctrine decision (pending, Anna)
+
+Options: (a) require a producing detector before the boost is trusted; (b)
+remove the SU boost path entirely (no producer => dead-but-exploitable input);
+(c) accept as documented. Behavior is pinned unchanged until decided.
+
+---
+
+## L-065 — `provenance_chain` Trust Uses Length Only; Hashes Are Never Verified [DOCUMENTED]
+
+**Registered 2026-07-18. Status: DOCUMENTED — doctrine decision pending (T cluster). L-number PROVISIONAL until merge.**
+**Mode affected:** all modes (`vigia_scorer._vigia_score` epc_factor path; CAIE `add_artifact` len<2 decay).**
+**Discovered:** 2026-07-18 pattern hunt (T-3), characterized in `tests/characterization/test_verdict_authority_inputs.py`.
+**Severity class:** integrity/contract gap (P2-class, sibling of L-062).
+
+### Description
+
+The chain-of-custody trust factor (`epc_factor`, `vigia_scorer.py:721-728`)
+consults **only `len(provenance_chain)`**; the hash strings are never
+recomputed or matched against artifact content. Verified 2026-07-18: two
+different sets of garbage hashes of the same length produce the identical
+score, and chain length alone moves `mean_effective_trust` (e.g. 0.80 -> 0.37)
+with zero real hashes. CAIE's own path likewise only checks `len < 2`
+(`caie.py:790-795`). The bridge additionally fabricates a placeholder
+provenance_chain when one is absent (`vigia_integration_bridge.py:447-448`).
+
+### Forensic implication
+
+An examiner can set custody trust by supplying an arbitrary-length list of
+fabricated hash strings; the "chain of custody" the trust factor claims to
+model is a length counter, not a verified cryptographic chain. Under Daubert
+this is a falsifiability gap: the custody trust is not reproducible from the
+artifact content the hashes claim to attest.
+
+### Doctrine decision (pending, Anna)
+
+Options: (a) verify at least the terminal hash against the artifact content
+where the content is available; (b) rename the factor to state honestly that
+it models declared-chain-length, not verified custody; (c) accept as
+documented. Behavior is pinned unchanged until decided.
+
+---

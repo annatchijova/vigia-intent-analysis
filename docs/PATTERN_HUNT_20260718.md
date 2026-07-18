@@ -483,3 +483,39 @@ recall>=0.10 vs banner "min required 0.60" — el umbral es decisión de Anna),
 **clase T** entera (T-1/T-2/T-3: candidatos L-* hermanos de L-062 — autoridad
 de veredicto, decisión de doctrina de Anna, no de un agente). Todo según "y
 luego todo lo que dijiste".
+
+
+---
+
+## Clase T — caracterizada y documentada (2026-07-18); doctrina pendiente
+
+Aplicada la misma disciplina que H-01: **generar el dato y pinear el
+comportamiento actual antes de que Anna decida la doctrina** — cero cambio de
+veredicto. Las tres conductas confirmadas empíricamente (algunas corrigieron al
+hunt doc original):
+
+- **T-1 (L-063)** — `caie_fractures` en modo fallback. Matizado con dato: solo
+  un `fracture_type` RECONOCIDO carga autoridad (FALSE_FLAG_PATTERN /
+  LOG_TAMPERING_DETECTED flipean NOISE→SUSPICION, boost 0.4275); un tipo
+  desconocido es inerte. En modo live se recomputan y descartan
+  (`source=live_caie`). El hunt doc original lo generalizaba de más.
+- **T-2 (L-064)** — `STATISTICAL_UNIFORMITY` boost. Confirmado: fabricado flipea
+  NOISE→SUSPICION (0.055→0.375) en TODOS los modos. **Productor fantasma
+  verificado**: ningún módulo runtime lo emite; el comentario del scorer que
+  decía "from the temporal engine" era falso — **corregido** (honestidad, cero
+  cambio de comportamiento).
+- **T-3 (L-065)** — `provenance_chain` solo consulta `len()`; hashes jamás
+  verificados. Pineado: dos sets de hashes basura de igual longitud dan el mismo
+  score (contenido no chequeado); la longitud sola mueve el trust (0.80→0.37).
+
+Entregables (todo seguro, sin tocar veredicto):
+- `tests/characterization/test_verdict_authority_inputs.py` — 8 pins que hacen
+  visible cualquier cambio futuro (si la doctrina valida el par / agrega
+  productor / verifica hashes / capea el veredicto, el pin falla a propósito).
+- `KNOWN_LIMITATIONS.md` L-063/064/065 (números PROVISIONALES hasta merge,
+  lección de la colisión L-061), cada uno con opciones de doctrina para Anna.
+- Comentario fantasma de T-2 corregido en `vigia_scorer.py`.
+
+**Lo que queda para Anna (doctrina, no de un agente):** decidir por cada canal
+si valida / agrega productor / capea / acepta-documentado. El dato y los guards
+están listos; la decisión de umbrales/veredicto es tuya.

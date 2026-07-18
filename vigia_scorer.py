@@ -998,8 +998,15 @@ def _vigia_score(case: dict) -> dict:
     #     NETWORK_VS_HOST, DOCUMENT_FORGERY, MFT_ENTRY_ANOMALY,
     #     USN_JOURNAL_GAP, NARRATIVE_POISONING_DETECTED
     #
-    # NOTE: STATISTICAL_UNIFORMITY from temporal violations (temporal engine, not CAIE)
-    #   is processed below — it is a valid deliberate-automation signal.
+    # NOTE: STATISTICAL_UNIFORMITY is read from case["temporal_violations"] and
+    #   processed below. HONESTY CORRECTION (T-2, docs/PATTERN_HUNT_20260718.md):
+    #   the earlier wording ("from the temporal engine") named a producer that
+    #   does not exist — NO runtime module emits STATISTICAL_UNIFORMITY. Grep of
+    #   vigia/ finds it only as a weight-table key (here + trust_fusion) and in
+    #   corpus-conversion scripts (scripts/convert_*_cases.py) that author it
+    #   into case JSON. So this is an examiner-JSON-only channel with verdict
+    #   authority and no validating producer — the same class as L-062, tracked
+    #   as L-064. Kept behavior-unchanged pending the doctrine decision.
     #
     # LIMITATION: boost=0.45 and penalty=0.25 coefficients are heuristic.
     #   Roadmap: Bayesian calibration on labelled case dataset.
@@ -1117,7 +1124,11 @@ def _vigia_score(case: dict) -> dict:
     fracture_malice_boost        = float(min(Fraction(1, 2),  sum(_boost_terms,   Fraction(0))))
     fracture_credibility_penalty = float(min(Fraction(7, 20), sum(_penalty_terms, Fraction(0))))
 
-    # STATISTICAL_UNIFORMITY from the temporal engine (not CAIE) — valid signal.
+    # STATISTICAL_UNIFORMITY (examiner-JSON-only channel — no runtime producer;
+    # see the honesty correction above and L-064). A fabricated entry here adds
+    # sev*0.35 to the malice boost and can flip NOISE->SUSPICION in ANY mode
+    # (unlike caie_fractures, this is not gated by CAIE availability). Behavior
+    # is unchanged here; the exposure is documented, not yet adjudicated.
     # Same exact-summation treatment; note the pre-existing semantics are
     # preserved: the CAIE-fracture sum is capped FIRST, then SU terms add on
     # top of the capped value, then the cap applies again.
