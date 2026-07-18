@@ -1,5 +1,15 @@
 # Protocolo de reducción de xfails (XFail Reduction Protocol) — 2026-07-17
 
+**Estado de este documento y del código asociado:**
+- Rama: `claude/xfail-reduction-strategy-cawyv2` (rama de feature; **sin PR
+  abierto todavía, sin review externo mergeado**). Base: `main` post-hackathon.
+- Commits: Tanda 1 = `43384b3`, Tanda 1.5 (caracterización H-01) = `4649568`,
+  Tanda 1.6 (governance: triggers, L-061, FIXME, este header) — ver `git log`
+  de la rama. Cuando se abra el PR, anotar aquí su número y quién lo revisa.
+- Nota de nomenclatura: "Tanda 1.5" ya se usó para la caracterización de la
+  curva temporal; el endurecimiento de governance de esta pasada es **Tanda
+  1.6** para no colisionar. Ambas viven en la misma rama.
+
 > El objetivo NO es bajar un contador. Es que el suite no mienta: cada test
 > que hoy no pasa debe tener una causa raíz clasificada y un criterio de
 > cierre explícito. Bajar de 33 a 20 xfails marcando tests o relajando
@@ -212,6 +222,32 @@ esas 35 celdas fallan a propósito y obligan a actualizarlas junto con el
 cambio (misma disciplina que `strict=True`). La decisión de ventana ahora
 espera con datos en la mano, no con intuición.
 
+**Trigger de desbloqueo (para que la decisión no se pudra en el limbo).** La
+decisión de ventana H-01 está BLOQUEADA hasta que se cumplan las dos
+condiciones, en orden:
+
+1. **Prerrequisito arquitectónico (path a):** resolver *dónde* vive la
+   validación. La caracterización probó que el hard gate del scorer no puede
+   alojar la ventana (no lee el delta). Hay que decidir entre: (a) el gate
+   valida el par `EFFECT_BEFORE_CAUSE` contra los timestamps reales antes de
+   disparar, o (b) `temporal_violations` se puebla solo vía un productor que
+   valida (la ruta CAIE TCV es el productor validado que ya existe). Esta es
+   la misma cuestión que L-061 — resolver L-061 ES resolver el prerrequisito.
+2. **Valor de ventana + topología de reloj:** elegir el tamaño (5–30 s de
+   referencia) y la regla mismo-reloj/relojes-distintos, sellarlos en
+   PolicySpec. Requiere introducir `clock_source` como concepto operativo
+   (hoy es metadata muerta).
+
+Owner de la decisión: doctrina (Anna / quien sostenga la doctrina del scorer)
+— NO es una decisión de código que un agente tome solo, porque fija umbrales
+que van a un veredicto sellado presentable en corte. Condición mínima para
+convocar la decisión: la curva de `test_temporal_gate_curve.py` revisada + una
+referencia defendible de drift NTP forense (evita elegir 5–30 s por intuición;
+si no hay literatura a mano, documentar el número como provisional y sujeto a
+revisión, nunca como establecido). Hasta entonces, L-061 queda como limitación
+documentada y el gate se comporta como hoy (conservador: sobre-detecta, no
+sub-detecta — falla del lado seguro para un motor forense).
+
 ### Pendiente deliberado — BUG-NLP-002 (tokenizer): NO tocar en estas tandas
 
 `test_analyze_surfaces_l33tspeak_as_oov` ya está en el estado correcto:
@@ -276,8 +312,8 @@ distintos del motor, no contratos de código.
 | VIGIA-FN-001 | NOISE/MALICE | Deuda de detector — exige contexto externo (RRHH) | BUGS_PENDIENTES §4940 |
 | VIGIA-FN-002 | NOISE/MALICE | Deuda de detector — exige contexto externo | BUGS_PENDIENTES §4941 |
 | VIGIA-FN-003 | SUSPICION/MALICE | Deuda de detector — exige análisis de memoria profundo (RWX) | BUGS_PENDIENTES §4955 |
-| VIGIA_KIWI_006 | NOISE/SUSPICION | Testimony-path / modo LLM — raíz sin adjudicar | BUGS_PENDIENTES §5452 |
-| VIGIA_KIWI_007 | NOISE/SUSPICION | Testimony-path / modo LLM — raíz sin adjudicar | BUGS_PENDIENTES §5453 |
+| VIGIA_KIWI_006 | NOISE/SUSPICION | Deuda de detector — señal de concealment sin detector (score 0.0294) | BUGS_PENDIENTES §5452 |
+| VIGIA_KIWI_007 | NOISE/SUSPICION | Deuda de detector — señal de concealment sin detector (score 0.0518) | BUGS_PENDIENTES §5453 |
 
 Consolidado por acción:
 
@@ -287,14 +323,19 @@ Consolidado por acción:
   CASE_RECOVERY §5 (recuperarlos rompería 4 NOISE correctos).
 - **Deuda de calibración (floor effect) — 3:** FP-003, NPS-2009, BEN-012.
   Acción: ticket de calibración del piso B-028/B-065; NO es xfail.
-- **Deuda de detector — 3:** FN-001, FN-002, FN-003. Acción: ticket en
-  BUGS_PENDIENTES (dos exigen contexto externo, uno exige análisis de memoria
-  profundo). Única sub-pista que amerita código de detector nuevo.
-- **Sin adjudicar — 2:** KIWI-006/007 (testimonio puro; el motor da NOISE
-  donde se espera SUSPICION, y existe además una observación separada de
-  alucinación en modo Ollama). No asignar causa raíz sin reproducir cuál de
-  los dos modos manda. Acción: reproducir en modo motor aislado antes de
-  clasificar.
+- **Deuda de detector — 5:** FN-001, FN-002, FN-003, KIWI-006, KIWI-007.
+  Acción: ticket en BUGS_PENDIENTES. FN-001/002 exigen contexto externo,
+  FN-003 análisis de memoria profundo. KIWI-006/007 reproducidos en modo
+  motor aislado el 2026-07-17 (corrige la nota previa "testimony-path / sin
+  adjudicar", que era errónea en dos frentes): NO son testimonio puro —
+  KIWI-006 es `cultural_marker`+`log_entry`, KIWI-007 es
+  `document_geometry`+`log_entry` — y puntúan **0.0294 / 0.0518**, muy por
+  debajo del piso 0.10. Eso descarta floor calibration (el piso solo levanta
+  hipótesis intent-class, no señal cero) y descarta la alucinación Ollama de
+  BUGS_PENDIENTES §5452 como causa del NOISE en modo motor (es una observación
+  de un modo distinto). Diagnóstico: la señal de concealment que el caso
+  pretende portar no tiene detector que dispare en el motor. Única sub-pista
+  que amerita código de detector nuevo.
 
 Nota sobre estabilidad del batch (respuesta al riesgo de "race conditions en
 el batch, no en el motor"): 199/201 casos leen bundles sellados

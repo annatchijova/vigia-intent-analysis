@@ -2729,3 +2729,62 @@ See B-135 for the planned fix (changing `_DEFAULT_LOG_DIR` to use `VIGIA_LOG_DIR
 instead of `VIGIA_EVIDENCE_DIR`).
 
 ---
+
+## L-061 — Scorer Hard Temporal Gate Trusts `temporal_violations` Without Validating It Against Artifact Timestamps [DOCUMENTED]
+
+**Registered 2026-07-17. Status: DOCUMENTED — fix tracked as H-01 (Tanda 4 of the XFail Reduction Protocol, `docs/XFAIL_REDUCTION_STRATEGY_20260717.md`).**
+**Mode affected:** all modes that call `vigia_scorer._vigia_score` (the deterministic core).
+**Discovered:** 2026-07-17, temporal-gate characterization (`tests/characterization/test_temporal_gate_curve.py`).
+**Severity class:** integrity/contract gap (P2-class). NOT a runtime-exploitable vulnerability — it requires control of the case-construction input, not a network/attacker surface — but it is a Daubert integrity concern because it sits at the highest-authority verdict rung.
+
+### Description
+
+The scorer's hard temporal gate (`vigia_scorer.py` L1120-1122) fires an
+**unconditional MALICE** verdict (confidence 0.95) as soon as the case's
+`temporal_violations` list contains an entry with
+`type == "EFFECT_BEFORE_CAUSE"` and `severity >= 0.9`:
+
+```python
+hard_temporal = any(
+    v.get("type") == "EFFECT_BEFORE_CAUSE"
+    and _sev_float(v.get("severity", 0), 0.0) >= 0.9
+    for v in violations          # violations = case.get("temporal_violations", [])
+)
+```
+
+It reads the asserted violation **verbatim**. It never parses the artifacts'
+timestamps and never reads `delta_seconds`. The characterization test pins the
+consequence: the gate fires MALICE for *every* delta, including `0` and `+2`
+(the effect AFTER the cause — no violation at all), because the input asserts
+the violation and the scorer trusts it.
+
+Data-flow finding (verified 2026-07-17): **no production detector emits
+`EFFECT_BEFORE_CAUSE`.** CAIE's live temporal rule emits
+`TEMPORAL_CAUSALITY_VIOLATION` (path b), which *does* derive the sign from
+real structured timestamps and *does* carry the R3-1 out-of-range guard.
+`EFFECT_BEFORE_CAUSE` in `temporal_violations` is populated **only from the
+case JSON** — i.e. examiner-authored / fixture data. There is no producer
+test guaranteeing that population is correct, because there is no producer.
+
+### Forensic implication
+
+VIGÍA's highest-authority verdict rung (unconditional MALICE, "physical law
+violation") can rest on an input field that is never cross-checked against the
+evidence it claims to describe. A defense expert could show that the MALICE
+verdict would fire identically for a non-violating timeline, because the gate
+does not validate the asserted pair. Under Daubert this is a falsifiability
+gap: the gate's conclusion is not independently reproducible from the artifact
+timestamps.
+
+### Mitigation / planned fix
+
+Tracked as H-01 (Tanda 4). Two admissible fixes, both documented in the
+strategy doc: (a) the hard gate validates the asserted `EFFECT_BEFORE_CAUSE`
+pair against the real artifact timestamps before firing; or (b)
+`temporal_violations` population is gated by a validating producer (the CAIE
+TCV path is the existing validated producer) with its own test. The current
+behavior is pinned by `tests/characterization/test_temporal_gate_curve.py`;
+when the fix lands, those pins fail on purpose and must be updated with the
+window decision.
+
+---
