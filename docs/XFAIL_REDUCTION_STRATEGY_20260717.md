@@ -1,11 +1,12 @@
 # Protocolo de reducción de xfails (XFail Reduction Protocol) — 2026-07-17
 
 **Estado de este documento y del código asociado:**
-- Rama: `claude/xfail-reduction-strategy-cawyv2` (rama de feature; **sin PR
-  abierto todavía, sin review externo mergeado**). Base: `main` post-hackathon.
+- Rama: `claude/xfail-reduction-strategy-cawyv2` (rama de feature). Base:
+  `main` post-hackathon. **PR: #10** (abierto 2026-07-17; revisor: pendiente
+  de asignar por el colectivo).
 - Commits: Tanda 1 = `43384b3`, Tanda 1.5 (caracterización H-01) = `4649568`,
-  Tanda 1.6 (governance: triggers, L-061, FIXME, este header) — ver `git log`
-  de la rama. Cuando se abra el PR, anotar aquí su número y quién lo revisa.
+  Tanda 1.6 (governance: triggers, L-061, FIXME, este header) = `bea1431`,
+  backlog Tanda 1.7 = `2585ff9`.
 - Nota de nomenclatura: "Tanda 1.5" ya se usó para la caracterización de la
   curva temporal; el endurecimiento de governance de esta pasada es **Tanda
   1.6** para no colisionar. Ambas viven en la misma rama.
