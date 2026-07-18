@@ -42,6 +42,14 @@ REPO = Path(__file__).resolve().parent.parent
 # en requirements-ci.txt. Cada entrada exige una entrada L-* documentada.
 KNOWN_CI_GAPS: dict[str, str] = {
     "mcp": "L-045",
+    # Env-injected phantom imports: the scan follows modules whose origin is
+    # inside the repo, and a virtualenv at <repo>/.venv puts installed
+    # third-party packages under that root. Some carry forward-compat / platform
+    # imports — annotationlib (Python 3.14 stdlib) and apport_python_hook (Ubuntu
+    # system module) — that do not resolve in an isolated 3.12 venv. Neither is a
+    # project dependency; they are environment noise, not a broken test import.
+    "annotationlib": "L-061",
+    "apport_python_hook": "L-061",
 }
 
 _REQ_NAME_RE = re.compile(r"^\s*([A-Za-z0-9][A-Za-z0-9._-]*)")

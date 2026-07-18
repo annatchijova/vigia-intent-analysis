@@ -2729,3 +2729,36 @@ See B-135 for the planned fix (changing `_DEFAULT_LOG_DIR` to use `VIGIA_LOG_DIR
 instead of `VIGIA_EVIDENCE_DIR`).
 
 ---
+
+## L-061 — CI import contract flags env-injected phantom modules from the in-repo `.venv` [DOCUMENTED]
+
+`tests/test_requirements_ci_contract.py::test_all_test_imports_resolve_with_requirements_ci`
+walks the import closure of the test suites and, for any module whose spec
+origin resolves *inside the repository root*, follows that module's own imports
+too (it is trying to prove the project's own code closes over `requirements-ci.txt`).
+
+A virtualenv commonly lives at `<repo>/.venv`, so its installed third-party
+packages sit *under the repository root*. The scan therefore descends into
+`.venv/**/site-packages` and parses the imports of installed dependencies. Two
+imports found there do not resolve in an isolated CPython 3.12 virtualenv:
+
+- **`annotationlib`** — a standard-library module introduced in **Python 3.14**
+  (PEP 749). Forward-compatibility shims in installed packages reference it; it
+  is absent from `sys.stdlib_module_names` on 3.12, so `find_spec` fails.
+- **`apport_python_hook`** — an **Ubuntu system module** shipped in
+  `/usr/lib/python3/dist-packages`. It resolves for the system interpreter but
+  not inside an isolated venv.
+
+Neither is a project dependency; both are environment noise reached only because
+the scanner crosses into `site-packages`. They are declared in `KNOWN_CI_GAPS`
+citing this limitation so the contract does not report environment noise as a
+broken test import. The test passes as-is under the system interpreter (where
+`apport_python_hook` is present).
+
+Planned/alternative fix (deliberately not taken here to keep the change
+surgical): exclude `site-packages` / `.venv` from the scanner's in-repo follow,
+so installed dependencies are treated as third-party leaves rather than walked.
+That is a broader change that also interacts with the third-party coverage
+assertion and is tracked separately.
+
+---
