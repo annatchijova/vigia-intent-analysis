@@ -151,6 +151,6 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}
       - name: Verificar EBS v1 stdlib only
         run: |
-          python3 tests/verify_ebs_v1_parcheado.py --help > /dev/null && echo "OK stdlib"
+          python3 forensics/verify_ebs_v1.py --help > /dev/null && echo "OK stdlib"
         env:
           PYTHONPATH: ${{ github.workspace }}
