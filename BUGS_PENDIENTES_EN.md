@@ -6938,3 +6938,34 @@ floor that spoofability weighting cannot push below SUSPICION), NOT a re-couplin
 to the absence bug B-148 fixed. Tracked separately so the correct fix is designed
 deliberately. When it lands, the `xfail(strict=True)` on `test_red_team_anchor_bypass`
 flips to XPASS and the marker is removed.
+
+---
+
+## B-150 — `_parse_iso_timestamp` interpreted tz-naive timestamps in the host-local timezone (determinism leak) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED (2026-07-19) — naive timestamps are now assumed UTC explicitly, with a disclosure log; red-first TZ-invariance test. |
+| **Severity** | P3 — determinism/portability (§5.2). Latent: corpus timestamps are Z-suffixed (aware), so no verdict impact on any host; the leak only fires on a tz-naive input. |
+| **File** | `vigia/sift/_math_utils.py:200-224` (`_parse_iso_timestamp`) — consumed by the disk/MFT timeline (`disk_forensics.py` `_analysis_epoch`) and `event_log_correlator.py`. |
+| **Detected** | Temporal-invariant audit (2026-07-19, the "B-150 residual" of the ChatGPT Point-3/temporal family). Assigned real id B-150. |
+
+**The bug.** `dt = datetime.fromisoformat(ts_str)` yields a **naive** datetime for
+an offset-less string (e.g. `"2026-07-19T10:00:00"`), and `int(dt.timestamp())`
+on a naive datetime interprets it in the **process-local timezone**. The same
+naive timestamp therefore seals a different epoch on a UTC host vs an
+`America/New_York` host — measured delta 14400s (4h, EDT). A determinism leak in
+a value that can reach a sealed verdict via `_analysis_epoch`.
+
+**The fix.** After `fromisoformat`, if `dt.tzinfo is None`, assume UTC
+**explicitly** (`dt.replace(tzinfo=timezone.utc)`) and emit a boundary WARNING —
+mirroring the CAIE `TCV_TIMESTAMP_NAIVE_ASSUMED_UTC` assume-UTC-and-log pattern
+already used in the verdict path. Aware inputs (Z or explicit offset) are
+unchanged (instant-based). No silent host-local interpretation.
+
+**Red-first.** `tests/test_b150_naive_timestamp_utc.py`: under `TZ=America/New_York`
+the naive parse diverged from the UTC parse pre-fix (RED, delta 14400s) and is
+now equal (GREEN); a UTC-host regression test and an explicit-offset test pin the
+unchanged paths. Full suite 1635 passed, 0 failed. No corpus gate needed — the
+fix only changes naive inputs, which the corpus does not contain, and on a UTC
+host naive==UTC before and after regardless.

@@ -18,10 +18,13 @@ FIXES APLICADOS (TANDA SEGURIDAD P0+P1+P2):
 from __future__ import annotations
 
 import json
+import logging
 from fractions import Fraction
 from collections import Counter
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple, Any
+
+logger = logging.getLogger(__name__)
 
 LN2 = Fraction(693147180559945309417232121458, 1000000000000000000000000000000)
 
@@ -205,8 +208,20 @@ def _parse_iso_timestamp(ts_str: str) -> int:
         raise ValueError("Timestamp vacío")
     ts_str = ts_str.replace("Z", "+00:00")
     try:
-        from datetime import datetime
+        from datetime import datetime, timezone
         dt = datetime.fromisoformat(ts_str)
+        # B-150: a tz-naive timestamp must be assumed UTC EXPLICITLY, with
+        # disclosure — never interpreted in the host-local timezone. dt.timestamp()
+        # on a naive datetime uses the process TZ, leaking it into the sealed epoch
+        # (determinism, §5.2). Mirrors the CAIE TCV_TIMESTAMP_NAIVE_ASSUMED_UTC
+        # assume-UTC-and-log pattern already used in the verdict path.
+        if dt.tzinfo is None:
+            logger.warning(
+                "[TS] naive timestamp %r has no timezone offset — assuming UTC "
+                "(host-local interpretation would leak the process timezone)",
+                ts_str,
+            )
+            dt = dt.replace(tzinfo=timezone.utc)
         ts = int(dt.timestamp())
         # Validar rango razonable (2000-2100)
         if ts < 946684800 or ts > 4102444800:  # 2000-01-01 a 2100-01-01
