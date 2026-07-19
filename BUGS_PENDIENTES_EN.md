@@ -6707,3 +6707,151 @@ diff hunks and full commit metadata reproduced above; `git show cf8a37c5
 expected_verdict` re-run against all 4 live copies confirms current
 on-disk state (`SUSPICION` ×3, `MALICE` ×1 in `cases/input/`). No case
 file was modified as part of this entry.
+
+---
+
+## B-146 — Cross-version verification of sealed bundles: VERIFIED PRESENT, not a gap (Qwen Point 4 proposal, refuted by code audit 2026-07-19)
+
+| Field | Value |
+|-------|-------|
+| **Status** | NOT A BUG — feature already implemented and tested. Recorded so it is not re-investigated. |
+| **Severity** | N/A (audit outcome, no defect) |
+| **File** | `vigia/core/canonicalize.py`, `vigia/core/bundle_builder.py`, `vigia/core/ebs_v1.py`, `tests/test_canonicalize_lockstep.py` |
+| **Proposed by** | External model (Qwen), 2026-07-19, as "Point 4 — cross-version verification of sealed bundles". Verified against live code per §4.1 before acceptance. |
+
+**Claim under investigation (Qwen):** if the sealed-bundle serialization/hash
+format evolves, can a *newer* VIGÍA verify a bundle sealed by an *older*
+version without a false failure? Proposed remedy: anchor an explicit
+`vigia_schema_version` field inside the hashed payload so a future verifier
+applies the historical rules.
+
+**What the live code shows — the mechanism already exists:**
+
+1. `canonicalize.py:58` — `CANONICALIZE_VERSION = "2"` is the serialization-rule
+   version. `_canonicalize_v1` (lines 73-111) is preserved *explicitly* "solo
+   para verificar bundles historicos" (docstring lines 22-37).
+2. The verification contract is exactly Qwen's proposal: verifiers **try v2 and
+   fall back to v1** (`canonicalize.py:26-28`: "la verificación prueba v2 y CAE
+   A v1: todo bundle sellado bajo v1 sigue verificando idéntico (results/)").
+   A bundle sealed under old rules verifies bit-identically under new code.
+3. Version fields are inside the sealed payload: `bundle_builder.py:227,231,241`
+   (`vigia_version`, `canonical_version: "1.0.0"`, `bundle_version`);
+   `ebs_v1.py:74` (`EBS_VERSION = "1.0"`), `ebs_v1.py:744`
+   (`bundle_version` serialized into the bundle dict).
+4. `tests/test_canonicalize_lockstep.py` (12 passed, 2026-07-19) verifies the
+   canonical encoder lockstep "para v2 y para el fallback v1".
+5. Corroborating evidence from the same day's CI fix (commit `b2d4ad80`): the
+   deleted verifier copy `tests/verify_ebs_v1_parcheado.py` "had already lost the
+   R3-2 dual-canon fallback, so it would REJECT historical v1 bundles if ever
+   run" (`test_canonicalize_lockstep.py:48-50`). The dual-canon fallback *is* the
+   cross-version verification mechanism — its loss is treated as a defect,
+   confirming the invariant is first-class.
+
+**REFUTATION GATE LOG — B-146**
+```
+Candidate finding : sealed bundles lack a version anchor, so a future VIGÍA
+                    could falsely reject (or wrongly validate) an old bundle
+Gate applied      : live-code audit of the canonicalize / bundle_builder /
+                    ebs_v1 sealing core + lockstep test
+Gate rule         : the proposal is a real gap only if no in-payload version
+                    exists AND the verifier does not dispatch on it
+Gate result       : REJECTED. CANONICALIZE_VERSION + bundle_version/EBS_VERSION
+                    are present in the hashed payload; the verifier tries v2
+                    and falls back to v1; the lockstep test covers both. The
+                    feature Qwen proposed already exists.
+Residual (optional): an explicit end-to-end "seal-under-v1, verify-under-current"
+                    regression test would be belt-and-suspenders. The lockstep
+                    test plus the historical `results/` v1 bundles (which still
+                    verify) already exercise the path; no defect blocks this.
+```
+
+**Verification:** `grep -n CANONICALIZE_VERSION vigia/core/canonicalize.py`;
+full read of `canonicalize.py` (v1 + v2 encoders + dual-canon docstring);
+`grep -n "version" vigia/core/bundle_builder.py vigia/core/ebs_v1.py`;
+`pytest tests/test_canonicalize_lockstep.py` → 12 passed. No code changed.
+
+---
+
+## B-147 — Adversarial resource exhaustion / ReDoS in artifact parsing (Qwen Point 3 proposal): two named vectors REFUTED; one latent ingestion-guard gap found
+
+| Field | Value |
+|-------|-------|
+| **Status** | PARTIALLY — the two vectors Qwen named are refuted (see below). One latent, non-live API-robustness gap found in `disk_forensics.py:131` (not currently reachable with malicious input; hardening candidate). |
+| **Severity** | P3 — availability hardening. No live exploitable path found. |
+| **File** | `vigia/tools/caie.py` (`_extract_assertions`), JSON parser (empirical), `vigia/sift/{pcap_parser,memory_forensics,disk_forensics}.py`, `vigia/vigia_command_center.py` |
+| **Proposed by** | External model (Qwen), 2026-07-19, as "Point 3 — parsing pathologies / ReDoS / Billion Laughs". Verified against live code + empirically per §1.3 before acceptance. |
+
+**Claim under investigation (Qwen):** a maliciously crafted artifact (deeply
+nested JSON, or text triggering catastrophic regex backtracking in
+`_extract_assertions`) hangs/OOMs the pipeline instead of being cleanly
+rejected; degrade honestly to `UNANALYZED | RESOURCE_EXHAUSTION`.
+
+**Vector-by-vector result:**
+
+1. **Catastrophic backtracking in `_extract_assertions` regexes — REFUTED.**
+   `caie.py:1020-1089`: the function uses **no regex at all**. It reads
+   already-parsed metadata via `dict.get()`, `isinstance` type checks, and
+   plain substring membership (`"lsass" in target`). There is no regex surface
+   in this function to attack.
+2. **Deep-nested JSON hang / OOM — REFUTED empirically.** `python3 -c` with a
+   depth-100000 nested array and a depth-100000 nested object both raise a
+   **bounded, catchable `RecursionError`** (process exit 0; no timeout at 20s,
+   no OOM, no segfault). CPython's JSON parser does not hang on nesting depth;
+   "Billion Laughs" is an XML-entity-expansion attack and does not apply to
+   `json.loads`.
+3. **Volume DoS (artifact flood) — ALREADY COVERED.** `caie.py`
+   `CrossArtifactIncongruenceEngine.add_artifact` enforces `_MAX_ARTIFACTS`
+   (Kimi P0) and rejects the excess (`CAIE_ARTIFACT_LIMIT` audit event).
+
+**Ingestion-parse audit (the real, narrow residual).** Four external/semi-trusted
+`json.loads` sites were audited for honest degradation:
+
+| Site | Guard present | Disposition |
+|------|---------------|-------------|
+| `pcap_parser.py:86` | `except json.JSONDecodeError` → `RuntimeError` w/ context | Guarded |
+| `memory_forensics.py:362` | `except (json.JSONDecodeError, subprocess.TimeoutExpired)` → log + `[]` | Guarded |
+| `vigia_command_center.py:154` | `except json.JSONDecodeError: continue` + outer `except Exception: pass` | Guarded |
+| `disk_forensics.py:131` | **none** — `json.loads(parsed_json or "{}")` unwrapped | **Gap (latent)** |
+
+**The `disk_forensics.py:131` finding, scoped honestly:**
+- `MFTTimelineAnalyzer.analyze(self, mft_bytes, parsed_json: Optional[str] = None, ...)`
+  parses `parsed_json` (an external parameter) with no try/except. A malformed
+  value raises `json.JSONDecodeError` (or `RecursionError` on deep nesting)
+  uncaught, crashing MFT analysis instead of degrading.
+- **Not live-exploitable today:** no in-repo caller passes `parsed_json`
+  (`grep parsed_json` finds only the signature); it defaults to `None` →
+  `json.loads("{}")` → always valid. The crash requires an external caller to
+  inject malformed JSON.
+- **Why it is still worth hardening:** 10 lines above (same method), the sibling
+  external input `timestamp_utc` *is* guarded, with the explicit rationale
+  "FIX P2 (Kimi post-patch): capturar ValueError si timestamp_utc es inválido —
+  no crashear". The unwrapped `json.loads(parsed_json)` breaks that same
+  defensive contract on the same method's other external input.
+
+**REFUTATION GATE LOG — B-147**
+```
+Candidate finding : crafted artifacts (deep JSON / regex backtracking) hang or
+                    OOM the pipeline; needs UNANALYZED/RESOURCE_EXHAUSTION guard
+Gate applied      : code read of _extract_assertions; empirical json.loads depth
+                    test; audit of 4 ingestion parse sites; caller trace of
+                    parsed_json
+Gate rule         : a vector is real only if it (a) has an exploitable surface
+                    and (b) fails unbounded (hang/OOM/crash) rather than bounded
+Gate result       : Vectors 1-3 REJECTED (no regex; bounded RecursionError;
+                    _MAX_ARTIFACTS already caps volume). One latent gap survives
+                    (disk_forensics.py:131), but is NOT live-reachable with
+                    malicious input in the current wiring — recorded as a
+                    hardening candidate, not a live vulnerability.
+```
+
+**Proposed hardening (pending, if actioned):** wrap `disk_forensics.py:131` in
+`try/except (json.JSONDecodeError, RecursionError)` → log + degrade to empty
+entries (honest degradation, mirroring the `timestamp_utc` guard above it).
+Red-first characterization test: call `analyze()` with malformed `parsed_json`,
+assert it degrades rather than raising. Corpus comparative gate: 0 verdict flips
+(valid JSON inputs are unaffected by construction).
+
+**Verification:** read of `caie.py:1020-1089`; `python3` depth-100000 JSON test
+(both array and object → bounded RecursionError, exit 0); `sed`/read of the 4
+ingestion sites; `grep -rn parsed_json vigia/` (only the signature — no caller
+injects it). No code changed as part of this audit entry.
