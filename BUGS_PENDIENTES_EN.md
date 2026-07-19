@@ -6861,3 +6861,80 @@ valid JSON is unaffected by construction (same `.get("entries")` path via the
 (both array and object → bounded RecursionError, exit 0); `sed`/read of the 4
 ingestion sites; `grep -rn parsed_json vigia/` (only the signature — no caller
 injects it). No code changed as part of this audit entry.
+
+---
+
+## B-148 — CAIE absence≡negative conflation: "network never analyzed" emitted as "analyzed, no activity", feeding a false fabrication accusation (proposed as "B-154"; assigned real id B-148) [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED (2026-07-19) — four-state NetworkObservation model in `_extract_assertions`; red-first tests; comparative corpus gate 0/201 flips. |
+| **Severity** | P2 — architectural consistency + evidence integrity. A rule that ACCUSES (log fabrication, severity 0.75-0.95) was firing on ABSENCE of data. |
+| **File** | `vigia/tools/caie.py` (`_extract_assertions`, memory branch ~1057-1089; consumed by the LOG_VS_MEMORY rule in `detect_fractures` ~1528) |
+| **Detected** | Architectural-consistency audit (2026-07-19): "does VIGÍA apply its own principles when it audits?" — verified against Forge `disposition.py` ("Findings and audit completeness are separate dimensions"; "inspired by VIGÍA's abstention gates") and Cronos `quality.py` `detect_negation` ("absence ... attenuating context, not positive confirmation"). Both are ported FROM VIGÍA, yet this CAIE path regressed from the doctrine. |
+
+**The bug.** For a `memory_process`/`lsass_session`/`kernel_structure` artifact,
+the old two-valued model emitted `memory_shows_no_network_activity` whenever
+`has_network` was false — including when the network fields were **absent**
+(memory never network-analyzed). That assertion is the sole input to the
+LOG_VS_MEMORY fabrication rule (`caie.py:1528-1558`), so "I did not analyze the
+network layer" was used to accuse a log of fabrication. "No encontré conexiones"
+and "no analicé la capa de red" are OPPOSITE epistemic states; the data model
+lost the distinction.
+
+**The fix (four-state model, at the assertion level).** Key PRESENCE (`in meta`),
+not `.get()` truthiness, decides whether the network layer was analyzed:
+- `ANALYZED_WITH_ACTIVITY` → `memory_shows_network_activity`
+- `ANALYZED_NO_ACTIVITY` (fields present, valid, empty) → `memory_shows_no_network_activity` (may feed the rule)
+- `NOT_ANALYZED` (no network fields at all) → `memory_network_not_analyzed` (must NOT accuse)
+- `ANALYSIS_FAILED` (field present, wrong type) → `memory_network_analysis_failed` (must NOT accuse)
+
+**Red-first + gate.** `tests/test_caie_b154_network_absence.py` (5 tests): the
+absent and malformed cases fired `memory_shows_no_network_activity` pre-fix (RED)
+and now don't; present-empty and populated cases are unchanged (regression
+guards). **Comparative corpus gate (Anna's mandate, broken==0): 0 verdict flips
+across 201 cases** — baseline (caie.py reverted) vs fixed produce bit-identical
+sealed verdicts; identical case sets, 0 asymmetry. So no real case depended on
+the absence-triggered accusation.
+
+**The suite itself encoded the bug (strongest corroboration).** Five existing
+adversarial tests relied on absence-triggered LOG_VS_MEMORY. Four were genuine
+mis-encodings — their canonical "memory contradicts log" fixture used
+network-ABSENT memory (`_S1_ARTIFACTS`: `{"pid": 4521}`, "Process memory shows
+nothing"); corrected to present-but-empty (`network_connections: []`), a genuine
+"analyzed, no activity" contradiction. The fifth is the real T-5 probe → **B-149**.
+
+**Verification:** red-first RED then GREEN; full suite 1632 passed / 31 xfailed;
+`scripts`-free corpus gate diff = 0 flips (script + raw runs preserved).
+
+---
+
+## B-149 — T-5: a high-severity C2 IoC can collapse to NOISE when the exculpatory memory artifact was never network-analyzed (surfaced by B-148) [OPEN — synthetic-only]
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN — synthetic-only (0/201 corpus cases). Documented as a limitation, not silently patched. Deliberately NOT bundled into B-148. |
+| **Severity** | P2 (latent) — a real, corroborated C2 IoC should never read as NOISE ("nothing to see here"). Currently reproducible only synthetically. |
+| **File** | `vigia_scorer.py` (spoofability-weighted Noisy-OR / verdict cascade); probe: `vigia/tests/adversarial/test_spoofability_correlation_attack.py::test_red_team_anchor_bypass` (now `xfail(strict=True)`) |
+
+**Why B-148 surfaced it.** The LOG_VS_MEMORY fabrication rule was doing double
+duty: besides detecting fabrication, its firing on network-absent memory was
+INCIDENTALLY the mechanism that stopped a high-spoofability C2 log from collapsing
+to NOISE. B-148 correctly stops the absence-firing (it was a false positive), which
+removes that incidental protection. Measured post-B-148: a C2 IoC
+(`raw_score=0.95`, `log_entry`) + a network-UNANALYZED exculpatory memory artifact
+with no explicit `verdict` → **verdict = NOISE** (`test_red_team_anchor_bypass`),
+whereas with an explicit-verdict exculpatory artifact it holds at SUSPICION
+(`test_metadata_convention...`, now a genuine-contradiction pass).
+
+**Honest scope.** The B-148 corpus gate shows **0/201 real cases** exhibit this —
+the anti-collapse protection rested on a false positive, but no real case relied
+on it either. So T-5 is a latent behavior, not a live corpus regression.
+
+**Proper fix (deferred, needs a decision).** A high-severity, independently
+corroborated IoC must resist NOISE collapse **on its own merits** — not via a
+fracture coupled to absent memory. This is a scorer-level change (e.g. an IoC
+floor that spoofability weighting cannot push below SUSPICION), NOT a re-coupling
+to the absence bug B-148 fixed. Tracked separately so the correct fix is designed
+deliberately. When it lands, the `xfail(strict=True)` on `test_red_team_anchor_bypass`
+flips to XPASS and the marker is removed.

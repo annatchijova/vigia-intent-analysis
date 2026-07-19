@@ -1060,17 +1060,41 @@ def _extract_assertions(artifact: "Artifact") -> frozenset:
         # - dest_ip / source_ip: must be non-empty strings (int/bool/None are invalid)
         # - network_connections: must be non-empty list or dict (string is not a
         #   connection list — truthiness bug caught by fuzzing 2026-06-25)
-        _dest_ip = meta.get("dest_ip")
-        _src_ip  = meta.get("source_ip")
-        _nc      = meta.get("network_connections")
+        # B-154: "analyzed, no activity" and "network layer never analyzed" are
+        # OPPOSITE epistemic states, not two ways of saying the same thing. The
+        # old two-valued model (has_network True/False) collapsed them, so an
+        # ABSENT network field emitted memory_shows_no_network_activity — a
+        # positive observation that then feeds the LOG_VS_MEMORY fabrication rule
+        # (line ~1528), letting "I did not look" accuse a log of fabrication.
+        # Four-state model (Forge disposition.py / Cronos detect_negation
+        # doctrine, both ported from VIGÍA: not-analyzed != clean; absence !=
+        # negative confirmation). Key PRESENCE ("in meta") decides whether the
+        # network layer was analyzed at all — .get() truthiness cannot.
+        _NET_KEYS = ("dest_ip", "source_ip", "network_connections")
+        _net_present = {k: meta[k] for k in _NET_KEYS if k in meta}
+        _nc      = _net_present.get("network_connections")
+        _dest_ip = _net_present.get("dest_ip")
+        _src_ip  = _net_present.get("source_ip")
         _nc_valid   = isinstance(_nc, (list, dict)) and bool(_nc)
         _dest_valid = isinstance(_dest_ip, str) and bool(_dest_ip.strip())
         _src_valid  = isinstance(_src_ip,  str) and bool(_src_ip.strip())
         has_network = _dest_valid or _src_valid or _nc_valid
+        # A present network key whose value is the wrong type is a FAILED
+        # analysis (e.g. network_connections arriving as a string), not a clean
+        # negative — it must not accuse either.
+        _malformed = (
+            ("network_connections" in _net_present and not isinstance(_nc, (list, dict)))
+            or ("dest_ip" in _net_present and not isinstance(_dest_ip, str))
+            or ("source_ip" in _net_present and not isinstance(_src_ip, str))
+        )
         if has_network:
-            assertions.add("memory_shows_network_activity")
+            assertions.add("memory_shows_network_activity")      # ANALYZED_WITH_ACTIVITY
+        elif not _net_present:
+            assertions.add("memory_network_not_analyzed")        # NOT_ANALYZED
+        elif _malformed:
+            assertions.add("memory_network_analysis_failed")     # ANALYSIS_FAILED
         else:
-            assertions.add("memory_shows_no_network_activity")
+            assertions.add("memory_shows_no_network_activity")   # ANALYZED_NO_ACTIVITY
 
         if meta.get("injections_detected") or meta.get("injected_pid"):
             assertions.add("memory_shows_injection")

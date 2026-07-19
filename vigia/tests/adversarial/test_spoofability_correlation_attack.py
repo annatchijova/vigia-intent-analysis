@@ -49,6 +49,8 @@ import json
 from pathlib import Path
 from typing import Dict
 
+import pytest
+
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
@@ -82,14 +84,24 @@ class SpoofabilityCorrelationAttackTest:
 
     # ── Base artifact construction (shared by both scenarios) ─────────────
 
-    def _memory_artifact(self, with_verdict: bool) -> Artifact:
+    def _memory_artifact(self, with_verdict: bool, network_analyzed: bool = False) -> Artifact:
         """
         Volatility on the process: normal memory behavior, no hooks, no
         injection. raw_score is deliberately low — this is the EXCULPATORY
         artifact, structurally hard to forge.
+
+        B-154: network_analyzed distinguishes the two epistemic states this test
+        family cares about. True -> the memory WAS examined for network activity
+        and found none (network_connections present-but-empty): a genuine
+        contradiction that legitimately fires LOG_VS_MEMORY. False (default) ->
+        the memory was never network-analyzed (field absent): NOT a contradiction,
+        so the fabrication rule must NOT fire — this is the real-pipeline pattern
+        the T-5 probe depends on.
         """
         meta = _acq_strong()
         meta.update({"pid": 4521, "process_name": "svchost.exe"})
+        if network_analyzed:
+            meta["network_connections"] = []
         if with_verdict:
             meta["verdict"] = "NOISE"
         return Artifact(
@@ -132,7 +144,7 @@ class SpoofabilityCorrelationAttackTest:
         """
         engine = CrossArtifactIncongruenceEngine()
         engine.reset()
-        engine.add_artifact(self._memory_artifact(with_verdict=True))
+        engine.add_artifact(self._memory_artifact(with_verdict=True, network_analyzed=True))
         engine.add_artifact(self._malicious_log_artifact(with_verdict=True))
         res = engine.evaluate()
 
@@ -171,10 +183,15 @@ class SpoofabilityCorrelationAttackTest:
         that the final verdict collapses to NOISE — despite containing a
         high-severity IoC (connection to a known C2).
 
-        This is NOT xfail: it is a hard assertion. If it passes, T-5 is not
-        exploitable under the current configuration. If it fails, T-5 is
-        confirmed and must be documented in KNOWN_LIMITATIONS.md as a real
-        finding, not a hypothesis.
+        B-148/B-154 update: this WAS a hard assertion that passed only because
+        LOG_VS_MEMORY fired on ABSENT memory network fields — a false-positive
+        fracture. With B-154 correcting that (absence != analyzed-negative), the
+        assertion now fails: verdict collapses to NOISE. T-5 is therefore
+        CONFIRMED (synthetic-only — 0/201 corpus cases per the B-148 gate) and is
+        documented as an open finding (B-149 / KNOWN_LIMITATIONS.md). The pytest
+        entrypoint carries @pytest.mark.xfail(strict=True); it flips to XPASS
+        when the proper B-149 fix (IoC resists NOISE collapse on its own merits)
+        lands.
         """
         engine = CrossArtifactIncongruenceEngine()
         engine.reset()
@@ -246,11 +263,26 @@ def test_metadata_convention_present_triggers_golden_rule():
     )
 
 
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "T-5 (B-149), confirmed after B-148/B-154: once absence stops triggering "
+        "LOG_VS_MEMORY (the fabrication rule was incidentally the anti-collapse "
+        "protection), a C2 IoC competing with a NETWORK-UNANALYZED exculpatory "
+        "artifact (no explicit verdict) collapses to NOISE. Synthetic-only: the "
+        "B-148 comparative corpus gate showed 0/201 real cases affected. The "
+        "proper fix — a high-severity confirmed IoC must resist NOISE collapse on "
+        "its own merits, not via a fracture coupled to absent memory — is tracked "
+        "as B-149 and deliberately NOT bundled into B-148. This test IS the "
+        "reproducible scenario; when B-149 lands, strict=True flips it to XPASS."
+    ),
+)
 def test_red_team_anchor_bypass():
     """
-    T-5 — hard assertion, not xfail. See
-    SpoofabilityCorrelationAttackTest.test_red_team_anchor_bypass docstring
-    for the full reasoning.
+    T-5 — now an expected failure (xfail, strict) documenting B-149. Before B-148
+    this asserted verdict != NOISE and passed only because LOG_VS_MEMORY fired on
+    ABSENT memory network fields — a false-positive fracture (B-154). With that
+    corrected, the real T-5 collapse (verdict == NOISE) is exposed. See B-149.
     """
     t = SpoofabilityCorrelationAttackTest()
     r = t.test_red_team_anchor_bypass()

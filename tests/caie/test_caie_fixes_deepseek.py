@@ -250,8 +250,8 @@ class TestEpistemicSeparation:
             metadata={"verdict": "MALICE", "dst_ip": "192.168.1.100"}
         ))
         engine.add_artifact(Artifact(
-            "mem_tool", "memory_process", 0.05, "Memory shows nothing",
-            metadata={"verdict": "NOISE"}
+            "mem_tool", "memory_process", 0.05, "Memory analyzed — no network objects",
+            metadata={"verdict": "NOISE", "network_connections": []}  # B-154: analyzed, not absent
         ))
 
         result = engine.evaluate()

@@ -226,8 +226,13 @@ def assert_metric_invariance(r1: dict, r2: dict, label: str) -> None:
 _S1_ARTIFACTS = [
     ("log_tool", "log_entry", 0.9, "Outbound C2 connection",
      {"dst_ip": "203.0.113.77", "pid": 4521}),
-    ("mem_tool", "memory_process", 0.1, "Process memory shows nothing",
-     {"pid": 4521}),
+    # B-154: memory that was ACTUALLY network-analyzed and found no connections
+    # (network_connections present-but-empty) — a genuine contradiction against
+    # the log's outbound claim. Previously this was {"pid": 4521} with NO network
+    # field, which under the four-state model is NOT_ANALYZED (memory never
+    # examined for network), not "analyzed, no activity" — and must not accuse.
+    ("mem_tool", "memory_process", 0.1, "Process memory analyzed — no network objects",
+     {"pid": 4521, "network_connections": []}),
 ]
 
 # S2: Benign HTTP access log (should NOT trigger LOG_VS_MEMORY)

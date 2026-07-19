@@ -2932,3 +2932,31 @@ it models declared-chain-length, not verified custody; (c) accept as
 documented. Behavior is pinned unchanged until decided.
 
 ---
+
+## L-066 — A high-severity C2 IoC can read as NOISE when the competing memory artifact was never network-analyzed (T-5 / B-149) [DOCUMENTED]
+
+Surfaced by B-148 (CAIE absence≡negative fix). The LOG_VS_MEMORY fabrication
+rule previously fired whenever a memory artifact lacked network fields, which
+incidentally prevented a high-spoofability C2 `log_entry` from collapsing to
+NOISE. B-148 correctly stops that firing (absence of network data is not a
+contradiction — "not analyzed" != "analyzed, no activity"), which removes the
+incidental protection.
+
+**Reproducible (synthetic) scenario:** a `log_entry` with a confirmed C2 IoC
+(`raw_score=0.95`, non-reserved `dst_ip`) competing with a low-spoofability
+exculpatory `memory_process` artifact that was never network-analyzed (no
+`dest_ip`/`source_ip`/`network_connections`) and carries no explicit
+`metadata["verdict"]` → sealed verdict = NOISE. See
+`vigia/tests/adversarial/test_spoofability_correlation_attack.py::test_red_team_anchor_bypass`
+(`xfail(strict=True)`).
+
+**Scope (honest):** the B-148 comparative corpus gate showed **0/201 real cases**
+exhibit this — the anti-collapse behavior rested on a false positive, and no real
+case relied on it. T-5 is a latent behavior, not a live corpus regression.
+
+**Daubert posture:** a documented WARN beats a false PASS. The correct fix — a
+high-severity, independently corroborated IoC must resist NOISE collapse on its
+own merits (a scorer-level IoC floor), not via a fracture coupled to absent
+memory — is tracked as B-149 and pinned until designed deliberately.
+
+---
