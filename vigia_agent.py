@@ -2085,6 +2085,28 @@ Exit codes:
         atomic_write_text(sha256_path, f"{disk_digest}  {abs_output_path}\n")
         logger.info("[BUNDLE] Verification: sha256sum -c %s", sha256_path)
 
+    # Reasoning trace (Cronos-in-VIGÍA): a PROCESS-evidence sibling of the bundle,
+    # sealed with its own ToolExecutionLogChain and written OUTSIDE the
+    # bundle_digest. The agent bundle hashes its ENTIRE dict (sha256sum -c), so
+    # the trace CANNOT live inside it without changing the digest — it lives in a
+    # separate <stem>_reasoning_trace.json. verify_reasoning_trace() binds the two
+    # by asserting the trace verdict == agent_verdict. Fail-soft: a trace-write
+    # error must never discard the already-sealed bundle (§5.3 honest degradation).
+    if not args.audit_only:
+        try:
+            from vigia.core.reasoning_trace import build_from_agent_bundle
+            _trace_dict = build_from_agent_bundle(bundle)
+            _trace_path = (output_path[:-5] + "_reasoning_trace.json"
+                           if output_path.endswith(".json")
+                           else output_path + "_reasoning_trace.json")
+            atomic_write_text(_trace_path, json.dumps(
+                _trace_dict, indent=2, sort_keys=True, ensure_ascii=True, default=_json_serial))
+            logger.info("[TRACE] reasoning trace: %s (verdict=%s, chain_tip=%s)",
+                        _trace_path, _trace_dict.get("verdict"),
+                        str(_trace_dict.get("chain_tip_sha256", ""))[:16])
+        except Exception as _trace_err:  # noqa: BLE001 — non-critical, fail-soft
+            logger.warning("[TRACE] reasoning trace not written (non-fatal): %s", _trace_err)
+
     # Console summary
     abduction = bundle.get("pipeline_results", {}).get("abduction", {})
     hypothesis = abduction.get("best_hypothesis", "UNDETERMINED")

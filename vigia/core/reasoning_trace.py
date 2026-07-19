@@ -56,7 +56,7 @@ from enum import Enum
 from fractions import Fraction
 from typing import Any, Dict, List, Optional
 
-from vigia.core.tool_log_chain import ToolExecutionLogChain
+from vigia.core.tool_log_chain import ToolExecutionLogChain, verify_tool_execution_log
 
 CRONOS_TRACE_VERSION = "1.0"
 
@@ -377,3 +377,116 @@ class ForensicReasoningTrace:
             if s.kind == StepKind.DECISION:
                 return s.payload.get("verdict")
         return None
+
+
+@dataclass
+class ReasoningTraceVerification:
+    valid: bool
+    errors: List[str] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {"valid": self.valid, "errors": list(self.errors)}
+
+
+def sealed_trace_verdict(trace: Dict[str, Any]) -> Optional[str]:
+    """Read the recorded verdict from a sealed trace dict (loaded from file)."""
+    v = trace.get("verdict")
+    if v is not None:
+        return v
+    for step in reversed(trace.get("steps", [])):
+        if step.get("kind") == StepKind.DECISION.value:
+            return step.get("payload", {}).get("verdict")
+    return None
+
+
+def verify_reasoning_trace(bundle: Dict[str, Any], trace: Dict[str, Any],
+                           **hmac_kwargs) -> ReasoningTraceVerification:
+    """Verify a reasoning trace against the bundle it explains.
+
+    Two independent checks, both must pass:
+      (i)  the trace's own tamper-evident chain is intact (ToolExecutionLogChain);
+      (ii) the verdict the trace recorded EQUALS the bundle's sealed
+           `agent_verdict`. This is the process-not-result invariant: the trace
+           explains the sealed result and must never contradict it. A divergence
+           is a WIRING BUG and MUST fail here — it is never silently reconciled.
+
+    The trace lives OUTSIDE the bundle_digest (a sibling artifact with its own
+    integrity), so this pairing check is the only thing binding the two: it must
+    be strict.
+    """
+    errors: List[str] = []
+
+    log = trace.get("tool_execution_log")
+    if not isinstance(log, list) or not log:
+        errors.append("trace has no tool_execution_log to verify")
+    else:
+        chain = verify_tool_execution_log(log, **hmac_kwargs)
+        if not chain.valid:
+            errors.append(f"trace chain invalid: {chain.to_dict()}")
+
+    trace_case = trace.get("case_id")
+    bundle_case = bundle.get("case_id")
+    if trace_case != bundle_case:
+        errors.append(f"case_id mismatch: trace={trace_case!r} bundle={bundle_case!r}")
+
+    trace_verdict = sealed_trace_verdict(trace)
+    bundle_verdict = bundle.get("agent_verdict")
+    if trace_verdict != bundle_verdict:
+        errors.append(
+            f"VERDICT DIVERGENCE (wiring bug): trace recorded {trace_verdict!r} "
+            f"but the sealed bundle verdict is {bundle_verdict!r} — the trace was "
+            f"built from a different result than the one sealed."
+        )
+
+    return ReasoningTraceVerification(valid=not errors, errors=errors)
+
+
+def build_from_agent_bundle(bundle: Dict[str, Any]) -> Dict[str, Any]:
+    """Derive a sealed reasoning trace from a sealed vigia_agent bundle.
+
+    Built entirely from data the agent already sealed, so it explains — never
+    re-decides — the result:
+      - the abductive hypothesis (best_hypothesis);
+      - the artifacts the agent could NOT analyze, as NOT_ANALYZED evidence
+        (B-148 honest degradation — absence is not a positive observation);
+      - the self-corrections it applied, as contradiction_detector entries
+        (B-151b — chained, tamper-evident, in Mode-1).
+    The DECISION verdict is the sealed `agent_verdict`, so the pairing check in
+    verify_reasoning_trace() holds by construction. Deterministic given the
+    bundle: sealed_at is the bundle's own analysis_timestamp, so the same sealed
+    bundle always yields the same trace (and thus the same chain tip)."""
+    case_id = str(bundle.get("case_id") or "UNKNOWN")
+    verdict = str(bundle.get("agent_verdict") or "ABSTAIN")
+    results = bundle.get("pipeline_results") if isinstance(bundle.get("pipeline_results"), dict) else {}
+    abduction = results.get("abduction") if isinstance(results.get("abduction"), dict) else {}
+    inner = results.get("results") if isinstance(results.get("results"), dict) else {}
+    unanalyzed = inner.get("unanalyzed_artifacts") or []
+    corrections = results.get("self_corrections") or []
+    sealed_at = str(bundle.get("analysis_timestamp") or "1970-01-01T00:00:00+00:00")
+
+    t = ForensicReasoningTrace(
+        case_id=case_id,
+        objective=f"Forensic intent analysis of {bundle.get('evidence_path', case_id)}",
+        mode="python_fallback",
+    )
+    t.add_hypothesis("primary", str(abduction.get("best_hypothesis") or "UNDETERMINED"))
+    for ua in list(unanalyzed)[:50]:
+        if isinstance(ua, dict):
+            label = ua.get("evidence_type") or ua.get("path") or ua.get("id") or "unknown"
+        else:
+            label = str(ua)
+        t.add_evidence(f"artifact not analyzed: {label}", ObservationState.NOT_ANALYZED)
+    for c in list(corrections)[:50]:
+        if not isinstance(c, dict):
+            continue
+        ctype = str(c.get("contradiction_type") or "contradiction")[:64]
+        action = str(c.get("recommended_action") or c.get("suggested_verdict_upgrade") or "corrected")
+        t.record_self_correction(
+            finding_id=ctype,
+            verdict_before=str(abduction.get("best_hypothesis") or "?"),
+            verdict_after=action,
+            reason=ctype,
+        )
+    # Submitted confidence = 1; the diversity ceiling turns it into the honest
+    # stored value (thin observation → capped confidence).
+    return t.seal(verdict=verdict, confidence=Fraction(1, 1), sealed_at=sealed_at)

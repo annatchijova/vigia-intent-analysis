@@ -7009,3 +7009,63 @@ set human-readable `reason` strings for 7/8 downgrades — the gap is the *chain
 event, not the reason). This is an architecture decision — wire it into Mode-1, or
 amend the doctrine to state the chained self-correction event is a Mode-2 (Claude
 Code) construct by design. Deliberately NOT fixed as a one-liner. Not yet decided.
+
+---
+
+## B-152 — Two distinct bundle-sealing paths with different integrity surfaces (architecture finding); reasoning-trace layer wired beside the agent bundle [DOCUMENTED + Phase 1.5 landed]
+
+| Field | Value |
+|-------|-------|
+| **Status** | Architecture finding DOCUMENTED; Cronos-in-VIGÍA reasoning trace wired into Mode-1 (Phase 1.5). |
+| **Severity** | P3 (documentation / architectural consistency). No defect — a real dual-path property future maintainers must know. |
+| **File** | `vigia/core/bundle_builder.py` (EBS path), `vigia_agent.py:_seal_bundle` (agent path), `vigia/core/reasoning_trace.py` (new). |
+
+**Architecture finding (Anna, 2026-07-19): VIGÍA has TWO sealing paths with
+different integrity surfaces.** Surfaced while designing where to attach the
+reasoning trace. They are not interchangeable:
+
+- **EBS path** (`bundle_builder.seal`): `bundle_hash = _sha256_dict(bundle_payload)`
+  over a FIXED key set; the serialized bundle is `bundle_payload + integrity`, and
+  the verifier re-derives over `{k:v for k in bundle if k != "integrity"}`
+  (`verify_ebs_v1.py:294`). Integrity surface = "everything except a named
+  exclusion list". A new field is inside the hash unless explicitly excluded.
+- **Agent path** (`vigia_agent._seal_bundle`, the primary Mode-1 seal):
+  `bundle_digest = sha256(json.dumps(entire bundle dict))`. NO exclusion
+  mechanism — the `.json` file on disk IS the hashed content (`sha256sum -c`).
+  `bundle_sha256` is not even embedded (no self-reference). Any field added to the
+  dict changes the digest.
+
+Consequence: "attach a narrative sibling OUTSIDE the verdict hash" is a different
+operation per path — an excluded key for EBS, a **separate file** for the agent
+bundle. Assuming the EBS mechanism for the agent path would have silently changed
+every agent `bundle_digest`. Recorded so this dual-path property is not
+rediscovered the hard way.
+
+**Phase 1.5 wiring (reasoning trace beside the agent bundle).** `vigia/core/
+reasoning_trace.py` (Cronos-adapted, deterministic, Fraction-only, B-148 doctrine
+enforced at the API) is written by `vigia_agent` as a sibling file
+`<stem>_reasoning_trace.json`, OUTSIDE `bundle_digest`, with its own
+`ToolExecutionLogChain` integrity. `verify_reasoning_trace(bundle, trace)` binds
+the two: it FAILS on chain tampering, `case_id` mismatch, or — the process-not-
+result guard — `trace.verdict != bundle.agent_verdict` (red-first tested). The
+trace is derived from data the bundle already sealed: the abductive hypothesis,
+NOT_ANALYZED evidence for unanalyzed artifacts (B-148), and self-corrections as
+chained `contradiction_detector` entries — which is the Mode-1 mechanism B-151(b)
+said was missing (now available; whether every scorer gate emits one is the
+remaining decision under B-151b).
+
+**Gate (Anna's three proofs).** (a/b) `tests/test_reasoning_trace_bundle_gate.py`
+proves against 15 real `results/agent_batch/*` bundles that building the trace
+leaves `bundle_digest` byte-identical (the dict is never mutated; the trace is a
+separate file) and that the trace verifies against each. (c) `test_reasoning_
+trace.py::test_verify_trace_FAILS_on_verdict_divergence` is the red-first: a trace
+that records a different verdict than the sealed bundle makes the verifier FAIL
+explicitly. End-to-end: `vigia_agent.py` on a real case writes the sibling, the
+bundle's own `sha256sum -c` still verifies (digest untouched), and the trace
+verifies against it. Full suite 1674 passed. Fail-soft: a trace-write error never
+discards the sealed bundle (§5.3).
+
+**Scope (honest).** The trace is currently derived from sealed-bundle summary
+data (hypothesis + unanalyzed + self-corrections), so for cases with none of the
+latter it is thin (MINIMAL quality). Richer step-by-step instrumentation of the
+live run loop, and MCP exposure of the trace, are later phases.

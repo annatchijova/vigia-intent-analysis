@@ -17,6 +17,8 @@ from vigia.core.reasoning_trace import (
     ObservationState,
     TraceQuality,
     detect_negation,
+    verify_reasoning_trace,
+    build_from_agent_bundle,
 )
 
 _TS = "2026-01-01T00:00:00+00:00"  # injected, deterministic seal timestamp
@@ -153,7 +155,89 @@ def test_sealed_verdict_exposes_recorded_verdict_for_consistency_check():
     assert t.sealed_verdict() == "SUSPICION"  # wiring/verifier asserts == bundle verdict
 
 
+_AGENT_BUNDLE = {
+    "case_id": "VIGIA-REAL-007",
+    "agent_verdict": "SUSPICION",
+    "evidence_path": "/ev/case",
+    "analysis_timestamp": "2026-01-01T00:00:00+00:00",
+    "signal_stats": {"n_unanalyzed_artifacts": 1},
+    "pipeline_results": {
+        "abduction": {"best_hypothesis": "SUSPICION"},
+        "results": {"unanalyzed_artifacts": [{"evidence_type": "pagefile", "path": "/ev/pagefile.sys"}]},
+        "self_corrections": [{"contradiction_type": "TCV_temporal_skip",
+                              "recommended_action": "cap_to_suspicion"}],
+    },
+}
+
+
+def test_build_from_agent_bundle_matches_verdict_and_verifies():
+    trace = build_from_agent_bundle(_AGENT_BUNDLE)
+    # DECISION verdict equals the sealed bundle verdict (pairing holds by construction)
+    assert trace["verdict"] == "SUSPICION"
+    r = verify_reasoning_trace(_AGENT_BUNDLE, trace)
+    assert r.valid, r.to_dict()
+
+
+def test_build_from_agent_bundle_records_unanalyzed_and_self_correction():
+    trace = build_from_agent_bundle(_AGENT_BUNDLE)
+    kinds = [s["kind"] for s in trace["steps"]]
+    assert "evidence" in kinds        # NOT_ANALYZED evidence for the pagefile
+    assert "self_correction" in kinds  # the TCV cap, chained
+    # B-151b: the self-correction is chained as a contradiction_detector entry
+    sc = [e for e in trace["tool_execution_log"] if e["tool"] == "contradiction_detector"]
+    assert len(sc) == 1
+    # B-148: the unanalyzed artifact is NOT_ANALYZED and does not support anything
+    ev = [s for s in trace["steps"] if s["kind"] == "evidence"][0]
+    assert ev["payload"]["observation"] == "NOT_ANALYZED"
+    assert "supports" not in ev["payload"]
+
+
+def test_build_from_agent_bundle_is_deterministic():
+    a = build_from_agent_bundle(_AGENT_BUNDLE)
+    b = build_from_agent_bundle(_AGENT_BUNDLE)
+    assert a["chain_tip_sha256"] == b["chain_tip_sha256"]
+
+
 def test_detect_negation():
     assert detect_negation("no network activity observed")
     assert detect_negation("the socket table was absent")
     assert not detect_negation("outbound connection to 8.8.8.8 confirmed")
+
+
+# ── verify_reasoning_trace: the process-not-result pairing guard ───────────────
+
+def test_verify_trace_passes_when_verdict_matches_bundle():
+    sealed = ForensicReasoningTrace(case_id="CASE-X", objective="o").seal(
+        "SUSPICION", Fraction(1, 2), sealed_at=_TS)
+    bundle = {"case_id": "CASE-X", "agent_verdict": "SUSPICION"}
+    r = verify_reasoning_trace(bundle, sealed)
+    assert r.valid, r.to_dict()
+
+
+def test_verify_trace_FAILS_on_verdict_divergence():
+    # Red-first: simulate a wiring bug — the trace recorded MALICE, the sealed
+    # bundle says SUSPICION. The verifier MUST fail explicitly, not "probably".
+    sealed = ForensicReasoningTrace(case_id="CASE-X", objective="o").seal(
+        "MALICE", Fraction(1, 2), sealed_at=_TS)
+    bundle = {"case_id": "CASE-X", "agent_verdict": "SUSPICION"}
+    r = verify_reasoning_trace(bundle, sealed)
+    assert not r.valid
+    assert any("VERDICT DIVERGENCE" in e for e in r.errors)
+
+
+def test_verify_trace_FAILS_on_tampered_chain():
+    sealed = _full_trace(case_id="CASE-Y").seal("SUSPICION", Fraction(3, 5), sealed_at=_TS)
+    bundle = {"case_id": "CASE-Y", "agent_verdict": "SUSPICION"}
+    sealed["tool_execution_log"][1]["result_summary"] = "TAMPERED"
+    r = verify_reasoning_trace(bundle, sealed)
+    assert not r.valid
+    assert any("chain invalid" in e for e in r.errors)
+
+
+def test_verify_trace_FAILS_on_case_id_mismatch():
+    sealed = ForensicReasoningTrace(case_id="CASE-A", objective="o").seal(
+        "NOISE", Fraction(0), sealed_at=_TS)
+    bundle = {"case_id": "CASE-B", "agent_verdict": "NOISE"}
+    r = verify_reasoning_trace(bundle, sealed)
+    assert not r.valid
+    assert any("case_id mismatch" in e for e in r.errors)
