@@ -110,7 +110,9 @@ class TestBreak016EndToEnd:
             assert bundle.get("agent_verdict") == "MALICE"
             assert proc.returncode == 1
         finally:
-            for leftover in (out, out + ".sha256"):
+            # out[:-5] drops ".json"; the agent also writes a _reasoning_trace.json
+            # sibling (Cronos-in-VIGÍA wiring) that must be cleaned up too.
+            for leftover in (out, out + ".sha256", out[:-5] + "_reasoning_trace.json"):
                 if os.path.exists(leftover):
                     os.unlink(leftover)
 
