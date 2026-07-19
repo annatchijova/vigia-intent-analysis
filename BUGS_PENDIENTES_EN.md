@@ -6534,11 +6534,11 @@ session); 0-flip gate shared with F1.
 
 ---
 
-## B-145 — VIGIA-REAL-007 (Nitroba) `expected_verdict`: LABEL-INTEGRITY finding, not a scoring defect — MALICE was wrong from the case's first commit, corrected 2026-07-12; `cases/input/` copy still uncorrected [PARTIALLY RESOLVED]
+## B-145 — VIGIA-REAL-007 (Nitroba) `expected_verdict`: LABEL-INTEGRITY finding, not a scoring defect — MALICE was wrong from the case's first commit, corrected 2026-07-12 in the 3 active copies; 4 non-active carriers still read MALICE (census extended 2026-07-19, point 4) [PARTIALLY RESOLVED]
 
 | Field | Value |
 |-------|-------|
-| **Status** | PARTIALLY RESOLVED — 3 of 4 on-disk copies corrected 2026-07-12 (`cf8a37c5`, `3f3a271f`); `cases/input/VIGIA-REAL-007.json` still reads `MALICE` as of this audit (2026-07-18) |
+| **Status** | PARTIALLY RESOLVED — the 3 **active** case-source copies (`data/cases/{,converted/,legacy/}`) were corrected 2026-07-12 (`cf8a37c5`, `3f3a271f`). Extended census 2026-07-19 (point 4) finds **4 non-active carriers** still `MALICE`: `cases/input/VIGIA-REAL-007.json`, `data/vigia_forensic_cases.json` (SKIP_STEMS), and 2 dated calibration datasets. None feed the published metric (all outside `CASES_DIRS`). No case/dataset file edited by this audit. |
 | **Severity** | P2 — ground-truth **label** integrity. Classified separately from a scoring-engine defect: no site in `vigia_scorer.py` ever produced an incorrect verdict against this evidence. |
 | **File** | `data/cases/VIGIA-REAL-007.json`, `data/cases/converted/VIGIA-REAL-007.json`, `data/cases/legacy/VIGIA-REAL-007.json`, `cases/input/VIGIA-REAL-007.json` (4 tracked copies of the case, per the R3-3/R3-3b/R3-3c shadow-copy pattern) |
 | **Detected in** | Git-history archaeology requested by @annatchijova, 2026-07-18 — full `git log -p --follow` trace of `expected_verdict` across all 4 copies, all branches, after unshallowing the clone (`git fetch --unshallow`; the shallow clone in the working session only exposed one squashed commit). |
@@ -6617,6 +6617,45 @@ directly evidenced):**
    active scoring/corpus pipeline, so this residual does **not** affect any
    published metric. It is a live inconsistency, not currently fixed (this
    audit is read-only per instructions; no case file was modified).
+
+4. **Extended census (2026-07-19) — the residual is wider than one copy.**
+   A full-tree scan of every carrier of the string `VIGIA-REAL-007`, extracting
+   the case-specific label (not a file-wide grep), shows the `MALICE → SUSPICION`
+   correction reached the three *active* case-source copies only. Four
+   **non-active** carriers still read `MALICE` for this case as of 2026-07-19:
+   - `cases/input/VIGIA-REAL-007.json` — `MALICE` (already documented in point 3;
+     `OUTSIDE_ALLOWLIST`).
+   - `data/vigia_forensic_cases.json` — `case_id=VIGIA-REAL-007 → MALICE`. This is
+     the ur-source from point 1. It is **not** loaded as an individual case: it is
+     listed in `SKIP_STEMS` (`run_all_agent.py:36-37`; likewise referenced in skip
+     context by `scripts/redteam_round3_emergent.py:144` and
+     `scripts/dryrun_signal_quality_gate.py:45`). Same shape as the corrected
+     copies (bare `expected_verdict`, no motor field), so it is a genuine
+     un-synced label — just not one the batch metric consumes. Point 3 did not
+     list it as a live residual; this entry corrects that omission.
+   - `data/calibration_ladder_dataset_20260705.json` — `cases[54]:
+     {expected: MALICE, motor_verdict: SUSPICION}`.
+   - `data/signal_calibration_dataset_20260709.json` — `records[422..424]:
+     {ground_truth: MALICE, case_motor_verdict: SUSPICION}` (3 records).
+
+   **Refutation — does any of this flip the published corpus metric? No.** The
+   active case set the deterministic runner reads is `CASES_DIRS`
+   (`run_all_agent.py:22-28`: `data/cases`, `converted`, `benign`,
+   `consolidated_canonical`, `legacy`). None of the four residual carriers is in
+   it. The R3-3 shadow-copy guard (`check_label_consistency`) scans only
+   `CASES_DIRS`, so it passes — the three active copies agree on `SUSPICION` — and
+   by design does not see these four. Published corpus accuracy is therefore
+   unaffected; this remains LABEL INTEGRITY, not a scoring defect.
+
+   **Honest caveat — the two calibration datasets are likely frozen snapshots,
+   not bugs.** Each 007 record carries the old ground-truth label (`MALICE`) AND
+   the current motor verdict (`SUSPICION`) side by side, in a file whose name is
+   date-stamped. That structure is consistent with an intentional
+   expected-vs-motor calibration baseline that deliberately records the
+   divergence. They are **not** asserted to be defects and were **not** edited;
+   flagged for @annatchijova's decision. `data/vigia_forensic_cases.json`, by
+   contrast, is an un-dated live source with no motor field — the one residual
+   that plausibly warrants a relabel.
 
 **Classification: LABEL INTEGRITY, not a scoring-engine bug.** At every point
 in this history, the deterministic motor's own verdict for this evidence was
