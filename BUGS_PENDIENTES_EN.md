@@ -6538,7 +6538,7 @@ session); 0-flip gate shared with F1.
 
 | Field | Value |
 |-------|-------|
-| **Status** | PARTIALLY RESOLVED — the 3 **active** case-source copies (`data/cases/{,converted/,legacy/}`) were corrected 2026-07-12 (`cf8a37c5`, `3f3a271f`). Extended census 2026-07-19 (point 4) finds **4 non-active carriers** still `MALICE`: `cases/input/VIGIA-REAL-007.json`, `data/vigia_forensic_cases.json` (SKIP_STEMS), and 2 dated calibration datasets. None feed the published metric (all outside `CASES_DIRS`). No case/dataset file edited by this audit. |
+| **Status** | PARTIALLY RESOLVED — the 3 **active** case-source copies (`data/cases/{,converted/,legacy/}`) were corrected 2026-07-12 (`cf8a37c5`, `3f3a271f`). Extended census 2026-07-19 (point 4) found **4 non-active carriers** still `MALICE`; `data/vigia_forensic_cases.json` (the one live un-dated source) was then relabeled to `SUSPICION` (2026-07-19). **3 non-consumer carriers remain `MALICE` by decision:** `cases/input/VIGIA-REAL-007.json` (`OUTSIDE_ALLOWLIST`) and 2 dated calibration snapshots (frozen offline calibration inputs — editing them would break B-076 reproducibility). None feed the published metric (all outside `CASES_DIRS`). |
 | **Severity** | P2 — ground-truth **label** integrity. Classified separately from a scoring-engine defect: no site in `vigia_scorer.py` ever produced an incorrect verdict against this evidence. |
 | **File** | `data/cases/VIGIA-REAL-007.json`, `data/cases/converted/VIGIA-REAL-007.json`, `data/cases/legacy/VIGIA-REAL-007.json`, `cases/input/VIGIA-REAL-007.json` (4 tracked copies of the case, per the R3-3/R3-3b/R3-3c shadow-copy pattern) |
 | **Detected in** | Git-history archaeology requested by @annatchijova, 2026-07-18 — full `git log -p --follow` trace of `expected_verdict` across all 4 copies, all branches, after unshallowing the clone (`git fetch --unshallow`; the shallow clone in the working session only exposed one squashed commit). |
@@ -6647,15 +6647,32 @@ directly evidenced):**
    by design does not see these four. Published corpus accuracy is therefore
    unaffected; this remains LABEL INTEGRITY, not a scoring defect.
 
-   **Honest caveat — the two calibration datasets are likely frozen snapshots,
+   **Honest caveat — the two calibration datasets are frozen offline snapshots,
    not bugs.** Each 007 record carries the old ground-truth label (`MALICE`) AND
    the current motor verdict (`SUSPICION`) side by side, in a file whose name is
-   date-stamped. That structure is consistent with an intentional
-   expected-vs-motor calibration baseline that deliberately records the
-   divergence. They are **not** asserted to be defects and were **not** edited;
-   flagged for @annatchijova's decision. `data/vigia_forensic_cases.json`, by
-   contrast, is an un-dated live source with no motor field — the one residual
-   that plausibly warrants a relabel.
+   date-stamped. Consumer analysis (2026-07-19) confirms the structure is
+   deliberate: `calibration_ladder_dataset_20260705.json` is referenced only by
+   its generator (`scripts/generate_ladder_dataset.py:110`) and by a **comment**
+   in `vigia_scorer.py:1181` documenting that the SUSPICION threshold 0.18→0.10
+   (B-076) was calibrated against it offline — the scorer does **not** load it at
+   runtime; the calibrated constant is baked in. `signal_calibration_dataset_
+   20260709.json` is referenced only by its generator, an offline refit
+   experiment (`scripts/experiment_a4_profile_refit.py:51`), and a test. Neither
+   is runtime ground truth. Editing them would retroactively alter the input of a
+   documented calibration (B-076 predates the 2026-07-12 relabel), breaking its
+   reproducibility. They were **not** edited, by decision.
+
+   **Resolution (2026-07-19):** `data/vigia_forensic_cases.json` — the one residual
+   that is an un-dated live source with no motor field, same class as the three
+   already-corrected copies — was relabeled `MALICE → SUSPICION` for `case_id
+   VIGIA-REAL-007` (surgical single-line patch, anchored on the unique
+   description line; JSON re-validated; diff = 1 line; `confidence_expected: 91`
+   left untouched, matching `cf8a37c5`'s minimal scope; full suite green
+   1624 passed). `cases/input/VIGIA-REAL-007.json` remains `MALICE` by prior
+   `OUTSIDE_ALLOWLIST` status (unchanged). The two calibration datasets remain
+   `MALICE` by the decision above. Net live-source state: 007 now reads
+   `SUSPICION` in every source the pipeline could load; the remaining `MALICE`
+   carriers are all documented non-consumers.
 
 **Classification: LABEL INTEGRITY, not a scoring-engine bug.** At every point
 in this history, the deterministic motor's own verdict for this evidence was
