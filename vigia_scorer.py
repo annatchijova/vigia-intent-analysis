@@ -1213,7 +1213,18 @@ def _vigia_score(case: dict) -> dict:
         and not fractures
     )
 
+    # B-151a: the single-artifact corroboration cap silently rewrote final_score
+    # (>0.65 -> 0.65) with no auditable trace — a transformation that reduces
+    # probative strength must leave a reason (CLAUDE.md Refutation Protocol).
+    # Record what was capped; surfaced into base_result below. Verdict-neutral.
+    _single_artifact_cap = None
     if n_artifacts < 2 and final_score > 0.65:
+        _single_artifact_cap = {
+            "pre_cap_score": _dround(final_score, _DETERMINISTIC_OUTPUT_PREC),
+            "capped_to": 0.65,
+            "rule": "single-artifact corroboration cap (n_artifacts < 2): a lone "
+                    "artifact class cannot sustain a high-confidence intent score",
+        }
         final_score = 0.65
 
     if hard_temporal:
@@ -1616,6 +1627,19 @@ def _vigia_score(case: dict) -> dict:
                 "documents the gap (re-submit with a well-formed ISO-8601 "
                 "timestamp). See temporal_pairs_skipped."
             )
+
+    # B-151a: disclose the single-artifact corroboration cap (if it fired) so the
+    # sealed result records that final_score was reduced and why — never a silent
+    # numeric rewrite. Verdict-neutral: the cap already applied above; this only
+    # makes the pre-existing transformation auditable.
+    if _single_artifact_cap is not None:
+        base_result["single_artifact_score_cap"] = _single_artifact_cap
+        base_result["reason"] = (
+            base_result.get("reason", "")
+            + f" [single-artifact cap: raw intent score "
+              f"{_single_artifact_cap['pre_cap_score']} capped to 0.65 — "
+              f"see single_artifact_score_cap]"
+        )
 
     # Rejected-artifact disclosure (H-10 / S-2, 2026-07-18, evidence integrity).
     #

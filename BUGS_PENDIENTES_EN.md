@@ -6969,3 +6969,43 @@ now equal (GREEN); a UTC-host regression test and an explicit-offset test pin th
 unchanged paths. Full suite 1635 passed, 0 failed. No corpus gate needed — the
 fix only changes naive inputs, which the corpus does not contain, and on a UTC
 host naive==UTC before and after regardless.
+
+---
+
+## B-151 — Scorer downgrades: (a) silent single-artifact score clamp [RESOLVED, dead code]; (b) mandated contradiction_detector chain entry not wired in Mode-1 [OPEN — architecture decision]
+
+| Field | Value |
+|-------|-------|
+| **Status** | (a) RESOLVED (2026-07-19) — clamp made auditable; also found unreachable. (b) OPEN — architecture decision, deliberately NOT bundled with (a). |
+| **Severity** | (a) P3 (disclosure of a dead-code clamp). (b) P2 (doctrine-vs-implementation gap). |
+| **File** | (a) `vigia_scorer.py` clamp ~1216 + marker ~1620; (b) `vigia_scorer.py` (no `ToolExecutionLogChain` in the decision path). |
+
+**(a) Silent single-artifact score clamp — RESOLVED, with an honest twist.**
+`if n_artifacts < 2 and final_score > 0.65: final_score = 0.65` silently rewrote
+the sealed score (a probative-strength reduction with no reason/marker, unlike
+every other downgrade in the cascade). Fix: capture the pre-cap score and surface
+a `single_artifact_score_cap` marker + reason note into `base_result`, mirroring
+the `normalization_failures` / `temporal_pairs_skipped` disclosure pattern.
+Verdict-neutral (the cap already applied; disclosure is additive).
+
+**Twist found while verifying: the clamp is currently UNREACHABLE dead code.** A
+single signal artifact is suppressed to a max score of ~0.038 (`cryptographic_hash`,
+raw 0.99, all boosters) — far below the 0.65 cap — so the "silent downgrade" this
+item named is not a live risk; the clamp is defensive and the marker is
+forward-looking disclosure. Pinned by `tests/test_b151a_single_artifact_cap.py`:
+if a single artifact ever scores >= 0.65 the test fails, flagging that the marker
+path has gone live. `_dround` returns float, so `final_score` here is float by the
+scorer's deterministic-rounding design (not a pure-Fraction path) — the `= 0.65`
+assignment is type-consistent, no new float injection.
+
+**(b) contradiction_detector chain entry not wired in Mode-1 — OPEN.** CLAUDE.md's
+"Self-Correction Event Schema" mandates that every gate-driven downgrade append a
+`contradiction_detector` entry via `ToolExecutionLogChain`. Verified: `vigia_scorer.py`,
+`bundle_builder.py`, `pipeline.py`, `sift_orchestrator.py` contain **zero**
+references to `ToolExecutionLogChain` / `contradiction_detector` — the appender is
+instantiated only in tests and a red-team script. So the deterministic Mode-1 path
+does not emit the mandated tamper-evident self-correction events (the cascade DOES
+set human-readable `reason` strings for 7/8 downgrades — the gap is the *chained*
+event, not the reason). This is an architecture decision — wire it into Mode-1, or
+amend the doctrine to state the chained self-correction event is a Mode-2 (Claude
+Code) construct by design. Deliberately NOT fixed as a one-liner. Not yet decided.
