@@ -128,7 +128,20 @@ class MFTTimelineAnalyzer:
             # Fallback: timestamp_utc es el default "1970-01-01T00:00:00Z" — usar conservador
             self._analysis_epoch = 1735689600  # 2025-01-01T00:00:00Z
 
-        entries = self._parse(json.loads(parsed_json or "{}").get("entries", []))
+        # B-147 (honest degradation): parsed_json is an external parameter; guard
+        # it like timestamp_utc above — a malformed value, deep nesting, or a
+        # valid-but-non-object payload must degrade to zero MFT entries with a
+        # boundary warning, never crash the analysis.
+        try:
+            _parsed = json.loads(parsed_json or "{}")
+            _mft_rows = _parsed.get("entries", []) if isinstance(_parsed, dict) else []
+        except (json.JSONDecodeError, RecursionError, ValueError) as _pj_err:
+            logger.warning(
+                "[MFT] parsed_json inválido/no parseable (%s) — degradando a 0 entradas MFT",
+                _pj_err,
+            )
+            _mft_rows = []
+        entries = self._parse(_mft_rows)
         sorted_entries = sorted(entries, key=lambda e: e.record_number)
 
         timestomp, hardlinks, ads, slack, recreation = [], [], [], [], []

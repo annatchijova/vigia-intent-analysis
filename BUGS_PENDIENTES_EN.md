@@ -6776,7 +6776,7 @@ full read of `canonicalize.py` (v1 + v2 encoders + dual-canon docstring);
 
 | Field | Value |
 |-------|-------|
-| **Status** | PARTIALLY — the two vectors Qwen named are refuted (see below). One latent, non-live API-robustness gap found in `disk_forensics.py:131` (not currently reachable with malicious input; hardening candidate). |
+| **Status** | RESOLVED (2026-07-19) — the two vectors Qwen named are refuted (see below). The one latent gap (`disk_forensics.py:131`) was hardened with an honest-degradation guard + red-first tests. |
 | **Severity** | P3 — availability hardening. No live exploitable path found. |
 | **File** | `vigia/tools/caie.py` (`_extract_assertions`), JSON parser (empirical), `vigia/sift/{pcap_parser,memory_forensics,disk_forensics}.py`, `vigia/vigia_command_center.py` |
 | **Proposed by** | External model (Qwen), 2026-07-19, as "Point 3 — parsing pathologies / ReDoS / Billion Laughs". Verified against live code + empirically per §1.3 before acceptance. |
@@ -6844,12 +6844,18 @@ Gate result       : Vectors 1-3 REJECTED (no regex; bounded RecursionError;
                     hardening candidate, not a live vulnerability.
 ```
 
-**Proposed hardening (pending, if actioned):** wrap `disk_forensics.py:131` in
-`try/except (json.JSONDecodeError, RecursionError)` → log + degrade to empty
-entries (honest degradation, mirroring the `timestamp_utc` guard above it).
-Red-first characterization test: call `analyze()` with malformed `parsed_json`,
-assert it degrades rather than raising. Corpus comparative gate: 0 verdict flips
-(valid JSON inputs are unaffected by construction).
+**Resolution (2026-07-19).** `disk_forensics.py:131` wrapped in
+`try/except (json.JSONDecodeError, RecursionError, ValueError)` plus an
+`isinstance(_parsed, dict)` shape check → on any failure, log a boundary warning
+and degrade to zero MFT entries (honest degradation, mirroring the
+`timestamp_utc` guard 10 lines above). Red-first: `tests/test_disk_forensics_
+ingest_guard.py` — three adversarial cases (malformed JSON → JSONDecodeError;
+depth-100000 nesting → RecursionError; valid-but-list payload → AttributeError)
+all crashed pre-fix and now degrade to `total_entries == 0`; a fourth
+regression test confirms a well-formed payload still parses (1 entry).
+Comparative gate: full suite **1628 passed** (1624 prior + 4 new), 0 flips —
+valid JSON is unaffected by construction (same `.get("entries")` path via the
+`isinstance(dict)` branch).
 
 **Verification:** read of `caie.py:1020-1089`; `python3` depth-100000 JSON test
 (both array and object → bounded RecursionError, exit 0); `sed`/read of the 4
