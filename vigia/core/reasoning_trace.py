@@ -6,6 +6,25 @@ VIGÍA". It records the Peircean forensic loop (hypotheses, evidence, refutation
 verdict) as a tamper-evident trace sealed BESIDE the ForensicBundle, never
 inside the sealed verdict (LLM/trace stays out of the decision path).
 
+PROCESS EVIDENCE, NEVER RESULT EVIDENCE — read this before wiring.
+-----------------------------------------------------------------
+This trace records HOW the investigation reasoned, not WHAT it concluded. The
+authoritative result is, and remains, the sealed `bundle_hash` / verdict in the
+ForensicBundle. The trace is attached OUTSIDE that hash (a narrative sibling
+excluded from `bundle_hash`, like `integrity`), so editing the trace does NOT
+invalidate the verdict — and, symmetrically, the trace can never *become* the
+verdict. Its own integrity is self-contained: the embedded ToolExecutionLogChain
+(entry_hash/entry_hmac + chain_tip anchor) seals the trace independently.
+
+Because the two live side by side, there is exactly one rule: the verdict the
+trace records in its DECISION step MUST equal the sealed bundle verdict. A
+divergence between them is NOT an acceptable ambiguity to be interpreted away —
+it is a BUG in the wiring (the trace was built from a different result than the
+one sealed), and a verifier that sees `reasoning_trace.verdict != bundle verdict`
+must FAIL, never silently prefer one. The trace explains the sealed result; it
+must never contradict it. `sealed_verdict()` exposes the recorded verdict so the
+wiring/verifier can assert this equality at the boundary.
+
 Ported and adapted from the Cronos black-box recorder, with three VIGÍA-native
 changes:
 
@@ -346,3 +365,15 @@ class ForensicReasoningTrace:
         }
         sealed.update(chain.bundle_fields())  # chain_tip_sha256 (+ chain_tip_hmac)
         return sealed
+
+    def sealed_verdict(self) -> Optional[str]:
+        """The verdict recorded in the DECISION step (None until sealed).
+
+        The wiring and any verifier MUST assert this equals the sealed bundle
+        verdict. A divergence is a wiring bug — the trace was built from a
+        different result than the one sealed — and must FAIL verification, never
+        be silently reconciled (see the module docstring: process, not result)."""
+        for s in reversed(self._steps):
+            if s.kind == StepKind.DECISION:
+                return s.payload.get("verdict")
+        return None

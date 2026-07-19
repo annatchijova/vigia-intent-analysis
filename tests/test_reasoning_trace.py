@@ -146,6 +146,13 @@ def test_no_steps_after_seal():
         t.add_hypothesis("late", "too late")
 
 
+def test_sealed_verdict_exposes_recorded_verdict_for_consistency_check():
+    t = _full_trace()
+    assert t.sealed_verdict() is None  # not sealed yet
+    t.seal("SUSPICION", Fraction(3, 5), sealed_at=_TS)
+    assert t.sealed_verdict() == "SUSPICION"  # wiring/verifier asserts == bundle verdict
+
+
 def test_detect_negation():
     assert detect_negation("no network activity observed")
     assert detect_negation("the socket table was absent")
