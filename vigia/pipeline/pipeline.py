@@ -1310,9 +1310,15 @@ class VigiaPipeline:
         whole vigia/ engine tree plus dependency manifests, with fail-visible
         handling of unreadable files.
 
-        Known residual boundary (documented, not silent): the shared attestation
-        walks the vigia/ package (_ROOT); vigia_scorer.py at the repository root
-        sits outside that tree. Widening the boundary is tracked separately.
+        Coverage boundary (V-1, 2026-07-18): the walk covers the vigia/ package
+        (_ROOT) AND the three root decision-path modules that live outside it —
+        vigia_scorer.py, vigia_agent.py, sift_orchestrator.py, the exact set
+        pyproject.toml declares as the sealed verdict pipeline (--cov). Earlier
+        the residual boundary named only vigia_scorer.py, silently omitting the
+        other two; all three are now folded in (default mode), each with the
+        same fail-visible handling (absent/unreadable → marker, never silent
+        drop). caie_legacy_root.py is deliberately excluded: no runtime module
+        imports it (dead code, not on the decision path).
         """
         try:
             from vigia.core.bundle_builder import BundleBuilder

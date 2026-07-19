@@ -4,9 +4,13 @@ echo "Running all VIGIA tests (85 tests + 186 cases)"
 echo "=========================================="
 
 echo ""
+# V-2 (docs/PATTERN_HUNT_20260718.md): this wrapper ran `pytest tests/`,
+# silently dropping vigia/tests/ (and collecting tests/integration, the
+# standalone runner). Now matches the authoritative full-suite command in
+# CLAUDE.md: tests/ + vigia/tests/, integration ignored.
 echo "[1/5] Running pytest suite..."
-python -m pytest tests/ -v --tb=short 2>&1 | tee test_results.log
-echo "Exit code: $?"
+python -m pytest tests/ vigia/tests/ --ignore=tests/integration -v --tb=short 2>&1 | tee test_results.log
+echo "Exit code: ${PIPESTATUS[0]}"
 
 echo ""
 echo "[2/5] Running all cases (186)..."

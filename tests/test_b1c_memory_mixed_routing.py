@@ -161,4 +161,22 @@ class TestEscalationAndHonesty:
                             _vol3_ok("Windows profile identified"))
         kwargs = _build_orchestrator_kwargs(dummy_dir, {})
         result = so.SIFTOrchestrator("T-B1C-JSON").analyze(**kwargs)
-        json.dumps(result, default=str)
+        # U-5 (docs/PATTERN_HUNT_20260718.md): this asserted NOTHING — the call
+        # was `json.dumps(result, default=str)` with no assert, so it could never
+        # fail. Investigated 2026-07-18: `default=str` is NOT masking a bug — it
+        # is the system's actual serialization contract. The orchestrator works
+        # in Fraction internally (Invariant 4: deterministic scoring, no floats
+        # in the decision path), and EVERY production serialization of this
+        # result uses default=str (pipeline.py:1477, vigia_integration_bridge.py
+        # :1248/:1282). So a native json.dumps(result) legitimately raises on the
+        # internal Fraction; asserting native serializability would impose a
+        # contract the system deliberately does not use. The real fix is to
+        # ASSERT under the production contract: it round-trips to a non-empty
+        # structure. (A future value that is not even str-coercible — a bytes
+        # blob, a circular ref — would still make this raise.)
+        dumped = json.dumps(result, default=str)  # production serialization contract
+        restored = json.loads(dumped)
+        assert isinstance(restored, dict) and restored, (
+            "merge result did not round-trip to a non-empty dict under the "
+            "production (default=str) serialization contract"
+        )

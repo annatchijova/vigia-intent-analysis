@@ -385,10 +385,33 @@ class BundleBuilder:
         - __pycache__/ y cualquier .pyc / .pyo (H7)
         - Archivos temporales del SO (*.tmp, *.swp, *~, .DS_Store)
         - Logs y archivos de cobertura (*.log, .coverage)
+
+        V-1 (docs/PATTERN_HUNT_20260718.md, 2026-07-18): la caminata cubre el
+        árbol vigia/ (_ROOT), pero los módulos de decisión que viven en la RAÍZ
+        del repo — vigia_scorer.py, vigia_agent.py, sift_orchestrator.py, los
+        mismos tres que pyproject.toml declara como "the sealed verdict
+        pipeline" (--cov) — quedaban fuera: cambiarlos dejaba
+        engine_attestation_hash byte-idéntico. La frontera residual documentada
+        nombraba solo vigia_scorer.py, ocultando los otros dos. Ahora, EN MODO
+        DEFAULT (source_dirs is None), los tres se pliegan al hash con la misma
+        degradación honesta (ausente/ilegible → marcador que perturba, nunca
+        desaparición silenciosa). Con source_dirs explícito el comportamiento
+        no cambia (los tests que pasan un dir temporal siguen viendo solo ese
+        dir). caie_legacy_root.py queda fuera a propósito: ningún módulo de
+        runtime lo importa (código muerto), no está en el decision path.
         """
         _EXCLUDED_DIRS = {"__pycache__", ".git", ".mypy_cache", ".ruff_cache", "node_modules"}
         _EXCLUDED_SUFFIXES = {".pyc", ".pyo", ".tmp", ".swp", ".log", ".coverage"}
         _EXCLUDED_NAMES = {".DS_Store", "Thumbs.db"}
+
+        # Módulos de decisión en la raíz del repo (fuera de _ROOT=<repo>/vigia).
+        # Set autoritativo = el --cov de pyproject.toml. Ordenado para
+        # determinismo. Solo se pliegan en modo default (V-1).
+        _ROOT_DECISION_MODULES = (
+            "sift_orchestrator.py",
+            "vigia_agent.py",
+            "vigia_scorer.py",
+        )
 
         # Archivos de dependencias a incluir (H32)
         _DEFAULT_DEP_FILES = ["requirements.txt", "pyproject.toml"]
@@ -429,6 +452,37 @@ class BundleBuilder:
                                 "engine attestation: source unreadable, folded "
                                 "into hash as %s (%s)", marker.strip(), exc,
                             )
+
+            # 1b. Módulos de decisión de la raíz del repo (V-1). Solo en modo
+            # default: con source_dirs explícito el llamador define el scope.
+            if source_dirs is None:
+                _repo_root = os.path.dirname(_ROOT)
+                for mod_name in _ROOT_DECISION_MODULES:  # ya ordenado
+                    mpath = os.path.join(_repo_root, mod_name)
+                    if not os.path.isfile(mpath):
+                        # Un módulo de decisión declarado que falta DEBE perturbar
+                        # el hash (no puede desaparecer en silencio): borrar
+                        # vigia_scorer.py no puede dejar la attestation idéntica.
+                        marker = f"MISSING_ROOT_MODULE:{mod_name}\n"
+                        sources.append(marker.encode("utf-8"))
+                        logger.warning(
+                            "engine attestation: root decision module %s absent, "
+                            "folded into hash as %s", mod_name, marker.strip(),
+                        )
+                        continue
+                    try:
+                        with open(mpath, "rb") as f:
+                            sources.append(
+                                f"ROOT:{mod_name}\n".encode("utf-8") + f.read()
+                            )
+                    except OSError as exc:
+                        marker = f"UNREADABLE_ROOT_MODULE:{mod_name}\n"
+                        sources.append(marker.encode("utf-8"))
+                        logger.warning(
+                            "engine attestation: root decision module %s present "
+                            "but unreadable, folded into hash as %s (%s)",
+                            mod_name, marker.strip(), exc,
+                        )
 
             # 2. Archivos de dependencias (H32)
             dep_paths = dep_files if dep_files is not None else _DEFAULT_DEP_FILES

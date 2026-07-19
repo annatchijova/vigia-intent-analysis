@@ -182,16 +182,21 @@ def _case_with_one_malformed_artifact() -> dict:
                 "metadata": {},
             },
             {
-                # raw_score not numeric -> breaks CAIE construction ->
-                # currently discarded with `continue` without leaving a trace.
+                # S-2 (2026-07-18): the original vector was raw_score
+                # "not_a_number", but CAIE's Artifact accepts that today (the
+                # Finite Math Shield clamps it downstream) — it is no longer
+                # rejected, so it stopped exercising H-10. An evidence_type
+                # outside the whitelist is the durable rejection: add_artifact()
+                # returns False (B-067) and the scorer wiring used to ignore that
+                # return, dropping the artifact with no trace.
                 "artifact_id": "broken_001",
-                "evidence_type": "memory_process",
+                "evidence_type": "totally_unknown_evidence_type",
                 "source_tool": "list_processes",
                 "timestamp": "2026-04-10T10:00:01Z",
-                "raw_score": "not_a_number",
+                "raw_score": 0.6,
                 "prior_trust": 0.9,
                 "provenance_chain": ["sha256:b1"],
-                "description": "malformed artifact that would have produced a fracture",
+                "description": "artifact of an unknown type that CAIE rejects",
                 "metadata": {},
             },
         ],
@@ -202,13 +207,16 @@ def _case_with_one_malformed_artifact() -> dict:
     }
 
 
-@pytest.mark.xfail(
-    reason="H-10: malformed artifact is discarded with `except Exception: continue` "
-           "without being reported. The verdict must expose a rejection count "
-           "(artifacts_rejected) to preserve reproducibility/completeness.",
-    strict=False,
-)
 def test_rejected_artifact_is_surfaced_in_verdict():
+    """H-10 — RESOLVED (S-2, docs/PATTERN_HUNT_20260718.md, 2026-07-18).
+
+    Was xfail: a malformed artifact was dropped in the scorer's CAIE wiring
+    with `except Exception: log + continue`, no counter in the result, and
+    caie_fractures_source stayed "live_caie" — the verdict read as fully
+    analyzed while an artifact was silently omitted. The public caie.evaluate()
+    path already surfaced artifacts_rejected; the wiring now mirrors it, plus
+    the evidence-integrity ABSTAIN-on-NOISE gate (same doctrine as the P1
+    temporal/normalization gates). Now a real guard."""
     result = _vigia_score(_case_with_one_malformed_artifact())
     rejected = (
         result.get("artifacts_rejected")
@@ -216,7 +224,16 @@ def test_rejected_artifact_is_surfaced_in_verdict():
         or result.get("rejected_artifacts")
     )
     assert rejected, (
-        "A malformed artifact was discarded without reporting it in the output. "
+        "A rejected artifact was discarded without reporting it in the output. "
         "A silent discard changes the verdict in an un-auditable way. "
         f"Result keys: {sorted(result.keys())}."
     )
+    # The disclosure records WHICH artifact was dropped and why (reproducibility).
+    details = result.get("rejected_details") or []
+    assert any(d.get("artifact_id") == "broken_001" for d in details), (
+        f"rejected_details did not identify the dropped artifact: {details}"
+    )
+    # Disclosure only — the verdict is NOT forced to ABSTAIN by a rejection: a
+    # whitelist rejection of an unknown evidence_type is by-design (B-067) and a
+    # legitimate NOISE. Forcing ABSTAIN here would contradict L-018 / the
+    # FN-regression doctrine. (See vigia_scorer S-2 comment.)

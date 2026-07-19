@@ -1341,6 +1341,25 @@ def t99():
 
 
 
+def test_ebs_v1_integration_all_checks_passed():
+    """U-1 (docs/PATTERN_HUNT_20260718.md): real pytest gate.
+
+    The @test(...) decorators above run each check AT IMPORT and swallow any
+    AssertionError into the module-level FAILED list, which was consulted ONLY
+    under `if __name__ == "__main__"` — so under pytest every check could fail
+    and the run stayed green (the checks executed at collection, their failures
+    discarded). The authoritative run is still the standalone invocation
+    (`python3 tests/integration/test_ebs_v1_integration.py`, wired in
+    vigia-forensic-ci.yml) and this dir is --ignore'd from the default pytest
+    suite (pyproject); this function is belt-and-suspenders so that IF the file
+    is ever collected by pytest, a swallowed failure surfaces as a red test
+    instead of a silent pass. FAILED is already populated by import time."""
+    assert not FAILED, (
+        f"{len(FAILED)}/{len(PASSED) + len(FAILED)} integration checks failed "
+        f"(swallowed at import): {FAILED}"
+    )
+
+
 if __name__ == "__main__":
     print("\n" + "=" * 60)
     print("  VIGIA Forensic Suite EBS v1 — Integration Tests (Refactored)")
