@@ -8461,3 +8461,35 @@ normales en `results/` y rechaza destinos fuera del CWD como antes.
 un target explícito dentro de evidencia y un sibling `results/` válido. También
 pasan el test end-to-end B-105 del bundle/trace/checksum y las fronteras B-175
 y B-176. No altera el análisis ni los veredictos, sólo su destino de escritura.
+
+---
+
+## B-178 — exportación SQLite para SIFT podía escribir artefactos derivados dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una copia de la base pericial podía aparecer en el árbol de evidencia fuente. |
+| **Archivo** | `vigia/tools/forensic_db.py`, `tests/test_b178_forensic_db_export_boundary.py`. |
+| **Modo** | Exportación opcional SIFT del análisis pericial (`export_db_path`), disponible a través de `analyze_document_register`. |
+| **Principio afectado** | Un path de salida controlado por caller es autoridad de escritura; la evidencia no puede recibir copias derivadas ni por ruta directa ni por redirect. |
+
+**Observación reproducida:** `ForensicDatabaseManager.export_for_sift()`
+canonicalizaba sólo el nombre final, creaba el padre si faltaba y pasaba el
+path a `sqlite3.Connection.backup()`. No consultaba `VIGIA_EVIDENCE_DIR`. Una
+DB fuente externa con `export_path=<evidence>/sift-export.db` creaba la copia
+SQLite dentro de evidencia. Un padre symlink (`export-redirect -> evidence`)
+también podía redirigir la exportación, porque se inspeccionaba únicamente el
+archivo final, que aún no existía.
+
+**Corrección aplicada:** `_validate_sift_export_path()` rechaza path vacío o
+con NUL, inspecciona con `lstat` cada componente existente y rechaza symlinks,
+canonicaliza el target y prohíbe por componentes cualquier solapamiento con
+`VIGIA_EVIDENCE_DIR`. La primera validación ocurre antes de `makedirs`; una
+segunda ocurre después de crear un padre externo, antes de que SQLite abra el
+archivo. El flujo conserva la exportación legítima a un workdir externo.
+
+**Validación:** tres regresiones cubren el write directo que antes ocurría, el
+padre symlink que resolvía dentro de evidencia y el control positivo de una
+exportación SQLite externa. Junto con B-175/B-176/B-177, pasan 12 tests. No
+modifica señales, puntajes ni veredictos; sólo reduce la autoridad de salida de
+una herramienta pericial.

@@ -30,6 +30,7 @@ import hashlib
 import json
 import os
 import sqlite3
+import stat
 import statistics
 import threading
 from contextlib import contextmanager
@@ -406,18 +407,79 @@ class ForensicDatabaseManager:
     # Exportación para SIFT
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _validate_sift_export_path(export_path: str) -> str:
+        """Return a canonical external export target without touching evidence.
+
+        ``export_path`` crosses the MCP/API boundary.  It is output authority,
+        not a harmless label: a derived SQLite copy beside source evidence
+        mutates the forensic tree just as surely as any other report export.
+        Validate it before creating its parent, and reject every existing
+        symlink component rather than inspecting only the final filename.
+        """
+        if not isinstance(export_path, str) or not export_path.strip():
+            raise SecurityError("Export path must be a non-empty string")
+        if "\x00" in export_path:
+            raise SecurityError("Export path contains a null byte")
+
+        raw_target = Path(os.path.abspath(os.path.expanduser(export_path)))
+
+        def reject_symlink_components(path: Path) -> None:
+            current = Path(path.anchor)
+            for component in path.parts[1:]:
+                current /= component
+                try:
+                    metadata = os.lstat(current)
+                except FileNotFoundError:
+                    # Descendants cannot exist until this component does.
+                    break
+                except OSError as exc:
+                    raise SecurityError(
+                        f"Cannot inspect export path component: {current}"
+                    ) from exc
+                if stat.S_ISLNK(metadata.st_mode):
+                    raise SecurityError(
+                        f"Export path contains symlink component: {current}"
+                    )
+
+        reject_symlink_components(raw_target)
+        try:
+            target = raw_target.resolve(strict=False)
+        except OSError as exc:
+            raise SecurityError(f"Cannot resolve export path: {raw_target}") from exc
+
+        evidence_dir = os.environ.get("VIGIA_EVIDENCE_DIR", "").strip()
+        if evidence_dir:
+            try:
+                evidence_root = Path(
+                    os.path.abspath(os.path.expanduser(evidence_dir))
+                ).resolve(strict=False)
+            except OSError as exc:
+                raise SecurityError(
+                    f"Cannot resolve VIGIA_EVIDENCE_DIR: {evidence_dir}"
+                ) from exc
+            if target == evidence_root or target.is_relative_to(evidence_root):
+                raise SecurityError(
+                    "Refusing to export derived SQLite inside "
+                    "VIGIA_EVIDENCE_DIR (forensic evidence is read-only)"
+                )
+
+        return str(target)
+
     def export_for_sift(self, export_path: str) -> str:
         """
         Exporta la DB completa para análisis externo en SIFT Workstation.
         Retorna el path del archivo exportado.
         """
-        abs_export = os.path.abspath(os.path.expanduser(export_path))
-        if os.path.islink(abs_export):
-            raise SecurityError(f"Export path cannot be symlink: {abs_export}")
-
+        abs_export = self._validate_sift_export_path(export_path)
         parent = os.path.dirname(abs_export)
         if not os.path.exists(parent):
             os.makedirs(parent, mode=0o750)
+
+        # The directory creation above was intentionally delayed until after
+        # the evidence-boundary check.  Re-check after it to catch a symlink
+        # introduced by a concurrent local actor before SQLite opens the file.
+        abs_export = self._validate_sift_export_path(abs_export)
 
         with self.connection() as conn:
             backup_conn = sqlite3.connect(abs_export)
