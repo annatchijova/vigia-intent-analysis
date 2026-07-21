@@ -8,6 +8,12 @@ severity directly: a string ("high") or None crashed the whole scorer on the
 `>= 0.9` comparison. After the fix, a malformed severity is treated as 0.0 and
 the gate does not fire (a bad value must not fabricate an unconditional MALICE);
 a valid numeric severity still fires exactly as before.
+
+B-172 update: the hard gate now reconstructs the claimed pair from the two
+referenced artifacts' own timestamps before it may fire. "Valid" therefore
+requires artifact timestamps corroborating the inversion (effect < cause);
+the fixture carries them so this shield keeps testing the severity coercion,
+not an unverifiable claim (which would ABSTAIN regardless of severity).
 """
 
 import logging
@@ -23,9 +29,11 @@ def _case(severity):
         "artifacts": [
             {"artifact_id": "a1", "evidence_type": "log_entry", "source_tool": "t",
              "raw_score": 0.5, "provenance_chain": ["sha256:x"],
+             "timestamp": "2026-04-10T10:00:00Z",
              "description": "effect artifact", "metadata": {}},
             {"artifact_id": "a2", "evidence_type": "memory_process", "source_tool": "t",
              "raw_score": 0.5, "provenance_chain": ["sha256:y"],
+             "timestamp": "2026-04-10T10:00:05Z",
              "description": "cause artifact", "metadata": {}},
         ],
         "temporal_violations": [
