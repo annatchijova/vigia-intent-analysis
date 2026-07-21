@@ -10,10 +10,11 @@ from __future__ import annotations
 from collections.abc import Iterator
 from contextlib import contextmanager
 import os
-import shutil
 import stat
 import tempfile
 from pathlib import Path
+
+from vigia.api_payload import MAX_CASE_JSON_BYTES
 
 
 class CasePathError(ValueError):
@@ -21,6 +22,14 @@ class CasePathError(ValueError):
 
 
 _CASE_ROOT_PARTS = (("cases",), ("data", "cases"))
+
+
+def _require_snapshot_size_within_limit(metadata: os.stat_result) -> None:
+    """Refuse a repository fixture that exceeds the HTTP snapshot contract."""
+    if metadata.st_size > MAX_CASE_JSON_BYTES:
+        raise CasePathError(
+            f"case exceeds the {MAX_CASE_JSON_BYTES}-byte API limit"
+        )
 
 
 def _lexical_absolute(path: os.PathLike[str] | str) -> Path:
@@ -133,6 +142,11 @@ def _open_case_from_repo(
         if not stat.S_ISREG(metadata.st_mode):
             os.close(file_fd)
             raise CasePathError("case path must be a regular file")
+        try:
+            _require_snapshot_size_within_limit(metadata)
+        except CasePathError:
+            os.close(file_fd)
+            raise
         return file_fd
     except CasePathError:
         raise
@@ -141,6 +155,18 @@ def _open_case_from_repo(
     finally:
         if directory_fd is not None:
             os.close(directory_fd)
+
+
+def _copy_case_snapshot_bounded(source, target) -> None:
+    """Copy a descriptor-bound case while defending against post-open growth."""
+    copied = 0
+    while chunk := source.read(64 * 1024):
+        copied += len(chunk)
+        if copied > MAX_CASE_JSON_BYTES:
+            raise CasePathError(
+                f"case exceeds the {MAX_CASE_JSON_BYTES}-byte API limit"
+            )
+        target.write(chunk)
 
 
 @contextmanager
@@ -166,7 +192,7 @@ def snapshot_case_file(
         with os.fdopen(file_fd, "rb") as source:
             with tempfile.NamedTemporaryFile(suffix=".json", delete=False) as target:
                 snapshot = Path(target.name)
-                shutil.copyfileobj(source, target, length=64 * 1024)
+                _copy_case_snapshot_bounded(source, target)
                 target.flush()
                 os.fsync(target.fileno())
     except OSError as exc:

@@ -599,9 +599,10 @@ the forensic verdict, score, confidence, and reason. API responses expose both
 fields so a valid seal is never presented as proof of a different decision.
 
 Caller-supplied case JSON is bounded to 1 MiB and 1,024 artifacts before any
-temporary file is created or scoring begins. These are HTTP availability
-boundaries, not forensic-schema validation and not limits on local evidence
-acquisition or binary ingestion.
+temporary file is created or scoring begins. Descriptor-bound repository case
+snapshots are likewise capped at 1 MiB, including a post-open copy guard. These
+are HTTP availability boundaries, not forensic-schema validation and not
+limits on local evidence acquisition or binary ingestion.
 
 ---
 

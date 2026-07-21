@@ -9323,3 +9323,38 @@ rechacen antes de escribir o invocar al scorer. Junto con fronteras FastAPI,
 paridad de imports y B-199 pasan **36 tests**; `py_compile` y `git diff
 --check` también pasan. El umbral es deliberadamente amplio respecto del
 corpus, pero explícito y verificable en vez de implícito e ilimitado.
+
+---
+
+## B-202 — `/analyze/path` podía snapshotear un fixture permitido sin límite de bytes [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de disponibilidad: la ruta estaba confinada correctamente, pero un JSON muy grande dentro de un root permitido podía copiarse entero a disco temporal antes de llegar al pipeline. |
+| **Archivos** | `vigia/api_case_paths.py`, `tests/test_b202_api_path_snapshot_boundary.py`, estados técnicos EN/ES. |
+| **Modo** | `POST /analyze/path` en ambos wrappers FastAPI; no modifica CLI, ingestión ni extracción forense de archivos grandes. |
+| **Principio afectado** | Confinar un pathname y sellar el snapshot evita sustitución de evidencia, pero no acota su costo. La misma frontera debe preservar procedencia y disponibilidad. |
+
+**Observación reproducida:** `snapshot_case_file()` abría el descriptor de un
+JSON regular bajo `cases/` o `data/cases/` de forma segura y luego lo copiaba
+íntegramente con `copyfileobj()`. Un fixture de más de 1 MiB dentro de un root
+permitido llegaba a `NamedTemporaryFile`; por tanto una protección contra
+traversal/symlinks no impedía una copia temporal no acotada. El mayor fixture
+versionado hoy mide 217.373 bytes, de modo que el límite no excluye el corpus
+actual.
+
+**Corrección aplicada:** después de `openat` con `O_NOFOLLOW`, VIGÍA verifica
+el tamaño del descriptor antes de crear el temporal y rechaza más de 1 MiB con
+`CasePathError`. La copia conserva además un contador de bytes: si el inode
+crece después del `fstat`, no escribe bytes que excedan el límite y el temporal
+incompleto se elimina por la ruta de excepción. La ruta sigue ligada al mismo
+descriptor confiable; no se reabre ni se cambia la semántica del caso.
+
+**Validación:** B-202 fue roja primero al demostrar que el fixture sobredimensionado
+llegaba a crear un temporal. Ahora exige rechazo previo a ese punto y prueba el
+guard de crecimiento post-apertura con un stream de 1 MiB + 1 byte. Con B-194
+(race/symlink), fronteras FastAPI y la regresión nueva pasan **26 tests**;
+`py_compile` y `git diff --check` pasan. Este contrato afecta sólo la selección
+HTTP de fixtures: un caso local mayor se puede adquirir y analizar por las
+rutas forenses/CLI correspondientes, sin ser truncado ni reinterpretado por
+la API.
