@@ -7462,3 +7462,37 @@ evidence-local path, subsequent evidence-sanitizer access, rejection of
 empty/traversal/absolute/hierarchical/NUL input, and the fact that a valid
 request reaches the privilege gate instead of the impossible path gate; it also
 rejects an existing leaf that is a regular file or symlink: **11 passed**.
+
+---
+
+## B-165 — The Android extractor denied Android evidence while parsing its Chrome profile [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 coverage/provenance: a result could contain parsed Android browsing while declaring Android artifacts absent. |
+| **File** | `vigia/sift/android_forensics.py:AndroidForensicsAnalyzer.analyze`. |
+| **Detected by** | Codex follow-up on the accessible raw extraction of `OWL-NEXUS5-CASE`, 2026-07-21. |
+
+The original Android marker set contained only platform DBs (`mmssms.db`,
+`contacts2.db`, `packages.xml`, etc.). OWL's accessible extraction preserves a
+real Android Chrome profile at
+`com.android.chrome/app_chrome/Default/History`, but not those global DBs. The
+analyzer parsed its 93 URLs and, beforehand, added the contradictory note “No
+Android-specific artifacts found.”
+
+**Applied repair:** a SQLite `History` file counts as Android coverage only
+when it occupies the exact Android Chrome package layout. A generic Chromium
+`History` file does not suffice. When this is the only marker, the result now
+records an explicit Android application-profile note without platform-wide
+markers. It adds no finding, score, confidence, or verdict: recognizing a
+source does not turn its contents or package name into intent or malice.
+
+**Verification:** `tests/test_b165_android_package_profile_coverage.py` was
+red and now pins the valid layout, rejection of a desktop Chromium `History`,
+and the zero-findings / `z_score=0.0` invariant. Together with marker, SQLite
+read-only, and empty-data semantics:
+`tests/test_b165_android_package_profile_coverage.py`,
+`tests/test_b139_bounded_marker_scan.py`, `tests/test_b071_sqlite_readonly.py`,
+and `tests/test_b072_b074_mobile_verdict_fixes.py`: **64 passed**. On OWL raw:
+93 browser entries, an accurate coverage note, zero findings, and a zero
+signal.

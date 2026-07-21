@@ -243,11 +243,7 @@ class AndroidForensicsAnalyzer:
         android_markers = scan_marker_names(
             evidence_path, _ANDROID_MARKER_FILES, engine="ANDROID", logger=logger
         )
-        if not android_markers:
-            logger.warning("[ANDROID] No Android artifacts found in %s", evidence_path)
-            result.analysis_notes.append(
-                "No Android-specific artifacts found. Directory may not contain Android evidence."
-            )
+        android_chrome_profile_detected = False
 
         # 1. Root detection
         self._detect_root(evidence_path, result)
@@ -295,11 +291,28 @@ class AndroidForensicsAnalyzer:
                     continue
             except (OSError, IOError):
                 continue
+            if self._is_android_chrome_history(evidence_path, db):
+                android_chrome_profile_detected = True
             try:
                 self._analyze_chrome(db, result)
             except Exception as e:
                 logger.error("[ANDROID] Chrome analysis failed: %s", e)
                 result.analysis_notes.append(f"Chrome parse error: {e}")
+
+        # B-165: a package-only extraction can preserve a valid Android Chrome
+        # profile while omitting system-wide marker DBs.  It is contradictory
+        # to parse that profile and then claim Android evidence is absent.  The
+        # layout validates coverage only; it does not create a finding or score.
+        if not android_markers:
+            if android_chrome_profile_detected:
+                result.analysis_notes.append(
+                    "Android Chrome application profile detected without platform-wide Android markers."
+                )
+            else:
+                logger.warning("[ANDROID] No Android artifacts found in %s", evidence_path)
+                result.analysis_notes.append(
+                    "No Android-specific artifacts found. Directory may not contain Android evidence."
+                )
 
         # 6. App detection
         self._detect_installed_apps(evidence_path, result)
@@ -346,6 +359,23 @@ class AndroidForensicsAnalyzer:
             (f for f in base.rglob(pattern)
              if not f.is_symlink() and f.is_file()),
             key=lambda p: str(p),
+        )
+
+    @staticmethod
+    def _is_android_chrome_history(evidence_path: Path, db_path: Path) -> bool:
+        """Whether ``db_path`` is the canonical Android Chrome History path.
+
+        A generic Chromium ``History`` file is not enough to establish an
+        Android extraction.  The Android package directory is the needed
+        provenance boundary; this method intentionally does not infer intent
+        from either the package name or its browsing contents.
+        """
+        try:
+            relative = db_path.relative_to(evidence_path)
+        except ValueError:
+            return False
+        return relative.parts[-4:] == (
+            "com.android.chrome", "app_chrome", "Default", "History"
         )
 
     def _build_correlation_groups(self) -> Dict[int, set]:
