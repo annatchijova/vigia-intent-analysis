@@ -551,6 +551,14 @@ def _vigia_score(case: dict) -> dict:
     artifacts_all = case.get("artifacts", [])
     violations    = case.get("temporal_violations", [])
     provenance    = case.get("provenance_analysis", {})
+    # B-205: a degenerate non-list field (``"artifacts": None``) must reach the
+    # existing fail-loud ERROR path below, not crash the B-171/B-172 field
+    # scans that now run before it (Round 4 contract: the scorer never raises
+    # on degenerate input).
+    if not isinstance(artifacts_all, list):
+        artifacts_all = []
+    if not isinstance(violations, list):
+        violations = []
 
     # B-172 / L-062: reconstruct every claimed hard temporal pair from the
     # actual source artifacts before it can drive MALICE.  Do not trust the

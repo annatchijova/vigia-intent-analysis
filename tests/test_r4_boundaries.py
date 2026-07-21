@@ -45,6 +45,12 @@ class TestZeroAndEmpty:
     def test_artifacts_none(self):
         assert _vigia_score({"artifacts": None})["verdict"] == "ERROR"
 
+    def test_temporal_violations_none(self):
+        # B-205: the B-171/B-172 field scans run before the degenerate-input
+        # ERROR guard — a None field must not crash them.
+        r = _vigia_score({"artifacts": [{}], "temporal_violations": None})
+        assert 0.0 <= r["score"] <= 0.99
+
     def test_single_empty_artifact_no_crash(self):
         r = _vigia_score({"artifacts": [{}]})
         assert 0.0 <= r["score"] <= 0.99

@@ -9423,3 +9423,39 @@ presentación (`signals`) de B-163 no regresa a proyección cruda. La batería
 existente de modo legacy/motor (`test_fase1_resolve`, `test_tanda_a_triage`,
 `test_b058`, `test_b163`, `test_b166`, `test_b195` — 52 tests) pasa sin
 cambios.
+
+---
+
+## B-205 — los escaneos de campos de B-171/B-172 crasheaban ante input degenerado [RESUELTO — Claude 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de robustez de frontera: `_vigia_score({"artifacts": None})` levantaba `TypeError` en vez de devolver el `ERROR` limpio que el contrato Round 4 garantiza (el scorer nunca crashea por input degenerado). Mismo defecto con `"temporal_violations": None`. |
+| **Archivos** | `vigia_scorer.py`, `tests/test_r4_boundaries.py`, `tests/test_hard_gate_severity_shield.py`. |
+| **Modo** | Todos los modos que llaman al scorer determinista. |
+| **Detectado por** | Corrida de la suite completa previa al merge de la rama `codex` — las baterías dirigidas de cada fix no incluían los contratos Round 4. |
+
+**Observación reproducida:** B-171/B-172 introdujeron escaneos de
+`artifacts` y `temporal_violations` (reconstrucción de pares temporales,
+retiro de autoridad SU) que corren ANTES de la guarda histórica
+`if not artifacts_all: → ERROR` (línea ~644). Un campo presente con valor
+`None` — clave existente, así que el default de `.get()` no aplica — llegaba
+al `for` y crasheaba. En `main` ambos casos devolvían `ERROR` limpio.
+
+**Corrección aplicada:** coerción `isinstance(list)` de ambos campos
+inmediatamente después de leerlos: un no-list cae a `[]`, que aterriza en el
+mismo path `ERROR` que `main` producía. Sin cambio de semántica de scoring
+para ningún input bien formado.
+
+**Fallout hermano (mismo origen, sin número propio):** el fixture de
+`test_hard_gate_severity_shield.py` declaraba `EFFECT_BEFORE_CAUSE` sobre
+artefactos sin timestamps; bajo el contrato B-172 eso es una alegación no
+verificable → ABSTAIN, y el test de severidad válida fallaba. El fixture
+ahora porta timestamps corroborantes (effect < cause), preservando la
+intención original del shield: probar la coerción de severidad, no una
+alegación inverificable.
+
+**Validación:** rojas primero las tres (`test_artifacts_none`,
+`test_temporal_violations_none` nueva, `test_valid_high_severity_still_fires`);
+verdes con el fix. Suite completa (`tests/` + `vigia/tests/`, sin
+integration) verde antes del merge.
