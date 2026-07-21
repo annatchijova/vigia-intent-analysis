@@ -37,10 +37,13 @@ import pytest
 REPO = Path(__file__).resolve().parent.parent
 
 # Casos reales medidos: motor=SUSPICION, expected=SUSPICION, sellado hoy=INTENT
+# case_002_log_fabrication salió de la lista con B-171: su SUSPICION (0.3354)
+# provenía de una declaración STATISTICAL_UNIFORMITY sin productor determinista;
+# el motor ahora abstiene honestamente y la precondición hyp==SUSPICION_DETECTED
+# dejó de valer (re-investigado, ver BUGS_PENDIENTES.md B-171).
 REAL_CASES = [
     "data/cases/consolidated_canonical/VIGIA-CAN-014.json",
     "data/cases/VIGIA-BREAK-013.json",
-    "data/cases/case_002_log_fabrication.json",
 ]
 
 
