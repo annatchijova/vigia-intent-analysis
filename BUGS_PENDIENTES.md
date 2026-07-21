@@ -8653,3 +8653,37 @@ padre symlink y bundle externo verificable. También pasan las tres regresiones
 atómicas L-023 y los dos tests de import/verify del pipeline: 6 seleccionados.
 No altera el bundle en memoria ni el veredicto: sólo niega un destino que nunca
 debió tener autoridad de escritura.
+
+---
+
+## B-184 — el bridge de integración podía crear outputs en evidencia y escapar con `case_id` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el bridge podía crear su árbol de resultados en evidencia; además un ID de caso con separadores redirigía el writer de reportes fuera del output declarado. |
+| **Archivo** | `vigia/pipeline/vigia_integration_bridge.py`, `tests/test_b184_integration_bridge_output_boundary.py`. |
+| **Modo** | `VigiaIntegrationEngine.run_case()` — usado por la demo, bridge MCP y callers Python de la integración legacy ↔ EBS. |
+| **Principio afectado** | `output_dir` y `case_id` son inputs distintos de autoridad de escritura. El primero debe quedar fuera de evidencia y el segundo debe ser datos, no una ruta derivada. |
+
+**Observación reproducida:** el engine convertía `output_dir` a absoluto y
+ejecutaba `os.makedirs()` antes de llamar al pipeline. Con
+`output_dir=<evidence>/bridge-output` creaba el directorio fuente incluso si
+no se solicitaba bundle ni reporte; un symlink de output tenía el mismo efecto.
+La segunda vía fue más grave: `case_id="escape/../../evidence/pwn"` producía
+`report_escape/../../evidence/pwn.json`. Con un componente externo existente,
+`atomic_write_text()` resolvía esos `..` y publicó un JSON real dentro de
+evidencia. La regresión lo reprodujo mediante el flujo del bridge, con pipeline
+y renderer mínimos simulados, no calculando paths aislados.
+
+**Corrección aplicada:** al existir alguna salida solicitada, el bridge valida
+el directorio antes de crear nada y vuelve a validarlo antes de derivar
+artefactos. Bundle y reporte pasan además por el guard justo antes de su uso.
+`case_id` ahora sólo acepta etiquetas no vacías sin NUL, `.`/`..` ni separadores
+de plataforma; se rechaza antes de la normalización o del pipeline. Si no se
+solicita ningún output, el bridge deja de crear un directorio innecesario.
+
+**Validación:** cuatro regresiones B-184 cubren output directo dentro de
+evidencia, output symlink, traversal real por `case_id` hacia el writer de
+reporte y bundle externo válido. La familia B-178 a B-184 más B-062/B-064 pasa
+34/34. No cambia evidencia, score ni decisión; restaura el confinamiento y
+evita que un identificador de caso se convierta en escritura.

@@ -46,6 +46,8 @@ import time
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
+from vigia.security.output_boundary import validate_external_output_path
+
 logger = logging.getLogger("vigia.integration_bridge")
 if not logger.handlers:
     _h = logging.StreamHandler()
@@ -1186,6 +1188,24 @@ class VigiaIntegrationEngine:
         self._audit_log.append(entry)
         logger.info("[VigiaEngine] %s %s", event, kwargs)
 
+    @staticmethod
+    def _validate_case_id_for_output(case_id: Any) -> str:
+        """Accept a case identifier as data, never as a filesystem fragment."""
+        value = str(case_id)
+        separators = {"/", "\\", os.path.sep}
+        if os.path.altsep:
+            separators.add(os.path.altsep)
+        if (
+            not value
+            or "\x00" in value
+            or value in {".", ".."}
+            or any(separator in value for separator in separators)
+        ):
+            raise ValueError(
+                "case_id must be a non-empty filename-safe label without path separators"
+            )
+        return value
+
     def run_case(
         self,
         case: Dict[str, Any],
@@ -1199,8 +1219,22 @@ class VigiaIntegrationEngine:
             case_id, decision, posterior, risk, bundle_hash,
             bundle_path, report_path, verify, mode, warnings, audit_log
         """
-        case_id = str(case.get("case_id", f"case_{int(time.time())}"))
+        case_id = self._validate_case_id_for_output(
+            case.get("case_id", f"case_{int(time.time())}")
+        )
         self._log("CASE_START", case_id=case_id)
+
+        # B-184: `output_dir` is caller-supplied write authority. Validate it
+        # before creating anything, then again after directory creation before
+        # deriving bundle/report paths from it.
+        if save_bundle or save_report:
+            safe_output_dir = validate_external_output_path(
+                self._output_dir, artifact_label="VIGÍA integration output"
+            )
+            os.makedirs(safe_output_dir, exist_ok=True)
+            self._output_dir = validate_external_output_path(
+                safe_output_dir, artifact_label="VIGÍA integration output"
+            )
 
         # ── Paso 0: Sanitización + Validación de schema ────────────────────
         case = _sanitize_case_input(case)        # H15: eliminar campos reservados inyectados
@@ -1241,9 +1275,13 @@ class VigiaIntegrationEngine:
         ecl_hash = compute_ecl_hash(self._baselines_yaml)
 
         # ── Paso 4: Ejecutar pipeline EBS v1 ─────────────────────────────
-        os.makedirs(self._output_dir, exist_ok=True)
-        bundle_filename = f"bundle_{case_id}.json"
-        bundle_path = os.path.join(self._output_dir, bundle_filename)
+        bundle_path = None
+        if save_bundle:
+            bundle_filename = f"bundle_{case_id}.json"
+            bundle_path = validate_external_output_path(
+                os.path.join(self._output_dir, bundle_filename),
+                artifact_label="VIGÍA integration bundle",
+            )
 
         if not _PIPELINE_AVAILABLE:
             raise RuntimeError(
@@ -1258,7 +1296,7 @@ class VigiaIntegrationEngine:
             calibration_path=self._calibration_path,
             covariance_path=self._covariance_path,
             ollama_model=self._ollama_model,
-            output_path=bundle_path if save_bundle else None,
+            output_path=bundle_path,
         )
         self._log("PIPELINE_DONE", decision=result["decision"], mode=result.get("mode"))
 
@@ -1315,7 +1353,10 @@ class VigiaIntegrationEngine:
                 )
 
                 report_filename = f"report_{case_id}.json"
-                report_path = os.path.join(self._output_dir, report_filename)
+                report_path = validate_external_output_path(
+                    os.path.join(self._output_dir, report_filename),
+                    artifact_label="VIGÍA integration report",
+                )
                 # B-064: escritura atómica (patrón L-023)
                 from vigia.core.atomic_io import atomic_write_text
                 atomic_write_text(
