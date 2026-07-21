@@ -7069,3 +7069,74 @@ discards the sealed bundle (§5.3).
 data (hypothesis + unanalyzed + self-corrections), so for cases with none of the
 latter it is thin (MINIMAL quality). Richer step-by-step instrumentation of the
 live run loop, and MCP exposure of the trace, are later phases.
+
+---
+
+## B-153 — FastAPI `/analyze/path` does not confine `case_path` [OPEN — Codex remediation in progress]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Conditional P1: only when the wrapper is exposed to an untrusted network. |
+| **Files** | `vigia_api.py`, `vigia/vigia_api.py` |
+| **Detected by** | Codex audit, 2026-07-21, branch `codex`. |
+
+Both endpoints form `REPO / payload.case_path` and pass it to the pipeline
+without rejecting absolute paths, `..`, symlinks, directories, or scope
+escapes. An absolute right operand discards `REPO` in `pathlib`. With inert
+stubs, both wrappers accepted and forwarded an existing file outside the
+checkout. This proves a case-scope/chain-of-custody breach; it does not claim
+arbitrary exfiltration because the pipeline expects case-shaped JSON. There is
+no request authentication and default bind is `0.0.0.0` (CORS is not auth).
+
+**Planned repair:** shared resolver, explicit `cases/` and `data/cases/` roots,
+regular non-symlink `.json`, escape tests, and loopback default.
+
+---
+
+## B-154 — `/v1/chat/completions` crashes on valid scalar JSON [OPEN — Codex remediation in progress]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3 — availability/protocol; evidence and verdict are unchanged. |
+| **File** | `vigia_api.py` |
+| **Detected by** | Codex audit, 2026-07-21. |
+
+`json.loads(text)` accepts `42` and `null`, but the endpoint immediately tests
+`"artifacts" in case_data`, raising uncaught `TypeError` rather than the usage
+guidance returned for `[]`. **Planned repair:** accept only a JSON object as a
+case and degrade every other JSON value to usage guidance; test scalar, list,
+and valid-object inputs.
+
+---
+
+## B-155 — `PathGuard` permits prefix collision and `..` escape [OPEN — Codex remediation in progress]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 — forensic-integrity / SIFT acquisition boundary. |
+| **Files** | `vigia/core/path_guard.py`, consumer `vigia/sift/sift_orchestrator.py` |
+| **Detected by** | Codex audit, 2026-07-21; controlled temporary fixture only. |
+
+The allowlist uses `str(abs_path).startswith(str(base))`, which is not
+component-aware containment. A sibling sharing a base prefix and paths with
+`..` pass; `safe_open()` opens the same path via `os.open()`. The orchestrator
+passes accepted paths to SIFT engines. Existing tests covered neither vector.
+**Planned repair:** component-aware containment plus regressions for `validate`
+and `safe_open`/`safe_read`, preserving symlink, `fstat`, and TOCTOU defenses.
+
+---
+
+## B-156 — Volatility/RegRipper validators fail open outside their allowlists [OPEN — Codex remediation in progress]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 — defense in depth and direct Python consumers. |
+| **Files** | `vigia/sift/memory_forensics.py`, `vigia/sift/registry_timeline_reconstructor.py` |
+| **Detected by** | Codex audit, 2026-07-21. |
+
+Both validators compute `allowed`, but when it is false they raise only if the
+path also does not exist. Existing files outside the declared roots are
+returned, as the controlled reproduction confirmed. SIFT normally places
+PathGuard first, but B-155 bypasses it and direct consumers have no such layer.
+**Planned repair:** reject whenever `allowed` is false and pin both negative and
+positive cases.

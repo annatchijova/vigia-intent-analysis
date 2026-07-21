@@ -7546,3 +7546,75 @@ smoke test MCP requiere entorno con `mcp` — L-045; pendiente para la
 próxima sesión con bridge vivo); gate 0-flips compartido con F1.
 
 ---
+
+## B-153 — FastAPI `/analyze/path` no confina `case_path` [ABIERTO — corrección Codex en curso]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 condicional: sólo si el wrapper está expuesto a red no confiable. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21, rama `codex`. |
+
+Ambos endpoints hacen `REPO / payload.case_path` y pasan el resultado al
+pipeline sin rechazar rutas absolutas, `..`, symlinks, directorios ni escapes.
+Una ruta absoluta descarta `REPO` en `pathlib`. Con stubs inertes, ambos
+wrappers aceptaron y reenviaron un archivo existente fuera del checkout. No se
+afirma exfiltración arbitraria: el pipeline requiere JSON con forma de caso;
+sí se confirma ruptura de scope/cadena de custodia. No hay autenticación y el
+bind default es `0.0.0.0` (CORS no es autenticación).
+
+**Corrección prevista:** resolver compartido, roots `cases/` y `data/cases/`,
+archivo `.json` regular no-symlink, pruebas red y loopback por default.
+
+---
+
+## B-154 — `/v1/chat/completions` crashea con escalares JSON válidos [ABIERTO — corrección Codex en curso]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 — disponibilidad/protocolo; no cambia evidencia ni veredicto. |
+| **Archivo** | `vigia_api.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21. |
+
+`json.loads(text)` acepta `42` y `null`, pero el endpoint evalúa
+`"artifacts" in case_data` y lanza `TypeError` no capturado en lugar de la guía
+que devuelve para `[]`. `ChatRequest.messages` no normaliza contenido en la
+frontera. **Corrección prevista:** aceptar sólo objeto JSON para casos y
+degradar cualquier otro valor a guía de uso; test para `42`, `null`, `[]` y caso válido.
+
+---
+
+## B-155 — `PathGuard` permite colisión de prefijo y escape `..` [ABIERTO — corrección Codex en curso]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 — integridad forense / frontera de adquisición SIFT. |
+| **Archivos** | `vigia/core/path_guard.py`, consumidor `vigia/sift/sift_orchestrator.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21; fixture temporal propio, sin evidencia personal. |
+
+La allowlist usa `str(abs_path).startswith(str(base))`, que no prueba
+contención por componentes. Con base `/tmp/vigia`, un sibling
+`/tmp/vigia-forge-...` pasa; rutas con `..` también pasan. `safe_open()` abre la
+misma ruta con `os.open()`: la apertura externa fue reproducida. El
+orchestrator entrega paths aceptados a los motores SIFT. Los tests no cubrían
+prefijo ni `..`. **Corrección prevista:** contención por componentes y tests en
+`validate` y `safe_open`/`safe_read`, conservando symlink, `fstat` y TOCTOU.
+
+---
+
+## B-156 — Validadores Volatility/RegRipper fallan abiertos fuera de allowlist [ABIERTO — corrección Codex en curso]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 — defensa en profundidad y consumidores Python directos. |
+| **Archivos** | `vigia/sift/memory_forensics.py`, `vigia/sift/registry_timeline_reconstructor.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21. |
+
+Ambos validadores calculan `allowed`, pero si es falso sólo lanzan cuando el
+path además no existe; cualquier archivo existente fuera de `/tmp/vigia`,
+`/evidence`, etc. retorna. La reproducción controlada confirmó ambos retornos
+fuera de root. SIFT suele anteponer PathGuard, pero B-155 lo atraviesa y los
+consumidores directos llegan aquí sin esa capa. **Corrección prevista:**
+rechazar siempre que `allowed` sea falso y fijarlo con tests negativos/positivos.
+
+---
