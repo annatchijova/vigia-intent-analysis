@@ -30,6 +30,7 @@ import os
 import re
 # subprocess REMOVED (P2-11 fix) — all calls migrated to sandboxed_execute
 import shutil
+import stat
 import uuid
 import sys
 from collections import Counter
@@ -248,6 +249,56 @@ os.chmod(_HONEY_TOKEN_DIR, 0o700)  # Owner only
 _PURGATORY_DIR = os.path.join(EVIDENCE_BASE_DIR, "purgatory")
 os.makedirs(_PURGATORY_DIR, exist_ok=True)
 os.chmod(_PURGATORY_DIR, 0o700)  # Owner only
+
+# B-164: mounted evidence remains beneath the same trust anchor as every
+# evidence-reading MCP tool.  Previously a target was confined to
+# EVIDENCE_BASE_DIR and then required to be below /mnt/analysis: two
+# unrelated roots, which made a valid request impossible.
+_MOUNT_ROOT = os.path.join(EVIDENCE_BASE_DIR, "mounted")
+os.makedirs(_MOUNT_ROOT, mode=0o700, exist_ok=True)
+os.chmod(_MOUNT_ROOT, 0o700)
+_MOUNT_LEAF_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
+
+
+def _sanitize_mount_point(mount_point: str) -> str:
+    """Create and return one private, evidence-local mount leaf.
+
+    Mounting is privileged.  The image remains confined to
+    ``EVIDENCE_BASE_DIR`` and a caller may select only a simple leaf name under
+    ``_MOUNT_ROOT``—never an arbitrary absolute path or request-controlled
+    hierarchy.  The mounted filesystem consequently remains available through
+    the normal evidence-reading tools without enlarging their authority.
+    """
+    if not isinstance(mount_point, str) or not _MOUNT_LEAF_RE.fullmatch(mount_point):
+        raise ValueError(
+            "mount_point must be a 1–64 character leaf containing only "
+            "letters, digits, '.', '_' or '-'."
+        )
+
+    # This root is created at bridge startup, before MCP input is processed.
+    safe_root = _sanitize_path(
+        _MOUNT_ROOT,
+        base_dir=EVIDENCE_BASE_DIR,
+        must_exist=True,
+    )
+    if not os.path.isdir(safe_root):
+        raise ValueError("mount_point root is not a directory")
+
+    candidate = os.path.join(safe_root, mount_point)
+    try:
+        os.mkdir(candidate, mode=0o700)
+    except FileExistsError:
+        pass
+
+    # Check the raw leaf too: resolving first would hide a symlink that points
+    # back inside the evidence root.
+    leaf_stat = os.lstat(candidate)
+    if stat.S_ISLNK(leaf_stat.st_mode):
+        raise ValueError("mount_point resolves through a symlink")
+    if not stat.S_ISDIR(leaf_stat.st_mode):
+        raise ValueError("mount_point exists but is not a directory")
+
+    return _sanitize_path(candidate, base_dir=safe_root, must_exist=True)
 
 # _AUDIT_LOG_PATH eliminada — audit_logger (vigia.security) maneja su propia ruta.
 
@@ -1239,7 +1290,7 @@ async def audit_network() -> dict | str:
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def mount_sift_evidence(
     image_path: str,
-    mount_point: str = "/mnt/analysis"
+    mount_point: str = "default"
 ) -> dict:
     """
     Mount forensic image using SIFT tools (ewfmount for E01, mount for dd).
@@ -1248,15 +1299,9 @@ async def mount_sift_evidence(
     P2 fix: migrated from subprocess.check_output to sandboxed_execute.
     """
     try:
-        image_path  = _sanitize_path_local(image_path)
-        mount_point = _sanitize_path_local(mount_point)
+        image_path = _sanitize_path_local(image_path)
     except ValueError as e:
         return {"error": str(e)}
-
-    _MOUNT_ROOT = "/mnt/analysis"
-    resolved_mount = os.path.realpath(os.path.abspath(mount_point))
-    if not resolved_mount.startswith(_MOUNT_ROOT + os.sep) and resolved_mount != _MOUNT_ROOT:
-        return {"error": f"mount_point must resolve inside {_MOUNT_ROOT}. Got: {resolved_mount}"}
 
     if os.geteuid() != 0:
         return {"error": "Root privileges required for mounting images. Re-run as root or via sudo."}
@@ -1265,16 +1310,19 @@ async def mount_sift_evidence(
         return {"error": f"Image not found: {image_path}"}
 
     ext = os.path.splitext(image_path)[1].lower()
+    if ext not in (".e01", ".ewf", ".dd", ".img", ".raw"):
+        return {"error": f"Unsupported image format: {ext}. Use .E01 or .dd/.img/.raw"}
 
     try:
-        os.makedirs(mount_point, exist_ok=True)
+        mount_point = _sanitize_mount_point(mount_point)
+    except ValueError as e:
+        return {"error": str(e)}
 
+    try:
         if ext in (".e01", ".ewf"):
             cmd = ["ewfmount", "--", image_path, mount_point]
-        elif ext in (".dd", ".img", ".raw"):
-            cmd = ["mount", "-o", "ro,loop,noexec,nosuid,nodev", "--", image_path, mount_point]
         else:
-            return {"error": f"Unsupported image format: {ext}. Use .E01 or .dd/.img"}
+            cmd = ["mount", "-o", "ro,loop,noexec,nosuid,nodev", "--", image_path, mount_point]
 
         result = await sandboxed_execute(
             cmd=cmd,
@@ -3675,4 +3723,3 @@ def _sanitize_path(raw: str, base_dir: str | None = None, **kwargs) -> str:  # t
     if not _os.path.isabs(raw):
         raw = str(_Path(_base) / raw)
     return _sp(raw, base_dir=_base, **kwargs)
-

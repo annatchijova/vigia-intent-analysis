@@ -7901,3 +7901,42 @@ Fase-1 y la regresión del veredicto SUSPICION:
 `tests/test_label_leak_normalize_case_schema.py`: **35 passed**. OWL ahora
 conserva 20 IDs, cero placeholders, cero tipos `unknown` y los cinco tipos
 canónicos; la hipótesis sigue siendo honestamente `ABSTAIN_DETECTED`.
+
+---
+
+## B-164 — `mount_sift_evidence` exigía dos raíces disjuntas y por eso era inalcanzable [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 operacional/forense: la tool MCP privilegiada no podía montar una imagen válida aun con evidencia disponible. |
+| **Archivo** | `vigia/vigia_sift_bridge.py:mount_sift_evidence`. |
+| **Detectado por** | Resolución MCP estricta de `OWL-NEXUS5-CASE`, seguida de auditoría Codex, 2026-07-21. |
+
+La tool primero pasaba tanto `image_path` como `mount_point` por
+`_sanitize_path_local()`, que confina al directorio `VIGIA_EVIDENCE_DIR`. Luego
+exigía que el mismo `mount_point` resolviera dentro de `/mnt/analysis`. Salvo
+que el directorio de evidencia coincidiera con `/mnt/analysis`, una solicitud
+no podía satisfacer ambos contratos: era rechazada antes de la comprobación de
+privilegios y antes de ejecutar el montaje. Esto explica por qué el análisis
+raw de OWL necesitó un montaje manual de sólo lectura aunque la tool MCP existe.
+
+**Corrección aplicada:** la imagen fuente sigue obligatoriamente bajo el
+directorio de evidencia. El punto de montaje ya no acepta una ruta arbitraria:
+acepta sólo un nombre de leaf `[A-Za-z0-9._-]` de 1–64 caracteres y crea ese
+leaf privado (`0700`) bajo `VIGIA_EVIDENCE_DIR/mounted/`. Así el filesystem
+montado continúa dentro del mismo ancla de confianza y puede ser leído luego
+por `list_files`, `read_evidence` y `search_pattern`, sin conceder al caller
+autoridad para elegir un destino privilegiado fuera de la evidencia. El leaf se
+verifica explícitamente con `lstat` para rechazar symlinks y archivos.
+
+**Límite deliberado:** el montaje sigue exigiendo que el proceso MCP tenga
+privilegios de root; esa compuerta es real y ahora se alcanza antes de crear un
+leaf por una solicitud no privilegiada. La reparación no monta imágenes durante
+los tests ni altera la imagen raw ni el montaje forense existente.
+
+**Validación:** `tests/test_b164_mcp_mount_root.py` fue rojo antes del patch
+(no existían `_MOUNT_ROOT` ni el sanitizador de leaf) y ahora prueba la ruta
+evidence-local, el acceso posterior por el sanitizador de evidencia, el rechazo
+de vacío/traversal/absoluta/jerarquía/NUL y que una solicitud válida llega a la
+compuerta de privilegios en lugar del gate imposible; también rechaza un leaf
+existente que sea archivo o symlink: **11 passed**.

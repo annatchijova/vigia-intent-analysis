@@ -7423,3 +7423,42 @@ SUSPICION verdict regression:
 `tests/test_label_leak_normalize_case_schema.py`: **35 passed**. OWL now keeps
 20 IDs, zero placeholders, zero `unknown` types, and five canonical types; its
 hypothesis remains honestly `ABSTAIN_DETECTED`.
+
+---
+
+## B-164 — `mount_sift_evidence` required two disjoint roots, making it unreachable [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 operational/forensic: the privileged MCP tool could not mount valid available evidence. |
+| **File** | `vigia/vigia_sift_bridge.py:mount_sift_evidence`. |
+| **Detected by** | Strict MCP resolution of `OWL-NEXUS5-CASE`, followed by Codex audit, 2026-07-21. |
+
+The tool first passed both `image_path` and `mount_point` through
+`_sanitize_path_local()`, which confines them to `VIGIA_EVIDENCE_DIR`. It then
+required that same `mount_point` to resolve under `/mnt/analysis`. Unless the
+evidence directory itself happened to be `/mnt/analysis`, no request could
+satisfy both contracts: it was rejected before the privilege check and before a
+mount was attempted. This is why OWL's raw analysis needed a manual read-only
+mount even though the MCP tool existed.
+
+**Applied repair:** the source image remains mandatory evidence-root content.
+The mount point no longer accepts an arbitrary path: it accepts only a 1–64
+character `[A-Za-z0-9._-]` leaf and creates that private (`0700`) leaf below
+`VIGIA_EVIDENCE_DIR/mounted/`. The mounted filesystem therefore stays beneath
+the same trust anchor and is available to `list_files`, `read_evidence`, and
+`search_pattern`, without granting a caller authority to choose a privileged
+destination outside evidence. The leaf is explicitly `lstat`-checked to reject
+symlinks and regular files.
+
+**Deliberate limit:** mounting still requires the MCP process to have root
+privilege; that is a real gate and is now reached before an unprivileged
+request can create a leaf. The repair neither mounts an image during tests nor
+alters the raw image or the existing forensic mount.
+
+**Verification:** `tests/test_b164_mcp_mount_root.py` was red before the patch
+(`_MOUNT_ROOT` and the leaf sanitizer did not exist). It now pins the
+evidence-local path, subsequent evidence-sanitizer access, rejection of
+empty/traversal/absolute/hierarchical/NUL input, and the fact that a valid
+request reaches the privilege gate instead of the impossible path gate; it also
+rejects an existing leaf that is a regular file or symlink: **11 passed**.
