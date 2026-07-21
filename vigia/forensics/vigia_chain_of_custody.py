@@ -36,7 +36,7 @@ Garantías:
 Uso:
   # Agregar un bundle a la cadena
   from vigia_chain_of_custody import ChainOfCustody
-  chain = ChainOfCustody("vigia_chain.db")
+  chain = ChainOfCustody()  # VIGIA_CHAIN_DB_PATH, workdir o state-dir
   entry = chain.append(sealed_bundle_dict, bundle_path="bundles/bundle_001.json")
   print(entry["chain_hash"])
 
@@ -60,6 +60,7 @@ import hashlib
 import json
 import os
 import sqlite3
+import stat
 import sys
 import hmac as _hmac_mod
 from dataclasses import dataclass, field
@@ -81,6 +82,67 @@ GENESIS_HASH = "0" * 64  # hash del nodo anterior para el primer bloque
 # La recomputación del bundle_hash debe excluirlos — mismo esquema que
 # BundleBuilder.quick_verify() y forensics/verify_ebs_v1.py.
 _PRESENTATION_FIELDS = ("integrity", "forensic_chain", "pki")
+
+
+def _default_ledger_path() -> str:
+    """Choose durable operational state without using the caller's CWD."""
+    explicit = os.getenv("VIGIA_CHAIN_DB_PATH", "").strip()
+    if explicit:
+        return explicit
+
+    work_dir = os.getenv("VIGIA_WORK_DIR", "").strip()
+    if work_dir:
+        return os.path.join(work_dir, "vigia_chain.db")
+
+    state_home = os.getenv("XDG_STATE_HOME", "").strip()
+    if not state_home:
+        state_home = os.path.join(os.path.expanduser("~"), ".local", "state")
+    return os.path.join(state_home, "vigia", "vigia_chain.db")
+
+
+def _validate_ledger_path(db_path: str) -> str:
+    """Return a safe ledger target without importing runtime dependencies.
+
+    This module intentionally remains runnable as a stdlib-only CLI.  The
+    check mirrors VIGÍA's output-boundary contract: a persistent, derived
+    ledger cannot be created inside source evidence and an existing symlink
+    component cannot redirect the SQLite DB/WAL/journal there.
+    """
+    if not isinstance(db_path, str) or not db_path.strip():
+        raise ValueError("ledger database path must be a non-empty string")
+    if "\x00" in db_path:
+        raise ValueError("ledger database path contains a null byte")
+
+    raw_target = Path(os.path.abspath(os.path.expanduser(db_path)))
+    current = Path(raw_target.anchor)
+    for component in raw_target.parts[1:]:
+        current /= component
+        try:
+            metadata = os.lstat(current)
+        except FileNotFoundError:
+            break
+        except OSError as exc:
+            raise ValueError(f"cannot inspect ledger path component: {current}") from exc
+        if stat.S_ISLNK(metadata.st_mode):
+            raise ValueError(f"ledger path contains symlink component: {current}")
+
+    try:
+        target = raw_target.resolve(strict=False)
+    except OSError as exc:
+        raise ValueError(f"cannot resolve ledger path: {raw_target}") from exc
+
+    evidence_dir = os.getenv("VIGIA_EVIDENCE_DIR", "").strip()
+    if evidence_dir:
+        evidence_root = Path(
+            os.path.abspath(os.path.expanduser(evidence_dir))
+        ).resolve(strict=False)
+        if target == evidence_root or target.is_relative_to(evidence_root):
+            raise ValueError(
+                "refusing to write chain ledger inside VIGIA_EVIDENCE_DIR "
+                "(forensic evidence is read-only)"
+            )
+
+    return str(target)
 
 # Schema SQLite — inmutable post-creación
 _SCHEMA = """
@@ -307,9 +369,13 @@ class ChainOfCustody:
       son incorrectos
     """
 
-    def __init__(self, db_path: str = "vigia_chain.db") -> None:
-        self.db_path = db_path
-        self._conn = sqlite3.connect(db_path, check_same_thread=False)
+    def __init__(self, db_path: Optional[str] = None) -> None:
+        requested_path = db_path if db_path is not None else _default_ledger_path()
+        self.db_path = _validate_ledger_path(requested_path)
+        os.makedirs(os.path.dirname(self.db_path) or ".", mode=0o750, exist_ok=True)
+        # Revalidate after parent creation before SQLite can create DB/WAL files.
+        self.db_path = _validate_ledger_path(self.db_path)
+        self._conn = sqlite3.connect(self.db_path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
         self._init_db()
 
@@ -929,8 +995,14 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="VIGÍA Chain of Custody — Ledger criptográfico de ForensicBundles",
     )
-    parser.add_argument("--db", default="vigia_chain.db",
-                        help="Ruta al ledger SQLite (default: vigia_chain.db)")
+    parser.add_argument(
+        "--db",
+        default=None,
+        help=(
+            "Ruta al ledger SQLite (default: VIGIA_CHAIN_DB_PATH, luego "
+            "VIGIA_WORK_DIR/vigia_chain.db o state-dir de usuario)"
+        ),
+    )
 
     sub = parser.add_subparsers(dest="command", required=True)
 

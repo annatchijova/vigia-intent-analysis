@@ -81,6 +81,11 @@ export VIGIA_WORK_DIR="/var/lib/vigia/work"
 # XDG-style user state directory. Must NEVER point inside VIGIA_EVIDENCE_DIR.
 export VIGIA_FORENSIC_DB_PATH="/var/lib/vigia/work/vigia_forensic.db"
 
+# Optional — persistent sealed-bundle chain ledger. Default:
+# $VIGIA_WORK_DIR/vigia_chain.db, then an XDG-style user state directory.
+# Must NEVER point inside VIGIA_EVIDENCE_DIR.
+export VIGIA_CHAIN_DB_PATH="/var/lib/vigia/work/vigia_chain.db"
+
 # Optional — enables LLM semantic analysis
 export ANTHROPIC_API_KEY="sk-..."          # Claude Code / API mode
 export VIGIA_LLM_BACKEND=ollama            # local mode

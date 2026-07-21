@@ -8724,3 +8724,39 @@ Entanglement; se excluyen las dos de `TestIdenticalDocumentCollapse`, ya
 marcadas en ese archivo como defecto de cadena de custodia pendiente e
 independiente. No modifica señal, score ni veredicto: separa el estado
 persistente del analista de los bytes adquiridos.
+
+---
+
+## B-186 — el ledger persistente de cadena de custodia podía contaminar evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el ledger SQLite crea una base y potenciales sidecars junto a la evidencia que pretende atestiguar. |
+| **Archivo** | `vigia/forensics/vigia_chain_of_custody.py`, `tests/test_b186_chain_ledger_output_boundary.py`, `README.md`, `CLAUDE.md`. |
+| **Modo** | API `ChainOfCustody`, CLI `vigia_chain_of_custody.py --db`, y cualquier flujo que persista bundles sellados. |
+| **Principio afectado** | El ledger es estado derivado del investigador; no puede tener como destino implícito el CWD ni una raíz de evidencia. |
+
+**Observación reproducida:** el constructor anterior usaba
+`vigia_chain.db` relativo al directorio de trabajo. Si un operador lanzaba el
+verificador desde `VIGIA_EVIDENCE_DIR`, la construcción escribía el ledger en
+el input. Un `--db <evidence>/chain.db` explícito era aceptado; también una
+ruta bajo un padre symlink que redirigía a evidencia. Finalmente, una ruta
+externa válida con padre aún inexistente fallaba antes de crear el ledger. Las
+cuatro condiciones fueron inducidas antes del parche.
+
+**Corrección aplicada:** el default ahora resuelve, en orden,
+`VIGIA_CHAIN_DB_PATH`, `VIGIA_WORK_DIR/vigia_chain.db` y un state-dir estilo
+XDG. El módulo sigue siendo ejecutable sólo con stdlib, por lo que incorpora
+un guard local equivalente al contrato de output: rechaza NUL, inspecciona
+con `lstat` cada componente existente para denegar symlinks, resuelve la ruta
+y prohíbe destinos iguales o descendientes de `VIGIA_EVIDENCE_DIR`. Crea el
+padre con permisos `0750` y valida de nuevo inmediatamente antes de que
+SQLite pueda crear DB/WAL/journal. README y el contrato MCP documentan la
+nueva variable.
+
+**Validación:** cuatro regresiones B-186 cubren el destino explícito dentro
+de evidencia, el escape por padre symlink, el default seguro aun con CWD
+ubicado dentro de evidencia y un destino externo nuevo. También pasan las 27
+pruebas existentes de hardening de cadena de custodia: **31/31**. No altera
+el contenido de ningún bundle, el hash canónico ni los veredictos; sólo
+separa la persistencia del ledger de los bytes adquiridos.
