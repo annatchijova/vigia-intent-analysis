@@ -8587,3 +8587,37 @@ dentro de evidencia.
 **Validación:** tres regresiones cubren destino directo, padre symlink y
 exportación externa; con B-178 a B-180 y las regresiones B-062/B-064 pasan 24
 tests. El JSON, la cadena hash y sus semánticas no cambian.
+
+---
+
+## B-182 — el exportador PDF forense v2 podía publicar dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una vista PDF derivada podía aparecer en el árbol de evidencia fuente, sin publicación atómica. |
+| **Archivo** | `vigia/pipeline/report_exporter_v2.py`, `tests/test_b182_report_pdf_output_boundary.py`. |
+| **Modo** | API opcional `export_pdf()` del exportador forense standalone. |
+| **Principio afectado** | Un renderer no obtiene autoridad de escritura sobre evidencia por recibir un `output_path`; una salida derivada debe estar confinada y publicarse de manera atómica. |
+
+**Observación reproducida:** tras construir los bytes PDF, `export_pdf()` abría
+el `output_path` entregado por el caller en modo binario de escritura. No había
+ninguna comprobación contra `VIGIA_EVIDENCE_DIR`, por lo que
+`<evidence>/report.pdf` era un destino válido; un padre symlink también podía
+redirigir la publicación. `reportlab` no está instalado en este entorno pese a
+ser dependencia declarada, así que la regresión instala un renderer mínimo
+simulado y ejecuta el branch real de construcción/publicación: eso aísla la
+frontera de filesystem y reproduce los dos writes antes del fix sin convertir
+la disponibilidad local del renderer en una excusa para no probarla.
+
+**Corrección aplicada:** el exportador valida el destino mediante el contrato
+compartido `validate_external_output_path()` antes de renderizar. Una vez que
+los bytes están listos crea sólo el padre externo, valida nuevamente para
+cerrar la ventana de redirección, y usa `atomic_write_bytes()` para publicar.
+El metadata devuelto contiene el path canónico validado. Las salidas externas
+siguen soportadas; los destinos dentro de evidencia o que pasan por symlink
+fallan cerrados con `SecurityError` sin crear archivos fuente.
+
+**Validación:** tres regresiones B-182 cubren destino directo dentro de
+evidencia, padre symlink y PDF externo atómico. Junto con B-178 a B-181 y
+B-062/B-064 pasan 27 tests. No afecta contenido analítico, hashes del informe,
+puntajes ni veredictos; limita exclusivamente la autoridad de publicación.
