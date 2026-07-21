@@ -8367,3 +8367,37 @@ inválida o un symlink se rechazan antes de iniciar el subprocess.
 antes filtraba el texto externo y el control positivo de una carpeta hija real.
 El cambio no modifica señales, score ni veredicto: reduce exclusivamente la
 autoridad de lectura de la herramienta.
+
+---
+
+## B-175 — el exportador de grafos podía escribir dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: un artefacto derivado podía aparecer junto a la entrada y cambiar el árbol que se debía preservar. |
+| **Archivo** | `vigia/abduction/vigia_artifact_graph.py`, `tests/test_b175_artifact_graph_output_boundary.py`. |
+| **Modos** | CLI de Artifact Graph: JSON, GEXF y GraphML. |
+| **Principio afectado** | `VIGIA_EVIDENCE_DIR` es entrada inmutable, aunque resida debajo de un root general de salida permitido como `/home` o `/tmp`. |
+
+**Observación reproducida:** el CLI construía por defecto el output JSON con
+`bundle_path.with_suffix(".graph.json")` y lo escribía directo con
+`Path.write_text`, sin pasar por `_validate_output_path`. Por tanto un bundle
+en `VIGIA_EVIDENCE_DIR/case.json` producía
+`VIGIA_EVIDENCE_DIR/case.graph.json`. Los exportadores GEXF/GraphML sí
+llamaban al validador, pero éste permitía cualquier path bajo `/home` o `/tmp`
+sin excluir la raíz de evidencia y sólo revisaba un symlink en el padre
+inmediato.
+
+**Corrección aplicada:** JSON, GEXF y GraphML usan la misma validación. El
+target y `VIGIA_EVIDENCE_DIR` se canonicalizan y se comparan por componentes;
+cualquier target dentro de evidencia, incluso por un redirect, aborta. La
+validación de roots permitidos también pasó de prefijo textual a
+`Path.is_relative_to`, y cada componente existente del path de salida se
+inspecciona con `lstat`: un symlink intermedio o final se rechaza antes de
+escribir.
+
+**Validación:** cuatro regresiones cubren export directo a evidencia, redirect
+intermedio, el CLI JSON con su output por defecto y una carpeta hija real de
+un root permitido. Junto con las pruebas B-164/B-169/B-173/B-174 de bridge y
+sandbox, pasan 36 tests. La corrección afecta exclusivamente los destinos de
+escritura; no cambia el contenido lógico del grafo ni los veredictos.

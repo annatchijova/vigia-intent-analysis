@@ -683,10 +683,11 @@ class ArtifactGraphEngine:
     @staticmethod
     def _validate_output_path(output_path: str) -> str:
         """
-        AG-OUT-01/02/03: valida output_path.
+        AG-OUT-01/02/03/B-175: valida output_path.
         - Sin traversal de path (..)
-        - Directorio padre existe y es escribible
+        - Directorio padre existe, no contiene symlinks y es escribible
         - Path dentro de directorios raíz permitidos (AG-OUT-04)
+        - Nunca dentro de ``VIGIA_EVIDENCE_DIR`` (B-175)
 
         AG-OUT-04 (Kimi P1): el check anterior prevenía '..' pero no paths absolutos
         que apunten a rutas sensibles. Ejemplo: '/etc/passwd' no tiene '..' pero
@@ -694,53 +695,80 @@ class ArtifactGraphEngine:
         El operador debe usar los directorios declarados en _ALLOWED_OUTPUT_ROOTS.
         """
         import os as _os_out
+        import stat as _stat_out
         # Directorios raíz permitidos para exportación de grafos
         _ALLOWED_OUTPUT_ROOTS: tuple = (
             "/tmp", "/home", "/var", "/forensics", "/quarantine",
             "/mnt", "/opt", "/srv",
         )
+        if not isinstance(output_path, str) or not output_path.strip():
+            raise ValueError("output_path debe ser un string no vacío")
+        if "\x00" in output_path:
+            raise ValueError("output_path contiene un byte nulo")
         p = Path(output_path)
         # Barrera 1: sin traversal
         if any(part == ".." for part in p.parts):
             raise ValueError(f"Path traversal en output_path: {output_path!r}")
-        # Barrera 2: path dentro de directorios permitidos
-        # AG-SYM-02 (Kimi P2): p.resolve() sigue symlinks por diseño en Python.
-        # Si /tmp/evil → /home/victim, p.resolve() retorna /home/victim/graph.json
-        # y el check de _ALLOWED_OUTPUT_ROOTS pasa porque /home está permitido.
-        # LIMITACIÓN CONOCIDA: esta barrera verifica el path resuelto, no el path
-        # tal como se escribirá. La barrera AG-SYM-01 más abajo mitiga el caso
-        # más común (symlink en el padre inmediato), pero symlinks en componentes
-        # intermedios del path (p.ej. /real/dir/symlink_intermedio/graph.json)
-        # no son detectados aquí. Para cobertura total: usar un entorno con
-        # namespaces de mount o verificar cada componente del path individualmente
-        # antes de exportar en producción de alta seguridad.
-        resolved_str = str(p.resolve()) if p.is_absolute() else str(Path.cwd() / p)
-        if not any(resolved_str.startswith(root) for root in _ALLOWED_OUTPUT_ROOTS):
+        raw_absolute = p if p.is_absolute() else Path.cwd() / p
+        try:
+            resolved = raw_absolute.resolve(strict=False)
+        except (OSError, RuntimeError) as exc:
+            raise ValueError(f"No se puede resolver output_path: {exc}") from exc
+
+        # Barrera 2: pertenencia de filesystem por componentes, nunca por
+        # prefijo textual (``/tmp-copy`` no hereda autoridad de ``/tmp``).
+        allowed_roots = tuple(Path(root).resolve(strict=False) for root in _ALLOWED_OUTPUT_ROOTS)
+        if not any(resolved == root or resolved.is_relative_to(root) for root in allowed_roots):
             raise ValueError(
                 f"[VIGIA AG-OUT-04] Output path fuera de directorios permitidos: {output_path!r}. "
                 f"Directorios válidos: {_ALLOWED_OUTPUT_ROOTS}"
             )
-        # Barrera 3: directorio padre existe, no es symlink, y es escribible
-        # AG-SYM-01 (Kimi P1): si el padre es symlink a /home/victim (directorio
-        # permitido), el check de _ALLOWED_OUTPUT_ROOTS pasaría igual. Rechazar
-        # cualquier componente del path que sea un symlink antes de escribir.
-        parent = p.parent
+
+        # B-175: evidence is an immutable input even when it lives below a
+        # generally valid host root such as /home or /tmp. Resolve first so a
+        # redirect into evidence cannot hide behind a benign-looking raw path.
+        evidence_dir = os.getenv("VIGIA_EVIDENCE_DIR", "").strip()
+        if evidence_dir:
+            try:
+                evidence_root = Path(evidence_dir).resolve(strict=False)
+            except (OSError, RuntimeError) as exc:
+                raise ValueError(f"No se puede resolver VIGIA_EVIDENCE_DIR: {exc}") from exc
+            if resolved == evidence_root or resolved.is_relative_to(evidence_root):
+                raise ValueError(
+                    "[VIGIA AG-OUT-05] Refusing to write graph output inside "
+                    "VIGIA_EVIDENCE_DIR (forensic evidence is read-only)."
+                )
+
+        # Barrera 3: reject every existing raw path component that is a
+        # symlink. Checking only the immediate parent missed
+        # ``safe/link/nested/graph.gexf`` and could redirect output after the
+        # logical path had passed containment checks.
+        cursor = Path(raw_absolute.anchor)
+        for component in raw_absolute.relative_to(raw_absolute.anchor).parts:
+            cursor /= component
+            try:
+                mode = _os_out.lstat(cursor).st_mode
+            except FileNotFoundError:
+                break
+            except OSError as exc:
+                raise ValueError(f"No se puede inspeccionar output_path: {exc}") from exc
+            if _stat_out.S_ISLNK(mode):
+                raise ValueError(
+                    f"[VIGIA AG-SYM-02] output_path contiene un symlink: {str(cursor)!r}. "
+                    "Usar el directorio real directamente."
+                )
+
+        parent = raw_absolute.parent
         if not parent.exists():
             raise ValueError(
                 f"Directorio padre no existe: {str(parent)!r}. "
                 "Crear el directorio manualmente antes de exportar."
             )
-        if _os_out.path.islink(str(parent)):
-            real_parent = _os_out.path.realpath(str(parent))
-            raise ValueError(
-                f"[VIGIA AG-SYM-01] Directorio padre es symlink: {str(parent)!r} "
-                f"→ {real_parent!r}. Usar el path real del directorio directamente."
-            )
         if not _os_out.access(str(parent), _os_out.W_OK):
             raise ValueError(
                 f"Directorio padre no es escribible: {str(parent)!r}."
             )
-        return str(p)
+        return str(raw_absolute)
 
     def export_gexf(self, G: AnyGraph, output_path: str) -> None:
         """Exporta a GEXF para Gephi."""
@@ -971,8 +999,9 @@ def main() -> int:
     )
 
     if args.format == "json":
-        out_path.write_text(engine.export_json(G), encoding="utf-8")
-        print(f"[OK] JSON → {out_path}")
+        safe_output_path = Path(engine._validate_output_path(str(out_path)))
+        safe_output_path.write_text(engine.export_json(G), encoding="utf-8")
+        print(f"[OK] JSON → {safe_output_path}")
     elif args.format == "gexf":
         engine.export_gexf(G, str(out_path))
         print(f"[OK] GEXF → {out_path}")
