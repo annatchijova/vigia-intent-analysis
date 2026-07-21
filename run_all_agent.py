@@ -11,11 +11,15 @@ Usage:
 """
 
 import argparse
+import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
 from pathlib import Path
+
+from vigia.core.runtime_fingerprint import runtime_execution_fingerprint
 
 # ── Configuración ─────────────────────────────────────────────────────────────
 REPO         = Path(__file__).parent
@@ -126,6 +130,55 @@ def extract_expected(case_path: Path) -> str:
                 or "UNKNOWN")
     except Exception:
         return "UNKNOWN"
+
+
+def _sha256_regular_file(path: Path) -> str | None:
+    """Hash a case without following a symlink; None means no cache reuse."""
+    try:
+        if path.is_symlink() or not path.is_file():
+            return None
+        digest = hashlib.sha256()
+        with path.open("rb") as source:
+            for chunk in iter(lambda: source.read(65536), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+    except OSError:
+        return None
+
+
+def cache_reuse_reason(
+    bundle: dict,
+    *,
+    evidence_sha256: str | None,
+    runtime_fingerprint: str | None,
+) -> str | None:
+    """Return None only when a sealed bundle proves it matches this run.
+
+    Cache reuse is a provenance claim.  A previous sealed verdict is not a
+    current evaluation if either the case bytes or deterministic runtime bytes
+    changed.  Historical bundles without B-166's fingerprint are deliberately
+    rerun once rather than silently being promoted to current results.
+    """
+    if not bundle.get("agent_verdict"):
+        return "unsealed_bundle"
+    if not evidence_sha256:
+        return "evidence_unavailable"
+    if bundle.get("evidence_sha256") != evidence_sha256:
+        return "evidence_changed"
+    if not runtime_fingerprint:
+        return "runtime_unavailable"
+    if bundle.get("runtime_fingerprint") != runtime_fingerprint:
+        return "runtime_or_context_changed_or_legacy_bundle"
+    return None
+
+
+def _agent_effective_environment(case_path: Path) -> dict[str, str]:
+    """Mirror the agent's evidence-root default before fingerprinting context."""
+    environment = dict(os.environ)
+    if not environment.get("VIGIA_EVIDENCE_DIR", "").strip():
+        evidence_root = case_path if case_path.is_dir() else case_path.parent
+        environment["VIGIA_EVIDENCE_DIR"] = str(evidence_root.absolute())
+    return environment
 
 
 # B-058 (B10): el veredicto sellado por el agente (agent_verdict, escrito por
@@ -310,11 +363,25 @@ def main():
             # detección (docs/FASE1_RESOLVE_EBS.md).
             cached = False
             cache_mode = None
+            cache_invalidation = None
+            try:
+                current_runtime_fingerprint = runtime_execution_fingerprint(
+                    REPO, _agent_effective_environment(case_path)
+                )
+            except (OSError, RuntimeError) as exc:
+                current_runtime_fingerprint = None
+                cache_invalidation = "runtime_unavailable"
+                print(f"{YEL}[B-166] Runtime fingerprint unavailable: {exc}{RST}")
             if not args.rerun and output_path.exists():
                 try:
                     _bundle = json.loads(output_path.read_text())
-                    _sealed = _bundle.get("agent_verdict")
-                    if _sealed:
+                    if cache_invalidation is None:
+                        cache_invalidation = cache_reuse_reason(
+                            _bundle,
+                            evidence_sha256=_sha256_regular_file(case_path),
+                            runtime_fingerprint=current_runtime_fingerprint,
+                        )
+                    if cache_invalidation is None:
                         cached = True
                         cache_mode = (_bundle.get("pipeline_results", {})
                                       .get("pipeline_meta", {})
@@ -346,6 +413,8 @@ def main():
 
             status = f"{GRN}PASS{RST}" if ok else f"{RED}FAIL{RST}"
             tag = f" {CYA}[CACHED:{cache_mode}]{RST}" if cached else ""
+            if cache_invalidation:
+                tag = f" {YEL}[RERUN:{cache_invalidation}]{RST}"
             print(f"  got={got:<12} {status}  ({elapsed:.1f}s){tag}")
 
             results.append({
@@ -356,6 +425,7 @@ def main():
                 "elapsed": round(elapsed, 1),
                 "cached": cached,
                 "cache_mode": cache_mode,
+                "cache_invalidation": cache_invalidation,
             })
 
         except subprocess.TimeoutExpired:

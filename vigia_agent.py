@@ -39,6 +39,8 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from vigia.core.runtime_fingerprint import runtime_execution_fingerprint
+
 # ── Forensic logging ─────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
@@ -1323,6 +1325,7 @@ class VIGIAAgent:
         results: Dict[str, Any],
         narrative: str,
         evidence_sha256: str,
+        runtime_fingerprint: str = "UNAVAILABLE",
     ) -> Dict[str, Any]:
         """
         Seals the final bundle with SHA-256.
@@ -1357,6 +1360,11 @@ class VIGIAAgent:
             "case_id": self.case_id,
             "evidence_path": str(self.evidence_path),
             "evidence_sha256": evidence_sha256,
+            # B-166: versioned content manifest of the deterministic runtime.
+            # A batch may reuse this sealed result only if its current runtime
+            # fingerprint is identical; a valid evidence hash alone is not
+            # proof that current code would reach the same result.
+            "runtime_fingerprint": runtime_fingerprint,
             "analysis_timestamp": _utcnow(),
             "iterations_executed": self.iteration + 1,
             "self_corrections_applied": len(self.corrections_applied),
@@ -1420,19 +1428,34 @@ class VIGIAAgent:
         logger.info("[AGENT] Starting VIGÍA Agent — case %s", self.case_id)
         logger.info("[AGENT] Evidence: %s", self.evidence_path)
 
-        # Record SHA-256 of the agent's own source code — version traceability
+        # B-166: record both the entrypoint and the complete deterministic
+        # runtime manifest.  The former remains useful for historical bundles;
+        # the latter prevents a cache from hiding a scorer/adapter change.
         try:
             agent_source = Path(__file__).read_bytes()
             agent_sha256 = hashlib.sha256(agent_source).hexdigest()
         except OSError:
             agent_sha256 = "UNAVAILABLE"
+        try:
+            runtime_fingerprint = runtime_execution_fingerprint(Path(__file__).parent)
+        except (OSError, RuntimeError) as exc:
+            runtime_fingerprint = "UNAVAILABLE"
+            logger.warning("[AGENT] Runtime fingerprint unavailable: %s", exc)
         self.audit.log(
             action="AGENT_INITIALIZED",
             tool="vigia_agent",
             inputs={"case_id": self.case_id, "agent_file": __file__},
-            outputs={"agent_sha256": agent_sha256, "agent_version": AGENT_VERSION},
+            outputs={
+                "agent_sha256": agent_sha256,
+                "agent_version": AGENT_VERSION,
+                "runtime_fingerprint": runtime_fingerprint,
+            },
             iteration=0,
-            note=f"Agent initialized — source SHA-256: {agent_sha256[:16]}...",
+            note=(
+                "Agent initialized — source SHA-256: "
+                f"{agent_sha256[:16]}...; runtime fingerprint: "
+                f"{runtime_fingerprint[:16]}..."
+            ),
         )
         logger.info("[AGENT] Agent SHA-256: %s", agent_sha256)
 
@@ -1521,7 +1544,7 @@ class VIGIAAgent:
 
         # 4. Seal bundle — returns (bundle_dict, canonical_json_text, sha256_digest)
         bundle, bundle_canonical_text, bundle_digest = self._seal_bundle(
-            results, narrative, evidence_sha256
+            results, narrative, evidence_sha256, runtime_fingerprint
         )
         # Attach temporary fields for main() — extracted with pop() before writing to disk
         bundle["_canonical_text"] = bundle_canonical_text

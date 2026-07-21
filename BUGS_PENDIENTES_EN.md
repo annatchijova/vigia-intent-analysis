@@ -5775,9 +5775,18 @@ Full suite: 1366 passed, 0 regressions.
 Of 23 MCP tools, only 3 have `audit_logger.log_info(event_type="TOOL_INVOKED")`
 before path sanitization: `generate_forensic_hash`, `read_evidence`, `list_files`.
 These 3 are the evidence-touching tools (chain-of-custody anchor). The remaining
-20 Phase 2-4 analysis tools are not instrumented. Their invocations are recorded
-by the calling agent's `tool_execution_log` chain (v2 with HMAC), but not in the
-per-tool audit log.
+20 Phase 2-4 analysis tools are not instrumented. A calling agent can reconstruct
+a v2 HMAC `tool_execution_log` after a session, but that is not equivalent to
+tool-side instrumentation or contemporaneous capture.
+
+**OWL v2 confirmation (2026-07-21):** external bundle
+`results/OWL-NEXUS5-CASE_bundle_claude_v2.json` preserves 37 entries and the
+stdlib verifier confirms its hash chain. Its own report documents that entries
+were written by the agent in batches after MCP calls and that HMAC cannot be
+keyedly verified without the access-restricted key. The chain therefore proves
+subsequent relative integrity, not wall-clock timing, call order, or literal
+MCP response text. This is not a verifier defect; it is concrete evidence that
+B-122 remains partially open.
 
 Deferred: broader rollout needs to address `audit_logger` synchronous fsync
 performance before adding to all 20 tools.
@@ -7384,6 +7393,22 @@ forensic meaning from nested chat, URL, or account records. A source-specific
 Android / Chrome / Musical.ly extractor must operate over hash-bound raw
 artifacts before VIGÍA may derive a score or its own `SUSPICION`.
 
+**Cross-mode confirmation, without verdict authority (2026-07-21):** the
+work products preserved in
+`results/OWL-NEXUS5-CASE_{report,bundle}_claude*` and
+`results/OWL-NEXUS5-CASE_{report,bundle}_chatgpt.*` verify their checksums and
+agree that legacy `NOISE` does not adequately describe the recovered evidence.
+Claude v1 traversed the extraction through 29 MCP calls and ChatGPT performed a
+read-only manual image review. Claude v2 corrected the scope: a delivery SMS
+was outside the original query and the Windows/Pidgin companion is
+**UNRESOLVED**, not ruled out. It retains `SUSPICION`, not `INTENT`/`MALICE`,
+because the cross-device link was not materialized. They are neither a motor
+regression oracle nor a score input: they differ, for example, on which message
+text is recoverable and what can be inferred about the second device. That
+disagreement is preserved and reinforces that VIGÍA must keep emitting
+`ABSTAIN` until a deterministic, source-specific, hash-bound extractor
+materializes the facts it proposes to score.
+
 ---
 
 ## B-163 — The agent shim projected signals from raw JSON, not from the schema it scores [RESOLVED — Codex 2026-07-21]
@@ -7496,3 +7521,48 @@ read-only, and empty-data semantics:
 and `tests/test_b072_b074_mobile_verdict_fixes.py`: **64 passed**. On OWL raw:
 93 browser entries, an accurate coverage note, zero findings, and a zero
 signal.
+
+---
+
+## B-166 — The batch reused bundles after evidence, runtime, or configuration changed [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 provenance/measurement: a cached metric could be presented as a result from the current runtime. |
+| **Files** | `run_all_agent.py`, `vigia_agent.py`, new `vigia/core/runtime_fingerprint.py`. |
+| **Detected by** | Codex audit of the `OWL-NEXUS5` batch, 2026-07-21. |
+
+`run_all_agent.py` accepted any existing bundle with an `agent_verdict`. It did
+not compare its `evidence_sha256`, source identity, or route-affecting
+configuration. The 201-case batch made the failure visible: it marked 200
+cases `CACHED:motor` even though the current `vigia_agent.py` SHA
+(`3e49…a279e`) already differed from the SHA recorded in those bundles
+(`3038…3120`). `motor` described only the historical bundle's EBS adapter
+mode; it did not prove that the current runtime produced it.
+
+**Applied repair:** every new bundle seals a `runtime_fingerprint` in addition
+to its evidence hash. It is a versioned SHA-256 manifest of deterministic entry
+points and the `.py` files under `vigia/`, together with the interpreter version
+and the `VIGIA_*` / `PYTHONHASHSEED` context that can alter a decision.
+Secret-shaped values contribute only presence/absence to the hash and are never
+serialized into a bundle. The runner mirrors the agent's default
+`VIGIA_EVIDENCE_DIR` and reuses a bundle only when its sealed verdict, case
+hash, and runtime/context fingerprint all match. A historical bundle without a
+fingerprint reruns once; output names the reason, for example
+`[RERUN:runtime_or_context_changed_or_legacy_bundle]`.
+
+**Declared limit:** the fingerprint identifies VIGÍA's source tree, Python, and
+relevant process configuration; it is not a substitute for a lockfile and does
+not attest external binaries or dependencies. When that layer matters to a
+case, rerun and preserve the execution environment.
+
+**Verification:** `tests/test_b166_batch_cache_provenance.py` pins exact
+equality, evidence mutation, runtime mutation, legacy bundles, symlinks,
+`VIGIA_EBS_RESOLVE`, and the default evidence root. Together with existing
+sealed-comparator contracts:
+`tests/test_b166_batch_cache_provenance.py`,
+`tests/test_b058_batch_reads_sealed_verdict.py`, and
+`tests/test_b10_comparator_reads_sealed_verdict.py`: **34 passed**.
+A direct read-only OWL run with an internal temporary output emitted `ABSTAIN`
+(exit 4), and its top-level fingerprint matched the one recorded in
+`AGENT_INITIALIZED`.
