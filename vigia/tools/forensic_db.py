@@ -42,7 +42,8 @@ from vigia.tools.nlp_constants import (
     DB_PERMISSIONS,
     CONFIG_PERMISSIONS,
     MAX_DB_SIZE,
-    EVIDENCE_PATH_ENV,
+    FORENSIC_DB_PATH_ENV,
+    WORK_DIR_ENV,
 )
 
 
@@ -79,13 +80,34 @@ class ForensicDatabaseManager:
             return
 
         if db_path is None:
-            evidence_path = os.environ.get(EVIDENCE_PATH_ENV, "/mnt/evidence")
-            db_path = os.path.join(evidence_path, "vigia_forensic.db")
+            db_path = self._default_db_path()
 
         self.db_path: str = self._secure_path(db_path)
         self._ensure_directory()
         self._init_database()
         self._initialized = True
+
+    @staticmethod
+    def _default_db_path() -> str:
+        """Choose persistent operational state without borrowing evidence roots.
+
+        ``VIGIA_EVIDENCE_PATH`` is retained as a legacy *input* variable but
+        is never a writable database default. Explicit database configuration
+        wins; otherwise reuse the documented private work root, falling back
+        to the calling user's XDG-style state directory.
+        """
+        explicit = os.environ.get(FORENSIC_DB_PATH_ENV, "").strip()
+        if explicit:
+            return explicit
+
+        work_dir = os.environ.get(WORK_DIR_ENV, "").strip()
+        if work_dir:
+            return os.path.join(work_dir, "vigia_forensic.db")
+
+        state_home = os.environ.get("XDG_STATE_HOME", "").strip()
+        if not state_home:
+            state_home = os.path.join(os.path.expanduser("~"), ".local", "state")
+        return os.path.join(state_home, "vigia", "vigia_forensic.db")
 
     # ------------------------------------------------------------------
     # Seguridad de path (DeepSeek)
@@ -93,14 +115,21 @@ class ForensicDatabaseManager:
 
     def _secure_path(self, path: str) -> str:
         """Sanitización anti-traversal, anti-symlink, anti-world-writable."""
-        abs_path = os.path.abspath(os.path.expanduser(path))
-
-        if os.path.islink(abs_path):
-            raise SecurityError(f"Database path cannot be symlink: {abs_path}")
+        abs_path = validate_external_output_path(
+            path, artifact_label="operational forensic SQLite database"
+        )
 
         parent = os.path.dirname(abs_path)
         if not os.path.exists(parent):
             os.makedirs(parent, mode=0o750)
+
+        # Creating a legitimate external parent can race a local redirect;
+        # validate the component chain again before SQLite creates WAL/lock
+        # files alongside the database.
+        abs_path = validate_external_output_path(
+            abs_path, artifact_label="operational forensic SQLite database"
+        )
+        parent = os.path.dirname(abs_path)
 
         try:
             stat_info = os.stat(parent)

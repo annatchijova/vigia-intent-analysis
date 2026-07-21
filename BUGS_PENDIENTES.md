@@ -8687,3 +8687,40 @@ evidencia, output symlink, traversal real por `case_id` hacia el writer de
 reporte y bundle externo válido. La familia B-178 a B-184 más B-062/B-064 pasa
 34/34. No cambia evidencia, score ni decisión; restaura el confinamiento y
 evita que un identificador de caso se convierta en escritura.
+
+---
+
+## B-185 — la SQLite operacional podía usar evidencia como almacenamiento por defecto [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: perfiles ACP, historial temporal y audit trail SQLite podían crear DB, WAL y lockfile dentro del árbol de evidencia. |
+| **Archivo** | `vigia/tools/forensic_db.py`, `vigia/tools/nlp_constants.py`, `tests/test_b185_forensic_db_source_boundary.py`, `tests/test_entanglement_groundtruth.py`, `README.md`, `CLAUDE.md`. |
+| **Modo** | `ForensicDatabaseManager()` implícito en ACP, temporal y Entanglement; también constructor con `db_path` explícito. |
+| **Principio afectado** | La persistencia del analista es estado operacional, no evidencia. Un singleton no puede tomar una raíz de entrada como fallback de escritura. |
+
+**Observación reproducida:** sin `db_path`, el singleton componía
+`$VIGIA_EVIDENCE_PATH/vigia_forensic.db` (o `/mnt/evidence`) y habilitaba WAL.
+En una investigación con la raíz legacy apuntando a evidencia, la mera
+construcción creaba la base y sus sidecars. El constructor explícito tampoco
+consultaba `VIGIA_EVIDENCE_DIR`: aceptaba tanto `<evidence>/vigia_forensic.db`
+como `db-redirect -> evidence` seguido de `db-redirect/vigia_forensic.db`.
+Los tres caminos fueron inducidos antes del parche; una DB externa fue el
+control positivo.
+
+**Corrección aplicada:** se introduce `VIGIA_FORENSIC_DB_PATH` como destino
+explícito. Sin él, el orden seguro es `VIGIA_WORK_DIR/vigia_forensic.db` y,
+si tampoco está configurado, un state-dir estilo XDG del usuario. La variable
+legacy `VIGIA_EVIDENCE_PATH` conserva significado de input pero no participa
+en la elección del destino. Todo `db_path`, implícito o explícito, pasa por
+`validate_external_output_path()` antes de crear padres y otra vez antes de
+que SQLite pueda crear DB/WAL/lock. README, contrato MCP y el fixture de
+Entanglement documentan la nueva configuración.
+
+**Validación:** cuatro regresiones B-185 cubren DB explícita en evidencia,
+padre symlink, fallback seguro aun si la variable legacy apunta a evidencia y
+DB externa válida. También pasan B-178 (backup SIFT) y 21 pruebas de
+Entanglement; se excluyen las dos de `TestIdenticalDocumentCollapse`, ya
+marcadas en ese archivo como defecto de cadena de custodia pendiente e
+independiente. No modifica señal, score ni veredicto: separa el estado
+persistente del analista de los bytes adquiridos.

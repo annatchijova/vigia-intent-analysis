@@ -396,6 +396,9 @@ pip install -e ".[dev]"
 
 ```bash
 export VIGIA_EVIDENCE_DIR="/path/to/read-only/evidence"   # required
+export VIGIA_WORK_DIR="/path/to/private/work"             # derived state; outside evidence
+# Optional durable ACP/temporal/entanglement SQLite; defaults under VIGIA_WORK_DIR or user state.
+export VIGIA_FORENSIC_DB_PATH="/path/to/private/work/vigia_forensic.db"
 export VIGIA_HMAC_KEY="your-hmac-key-min-32-chars"        # bundle integrity
 export ANTHROPIC_API_KEY="sk-..."                          # Claude Code / API mode
 export VIGIA_LLM_BACKEND=ollama                            # local mode

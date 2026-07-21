@@ -76,6 +76,11 @@ export VIGIA_LOG_DIR="/var/log/vigia"
 # Default: a private mode-0700 temporary directory for the server lifetime.
 export VIGIA_WORK_DIR="/var/lib/vigia/work"
 
+# Optional — durable operational SQLite state for ACP, temporal and
+# entanglement modules. Default: $VIGIA_WORK_DIR/vigia_forensic.db, then an
+# XDG-style user state directory. Must NEVER point inside VIGIA_EVIDENCE_DIR.
+export VIGIA_FORENSIC_DB_PATH="/var/lib/vigia/work/vigia_forensic.db"
+
 # Optional — enables LLM semantic analysis
 export ANTHROPIC_API_KEY="sk-..."          # Claude Code / API mode
 export VIGIA_LLM_BACKEND=ollama            # local mode
