@@ -239,6 +239,20 @@ _LEGACY_TYPE_TO_EVIDENCE: Dict[str, str] = {
     "registro_acceso":            "log_entry",
     "historial_accesos_referencia": "log_entry",
     "contexto_usuario":           "log_entry",
+    # Mobile / social legacy taxonomy. These map only the collection class to
+    # an existing EBS profile; they do not turn nested scenario prose into a
+    # score or forensic anomaly (B-162).
+    "account_registration":       "app_data",
+    "web_search":                 "web_search",
+    "instant_message":            "chat_message",
+    "social_media_search":        "social_media",
+    "installed_app":              "app_data",
+    "system_event":               "log_entry",
+    "musical_ly_activity":        "social_media",
+    "access_log":                 "log_entry",
+    "access_history_reference":   "log_entry",
+    "user_context":               "log_entry",
+    "slack_message":              "chat_message",
     # Identity mappings — canonical names used directly as 'type' in EBS v1 cases
     "memory_process":               "memory_process",
     "kernel_structure":             "kernel_structure",
@@ -353,9 +367,36 @@ def _normalize_artifact_legacy(artifact: Dict[str, Any], idx: int) -> Dict[str, 
 
     art = dict(artifact)
 
+    # B-162: some legacy mobile/social scenario exports identify records as
+    # ``id`` rather than EBS's ``artifact_id``. Preserve that identifier before
+    # any conversion so a source-bearing record never collapses to the adapter
+    # placeholder ``?``. This is a field rename, not a new factual assertion.
+    if "artifact_id" not in art and art.get("id") not in (None, ""):
+        art["artifact_id"] = str(art["id"])
+
     # --- evidence_type ---
     legacy_type = str(art.get("type", "")).strip().lower()
     art["evidence_type"] = _LEGACY_TYPE_TO_EVIDENCE.get(legacy_type, "default")
+
+    # B-162: content-rich scenario records without a deterministic semantic
+    # extractor used to be accepted as minimum-score defaults, letting a real
+    # loss of message/URL/account semantics end in a clean NOISE. Keep their
+    # bytes/fields intact, but surface the coverage gap. The scorer's existing
+    # normalization gate converts only a would-be NOISE to ABSTAIN. In
+    # particular, do NOT read metadata.significance or narrative content as a
+    # score: authored scenario prose must never acquire verdict authority.
+    if (
+        "id" in artifact
+        and "artifact_id" not in artifact
+        and isinstance(art.get("content"), dict)
+        and not isinstance(art.get("forensic_anomalies"), list)
+        and not isinstance(art.get("analyst_flags"), list)
+    ):
+        art.setdefault("normalization_failures", []).append({
+            "field": "content",
+            "reason": "structured_content_without_semantic_extractor",
+            "legacy_type": legacy_type,
+        })
 
     # --- source_tool ---
     if "source_tool" not in art:

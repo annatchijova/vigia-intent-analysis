@@ -7332,3 +7332,55 @@ given the configured key. `tests/test_reasoning_trace.py`,
 `tests/test_r3_5_chain_tip_truncation.py`: **60 passed**. The existing OWL
 trace still verifies, now with `tip_checked=True`; it remains honestly
 hash-only (`hmac_checked=False`) until a persisted HMAC key is supplied.
+
+---
+
+## B-162 — The legacy adapter silently erased an unmodeled structured-evidence schema [PARTIALLY REMEDIATED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 evidence-integrity / honest-degradation failure. |
+| **Files** | `vigia/pipeline/vigia_integration_bridge.py:_normalize_artifact_legacy`, `vigia_scorer.py` normalization gate. |
+| **Detected by** | Codex audit of `OWL-NEXUS5-CASE`, 2026-07-21. |
+
+The legacy adapter expected `artifact_id`, `forensic_anomalies`, and
+`analyst_flags`. The OWL scenario uses `id`, nested structured `content`, and
+mobile/social types such as `web_search` and `instant_message`. Before any
+mapping, all 20 artifacts silently became `artifact_id="?"`,
+`evidence_type="unknown"`, and zero-score signals. The run then sealed
+`NOISE`, without a `normalization_failures` marker or an `ABSTAIN` disposition.
+
+Repository-wide measurement found 24 legacy artifacts with unmapped types;
+20 belong to OWL. Mapping those type names alone is not a verdict repair:
+the adapter has no deterministic extractor for the nested message, URL, and
+account semantics, so each artifact still receives the minimum raw score and
+OWL remains `NOISE` (measured score `0.0627`). Treating scenario prose such as
+`metadata.significance` as an anomaly or score would instead make an authored
+case narrative authoritative, reopening the label-leak / examiner-assertion
+class.
+
+**Applied repair:** the normalizer preserves `id` as `artifact_id`, recognizes
+the mobile/social taxonomy only as a collection class, and attaches
+`structured_content_without_semantic_extractor` when structured content lacks a
+deterministic extractor. The existing gate converts the would-be `NOISE` to
+`ABSTAIN`. Neither `metadata.significance`, narrative text, nor
+`expected_verdict` becomes a score input.
+
+**Verification:** red-first tests establish that the ID and
+`instant_message` class are preserved, that the minimal case ends in `ABSTAIN`
+with the exact loss marker, and that changing its expected label between
+`SUSPICION` and `MALICE` changes no normalized artifact.
+`tests/test_b162_structured_legacy_degradation.py`,
+`tests/test_label_leak_normalize_case_schema.py`,
+`tests/test_b066_b067_mobile_whitelist.py`,
+`tests/test_p1_metadata_normalization_integrity.py`, and
+`tests/test_b6_artifact_type_map_consistency.py`: **58 passed**. A real
+temporary-bundle run of `vigia_agent.py` on the OWL JSON changed `NOISE` to
+**`ABSTAIN`** (`motor_score=0.0627`), with a valid checksum and reasoning trace,
+without promoting prose into evidence.
+
+**Open residual:** this repairs the false-clean outcome; it does not extract
+forensic meaning from nested chat, URL, or account records. The agent renderer
+still presents OWL primary signals as `unknown`. A source-specific Android /
+Chrome / Musical.ly extractor must operate over hash-bound raw artifacts before
+VIGÍA may derive a score or its own `SUSPICION`.
