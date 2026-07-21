@@ -9359,3 +9359,32 @@ eliminación del temporal parcial que ese stream hubiera creado. Con B-194
 HTTP de fixtures: un caso local mayor se puede adquirir y analizar por las
 rutas forenses/CLI correspondientes, sin ser truncado ni reinterpretado por
 la API.
+
+---
+
+## B-203 — la API presentaba un caso permitido rechazado por tamaño como `404` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de degradación honesta: el límite de disponibilidad de B-202 funcionaba, pero la capa HTTP ocultaba su razón bajo la misma respuesta usada para rutas inexistentes o prohibidas. |
+| **Archivos** | `vigia/api_case_paths.py`, `vigia_api.py`, `vigia/vigia_api.py`, `tests/test_b203_api_case_limit_contract.py`, estados técnicos EN/ES. |
+| **Modo** | `POST /analyze/path`, ambos imports públicos. |
+| **Principio afectado** | Una API puede ocultar detalles de paths locales sin convertir una política declarada y verificable en una afirmación falsa de inexistencia. |
+
+**Observación reproducida:** tras B-202, un `data/cases/oversized.json` regular
+y permitido se rechazaba antes de pipeline y temporal, pero ambos wrappers
+capturaban todo `CasePathError` y devolvían `404 Caso no encontrado`. El mismo
+status y texto se usan correctamente para traversal, symlinks y archivos que
+no existen, pero no describían el hecho ya comprobado: había un fixture
+permitido que excedía el presupuesto documentado.
+
+**Corrección aplicada:** `CaseSnapshotLimitError` especializa el error de path
+para el único rechazo de tamaño declarado. Ambos wrappers lo traducen a `422`
+con el límite de bytes; los demás `CasePathError` continúan devolviendo el
+`404` opaco, por lo que la ruta no se convierte en un oráculo de filesystem.
+La separación no modifica el snapshot, los veredictos ni la selección de casos.
+
+**Validación:** B-203 fue roja primero en los dos wrappers (`404`); ahora exige
+`422`, el motivo de límite y que el scorer no sea invocado. Junto con B-202,
+B-194 y los límites JSON, pasan **29 tests**; `py_compile` y `git diff --check`
+pasan.

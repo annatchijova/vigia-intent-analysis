@@ -14,7 +14,11 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from vigia.api_case_paths import CasePathError, snapshot_case_file
+from vigia.api_case_paths import (
+    CasePathError,
+    CaseSnapshotLimitError,
+    snapshot_case_file,
+)
 from vigia.api_defaults import DEFAULT_CORS_ORIGINS, DEFAULT_HOST, DEFAULT_PORT
 from vigia.api_payload import CasePayloadError, validate_case_payload
 from vigia.openai_compat import ChatRequest, install_openai_compatibility
@@ -171,6 +175,8 @@ def analyze_by_path(payload: CasePath):
             except Exception:
                 narrative = "[narrativa no disponible]"
         return {**pipeline, "narrative": narrative, "case": Path(payload.case_path).name}
+    except CaseSnapshotLimitError as exc:
+        raise HTTPException(422, str(exc)) from None
     except CasePathError:
         raise HTTPException(404, "Caso no encontrado en los directorios permitidos")
     except Exception:

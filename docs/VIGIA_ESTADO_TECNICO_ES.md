@@ -701,7 +701,10 @@ artefactos antes de crear un temporal o iniciar el scoring. Los snapshots de
 casos del repositorio ligados al descriptor también se limitan a 1 MiB, incluso
 durante la copia posterior a la apertura. Son fronteras de disponibilidad HTTP,
 no validación del esquema forense ni límites sobre la adquisición local de
-evidencia o la ingestión binaria.
+evidencia o la ingestión binaria. Las rutas inválidas o que escapan el scope
+siguen respondiendo `404` opaco; un caso permitido rechazado sólo por el límite
+de tamaño declarado responde `422` con ese límite, sin fingir que el archivo
+no existe.
 
 ---
 

@@ -21,13 +21,17 @@ class CasePathError(ValueError):
     """The requested filesystem case is missing or outside the API contract."""
 
 
+class CaseSnapshotLimitError(CasePathError):
+    """A valid repository case exceeds the declared API snapshot budget."""
+
+
 _CASE_ROOT_PARTS = (("cases",), ("data", "cases"))
 
 
 def _require_snapshot_size_within_limit(metadata: os.stat_result) -> None:
     """Refuse a repository fixture that exceeds the HTTP snapshot contract."""
     if metadata.st_size > MAX_CASE_JSON_BYTES:
-        raise CasePathError(
+        raise CaseSnapshotLimitError(
             f"case exceeds the {MAX_CASE_JSON_BYTES}-byte API limit"
         )
 
@@ -163,7 +167,7 @@ def _copy_case_snapshot_bounded(source, target) -> None:
     while chunk := source.read(64 * 1024):
         copied += len(chunk)
         if copied > MAX_CASE_JSON_BYTES:
-            raise CasePathError(
+            raise CaseSnapshotLimitError(
                 f"case exceeds the {MAX_CASE_JSON_BYTES}-byte API limit"
             )
         target.write(chunk)
