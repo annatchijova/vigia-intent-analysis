@@ -7178,3 +7178,21 @@ to configure the environment variable.
 **Applied repair:** the package parent (checkout root) is now the default,
 independent of the working directory; `VIGIA_REPO` remains an explicit
 override. A regression imports the package wrapper with that variable unset.
+
+---
+
+## B-158 — API returns internal exception details and checkout path [OPEN — Codex remediation in progress]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Conditional P3 — diagnostic disclosure to clients that can reach the API. |
+| **Files** | `vigia_api.py`, `vigia/vigia_api.py` |
+| **Detected by** | Codex audit, 2026-07-21. |
+
+Both analysis endpoints raise `HTTPException(500, str(e))`: a pipeline
+exception can return local paths, binary names, or internal failure details to
+the caller. Root `/health` also returns `str(REPO)`. A controlled inert
+exception confirms that its text is preserved in the public `detail`. This
+does not change evidence or verdicts, and requires a client that can reach the
+endpoint. **Planned repair:** log the exception server-side, return a generic
+message, and omit the filesystem root from health.

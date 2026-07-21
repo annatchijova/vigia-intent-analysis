@@ -226,6 +226,24 @@ checkout root, rather than the package directory. `VIGIA_REPO` remains an
 explicit override. The API boundary regression imports the module with the
 environment variable absent and asserts that root.
 
+## C-06 — API diagnostics disclose local implementation details [CONFIRMED]
+
+**Severity:** Conditional P3 information disclosure. It matters only to a
+client that can reach the API; it does not alter a verdict, a seal, or evidence
+selection.
+
+Both `analyze_by_path()` and `analyze_by_json()` convert an arbitrary pipeline
+exception directly to `HTTPException(500, str(e))`. The root wrapper's health
+endpoint also serializes its configured repository path. With an inert pipeline
+raising a fixture string, the public exception detail contains that exact
+string. Depending on the underlying fault, this can disclose filesystem layout
+or tool configuration.
+
+### Repair proposal — not implemented
+
+Log a contextual exception on the server, return one stable generic 500 detail
+to the caller, and expose health status without the repository filesystem path.
+
 ## Checked, not relabeled as new
 
 `L-063`, `L-064`, and `L-065` are already accurately documented doctrine

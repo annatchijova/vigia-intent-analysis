@@ -7658,3 +7658,22 @@ checkout), independiente del directorio de trabajo; `VIGIA_REPO` continúa
 siendo un override explícito. La regresión importa el wrapper sin esa variable.
 
 ---
+
+## B-158 — API devuelve detalles internos de excepción y ruta de checkout [ABIERTO — corrección Codex en curso]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 condicional — divulgación de diagnóstico a clientes que alcancen la API. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21. |
+
+Ambos endpoints de análisis hacen `HTTPException(500, str(e))`: una excepción
+del pipeline puede devolver rutas, nombres de binarios o detalles de una falla
+interna al cliente. Además `/health` raíz retorna `str(REPO)`. Una reproducción
+con excepción inerte de fixture confirma que el `detail` público conserva el
+texto controlado. No cambia evidencia ni veredicto; requiere un cliente capaz
+de llegar al endpoint. **Corrección prevista:** registrar la excepción
+server-side, devolver mensaje genérico y no publicar el filesystem root en
+health.
+
+---
