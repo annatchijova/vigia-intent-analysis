@@ -8796,3 +8796,37 @@ roja antes del parche (2 escapes reproducidos) y verde después: **4/4**.
 Junto con B-186, pasan **8/8**. No modifica la semántica de los patrones ni
 los veredictos; quita autoridad de escritura al argumento `--db` cuando
 apunta a evidencia.
+
+---
+
+## B-188 — el detector semiótico simulaba un fallback inexistente ante DB de patrones ausente [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de degradación honesta: una dependencia semiótica ausente podía fallar con `no such table` después de aparentar un fallback de primer uso. |
+| **Archivo** | `vigia/core/semiotic_detector_v2.py`, `tests/test_b188_missing_patterns_db_degradation.py`. |
+| **Modo** | `SemioticDetectorV2` usado por el pipeline y por `vigia_case_adapter`; en modo agente, la falla del detector debe ser `ABSTAIN`, nunca `NOISE`. |
+| **Principio afectado** | Un componente indisponible no puede presentarse como detector vacío ni como resultado limpio. El fallo debe ser explícito para que el adaptador conserve el fault y se abstenga. |
+
+**Observación reproducida:** `_load_patterns()` abría la DB con `mode=ro`; si
+no existía, capturaba el error y creaba `:memory:` con el comentario
+“fallback … primer run”. Inmediatamente intentaba `SELECT … FROM
+nlp_patterns` en esa memoria sin schema, por lo que la construcción abortaba
+con `sqlite3.OperationalError: no such table`. Además, el URI se armaba por
+interpolación de ruta, en vez de serializar un file URI. La regresión B-188
+reprodujo la falla con una ruta ausente y verificó que no se creara archivo.
+
+**Corrección aplicada:** se elimina el falso fallback. La ruta se convierte a
+`Path(...).resolve().as_uri()` y se abre sólo con `mode=ro`; cualquier error
+de apertura o schema se traduce en `RuntimeError` explícito: `semiotic pattern
+database unavailable`. No se fabrica una memoria vacía que podría devolver
+ausencia de patrones con apariencia de análisis. El adaptador existente ya
+registra esa indisponibilidad como `detector_fault`, fija confianza cero y
+emite `ABSTAIN`.
+
+**Validación:** B-188 fue roja antes del parche con el `OperationalError`
+contradictorio y verde después, confirmando tanto el error semántico explícito
+como ausencia de DB creada. También pasan `test_red_team.py` y el conjunto
+relevante: **7/7**. No cambia resultados cuando la DB distribuida está
+disponible; cuando falta, hace visible el límite en lugar de permitir una
+conclusión limpia sobre análisis semiótico no realizado.
