@@ -8401,3 +8401,33 @@ intermedio, el CLI JSON con su output por defecto y una carpeta hija real de
 un root permitido. Junto con las pruebas B-164/B-169/B-173/B-174 de bridge y
 sandbox, pasan 36 tests. La corrección afecta exclusivamente los destinos de
 escritura; no cambia el contenido lógico del grafo ni los veredictos.
+
+---
+
+## B-176 — el rechazo del PDF pericial ocurría después de crear una carpeta en evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una configuración inválida de PDF alteraba el árbol de evidencia aun cuando no generaba el PDF. |
+| **Archivo** | `vigia/tools/adversarial_nlp.py`, `tests/test_b176_pericial_pdf_evidence_boundary.py`. |
+| **Modo** | Análisis de registro estilométrico que activa el PDF pericial opcional. |
+| **Principio afectado** | Validar el destino antes de cualquier side effect; `VIGIA_EVIDENCE_DIR` nunca recibe estado derivado. |
+
+**Observación reproducida:** `_export_pdf()` hacía
+`os.makedirs(VIGIA_PERICIAL_PDF_DIR, exist_ok=True)` antes de comprobar si el
+PDF terminaba debajo de `VIGIA_EVIDENCE_DIR`. Con
+`VIGIA_PERICIAL_PDF_DIR=<evidence>/generated-reports`, el método devolvía
+correctamente `None` y registraba `PDF_EXPORT_INTO_EVIDENCE_DIR`, pero ya
+había creado `generated-reports/` dentro de la evidencia.
+
+**Corrección aplicada:** se construye el target y se compara
+canónicamente con la raíz de evidencia antes de `makedirs`; el test usa
+pertenencia por componentes (`==` / `is_relative_to`), por lo que
+`evidence-copy` no queda bloqueado por accidente y un symlink hacia evidencia
+no puede ocultar el destino. Sólo si el target es externo se crea la carpeta y
+se invoca el renderer.
+
+**Validación:** dos regresiones prueban que el rechazo deja la evidencia vacía
+y que el flujo externo crea el directorio, llama al renderer y preserva la
+evidencia. La batería integrada de boundaries de exportación, sandbox y MCP
+queda en 38 tests passing. No se modifican análisis, señales ni veredictos.
