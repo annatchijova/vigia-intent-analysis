@@ -20,7 +20,7 @@ provenance discipline.
 No product code was patched before the documented state, live callers, and a
 bounded reproduction were checked.
 
-## C-01 — FastAPI case-path escape [CONFIRMED]
+## C-01 — FastAPI case-path escape [RESOLVED on `codex`]
 
 **Severity:** P1 *when either FastAPI wrapper is exposed to an untrusted
 network*. It has no remote attacker if the wrapper is not running or is
@@ -75,24 +75,23 @@ case-shaped JSON file outside the intended VIGÍA case directories. This
 violates the documented endpoint contract and contaminates case scope and
 chain-of-custody, even where no secret is returned verbatim.
 
-### Repair proposal — not implemented
+### Remediation — implemented on `codex`
 
-1. Add one pure shared `resolve_case_path()` boundary; do not duplicate guards.
-2. Reject absolute input; resolve and require explicit roots `data/cases/` and
-   `cases/`, not merely any path below the repository.
-3. Require a regular, non-symlink `.json` file and open the validated path.
-4. Test absolute path, `..` escape, symlink escape, directory, and an allowed
-   fixture against both public wrappers.
-5. Bind the experimental API to `127.0.0.1` by default. Remote operation must
-   require explicit authentication before binding beyond loopback.
-6. Validate and normalize inbound JSON before scoring. Today it is scored
-   before later EBS validation; no false-clean verdict was observed, so this is
-   a defense-in-depth repair rather than a separate confirmed defect.
+`vigia/api_case_paths.py` now supplies one pure shared resolver for both
+wrappers. It rejects absolute paths and raw `..`, restricts selection to
+`data/cases/` and `cases/`, and requires a regular non-symlink `.json` file.
+The endpoint maps every resolver failure to the same 404 so it is not a local
+path oracle. Both startup paths now default to `127.0.0.1`; both file-backed
+pipelines validate and normalize case JSON before scoring. The 15 direct API
+regressions cover allowed input, absolute and traversal attempts, prefix-like
+relative path, symlink, directory, wrong extension, scalar chat JSON, and the
+package-root default. The 38 end-to-end tests also pass.
 
-Authentication and remote deployment are owner decisions, so this audit does
-not choose or implement them.
+Authentication remains a product/deployment decision for any deliberate
+non-loopback bind. This patch makes that exposure opt-in; it does not pretend
+an invented authentication scheme is a reviewed access policy.
 
-## C-02 — OpenAI-compatible chat crashes on scalar JSON [CONFIRMED]
+## C-02 — OpenAI-compatible chat crashes on scalar JSON [RESOLVED on `codex`]
 
 **Severity:** P3 availability/protocol degradation. No scorer decision or
 evidence is changed; a single malformed-but-valid chat request receives a
@@ -112,11 +111,11 @@ Controlled direct calls, without a server or pipeline execution:
 '[]'   -> normal usage guidance
 ```
 
-The repair is small and should be covered by a regression test: accept only a
-JSON object for forensic-case handling (`isinstance(case_data, dict)`), return
-the existing usage guidance for all other JSON values, and validate the outer
-message contract at the boundary. The package wrapper has no OpenAI-compatible
-chat route, so C-02 is root-wrapper specific.
+The root wrapper now accepts only a JSON object with `artifacts` for
+forensic-case handling. Scalars, lists, `null`, invalid JSON, and non-text
+message content return usage guidance rather than a server error. A valid
+object still reaches the inert test pipeline. The package wrapper has no
+OpenAI-compatible chat route, so C-02 remains root-wrapper specific.
 
 ## C-03 — PathGuard allowlist accepts prefix collisions and `..` escapes [CONFIRMED]
 
@@ -206,7 +205,7 @@ symlink, and non-regular-file rejections remain explicit. The same regression
 module covers both engine interfaces for an existing outside fixture and a
 regular in-root fixture. There is still no implicit unrestricted mode.
 
-## C-05 — Packaged FastAPI wrapper has an incorrect default repository root [CONFIRMED]
+## C-05 — Packaged FastAPI wrapper has an incorrect default repository root [RESOLVED on `codex`]
 
 **Severity:** P2 local availability. This does not affect verdict authority,
 evidence content, or network exposure. It prevents the packaged API entrypoint
@@ -220,11 +219,12 @@ verification paths expect assets under `checkout/data/cases`, `checkout/cases`,
 this checkout. The root wrapper does not have this defect because its file is
 already at checkout root.
 
-### Repair proposal — not implemented
+### Remediation — implemented on `codex`
 
-Set the package wrapper default to `Path(__file__).resolve().parent.parent`
-and pin it with a no-`VIGIA_REPO` import regression. Do not make package-root
-selection depend on the current working directory.
+The wrapper now defaults to `Path(__file__).resolve().parent.parent`, the
+checkout root, rather than the package directory. `VIGIA_REPO` remains an
+explicit override. The API boundary regression imports the module with the
+environment variable absent and asserts that root.
 
 ## Checked, not relabeled as new
 

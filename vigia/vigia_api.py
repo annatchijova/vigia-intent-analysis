@@ -13,8 +13,9 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from vigia.api_case_paths import CasePathError, resolve_case_path
 
-REPO = Path(os.environ.get("VIGIA_REPO", Path(__file__).parent))
+REPO = Path(os.environ.get("VIGIA_REPO", Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(REPO))
 
 app = FastAPI(title="VIGÍA Forensic Intelligence API", version="1.0")
@@ -39,14 +40,16 @@ def _run_pipeline(case_path: Path) -> dict:
 
     with open(case_path) as f:
         case = json.load(f)
-    case_norm = _normalize_case(case)
+    # Validar el mismo caso normalizado antes de invocar el scorer. Un caso
+    # inválido no debe consumir una ruta de decisión y luego fallar al sellar.
+    case_ebs = normalize_case_schema(dict(case))
+    validate_case_schema(case_ebs)
+    case_norm = _normalize_case(case_ebs)
 
     t0 = time.perf_counter()
     score = _vigia_score(case_norm)
 
     # Pipeline EBS v1 para bundle hash
-    case_ebs = normalize_case_schema(dict(case))
-    validate_case_schema(case_ebs)
     adapter = CaseAdapter()
     signals, _ = adapter.to_signals(case_ebs)
     drift = CaseAdapter.compute_drift(case_ebs)
@@ -112,9 +115,10 @@ def list_cases():
 @app.post("/analyze/path")
 def analyze_by_path(payload: CasePath):
     """Analiza un caso forense VIGÍA dado su path relativo al repo (ej: data/cases/VIGIA-REAL-001.json). USAR ESTE ENDPOINT para analizar casos existentes."""
-    case_path = REPO / payload.case_path
-    if not case_path.exists():
-        raise HTTPException(404, f"Caso no encontrado: {payload.case_path}")
+    try:
+        case_path = resolve_case_path(REPO, payload.case_path)
+    except CasePathError:
+        raise HTTPException(404, "Caso no encontrado en los directorios permitidos")
     try:
         pipeline = _run_pipeline(case_path)
         try:
@@ -148,4 +152,9 @@ def analyze_by_json(payload: CasePayload):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=False)
+    uvicorn.run(
+        app,
+        host=os.environ.get("VIGIA_HOST", "127.0.0.1"),
+        port=int(os.environ.get("VIGIA_PORT", "8000")),
+        reload=False,
+    )

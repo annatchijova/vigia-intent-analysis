@@ -7072,7 +7072,7 @@ live run loop, and MCP exposure of the trace, are later phases.
 
 ---
 
-## B-153 — FastAPI `/analyze/path` does not confine `case_path` [OPEN — Codex remediation in progress]
+## B-153 — FastAPI `/analyze/path` does not confine `case_path` [RESOLVED — Codex 2026-07-21]
 
 | Field | Value |
 |-------|-------|
@@ -7086,14 +7086,20 @@ escapes. An absolute right operand discards `REPO` in `pathlib`. With inert
 stubs, both wrappers accepted and forwarded an existing file outside the
 checkout. This proves a case-scope/chain-of-custody breach; it does not claim
 arbitrary exfiltration because the pipeline expects case-shaped JSON. There is
-no request authentication and default bind is `0.0.0.0` (CORS is not auth).
+no request authentication and the default bind was `0.0.0.0` (CORS is not auth).
 
-**Planned repair:** shared resolver, explicit `cases/` and `data/cases/` roots,
-regular non-symlink `.json`, escape tests, and loopback default.
+**Applied repair:** `vigia/api_case_paths.py` centralizes the boundary used by
+both wrappers. It accepts only regular, non-symlink `.json` files below
+`cases/` or `data/cases/`, and rejects absolute paths, `..`, directories,
+wrong extensions, and escapes without disclosing the local path. Both modes
+now bind to `127.0.0.1` by default and validate/normalize a file-backed case
+before scoring. Fifteen API regressions cover the vectors and the allowed case.
+An operator who deliberately exposes the service beyond loopback still needs a
+designed authentication policy; this patch does not invent one.
 
 ---
 
-## B-154 — `/v1/chat/completions` crashes on valid scalar JSON [OPEN — Codex remediation in progress]
+## B-154 — `/v1/chat/completions` crashes on valid scalar JSON [RESOLVED — Codex 2026-07-21]
 
 | Field | Value |
 |-------|-------|
@@ -7103,9 +7109,12 @@ regular non-symlink `.json`, escape tests, and loopback default.
 
 `json.loads(text)` accepts `42` and `null`, but the endpoint immediately tests
 `"artifacts" in case_data`, raising uncaught `TypeError` rather than the usage
-guidance returned for `[]`. **Planned repair:** accept only a JSON object as a
-case and degrade every other JSON value to usage guidance; test scalar, list,
-and valid-object inputs.
+guidance returned for `[]`.
+
+**Applied repair:** only a JSON object containing `artifacts` reaches the
+pipeline; scalar, `null`, list, invalid JSON, or non-text content receives the
+usage guidance. Regressions pin `42`, `null`, `[]`, and confirm that a valid
+object still reaches the inert test pipeline.
 
 ---
 
@@ -7152,7 +7161,7 @@ regular in-root file.
 
 ---
 
-## B-157 — Packaged API wrapper defaults to `vigia/` instead of checkout root [OPEN — Codex remediation in progress]
+## B-157 — Packaged API wrapper defaults to `vigia/` instead of checkout root [RESOLVED — Codex 2026-07-21]
 
 | Field | Value |
 |-------|-------|
@@ -7164,5 +7173,8 @@ Without `VIGIA_REPO`, the module uses `Path(__file__).parent` —
 `checkout/vigia/` — while it looks for `data/cases`, `cases`,
 `scripts/vigia_ask.sh`, and `forensics/verify_ebs_v1.py` at the checkout root.
 `python -m vigia.vigia_api` is therefore incomplete unless the operator knows
-to configure the environment variable. **Planned repair:** default to the
-package parent and add a regression with `VIGIA_REPO` unset.
+to configure the environment variable.
+
+**Applied repair:** the package parent (checkout root) is now the default,
+independent of the working directory; `VIGIA_REPO` remains an explicit
+override. A regression imports the package wrapper with that variable unset.

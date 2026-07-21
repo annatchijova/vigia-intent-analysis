@@ -27,8 +27,9 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from vigia.api_case_paths import CasePathError, resolve_case_path
 
-REPO = Path(os.environ.get("VIGIA_REPO", Path(__file__).parent))
+REPO = Path(os.environ.get("VIGIA_REPO", Path(__file__).resolve().parent))
 sys.path.insert(0, str(REPO))
 
 app = FastAPI(title="VIGÍA Forensic Intelligence API", version="1.0")
@@ -53,14 +54,16 @@ def _run_pipeline(case_path: Path) -> dict:
 
     with open(case_path) as f:
         case = json.load(f)
-    case_norm = _normalize_case(case)
+    # Validar el mismo caso normalizado antes de invocar el scorer. Un caso
+    # inválido no debe consumir una ruta de decisión y luego fallar al sellar.
+    case_ebs = normalize_case_schema(dict(case))
+    validate_case_schema(case_ebs)
+    case_norm = _normalize_case(case_ebs)
 
     t0 = time.perf_counter()
     score = _vigia_score(case_norm)
 
     # Pipeline EBS v1 para bundle hash
-    case_ebs = normalize_case_schema(dict(case))
-    validate_case_schema(case_ebs)
     adapter = CaseAdapter()
     signals, _ = adapter.to_signals(case_ebs)
     drift = CaseAdapter.compute_drift(case_ebs)
@@ -143,6 +146,20 @@ class ChatRequest(BaseModel):
     stream: bool = False
 
 
+def _usage_guidance() -> str:
+    """Return the protocol help without treating malformed input as a case."""
+    return (
+        "**VIGÍA Forensic Intelligence API**\n\n"
+        "Para analizar un caso, enviá el JSON objeto del caso completo como mensaje "
+        "(debe incluir `artifacts`).\n\n"
+        "O usá los endpoints directos:\n"
+        "- `POST /analyze/path` — caso existente por nombre\n"
+        "- `POST /analyze/json` — caso como JSON en el body\n"
+        "- `GET /cases` — listar casos disponibles\n"
+        "- `GET /health` — estado del sistema"
+    )
+
+
 @app.post("/v1/chat/completions")
 def chat_completions(req: ChatRequest):
     """
@@ -165,10 +182,13 @@ def chat_completions(req: ChatRequest):
         last = user_messages[-1]
         text = last.get("content", "") if isinstance(last, dict) else last.content
 
-        # Intentar parsear como caso forense JSON
+        # Intentar parsear solamente un objeto caso forense JSON. Escalares,
+        # listas y contenido OpenAI multimodal degradan a guía, no a 500.
         try:
             case_data = json.loads(text)
-            if "artifacts" in case_data:
+            if not isinstance(case_data, dict):
+                content = _usage_guidance()
+            elif "artifacts" in case_data:
                 tf = tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w")
                 json.dump(case_data, tf)
                 tf.close()
@@ -209,16 +229,8 @@ def chat_completions(req: ChatRequest):
                     "Enviá un caso forense con estructura `{\"artifacts\": [...]}` "
                     "o usá `/analyze/path` con el nombre de un caso existente."
                 )
-        except (json.JSONDecodeError, ValueError):
-            content = (
-                "**VIGÍA Forensic Intelligence API**\n\n"
-                "Para analizar un caso, enviá el JSON del caso completo como mensaje.\n\n"
-                "O usá los endpoints directos:\n"
-                "- `POST /analyze/path` — caso existente por nombre\n"
-                "- `POST /analyze/json` — caso como JSON en el body\n"
-                "- `GET /cases` — listar casos disponibles\n"
-                "- `GET /health` — estado del sistema"
-            )
+        except (json.JSONDecodeError, TypeError, ValueError):
+            content = _usage_guidance()
 
     return {
         "id":      f"vigia-{int(time.time())}",
@@ -251,9 +263,12 @@ def list_cases():
 @app.post("/analyze/path")
 def analyze_by_path(payload: CasePath):
     """Analiza un caso forense VIGÍA dado su path relativo al repo (ej: data/cases/VIGIA-REAL-001.json). USAR ESTE ENDPOINT para analizar casos existentes."""
-    case_path = REPO / payload.case_path
-    if not case_path.exists():
-        raise HTTPException(404, f"Caso no encontrado: {payload.case_path}")
+    try:
+        case_path = resolve_case_path(REPO, payload.case_path)
+    except CasePathError:
+        # El mismo 404 para ruta inválida o inexistente evita convertir este
+        # endpoint en un oráculo de paths locales.
+        raise HTTPException(404, "Caso no encontrado en los directorios permitidos")
     try:
         pipeline = _run_pipeline(case_path)
         try:
@@ -288,6 +303,6 @@ def analyze_by_json(payload: CasePayload):
 if __name__ == "__main__":
     import os
     import uvicorn
-    _host = os.environ.get("VIGIA_HOST", "0.0.0.0")
+    _host = os.environ.get("VIGIA_HOST", "127.0.0.1")
     _port = int(os.environ.get("VIGIA_PORT", "8000"))
     uvicorn.run(app, host=_host, port=_port, reload=False)

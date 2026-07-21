@@ -7547,7 +7547,7 @@ próxima sesión con bridge vivo); gate 0-flips compartido con F1.
 
 ---
 
-## B-153 — FastAPI `/analyze/path` no confina `case_path` [ABIERTO — corrección Codex en curso]
+## B-153 — FastAPI `/analyze/path` no confina `case_path` [RESUELTO — Codex 2026-07-21]
 
 | Campo | Valor |
 |-------|-------|
@@ -7561,14 +7561,20 @@ Una ruta absoluta descarta `REPO` en `pathlib`. Con stubs inertes, ambos
 wrappers aceptaron y reenviaron un archivo existente fuera del checkout. No se
 afirma exfiltración arbitraria: el pipeline requiere JSON con forma de caso;
 sí se confirma ruptura de scope/cadena de custodia. No hay autenticación y el
-bind default es `0.0.0.0` (CORS no es autenticación).
+bind default era `0.0.0.0` (CORS no es autenticación).
 
-**Corrección prevista:** resolver compartido, roots `cases/` y `data/cases/`,
-archivo `.json` regular no-symlink, pruebas red y loopback por default.
+**Corrección aplicada:** `vigia/api_case_paths.py` concentra la frontera para
+ambos wrappers. Sólo acepta `.json` regular, no-symlink, bajo `cases/` o
+`data/cases/`; rechaza ruta absoluta, `..`, directorio, extensión ajena y
+escape sin revelar cuál fue el path local. Ambos modos ahora hacen bind a
+`127.0.0.1` por default y validan/normalizan el caso antes de scorear. Las 15
+regresiones API cubren los vectores y el caso permitido. Un operador que elija
+exponer el servicio más allá de loopback todavía debe diseñar autenticación;
+esa política no se inventó en este parche.
 
 ---
 
-## B-154 — `/v1/chat/completions` crashea con escalares JSON válidos [ABIERTO — corrección Codex en curso]
+## B-154 — `/v1/chat/completions` crashea con escalares JSON válidos [RESUELTO — Codex 2026-07-21]
 
 | Campo | Valor |
 |-------|-------|
@@ -7579,8 +7585,12 @@ archivo `.json` regular no-symlink, pruebas red y loopback por default.
 `json.loads(text)` acepta `42` y `null`, pero el endpoint evalúa
 `"artifacts" in case_data` y lanza `TypeError` no capturado en lugar de la guía
 que devuelve para `[]`. `ChatRequest.messages` no normaliza contenido en la
-frontera. **Corrección prevista:** aceptar sólo objeto JSON para casos y
-degradar cualquier otro valor a guía de uso; test para `42`, `null`, `[]` y caso válido.
+frontera.
+
+**Corrección aplicada:** sólo un objeto JSON con `artifacts` llega al pipeline;
+escalar, `null`, lista, JSON inválido o contenido no textual devuelve guía de
+uso. Las regresiones fijan `42`, `null`, `[]` y confirman que un objeto válido
+sigue llegando al pipeline inerte de prueba.
 
 ---
 
@@ -7629,7 +7639,7 @@ un archivo regular dentro de root.
 
 ---
 
-## B-157 — Wrapper API empaquetado usa `vigia/` como root por default [ABIERTO — corrección Codex en curso]
+## B-157 — Wrapper API empaquetado usa `vigia/` como root por default [RESUELTO — Codex 2026-07-21]
 
 | Campo | Valor |
 |-------|-------|
@@ -7641,7 +7651,10 @@ Si `VIGIA_REPO` no está definido, el módulo usa `Path(__file__).parent`, es
 decir `checkout/vigia/`, pero busca `data/cases`, `cases`, `scripts/vigia_ask.sh`
 y `forensics/verify_ebs_v1.py` que viven en el root del checkout. El modo
 `python -m vigia.vigia_api` queda incompleto salvo que el operador conozca y
-configure la variable de entorno. **Corrección prevista:** usar el padre del
-paquete como default y agregar regresión sin `VIGIA_REPO`.
+configure la variable de entorno.
+
+**Corrección aplicada:** el default es ahora el padre del paquete (root del
+checkout), independiente del directorio de trabajo; `VIGIA_REPO` continúa
+siendo un override explícito. La regresión importa el wrapper sin esa variable.
 
 ---
