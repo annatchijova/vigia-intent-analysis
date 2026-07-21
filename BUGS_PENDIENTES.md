@@ -8760,3 +8760,39 @@ ubicado dentro de evidencia y un destino externo nuevo. También pasan las 27
 pruebas existentes de hardening de cadena de custodia: **31/31**. No altera
 el contenido de ningún bundle, el hash canónico ni los veredictos; sólo
 separa la persistencia del ledger de los bytes adquiridos.
+
+---
+
+## B-187 — el inicializador de patrones podía borrar o crear SQLite dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el inicializador hace `DELETE` e inserciones idempotentes; un `--db` mal dirigido podía modificar un SQLite adquirido. |
+| **Archivo** | `vigia/tools/init_patterns_db.py`, `tests/test_b187_patterns_db_output_boundary.py`. |
+| **Modo** | Inicialización fresh/CI mediante `python3 vigia/tools/init_patterns_db.py [--db PATH]`. |
+| **Principio afectado** | Una herramienta de construcción de corpus no recibe autoridad para reescribir evidencia por aceptar una ruta de DB arbitraria. |
+
+**Observación reproducida:** `init_db()` creaba el padre, abría cualquier
+ruta SQLite, instalaba schema y ejecutaba `DELETE FROM nlp_patterns`. Con
+`VIGIA_EVIDENCE_DIR` configurado, tanto
+`<evidence>/forensic_patterns.sqlite` como
+`patterns-redirect -> <evidence>` seguido de
+`patterns-redirect/forensic_patterns.sqlite` eran aceptados y modificados.
+Ambos escapes fueron inducidos antes del parche; una DB nueva fuera de
+evidencia fue el control positivo.
+
+**Corrección aplicada:** el inicializador usa
+`validate_external_output_path()` antes de crear el padre y vuelve a
+validarlo antes de que SQLite pueda crear DB/WAL/journal. Conserva su DB de
+patrones distribuida y el comportamiento idempotente para CI; sólo deniega
+destinos dentro de evidencia o con componentes symlink. Como la invocación
+documentada es directa, se añadió el bootstrap mínimo de `sys.path` para que
+el import del guard funcione tanto con `python3 vigia/tools/init_patterns_db.py`
+como con módulo/CI, sin exigir `PYTHONPATH`.
+
+**Validación:** B-187 cubre destino directo en evidencia, redirección por
+symlink, DB externa válida y la invocación directa documentada. La prueba fue
+roja antes del parche (2 escapes reproducidos) y verde después: **4/4**.
+Junto con B-186, pasan **8/8**. No modifica la semántica de los patrones ni
+los veredictos; quita autoridad de escritura al argumento `--db` cuando
+apunta a evidencia.
