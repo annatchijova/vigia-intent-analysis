@@ -226,7 +226,7 @@ checkout root, rather than the package directory. `VIGIA_REPO` remains an
 explicit override. The API boundary regression imports the module with the
 environment variable absent and asserts that root.
 
-## C-06 — API diagnostics disclose local implementation details [CONFIRMED]
+## C-06 — API diagnostics disclose local implementation details [RESOLVED on `codex`]
 
 **Severity:** Conditional P3 information disclosure. It matters only to a
 client that can reach the API; it does not alter a verdict, a seal, or evidence
@@ -239,10 +239,13 @@ raising a fixture string, the public exception detail contains that exact
 string. Depending on the underlying fault, this can disclose filesystem layout
 or tool configuration.
 
-### Repair proposal — not implemented
+### Remediation — implemented on `codex`
 
-Log a contextual exception on the server, return one stable generic 500 detail
-to the caller, and expose health status without the repository filesystem path.
+Both wrappers now use a module logger for the contextual server-side exception
+and return only `Error interno en el pipeline forense.` to the caller. Their
+health endpoints report operational status without serializing `REPO`. Direct
+regressions inject a controlled exception into each analysis endpoint and prove
+the public detail is stable and free of the injected text.
 
 ## Checked, not relabeled as new
 

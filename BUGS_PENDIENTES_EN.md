@@ -7181,7 +7181,7 @@ override. A regression imports the package wrapper with that variable unset.
 
 ---
 
-## B-158 — API returns internal exception details and checkout path [OPEN — Codex remediation in progress]
+## B-158 — API returns internal exception details and checkout path [RESOLVED — Codex 2026-07-21]
 
 | Field | Value |
 |-------|-------|
@@ -7194,5 +7194,9 @@ exception can return local paths, binary names, or internal failure details to
 the caller. Root `/health` also returns `str(REPO)`. A controlled inert
 exception confirms that its text is preserved in the public `detail`. This
 does not change evidence or verdicts, and requires a client that can reach the
-endpoint. **Planned repair:** log the exception server-side, return a generic
-message, and omit the filesystem root from health.
+endpoint.
+
+**Applied repair:** both wrappers log the context server-side and return one
+stable detail: `Error interno en el pipeline forense.` `/health` reports only
+operational status. Controlled-exception regressions verify that no public
+`detail` preserves internal text.

@@ -4,6 +4,7 @@ VIGÍA API — FastAPI wrapper para OpenWebUI.
 Expone el pipeline real (run_vigia_full.py + vigia_ask.sh) como endpoints REST.
 """
 import json
+import logging
 import os
 import subprocess
 import sys
@@ -17,6 +18,7 @@ from vigia.api_case_paths import CasePathError, resolve_case_path
 
 REPO = Path(os.environ.get("VIGIA_REPO", Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(REPO))
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="VIGÍA Forensic Intelligence API", version="1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
@@ -97,7 +99,7 @@ def _run_narrative(case_path: Path) -> str:
 
 @app.get("/health")
 def health():
-    return {"status": "VIGÍA operativo", "repo": str(REPO)}
+    return {"status": "VIGÍA operativo"}
 
 
 @app.get("/cases")
@@ -126,8 +128,9 @@ def analyze_by_path(payload: CasePath):
         except Exception:
             narrative = "[narrativa no disponible]"
         return {**pipeline, "narrative": narrative, "case": case_path.name}
-    except Exception as e:
-        raise HTTPException(500, str(e))
+    except Exception:
+        logger.exception("Fallo interno al analizar un caso por path")
+        raise HTTPException(500, "Error interno en el pipeline forense.") from None
 
 
 @app.post("/analyze/json")
@@ -144,8 +147,9 @@ def analyze_by_json(payload: CasePayload):
             narrative = "[narrativa no disponible]"
         return {**pipeline, "narrative": narrative,
                 "case": payload.case_data.get("case_id", "inline")}
-    except Exception as e:
-        raise HTTPException(500, str(e))
+    except Exception:
+        logger.exception("Fallo interno al analizar un caso JSON")
+        raise HTTPException(500, "Error interno en el pipeline forense.") from None
     finally:
         os.unlink(tf.name)
 

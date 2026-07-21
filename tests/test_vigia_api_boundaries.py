@@ -137,3 +137,32 @@ def test_packaged_api_defaults_to_checkout_root_without_environment_override(mon
     package_api = importlib.reload(importlib.import_module("vigia.vigia_api"))
 
     assert package_api.REPO == Path(package_api.__file__).resolve().parent.parent
+
+
+def test_api_does_not_return_pipeline_exception_detail_to_client(
+    tmp_path, monkeypatch, api_module
+):
+    repo, _ = _fixture_repo(tmp_path)
+    monkeypatch.setattr(api_module, "REPO", repo)
+
+    def _boom(_path):
+        raise RuntimeError("controlled-diagnostic-fixture")
+
+    monkeypatch.setattr(api_module, "_run_pipeline", _boom)
+
+    for invoke in (
+        lambda: api_module.analyze_by_path(
+            api_module.CasePath(case_path="data/cases/allowed.json")
+        ),
+        lambda: api_module.analyze_by_json(
+            api_module.CasePayload(case_data={"artifacts": []})
+        ),
+    ):
+        with pytest.raises(HTTPException) as error:
+            invoke()
+        assert error.value.status_code == 500
+        assert error.value.detail == "Error interno en el pipeline forense."
+
+
+def test_health_does_not_disclose_configured_repository_path(api_module):
+    assert "repo" not in api_module.health()

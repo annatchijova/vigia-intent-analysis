@@ -7659,7 +7659,7 @@ siendo un override explícito. La regresión importa el wrapper sin esa variable
 
 ---
 
-## B-158 — API devuelve detalles internos de excepción y ruta de checkout [ABIERTO — corrección Codex en curso]
+## B-158 — API devuelve detalles internos de excepción y ruta de checkout [RESUELTO — Codex 2026-07-21]
 
 | Campo | Valor |
 |-------|-------|
@@ -7672,8 +7672,11 @@ del pipeline puede devolver rutas, nombres de binarios o detalles de una falla
 interna al cliente. Además `/health` raíz retorna `str(REPO)`. Una reproducción
 con excepción inerte de fixture confirma que el `detail` público conserva el
 texto controlado. No cambia evidencia ni veredicto; requiere un cliente capaz
-de llegar al endpoint. **Corrección prevista:** registrar la excepción
-server-side, devolver mensaje genérico y no publicar el filesystem root en
-health.
+de llegar al endpoint.
+
+**Corrección aplicada:** ambos wrappers registran el contexto server-side y
+devuelven el único detalle estable `Error interno en el pipeline forense.`.
+`/health` informa sólo estado. Regresiones con excepción controlada verifican
+que ningún `detail` público conserva el texto interno.
 
 ---
