@@ -206,6 +206,26 @@ symlink, and non-regular-file rejections remain explicit. The same regression
 module covers both engine interfaces for an existing outside fixture and a
 regular in-root fixture. There is still no implicit unrestricted mode.
 
+## C-05 — Packaged FastAPI wrapper has an incorrect default repository root [CONFIRMED]
+
+**Severity:** P2 local availability. This does not affect verdict authority,
+evidence content, or network exposure. It prevents the packaged API entrypoint
+from finding the assets it is documented to serve unless an operator sets an
+otherwise optional environment variable.
+
+`vigia/vigia_api.py` sets `REPO` to `Path(__file__).parent` when `VIGIA_REPO`
+is unset. That resolves to `checkout/vigia/`; its `/cases`, narration, and EBS
+verification paths expect assets under `checkout/data/cases`, `checkout/cases`,
+`checkout/scripts`, and `checkout/forensics`. None exists beneath `vigia/` in
+this checkout. The root wrapper does not have this defect because its file is
+already at checkout root.
+
+### Repair proposal — not implemented
+
+Set the package wrapper default to `Path(__file__).resolve().parent.parent`
+and pin it with a no-`VIGIA_REPO` import regression. Do not make package-root
+selection depend on the current working directory.
+
 ## Checked, not relabeled as new
 
 `L-063`, `L-064`, and `L-065` are already accurately documented doctrine

@@ -7149,3 +7149,20 @@ configured allowlist. An existing file outside a root raises `PermissionError`;
 absence remains `FileNotFoundError`, while other explicit boundary rejections
 remain visible. Regressions pin both engine rejections and acceptance of a
 regular in-root file.
+
+---
+
+## B-157 — Packaged API wrapper defaults to `vigia/` instead of checkout root [OPEN — Codex remediation in progress]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 — local availability/operation; it neither changes the engine nor exposes data. |
+| **File** | `vigia/vigia_api.py` |
+| **Detected by** | Codex audit, 2026-07-21. |
+
+Without `VIGIA_REPO`, the module uses `Path(__file__).parent` —
+`checkout/vigia/` — while it looks for `data/cases`, `cases`,
+`scripts/vigia_ask.sh`, and `forensics/verify_ebs_v1.py` at the checkout root.
+`python -m vigia.vigia_api` is therefore incomplete unless the operator knows
+to configure the environment variable. **Planned repair:** default to the
+package parent and add a regression with `VIGIA_REPO` unset.

@@ -7628,3 +7628,20 @@ explícitos siguen visibles. Regresiones fijan ambos rechazos y la aceptación d
 un archivo regular dentro de root.
 
 ---
+
+## B-157 — Wrapper API empaquetado usa `vigia/` como root por default [ABIERTO — corrección Codex en curso]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 — disponibilidad/operación local; no cambia el motor ni expone datos. |
+| **Archivo** | `vigia/vigia_api.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21. |
+
+Si `VIGIA_REPO` no está definido, el módulo usa `Path(__file__).parent`, es
+decir `checkout/vigia/`, pero busca `data/cases`, `cases`, `scripts/vigia_ask.sh`
+y `forensics/verify_ebs_v1.py` que viven en el root del checkout. El modo
+`python -m vigia.vigia_api` queda incompleto salvo que el operador conozca y
+configure la variable de entorno. **Corrección prevista:** usar el padre del
+paquete como default y agregar regresión sin `VIGIA_REPO`.
+
+---
