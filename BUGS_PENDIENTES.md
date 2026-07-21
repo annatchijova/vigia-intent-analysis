@@ -7767,3 +7767,47 @@ recupera cobertura, pero no finge que el conteo de llamadas resuelva L-041,
 los placeholders del case JSON ni B-052-P2.
 
 ---
+
+## B-161 — El verificador del reasoning trace no anclaba la cola que declara [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de integridad forense/provenance. No altera un veredicto Modo 1 sellado, pero debilita un sibling que se presenta como evidencia de proceso. |
+| **Archivo** | `vigia/core/reasoning_trace.py:verify_reasoning_trace`. |
+| **Detectado por** | Auditoría Codex de `OWL-NEXUS5-CASE_bundle_chatgpt_reasoning_trace.json`, 2026-07-21. |
+
+`ForensicReasoningTrace.seal()` escribe `chain_tip_sha256` (y, cuando hay una
+clave configurada, `chain_tip_hmac`) junto a su `tool_execution_log` v2. Sin
+embargo, `verify_reasoning_trace()` llama a `verify_tool_execution_log(log)` sin
+pasarle ninguno de los anclajes declarados. Por lo tanto sólo verifica los
+enlaces internos que recibe; nunca comprueba que la última entrada sea igual a
+`trace["chain_tip_sha256"]`.
+
+**Prueba roja (en memoria; ningún artefacto de evidencia fue editado):** el
+trace OWL tenía tres entradas. Al eliminar la última, reemplazar
+`chain_tip_sha256` por el hash de la nueva última entrada y llamar a
+`verify_reasoning_trace(bundle, trace)`, el resultado siguió siendo
+`valid=True, errors=[]`. El trace OWL real además informó `hmac_checked=False`
+y `tip_checked=False` porque no se suministró una clave HMAC persistente.
+
+Es una omisión de wiring distinta del residual documentado en R3-5. Incluso
+cuando el verificador empiece a revisar la cola SHA-256 declarada, quien pueda
+reescribir todo el sibling hash-only (incluida su punta) sigue siendo
+indetectable sin HMAC persistente u otro autenticador externo. El defecto
+inmediato es más acotado y testeable: una cola declarada que no cambia debe
+detectar un log truncado o extendido, tal como ya hace `verify_bundle_tool_log()`.
+
+**Corrección aplicada:** `verify_reasoning_trace()` ahora pasa
+`trace["chain_tip_sha256"]` y, si está presente, `trace["chain_tip_hmac"]` a
+`verify_tool_execution_log()`. La ausencia de una punta SHA-256 declarada es
+ahora un error de verificación. El verificador público da a esa punta el mismo
+tratamiento R3-5 que ya usa `verify_bundle_tool_log()`.
+
+**Validación:** tests rojos primero rechazan ahora un trace truncado que
+conserva su punta declarada original y rechazan un HMAC declarado falsificado
+cuando el verificador recibe la clave configurada.
+`tests/test_reasoning_trace.py`, `tests/test_reasoning_trace_bundle_gate.py` y
+`tests/test_r3_5_chain_tip_truncation.py`: **60 passed**. El trace OWL existente
+sigue verificando, ahora con `tip_checked=True`; permanece honestamente
+hash-only (`hmac_checked=False`) hasta que se configure una clave HMAC
+persistente.

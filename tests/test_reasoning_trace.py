@@ -8,6 +8,7 @@ B-151b self-correction chaining via ToolExecutionLogChain.
 """
 from __future__ import annotations
 
+import copy
 from fractions import Fraction
 
 import pytest
@@ -230,6 +231,40 @@ def test_verify_trace_FAILS_on_tampered_chain():
     bundle = {"case_id": "CASE-Y", "agent_verdict": "SUSPICION"}
     sealed["tool_execution_log"][1]["result_summary"] = "TAMPERED"
     r = verify_reasoning_trace(bundle, sealed)
+    assert not r.valid
+    assert any("chain invalid" in e for e in r.errors)
+
+
+def test_verify_trace_FAILS_on_truncated_log_with_declared_tail():
+    """B-161: the trace's declared v2 tail must detect a removed final event."""
+    sealed = _full_trace(case_id="CASE-TAIL").seal(
+        "SUSPICION", Fraction(3, 5), sealed_at=_TS
+    )
+    bundle = {"case_id": "CASE-TAIL", "agent_verdict": "SUSPICION"}
+    truncated = copy.deepcopy(sealed)
+    truncated["tool_execution_log"].pop()
+
+    r = verify_reasoning_trace(bundle, truncated)
+
+    assert not r.valid
+    assert any("chain invalid" in e for e in r.errors)
+
+
+def test_verify_trace_checks_keyed_declared_tail(monkeypatch):
+    """B-161: a supplied HMAC key authenticates the trace's declared tail."""
+    key = bytes.fromhex("11" * 32)
+    monkeypatch.setenv("VIGIA_HMAC_KEY", key.hex())
+    sealed = _full_trace(case_id="CASE-KEYED-TAIL").seal(
+        "SUSPICION", Fraction(3, 5), sealed_at=_TS
+    )
+    bundle = {"case_id": "CASE-KEYED-TAIL", "agent_verdict": "SUSPICION"}
+
+    assert verify_reasoning_trace(bundle, sealed, hmac_key=key).valid
+
+    tampered = copy.deepcopy(sealed)
+    tampered["chain_tip_hmac"] = "00" * 32
+    r = verify_reasoning_trace(bundle, tampered, hmac_key=key)
+
     assert not r.valid
     assert any("chain invalid" in e for e in r.errors)
 

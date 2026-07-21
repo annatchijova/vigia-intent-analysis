@@ -7287,3 +7287,48 @@ extraction, the live result now reports 21 SMS and 7 calls, with
 still sealed **ABSTAIN** and 0 Android findings: the fix recovers coverage, but
 does not pretend that counting calls resolves L-041, the case JSON placeholders,
 or B-052-P2.
+
+---
+
+## B-161 — The reasoning-trace verifier did not anchor its declared tail [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 forensic/provenance integrity. It does not alter a sealed Mode-1 verdict, but weakens a claimed process-evidence sibling. |
+| **File** | `vigia/core/reasoning_trace.py:verify_reasoning_trace`. |
+| **Detected by** | Codex audit of `OWL-NEXUS5-CASE_bundle_chatgpt_reasoning_trace.json`, 2026-07-21. |
+
+`ForensicReasoningTrace.seal()` writes `chain_tip_sha256` (and, when a key is
+configured, `chain_tip_hmac`) beside its v2 `tool_execution_log`. However,
+`verify_reasoning_trace()` calls `verify_tool_execution_log(log)` without
+passing either declared tail anchor. It therefore verifies only the internal
+links handed to it; it never checks that the final entry equals the trace's
+declared `chain_tip_sha256`.
+
+**Red proof (in memory; no evidence artifact was edited):** the OWL trace had
+three entries. Removing its final entry, replacing `chain_tip_sha256` with the
+new final entry hash, and calling `verify_reasoning_trace(bundle, trace)` still
+returned `valid=True, errors=[]`. The actual OWL trace also reported
+`hmac_checked=False` and `tip_checked=False` because no persistent HMAC key
+was supplied.
+
+This is a distinct wiring omission from the residual documented in R3-5. Even
+after the verifier begins checking the declared SHA-256 tail, a writer who can
+rewrite the entire hash-only sibling (including its tip) remains undetectable
+without a persisted HMAC key or another external authenticator. The immediate
+defect is narrower and testable: an unchanged declared tail must detect a
+truncated or appended log, exactly as `verify_bundle_tool_log()` already does.
+
+**Applied repair:** `verify_reasoning_trace()` now passes
+`trace["chain_tip_sha256"]` and, when present, `trace["chain_tip_hmac"]` into
+`verify_tool_execution_log()`. A missing declared SHA-256 tail is itself a
+verification error. The public verifier now gives the declared tail the same
+R3-5 treatment as `verify_bundle_tool_log()`.
+
+**Verification:** red-first tests now reject a truncated trace with its
+original declared tail and reject a forged declared HMAC when the verifier is
+given the configured key. `tests/test_reasoning_trace.py`,
+`tests/test_reasoning_trace_bundle_gate.py`, and
+`tests/test_r3_5_chain_tip_truncation.py`: **60 passed**. The existing OWL
+trace still verifies, now with `tip_checked=True`; it remains honestly
+hash-only (`hmac_checked=False`) until a persisted HMAC key is supplied.
