@@ -20,7 +20,9 @@ CONTRATOS IMPLEMENTADOS:
     ForensicBundle     — artefacto sellado EBS v1 exportable a SIFT
 
 INVARIANTES DEL ESTÁNDAR (no negociables):
-    I1 — Determinismo:       mismo input → mismo bundle
+    I1 — Determinismo:       mismo input analítico → mismo resultado; este
+                              módulo legacy asigna UUID/timestamp por corrida
+                              y no debe usarse para comparar bundle_hash de replays
     I2 — Integridad encadenada: bundle_hash cubre TODO el contenido
     I3 — Política verificable: policy_spec es independiente del runtime
     I4 — Acciones explícitas: no existen efectos implícitos
@@ -717,7 +719,8 @@ class ForensicBundle:
         integrity       : hashes SHA-256 encadenados (sellado criptográfico)
 
     PROPIEDADES:
-        - Determinista (I1): mismo input → mismo bundle_hash
+        - Legacy custody seal: mismo input preserva la salida analítica, pero
+          UUID/timestamp nuevos hacen que cada `bundle_hash` sea por corrida
         - Autocontenido: auditable sin acceso al runtime
         - Portable: compatible con cualquier verificador EBS v1
         - SIFT-ready: exportable directamente como JSON

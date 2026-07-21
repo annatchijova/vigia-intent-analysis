@@ -21,10 +21,11 @@ PROTOCOLO DE HASHING:
     2. policy_hash  = SHA256(policy_dict)
     3. decision_hash = SHA256(decision_dict)
     4. evidence_graph con graph_hash asignado -> graph_dict_final
-    5. bundle_hash  = SHA256(bundle_id + version + timestamp +
+    5. analysis_fingerprint = SHA256(proyeccion analitica determinista)
+    6. bundle_hash  = SHA256(bundle_id + version + timestamp +
                              graph_dict_final + decision_dict +
                              policy_dict + actions + system_state)
-       [bundle_hash cubre TODO — Invariante I2]
+       [bundle_hash cubre TODO el artefacto de custodia — Invariante I2]
 
 SALIDA:
     dict sellado compatible con verify_ebs_v1.py y con SIFT.
@@ -61,6 +62,7 @@ logger = logging.getLogger(__name__)
 from vigia.core.ebs_v1 import (
     ForensicBundle, IntegrityBlock, EBS_VERSION,
 )
+from vigia.security.output_boundary import validate_external_output_path
 
 
 # ---------------------------------------------------------------------------
@@ -163,6 +165,37 @@ def _sha256_dict_matches(obj: Dict, stored: str) -> bool:
     )
 
 
+def _analysis_projection(bundle_payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Return the stable analytical content of a full EBS payload.
+
+    ``bundle_hash`` is intentionally an identity for a specific custody event:
+    it includes the newly assigned ``bundle_id`` and timestamps.  Those fields
+    must remain sealed, but cannot identify a deterministic replay.  This
+    projection removes *only* that operational identity metadata; all
+    analytical content, configuration attestation, graph hash, and policy
+    remain in scope.
+
+    The helper is local and pure so ``quick_verify`` and the standalone
+    verifier can independently re-derive the same contract.
+    """
+    projection = dict(bundle_payload)
+    projection.pop("bundle_id", None)
+    projection.pop("timestamp", None)
+
+    graph = dict(projection.get("evidence_graph", {}))
+    graph.pop("generated_at", None)
+    projection["evidence_graph"] = graph
+
+    policy = dict(projection.get("policy_spec", {}))
+    policy.pop("created_at", None)
+    projection["policy_spec"] = policy
+
+    state = dict(projection.get("system_state", {}))
+    state.pop("timestamp", None)
+    projection["system_state"] = state
+    return projection
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -257,6 +290,12 @@ class BundleBuilder:
         config_for_hash["caie_enabled"] = caie_analysis is not None
         bundle_payload["config_attestation"]["config_hash"] = _sha256_dict(config_for_hash)
 
+        # B-198: two hashes have intentionally different scopes.  The full
+        # custody seal remains unique per run and covers every payload field;
+        # the analysis fingerprint makes a deterministic replay comparable
+        # without pretending that two separately timestamped executions are
+        # the same custody event.
+        analysis_fingerprint = _sha256_dict(_analysis_projection(bundle_payload))
         bundle_hash = _sha256_dict(bundle_payload)
 
         integrity = IntegrityBlock(
@@ -264,6 +303,7 @@ class BundleBuilder:
             graph_hash=graph_hash,
             policy_hash=policy_hash,
             decision_hash=decision_hash,
+            analysis_fingerprint=analysis_fingerprint,
             engine_attestation_hash=engine_attestation_hash,
             ecl_hash=ecl_hash,
         )
@@ -298,10 +338,19 @@ class BundleBuilder:
         """
         import tempfile
 
+        # B-183: a sealed bundle is derived output, never source evidence.
+        # Validate before creating a parent directory and again immediately
+        # before publication, because ``path`` carries write authority.
+        abs_path = validate_external_output_path(
+            path, artifact_label="sealed forensic bundle"
+        )
         content = json.dumps(sealed_dict, sort_keys=True, indent=2, default=str)
-        abs_path = os.path.abspath(path)
         target_dir = os.path.dirname(abs_path)
         os.makedirs(target_dir, exist_ok=True)
+        abs_path = validate_external_output_path(
+            abs_path, artifact_label="sealed forensic bundle"
+        )
+        target_dir = os.path.dirname(abs_path)
 
         mem_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
 
@@ -346,6 +395,7 @@ class BundleBuilder:
             integrity = sealed_dict.get("integrity", {})
             stored_bundle_hash = integrity.get("bundle_hash", "")
             stored_graph_hash = integrity.get("graph_hash", "")
+            stored_analysis_fingerprint = integrity.get("analysis_fingerprint", "")
 
             # Verificar graph_hash (prueba v2 y cae a v1 — R3-2)
             graph = sealed_dict.get("evidence_graph", {})
@@ -361,6 +411,19 @@ class BundleBuilder:
             if not _sha256_dict_matches(payload, stored_bundle_hash):
                 recomputed_bundle = _sha256_dict(payload)
                 return False, f"bundle_hash invalido: {recomputed_bundle[:8]}!={stored_bundle_hash[:8]}"
+
+            # Optional for historical bundles.  New B-198 bundles declare a
+            # deterministic analysis identity in addition to their per-run
+            # custody seal, so a decorative or corrupted field must fail.
+            if stored_analysis_fingerprint and not _sha256_dict_matches(
+                _analysis_projection(payload), stored_analysis_fingerprint
+            ):
+                recomputed_analysis = _sha256_dict(_analysis_projection(payload))
+                return (
+                    False,
+                    "analysis_fingerprint invalido: "
+                    f"{recomputed_analysis[:8]}!={stored_analysis_fingerprint[:8]}",
+                )
 
             return True, "OK — bundle integro"
 
@@ -526,13 +589,17 @@ class BundleBuilder:
 # Construye un ForensicBundle desde el resultado de _vigia_score() y lo sella
 # con BundleBuilder.seal(). Sin dependencia de VigiaPipeline.
 #
-# Mapeo forense → EBS DecisionVerdict:
-#   MALICE    → REJECT
-#   SUSPICION → ABSTAIN
-#   NOISE     → ACCEPT
-#   UNKNOWN   → ABSTAIN
-#
 # El veredicto forense original se preserva en caie_analysis.verdict.
+#
+# Importante: el ``score`` del scorer standalone es una escala de intención
+# compuesta, con sus propios gates de corroboración.  No es el posterior de
+# fabricación que consume ``RiskBoundedDecisionLayer``.  Esta envoltura puede
+# sellar el análisis standalone, pero no debe inventar una traducción
+# ``MALICE -> REJECT`` / ``NOISE -> ACCEPT`` usando la misma cifra como riesgo
+# EBS: esa conversión producía bundles que el verificador independiente
+# rechazaba por incoherentes.  Hasta que exista una calibración explícita y
+# verificable entre ambas escalas, el DecisionTrace EBS declara ABSTAIN y el
+# payload CAIE conserva íntegros score, confianza y veredicto forenses.
 # ---------------------------------------------------------------------------
 
 def build_bundle(case: Dict[str, Any], scorer_result: Dict[str, Any]) -> Dict[str, Any]:
@@ -581,24 +648,25 @@ def build_bundle(case: Dict[str, Any], scorer_result: Dict[str, Any]) -> Dict[st
 
     graph = EvidenceGraph(nodes=nodes, edges=edges)
 
-    # ── DecisionTrace: mapeo veredicto forense → EBS DecisionVerdict ─────────
-    _VERDICT_MAP = {
-        "MALICE":    "REJECT",
-        "SUSPICION": "ABSTAIN",
-        "NOISE":     "ACCEPT",
-        "UNKNOWN":   "ABSTAIN",
-    }
+    # ── DecisionTrace: frontera explícita entre scorer y EBS ──────────────────
     raw_verdict = scorer_result.get("verdict", "UNKNOWN")
-    decision_verdict = _VERDICT_MAP.get(raw_verdict, "ABSTAIN")
     score      = float(scorer_result.get("score", 0.0) or 0.0)
     confidence = float(scorer_result.get("confidence", 0.0) or 0.0)
     confidence = min(1.0, max(0.0, confidence))
 
     decision_trace = DecisionTrace(
-        decision=decision_verdict,
-        posterior=confidence,
-        risk=score,
-        reason_code=f"VIGIA_SCORER:{raw_verdict}",
+        # The standalone scorer does not emit a calibrated P(fabrication).
+        # 0.5 is the neutral value that makes the EBS decision ABSTAIN under
+        # its declared policy, rather than turning a different score scale
+        # into an unauditable ACCEPT or REJECT claim.
+        decision="ABSTAIN",
+        posterior=0.5,
+        risk=0.5,
+        reason_code="STANDALONE_SCORER_UNCALIBRATED_EBS_RISK",
+        abstain_reason=(
+            "Standalone scorer intent score is sealed in caie_analysis but is "
+            "not a calibrated EBS fabrication-risk posterior."
+        ),
     )
 
     # ── PolicySpec y SystemState ──────────────────────────────────────────────
@@ -653,7 +721,7 @@ def build_bundle(case: Dict[str, Any], scorer_result: Dict[str, Any]) -> Dict[st
         caie_payload["devil_advocate"] = compose_devil_advocate_struct(
             pattern_signal_metadata=None,
             raw_verdict=raw_verdict,
-            mapped_verdict=decision_verdict,
+            mapped_verdict="ABSTAIN",
             score=score,
             confidence=confidence,
             scope_note="standalone scorer mode (vigia/core/bundle_builder.py build_bundle())",

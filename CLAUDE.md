@@ -18,11 +18,13 @@ finding you emit may be presented to a court. Operate accordingly.
 
 ## Deployment Modes
 
-VIGÍA runs in five modes. Identify which mode is active before proceeding. The
-deterministic scoring core is **identical across all of them** — the LLM only ever
-enriches the narrative layer over an already-sealed `ForensicBundle`; it never changes
-a verdict or a score. See `README.md` ("Deployment Modes") for the authoritative
-description.
+VIGÍA runs in five modes. Identify which mode is active before proceeding. Mode 1 is
+the deterministic sealed-verdict contract. Mode 2 reuses deterministic local tools,
+but its tool-driven Peircean investigation and report are separately scoped: they do
+not mutate a sealed Mode 1 bundle, yet they are not an identical replay of Mode 1.
+When the two reports differ, preserve both outputs and their scope notes rather than
+silently treating one as an override. See `README.md` ("Deployment Modes") for the
+authoritative description.
 
 | Mode | How to identify | Entry point | LLM available |
 |------|-----------------|-------------|---------------|
@@ -68,6 +70,25 @@ export VIGIA_EVIDENCE_DIR="/path/to/read-only/evidence"
 # Optional — where SecurityAudit writes security_audit.log (B-135).
 # Default: /var/log/vigia. Must NEVER point inside VIGIA_EVIDENCE_DIR.
 export VIGIA_LOG_DIR="/var/log/vigia"
+
+# Optional — private operational state for the MCP bridge (B-173): mounted
+# filesystems, quarantine copies, and honey tokens. Must be outside evidence.
+# Default: a private mode-0700 temporary directory for the server lifetime.
+export VIGIA_WORK_DIR="/var/lib/vigia/work"
+
+# Optional — derived execution JSONL logs. Default: $VIGIA_WORK_DIR/logs,
+# then an XDG-style user state directory. Must NEVER point inside evidence.
+export VIGIA_EXECUTION_LOG_DIR="/var/lib/vigia/work/logs"
+
+# Optional — durable operational SQLite state for ACP, temporal and
+# entanglement modules. Default: $VIGIA_WORK_DIR/vigia_forensic.db, then an
+# XDG-style user state directory. Must NEVER point inside VIGIA_EVIDENCE_DIR.
+export VIGIA_FORENSIC_DB_PATH="/var/lib/vigia/work/vigia_forensic.db"
+
+# Optional — persistent sealed-bundle chain ledger. Default:
+# $VIGIA_WORK_DIR/vigia_chain.db, then an XDG-style user state directory.
+# Must NEVER point inside VIGIA_EVIDENCE_DIR.
+export VIGIA_CHAIN_DB_PATH="/var/lib/vigia/work/vigia_chain.db"
 
 # Optional — enables LLM semantic analysis
 export ANTHROPIC_API_KEY="sk-..."          # Claude Code / API mode
@@ -446,7 +467,8 @@ rather than duplicating their content here:
 ## Invariants — Non-Negotiable
 
 1. **Evidence is read-only.** Never write to `VIGIA_EVIDENCE_DIR`. Write extracted
-   artifacts to a separate working directory only.
+   artifacts, mounted filesystems, quarantine copies, and honey tokens only to
+   the separate `VIGIA_WORK_DIR` working directory.
 
 2. **Hash before reading.** `generate_forensic_hash` precedes `read_evidence` on
    every artifact. No exceptions. An unhashed file has no chain of custody.

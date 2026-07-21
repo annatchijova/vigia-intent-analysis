@@ -87,6 +87,43 @@ class TestB072ContactsConflation:
         a._analyze_call_log(db, r)
         assert any(f.finding_type == "EMPTY_CALL_LOG" for f in a._findings)
 
+    def test_android_contacts2_calls_table_is_not_silently_skipped(self, tmp_path):
+        """B-160: some Android extractions place calls in contacts2.db.
+
+        The filename must not make VIGÍA discard a valid ``calls`` table or
+        mistake the absence of contacts tables for an empty contacts book.
+        """
+        db = tmp_path / "contacts2.db"
+        _make_db(db, ["CREATE TABLE calls(id INTEGER, number TEXT)"])
+        conn = sqlite3.connect(str(db))
+        conn.executemany(
+            "INSERT INTO calls VALUES (?, ?)",
+            [(1, "611"), (2, "7705997290"), (3, "40404"), (4, "7733404607"),
+             (5, "5092520958"), (6, "8666688047"), (7, "8666688047")],
+        )
+        conn.commit()
+        conn.close()
+
+        result = AndroidForensicsAnalyzer().analyze(tmp_path)
+
+        assert result.contacts_parsed is False
+        assert result.calls_parsed is True
+        assert result.total_calls == 7
+        assert not any(f.finding_type == "EMPTY_CONTACTS" for f in result.findings)
+        assert not any(f.finding_type == "EMPTY_CALL_LOG" for f in result.findings)
+
+    def test_android_empty_calls_in_contacts2_is_a_real_empty_call_log(self, tmp_path):
+        """B-160 preserves B-072: a successfully counted empty table is empty."""
+        _make_db(tmp_path / "contacts2.db", ["CREATE TABLE calls(id INTEGER)"])
+
+        result = AndroidForensicsAnalyzer().analyze(tmp_path)
+
+        assert result.contacts_parsed is False
+        assert result.calls_parsed is True
+        assert result.total_calls == 0
+        assert any(f.finding_type == "EMPTY_CALL_LOG" for f in result.findings)
+        assert not any(f.finding_type == "EMPTY_CONTACTS" for f in result.findings)
+
 
 class TestB072DataMinimizationEscalation:
     """El bug REAL (red-team): removimos el finding EMPTY_* pero to_signal

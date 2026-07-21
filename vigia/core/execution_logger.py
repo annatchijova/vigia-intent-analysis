@@ -12,7 +12,9 @@ Cada evento registra:
   desde log_version 1.1 — antes truncado a 16 hex),
   _seq (número de secuencia, canonicalizado como int)
 
-El archivo se genera en data/logs/{case_id}_execution.jsonl.
+El archivo se genera fuera de la evidencia: en ``VIGIA_EXECUTION_LOG_DIR`` si
+está definido; si no, en ``$VIGIA_WORK_DIR/logs`` o en el estado privado del
+usuario. Un llamador puede indicar explícitamente un directorio externo.
 Formato: JSONL (una línea JSON por evento), sort_keys=True, ensure_ascii=True.
 Apto para cadena de custodia Daubert.
 
@@ -27,11 +29,45 @@ from datetime import datetime, timezone
 from fractions import Fraction
 from typing import Any, Dict, Optional
 
+from vigia.security.output_boundary import validate_external_output_path
+
 
 # ── Utilidades canónicas ──────────────────────────────────────────────────
 
 def _utcnow_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _default_execution_log_dir() -> str:
+    """Return a private operational directory for derived JSONL logs.
+
+    Execution logs are derived audit artifacts, not source evidence.  A
+    repository-relative default made their destination depend on the process
+    current working directory, which can itself be an evidence directory.
+    """
+    explicit = os.environ.get("VIGIA_EXECUTION_LOG_DIR", "").strip()
+    if explicit:
+        return explicit
+
+    work_dir = os.environ.get("VIGIA_WORK_DIR", "").strip()
+    if work_dir:
+        return os.path.join(work_dir, "logs")
+
+    state_root = os.environ.get("XDG_STATE_HOME", "").strip()
+    if not state_root:
+        state_root = os.path.join(os.path.expanduser("~"), ".local", "state")
+    return os.path.join(state_root, "vigia", "logs")
+
+
+def _validate_case_id(case_id: str) -> str:
+    """Accept a case label, never a path fragment with write authority."""
+    if not isinstance(case_id, str) or not case_id.strip():
+        raise ValueError("case_id must be a non-empty string")
+    if "\x00" in case_id:
+        raise ValueError("case_id contains a null byte")
+    if case_id in {".", ".."} or "/" in case_id or "\\" in case_id:
+        raise ValueError("case_id must not contain path separators")
+    return case_id
 
 
 # P1-19: importar _canonicalize canónico — unificación de esquemas.
@@ -66,12 +102,23 @@ class VigiaExecutionLogger:
         print(logger.log_file)
     """
 
-    def __init__(self, case_id: str, output_dir: str = "data/logs",
+    def __init__(self, case_id: str, output_dir: Optional[str] = None,
                  deterministic_timestamp: Optional[str] = None) -> None:
-        self.case_id = case_id
-        self.output_dir = output_dir
-        os.makedirs(output_dir, exist_ok=True)
-        self.log_path = os.path.join(output_dir, f"{case_id}_execution.jsonl")
+        self.case_id = _validate_case_id(case_id)
+        requested_dir = output_dir if output_dir is not None else _default_execution_log_dir()
+        requested_path = os.path.join(
+            requested_dir, f"{self.case_id}_execution.jsonl"
+        )
+        self.log_path = validate_external_output_path(
+            requested_path, artifact_label="execution log"
+        )
+        self.output_dir = os.path.dirname(self.log_path)
+        os.makedirs(self.output_dir, mode=0o750, exist_ok=True)
+        # Check again after directory creation: an unexpected filesystem
+        # substitution must not turn a validated parent into source evidence.
+        self.log_path = validate_external_output_path(
+            self.log_path, artifact_label="execution log"
+        )
         self._event_count = 0
         # Timestamp fijo para runs de evaluación deterministas; real para producción
         self._session_start = deterministic_timestamp or _utcnow_iso()
@@ -82,7 +129,7 @@ class VigiaExecutionLogger:
         # Los logs 1.0 existentes siguen siendo verificables con su esquema.
         self._write({
             "event_type": "SESSION_START",
-            "case_id": case_id,
+            "case_id": self.case_id,
             "session_start": self._session_start,
             "log_version": "1.1",
             "standard": "SANS_FIND_EVIL_2026",

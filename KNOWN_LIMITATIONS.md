@@ -1366,7 +1366,13 @@ bundles, both containing a `bundle_hash` field:
 1. **Lightweight CLI bundle** (`vigia/core/bundle_builder.py::build_bundle()`):
    Seals scorer output for standalone use, junior analysts, and chatbot integration
    (OpenWebUI/Ollama). Input: dict from `_vigia_score()`. Contains: verdict,
-   score, CAIE fractures, peirce_chain, quadripartite_state.
+   score, CAIE fractures, peirce_chain, quadripartite_state. The direct scorer's
+   forensic verdict is preserved in `caie_analysis`; its composite intent score is
+   **not** treated as a calibrated EBS fabrication-risk posterior. Consequently
+   the EBS `decision_trace` explicitly records `ABSTAIN` with
+   `STANDALONE_SCORER_UNCALIBRATED_EBS_RISK`, while still sealing the complete
+   direct analysis. This prevents a chatbot or API caller from reading a valid
+   cryptographic seal as proof of a second, uncalibrated EBS decision.
 
 2. **Full forensic bundle** (`vigia/models/ebs.py::ForensicBundle.seal()`):
    Seals the complete pipeline output for SIFT integration. Input: ForensicBundle
@@ -2310,6 +2316,16 @@ intended.**
 **Affects:** Any case where Mode 1 (`vigia_agent.py`) and Mode 2 (Claude
 Code + MCP `cross_artifact_analysis`) are compared on the same evidence.
 
+### Contract clarification — 2026-07-21 (Codex)
+
+Mode 2 is not a byte-for-byte replay of the Mode 1 agent bundle. Mode 1 seals
+the output of its fixed JSON/scorer path. Mode 2 runs a tool-driven Peircean
+investigation and records a separately scoped report. The two paths may reuse
+deterministic components, but their evidence reach, aggregation, and report
+schema differ. Mode 2 must never mutate or overwrite a Mode 1 seal; conversely,
+a Mode 2 conclusion must not be described as if it were the already-sealed Mode
+1 verdict. README and `CLAUDE.md` now state this explicitly.
+
 ### Background — three known divergence types between modes
 
 | Type | Source | Mechanism | Status |
@@ -2378,13 +2394,16 @@ intended resolution layer.
 
 ---
 
-## L-057 — 18 MCP tools without TOOL_INVOKED entry audit log [DOCUMENTED]
+## L-057 — MCP tools without a uniform `TOOL_INVOKED` entry audit log [RESOLVED — B-169, 2026-07-21]
 
 **Scope:** Mode 2 (Claude Code + MCP), Mode 5 (OpenWebUI). Modes 1, 3, 4 unaffected.
 
-**Status:** DOCUMENTED — partial mitigation applied in B-122 (2026-07-14).
+**Status:** RESOLVED — B-169 replaced the partial B-122 instrumentation with
+one mandatory registration boundary for every MCP tool exposed by the active
+bridge. The historical condition below is retained so prior bundles and audit
+claims are not rewritten.
 
-### What is missing
+### Historical condition (before B-169)
 
 `vigia/vigia_sift_bridge.py` exposes 22 MCP tools. B-122 added
 `audit_logger.log_info(event_type="TOOL_INVOKED")` at entry to the three
@@ -2440,24 +2459,21 @@ or supplied by the agent, so the chain-of-custody gap is lower severity.
 `deactivate_honey_token` already has an audit log call at exit (not entry).
 The gap is the invocation record before the operation, not the outcome record.
 
-### Mitigation (follow-up to B-122)
+### Resolution (B-169)
 
-Apply the same B-122 pattern to each remaining tool:
+`vigia/vigia_sift_bridge.py` now routes every local decorator and every
+external `mcp.tool()` registration through `_register_mcp_tool()`. Its
+`_audit_mcp_entry()` wrapper emits `TOOL_INVOKED` before rate limiting,
+sanitization, sandboxing or tool execution, so blocked and failed attempts
+are present too. Argument summaries preserve parameter names, scalar values,
+collection cardinality, and a SHA-256 of at most a 4 KiB string/bytes prefix;
+they never write raw evidence, prompts, paths or token values into the audit
+trail merely to prove a call occurred.
 
-```python
-audit_logger.log_info(
-    event_type="TOOL_INVOKED",
-    tool="<tool_name>",
-    message=f"<primary_arg>={value!r}",  # or f"n_items={len(arg)}" for list args
-)
-```
-
-Insert before the first `_sanitize_path_local()` call (file-touching tools)
-or immediately after `try:` (computation tools with no path argument).
-
-For `search_pattern` and `mount_sift_evidence` the log must precede the
-`sandboxed_execute` call so that blocked or timed-out subprocess attempts
-are also captured.
+This resolves entry-audit coverage for the bridge process. It does **not**
+change the separate B-122/L-057 provenance limit for historical bundles, nor
+does it prove wall-clock ordering, an external client's identity, or that a
+post-hoc tool-log response came from the claimed live service.
 
 ### Known performance note
 
@@ -2682,9 +2698,9 @@ change and calibration corpus.
 
 ---
 
-## L-060 — `SecurityAudit` Writes `security_audit.log` Into `VIGIA_EVIDENCE_DIR` [DOCUMENTED]
+## L-060 — `SecurityAudit` Wrote `security_audit.log` Into `VIGIA_EVIDENCE_DIR` [RESOLVED B-135]
 
-**Registered 2026-07-14. Status: DOCUMENTED — fix tracked as B-135.**
+**Registered 2026-07-14. Resolved 2026-07-16 by B-135. Historical condition retained as an audit record.**
 **Mode affected:** Mode 1 (`vigia_agent.py`) when `VIGIA_EVIDENCE_DIR` is set.
 **Discovered:** VIGIA-MAGNET-2022-iOS-JESS Mode 1 runs, 2026-07-14.
 
@@ -2716,17 +2732,23 @@ affect the correctness of VIGÍA's analysis. The risk is Daubert credibility: a
 defense expert could point to the modified evidence directory as a chain-of-custody
 gap.
 
-### Mitigation
+### Resolution and validation
 
-Set `VIGIA_LOG_DIR` before running `vigia_agent.py`:
+B-135 changed the default to:
 
-```bash
-export VIGIA_LOG_DIR="/tmp/vigia_logs"
-python3 vigia_agent.py --evidence "$VIGIA_EVIDENCE_DIR" --case-id CASE-001
+```python
+_DEFAULT_LOG_DIR: Final[str] = os.getenv("VIGIA_LOG_DIR", "/var/log/vigia")
 ```
 
-See B-135 for the planned fix (changing `_DEFAULT_LOG_DIR` to use `VIGIA_LOG_DIR`
-instead of `VIGIA_EVIDENCE_DIR`).
+`VIGIA_EVIDENCE_DIR` now only identifies evidence. `VIGIA_LOG_DIR` controls the
+audit destination; an explicit `SecurityAudit(log_path=...)` still has priority,
+and the pre-existing secure temporary fallback is used when the configured log
+directory cannot be written.
+
+`tests/test_b135_security_log_dir.py` verifies all five relevant contracts:
+the default ignores `VIGIA_EVIDENCE_DIR`, honours `VIGIA_LOG_DIR`, retains the
+`/var/log/vigia` fallback, leaves an evidence directory byte-for-byte empty in
+an end-to-end write, and preserves explicit log-path precedence.
 
 ---
 
@@ -2763,9 +2785,9 @@ assertion and is tracked separately.
 
 ---
 
-## L-062 — Scorer Hard Temporal Gate Trusts `temporal_violations` Without Validating It Against Artifact Timestamps [DOCUMENTED]
+## L-062 — Scorer Hard Temporal Gate Trusted `temporal_violations` Without Validating It Against Artifact Timestamps [MITIGATED B-172; H-01 tolerance remains]
 
-**Registered 2026-07-17. Status: DOCUMENTED — fix tracked as H-01 (Tanda 4 of the XFail Reduction Protocol, `docs/XFAIL_REDUCTION_STRATEGY_20260717.md`).**
+**Registered 2026-07-17. Claim-authority portion mitigated 2026-07-21 by B-172. The separate H-01 tolerance-window decision remains open.**
 **Mode affected:** all modes that call `vigia_scorer._vigia_score` (the deterministic core).
 **Discovered:** 2026-07-17, temporal-gate characterization (`tests/characterization/test_temporal_gate_curve.py`).
 **Severity class:** integrity/contract gap (P2-class). NOT a runtime-exploitable vulnerability — it requires control of the case-construction input, not a network/attacker surface — but it is a Daubert integrity concern because it sits at the highest-authority verdict rung.
@@ -2809,72 +2831,86 @@ does not validate the asserted pair. Under Daubert this is a falsifiability
 gap: the gate's conclusion is not independently reproducible from the artifact
 timestamps.
 
-### Mitigation / planned fix
+### B-172 mitigation and remaining H-01 work
 
-Tracked as H-01 (Tanda 4). Two admissible fixes, both documented in the
-strategy doc: (a) the hard gate validates the asserted `EFFECT_BEFORE_CAUSE`
-pair against the real artifact timestamps before firing; or (b)
-`temporal_violations` population is gated by a validating producer (the CAIE
-TCV path is the existing validated producer) with its own test. The current
-behavior is pinned by `tests/characterization/test_temporal_gate_curve.py`;
-when the fix lands, those pins fail on purpose and must be updated with the
-window decision.
+B-172 reconstructs every categorical `EFFECT_BEFORE_CAUSE` claim from the
+referenced artifact IDs and their top-level ISO-8601 timestamps. The pair must
+be unique, timezone-explicit, within CAIE's fixed plausibility window, and
+actually satisfy `effect < cause`. A high-severity claim that fails any part of
+that check is retained as `unverified_hard_temporal_violations`, contributes no
+temporal trust penalty, and forces `ABSTAIN` rather than categorical `MALICE`.
+The validated pair is exposed in the sealed score result.
+
+This deliberately does **not** decide the tolerance policy: a verified negative
+ordering still follows the former categorical gate, including a small skew. H-01
+remains tracked in the strategy document for the cross-clock tolerance and CAIE
+severity-scaling design.
+
+`tests/test_b172_hard_temporal_pair_validation.py` covers a contradicted
+assertion, a missing artifact, and a real inversion. The revised temporal-curve
+characterization preserves H-01's no-tolerance negative-delta pin separately.
 
 ---
 
-## L-063 — Fallback-Mode `caie_fractures` Carry Verdict Authority From Case JSON (Recognised Types) [DOCUMENTED]
+## L-063 — Fallback-Mode `caie_fractures` Carry Verdict Authority From Case JSON (Recognised Types) [RESOLVED B-170]
 
-**Registered 2026-07-18. Status: DOCUMENTED — doctrine decision pending (T cluster, docs/PATTERN_HUNT_20260718.md). L-number PROVISIONAL until merge (see L-061/L-062 collision).**
+**Registered 2026-07-18. Resolved 2026-07-21 by B-170. Historical condition retained below as an audit record.**
 **Mode affected:** `vigia_scorer._vigia_score` when `from vigia.tools.caie import ...` fails (standalone / CAIE-unavailable mode — a documented, supported mode, file header §"Deployment Modes").**
 **Discovered:** 2026-07-18 pattern hunt (T-1), characterized in `tests/characterization/test_verdict_authority_inputs.py`.
 **Severity class:** integrity/contract gap (P2-class, sibling of L-062) — requires control of the case-construction input, not a runtime attack surface.
 
 ### Description
 
-When live CAIE is importable, the scorer **recomputes** fractures from the
-evidence and discards any `caie_fractures` supplied in the case JSON
-(`caie_fractures_source == "live_caie"`). When the import fails, it falls back
-to `case.get("caie_fractures", [])` (`vigia_scorer.py:684`) and consumes them
-directly: a fabricated fracture whose `fracture_type` is in
-`MALICIOUS_FRACTURE_TYPES` adds `sev*0.45` to the malice boost and can flip a
-NOISE verdict to SUSPICION.
+Historically, when live CAIE was importable, the scorer **recomputed** fractures
+from evidence and discarded any `caie_fractures` supplied in case JSON
+(`caie_fractures_source == "live_caie"`). When the import failed, it fell back
+to `case.get("caie_fractures", [])` and consumed them directly: a fabricated
+fracture whose `fracture_type` was in `MALICIOUS_FRACTURE_TYPES` added
+`sev*0.45` to the malice boost and could flip NOISE to SUSPICION.
 
-Characterized bound (verified 2026-07-18): the exposure requires a
-**recognised** type. A fabricated fracture with an unrecognised type is inert
-(no boost, stays NOISE). `caie_fractures_source == "json_fallback"` is sealed,
-so the degraded mode is disclosed — but the disclosure does not remove the
-authority the fabricated fracture carries.
+The characterized bound (verified 2026-07-18) required a **recognised** type.
+An unrecognised type was inert, but `caie_fractures_source == "json_fallback"`
+only disclosed the degraded mode; it did not remove the declared fracture's
+authority.
 
 ### Forensic implication
 
-In standalone mode, an examiner-authored `caie_fractures` entry with a known
-type name influences the verdict with no validating producer. The mitigating
-facts: (a) live mode ignores it entirely; (b) the fallback is disclosed via
-`caie_fractures_source`; (c) only recognised types work.
+### Fix and current contract
 
-### Doctrine decision (pending, Anna)
+B-170 separates disclosure from authority. In CAIE fallback mode every
+JSON-declared fracture remains in `caie_fracture_details`, but contributes
+neither a malice boost nor a credibility penalty. The sealed
+`caie_fracture_authority` field reports that the material is
+`unverified_json_no_verdict_authority`.
 
-Options: (a) cap the verdict in fallback mode (fabricated fractures cannot
-exceed SUSPICION without live corroboration); (b) treat `json_fallback` as
-narrative-only for fracture authority; (c) accept as documented and rely on
-the `caie_fractures_source` disclosure. Behavior is pinned unchanged until
-decided.
+If the declaration contains a recognised CAIE fracture type, the final result
+is `ABSTAIN`, with `unverified_json_caie_fractures` and the score-only
+pre-gate verdict/reason retained in the sealed output. The operator must rerun
+with live CAIE before VIGÍA can issue a substantive verdict. Live CAIE remains
+unchanged: it recomputes its own fractures and may use them normally.
+
+### Validation
+
+`tests/characterization/test_verdict_authority_inputs.py::TestT1FallbackFractureAuthority`
+proves the former NOISE -> SUSPICION escalation is gone: the same recognised
+JSON declaration now yields zero boost and `ABSTAIN`; an unrecognised type is
+still inert; a live CAIE run still discards case JSON and recomputes evidence.
 
 ---
 
-## L-064 — `STATISTICAL_UNIFORMITY` Malice Boost Has No Runtime Producer (All Modes) [DOCUMENTED]
+## L-064 — `STATISTICAL_UNIFORMITY` Malice Boost Has No Runtime Producer (All Modes) [RESOLVED B-171]
 
-**Registered 2026-07-18. Status: DOCUMENTED — doctrine decision pending (T cluster). L-number PROVISIONAL until merge.**
+**Registered 2026-07-18. Resolved 2026-07-21 by B-171. Historical condition retained below as an audit record.**
 **Mode affected:** all modes calling `vigia_scorer._vigia_score` (NOT gated by CAIE availability — worse reach than L-063).**
 **Discovered:** 2026-07-18 pattern hunt (T-2), characterized in `tests/characterization/test_verdict_authority_inputs.py`.
 **Severity class:** integrity/contract gap (P2-class, sibling of L-062).
 
 ### Description
 
-`case["temporal_violations"]` entries of `type == "STATISTICAL_UNIFORMITY"` add
-`sev*0.35` to `fracture_malice_boost` (`vigia_scorer.py`, SU-terms block),
-**unconditionally in every mode**. A fabricated entry (severity 1.0) flips a
-NOISE case to SUSPICION (measured: score 0.055 -> 0.375).
+Historically, `case["temporal_violations"]` entries of
+`type == "STATISTICAL_UNIFORMITY"` added `sev*0.35` to
+`fracture_malice_boost` **unconditionally in every mode**. A fabricated entry
+(severity 1.0) could flip NOISE to SUSPICION (measured: score 0.055 -> 0.375).
 
 Data-flow finding (verified 2026-07-18): **no runtime module emits
 `STATISTICAL_UNIFORMITY`.** A grep of `vigia/` finds it only as a weight-table
@@ -2884,17 +2920,34 @@ author it into case JSON. An in-code comment previously described it as coming
 "from the temporal engine" — a producer that does not exist; the comment has
 been corrected (honesty fix, behavior unchanged).
 
-### Forensic implication
+### Fix and current contract
 
-Same class as L-062 (the hard temporal gate), one rung lower in severity
-(boost, not unconditional MALICE), but with wider reach: it is not gated by
-CAIE availability, so it fires in standalone mode too.
+B-171 removes every JSON-only score path: both the explicit malice boost and
+the temporal-trust penalty. A declared violation remains counted in
+`temporal_violations` and is retained as
+`unverified_statistical_uniformity_violations`, but its score contribution is
+zero. `statistical_uniformity_authority` explicitly reports
+`unverified_json_no_verdict_authority`.
 
-### Doctrine decision (pending, Anna)
+Because a declared regularity claim can be decision-relevant yet has no
+producer under the scorer's contract, the final result is `ABSTAIN` and retains
+the score-only pre-gate verdict/reason. This applies in live and fallback CAIE
+modes: availability of CAIE does not validate a statistic CAIE never produced.
+The separately callable MCP jitter detector is not treated as a producer; it
+has a different input/output contract and is not wired into the sealed scorer.
 
-Options: (a) require a producing detector before the boost is trusted; (b)
-remove the SU boost path entirely (no producer => dead-but-exploitable input);
-(c) accept as documented. Behavior is pinned unchanged until decided.
+**Known corpus effect:** `case_002_log_fabrication` retains its scenario label
+`expected_verdict: SUSPICION`, but its current deterministic result is
+`ABSTAIN` until the case carries raw interval evidence and a deterministic
+scorer detector derives the statistical claim. The label documents the
+scenario; it does not override the evidence contract.
+
+### Validation
+
+`tests/characterization/test_verdict_authority_inputs.py::TestT2StatisticalUniformity`
+proves the former NOISE -> SUSPICION transition is gone in both live and
+fallback CAIE modes. `tests/test_invariant4_fraction_accumulators.py` proves a
+declared SU claim cannot add to a live CAIE fracture boost.
 
 ---
 

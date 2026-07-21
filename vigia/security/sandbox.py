@@ -37,6 +37,7 @@ import re
 import resource
 import sys
 import warnings
+from pathlib import Path
 from typing import Final
 
 
@@ -475,9 +476,44 @@ async def safe_grep(
     except ValueError as exc:
         return {"matches": [], "truncated": False, "error": str(exc)}
 
-    # Optional confinement to allowed evidence directories
+    # Optional confinement to allowed evidence directories.  This is a
+    # filesystem authority check, not a text-prefix check: ``/evidence-copy``
+    # must never inherit authority from ``/evidence`` merely because the
+    # strings share a prefix (B-174).
     if allowed_dirs:
-        if not any(safe_folder.startswith(d) for d in allowed_dirs):
+        safe_folder_path = Path(safe_folder)
+        authorised = False
+        for allowed_dir in allowed_dirs:
+            if not isinstance(allowed_dir, str):
+                return {
+                    "matches": [],
+                    "truncated": False,
+                    "error": "Allowed evidence directory must be a path string.",
+                }
+            try:
+                allowed_root = Path(
+                    _sanitize_path(
+                        allowed_dir,
+                        must_exist=True,
+                        allow_symlinks=False,
+                    )
+                )
+            except ValueError as exc:
+                return {
+                    "matches": [],
+                    "truncated": False,
+                    "error": f"Invalid allowed evidence directory: {exc}",
+                }
+            if not allowed_root.is_dir():
+                return {
+                    "matches": [],
+                    "truncated": False,
+                    "error": f"Allowed evidence path is not a directory: {allowed_root!s}",
+                }
+            if safe_folder_path == allowed_root or safe_folder_path.is_relative_to(allowed_root):
+                authorised = True
+                break
+        if not authorised:
             return {
                 "matches": [],
                 "truncated": False,

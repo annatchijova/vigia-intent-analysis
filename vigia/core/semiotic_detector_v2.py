@@ -330,19 +330,26 @@ class SemioticDetectorV2:
     def _load_patterns(self) -> None:
         # mode=ro: herramienta forense estéril — VIGÍA nunca escribe en su DB de patrones.
         # Bloquea inyección en runtime y cumple aislamiento Daubert (Gemini V23).
-        db_uri = f"file:{self.db_path}?mode=ro"
+        db_uri = Path(self.db_path).expanduser().resolve(strict=False).as_uri() + "?mode=ro"
+        conn = None
         try:
             conn = sqlite3.connect(db_uri, uri=True)
-        except sqlite3.OperationalError:
-            # Fallback si la DB no existe (primer run sin SQLite poblado)
-            conn = sqlite3.connect(":memory:")
-        conn.row_factory = sqlite3.Row
-        rows = conn.execute("""
-            SELECT pattern_name, category, pattern_regex, weight, 
-                   description, case_origin, peirce_layer, confidence_boost
-            FROM nlp_patterns ORDER BY weight DESC
-        """).fetchall()
-        conn.close()
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("""
+                SELECT pattern_name, category, pattern_regex, weight,
+                       description, case_origin, peirce_layer, confidence_boost
+                FROM nlp_patterns ORDER BY weight DESC
+            """).fetchall()
+        except sqlite3.Error as exc:
+            # Do not pretend that an empty in-memory database is a usable
+            # detector.  Callers convert this unavailable component to a
+            # detector fault / ABSTAIN instead of a clean-looking NOISE.
+            raise RuntimeError(
+                f"semiotic pattern database unavailable: {self.db_path}"
+            ) from exc
+        finally:
+            if conn is not None:
+                conn.close()
         for row in rows:
             try:
                 pattern_str = row["pattern_regex"]

@@ -9,22 +9,16 @@ the diff. It is the empirical dataset for the H-01 window decision: you do
 not decide the tolerance window from intuition, you decide it against this
 curve.
 
-What it documents (verified 2026-07-17, this is the behavior BEFORE any
-tolerance window exists):
+What it documents (revised 2026-07-21 after B-172, still BEFORE any tolerance
+window exists):
 
   PATH (a) — scorer hard gate (vigia_scorer._vigia_score):
-    The hard gate reads ONLY `type == EFFECT_BEFORE_CAUSE` and
-    `severity >= 0.9` from the pre-computed `temporal_violations` list
-    (vigia_scorer.py L1120-1122). It NEVER parses the timestamps and NEVER
-    reads `delta_seconds`. Consequence, pinned below: the verdict is MALICE
-    for EVERY delta — including delta = 0 and delta = +2 (the network event
-    AFTER the process, i.e. NO violation at all) — because the fixture
-    asserts the violation and the scorer trusts it verbatim. `clock_source`
-    is dead metadata: no production code path reads it.
-    => The tolerance window for path (a) CANNOT live in the scorer's hard
-       gate (it has no delta to test). It must live wherever
-       `temporal_violations` is POPULATED upstream, or the hard gate must
-       start validating the asserted pair against the real timestamps.
+    B-172 re-derives the asserted pair from the two referenced artifact
+    timestamps. Negative ordering still yields MALICE under the legacy
+    no-tolerance policy. Zero/positive ordering cannot become MALICE merely
+    because JSON asserts it: the result is ABSTAIN with the unverified claim
+    preserved. `clock_source` remains dead metadata: B-172 fixes claim
+    validation, not the separate skew-window decision.
 
   PATH (b) — CAIE TCV rule (CrossArtifactIncongruenceEngine.detect_fractures):
     Computes the sign correctly from real structured timestamps
@@ -35,8 +29,8 @@ tolerance window exists):
        cross-source distinction) would live.
 
 CONTRACT: these are pins, not aspirations. If you implement the H-01
-tolerance window, THESE TESTS WILL FAIL — that is intended. Update the
-pinned values in the same commit that changes the behavior, and cross-check
+tolerance window, the negative-delta cells may move — that is intended. Update
+the pinned values in the same commit that changes the behavior, and cross-check
 that the change matches the documented window decision. Do not silence a
 failure here without understanding which cell of the curve moved and why.
 
@@ -112,44 +106,35 @@ def _scorer_case(delta_seconds: float, clock_source: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# PATH (a): scorer hard gate — pinned FLAT (MALICE everywhere, delta ignored)
+# PATH (a): scorer hard gate — validates pair, but no skew tolerance yet
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("delta", _DELTAS)
 @pytest.mark.parametrize("clock_source", _CLOCK_SOURCES)
-def test_char_scorer_hard_gate_is_flat(delta, clock_source):
-    """PIN: scorer verdict is MALICE + hard_temporal_gate for every delta and
-    clock_source, because the hard gate trusts the asserted violation without
-    reading timestamps. This includes delta >= 0 (no real violation).
-
-    If the H-01 window lands and this cell stops being MALICE, update the pin.
-    """
+def test_char_scorer_hard_gate_requires_artifact_inversion(delta, clock_source):
+    """PIN: B-172 separates a real negative ordering from a contradicted JSON
+    claim. H-01 tolerance is intentionally not decided here, so every verified
+    negative delta still takes the existing hard gate."""
     result = _vigia_score(_scorer_case(delta, clock_source))
-    assert result.get("hard_temporal_gate") is True, (
-        f"CHARACTERIZATION PIN MOVED (path a): delta={delta}, "
-        f"clock_source={clock_source} no longer trips the hard gate. If this "
-        "is the H-01 tolerance fix, update this pin and the curve docstring."
-    )
-    assert result.get("verdict") == "MALICE", (
-        f"CHARACTERIZATION PIN MOVED (path a): delta={delta}, "
-        f"clock_source={clock_source} verdict is now "
-        f"{result.get('verdict')!r}, was MALICE."
-    )
+    if delta < 0:
+        assert result.get("hard_temporal_gate") is True
+        assert result.get("verdict") == "MALICE"
+        assert result.get("hard_temporal_authority") == "validated_artifact_pair"
+    else:
+        assert result.get("hard_temporal_gate") is False
+        assert result.get("verdict") == "ABSTAIN"
+        assert result.get("hard_temporal_authority") == (
+            "unverified_json_no_verdict_authority"
+        )
 
 
-def test_char_scorer_ignores_clock_source_and_delta_sign():
-    """PIN (explicit): path (a) is blind to both the delta sign and the clock
-    source. delta=+2 (network AFTER process, no violation) still yields MALICE
-    because the fixture asserts EFFECT_BEFORE_CAUSE and the scorer does not
-    re-derive it. This is the load-bearing finding for the H-01 decision:
-    the tolerance window cannot be implemented in the scorer's hard gate.
-    """
+def test_char_scorer_rejects_positive_order_claim():
+    """PIN (explicit): an event after its alleged cause cannot produce MALICE
+    from an `EFFECT_BEFORE_CAUSE` declaration. This validates authority, not
+    the still-unresolved tolerance for genuinely negative deltas."""
     positive = _vigia_score(_scorer_case(2.0, "host_ntp"))
-    assert positive.get("verdict") == "MALICE", (
-        "CHARACTERIZATION PIN MOVED: path (a) started distinguishing a "
-        "non-violating positive delta. That means the scorer now validates "
-        "the asserted violation against timestamps — a real H-01 change."
-    )
+    assert positive.get("verdict") == "ABSTAIN"
+    assert positive.get("hard_temporal_gate") is False
 
 
 # ---------------------------------------------------------------------------

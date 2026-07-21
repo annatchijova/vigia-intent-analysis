@@ -39,6 +39,8 @@ from fractions import Fraction
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
+from vigia.core.runtime_fingerprint import runtime_execution_fingerprint
+
 # ── Forensic logging ─────────────────────────────────────────────────────────
 logging.basicConfig(
     level=logging.INFO,
@@ -1055,6 +1057,19 @@ class VIGIAAgent:
             narrative_parts.append(str(_reasoner_narr))
         narrative_parts.append("")
 
+        # B-195: scenario prose supplied in an EBS JSON can help an examiner
+        # orient themselves, but it is not an output of the deterministic
+        # selector and cannot be printed as motor reasoning.  Keep it visibly
+        # separate in the sealed report so a claim's provenance survives the
+        # handoff rather than being upgraded by presentation alone.
+        _scenario_context = abduction.get("scenario_context")
+        if isinstance(_scenario_context, str) and _scenario_context:
+            narrative_parts.append(
+                "--- CASE CONTEXT (UNVERIFIED INPUT — NOT ANALYTICAL EVIDENCE) ---"
+            )
+            narrative_parts.append(_scenario_context)
+            narrative_parts.append("")
+
         if signals:
             top_signals = sorted(signals, key=_to_frac_z, reverse=True)[:5]
             narrative_parts.append("--- TOP SIGNALS (top 5 by z-score) ---")
@@ -1323,6 +1338,7 @@ class VIGIAAgent:
         results: Dict[str, Any],
         narrative: str,
         evidence_sha256: str,
+        runtime_fingerprint: str = "UNAVAILABLE",
     ) -> Dict[str, Any]:
         """
         Seals the final bundle with SHA-256.
@@ -1357,6 +1373,11 @@ class VIGIAAgent:
             "case_id": self.case_id,
             "evidence_path": str(self.evidence_path),
             "evidence_sha256": evidence_sha256,
+            # B-166: versioned content manifest of the deterministic runtime.
+            # A batch may reuse this sealed result only if its current runtime
+            # fingerprint is identical; a valid evidence hash alone is not
+            # proof that current code would reach the same result.
+            "runtime_fingerprint": runtime_fingerprint,
             "analysis_timestamp": _utcnow(),
             "iterations_executed": self.iteration + 1,
             "self_corrections_applied": len(self.corrections_applied),
@@ -1420,19 +1441,34 @@ class VIGIAAgent:
         logger.info("[AGENT] Starting VIGÍA Agent — case %s", self.case_id)
         logger.info("[AGENT] Evidence: %s", self.evidence_path)
 
-        # Record SHA-256 of the agent's own source code — version traceability
+        # B-166: record both the entrypoint and the complete deterministic
+        # runtime manifest.  The former remains useful for historical bundles;
+        # the latter prevents a cache from hiding a scorer/adapter change.
         try:
             agent_source = Path(__file__).read_bytes()
             agent_sha256 = hashlib.sha256(agent_source).hexdigest()
         except OSError:
             agent_sha256 = "UNAVAILABLE"
+        try:
+            runtime_fingerprint = runtime_execution_fingerprint(Path(__file__).parent)
+        except (OSError, RuntimeError) as exc:
+            runtime_fingerprint = "UNAVAILABLE"
+            logger.warning("[AGENT] Runtime fingerprint unavailable: %s", exc)
         self.audit.log(
             action="AGENT_INITIALIZED",
             tool="vigia_agent",
             inputs={"case_id": self.case_id, "agent_file": __file__},
-            outputs={"agent_sha256": agent_sha256, "agent_version": AGENT_VERSION},
+            outputs={
+                "agent_sha256": agent_sha256,
+                "agent_version": AGENT_VERSION,
+                "runtime_fingerprint": runtime_fingerprint,
+            },
             iteration=0,
-            note=f"Agent initialized — source SHA-256: {agent_sha256[:16]}...",
+            note=(
+                "Agent initialized — source SHA-256: "
+                f"{agent_sha256[:16]}...; runtime fingerprint: "
+                f"{runtime_fingerprint[:16]}..."
+            ),
         )
         logger.info("[AGENT] Agent SHA-256: %s", agent_sha256)
 
@@ -1521,7 +1557,7 @@ class VIGIAAgent:
 
         # 4. Seal bundle — returns (bundle_dict, canonical_json_text, sha256_digest)
         bundle, bundle_canonical_text, bundle_digest = self._seal_bundle(
-            results, narrative, evidence_sha256
+            results, narrative, evidence_sha256, runtime_fingerprint
         )
         # Attach temporary fields for main() — extracted with pop() before writing to disk
         bundle["_canonical_text"] = bundle_canonical_text
@@ -1922,6 +1958,57 @@ def _warn_missing_critical_deps() -> None:
             )
 
 
+def _validate_agent_output_path(
+    output_path: str,
+    *,
+    working_directory: Path | None = None,
+    evidence_directory: str | Path | None = None,
+) -> str:
+    """Return an agent output path confined to work and outside evidence.
+
+    The autonomous agent writes a sealed bundle plus verification and reasoning
+    siblings.  Keeping the bundle below the working directory is necessary but
+    insufficient: an operator can invoke the agent *from* the evidence tree.
+    In that configuration the former CWD-only check authorised a write into
+    immutable input (B-177).
+    """
+    if not isinstance(output_path, str) or not output_path.strip():
+        raise ValueError("output path must be a non-empty string")
+    if "\x00" in output_path:
+        raise ValueError("output path contains a null byte")
+
+    try:
+        work_root = (working_directory or Path.cwd()).resolve(strict=False)
+        requested = Path(output_path)
+        resolved = (
+            requested.resolve(strict=False)
+            if requested.is_absolute()
+            else (work_root / requested).resolve(strict=False)
+        )
+    except (OSError, RuntimeError) as exc:
+        raise ValueError(f"invalid output path: {exc}") from exc
+
+    if not resolved.is_relative_to(work_root):
+        raise ValueError(f"output path escapes working directory: {output_path!r}")
+
+    configured_evidence = (
+        evidence_directory
+        if evidence_directory is not None
+        else os.environ.get("VIGIA_EVIDENCE_DIR", "").strip()
+    )
+    if configured_evidence:
+        try:
+            evidence_root = Path(configured_evidence).resolve(strict=False)
+        except (OSError, RuntimeError) as exc:
+            raise ValueError(f"invalid evidence directory: {exc}") from exc
+        if resolved == evidence_root or resolved.is_relative_to(evidence_root):
+            raise ValueError(
+                "output path points inside forensic evidence; choose a separate results directory"
+            )
+
+    return str(resolved)
+
+
 def main() -> None:
     _warn_missing_critical_deps()
     parser = argparse.ArgumentParser(
@@ -2002,19 +2089,15 @@ Exit codes:
     safe_case_id = re.sub(r"[^a-zA-Z0-9_\-]", "_", args.case_id)
     output_path = args.output or f"{safe_case_id}_bundle.json"
 
-    # FIX P1-4: sanitize output to prevent path traversal
-    output_path_obj = Path(output_path)
+    # FIX P1-4/B-177: output must remain inside the work directory AND never
+    # overlap immutable evidence. The helper returns the canonical absolute
+    # path, binding the bundle, its checksum and its reasoning-trace sibling
+    # to the same safe destination.
     try:
-        resolved = output_path_obj.resolve()
-        cwd = Path.cwd().resolve()
-        # Use is_relative_to() — str.startswith() has edge cases with path prefixes
-        if not resolved.is_relative_to(cwd):
-            logger.error("[FATAL] Output path escapes working directory: %s", output_path)
-            sys.exit(2)
-    except (OSError, RuntimeError) as e:
+        output_path = _validate_agent_output_path(output_path)
+    except ValueError as e:
         logger.error("[FATAL] Invalid output path: %s — %s", output_path, e)
         sys.exit(2)
-    output_path = str(output_path_obj)
 
     # L-037: Build acquisition overrides from CLI flags
     _acq_overrides: Dict[str, Any] = {}

@@ -26,6 +26,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
+from vigia.core.path_guard import PathGuard
 from vigia.sift._math_utils import _entropy_shannon, _parse_iso_timestamp, noisy_or_correlated
 
 logger = logging.getLogger(__name__)
@@ -308,20 +309,14 @@ class Volatility3Interface:
         2. Verifica que esté dentro de ALLOWED_BASE_PATHS.
         3. Verifica que sea archivo regular (no symlink a /etc/passwd).
         """
-        p = Path(dump_path).resolve()
-        # Verificar que no es symlink
-        if p.is_symlink():
-            raise ValueError(f"Symlinks prohibidos: {dump_path}")
-        # Verificar que está en allowlist
-        allowed = any(
-            p == base or (base in p.parents or p == base)
-            for base in ALLOWED_BASE_PATHS
-        )
-        if not allowed:
-            # Si no hay allowlist configurada, al menos verificar que existe
-            if not p.exists():
-                raise FileNotFoundError(f"Dump no encontrado: {dump_path}")
-        return p
+        check = PathGuard(allowed_base_paths=ALLOWED_BASE_PATHS).validate(dump_path)
+        if check.valid:
+            return Path(os.path.abspath(os.fspath(dump_path)))
+        if check.reason == "FILE_NOT_FOUND":
+            raise FileNotFoundError(f"Dump no encontrado: {dump_path}")
+        if check.reason == "OUTSIDE_ALLOWLIST":
+            raise PermissionError(f"Dump outside configured allowlist: {dump_path}")
+        raise ValueError(f"Dump path rejected: {check.reason}")
 
     def _detect_version(self) -> str:
         try:

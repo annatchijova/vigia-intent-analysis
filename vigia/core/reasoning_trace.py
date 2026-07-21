@@ -420,7 +420,16 @@ def verify_reasoning_trace(bundle: Dict[str, Any], trace: Dict[str, Any],
     if not isinstance(log, list) or not log:
         errors.append("trace has no tool_execution_log to verify")
     else:
-        chain = verify_tool_execution_log(log, **hmac_kwargs)
+        declared_tip = trace.get("chain_tip_sha256")
+        if not isinstance(declared_tip, str) or not declared_tip:
+            errors.append("trace has no declared chain_tip_sha256 to anchor its tail")
+            declared_tip = None
+        chain = verify_tool_execution_log(
+            log,
+            expected_tip=declared_tip,
+            expected_tip_hmac=trace.get("chain_tip_hmac"),
+            **hmac_kwargs,
+        )
         if not chain.valid:
             errors.append(f"trace chain invalid: {chain.to_dict()}")
 

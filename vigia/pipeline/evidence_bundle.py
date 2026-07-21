@@ -7,6 +7,7 @@ import zipfile
 from typing import Dict, Any, Optional
 
 from vigia.core.atomic_io import atomic_write_text, atomic_write_bytes
+from vigia.security.output_boundary import SecurityError, validate_external_output_path
 
 
 # ---------------------------------------------------------------------------
@@ -77,6 +78,17 @@ def sign_manifest(manifest_hash: str, private_key=None) -> Optional[str]:
     return f"SIGNED({manifest_hash[:16]})"
 
 
+def _validate_case_id(case_id: str) -> str:
+    """Keep a case label from becoming authority over the output path."""
+    if not isinstance(case_id, str) or not case_id.strip():
+        raise SecurityError("Case ID must be a non-empty string")
+    if "\x00" in case_id:
+        raise SecurityError("Case ID contains a null byte")
+    if case_id in {".", ".."} or "/" in case_id or "\\" in case_id:
+        raise SecurityError("Case ID must not contain path separators")
+    return case_id
+
+
 # ---------------------------------------------------------------------------
 # Builder principal
 # ---------------------------------------------------------------------------
@@ -98,13 +110,20 @@ def build_evidence_bundle(
     - firma opcional
     """
 
-    os.makedirs(output_dir, exist_ok=True)
+    safe_output_dir = validate_external_output_path(
+        output_dir, artifact_label="evidence bundle output"
+    )
+    safe_case_id = _validate_case_id(case_id)
+    os.makedirs(safe_output_dir, exist_ok=True)
+    safe_output_dir = validate_external_output_path(
+        safe_output_dir, artifact_label="evidence bundle output"
+    )
 
     # -----------------------------------------------------------------------
     # Paths
     # -----------------------------------------------------------------------
 
-    bundle_dir = os.path.join(output_dir, f"{case_id}_bundle")
+    bundle_dir = os.path.join(safe_output_dir, f"{safe_case_id}_bundle")
     os.makedirs(bundle_dir, exist_ok=True)
 
     pdf_out = os.path.join(bundle_dir, "report.pdf")
@@ -150,7 +169,7 @@ def build_evidence_bundle(
 
     zip_path = None
     if zip_output:
-        zip_path = os.path.join(output_dir, f"{case_id}_bundle.zip")
+        zip_path = os.path.join(safe_output_dir, f"{safe_case_id}_bundle.zip")
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as z:
             for fname in os.listdir(bundle_dir):
                 z.write(

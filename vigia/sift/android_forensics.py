@@ -35,6 +35,9 @@ logger = logging.getLogger(__name__)
 
 TOOL_NAME = "ANDROID_FORENSICS"
 ARTIFACT_RELIABILITY = Fraction(70, 100)
+# B-167: the parser intentionally bounds SMS body inspection. The cap is a
+# resource limit, never a claim that every available message body was read.
+SMS_CONTENT_ANALYSIS_LIMIT = 500
 
 # Chrome timestamp epoch: microseconds since 1601-01-01
 _CHROME_EPOCH_OFFSET = 11644473600
@@ -112,6 +115,11 @@ class AndroidAnalysisResult:
     is_rooted: bool = False
     root_method: str = ""
     total_sms: int = 0
+    # B-167: total_sms counts all rows; these fields describe the body-bearing
+    # subset that was actually eligible for content inspection.
+    sms_analyzable_rows: int = 0
+    sms_analyzed_rows: int = 0
+    sms_content_truncated: bool = False
     total_contacts: int = 0
     total_calls: int = 0
     # B-072: solo un conteo EXITOSO de 0 es evidencia de data_minimization
@@ -185,6 +193,9 @@ class AndroidAnalysisResult:
                 "is_rooted": self.is_rooted,
                 "root_method": self.root_method,
                 "total_sms": self.total_sms,
+                "sms_analyzable_rows": self.sms_analyzable_rows,
+                "sms_analyzed_rows": self.sms_analyzed_rows,
+                "sms_content_truncated": self.sms_content_truncated,
                 "total_contacts": self.total_contacts,
                 "total_calls": self.total_calls,
                 "encrypted_apps_count": n_encrypted,
@@ -243,11 +254,7 @@ class AndroidForensicsAnalyzer:
         android_markers = scan_marker_names(
             evidence_path, _ANDROID_MARKER_FILES, engine="ANDROID", logger=logger
         )
-        if not android_markers:
-            logger.warning("[ANDROID] No Android artifacts found in %s", evidence_path)
-            result.analysis_notes.append(
-                "No Android-specific artifacts found. Directory may not contain Android evidence."
-            )
+        android_chrome_profile_detected = False
 
         # 1. Root detection
         self._detect_root(evidence_path, result)
@@ -267,6 +274,15 @@ class AndroidForensicsAnalyzer:
             except Exception as e:
                 logger.error("[ANDROID] Contacts analysis failed: %s", e)
                 result.analysis_notes.append(f"Contacts parse error: {e}")
+            # B-160: some logical Android extractions keep the call-history
+            # table in contacts2.db. Dispatch by the readable table as well as
+            # the conventional filename; an absent calls table here is normal
+            # and must not be reported as an empty call log (B-072).
+            try:
+                self._analyze_call_log(db, result, report_missing_table=False)
+            except Exception as e:
+                logger.error("[ANDROID] Embedded call-log analysis failed: %s", e)
+                result.analysis_notes.append(f"Embedded call-log parse error: {e}")
 
         # 4. Call log
         for db in self._safe_rglob(evidence_path, "calllog.db", limit=3):
@@ -286,11 +302,28 @@ class AndroidForensicsAnalyzer:
                     continue
             except (OSError, IOError):
                 continue
+            if self._is_android_chrome_history(evidence_path, db):
+                android_chrome_profile_detected = True
             try:
                 self._analyze_chrome(db, result)
             except Exception as e:
                 logger.error("[ANDROID] Chrome analysis failed: %s", e)
                 result.analysis_notes.append(f"Chrome parse error: {e}")
+
+        # B-165: a package-only extraction can preserve a valid Android Chrome
+        # profile while omitting system-wide marker DBs.  It is contradictory
+        # to parse that profile and then claim Android evidence is absent.  The
+        # layout validates coverage only; it does not create a finding or score.
+        if not android_markers:
+            if android_chrome_profile_detected:
+                result.analysis_notes.append(
+                    "Android Chrome application profile detected without platform-wide Android markers."
+                )
+            else:
+                logger.warning("[ANDROID] No Android artifacts found in %s", evidence_path)
+                result.analysis_notes.append(
+                    "No Android-specific artifacts found. Directory may not contain Android evidence."
+                )
 
         # 6. App detection
         self._detect_installed_apps(evidence_path, result)
@@ -337,6 +370,23 @@ class AndroidForensicsAnalyzer:
             (f for f in base.rglob(pattern)
              if not f.is_symlink() and f.is_file()),
             key=lambda p: str(p),
+        )
+
+    @staticmethod
+    def _is_android_chrome_history(evidence_path: Path, db_path: Path) -> bool:
+        """Whether ``db_path`` is the canonical Android Chrome History path.
+
+        A generic Chromium ``History`` file is not enough to establish an
+        Android extraction.  The Android package directory is the needed
+        provenance boundary; this method intentionally does not infer intent
+        from either the package name or its browsing contents.
+        """
+        try:
+            relative = db_path.relative_to(evidence_path)
+        except ValueError:
+            return False
+        return relative.parts[-4:] == (
+            "com.android.chrome", "app_chrome", "Default", "History"
         )
 
     def _build_correlation_groups(self) -> Dict[int, set]:
@@ -430,14 +480,28 @@ class AndroidForensicsAnalyzer:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM sms").fetchone()[0]
                 result.total_sms = count
+                result.sms_analyzable_rows = conn.execute(
+                    "SELECT COUNT(*) FROM sms WHERE body IS NOT NULL"
+                ).fetchone()[0]
             except sqlite3.OperationalError:
                 result.analysis_notes.append("mmssms.db: 'sms' table not found")
                 return
 
             rows = conn.execute(
                 "SELECT _id, address, body, date, type, thread_id "
-                "FROM sms WHERE body IS NOT NULL LIMIT 500"
+                "FROM sms WHERE body IS NOT NULL "
+                "ORDER BY _id ASC LIMIT ?",
+                (SMS_CONTENT_ANALYSIS_LIMIT,),
             ).fetchall()
+            result.sms_analyzed_rows = len(rows)
+            if result.sms_analyzable_rows > result.sms_analyzed_rows:
+                result.sms_content_truncated = True
+                result.analysis_notes.append(
+                    "mmssms.db: SMS content analysis truncated "
+                    f"({result.sms_analyzed_rows} of "
+                    f"{result.sms_analyzable_rows} non-null bodies); "
+                    "the remaining bodies were not analyzed."
+                )
 
             for row in rows:
                 body = str(row["body"] or "")
@@ -508,7 +572,13 @@ class AndroidForensicsAnalyzer:
 
     # ── Call Log ────────────────────────────────────────────────────────────
 
-    def _analyze_call_log(self, db_path: Path, result: AndroidAnalysisResult) -> None:
+    def _analyze_call_log(
+        self,
+        db_path: Path,
+        result: AndroidAnalysisResult,
+        *,
+        report_missing_table: bool = True,
+    ) -> None:
         conn = self._safe_sqlite_connect(db_path)
         if conn is None:
             result.analysis_notes.append(f"calllog.db: could not open {db_path}")
@@ -520,7 +590,8 @@ class AndroidForensicsAnalyzer:
                 result.total_calls = count
                 parsed = True
             except sqlite3.OperationalError:
-                result.analysis_notes.append("calllog.db: 'calls' table not found")
+                if report_missing_table:
+                    result.analysis_notes.append(f"{db_path.name}: 'calls' table not found")
         finally:
             conn.close()
 

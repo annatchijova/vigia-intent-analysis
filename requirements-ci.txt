@@ -24,3 +24,7 @@ psutil>=5.9.0
 # S-1 (contrato 2026-07-05): pyyaml es importado por vigia/config/ vía yaml.safe_load;
 # estaba en requirements.txt pero no acá. Detectado por test_requirements_ci_contract.py.
 pyyaml>=6.0.0
+# FastAPI is imported by both documented HTTP wrapper paths and their boundary
+# contract tests. Keep it in the minimal CI environment rather than relying on
+# a developer machine's global installation.
+fastapi>=0.100.0

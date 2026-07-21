@@ -39,6 +39,9 @@ for p in [_ROOT, os.path.join(_ROOT, "vigia", "core")]:
     if p not in sys.path:
         sys.path.insert(0, p)
 
+from vigia.core.atomic_io import atomic_write_text
+from vigia.security.output_boundary import validate_external_output_path
+
 # ── Umbrales ──────────────────────────────────────────────────────────
 THRESHOLD_MALICIOUS = Fraction(32, 10)
 THRESHOLD_BENIGN    = Fraction(17, 10)
@@ -355,6 +358,23 @@ def convert_case(case_path: str) -> list:
     return signals
 
 
+def save_signals(signals: list, output_path: str) -> str:
+    """Atomically export derived adapter output outside source evidence."""
+    safe_path = validate_external_output_path(
+        output_path, artifact_label="case-adapter export"
+    )
+    output_dir = os.path.dirname(safe_path)
+    os.makedirs(output_dir, mode=0o750, exist_ok=True)
+    safe_path = validate_external_output_path(
+        safe_path, artifact_label="case-adapter export"
+    )
+    atomic_write_text(
+        safe_path,
+        json.dumps(signals, indent=2, ensure_ascii=False),
+    )
+    return safe_path
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Uso: python3 vigia_case_adapter.py <caso.json> [output.json]")
@@ -362,8 +382,7 @@ if __name__ == "__main__":
     signals = convert_case(sys.argv[1])
     output  = json.dumps(signals, indent=2, ensure_ascii=False)
     if len(sys.argv) > 2:
-        with open(sys.argv[2], "w") as f:
-            f.write(output)
-        print(f"Guardado en {sys.argv[2]}", file=sys.stderr)
+        written_path = save_signals(signals, sys.argv[2])
+        print(f"Guardado en {written_path}", file=sys.stderr)
     else:
         print(output)

@@ -4951,12 +4951,14 @@ clases con implicaciones distintas para "cómo resolverlo":
    corroboración — cambio de scorer, no de hoy; candidato a L-0XX nuevo
    (BREAK-015) que documente la tensión explícitamente en vez de dejarlo
    como un fallo mudo.
-3. **Gap de motor real y cerrable (distinto en naturaleza de 1):**
-   `VIGIA-FN-003` exige análisis de memoria profundo (regiones RWX,
-   parent-process-mismatch) que el motor no ejecuta hoy — a diferencia de 1,
-   esto NO requiere una fuente de datos externa nueva, sería extender un
-   engine que ya existe. Candidato genuino a backlog de ingeniería (no de
-   doctrina).
+3. **Diagnóstico histórico corregido — no es gap de motor:**
+   `VIGIA-FN-003` ya activa la fractura
+   `PROCESS_INJECTION_ANTIFORENSIC` sobre regiones RWX y
+   `parent-process-mismatch`. El `SUSPICION` actual no significa que el
+   detector no corra: el gate B-068 rechaza elevar dos observaciones de la
+   misma colección de memoria a corroboración independiente de `MALICE`.
+   Véase B-196. Es una adjudicación de suficiencia/procedencia de evidencia,
+   no backlog de detector.
 4. **Guard H-02 (FP-CULTURAL ×2):** ya rastreado por separado, sin cambio de
    estado hoy.
 
@@ -6019,10 +6021,19 @@ before path sanitization:
 
 The 3 covered tools are the highest priority: they touch evidence files
 directly and form the chain-of-custody anchor (hash before read). The 20
-uncovered tools are Phase 2-4 analysis tools — their invocations are
-typically recorded in the `tool_execution_log` chain (v2, with HMAC) by
-the calling agent, but NOT in the per-tool audit log. An examiner auditing
-a specific tool's invocation history would find gaps.
+uncovered tools are Phase 2-4 analysis tools. A calling agent can reconstruct
+a v2 HMAC `tool_execution_log` after a session, but that is not equivalent to
+tool-side instrumentation or contemporaneous capture. An examiner auditing a
+specific tool's invocation history would find gaps.
+
+**Confirmación OWL v2 (2026-07-21):** el bundle externo
+`results/OWL-NEXUS5-CASE_bundle_claude_v2.json` preserva 37 entradas y el
+verificador stdlib confirma su cadena hash. El propio informe documenta que
+las entradas fueron escritas en tandas por el agente después de las llamadas
+MCP y que, sin la clave, el verificador no puede comprobar el HMAC keyed.
+Por lo tanto la cadena prueba integridad relativa posterior, no el instante,
+orden wall-clock ni texto literal de cada respuesta MCP. No es una falla del
+verificador; es evidencia concreta de por qué B-122 sigue parcialmente abierto.
 
 ### Known technical debt
 
@@ -7546,3 +7557,1905 @@ smoke test MCP requiere entorno con `mcp` — L-045; pendiente para la
 próxima sesión con bridge vivo); gate 0-flips compartido con F1.
 
 ---
+
+## B-153 — FastAPI `/analyze/path` no confina `case_path` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 condicional: sólo si el wrapper está expuesto a red no confiable. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21, rama `codex`. |
+
+Ambos endpoints hacen `REPO / payload.case_path` y pasan el resultado al
+pipeline sin rechazar rutas absolutas, `..`, symlinks, directorios ni escapes.
+Una ruta absoluta descarta `REPO` en `pathlib`. Con stubs inertes, ambos
+wrappers aceptaron y reenviaron un archivo existente fuera del checkout. No se
+afirma exfiltración arbitraria: el pipeline requiere JSON con forma de caso;
+sí se confirma ruptura de scope/cadena de custodia. No hay autenticación y el
+bind default era `0.0.0.0` (CORS no es autenticación).
+
+**Corrección aplicada:** `vigia/api_case_paths.py` concentra la frontera para
+ambos wrappers. Sólo acepta `.json` regular, no-symlink, bajo `cases/` o
+`data/cases/`; rechaza ruta absoluta, `..`, directorio, extensión ajena y
+escape sin revelar cuál fue el path local. Ambos modos ahora hacen bind a
+`127.0.0.1` por default y validan/normalizan el caso antes de scorear. Las 15
+regresiones API cubren los vectores y el caso permitido. Un operador que elija
+exponer el servicio más allá de loopback todavía debe diseñar autenticación;
+esa política no se inventó en este parche.
+
+---
+
+## B-154 — `/v1/chat/completions` crashea con escalares JSON válidos [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 — disponibilidad/protocolo; no cambia evidencia ni veredicto. |
+| **Archivo** | `vigia_api.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21. |
+
+`json.loads(text)` acepta `42` y `null`, pero el endpoint evalúa
+`"artifacts" in case_data` y lanza `TypeError` no capturado en lugar de la guía
+que devuelve para `[]`. `ChatRequest.messages` no normaliza contenido en la
+frontera.
+
+**Corrección aplicada:** sólo un objeto JSON con `artifacts` llega al pipeline;
+escalar, `null`, lista, JSON inválido o contenido no textual devuelve guía de
+uso. Las regresiones fijan `42`, `null`, `[]` y confirman que un objeto válido
+sigue llegando al pipeline inerte de prueba.
+
+---
+
+## B-155 — `PathGuard` permite colisión de prefijo y escape `..` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 — integridad forense / frontera de adquisición SIFT. |
+| **Archivos** | `vigia/core/path_guard.py`, consumidor `vigia/sift/sift_orchestrator.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21; fixture temporal propio, sin evidencia personal. |
+
+La allowlist usa `str(abs_path).startswith(str(base))`, que no prueba
+contención por componentes. Con base `/tmp/vigia`, un sibling
+`/tmp/vigia-forge-...` pasa; rutas con `..` también pasan. `safe_open()` abre la
+misma ruta con `os.open()`: la apertura externa fue reproducida. El
+orchestrator entrega paths aceptados a los motores SIFT. Los tests no cubrían
+prefijo ni `..`.
+
+**Corrección aplicada:** `PathGuard` rechaza `..` antes de normalizar y compara
+roots y candidato por componentes léxicos, sin seguir symlinks. `safe_open()`
+usa la misma representación normalizada. Se conservan los chequeos existentes
+de symlink, regularidad, `fstat` y TOCTOU. Regresiones cubren colisión de
+prefijo, traversal, lectura positiva y rechazo de `safe_read`.
+
+---
+
+## B-156 — Validadores Volatility/RegRipper fallan abiertos fuera de allowlist [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 — defensa en profundidad y consumidores Python directos. |
+| **Archivos** | `vigia/sift/memory_forensics.py`, `vigia/sift/registry_timeline_reconstructor.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21. |
+
+Ambos validadores calculan `allowed`, pero si es falso sólo lanzan cuando el
+path además no existe; cualquier archivo existente fuera de `/tmp/vigia`,
+`/evidence`, etc. retorna. La reproducción controlada confirmó ambos retornos
+fuera de root. SIFT suele anteponer PathGuard, pero B-155 lo atraviesa y los
+consumidores directos llegan aquí sin esa capa.
+
+**Corrección aplicada:** ambos validadores delegan en `PathGuard` con su
+allowlist configurada. Un archivo existente fuera de root ahora produce
+`PermissionError`; ausencia sigue siendo `FileNotFoundError` y otros rechazos
+explícitos siguen visibles. Regresiones fijan ambos rechazos y la aceptación de
+un archivo regular dentro de root.
+
+---
+
+## B-157 — Wrapper API empaquetado usa `vigia/` como root por default [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 — disponibilidad/operación local; no cambia el motor ni expone datos. |
+| **Archivo** | `vigia/vigia_api.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21. |
+
+Si `VIGIA_REPO` no está definido, el módulo usa `Path(__file__).parent`, es
+decir `checkout/vigia/`, pero busca `data/cases`, `cases`, `scripts/vigia_ask.sh`
+y `forensics/verify_ebs_v1.py` que viven en el root del checkout. El modo
+`python -m vigia.vigia_api` queda incompleto salvo que el operador conozca y
+configure la variable de entorno.
+
+**Corrección aplicada:** el default es ahora el padre del paquete (root del
+checkout), independiente del directorio de trabajo; `VIGIA_REPO` continúa
+siendo un override explícito. La regresión importa el wrapper sin esa variable.
+
+---
+
+## B-158 — API devuelve detalles internos de excepción y ruta de checkout [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 condicional — divulgación de diagnóstico a clientes que alcancen la API. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py` |
+| **Detectado por** | Auditoría Codex 2026-07-21. |
+
+Ambos endpoints de análisis hacen `HTTPException(500, str(e))`: una excepción
+del pipeline puede devolver rutas, nombres de binarios o detalles de una falla
+interna al cliente. Además `/health` raíz retorna `str(REPO)`. Una reproducción
+con excepción inerte de fixture confirma que el `detail` público conserva el
+texto controlado. No cambia evidencia ni veredicto; requiere un cliente capaz
+de llegar al endpoint.
+
+**Corrección aplicada:** ambos wrappers registran el contexto server-side y
+devuelven el único detalle estable `Error interno en el pipeline forense.`.
+`/health` informa sólo estado. Regresiones con excepción controlada verifican
+que ningún `detail` público conserva el texto interno.
+
+---
+
+## B-159 — El contrato público de Modo 2 afirma replay idéntico, pero sus informes tienen autoridad de conclusión independiente [DOCUMENTADO + texto corregido — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de integridad epistemológica/provenance; no es corrupción del scorer. |
+| **Alcance** | `README.md`, `CLAUDE.md`, `KNOWN_LIMITATIONS.md`, comparación de Modo 1/Modo 2. |
+| **Detectado por** | Auditoría Codex sobre replay batch y ejecuciones temporales, 2026-07-21. |
+
+El README afirmaba que el veredicto determinista era idéntico en todos los
+modos y que Claude sólo narraba sobre un bundle sellado. Esa afirmación no
+coincidía con el contrato operativo ni con los artefactos: `CLAUDE.md` permite
+que Modo 2 emita escalones que Modo 1 no tiene, y los informes Mode 2 archivados
+incluyen conclusiones propias (por ejemplo `VIGIA-BREAK-015_claude*.json`:
+`MALICE`) mientras el agente determinista actual y el bundle archivado sellan
+`SUSPICION`. Modo 2 no modifica ese bundle; produce una investigación MCP con
+alcance de evidencia, agregación y esquema de reporte distintos.
+
+La comprobación no reescribió `results/agent_batch`: ejecuciones en `/tmp` del
+agente actual volvieron a sellar `SUSPICION` para BREAK-012 y BREAK-015. Para
+BREAK-012, además, el caso canónico ya fue relabelado de `BENIGN` a
+`SUSPICION` porque tiene dos sujetos (jdoe exonerado; atacante desconocido
+sospechado); informes históricos con `BENIGN` no prueban una divergencia actual.
+
+**Caracterización de BREAK-015:** el caso declara
+`SPATIAL_IDENTITY_COLLAPSE`, `BIOMETRIC_IMPOSTURE` e
+`IDENTITY_BIFURCATION`, pero el scorer Modo 1 recalcula CAIE vivo y no tiene
+un productor determinista para esas tres clases. La ejecución actual midió
+`caie_fractures=0`, `fracture_malice_boost=0` y score `0.2382`, que pertenece
+a la banda `SUSPICION` (< `0.33`). Convertir las fracturas declaradas en
+autoridad directa para obtener `MALICE` reabriría la clase L-063 (JSON del
+examinador con autoridad de veredicto). Un arreglo real requiere un detector
+determinista y corpus negativo para esa clase de bifurcación de identidad; no
+se retocaron umbrales ni se forzó un PASS.
+
+**Corrección aplicada:** se reemplazaron las promesas de identidad de veredicto
+por el contrato verificable: Modo 1 es la salida sellada corpus-wide; Modo 2 no
+puede mutarla ni reemplazarla, pero su informe interactivo puede ser una
+investigación independiente. Si divergen, se preservan ambos artefactos y sus
+límites. El scorer y las etiquetas no se tocaron.
+
+---
+
+## B-160 — El extractor Android ignoraba una tabla `calls` válida dentro de `contacts2.db` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 — pérdida silenciosa de cobertura de evidencia mobile; no autoriza por sí sola un veredicto más severo. |
+| **Archivo** | `vigia/sift/android_forensics.py` (`analyze`, `_analyze_contacts`, `_analyze_call_log`). |
+| **Detectado por** | Auditoría Codex del falso negativo `OWL-NEXUS5`, 2026-07-21. |
+
+El descubrimiento Android buscaba `contacts2.db` exclusivamente como libreta de
+contactos (`raw_contacts` o `contacts`) y sólo buscaba historial de llamadas en
+archivos llamados `calllog.db`. En la extracción real
+`evidence/owl-2019-nexus5-quick/Agent Data/contacts2.db`, la base SQLite es
+legible y contiene la tabla `calls` con **7** filas, pero no contiene ninguna
+de las dos tablas de contactos. El resultado vivo quedaba
+`contacts_parsed=False`, `calls_parsed=False`, `total_calls=0` y anotaba
+"could not count contacts"; los siete registros no se analizan.
+
+Esto no es el mismo defecto que B-072: B-072 impide correctamente que un
+schema no parseable se convierta en una agenda o historial *vacío*. Aquí el
+schema es reconocible y la evidencia existe, pero el dispatcher la asocia al
+nombre del archivo en vez de inspeccionar la tabla disponible. Tampoco explica
+por sí solo el NOISE de OWL: el mensaje de coordinación queda fuera por L-041,
+el case JSON tiene 20 placeholders `unknown`/score cero, y el camino mobile
+emite una sola señal agregada (B-052-P2). Es una pérdida independiente de
+cobertura que debe repararse con tests de `contacts2.db` que contenga `calls`,
+preservando la semántica fail-closed de B-072.
+
+**Corrección aplicada:** después de tratar `contacts2.db` como contactos, el
+dispatcher también lo pasa por el contador de llamadas ya existente. La ausencia
+de tabla `calls` dentro de ese archivo es normal y no agrega una nota ni genera
+un falso `EMPTY_CALL_LOG`; una tabla `calls` leíble, incluso vacía, conserva la
+semántica B-072. No se introdujo heurística sobre el contenido de las llamadas.
+
+**Validación:** dos tests rojos primero fijan (a) siete llamadas en
+`contacts2.db` → `calls_parsed=True`, `total_calls=7`, sin `EMPTY_CONTACTS`;
+y (b) tabla `calls` parseable vacía → `EMPTY_CALL_LOG`, sin
+`EMPTY_CONTACTS`. `tests/test_b072_b074_mobile_verdict_fixes.py`: **35
+passed**. Sobre la extracción OWL real, el resultado vivo ahora reporta 21 SMS
+y 7 llamadas, con `contacts_parsed=False` correctamente. Una ejecución completa
+en un bundle temporal siguió sellando **ABSTAIN** y 0 findings Android: el fix
+recupera cobertura, pero no finge que el conteo de llamadas resuelva L-041,
+los placeholders del case JSON ni B-052-P2.
+
+---
+
+## B-161 — El verificador del reasoning trace no anclaba la cola que declara [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de integridad forense/provenance. No altera un veredicto Modo 1 sellado, pero debilita un sibling que se presenta como evidencia de proceso. |
+| **Archivo** | `vigia/core/reasoning_trace.py:verify_reasoning_trace`. |
+| **Detectado por** | Auditoría Codex de `OWL-NEXUS5-CASE_bundle_chatgpt_reasoning_trace.json`, 2026-07-21. |
+
+`ForensicReasoningTrace.seal()` escribe `chain_tip_sha256` (y, cuando hay una
+clave configurada, `chain_tip_hmac`) junto a su `tool_execution_log` v2. Sin
+embargo, `verify_reasoning_trace()` llama a `verify_tool_execution_log(log)` sin
+pasarle ninguno de los anclajes declarados. Por lo tanto sólo verifica los
+enlaces internos que recibe; nunca comprueba que la última entrada sea igual a
+`trace["chain_tip_sha256"]`.
+
+**Prueba roja (en memoria; ningún artefacto de evidencia fue editado):** el
+trace OWL tenía tres entradas. Al eliminar la última, reemplazar
+`chain_tip_sha256` por el hash de la nueva última entrada y llamar a
+`verify_reasoning_trace(bundle, trace)`, el resultado siguió siendo
+`valid=True, errors=[]`. El trace OWL real además informó `hmac_checked=False`
+y `tip_checked=False` porque no se suministró una clave HMAC persistente.
+
+Es una omisión de wiring distinta del residual documentado en R3-5. Incluso
+cuando el verificador empiece a revisar la cola SHA-256 declarada, quien pueda
+reescribir todo el sibling hash-only (incluida su punta) sigue siendo
+indetectable sin HMAC persistente u otro autenticador externo. El defecto
+inmediato es más acotado y testeable: una cola declarada que no cambia debe
+detectar un log truncado o extendido, tal como ya hace `verify_bundle_tool_log()`.
+
+**Corrección aplicada:** `verify_reasoning_trace()` ahora pasa
+`trace["chain_tip_sha256"]` y, si está presente, `trace["chain_tip_hmac"]` a
+`verify_tool_execution_log()`. La ausencia de una punta SHA-256 declarada es
+ahora un error de verificación. El verificador público da a esa punta el mismo
+tratamiento R3-5 que ya usa `verify_bundle_tool_log()`.
+
+**Validación:** tests rojos primero rechazan ahora un trace truncado que
+conserva su punta declarada original y rechazan un HMAC declarado falsificado
+cuando el verificador recibe la clave configurada.
+`tests/test_reasoning_trace.py`, `tests/test_reasoning_trace_bundle_gate.py` y
+`tests/test_r3_5_chain_tip_truncation.py`: **60 passed**. El trace OWL existente
+sigue verificando, ahora con `tip_checked=True`; permanece honestamente
+hash-only (`hmac_checked=False`) hasta que se configure una clave HMAC
+persistente.
+
+---
+
+## B-162 — El adaptador legacy borraba silenciosamente un schema de evidencia estructurada sin modelar [REPARACIÓN PARCIAL — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de integridad de evidencia / degradación honesta. |
+| **Archivos** | `vigia/pipeline/vigia_integration_bridge.py:_normalize_artifact_legacy`, puerta de normalización de `vigia_scorer.py`. |
+| **Detectado por** | Auditoría Codex de `OWL-NEXUS5-CASE`, 2026-07-21. |
+
+El adaptador legacy esperaba `artifact_id`, `forensic_anomalies` y
+`analyst_flags`. El escenario OWL usa `id`, `content` estructurado anidado y
+tipos mobile/social como `web_search` e `instant_message`. Antes de mapearlos,
+los 20 artefactos se convertían silenciosamente en señales con
+`artifact_id="?"`, `evidence_type="unknown"` y score cero. La corrida sellaba
+`NOISE`, sin un marcador `normalization_failures` ni disposición `ABSTAIN`.
+
+La medición repository-wide encontró 24 artefactos legacy con tipos sin mapear;
+20 pertenecen a OWL. Mapear sólo esos nombres de tipo no repara un veredicto:
+el adaptador no tiene extractor determinista para la semántica anidada de
+mensajes, URLs y cuentas, por lo que cada artefacto sigue con score mínimo y
+OWL queda en `NOISE` (score medido `0.0627`). Convertir prosa del escenario como
+`metadata.significance` en anomalía o score haría autoritativa una narrativa
+redactada, reabriendo la clase fuga de etiqueta / aserción del examinador.
+
+**Reparación aplicada:** el normalizador conserva `id` como `artifact_id`,
+reconoce la taxonomía mobile/social sólo como clase de colección y adjunta
+`structured_content_without_semantic_extractor` cuando el contenido estructurado
+carece de un extractor determinista. La puerta existente convierte el resultado
+que habría sido `NOISE` en `ABSTAIN`. Ni `metadata.significance`, ni el texto de
+la narrativa, ni `expected_verdict` pasan a ser inputs de score.
+
+**Validación:** los tests red-first comprueban que el ID y la clase
+`instant_message` se preservan, que el caso mínimo termina en `ABSTAIN` con el
+marcador exacto de pérdida y que cambiar el label esperado entre `SUSPICION` y
+`MALICE` no cambia ningún artefacto normalizado.
+`tests/test_b162_structured_legacy_degradation.py`,
+`tests/test_label_leak_normalize_case_schema.py`,
+`tests/test_b066_b067_mobile_whitelist.py`,
+`tests/test_p1_metadata_normalization_integrity.py` y
+`tests/test_b6_artifact_type_map_consistency.py`: **58 passed**. Una ejecución
+real de `vigia_agent.py` sobre el JSON OWL, en un bundle temporal con checksum y
+reasoning trace válidos, cambió de `NOISE` a **`ABSTAIN`** (`motor_score=0.0627`)
+sin elevar la prosa a evidencia.
+
+**Residual abierto:** esto resuelve la salida falsamente limpia, no extrae el
+significado forense de un chat, URL o cuenta anidados. Un extractor específico
+para Android/Chrome/Musical.ly deberá trabajar sobre artefactos raw con hash y
+provenance antes de que VIGÍA pueda derivar una puntuación o `SUSPICION` propia.
+
+**Confirmación cross-mode, sin autoridad de veredicto (2026-07-21):** los
+work-products preservados en
+`results/OWL-NEXUS5-CASE_{report,bundle}_claude*` y
+`results/OWL-NEXUS5-CASE_{report,bundle}_chatgpt.*` verifican sus checksums y
+coinciden en que el `NOISE` legacy no describe adecuadamente la evidencia
+recuperada. El v1 de Claude recorrió la extracción con 29 llamadas MCP y
+ChatGPT hizo una revisión read-only manual de la imagen. El v2 de Claude
+rectificó el alcance: un SMS de entrega estaba fuera de la primera consulta y
+el Windows/Pidgin companion queda **UNRESOLVED**, no descartado. Conserva
+`SUSPICION`, no `INTENT`/`MALICE`, porque el vínculo cross-device no fue
+materializado. No son una regresión del motor ni una fuente de score: difieren,
+por ejemplo, sobre qué texto de mensajes puede recuperarse y qué significa el
+segundo dispositivo. Esa discordancia queda preservada, y refuerza que VIGÍA
+debe seguir emitiendo `ABSTAIN` hasta que un extractor determinista,
+source-specific y hash-bound materialice los hechos que pretende puntuar.
+
+---
+
+## B-163 — El shim del agente proyectaba señales desde el JSON crudo y no desde el schema que puntúa [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de coherencia de evidence/provenance y explicabilidad. |
+| **Archivo** | `sift_orchestrator.py:_analyze_ebs_json`. |
+| **Detectado por** | Seguimiento Codex de B-162 sobre `OWL-NEXUS5-CASE`, 2026-07-21. |
+
+El modo agente tiene dos consumidores del mismo JSON EBS legacy. La selección
+abductiva llama a `_vigia_score()`, que normaliza la entrada; el render de
+señales en `_analyze_ebs_json()` iteraba el JSON sin normalizar. En OWL, por
+ello, el motor sellaba correctamente `ABSTAIN` por pérdida de normalización,
+pero la narrativa presentaba 20 señales `artifact_id="?"`,
+`evidence_type="unknown"`, score cero y fuente desconocida. La explicación no
+describía los artefactos que el motor realmente evaluó.
+
+No autoriza cambiar el score ni interpretar `content`: la reparación debe usar
+la misma normalización determinista y ciega a la etiqueta para construir las
+señales de presentación, manteniendo `expected_verdict` sólo como passthrough
+histórico del modo `legacy`. Un caso con contenido estructurado aún debe
+permanecer `ABSTAIN` hasta que exista un extractor raw específico de fuente.
+
+**Corrección aplicada:** `_analyze_ebs_json()` normaliza el caso una vez al
+entrar, antes de construir señales y antes de delegar la selección al motor.
+La normalización es la misma, determinista y label-blind, que recibe el scorer;
+no cambia `raw_score` a partir de contenido ni de `metadata.significance`.
+
+**Validación:** `tests/test_b163_agent_normalization_projection.py` fue rojo
+antes del patch (`?`/`unknown`) y ahora fija tanto la equivalencia de proyección
+con el normalizador como la invariancia al label-flip. Junto con B-162,
+Fase-1 y la regresión del veredicto SUSPICION:
+`tests/test_b163_agent_normalization_projection.py`,
+`tests/test_b162_structured_legacy_degradation.py`,
+`tests/test_fase1_resolve.py`, `tests/test_b097_motor_suspicion_verdict.py` y
+`tests/test_label_leak_normalize_case_schema.py`: **35 passed**. OWL ahora
+conserva 20 IDs, cero placeholders, cero tipos `unknown` y los cinco tipos
+canónicos; la hipótesis sigue siendo honestamente `ABSTAIN_DETECTED`.
+
+---
+
+## B-164 — `mount_sift_evidence` exigía dos raíces disjuntas y por eso era inalcanzable [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 operacional/forense: la tool MCP privilegiada no podía montar una imagen válida aun con evidencia disponible. |
+| **Archivo** | `vigia/vigia_sift_bridge.py:mount_sift_evidence`. |
+| **Detectado por** | Resolución MCP estricta de `OWL-NEXUS5-CASE`, seguida de auditoría Codex, 2026-07-21. |
+
+La tool primero pasaba tanto `image_path` como `mount_point` por
+`_sanitize_path_local()`, que confina al directorio `VIGIA_EVIDENCE_DIR`. Luego
+exigía que el mismo `mount_point` resolviera dentro de `/mnt/analysis`. Salvo
+que el directorio de evidencia coincidiera con `/mnt/analysis`, una solicitud
+no podía satisfacer ambos contratos: era rechazada antes de la comprobación de
+privilegios y antes de ejecutar el montaje. Esto explica por qué el análisis
+raw de OWL necesitó un montaje manual de sólo lectura aunque la tool MCP existe.
+
+**Corrección aplicada:** la imagen fuente sigue obligatoriamente bajo el
+directorio de evidencia. El punto de montaje ya no acepta una ruta arbitraria:
+acepta sólo un nombre de leaf `[A-Za-z0-9._-]` de 1–64 caracteres y crea ese
+leaf privado (`0700`) bajo `VIGIA_EVIDENCE_DIR/mounted/`. Así el filesystem
+montado continúa dentro del mismo ancla de confianza y puede ser leído luego
+por `list_files`, `read_evidence` y `search_pattern`, sin conceder al caller
+autoridad para elegir un destino privilegiado fuera de la evidencia. El leaf se
+verifica explícitamente con `lstat` para rechazar symlinks y archivos.
+
+**Límite deliberado:** el montaje sigue exigiendo que el proceso MCP tenga
+privilegios de root; esa compuerta es real y ahora se alcanza antes de crear un
+leaf por una solicitud no privilegiada. La reparación no monta imágenes durante
+los tests ni altera la imagen raw ni el montaje forense existente.
+
+**Validación:** `tests/test_b164_mcp_mount_root.py` fue rojo antes del patch
+(no existían `_MOUNT_ROOT` ni el sanitizador de leaf) y ahora prueba la ruta
+evidence-local, el acceso posterior por el sanitizador de evidencia, el rechazo
+de vacío/traversal/absoluta/jerarquía/NUL y que una solicitud válida llega a la
+compuerta de privilegios en lugar del gate imposible; también rechaza un leaf
+existente que sea archivo o symlink: **11 passed**.
+
+---
+
+## B-165 — El extractor Android negaba evidencia Android mientras parseaba su perfil Chrome [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de cobertura/provenance: un resultado podía contener browsing Android parseado y a la vez declarar que no había artefactos Android. |
+| **Archivo** | `vigia/sift/android_forensics.py:AndroidForensicsAnalyzer.analyze`. |
+| **Detectado por** | Seguimiento Codex sobre la extracción raw accesible de `OWL-NEXUS5-CASE`, 2026-07-21. |
+
+El conjunto original de marcadores Android sólo contenía DBs de plataforma
+(`mmssms.db`, `contacts2.db`, `packages.xml`, etc.). La extracción accesible de
+OWL preserva un perfil real de Android Chrome en
+`com.android.chrome/app_chrome/Default/History`, pero no esos DBs globales.
+El analizador parseaba sus 93 URLs y, antes de hacerlo, agregaba la nota
+contradictoria “No Android-specific artifacts found”.
+
+**Corrección aplicada:** un `History` SQLite sólo cuenta como cobertura Android
+si ocupa exactamente el layout de paquete Android Chrome. Un `History`
+Chromium genérico no basta. Si éste es el único marcador, el resultado deja la
+nota explícita de perfil Android de aplicación sin marcadores de plataforma.
+No añade finding, score, confianza ni veredicto: reconocer una fuente no
+convierte su contenido ni su nombre de paquete en intención o malicia.
+
+**Validación:** `tests/test_b165_android_package_profile_coverage.py` fue rojo
+y ahora fija el layout válido, el rechazo del `History` Chromium de escritorio
+y la invariante de cero findings / `z_score=0.0`. Junto con los contratos de
+marcadores, SQLite read-only y semántica de vacío:
+`tests/test_b165_android_package_profile_coverage.py`,
+`tests/test_b139_bounded_marker_scan.py`, `tests/test_b071_sqlite_readonly.py`
+y `tests/test_b072_b074_mobile_verdict_fixes.py`: **64 passed**. Sobre OWL raw:
+93 entradas de browser, nota de cobertura correcta, cero findings y señal cero.
+
+---
+
+## B-166 — El batch reutilizaba bundles aunque cambiasen evidencia, runtime o configuración [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de provenance/medición: una métrica cacheada podía presentarse como resultado del motor actual. |
+| **Archivos** | `run_all_agent.py`, `vigia_agent.py`, nuevo `vigia/core/runtime_fingerprint.py`. |
+| **Detectado por** | Auditoría Codex del batch `OWL-NEXUS5`, 2026-07-21. |
+
+`run_all_agent.py` aceptaba cualquier bundle existente que tuviera
+`agent_verdict`. No comparaba su `evidence_sha256`, el SHA del código, ni la
+configuración que decide la ruta. El batch de 201 casos lo hizo visible: marcó
+200 casos `CACHED:motor` aun cuando el SHA de `vigia_agent.py` vigente
+(`3e49…a279e`) ya difería del SHA registrado en sus bundles
+(`3038…3120`). `motor` sólo describía el modo del adaptador EBS del bundle
+histórico; no demostraba que el runtime vigente lo hubiera producido.
+
+**Corrección aplicada:** cada bundle nuevo sella `runtime_fingerprint` además
+del hash de evidencia. Es un manifiesto SHA-256 versionado de los entry points
+deterministas y de los `.py` bajo `vigia/`, más la versión del intérprete y el
+contexto `VIGIA_*`/`PYTHONHASHSEED` que puede cambiar una decisión. Los valores
+con forma de secreto sólo aportan presencia/ausencia al hash: nunca se escriben
+en el bundle. El runner reproduce el default de `VIGIA_EVIDENCE_DIR` del
+agente y reutiliza un bundle sólo si coincide el veredicto sellado, el hash del
+caso y la huella de runtime/contexto. Un bundle histórico sin huella se rerunea
+una vez; el output declara el motivo, por ejemplo
+`[RERUN:runtime_or_context_changed_or_legacy_bundle]`.
+
+**Límite declarado:** la huella identifica el source tree de VIGÍA, Python y
+la configuración de proceso pertinente; no sustituye un lockfile ni pretende
+atestar binarios/dependencias externas. Si esa capa importa para un caso, se
+debe rerunear y preservar el entorno de ejecución.
+
+**Validación:** `tests/test_b166_batch_cache_provenance.py` prueba igualdad
+exacta, mutación de evidencia, mutación de runtime, bundle legacy, symlink,
+modo `VIGIA_EBS_RESOLVE` y el default de evidence root. Junto a los contratos
+existentes del comparador sellado:
+`tests/test_b166_batch_cache_provenance.py`,
+`tests/test_b058_batch_reads_sealed_verdict.py` y
+`tests/test_b10_comparator_reads_sealed_verdict.py`: **34 passed**.
+Una corrida directa read-only de OWL, con output temporal interno, emitió
+`ABSTAIN` (exit 4) y el fingerprint top-level coincidió con el registrado en
+`AGENT_INITIALIZED`.
+
+---
+
+## B-167 — El límite de 500 cuerpos SMS podía ocultar una extracción Android parcial [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de degradación honesta / cobertura mobile. No convierte contenido en intención ni sube un veredicto. |
+| **Archivos** | `vigia/sift/android_forensics.py`, shim raíz `sift_orchestrator.py`. |
+| **Detectado por** | Auditoría Codex al investigar el falso negativo OWL-NEXUS5, 2026-07-21. |
+
+`AndroidForensicsAnalyzer._analyze_sms()` limitaba deliberadamente la lectura
+de cuerpos no nulos a 500 filas para acotar recursos, pero la consulta no
+tenía `ORDER BY`, no contaba la población de cuerpos elegibles y no registraba
+si el límite se alcanzaba. `total_sms` quedaba expuesto como si describiera
+una cobertura completa. El shim sólo emitía `*_UNANALYZED` cuando el analizador
+lanzaba una excepción; una extracción parcialmente inspeccionada podía por lo
+tanto mezclarse con otros artefactos y contribuir a un resultado limpio sin
+marcador de pérdida.
+
+**Prueba roja:** una `mmssms.db` SQLite sintética con 501 cuerpos no nulos
+devolvía `total_sms=501`, sin atributo de truncación y sin marcador
+`unanalyzed` en el resultado del shim. El cuerpo 501 quedaba fuera de la
+consulta de contenido y el bundle no tenía forma de distinguirlo de una base
+completamente inspeccionada.
+
+**Corrección aplicada:** el límite de 500 se conserva, ahora con orden
+determinista `ORDER BY _id ASC`. El resultado declara `sms_analyzable_rows`,
+`sms_analyzed_rows` y `sms_content_truncated`; el `SignalOutput` preserva esos
+campos. Cuando hay cuerpos omitidos, el shim agrega la señal derivada
+`ANDROID_SMS_UNANALYZED` (`artifact_type=android_sms`, `z=0`,
+`signal_class=derived`). No añade findings, no puntúa texto no inspeccionado y
+no fabrica corroboración; usa el mecanismo F7 existente para que el agente
+vea `results.unanalyzed_artifacts` y no generalice limpieza al sufijo no leído.
+
+Esto es independiente de L-041: B-167 declara cobertura parcial; L-041 sigue
+documentando que, aun dentro de las 500 filas leídas, el extractor sólo modela
+la regla calibrada de menciones salientes a apps cifradas y no debe convertir
+lenguaje genérico de coordinación en intención.
+
+**Validación:** `tests/test_b167_android_sms_truncation.py` se escribió rojo
+contra el HEAD previo y fija tanto la telemetría del analizador como la
+propagación del marcador a `n_unanalyzed_artifacts` del shim.
+
+---
+
+## B-168 — Las dos entradas FastAPI prometían el mismo gateway pero exponían contratos distintos [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de superficie API / seguridad de despliegue. No altera el scoring ni los bundles. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py`, nuevos `vigia/api_defaults.py` y `vigia/openai_compat.py`, `INSTALL.md`, `INSTALL_ES.md`. |
+| **Detectado por** | Auditoría Codex de la superficie menos ejercitada (API), 2026-07-21. |
+
+Ambos módulos se describían como gateway FastAPI para OpenWebUI, pero sólo el
+script raíz exponía el contrato OpenAI-compatible que ese cliente necesita:
+`GET /v1/models` y `POST /v1/chat/completions`. Ejecutar o importar
+`vigia.vigia_api` producía una API que parecía sana (`/health`, `/cases` y los
+dos endpoints directos), pero no podía completar el handshake de OpenWebUI.
+Al mismo tiempo, el wrapper empaquetado aceptaba CORS desde `*`, mientras que
+el raíz aplicaba una lista explícita. La diferencia permitía que una elección
+de import path cambiara tanto la funcionalidad publicada como el límite de
+navegador, sin señal al operador.
+
+**Prueba roja:** `tests/test_b168_api_contract_parity.py` falló contra el
+HEAD previo: faltaban ambos endpoints bajo `vigia.vigia_api` y la inspección
+de `app.user_middleware` encontró `allow_origins=['*']` sólo en ese wrapper.
+
+**Corrección aplicada:** el shim OpenAI-compatible vive ahora una sola vez en
+`vigia/openai_compat.py` y ambos wrappers lo instalan con sus propias funciones
+de pipeline/narrativa. `vigia/api_defaults.py` concentra host loopback,
+puerto y CORS por defecto para que las dos entradas no vuelvan a divergir.
+Los documentos de instalación ahora reflejan el host real `127.0.0.1`, el
+estado real de `/health`, y declaran el límite importante: la API no valida
+keys, CORS no autentica, y una exposición remota exige un reverse proxy
+autenticado y una política de red deliberada. No se inventó un protocolo de
+credenciales incompatible con OpenWebUI.
+
+**Validación:** la prueba de paridad fija endpoints, CORS y ejecución del
+pipeline local stubbed desde ambos imports; junto a
+`tests/test_vigia_api_boundaries.py`: **23 passed**. Las pruebas no abren
+sockets ni leen archivos fuera de fixtures.
+
+---
+
+## B-169 — El audit trail MCP omitía la mayoría de las invocaciones de herramientas [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de procedencia de ejecución (Mode 2 / Mode 5). No modifica los veredictos, el scorer ni los bundles existentes. |
+| **Archivos** | `vigia/vigia_sift_bridge.py`, `KNOWN_LIMITATIONS.md`, `tests/test_b169_mcp_invocation_audit.py`. |
+| **Detectado por** | Revisión Codex de la superficie MCP y seguimiento de L-057, 2026-07-21. |
+
+La bridge activa tenía tres `TOOL_INVOKED` escritos a mano
+(`list_files`, `read_evidence`, `generate_forensic_hash`), pero otras
+herramientas con consecuencias relevantes —`search_pattern`,
+`mount_sift_evidence`, `reason_with_llm` y activación/desactivación de honey
+tokens— podían ejecutarse sin evento de entrada. Además, las herramientas
+externas registradas con `mcp.tool()(...)` al final del archivo no atravesaban
+ninguna frontera común. El trail podía mostrar un resultado o un log interno,
+pero no demostrar uniformemente que la herramienta había sido invocada con
+una clase de parámetros determinada.
+
+**Prueba roja:** una llamada stubbed a `search_pattern` retornaba normalmente
+con cero eventos `TOOL_INVOKED`; un contrato AST encontró 22 decoradores MCP
+directos y múltiples registraciones externas que evitaban todo wrapper común.
+
+**Corrección aplicada:** `_register_mcp_tool()` es ahora la única ruta de
+registro MCP. Envuelve tanto las 22 herramientas locales como las externas
+opcionales y escribe `TOOL_INVOKED` antes de rate limit, validación, sandbox o
+ejecución. La telemetría conserva nombre de argumento, tipo/cardinalidad y un
+SHA-256 de prefijo de hasta 4 KiB para `str`/`bytes`; no vuelca texto de
+evidencia, prompts, rutas ni secretos al log sólo para auditar la llamada. Se
+retiraron los tres logs manuales anteriores para no duplicar eventos.
+
+**Límite honesto:** el cambio acredita la entrada en el proceso bridge que
+escribió la cadena HMAC. No autentica por sí mismo al cliente MCP, no vuelve
+retroactivamente completos a bundles anteriores y no prueba tiempo de pared ni
+que una respuesta post-hoc provenga de una sesión viva.
+
+**Validación:** `tests/test_b169_mcp_invocation_audit.py` prueba que una
+búsqueda registra entrada antes de procesar el patrón sensible y que ninguna
+registración evade la frontera compartida. Junto con el contrato de montaje
+B-164: **13 passed**. La prueba no monta imágenes ni ejecuta un subprocess
+real.
+
+---
+
+## B-170 / L-063 — El fallback de CAIE otorgaba autoridad de veredicto a fracturas declaradas en JSON [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Limitación cerrada** | `L-063` — resuelta por degradación honesta: JSON conserva evidencia declarada, no autoridad de veredicto. |
+| **Severidad** | P2 de integridad/autoridad de veredicto en modo degradado. |
+| **Archivo** | `vigia_scorer.py`, `KNOWN_LIMITATIONS.md`, `tests/characterization/test_verdict_authority_inputs.py`. |
+| **Detectado por** | Cierre de L-063, tras el barrido de entradas de autoridad de veredicto. |
+
+Cuando `vigia.tools.caie` no se podía importar, `_vigia_score()` recuperaba
+`case["caie_fractures"]` y lo usaba como si fuera salida de CAIE. Un caller que
+conociera un `fracture_type` malicioso reconocido podía declarar una fractura
+con severidad alta y obtener un salto determinista `NOISE -> SUSPICION`, sin que
+el productor que normalmente deriva esa afirmación hubiera corrido. El campo
+`caie_fractures_source="json_fallback"` quedaba sellado, pero una etiqueta de
+procedencia no elimina por sí misma la autoridad que ya se aplicó.
+
+**Prueba roja:** el caso de caracterización bloquea deliberadamente el import
+de CAIE y entrega un único `FALSE_FLAG_PATTERN` desde JSON. Antes de B-170 el
+resultado era `SUSPICION` y `fracture_malice_boost > 0`; la entrada no provenía
+de artefactos ni de una ejecución CAIE viva.
+
+**Corrección aplicada:** las fracturas declaradas permanecen como material
+auditable (`caie_fracture_details`), pero en fallback no participan ni del
+boost de malicia ni de la penalidad de credibilidad. El resultado declara
+`caie_fracture_authority="unverified_json_no_verdict_authority"`. Si la lista
+contiene un tipo que CAIE reconocería, la ausencia del productor pasa a ser
+decisión-relevante: VIGÍA emite `ABSTAIN`, conserva la lista en
+`unverified_json_caie_fractures`, y registra el veredicto/razón de score previo
+al gate. Así el sistema no fabrica ni una escalada ni una limpieza a partir de
+una afirmación no verificable; exige reejecución con CAIE vivo.
+
+**Límite deliberado:** B-170 no inventa un productor ni intenta validar una
+fractura desde texto libre. Tampoco modifica CAIE vivo: cuando está disponible,
+éste sigue recalculando sus fracturas desde artefactos y conserva su autoridad
+normal. L-064 y L-065 son canales de autoridad distintos y permanecen
+pendientes.
+
+**Validación:**
+`tests/characterization/test_verdict_authority_inputs.py::TestT1FallbackFractureAuthority`
+verifica: JSON reconocido + CAIE ausente = `ABSTAIN`, boost `0`, disclosure
+sellada; tipo no reconocido = inerte; CAIE vivo = recomputa y descarta el JSON.
+
+---
+
+## B-171 / L-064 — `STATISTICAL_UNIFORMITY` declarada en JSON podía subir el veredicto en todos los modos [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Limitación cerrada** | `L-064` — resuelta por degradación honesta: la regularidad declarada permanece visible, pero no es un resultado de un productor del scorer. |
+| **Severidad** | P2 de integridad/autoridad de veredicto, con alcance en todos los modos. |
+| **Archivo** | `vigia_scorer.py`, `KNOWN_LIMITATIONS.md`, `tests/characterization/test_verdict_authority_inputs.py`, `tests/test_audit_gates.py`. |
+| **Detectado por** | Cierre del canal T-2 de entradas de autoridad de veredicto. |
+
+`temporal_violations[].type == "STATISTICAL_UNIFORMITY"` añadía
+`severity * 0.35` a `fracture_malice_boost` aun cuando ningún módulo del runtime
+del scorer había calculado esa estadística. Un JSON construido a mano podía
+mover `NOISE -> SUSPICION` tanto con CAIE vivo como sin CAIE. La existencia de
+un tool MCP de jitter no mitigaba el problema: recibe otra forma de entrada,
+usa otro contrato y no alimentaba el bundle ni el scorer.
+
+**Prueba roja:** una base de tres logs de score bajo obtiene una única
+`STATISTICAL_UNIFORMITY` desde JSON. Antes de B-171 emitía `SUSPICION` con boost
+positivo en los dos modos. La caracterización también confirmó el impacto real:
+`case_002_log_fabrication` pasaba de `UNKNOWN` (0.0839) a `SUSPICION` (0.3354)
+sólo por esa declaración.
+
+**Corrección aplicada:** el scorer ya no agrega términos SU al acumulador ni
+permite que esa declaración reduzca el trust vía `_compute_temporal_factor`.
+La declaración se preserva en `unverified_statistical_uniformity_violations` y
+el campo `statistical_uniformity_authority` declara explícitamente que no posee
+autoridad. Cuando aparece, el resultado final es `ABSTAIN`, conserva el
+veredicto y la razón de score previos, y exige una reejecución con un productor
+determinista que derive la regularidad desde intervalos crudos.
+
+**Límite deliberado:** no se fingió que el MCP jitter era ese productor ni se
+aceptaron `interval_seconds_std`, `uniformity_flag` o texto narrativo como
+prueba calculada. Construir el detector correcto requiere un contrato nuevo de
+secuencias temporales crudas, aritmética exacta, corpus negativo y calibración.
+La etiqueta de escenario de `case_002_log_fabrication` se mantiene; el motor
+ahora abstiene honestamente hasta que exista esa evidencia.
+
+**Validación:** `TestT2StatisticalUniformity` prueba `ABSTAIN`, boost `0` e
+identidad exacta de score/trust frente a la misma evidencia sin SU, con CAIE
+vivo y caído. Las regresiones de fracturas CAIE vivas, Decimal severity y el
+gate de corroboración independiente se conservan con una fractura CAIE viva
+test-only, no con un boost JSON.
+
+---
+
+## B-172 / L-062 — una declaración temporal podía imponer `MALICE` sin coincidir con los artefactos [MITIGADO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Limitación mitigada** | Porción de autoridad de `L-062`: una afirmación JSON `EFFECT_BEFORE_CAUSE` ya no puede disparar por sí sola el gate categórico. La tolerancia de relojes H-01 continúa abierta. |
+| **Severidad** | P2 de integridad/autoridad de veredicto, con alcance en todos los modos que llaman al scorer determinista. |
+| **Archivo** | `vigia_scorer.py`, `tests/test_b172_hard_temporal_pair_validation.py`, `tests/characterization/test_temporal_gate_curve.py`, `KNOWN_LIMITATIONS.md`, `docs/CODEX_AUDIT_2026-07-21.md`. |
+| **Detectado por** | Auditoría de entradas de autoridad de veredicto y la curva de caracterización temporal L-062/H-01. |
+
+El gate histórico evaluaba solamente la declaración
+`temporal_violations[].type == "EFFECT_BEFORE_CAUSE"` y una severidad alta. Si
+el JSON afirmaba una inversión de cinco segundos, el scorer emitía `MALICE`
+aunque los timestamps de los artefactos reales mostraran que el supuesto efecto
+ocurrió después de la causa. La copia anidada de timestamps y `delta_seconds`
+eran una alegación del examinador, no una derivación verificable.
+
+**Prueba roja:** `test_asserted_inversion_contradicted_by_artifacts_abstains`
+declara `effect < cause`, pero entrega artefactos donde el efecto sucede dos
+segundos después de la causa. Antes de B-172 obtenía `MALICE`; esa conclusión
+no era falsificable desde la evidencia fuente.
+
+**Corrección aplicada:** B-172 reconstruye el par desde IDs de artefacto
+únicos y sus timestamps ISO-8601 de nivel superior. Ambos timestamps deben
+tener zona horaria explícita, pertenecer a la ventana de plausibilidad fija de
+CAIE y satisfacer realmente `effect < cause`. Sólo ese par verificado conserva
+el gate histórico. Una alegación de severidad alta que no verifica se retiene
+en `unverified_hard_temporal_violations`, se excluye de todas las penalidades
+temporales y produce `ABSTAIN`, con razón y par previo sellados. El resultado
+expone `hard_temporal_authority` y, cuando existe, el par validado.
+
+**Límite deliberado:** esto no decide H-01. Una inversión real, incluso de
+fracción de segundo, conserva por ahora el gate categórico anterior; los dos
+`xfail` de `tests/test_audit_temporal_skew.py` siguen marcando esa doctrina
+pendiente. Tampoco reemplaza L-065: B-172 valida coherencia entre la alegación
+y los artefactos presentes, no autentica por sí sola la cadena de procedencia.
+
+**Validación:** 74 tests pasan y 4 `xfail` documentados se conservan en la
+batería de autoridad temporal, CAIE, `Fraction` y severidad `Decimal`. El caso
+canónico con inversión real de cinco segundos mantiene `MALICE`; una alegación
+contradicha o con artefacto ausente ahora emite `ABSTAIN`.
+
+---
+
+## B-173 — el import del bridge MCP mutaba `VIGIA_EVIDENCE_DIR` con estado operativo [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: la mutación ocurría antes de leer un artefacto y cambiaba el listado/mtime del árbol de evidencia. |
+| **Archivo** | `vigia/vigia_sift_bridge.py`, `tests/test_b173_bridge_work_root.py`, `tests/test_b164_mcp_mount_root.py`, `CLAUDE.md`. |
+| **Modos** | MCP activo (`launch_vigia_mcp.sh` ejecuta este bridge); cualquier import del módulo con `VIGIA_EVIDENCE_DIR` configurado. |
+| **Principio afectado** | Invariante 1 de `CLAUDE.md`: evidencia read-only; los artefactos extraídos deben ir a un directorio de trabajo separado. |
+
+**Observación reproducida:** con un directorio de evidencia vacío,
+`VIGIA_EVIDENCE_DIR=<evidence> python3 -c 'import vigia.vigia_sift_bridge'`
+creaba inmediatamente `honey_tokens/`, `purgatory/` y `mounted/` debajo de la
+entrada. No era necesario invocar una herramienta. B-164 había hecho que el
+mount fuera alcanzable al ubicarlo bajo el mismo root de lectura; eso reparó un
+gate imposible pero confundió la raíz de entrada con la raíz operacional.
+
+**Corrección aplicada:** B-173 introduce `VIGIA_WORK_DIR`, una raíz privada
+`0700` disjunta de la evidencia. Si no se configura, el bridge crea una raíz
+temporal privada por proceso. Honey tokens, cuarentena y mount points viven
+allí. El bridge rechaza antes de crear directorios una workdir anidada, igual o
+padre de `VIGIA_EVIDENCE_DIR`, y también rechaza componentes symlink. Las
+herramientas de lectura aceptan sólo la evidencia original o el subárbol
+controlado `WORK_BASE_DIR/mounted`; la fuente de `mount_sift_evidence` continúa
+restringida exclusivamente a evidencia original.
+
+**Validación:** 30 pruebas MCP pasan: import subprocess sin mutar evidencia,
+rechazo de workdir insegura, mount root legible pero confinado, targets
+malformados/symlinks rechazados, auditoría de invocación y sanitización grep.
+
+**Límite deliberado:** el Purgatorio conserva una copia operativa y su hash;
+no la reetiqueta como evidencia fuente ni resuelve por sí mismo L-065 (la
+autenticación de cadenas de procedencia). El directorio de trabajo debe
+preservarse explícitamente si el operador necesita retener ese estado entre
+reinicios.
+
+---
+
+## B-174 — `safe_grep` autorizaba un directorio hermano por prefijo textual [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de confidencialidad: una búsqueda MCP podía leer fuera de sus roots autorizados si el directorio externo compartía el prefijo textual. |
+| **Archivo** | `vigia/security/sandbox.py`, `tests/test_b174_safe_grep_allowed_root.py`. |
+| **Modo** | MCP `search_pattern`, a través del helper reutilizable `safe_grep(..., allowed_dirs=...)`. |
+| **Principio afectado** | La lista de directorios permitidos expresa una frontera de autoridad de filesystem, no una coincidencia de cadenas. |
+
+**Observación reproducida:** con un root permitido `.../evidence`, un
+directorio hermano `.../evidence-escape/private.txt` y
+`allowed_dirs=[".../evidence"]`, el guard anterior hacía
+`safe_folder.startswith(allowed_dir)`. La condición era verdadera y `find` +
+`grep` devolvían el contenido de `private.txt`, aun cuando no era descendiente
+de la evidencia autorizada.
+
+**Corrección aplicada:** los roots permitidos se canonicalizan, se exige que
+existan, sean directorios y no contengan symlinks; luego la pertenencia se
+evalúa por componentes de `Path` (`==` o `is_relative_to`), nunca por prefijo
+de texto. Una subcarpeta real sigue siendo legible; un hermano, una raíz
+inválida o un symlink se rechazan antes de iniciar el subprocess.
+
+**Validación:** 32 pruebas de sandbox/MCP pasan, incluidas la reproducción que
+antes filtraba el texto externo y el control positivo de una carpeta hija real.
+El cambio no modifica señales, score ni veredicto: reduce exclusivamente la
+autoridad de lectura de la herramienta.
+
+---
+
+## B-175 — el exportador de grafos podía escribir dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: un artefacto derivado podía aparecer junto a la entrada y cambiar el árbol que se debía preservar. |
+| **Archivo** | `vigia/abduction/vigia_artifact_graph.py`, `tests/test_b175_artifact_graph_output_boundary.py`. |
+| **Modos** | CLI de Artifact Graph: JSON, GEXF y GraphML. |
+| **Principio afectado** | `VIGIA_EVIDENCE_DIR` es entrada inmutable, aunque resida debajo de un root general de salida permitido como `/home` o `/tmp`. |
+
+**Observación reproducida:** el CLI construía por defecto el output JSON con
+`bundle_path.with_suffix(".graph.json")` y lo escribía directo con
+`Path.write_text`, sin pasar por `_validate_output_path`. Por tanto un bundle
+en `VIGIA_EVIDENCE_DIR/case.json` producía
+`VIGIA_EVIDENCE_DIR/case.graph.json`. Los exportadores GEXF/GraphML sí
+llamaban al validador, pero éste permitía cualquier path bajo `/home` o `/tmp`
+sin excluir la raíz de evidencia y sólo revisaba un symlink en el padre
+inmediato.
+
+**Corrección aplicada:** JSON, GEXF y GraphML usan la misma validación. El
+target y `VIGIA_EVIDENCE_DIR` se canonicalizan y se comparan por componentes;
+cualquier target dentro de evidencia, incluso por un redirect, aborta. La
+validación de roots permitidos también pasó de prefijo textual a
+`Path.is_relative_to`, y cada componente existente del path de salida se
+inspecciona con `lstat`: un symlink intermedio o final se rechaza antes de
+escribir.
+
+**Validación:** cuatro regresiones cubren export directo a evidencia, redirect
+intermedio, el CLI JSON con su output por defecto y una carpeta hija real de
+un root permitido. Junto con las pruebas B-164/B-169/B-173/B-174 de bridge y
+sandbox, pasan 36 tests. La corrección afecta exclusivamente los destinos de
+escritura; no cambia el contenido lógico del grafo ni los veredictos.
+
+---
+
+## B-176 — el rechazo del PDF pericial ocurría después de crear una carpeta en evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una configuración inválida de PDF alteraba el árbol de evidencia aun cuando no generaba el PDF. |
+| **Archivo** | `vigia/tools/adversarial_nlp.py`, `tests/test_b176_pericial_pdf_evidence_boundary.py`. |
+| **Modo** | Análisis de registro estilométrico que activa el PDF pericial opcional. |
+| **Principio afectado** | Validar el destino antes de cualquier side effect; `VIGIA_EVIDENCE_DIR` nunca recibe estado derivado. |
+
+**Observación reproducida:** `_export_pdf()` hacía
+`os.makedirs(VIGIA_PERICIAL_PDF_DIR, exist_ok=True)` antes de comprobar si el
+PDF terminaba debajo de `VIGIA_EVIDENCE_DIR`. Con
+`VIGIA_PERICIAL_PDF_DIR=<evidence>/generated-reports`, el método devolvía
+correctamente `None` y registraba `PDF_EXPORT_INTO_EVIDENCE_DIR`, pero ya
+había creado `generated-reports/` dentro de la evidencia.
+
+**Corrección aplicada:** se construye el target y se compara
+canónicamente con la raíz de evidencia antes de `makedirs`; el test usa
+pertenencia por componentes (`==` / `is_relative_to`), por lo que
+`evidence-copy` no queda bloqueado por accidente y un symlink hacia evidencia
+no puede ocultar el destino. Sólo si el target es externo se crea la carpeta y
+se invoca el renderer.
+
+**Validación:** dos regresiones prueban que el rechazo deja la evidencia vacía
+y que el flujo externo crea el directorio, llama al renderer y preserva la
+evidencia. La batería integrada de boundaries de exportación, sandbox y MCP
+queda en 38 tests passing. No se modifican análisis, señales ni veredictos.
+
+---
+
+## B-177 — el agente autónomo permitía bundles dentro de evidencia si el CWD coincidía [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el bundle sellado, checksum y trace podían contaminar la evidencia de entrada. |
+| **Archivo** | `vigia_agent.py`, `tests/test_b177_agent_output_evidence_boundary.py`. |
+| **Modo** | CLI del agente autónomo (Modo 1 / batch). |
+| **Principio afectado** | Estar dentro del CWD permitido no autoriza a escribir dentro de la evidencia; ambos límites son necesarios. |
+
+**Observación reproducida:** el guard anterior verificaba sólo que
+`Path(output).resolve()` fuera descendiente de `Path.cwd()`. Un operador que
+ejecutaba `vigia_agent.py` desde `VIGIA_EVIDENCE_DIR` recibía el output por
+defecto `<case-id>_bundle.json` dentro de esa misma evidencia. `atomic_write_text`
+podía crear además los directorios padre, y el flujo escribía tres siblings:
+bundle, `.sha256` y `_reasoning_trace.json`.
+
+**Corrección aplicada:** `_validate_agent_output_path()` define un contrato
+testeable: canonicaliza el target, exige pertenencia al workdir y rechaza por
+componentes cualquier solapamiento con `VIGIA_EVIDENCE_DIR`. `main()` lo llama
+antes de construir el agente o escribir archivos y usa la ruta absoluta
+resultante para los tres artifacts asociados. El cambio preserva los outputs
+normales en `results/` y rechaza destinos fuera del CWD como antes.
+
+**Validación:** tres regresiones cubren el output por defecto con CWD=evidencia,
+un target explícito dentro de evidencia y un sibling `results/` válido. También
+pasan el test end-to-end B-105 del bundle/trace/checksum y las fronteras B-175
+y B-176. No altera el análisis ni los veredictos, sólo su destino de escritura.
+
+---
+
+## B-178 — exportación SQLite para SIFT podía escribir artefactos derivados dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una copia de la base pericial podía aparecer en el árbol de evidencia fuente. |
+| **Archivo** | `vigia/tools/forensic_db.py`, `tests/test_b178_forensic_db_export_boundary.py`. |
+| **Modo** | Exportación opcional SIFT del análisis pericial (`export_db_path`), disponible a través de `analyze_document_register`. |
+| **Principio afectado** | Un path de salida controlado por caller es autoridad de escritura; la evidencia no puede recibir copias derivadas ni por ruta directa ni por redirect. |
+
+**Observación reproducida:** `ForensicDatabaseManager.export_for_sift()`
+canonicalizaba sólo el nombre final, creaba el padre si faltaba y pasaba el
+path a `sqlite3.Connection.backup()`. No consultaba `VIGIA_EVIDENCE_DIR`. Una
+DB fuente externa con `export_path=<evidence>/sift-export.db` creaba la copia
+SQLite dentro de evidencia. Un padre symlink (`export-redirect -> evidence`)
+también podía redirigir la exportación, porque se inspeccionaba únicamente el
+archivo final, que aún no existía.
+
+**Corrección aplicada:** `_validate_sift_export_path()` rechaza path vacío o
+con NUL, inspecciona con `lstat` cada componente existente y rechaza symlinks,
+canonicaliza el target y prohíbe por componentes cualquier solapamiento con
+`VIGIA_EVIDENCE_DIR`. La primera validación ocurre antes de `makedirs`; una
+segunda ocurre después de crear un padre externo, antes de que SQLite abra el
+archivo. El flujo conserva la exportación legítima a un workdir externo.
+
+**Validación:** tres regresiones cubren el write directo que antes ocurría, el
+padre symlink que resolvía dentro de evidencia y el control positivo de una
+exportación SQLite externa. Junto con B-175/B-176/B-177, pasan 12 tests. No
+modifica señales, puntajes ni veredictos; sólo reduce la autoridad de salida de
+una herramienta pericial.
+
+---
+
+## B-179 — la plantilla de configuración pericial podía contaminar evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una operación auxiliar podía crear directorios y sobrescribir un archivo de configuración en la evidencia fuente. |
+| **Archivo** | `vigia/tools/adversarial_nlp.py`, `vigia/tools/forensic_db.py`, `tests/test_b179_config_template_evidence_boundary.py`. |
+| **Modo** | API `ForensicEngine.save_config_template()` / `ConfigLoader.save_default_config()`. |
+| **Principio afectado** | El hecho de que un output sea una plantilla y no un resultado analítico no le concede autoridad sobre `VIGIA_EVIDENCE_DIR`. |
+
+**Observación reproducida:** `ConfigLoader.save_default_config(path)` convertía
+el path a absoluto, ejecutaba `os.makedirs(parent)` y abría el archivo en modo
+`"w"`, sin consultar la raíz de evidencia. Con
+`path=<evidence>/templates/defaults.json` creaba `templates/` y escribía el
+JSON de configuración. El comportamiento era alcanzable por la fachada pública
+`save_config_template()` del motor pericial.
+
+**Corrección aplicada:** B-179 extrae `validate_external_output_path()` como
+contrato común de output para el gestor SQLite y la plantilla. Rechaza vacío y
+NUL, componentes symlink existentes y todo destino que canónicamente sea
+descendiente de `VIGIA_EVIDENCE_DIR`. Cada caller lo aplica antes de crear
+padres y nuevamente después, antes de abrir/escribir. La plantilla externa se
+mantiene soportada; los tests B-178 conservan la cobertura de la exportación
+SIFT sobre el mismo guard.
+
+**Validación:** tres regresiones cubren el destino directo dentro de evidencia,
+el padre symlink que resuelve a evidencia y el control positivo externo. La
+familia B-175 a B-179 queda en 15 tests passing. El cambio no toca detección,
+score, modelado ni veredictos: sólo retira autoridad de escritura indebida.
+
+---
+
+## B-180 — constructor de paquetes sellados podía escribir en evidencia y recibir traversal por `case_id` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una API de empaquetado podía contaminar la fuente con PDF copiado, ledger, manifest, firma y ZIP; el identificador del caso también podía escapar del output externo. |
+| **Archivo** | `vigia/security/output_boundary.py` (nuevo), `vigia/pipeline/evidence_bundle.py`, `vigia/tools/forensic_db.py`, `vigia/tools/adversarial_nlp.py`, `tests/test_b180_evidence_bundle_output_boundary.py`. |
+| **Modo** | `build_evidence_bundle()` de la API de bundles verificables; el guard compartido cubre además SIFT y plantillas periciales. |
+| **Principio afectado** | Un directorio de salida y un identificador de caso son ambos inputs de autoridad. Ningún artefacto derivado puede cruzar hacia `VIGIA_EVIDENCE_DIR`. |
+
+**Observación reproducida:** `build_evidence_bundle()` ejecutaba
+`os.makedirs(output_dir)` sin validar, luego escribía bajo
+`<output_dir>/<case_id>_bundle/` el PDF, `ledger.json`, `manifest.json` y
+potencialmente firma/ZIP. Con `output_dir=<evidence>` el paquete completo se
+creaba dentro de la fuente. Aun después de validar sólo `output_dir`, un
+`case_id="../evidence/b180"` habría permitido que `os.path.join()` construyera
+un bundle fuera del root externo. Un directorio de salida symlink hacia
+evidencia era el tercer vector equivalente.
+
+**Corrección aplicada:** B-180 mueve el contrato genérico a
+`vigia.security.output_boundary`: `validate_external_output_path()` valida
+vacío/NUL, rechaza cada componente symlink con `lstat`, canonicaliza y bloquea
+pertenencia por componentes a `VIGIA_EVIDENCE_DIR`, antes y después de crear
+un padre externo. Lo usan el paquete, exportación SIFT y plantilla de config.
+El builder además valida que `case_id` sea una etiqueta no vacía sin NUL,
+separadores ni `.`/`..`; todas sus rutas hijas se derivan sólo de ese ID seguro.
+
+**Validación:** cuatro regresiones B-180 cubren output directo en evidencia,
+control positivo externo, traversal por ID y output symlink. Con B-178/B-179 y
+las regresiones B-062/B-064 de atomicidad/registro, pasan 21 tests. La
+corrección no modifica contenido forense, scores ni veredictos; restaura la
+separación entre entrada preservada y paquete derivado.
+
+---
+
+## B-181 — `EvidenceLedger.export_json()` tenía atomicidad sin frontera de salida [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: un ledger encadenado podía escribirse en la evidencia de origen, por ruta directa o padre symlink. |
+| **Archivo** | `vigia/pipeline/security_evidence_registry.py`, `tests/test_b181_evidence_ledger_export_boundary.py`. |
+| **Modo** | API `EvidenceLedger.export_json(path)`. |
+| **Principio afectado** | Una escritura atómica preserva el ledger destino, pero no autoriza que ese destino sea la evidencia fuente. Atomicidad y autorización son garantías distintas. |
+
+**Observación reproducida:** la exportación usaba correctamente
+`atomic_write_text(path, ...)`, pero recibía `path` sin validación. Con
+`path=<evidence>/ledger.json` creaba el ledger en la entrada preservada. Con un
+padre `ledger-redirect -> evidence`, el helper atómico creaba el tempfile y
+publicaba el JSON a través del symlink. Ambos resultados fueron inducidos antes
+del parche; la exportación externa servía como control positivo.
+
+**Corrección aplicada:** el ledger pasa su destino por
+`validate_external_output_path()` antes de crear el padre y una segunda vez
+antes de invocar `atomic_write_text`. Conserva el write atómico B-064, por lo
+que el nuevo control añade autorización sin debilitar la resistencia a crash.
+El error es fail-closed (`SecurityError`) y no deja tempfiles ni directorios
+dentro de evidencia.
+
+**Validación:** tres regresiones cubren destino directo, padre symlink y
+exportación externa; con B-178 a B-180 y las regresiones B-062/B-064 pasan 24
+tests. El JSON, la cadena hash y sus semánticas no cambian.
+
+---
+
+## B-182 — el exportador PDF forense v2 podía publicar dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una vista PDF derivada podía aparecer en el árbol de evidencia fuente, sin publicación atómica. |
+| **Archivo** | `vigia/pipeline/report_exporter_v2.py`, `tests/test_b182_report_pdf_output_boundary.py`. |
+| **Modo** | API opcional `export_pdf()` del exportador forense standalone. |
+| **Principio afectado** | Un renderer no obtiene autoridad de escritura sobre evidencia por recibir un `output_path`; una salida derivada debe estar confinada y publicarse de manera atómica. |
+
+**Observación reproducida:** tras construir los bytes PDF, `export_pdf()` abría
+el `output_path` entregado por el caller en modo binario de escritura. No había
+ninguna comprobación contra `VIGIA_EVIDENCE_DIR`, por lo que
+`<evidence>/report.pdf` era un destino válido; un padre symlink también podía
+redirigir la publicación. `reportlab` no está instalado en este entorno pese a
+ser dependencia declarada, así que la regresión instala un renderer mínimo
+simulado y ejecuta el branch real de construcción/publicación: eso aísla la
+frontera de filesystem y reproduce los dos writes antes del fix sin convertir
+la disponibilidad local del renderer en una excusa para no probarla.
+
+**Corrección aplicada:** el exportador valida el destino mediante el contrato
+compartido `validate_external_output_path()` antes de renderizar. Una vez que
+los bytes están listos crea sólo el padre externo, valida nuevamente para
+cerrar la ventana de redirección, y usa `atomic_write_bytes()` para publicar.
+El metadata devuelto contiene el path canónico validado. Las salidas externas
+siguen soportadas; los destinos dentro de evidencia o que pasan por symlink
+fallan cerrados con `SecurityError` sin crear archivos fuente.
+
+**Validación:** tres regresiones B-182 cubren destino directo dentro de
+evidencia, padre symlink y PDF externo atómico. Junto con B-178 a B-181 y
+B-062/B-064 pasan 27 tests. No afecta contenido analítico, hashes del informe,
+puntajes ni veredictos; limita exclusivamente la autoridad de publicación.
+
+---
+
+## B-183 — `BundleBuilder.save()` podía sellar un resultado dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: la API central de publicación de bundles podía crear o reemplazar un JSON derivado dentro de la evidencia fuente. |
+| **Archivo** | `vigia/core/bundle_builder.py`, `tests/test_b183_bundle_builder_output_boundary.py`. |
+| **Modo** | API Python `BundleBuilder.save()`, consumida por `run_vigia`, CLI y el bridge de integración. |
+| **Principio afectado** | El sellado criptográfico prueba el contenido del bundle, no autoriza su destino. Una cadena de custodia no puede comenzar modificando la evidencia que pretende describir. |
+
+**Observación reproducida:** aunque B-064 ya garantizaba tempfile, `fsync`,
+`replace` y hash desde disco, `BundleBuilder.save()` aceptaba un path arbitrario
+y ejecutaba `makedirs()` sobre su padre. Con
+`path=<evidence>/bundle.json` escribía el bundle sellado en la fuente. Con un
+padre `bundle-redirect -> evidence`, el tempfile y el `replace` se publicaban
+por esa redirección. Ambos fallos se indujeron antes del cambio; un destino
+externo fue el control positivo.
+
+**Corrección aplicada:** el sumidero público valida el destino con
+`validate_external_output_path()` antes de crear el directorio y una segunda
+vez antes de abrir el tempfile. Así heredan el límite la API, `run_vigia`, su
+CLI y cualquier caller futuro, sin confiar en que cada fachada recuerde
+validarlo. Se conserva íntegro el protocolo B-064: misma serialización
+canónica, `fsync`, publicación atómica y hash calculado desde lo escrito.
+
+**Validación:** tres regresiones B-183 cubren output directo en evidencia,
+padre symlink y bundle externo verificable. También pasan las tres regresiones
+atómicas L-023 y los dos tests de import/verify del pipeline: 6 seleccionados.
+No altera el bundle en memoria ni el veredicto: sólo niega un destino que nunca
+debió tener autoridad de escritura.
+
+---
+
+## B-184 — el bridge de integración podía crear outputs en evidencia y escapar con `case_id` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el bridge podía crear su árbol de resultados en evidencia; además un ID de caso con separadores redirigía el writer de reportes fuera del output declarado. |
+| **Archivo** | `vigia/pipeline/vigia_integration_bridge.py`, `tests/test_b184_integration_bridge_output_boundary.py`. |
+| **Modo** | `VigiaIntegrationEngine.run_case()` — usado por la demo, bridge MCP y callers Python de la integración legacy ↔ EBS. |
+| **Principio afectado** | `output_dir` y `case_id` son inputs distintos de autoridad de escritura. El primero debe quedar fuera de evidencia y el segundo debe ser datos, no una ruta derivada. |
+
+**Observación reproducida:** el engine convertía `output_dir` a absoluto y
+ejecutaba `os.makedirs()` antes de llamar al pipeline. Con
+`output_dir=<evidence>/bridge-output` creaba el directorio fuente incluso si
+no se solicitaba bundle ni reporte; un symlink de output tenía el mismo efecto.
+La segunda vía fue más grave: `case_id="escape/../../evidence/pwn"` producía
+`report_escape/../../evidence/pwn.json`. Con un componente externo existente,
+`atomic_write_text()` resolvía esos `..` y publicó un JSON real dentro de
+evidencia. La regresión lo reprodujo mediante el flujo del bridge, con pipeline
+y renderer mínimos simulados, no calculando paths aislados.
+
+**Corrección aplicada:** al existir alguna salida solicitada, el bridge valida
+el directorio antes de crear nada y vuelve a validarlo antes de derivar
+artefactos. Bundle y reporte pasan además por el guard justo antes de su uso.
+`case_id` ahora sólo acepta etiquetas no vacías sin NUL, `.`/`..` ni separadores
+de plataforma; se rechaza antes de la normalización o del pipeline. Si no se
+solicita ningún output, el bridge deja de crear un directorio innecesario.
+
+**Validación:** cuatro regresiones B-184 cubren output directo dentro de
+evidencia, output symlink, traversal real por `case_id` hacia el writer de
+reporte y bundle externo válido. La familia B-178 a B-184 más B-062/B-064 pasa
+34/34. No cambia evidencia, score ni decisión; restaura el confinamiento y
+evita que un identificador de caso se convierta en escritura.
+
+---
+
+## B-185 — la SQLite operacional podía usar evidencia como almacenamiento por defecto [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: perfiles ACP, historial temporal y audit trail SQLite podían crear DB, WAL y lockfile dentro del árbol de evidencia. |
+| **Archivo** | `vigia/tools/forensic_db.py`, `vigia/tools/nlp_constants.py`, `tests/test_b185_forensic_db_source_boundary.py`, `tests/test_entanglement_groundtruth.py`, `README.md`, `CLAUDE.md`. |
+| **Modo** | `ForensicDatabaseManager()` implícito en ACP, temporal y Entanglement; también constructor con `db_path` explícito. |
+| **Principio afectado** | La persistencia del analista es estado operacional, no evidencia. Un singleton no puede tomar una raíz de entrada como fallback de escritura. |
+
+**Observación reproducida:** sin `db_path`, el singleton componía
+`$VIGIA_EVIDENCE_PATH/vigia_forensic.db` (o `/mnt/evidence`) y habilitaba WAL.
+En una investigación con la raíz legacy apuntando a evidencia, la mera
+construcción creaba la base y sus sidecars. El constructor explícito tampoco
+consultaba `VIGIA_EVIDENCE_DIR`: aceptaba tanto `<evidence>/vigia_forensic.db`
+como `db-redirect -> evidence` seguido de `db-redirect/vigia_forensic.db`.
+Los tres caminos fueron inducidos antes del parche; una DB externa fue el
+control positivo.
+
+**Corrección aplicada:** se introduce `VIGIA_FORENSIC_DB_PATH` como destino
+explícito. Sin él, el orden seguro es `VIGIA_WORK_DIR/vigia_forensic.db` y,
+si tampoco está configurado, un state-dir estilo XDG del usuario. La variable
+legacy `VIGIA_EVIDENCE_PATH` conserva significado de input pero no participa
+en la elección del destino. Todo `db_path`, implícito o explícito, pasa por
+`validate_external_output_path()` antes de crear padres y otra vez antes de
+que SQLite pueda crear DB/WAL/lock. README, contrato MCP y el fixture de
+Entanglement documentan la nueva configuración.
+
+**Validación:** cuatro regresiones B-185 cubren DB explícita en evidencia,
+padre symlink, fallback seguro aun si la variable legacy apunta a evidencia y
+DB externa válida. También pasan B-178 (backup SIFT) y 21 pruebas de
+Entanglement; se excluyen las dos de `TestIdenticalDocumentCollapse`, ya
+marcadas en ese archivo como defecto de cadena de custodia pendiente e
+independiente. No modifica señal, score ni veredicto: separa el estado
+persistente del analista de los bytes adquiridos.
+
+---
+
+## B-186 — el ledger persistente de cadena de custodia podía contaminar evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el ledger SQLite crea una base y potenciales sidecars junto a la evidencia que pretende atestiguar. |
+| **Archivo** | `vigia/forensics/vigia_chain_of_custody.py`, `tests/test_b186_chain_ledger_output_boundary.py`, `README.md`, `CLAUDE.md`. |
+| **Modo** | API `ChainOfCustody`, CLI `vigia_chain_of_custody.py --db`, y cualquier flujo que persista bundles sellados. |
+| **Principio afectado** | El ledger es estado derivado del investigador; no puede tener como destino implícito el CWD ni una raíz de evidencia. |
+
+**Observación reproducida:** el constructor anterior usaba
+`vigia_chain.db` relativo al directorio de trabajo. Si un operador lanzaba el
+verificador desde `VIGIA_EVIDENCE_DIR`, la construcción escribía el ledger en
+el input. Un `--db <evidence>/chain.db` explícito era aceptado; también una
+ruta bajo un padre symlink que redirigía a evidencia. Finalmente, una ruta
+externa válida con padre aún inexistente fallaba antes de crear el ledger. Las
+cuatro condiciones fueron inducidas antes del parche.
+
+**Corrección aplicada:** el default ahora resuelve, en orden,
+`VIGIA_CHAIN_DB_PATH`, `VIGIA_WORK_DIR/vigia_chain.db` y un state-dir estilo
+XDG. El módulo sigue siendo ejecutable sólo con stdlib, por lo que incorpora
+un guard local equivalente al contrato de output: rechaza NUL, inspecciona
+con `lstat` cada componente existente para denegar symlinks, resuelve la ruta
+y prohíbe destinos iguales o descendientes de `VIGIA_EVIDENCE_DIR`. Crea el
+padre con permisos `0750` y valida de nuevo inmediatamente antes de que
+SQLite pueda crear DB/WAL/journal. README y el contrato MCP documentan la
+nueva variable.
+
+**Validación:** cuatro regresiones B-186 cubren el destino explícito dentro
+de evidencia, el escape por padre symlink, el default seguro aun con CWD
+ubicado dentro de evidencia y un destino externo nuevo. También pasan las 27
+pruebas existentes de hardening de cadena de custodia: **31/31**. No altera
+el contenido de ningún bundle, el hash canónico ni los veredictos; sólo
+separa la persistencia del ledger de los bytes adquiridos.
+
+---
+
+## B-187 — el inicializador de patrones podía borrar o crear SQLite dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el inicializador hace `DELETE` e inserciones idempotentes; un `--db` mal dirigido podía modificar un SQLite adquirido. |
+| **Archivo** | `vigia/tools/init_patterns_db.py`, `tests/test_b187_patterns_db_output_boundary.py`. |
+| **Modo** | Inicialización fresh/CI mediante `python3 vigia/tools/init_patterns_db.py [--db PATH]`. |
+| **Principio afectado** | Una herramienta de construcción de corpus no recibe autoridad para reescribir evidencia por aceptar una ruta de DB arbitraria. |
+
+**Observación reproducida:** `init_db()` creaba el padre, abría cualquier
+ruta SQLite, instalaba schema y ejecutaba `DELETE FROM nlp_patterns`. Con
+`VIGIA_EVIDENCE_DIR` configurado, tanto
+`<evidence>/forensic_patterns.sqlite` como
+`patterns-redirect -> <evidence>` seguido de
+`patterns-redirect/forensic_patterns.sqlite` eran aceptados y modificados.
+Ambos escapes fueron inducidos antes del parche; una DB nueva fuera de
+evidencia fue el control positivo.
+
+**Corrección aplicada:** el inicializador usa
+`validate_external_output_path()` antes de crear el padre y vuelve a
+validarlo antes de que SQLite pueda crear DB/WAL/journal. Conserva su DB de
+patrones distribuida y el comportamiento idempotente para CI; sólo deniega
+destinos dentro de evidencia o con componentes symlink. Como la invocación
+documentada es directa, se añadió el bootstrap mínimo de `sys.path` para que
+el import del guard funcione tanto con `python3 vigia/tools/init_patterns_db.py`
+como con módulo/CI, sin exigir `PYTHONPATH`.
+
+**Validación:** B-187 cubre destino directo en evidencia, redirección por
+symlink, DB externa válida y la invocación directa documentada. La prueba fue
+roja antes del parche (2 escapes reproducidos) y verde después: **4/4**.
+Junto con B-186, pasan **8/8**. No modifica la semántica de los patrones ni
+los veredictos; quita autoridad de escritura al argumento `--db` cuando
+apunta a evidencia.
+
+---
+
+## B-188 — el detector semiótico simulaba un fallback inexistente ante DB de patrones ausente [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de degradación honesta: una dependencia semiótica ausente podía fallar con `no such table` después de aparentar un fallback de primer uso. |
+| **Archivo** | `vigia/core/semiotic_detector_v2.py`, `tests/test_b188_missing_patterns_db_degradation.py`. |
+| **Modo** | `SemioticDetectorV2` usado por el pipeline y por `vigia_case_adapter`; en modo agente, la falla del detector debe ser `ABSTAIN`, nunca `NOISE`. |
+| **Principio afectado** | Un componente indisponible no puede presentarse como detector vacío ni como resultado limpio. El fallo debe ser explícito para que el adaptador conserve el fault y se abstenga. |
+
+**Observación reproducida:** `_load_patterns()` abría la DB con `mode=ro`; si
+no existía, capturaba el error y creaba `:memory:` con el comentario
+“fallback … primer run”. Inmediatamente intentaba `SELECT … FROM
+nlp_patterns` en esa memoria sin schema, por lo que la construcción abortaba
+con `sqlite3.OperationalError: no such table`. Además, el URI se armaba por
+interpolación de ruta, en vez de serializar un file URI. La regresión B-188
+reprodujo la falla con una ruta ausente y verificó que no se creara archivo.
+
+**Corrección aplicada:** se elimina el falso fallback. La ruta se convierte a
+`Path(...).resolve().as_uri()` y se abre sólo con `mode=ro`; cualquier error
+de apertura o schema se traduce en `RuntimeError` explícito: `semiotic pattern
+database unavailable`. No se fabrica una memoria vacía que podría devolver
+ausencia de patrones con apariencia de análisis. El adaptador existente ya
+registra esa indisponibilidad como `detector_fault`, fija confianza cero y
+emite `ABSTAIN`.
+
+**Validación:** B-188 fue roja antes del parche con el `OperationalError`
+contradictorio y verde después, confirmando tanto el error semántico explícito
+como ausencia de DB creada. También pasan `test_red_team.py` y el conjunto
+relevante: **7/7**. No cambia resultados cuando la DB distribuida está
+disponible; cuando falta, hace visible el límite en lugar de permitir una
+conclusión limpia sobre análisis semiótico no realizado.
+
+---
+
+## B-189 — el runner canónico podía publicar resultados dentro de la evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: `--output` tenía autoridad de escritura irrestricta; podía reemplazar o añadir un JSON de resultados dentro del input adquirido. |
+| **Archivo** | `vigia/scripts/run_pipeline.py`, `tests/test_b189_pipeline_output_boundary.py`. |
+| **Modo** | Pipeline determinista `python3 -m vigia.scripts.run_pipeline --input … --output …`. |
+| **Principio afectado** | El resultado derivado debe vivir fuera de evidencia y publicarse atómicamente; una ruta de salida no puede volver al árbol que se está examinando. |
+
+**Observación reproducida:** el runner leía el input y ejecutaba
+`Path(output_path).write_text(...)` sin validar, sin crear padre y sin
+publicación atómica. Un destino `<evidence>/pipeline-result.json` y un padre
+`result-redirect -> <evidence>` fueron escritos con éxito. Inversamente, un
+destino externo nuevo fallaba por `FileNotFoundError`. Las tres condiciones
+fueron inducidas antes del parche.
+
+**Corrección aplicada:** `run()` valida `--output` con
+`validate_external_output_path()`, crea el padre externo con `0750`, vuelve a
+validar antes de escribir y usa `atomic_write_text()` para temp+fsync+replace.
+El log imprime el destino canonicalizado. La decisión, la canonicalización v1
+de compatibilidad y el contenido JSON de una ejecución válida no cambian.
+
+**Validación:** B-189 cubre output directo en evidencia, escape por symlink y
+output externo con padre inexistente. Fue roja **3/3** antes del parche y
+verde **3/3** después. Además pasan las 23 pruebas de `test_tanda_a_triage.py`:
+**26/26**. El cambio impide contaminar adquisición y elimina el fallo espurio
+del output externo sin ampliar las conclusiones del pipeline.
+
+---
+
+## B-190 — el logger de ejecución podía alterar evidencia y escapar con `case_id` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una traza derivada del pipeline podía escribirse en el árbol adquirido o en un destino construido desde una etiqueta de caso. |
+| **Archivo** | `vigia/core/execution_logger.py`, `vigia/pipeline/pipeline.py`, `tests/test_b190_execution_logger_output_boundary.py`. |
+| **Modo** | Pipeline determinista y cualquier consumidor directo de `VigiaExecutionLogger`. |
+| **Principio afectado** | La evidencia es de solo lectura: ni el trail que la describe ni el identificador de caso pueden obtener autoridad de escritura sobre ella. |
+
+**Observación reproducida:** el constructor recibía `output_dir="data/logs"`,
+creaba ese path relativo al CWD y concatenaba `case_id` sin tratarlo como un
+identificador no confiable. Con `VIGIA_EVIDENCE_DIR=<evidence>` se indujeron
+cuatro violaciones antes del parche: (1) `output_dir=<evidence>` creaba el
+JSONL dentro de la adquisición; (2) un padre symlink que apuntaba a evidencia
+también era aceptado; (3) `case_id="../evidence/escape"` escapaba del
+directorio de logs; y (4) iniciar el proceso desde la evidencia hacía que el
+default relativo publicara `data/logs` en ese mismo árbol. El logger no cambia
+un veredicto, pero sí podía modificar el objeto cuyo análisis pretende dejar
+trazado.
+
+**Corrección aplicada:** `case_id` ahora es una etiqueta no vacía sin NUL ni
+separadores de ruta. Cuando no se pasa un destino explícito, los logs usan
+`VIGIA_EXECUTION_LOG_DIR`, luego `$VIGIA_WORK_DIR/logs`, y finalmente estado
+privado XDG; nunca el CWD. El destino final se valida con la frontera común
+`validate_external_output_path()` antes y después de crear su padre externo
+con modo `0750`. Esa validación rechaza evidencia directa y todo componente
+symlink. Se documentó `VIGIA_EXECUTION_LOG_DIR` junto al resto del estado
+operativo privado. El logger mantiene el formato JSONL, la cadena de hashes y
+el comportamiento de destinos externos legítimos.
+
+**Validación:** las cinco pruebas B-190 fueron rojas antes del fix y verdes
+después: evidencia directa, padre symlink, traversal de `case_id`, default
+desde CWD de evidencia y output externo permitido. Además pasan
+`tests/test_hash_chain_hardening.py` y `tests/test_tanda_a_triage.py`: **55
+passed** (una advertencia histórica de timestamp no sellado). La inducción
+confirma el cierre de la autoridad de escritura; no afirma atomicidad ante
+caída de energía de la secuencia JSONL, que queda fuera de este fix.
+
+---
+
+## B-191 — el generador de execution logs se rompía al encontrar una señal [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de trazabilidad: el modo que debe registrar hallazgos SANS abortaba antes de emitir el primer `FORENSIC_FINDING` cuando el detector devolvía una señal normal. |
+| **Archivo** | `vigia/scripts/generate_execution_log.py`, `tests/test_b191_execution_log_generator_schema.py`. |
+| **Modo** | Generador JSONL individual/batch de Agent Execution Logs. |
+| **Principio afectado** | Un trail forense debe consumir el contrato canónico del detector y conservar pesos exactos, no inventar un valor de display ni fallar en el camino con evidencia. |
+
+**Observación reproducida:** `SemioticDetectorV2.analyze()` emite cada match
+con `weight_num` y `weight_den`, y mantiene `_weight` sólo como display. El
+generador pedía en cambio `match["weight"]` con fallback `0.5` y llamaba a
+`VigiaExecutionLogger.log_event(pattern_weight=...)`; esa firma no existe.
+Una inducción mínima con un match válido `7/10` produjo exactamente
+`TypeError: ... unexpected keyword argument 'pattern_weight'`. Por tanto un
+caso sin matches podía aparentar funcionar, mientras que el camino que debía
+registrar un hallazgo no terminaba su log ni su veredicto final.
+
+**Corrección aplicada:** el generador consume exclusivamente
+`weight_num`/`weight_den`, los valida como enteros racionales no negativos con
+denominador positivo, calcula la confianza de display mediante aritmética
+entera y llama a la firma existente `pattern_weight_num` /
+`pattern_weight_den`. Un schema de detector no canónico ahora falla con un
+error explícito en vez de registrar un 50% inventado. La decisión del motor
+no se modifica: sólo se restaura el consumidor de su output y su trazabilidad
+exacta.
+
+**Validación:** la prueba B-191 usó el mismo schema canónico del detector, fue
+roja antes (`TypeError`) y verde después; verifica que el JSONL conserva
+`_pattern_weight = 7/10` en su representación canónica. Junto con B-190 y el
+hardening de cadena pasan **33 tests**. No se afirma que este generador sea el
+autoridad de veredicto: su función es registrar fielmente la salida ya
+producida por el detector y la capa de decisión.
+
+---
+
+## B-192 — el script de execution logs reintroducía el default inseguro [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad operacional: aunque el logger central ya tenía un default privado (B-190), el script que lo invoca le imponía el antiguo `data/logs` relativo al CWD. |
+| **Archivo** | `vigia/scripts/generate_execution_log.py`, `tests/test_b192_execution_log_script_output_boundary.py`. |
+| **Modo** | Generador standalone individual y batch de Agent Execution Logs. |
+| **Principio afectado** | Una frontera de escritura sólo vale si cada entry point conserva sus defaults seguros; un wrapper no puede recuperar autoridad ambiental que el componente protegido ya había eliminado. |
+
+**Observación reproducida:** una ejecución real del script con
+`VIGIA_WORK_DIR=<tmp>` siguió publicando en `data/logs/` del checkout porque
+`process_case(..., output_path=None)` sobrescribía el default del logger. La
+inducción desde un CWD igual a `VIGIA_EVIDENCE_DIR` fue rechazada por B-190,
+evitando contaminar evidencia, pero el modo no podía completar aunque tenía un
+work directory válido. Esto refutó la hipótesis de que corregir sólo el
+constructor cubría todos los entry points.
+
+**Corrección aplicada:** `process_case` y `process_dataset` aceptan un
+`output_dir` opcional; al no recibirlo delegan al default privado de
+`VigiaExecutionLogger`. El CLI deja de preseleccionar `data/logs`, propaga
+`--output-dir` al batch y describe el orden de destinos seguro. Un `--output`
+o `--output-dir` explícito sigue siendo posible, pero queda sujeto a la misma
+validación contra evidencia y symlinks de B-190.
+
+**Validación:** B-192 fue roja antes por `SecurityError` al iniciar desde un
+CWD de evidencia pese a tener `VIGIA_WORK_DIR`; queda verde y genera
+`<work>/logs/B192-001_execution.jsonl` sin crear nada en evidencia. Con B-190,
+B-191, hardening de cadena y triage pasan **57 tests**. El test de integración
+real posterior confirmó que un match del detector produce el JSONL en el work
+directory, no en el checkout.
+
+---
+
+## B-193 — el adaptador de casos podía sobrescribir evidencia con su export [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el CLI del adaptador aceptaba cualquier segundo argumento como output y lo abría con `"w"`, incluida evidencia adquirida. |
+| **Archivo** | `vigia/tools/vigia_case_adapter.py`, `tests/test_b193_case_adapter_output_boundary.py`. |
+| **Modo** | Conversión directa `python3 vigia/tools/vigia_case_adapter.py <caso.json> [output.json]`. |
+| **Principio afectado** | El adaptador lee evidencia para derivar señales; su JSON de salida no puede recibir autoridad para alterar el input ni ser publicado parcialmente. |
+
+**Observación reproducida:** con un caso mínimo externo y
+`VIGIA_EVIDENCE_DIR=<evidence>`, la invocación CLI con
+`<evidence>/derived.json` terminaba con exit `0` y creaba el archivo dentro de
+evidencia. No había validación de path, control de symlink, creación segura de
+padres ni publicación atómica. Es una ruptura de separación source/derived,
+no una modificación de la lógica de adaptación.
+
+**Corrección aplicada:** se incorporó `save_signals()`: valida el destino con
+la frontera compartida antes y después de crear el padre externo `0750`, y
+publica el JSON mediante `atomic_write_text()` (tempfile, fsync, replace y
+fsync del directorio). El CLI usa esa función y reporta el path canonicalizado.
+Los exports externos legítimos mantienen el mismo contenido JSON.
+
+**Validación:** B-193 fue inducido antes mediante la escritura CLI directa.
+Después, sus tres tests verifican rechazo dentro de evidencia, rechazo a través
+de symlink y export externo canónico conservando el contenido. Con B-190–B-192
+y hardening de cadena pasan **37 tests**. La validación protege la autoridad de
+escritura; no pretende resolver por sí sola una sustitución hostil de directorio
+entre operaciones de filesystem fuera del modelo de permisos del proceso.
+
+---
+
+## B-194 — la API validaba el pathname de un caso pero abría ese pathname después [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de integridad y alcance forense, condicionado a que un actor pueda mutar concurrentemente el directorio de casos. No supone que un cliente HTTP, por sí solo, tenga permiso de escritura en el checkout. |
+| **Archivos** | `vigia/api_case_paths.py`, `vigia_api.py`, `vigia/vigia_api.py`, `tests/test_b194_api_case_snapshot_race.py`, `tests/test_vigia_api_boundaries.py`. |
+| **Modo** | FastAPI `POST /analyze/path`, ambas rutas de importación documentadas. |
+| **Principio afectado** | La selección de evidencia sólo es válida si el objeto que se analiza es el mismo que fue autorizado. `lstat()` seguido de `open(path)` no preserva esa identidad frente a sustitución entre operaciones. |
+
+**Observación reproducida:** `resolve_case_path()` ya rechazaba rutas absolutas,
+traversal y symlinks que existieran durante su inspección. Sin embargo devolvía
+un `Path` y el pipeline lo abría más tarde por nombre. En un directorio temporal
+controlado, se autorizó `data/cases/allowed.json`, se reemplazó esa hoja por un
+symlink a `outside/case.json` y un `open()` ordinario leyó el JSON externo. La
+inducción confirma una carrera de pathname; no afirma exfiltración de un secreto
+arbitrario, porque el pipeline requiere JSON con forma de caso y la exposición
+depende de la configuración de narración y despliegue.
+
+**Corrección aplicada:** `snapshot_case_file()` conserva la validación léxica y
+de archivo regular, pero su apertura autoritativa parte de un descriptor del
+repositorio y recorre `data/cases` o `cases` componente por componente mediante
+`dir_fd`, `O_DIRECTORY` y `O_NOFOLLOW`. Un symlink de hoja o de directorio que
+aparezca después de validar falla cerrado. El descriptor de archivo ya ligado se
+copia a un temporal privado con `fsync`; tanto el pipeline determinista como la
+narración opcional consumen esa instantánea y nunca reabren el pathname aportado
+por el cliente. La plataforma que no ofrece estas primitivas rehúsa el caso en
+vez de volver silenciosamente al patrón vulnerable.
+
+**Validación:** los tests B-194 fueron rojos antes (la primitiva no existía) y
+verdes después. Simulan, por separado, sustitución de la hoja y del directorio
+raíz tras la resolución inicial; ambos producen `CasePathError`. El contrato de
+endpoint verifica también que las dos APIs devuelven 404 sin invocar el pipeline.
+La prueba manual aislada obtuvo `SWAP_REJECTED` con el `ELOOP` esperado. Con las
+regresiones de frontera y paridad API pasan **28 tests**. Una escritura directa
+de contenido regular *dentro* de un case root que el atacante ya controla sigue
+fuera de esta defensa: eso es autoridad de modificación de evidencia, no una
+evasión de confinamiento de path.
+
+---
+
+## B-195 — el adaptador JSON presentaba la narrativa del caso como razonamiento del motor [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 epistemológico y de trazabilidad: una afirmación escrita por quien construyó el caso podía quedar sellada y visualizada como si la hubiera deducido el selector determinista. |
+| **Archivos** | `sift_orchestrator.py`, `vigia_agent.py`, `tests/test_b195_case_description_provenance.py`. |
+| **Modo** | Agente determinista sobre caso EBS JSON; afecta el bundle, su narrativa y el indicador `analytical_reasoning`. |
+| **Principio afectado** | El contexto de escenario puede conservarse, pero su procedencia y falta de autoridad analítica deben sobrevivir cada transformación y handoff. La presentación no puede elevar un claim a evidencia. |
+
+**Observación reproducida:** `_analyze_ebs_json()` era label-blind para el
+scorer, pero copiaba `case_data["description"]` literalmente a
+`abduction["narrative"]`. Luego `vigia_agent._generate_narrative()` lo imprimía
+bajo **“Razonamiento del motor abductivo”** y `_seal_bundle()` lo usaba para
+declarar `analytical_reasoning=True`. La inducción B-195 entregó una sola señal
+de memoria y un `description` con la afirmación no respaldada “exfiltration was
+completed and the operator was physically identified”; antes del fix esa frase
+aparecía como razonamiento del motor aunque no estuviera en ningún artefacto ni
+en el resultado del scorer. `VIGIA-FN-003` manifestó el mismo defecto: su
+escenario decía que la exfiltración ocurría dentro de TLS, pero el motor sólo
+había probado una fractura de inyección y concluía `SUSPICION` por falta de
+corroboración.
+
+**Corrección aplicada:** el campo `abduction.narrative` se construye ahora
+únicamente a partir de la selección label-blind y de `motor_reason`, con
+`narrative_provenance="deterministic_motor_selection"`. El texto de entrada se
+preserva, sin alterar el score, como `scenario_context` con
+`scenario_context_provenance="case_description_unverified"`; el reporte del
+agente lo muestra en una sección separada, **“CASE CONTEXT (UNVERIFIED INPUT —
+NOT ANALYTICAL EVIDENCE)”**. El modo `legacy` queda explícitamente rotulado como
+reproducción, no como razonamiento nuevo.
+
+**Validación:** las dos pruebas B-195 fueron rojas antes: la claim inyectada
+ocupaba el campo de razonamiento y aparecía antes de cualquier contexto
+etiquetado. Después quedan verdes y prueban que el relato del selector contiene
+su razón propia, que el input se conserva con procedencia no verificada y que
+el agente no mezcla ambas secciones. Junto con B-163, `fase1_resolve` y la suite
+de robustez de narrativa pasan **67 tests**. Una ejecución directa de FN-003
+conserva `SUSPICION` y su misma razón de gate; la frase sobre TLS ya no aparece
+en el bloque de motor. Esta corrección no convierte descripciones de artefactos
+en datos inocuos: esas descripciones siguen siendo observaciones del artefacto
+y deben tener su propia procedencia de adquisición para servir como evidencia.
+
+---
+
+## B-196 — `VIGIA-FN-003` se mantenía como deuda de detector aunque el detector ya estaba activo [RESUELTO — reclasificado, Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de gobernanza de corpus: el backlog atribuía un `SUSPICION` a una capacidad ausente, lo que invitaba a retocar el scorer para forzar una conclusión que la evidencia actual no corrobora. |
+| **Archivos** | `BUGS_PENDIENTES.md`, `docs/XFAIL_REDUCTION_STRATEGY_20260717.md`; observación en el bundle sellado `results/agent_batch/VIGIA-FN-003_agent_bundle.json`. |
+| **Modo** | Agente determinista / motor EBS. |
+| **Principio afectado** | Un veredicto menor que la etiqueta de un escenario no prueba ausencia de detección. La taxonomía de fallos debe distinguir detector, gate de corroboración y expectativa histórica. |
+
+**Observación reproducida:** el bundle de `VIGIA-FN-003` no omite la señal de
+memoria: CAIE registra la fractura viva `PROCESS_INJECTION_ANTIFORENSIC`, de
+severidad `0.85`, y el boost exacto `0.3825`. Una reejecución actual del modo
+`motor` devuelve `SUSPICION` con score `0.6022` y explica que, aunque supera
+el umbral de `MALICE`, no abre una rama de corroboración: las dos observaciones
+duras pertenecen a una sola colección/dominio de memoria. Al retirar metadata
+de inyección el boost desaparece; al retirar el mismatch de parent process el
+caso sigue siendo `SUSPICION`. El detector, por tanto, sí participa y altera
+materialmente el resultado.
+
+**Contraste:** `VIGIA-CAN-042`, con la misma clase de fractura, alcanza
+`MALICE` (`0.6524`) porque aporta cuatro artefactos repartidos entre dos
+colecciones de evidencia y satisface B-068. No es evidencia de que FN-003
+necesite un detector RWX nuevo, sino del límite deliberado que evita contar
+dos observaciones del mismo volcado como dos fuentes independientes.
+
+**Resolución:** se retira FN-003 de la deuda de detector y se reclasifica como
+disputa entre la etiqueta histórica `MALICE` y la suficiencia de la adquisición
+disponible. La etiqueta del escenario se conserva por trazabilidad: no se
+reescribe el corpus para hacer coincidir el motor. Elevarlo requeriría nueva
+corroboración independiente (por ejemplo identidad, red, pago o adquisición
+física), no aumentar pesos ni añadir una regla que ya existe. B-195 además
+separa la frase narrativa sobre exfiltración TLS del razonamiento sellado: no
+puede usarse como la corroboración que falta.
+
+---
+
+## B-197 — `run_vigia()` descartaba señales malformadas y sellaba la decisión parcial [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad de entrada y degradación honesta: un entry point público podía transformar evidencia suministrada pero inválida en ausencia de evidencia sin que el bundle pudiera atestiguarlo. |
+| **Archivo** | `vigia/pipeline/pipeline.py`, `tests/test_b197_pipeline_signal_boundary.py`. |
+| **Modo** | `run_vigia()` (CLI/Python API e Integration Bridge). |
+| **Principio afectado** | La frontera debe rechazar una solicitud incompleta antes de decidir; no puede conservar sólo las partes que lograron parsear y presentar el resultado como análisis del conjunto aportado. |
+
+**Observación reproducida:** `_signals_from_dicts()` envolvía cada construcción
+de `SignalOutput` en `except Exception`, emitía un warning y continuaba. Con
+una señal válida seguida por `{"z_score": 9.0, "confidence": 1.0}` sin
+`tool_name`, el helper retornaba una señal en vez de fallar; `run_vigia()`
+entonces entraba a `run_full()` y sellaba un resultado para el subconjunto. El
+bundle no contiene el conteo de objetos rechazados, su índice ni la causa de
+conversión, de modo que un lector no podía distinguir «una evidencia» de «dos
+evidencias, una perdida en la frontera». La variante con sólo la señal inválida
+terminaba en error más tarde por cero señales, pero la variante mixta ocultaba
+el problema.
+
+**Corrección aplicada:** la frontera exige que `signals_data` sea una lista y
+que cada entrada sea un objeto. Si la construcción o validación de
+`SignalOutput` falla, `_signals_from_dicts()` lanza `ValueError` con el índice
+`signals_data[i]` y encadena la causa original. `run_vigia()` por tanto no
+inicia el pipeline, no sella un bundle y no presenta un veredicto parcial. Las
+señales válidas conservan el mismo contrato de transporte; no se modificó el
+scorer ni se introdujo un fallback de etiqueta.
+
+**Validación:** las dos pruebas B-197 fueron rojas antes: tanto el helper como
+`run_vigia()` aceptaban la lista mixta. Después verifican rechazo visible en
+ambas fronteras. Junto con las regresiones F0/B-062/B-064 y la integración EBS
+pasan **30 tests**. El cambio prefiere un error explícito sobre una abstención
+sintética: el operador debe corregir o documentar la evidencia malformada antes
+de iniciar otra corrida.
+
+---
+
+## B-198 — se confundía la repetición analítica con el sello de custodia por corrida [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 epistemológico y de verificabilidad: el producto afirmaba que igual input producía el mismo `bundle_hash`, aunque ese hash identifica deliberadamente artefactos de custodia distintos. No alteraba el veredicto ni era indeterminismo del scorer. |
+| **Archivos** | `vigia/core/ebs_v1.py`, `vigia/core/bundle_builder.py`, `vigia/pipeline/pipeline.py`, `forensics/verify_ebs_v1.py`, `tests/test_b198_analysis_fingerprint.py`, `README.md`, ambas copias de `VIGIA_ESTADO_TECNICO_ES.md`, `docs/ENGINEERING_DISCIPLINE.md`; `vigia/models/ebs.py` queda explícitamente rotulado como ruta legacy, no como contrato de replay. |
+| **Modo** | Pipeline EBS v1, API/CLI `run_vigia()` y verificador stdlib-only. |
+| **Principio afectado** | Determinismo no significa borrar identidad ni tiempo de una cadena de custodia. Las dos propiedades deben tener nombres, scopes y verificadores distintos. |
+
+**Observación reproducida:** dos llamadas idénticas a `run_vigia()` conservaron
+la misma decisión, posterior, riesgo y proyección de contenido analítico, pero
+produjeron distinto `integrity.bundle_hash`. La diferencia se redujo exactamente
+a `bundle_id`, `timestamp`, `evidence_graph.generated_at`,
+`policy_spec.created_at`, `system_state.timestamp`, `integrity.sealed_at` y el
+`bundle_hash` que deriva de esos campos. Es correcto que el sello completo los
+cubra: son la identidad y el momento de *esa* corrida. El problema era el claim
+contrario en README/estado técnico y su evidencia citada: `tests/check_determinism.py`
+ejecuta una herramienta aislada y elimina timestamps antes de hashear; no crea
+ni compara bundles EBS. El test histórico T13 sólo lograba hashes iguales
+forzando manualmente UUID y todos los timestamps.
+
+**Corrección aplicada:** los bundles nuevos incluyen
+`integrity.analysis_fingerprint`, SHA-256 de la proyección analítica canónica
+que excluye sólo UUID y metadatos de tiempo por corrida. El `bundle_hash` no se
+debilitó ni se reutiliza: sigue sellando el payload completo de custodia. El
+pipeline y su CLI exponen ambas huellas. `quick_verify()` y el verificador
+independiente re-derivan `analysis_fingerprint` cuando está declarado; si se
+altera, fallan. Los bundles históricos que no tienen ese campo siguen siendo
+válidos bajo su contrato previo y el verificador lo marca explícitamente como
+legacy, no como una falsa comprobación.
+
+**Validación:** la regresión B-198 fue roja antes (no existía la huella y los
+dos verificadores aceptaban un digest decorativo). Después prueba: (1) mismo
+contenido analítico → mismo `analysis_fingerprint` pero sellos de custodia
+distintos; (2) corrupción del fingerprint rechazada por ambos verificadores;
+(3) compatibilidad de un bundle sin ese campo; y (4) exposición por el entry
+point público. Con las suites de sellado, contrato del verificador e
+integración EBS pasan **25 tests**. La nueva huella no prueba que dos corridas
+ocurrieron al mismo tiempo ni reemplaza al `bundle_hash`; prueba sólo que su
+proyección analítica declarada coincide.
+
+---
+
+## B-199 — la API devolvía un veredicto del scorer y el hash de otra decisión EBS [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 epistemológico/de interfaz: una respuesta HTTP podía presentar un veredicto forense y un `bundle_hash` válido como si atestiguaran la misma decisión, aunque provenían de dos motores y escalas distintas. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py`, `vigia/core/bundle_builder.py`, `vigia/openai_compat.py`, `tests/test_b199_api_seal_coherence.py`, `KNOWN_LIMITATIONS.md`, estados técnicos EN/ES. |
+| **Modo** | FastAPI/OpenWebUI, ambos imports soportados (`vigia_api` y `vigia.vigia_api`); el modo agente y las rutas de submission no fueron alterados. |
+| **Principio afectado** | Un sello de integridad sólo puede acompañar la afirmación exacta que contiene. Si dos capas usan semánticas de riesgo diferentes, la interfaz debe exhibirlas como distintas o abstenerse, nunca unirlas por cercanía de nombre. |
+
+**Observación reproducida:** cada wrapper calculaba primero `_vigia_score()` y
+devolvía sus campos `verdict`, `score`, `confidence` y `reason`. En paralelo
+adaptaba el mismo caso a `SignalOutput` y ejecutaba `VigiaPipeline.run_full()`
+solamente para tomar `bundle_hash` y el resultado de `verify_ebs_v1.py`. En
+`FP-CULTURAL-CLEAN-001`, por ejemplo, el scorer devolvía `NOISE` con score
+`0.0659`, mientras el bundle adjuntado contenía `decision_trace.decision =
+REJECT`, riesgo `0.982695` y razón `REJECT_POSTERIOR`. No es una mera
+traducción de vocabulario: `NOISE` significa evidencia insuficiente de
+intención, mientras `REJECT` EBS expresa alto riesgo de fabricación.
+
+**Causa raíz:** se intentó usar el pipeline EBS como una fábrica genérica de
+hashes para el scorer standalone. El adaptador de casos y el pipeline tienen
+otra representación de señales y otro modelo de riesgo. Cambiar simplemente a
+`build_bundle()` tampoco bastaba: esa función mapeaba `NOISE → ACCEPT` y
+`MALICE → REJECT` reutilizando el score compuesto de intención como
+`DecisionTrace.risk`. El verificador independiente rechazaba esos bundles: por
+ejemplo, `NOISE` con riesgo `0.0659` y epsilon `0.05` debía ser `ABSTAIN`, y
+`MALICE` con riesgo `0.823` también debía ser `ABSTAIN` bajo la política EBS.
+La coincidencia aparente de cifras no constituía una calibración.
+
+**Corrección aplicada:** los dos wrappers ya no ejecutan un segundo pipeline
+para obtener un hash. Sellan exactamente el dict devuelto por `_vigia_score()`
+y comprueban antes de responder que `caie_analysis.verdict` dentro del bundle
+coincida con el veredicto HTTP. El bundle preserva score, confianza, razón y
+veredicto forenses completos; como el scorer standalone no produce un posterior
+EBS de fabricación calibrado, su `decision_trace` registra `ABSTAIN`, riesgo y
+posterior neutrales `0.5`, y la razón
+`STANDALONE_SCORER_UNCALIBRATED_EBS_RISK`. Es una abstención sobre *la capa
+EBS*, no una modificación ni downgrade del veredicto forense directo. La API y
+la superficie OpenAI-compatible muestran explícitamente `sealed_forensic_verdict`,
+`ebs_decision` y `seal_scope=DIRECT_SCORER_ANALYSIS_ONLY`.
+
+**Validación:** la regresión B-199 se escribió roja primero. Construye bundles
+standalone controlados `NOISE`, `SUSPICION` y `MALICE`, verifica cada uno con el
+verificador independiente y exige que conserve el veredicto forense pero se
+abstenga en EBS. Después ejecuta ambos wrappers reales y exige `verify=PASS`,
+igualdad entre el veredicto retornado y el sellado, y el scope declarado. Con
+las fronteras FastAPI, paridad de imports y suites de sellado/verificador pasan
+**50 tests**. Esto no afirma que el pipeline EBS completo sea inválido: afirma
+que su decisión no puede utilizarse como prueba del scorer standalone hasta
+tener una traducción de artefactos y calibración de riesgo explícitas.
+
+---
+
+## B-200 — la API llamaba `FAIL` a un verificador que no había podido ejecutarse [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de degradación honesta: una configuración `VIGIA_REPO` inexistente o un error de proceso se mostraba al cliente como fallo criptográfico del bundle. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py`, `tests/test_b199_api_seal_coherence.py`. |
+| **Modo** | FastAPI/OpenWebUI, ambos imports públicos. |
+| **Principio afectado** | Un resultado de verificación sólo puede decir `FAIL` si el verificador ejecutado alcanzó ese resultado. Ausencia de ejecutable, fallo de arranque o salida no reconocible son indisponibilidad operacional, no evidencia de alteración. |
+
+**Observación reproducida:** el entorno tenía `VIGIA_REPO` configurado a un
+checkout que ya no existe. Ambos wrappers construían correctamente el bundle,
+pero lanzaban `python3 <repo-inexistente>/forensics/verify_ebs_v1.py`. Como la
+subproceso devolvía stderr sin la palabra `PASS`, el código respondía
+`verify="FAIL — ?"`. Ese texto sugiere que el contenido sellado fue rechazado,
+cuando el programa de verificación ni siquiera se abrió.
+
+**Corrección aplicada:** la API comprueba que el ejecutable del verificador
+existe, captura errores al iniciar la subproceso y clasifica la salida de forma
+explícita. `PASS` y `FAIL` se emiten solamente si el CLI produjo
+`Resultado : PASS` o `Resultado : FAIL`; cualquier ausencia, error de arranque
+o salida no interpretable se devuelve como `UNAVAILABLE — ?` y se registra en
+el log del servidor sin exponer paths ni stderr al cliente. El archivo temporal
+del bundle se elimina también si el proceso no logra arrancar.
+
+**Validación:** la prueba nueva fuerza ambos wrappers a usar un `REPO` sin
+`forensics/verify_ebs_v1.py`. Era roja antes (`FAIL — ?`) y ahora exige
+`UNAVAILABLE — ?`, sin la palabra `FAIL`. La misma suite conserva el caso de
+verificación normal `PASS` y los contratos de rutas/compatibilidad OpenAI:
+**32 tests** pasan. La configuración rota sigue siendo responsabilidad del
+operador; el cambio sólo impide que VIGÍA la convierta en una afirmación forense
+falsa.
+
+---
+
+## B-201 — el API aceptaba casos JSON remotos sin límite de tamaño ni cardinalidad [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de disponibilidad: una petición no confiable podía materializar un archivo temporal y despachar al scorer un grafo sintético de tamaño no acotado. No cambiaba por sí misma un veredicto ni afectaba la adquisición local de evidencia. |
+| **Archivos** | `vigia/api_payload.py`, `vigia_api.py`, `vigia/vigia_api.py`, `vigia/openai_compat.py`, `tests/test_b201_api_payload_boundary.py`, estados técnicos EN/ES. |
+| **Modo** | `POST /analyze/json` y el caso JSON embebido en `POST /v1/chat/completions`, para ambos wrappers públicos. |
+| **Principio afectado** | La frontera HTTP debe validar disponibilidad antes de persistir o analizar datos no confiables. Un límite de transporte no sustituye la validación semántica forense ni debe restringir la adquisición local. |
+
+**Observación reproducida:** los dos endpoints aceptaban cualquier diccionario
+JSON y el shim OpenAI-compatible lo escribía directamente a un temporal antes
+de llamar al pipeline. Con un payload controlado de 1.025 artefactos, ambos
+wrappers alcanzaban el scorer; si el request fallaba más tarde, la respuesta
+era un error genérico. No existía contrato explícito de bytes ni de
+cardinalidad, aunque el corpus versionado alcanza sólo 217.373 bytes y 101
+artefactos por caso.
+
+**Corrección aplicada:** `validate_case_payload()` define una frontera común
+para los dos wrappers: objeto JSON serializable, máximo 1.048.576 bytes UTF-8
+y máximo 1.024 artefactos. Se ejecuta antes de crear un temporal, narrativa o
+scoring. `/analyze/json` rechaza con HTTP 422; el contrato compatible con
+OpenAI devuelve una explicación de input clara. Los límites aplican sólo a
+casos entregados por HTTP: ni la ingestión local, ni artefactos binarios, ni el
+motor determinista cambian de alcance o de semántica.
+
+**Validación:** B-201 se escribió roja primero: el request de 1.025 artefactos
+alcanzaba el pipeline en ambas rutas. Después exige que los dos wrappers
+rechacen antes de escribir o invocar al scorer. Junto con fronteras FastAPI,
+paridad de imports y B-199 pasan **36 tests**; `py_compile` y `git diff
+--check` también pasan. El umbral es deliberadamente amplio respecto del
+corpus, pero explícito y verificable en vez de implícito e ilimitado.
+
+---
+
+## B-202 — `/analyze/path` podía snapshotear un fixture permitido sin límite de bytes [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de disponibilidad: la ruta estaba confinada correctamente, pero un JSON muy grande dentro de un root permitido podía copiarse entero a disco temporal antes de llegar al pipeline. |
+| **Archivos** | `vigia/api_case_paths.py`, `tests/test_b202_api_path_snapshot_boundary.py`, estados técnicos EN/ES. |
+| **Modo** | `POST /analyze/path` en ambos wrappers FastAPI; no modifica CLI, ingestión ni extracción forense de archivos grandes. |
+| **Principio afectado** | Confinar un pathname y sellar el snapshot evita sustitución de evidencia, pero no acota su costo. La misma frontera debe preservar procedencia y disponibilidad. |
+
+**Observación reproducida:** `snapshot_case_file()` abría el descriptor de un
+JSON regular bajo `cases/` o `data/cases/` de forma segura y luego lo copiaba
+íntegramente con `copyfileobj()`. Un fixture de más de 1 MiB dentro de un root
+permitido llegaba a `NamedTemporaryFile`; por tanto una protección contra
+traversal/symlinks no impedía una copia temporal no acotada. El mayor fixture
+versionado hoy mide 217.373 bytes, de modo que el límite no excluye el corpus
+actual.
+
+**Corrección aplicada:** después de `openat` con `O_NOFOLLOW`, VIGÍA verifica
+el tamaño del descriptor antes de crear el temporal y rechaza más de 1 MiB con
+`CasePathError`. La copia conserva además un contador de bytes: si el inode
+crece después del `fstat`, no escribe bytes que excedan el límite y el temporal
+incompleto se elimina por la ruta de excepción. La ruta sigue ligada al mismo
+descriptor confiable; no se reabre ni se cambia la semántica del caso.
+
+**Validación:** B-202 fue roja primero al demostrar que el fixture sobredimensionado
+llegaba a crear un temporal. Ahora exige rechazo previo a ese punto y prueba el
+guard de crecimiento post-apertura con un stream de 1 MiB + 1 byte, incluida la
+eliminación del temporal parcial que ese stream hubiera creado. Con B-194
+(race/symlink), fronteras FastAPI y la regresión nueva pasan **27 tests**;
+`py_compile` y `git diff --check` pasan. Este contrato afecta sólo la selección
+HTTP de fixtures: un caso local mayor se puede adquirir y analizar por las
+rutas forenses/CLI correspondientes, sin ser truncado ni reinterpretado por
+la API.
+
+---
+
+## B-203 — la API presentaba un caso permitido rechazado por tamaño como `404` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de degradación honesta: el límite de disponibilidad de B-202 funcionaba, pero la capa HTTP ocultaba su razón bajo la misma respuesta usada para rutas inexistentes o prohibidas. |
+| **Archivos** | `vigia/api_case_paths.py`, `vigia_api.py`, `vigia/vigia_api.py`, `tests/test_b203_api_case_limit_contract.py`, estados técnicos EN/ES. |
+| **Modo** | `POST /analyze/path`, ambos imports públicos. |
+| **Principio afectado** | Una API puede ocultar detalles de paths locales sin convertir una política declarada y verificable en una afirmación falsa de inexistencia. |
+
+**Observación reproducida:** tras B-202, un `data/cases/oversized.json` regular
+y permitido se rechazaba antes de pipeline y temporal, pero ambos wrappers
+capturaban todo `CasePathError` y devolvían `404 Caso no encontrado`. El mismo
+status y texto se usan correctamente para traversal, symlinks y archivos que
+no existen, pero no describían el hecho ya comprobado: había un fixture
+permitido que excedía el presupuesto documentado.
+
+**Corrección aplicada:** `CaseSnapshotLimitError` especializa el error de path
+para el único rechazo de tamaño declarado. Ambos wrappers lo traducen a `422`
+con el límite de bytes; los demás `CasePathError` continúan devolviendo el
+`404` opaco, por lo que la ruta no se convierte en un oráculo de filesystem.
+La separación no modifica el snapshot, los veredictos ni la selección de casos.
+
+**Validación:** B-203 fue roja primero en los dos wrappers (`404`); ahora exige
+`422`, el motivo de límite y que el scorer no sea invocado. Junto con B-202,
+B-194 y los límites JSON, pasan **29 tests**; `py_compile` y `git diff --check`
+pasan.
+
+---
+
+## B-204 — el modo legacy promediaba artefactos normalizados por B-163, no los crudos históricos [RESUELTO — Codex+Claude 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 de reproducción histórica: el modo explícito `VIGIA_EBS_RESOLVE=legacy` existe solo para reproducir bundles pre-B-163, pero su promedio dejó de reproducirlos cuando B-163 normalizó el caso en la frontera del adaptador. |
+| **Archivos** | `sift_orchestrator.py`, `tests/test_b204_legacy_avg_raw_reproduction.py`. |
+| **Modo** | Solo `VIGIA_EBS_RESOLVE=legacy` (nunca default). El path motor no cambia de valor. |
+| **Principio afectado** | Un modo de reproducción histórica que no reproduce la aritmética histórica es una afirmación falsa de fidelidad (§5.3 degradación honesta). |
+
+**Observación reproducida:** para un artefacto legacy sin `raw_score` ni
+`prior_trust`, la normalización B-163 sintetiza `raw_score >= 0.05` (clamp
+inferior) y `prior_trust` 0.70–0.90 por capa peirceana. El promedio del
+adaptador en modo legacy pasaba de `0` (crudo: defaults `0` × `1/2`) a
+`17/400` (sintetizado: `0.05 × 0.85`) — un valor que ningún bundle histórico
+contiene. `confidence_f` e `is_conclusive` del modo legacy derivan de ese
+promedio.
+
+**Corrección aplicada:** `_analyze_ebs_json` conserva `raw_case_data` junto al
+caso normalizado y selecciona la fuente del promedio según el modo: artefactos
+crudos solo bajo legacy explícito, normalizados para presentación y para el
+path motor (donde el promedio es solo informativo — la hipótesis y la
+confianza salen de `_resolve_hypothesis`). Una sola aritmética, dos entradas
+explícitas.
+
+**Validación:** B-204 fue roja primero contra el código previo (promedio
+`17/400` en modo legacy); con el fix exige `0` crudo, verifica que el modo
+motor sigue promediando la representación normalizada, que ambos modos
+coinciden en casos canónicos (idempotencia del normalizador) y que la
+presentación (`signals`) de B-163 no regresa a proyección cruda. La batería
+existente de modo legacy/motor (`test_fase1_resolve`, `test_tanda_a_triage`,
+`test_b058`, `test_b163`, `test_b166`, `test_b195` — 52 tests) pasa sin
+cambios.
+
+---
+
+## B-205 — los escaneos de campos de B-171/B-172 crasheaban ante input degenerado [RESUELTO — Claude 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de robustez de frontera: `_vigia_score({"artifacts": None})` levantaba `TypeError` en vez de devolver el `ERROR` limpio que el contrato Round 4 garantiza (el scorer nunca crashea por input degenerado). Mismo defecto con `"temporal_violations": None`. |
+| **Archivos** | `vigia_scorer.py`, `tests/test_r4_boundaries.py`, `tests/test_hard_gate_severity_shield.py`. |
+| **Modo** | Todos los modos que llaman al scorer determinista. |
+| **Detectado por** | Corrida de la suite completa previa al merge de la rama `codex` — las baterías dirigidas de cada fix no incluían los contratos Round 4. |
+
+**Observación reproducida:** B-171/B-172 introdujeron escaneos de
+`artifacts` y `temporal_violations` (reconstrucción de pares temporales,
+retiro de autoridad SU) que corren ANTES de la guarda histórica
+`if not artifacts_all: → ERROR` (línea ~644). Un campo presente con valor
+`None` — clave existente, así que el default de `.get()` no aplica — llegaba
+al `for` y crasheaba. En `main` ambos casos devolvían `ERROR` limpio.
+
+**Corrección aplicada:** coerción `isinstance(list)` de ambos campos
+inmediatamente después de leerlos: un no-list cae a `[]`, que aterriza en el
+mismo path `ERROR` que `main` producía. Sin cambio de semántica de scoring
+para ningún input bien formado.
+
+**Fallout hermano (mismo origen, sin número propio):** el fixture de
+`test_hard_gate_severity_shield.py` declaraba `EFFECT_BEFORE_CAUSE` sobre
+artefactos sin timestamps; bajo el contrato B-172 eso es una alegación no
+verificable → ABSTAIN, y el test de severidad válida fallaba. El fixture
+ahora porta timestamps corroborantes (effect < cause), preservando la
+intención original del shield: probar la coerción de severidad, no una
+alegación inverificable.
+
+**Validación:** rojas primero las tres (`test_artifacts_none`,
+`test_temporal_violations_none` nueva, `test_valid_high_severity_still_fires`);
+verdes con el fix. Suite completa (`tests/` + `vigia/tests/`, sin
+integration) verde antes del merge.

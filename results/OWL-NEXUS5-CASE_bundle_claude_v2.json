@@ -1,0 +1,667 @@
+{
+  "case_id": "VIGIA-OWL-2019-NEXUS5",
+  "mode": "claude_code",
+  "investigator": "VIGIA Autonomous Agent (Claude Code / Anthropic, Sonnet 5)",
+  "analysis_timestamp": "2026-07-21T17:03:04.875764Z",
+  "evidence_sources": {
+    "quick_extraction": {
+      "path": "evidence/owl-2019-nexus5-quick/Agent Data",
+      "files_sha256": {
+        "mmssms.db": "0bc8bfcb4fbebe9cccc9fd3d37ffad5de7e33b09f3d524c648787dde2bf5fce6"
+      },
+      "finding": "search_pattern for birdtrader/layster82/musically/owl: zero hits. Direct sms/contacts read: 21 SMS rows, Facebook/Twitter shortcodes only, no owl content."
+    },
+    "full_image_data_partition": {
+      "path": "evidence/owl-2019-nexus5-full/mnt (Android /data, GPT partition 28, offset 2032140288 bytes, mounted ro,noload,noexec,nosuid,nodev)",
+      "mounted_by": "operator (Anna), via sudo -- MCP mount_sift_evidence tool is unusable in this deployment (see known_limitations / tool defect below)",
+      "extracted_subset_sha256": {
+        "com.android.chrome/app_chrome/Default/Bookmarks": "b05434c3bdb263ef064dd9c31c018fcddac9b282b9eb3adcff76f2268d152cd0",
+        "com.zhiliaoapp.musically/databases/musically.db": "04772f57ee542bc792763bbc6438276de1fe74ec526dc4ea3b2dd21a6a485c7e"
+      },
+      "extracted_by": "operator (Anna), via sudo cp -a + chown -- app-UID-owned directories on the ro mount are unreadable by the unprivileged MCP server process; source mount was not modified"
+    },
+    "companion_case_ruled_out": {
+      "path": "evidence/owl-2019-hd1-windows",
+      "finding": "search_pattern for owl/mcavoy: zero hits. Unrelated Digital Corpora OWL-2019 HD1 Windows Pass-the-Hash scenario. Not the 'HP companion' device referenced in the case doctrine note."
+    }
+  },
+  "findings_from_tools": [
+    {
+      "source": "search_pattern + generate_forensic_hash",
+      "artifact": "com.android.chrome/app_chrome/Default/Bookmarks (+ .bak)",
+      "finding": "Saved bookmark: http://m.birdtrader.co.uk/owls/barn-owls-for-sale/557933",
+      "sha256": "b05434c3bdb263ef064dd9c31c018fcddac9b282b9eb3adcff76f2268d152cd0"
+    },
+    {
+      "source": "search_pattern",
+      "artifact": "com.android.chrome/app_chrome/Default/Preferences",
+      "finding": "account_info: email=mcavoys87@gmail.com, gaia=101797553944830818468 -- matches the named case subject"
+    },
+    {
+      "source": "search_pattern",
+      "artifact": "com.zhiliaoapp.musically/cache/HttpCache/*",
+      "finding": "handle=layster82, nickName='Layla Aster', userId=190723800861179904, followed=true, following=true, relationsFromMe=['FRIENDSHIP'], encrypt_token present -- an established, mutual, encrypted direct-message channel between the device account and this seller account is independently confirmed"
+    },
+    {
+      "source": "search_pattern",
+      "artifact": "com.zhiliaoapp.musically/databases/musically.db, .../*_emmsg.db",
+      "finding": "No plaintext hits for 'How do you like' / 'email'. The negotiation message bodies quoted in data/cases/OWL-NEXUS5-CASE.json (ART-011..015) could NOT be independently re-derived from local storage -- EaseMob/hyphenate.io messaging (the case's own image_url references a1.hyphenate.io) encrypts message bodies at rest. This agent can confirm the channel and relationship; it cannot independently confirm the literal wording."
+    },
+    {
+      "source": "list_files",
+      "artifact": "/data (top level)",
+      "finding": "com.cleanmaster.security and com.cmcm.locker (AppLock apps) are installed, alongside com.zhiliaoapp.musically and com.snapchat.android -- independently confirms the case file's claim that AppLock was installed on exactly the two apps used for the negotiation"
+    },
+    {
+      "source": "search_pattern (quick extraction)",
+      "artifact": "evidence/owl-2019-nexus5-quick/Agent Data/*",
+      "finding": "Zero hits for birdtrader/layster82/musically/owl. mmssms.db: 21 SMS rows, Facebook/Twitter shortcodes only."
+    },
+    {
+      "source": "list_files + search_pattern",
+      "artifact": "evidence/owl-2019-hd1-windows",
+      "finding": "Zero hits for owl/mcavoy. Confirmed unrelated case (Pass-the-Hash scenario), not a corroborating companion device."
+    }
+  ],
+  "tool_verdicts": {
+    "infer_intent": {
+      "verdict": "NOISE",
+      "note": "Run twice (once with hand-transcribed chat text, once with only tool-retrieved facts) -- both NOISE. This tool is scoped to LLM-evasion/Carnegie-manipulation detection (message escalation/jailbreak patterns), not general criminal-intent classification; its NOISE result means 'no prompt-injection/escalation pattern', not 'no wrongdoing'. Used as a supporting signal only."
+    },
+    "audit_grice_maxims": {
+      "verdict": "NOISE",
+      "note": "0/5 maxim violations on the negotiation text (sourced from the case file transcription, plaintext not independently recoverable from device). Cooperative, non-deceptive phrasing -- the anomaly in this case is structural/behavioral (research -> contact -> verification -> same-day app-lock), not linguistic-deceptive."
+    },
+    "detect_eco_overinterpretation": {
+      "verdict": "NORMAL_DISTRIBUTION",
+      "note": "0% obvious/staged ratio across the full artifact list (including the explicit absence-of-payment gap as an artifact). Rules out evidence fabrication or false-flag staging."
+    },
+    "validate_and_correct_analysis": {
+      "note": "NON-DETERMINISTIC ACROSS CALLS -- reported as-is, not cherry-picked",
+      "call_1": {
+        "correction_applied": false,
+        "verdict_accepted": "SUSPICION",
+        "llm_backend": "ollama"
+      },
+      "call_2": {
+        "correction_applied": true,
+        "verdict": "INTENT",
+        "confidence": 85,
+        "carnegie_pattern": "Authority bypass via competence appeal -- mimicking legitimate user behavior to suppress scrutiny",
+        "llm_backend": "ollama",
+        "caveat": "This escalation reinterprets ordinary bookmarking/AppLock use as deliberate evasion; the same tool, same evidence class, previous call accepted SUSPICION without correction. Per CLAUDE.md's llm-out-of-the-loop doctrine, this tool's output is an exploratory signal and is NOT treated as the sealed verdict."
+      }
+    }
+  },
+  "agent_verdict": "SUSPICION",
+  "confidence": "HIGH",
+  "status": "CONFIRMED",
+  "verdict_basis": "The verdict is set by the deterministic Daubert Corroboration Gate already on file for this case (data/cases/OWL-NEXUS5-CASE.json:_label_correction_20260710, signed by Anna, 2026-07-10): single device, all evidence class D3, no independent triangulating device/channel in evidence -> INTENT/MALICE candidates are capped at SUSPICION regardless of the LLM self-correction tool's unstable output (see tool_verdicts.validate_and_correct_analysis above). This agent independently confirmed, via MCP tools against the actual mounted device data (not the case file's prose), that the browsing, the seller relationship/DM channel, and the AppLock installations are real artifacts on this device; it could not independently confirm the literal negotiation wording (encrypted at rest) or any purchase/payment confirmation (absent from all evidence examined). CORRECTED (v2): the delivery/confirmation SMS and the Pidgin lead on evidence/owl-2019-hd1-windows are real, newly-identified artifacts (see v1_corrections, v1_companion_case_reopened) that could plausibly satisfy the Daubert Corroboration Gate's second-source requirement -- but this agent could not confirm the identity link with available tooling in this session. The gate's premise is therefore UNRESOLVED, not affirmatively met by absence of a second source (as v1 stated) nor affirmatively satisfied by a confirmed second source. Verdict is held at SUSPICION as the conservative default while this gap remains open; it should NOT be read as 'ruled out', and a follow-up investigation (see next_steps) could change it.",
+  "mitre_ttps": [
+    "T1070.004",
+    "T1036",
+    "T1071.001"
+  ],
+  "mode1_vs_mode2_note": "The batch/motor run (Mode 1, results/agent_batch/OWL-NEXUS5-CASE_agent_bundle.json) reports verdict=NOISE. Root cause (diagnosed in this session, not fixed here): vigia/pipeline/vigia_integration_bridge.py::_normalize_artifact_legacy() and vigia/tools/vigia_case_adapter.py::artifact_to_signal() expect a legacy artifact schema (artifact_id, forensic_anomalies:list, analyst_flags:list, peirce_layer) that does not match this case's schema (id, content:dict, metadata.significance). Every .get(key, default) silently falls through, so all 20 signals in the Mode-1 bundle carry artifact_id='?', evidence_type='unknown', confidence=1/2, z_score=0/1 -- an ingestion/adapter defect, not a miscalibrated threshold. This Mode 2 bundle resolves the case independently by reading the actual device data directly; per CLAUDE.md, both outputs are preserved, neither silently overrides the other.",
+  "known_limitations": [
+    "mount_sift_evidence (MCP tool) is unusable in this deployment: vigia/vigia_sift_bridge.py:1251-1262 requires mount_point to simultaneously resolve under VIGIA_EVIDENCE_DIR (path sanitizer) AND under the hardcoded /mnt/analysis (_MOUNT_ROOT check) -- mutually exclusive constraints, no path satisfies both. It also requires the MCP server process to run as root (os.geteuid()==0), which it does not. The operator performed the raw-image mount and app-directory extraction manually via sudo, outside the MCP, strictly read-only (ro,noload,noexec,nosuid,nodev) and with a hard link (same inode) to the original acquisition file, preserving chain of custody; all subsequent analysis (list_files/search_pattern/generate_forensic_hash) was done via MCP.",
+    "Negotiation message bodies (the literal chat wording) are encrypted at rest in local Musical.ly/EaseMob storage and were not independently recoverable by this agent -- the wording used for audit_grice_maxims is the case file's own transcription (chain-of-custody-linked to the original Magnet ACQUIRE image, SHA1 F46EE05CE1A2210501EA512ED9E4C7EC59222CCA), not an independent re-extraction.",
+    "validate_and_correct_analysis (Ollama-backed) produced contradictory outputs across two calls on materially equivalent evidence (SUSPICION-accepted vs. INTENT-escalated) -- documented above, not treated as the deciding signal, consistent with the architecture's llm-out-of-the-loop principle.",
+    "No second/companion device is in evidence in this environment (owl-2019-hd1-windows checked and ruled out); the corroboration requirement for INTENT/MALICE cannot be met here regardless of content.",
+    "infer_intent is scoped to LLM-evasion/Carnegie-manipulation detection, not general criminal-intent classification; used only as a supporting signal."
+  ],
+  "case_definition_path": "data/cases/OWL-NEXUS5-CASE.json",
+  "case_definition_sha256": "7710fe9254f51496a1165cfb68b0d3c94e36d0b56193defc6618a822d61185ce",
+  "bundle_version": 2,
+  "supersedes": "results/OWL-NEXUS5-CASE_bundle_claude.json (v1) -- v1 is NOT deleted, kept for the audit trail; this file corrects it, forward-only",
+  "methodological_disclaimer": "IMPORTANT, added after external adversarial audit (relayed by operator via a separate ChatGPT review, 2026-07-21): the tool_execution_log below (both the original 29 entries and the 8 correction entries appended here) was constructed by the Claude Code agent AFTER each batch of real MCP tool calls completed within this conversation, by writing a short Python script that calls ToolExecutionLogChain.append() once per remembered call, back-to-back in one process. This means: (a) entry_hash/entry_hmac chaining IS real -- it proves no entry was altered relative to its neighbours once written, and the SHA-256/HMAC of each cited artifact IS real and independently reproducible; but (b) the per-entry 'timestamp' field does NOT represent the wall-clock moment each MCP tool was actually invoked during the conversation -- entries within a batch are seconds-to-microseconds apart because they were authored in one script run, not captured live at each call site. The bundle's analysis_timestamp field can therefore precede its own tool_execution_log batch, which is confusing and was flagged correctly by the external audit. This is a real gap between 'tamper-evident once written' and 'contemporaneously captured' -- the fix is to instrument vigia_sift_bridge.py itself to call chain.append() at each tool's entry/exit (not done in this session; recommended as follow-up, out of scope for resolving this case).",
+  "v1_corrections": [
+    {
+      "issue": "v1 claimed 'no purchase/payment/delivery confirmation exists anywhere in the evidence examined' as part of the SUSPICION basis.",
+      "correction": "FALSE. mmssms.db (quick extraction) contains: sender +13045184333, 2017-02-01T00:41:15Z UTC: 'Sarah, the delivery is today 7 tonight the confirmation will come later through pidgin'. Missed in v1 because the original query used LIMIT 5; the full 21-row table was not read.",
+      "impact": "This is a real delivery/confirmation message and directly weakens the 'no second-source corroboration' basis for capping the verdict at SUSPICION. See v1_companion_case_reopened below."
+    },
+    {
+      "issue": "v1 classified evidence/owl-2019-hd1-windows as 'unrelated, ruled out' based only on zero ASCII hits for 'owl'/'mcavoy'.",
+      "correction": "RECLASSIFIED to UNRESOLVED. Pidgin (the exact IM client named in the corrected SMS above) is installed and was run on this machine (3 prefetch entries: PIDGIN.EXE-86E18E41.pf, PIDGIN-2.11.0.EXE-93DF4765.pf, 'PIDGIN-2.11.0 (1).EXE-138939A7.pf'). Precise execution timestamps could not be extracted (prefetch files are MAM-compressed, Windows 10 format; no decompressor available in this toolset). search_pattern for 'mcavoy'/'Sarah'/'layster' across the full owl-2019-hd1-windows tree found zero ASCII hits, but this is INCONCLUSIVE, not a refutation: Windows registry hives (SAM/SOFTWARE/SYSTEM/NTUSER.DAT) commonly store strings as UTF-16LE, which a plain ASCII grep will not match even if present.",
+      "impact": "The Daubert Corroboration Gate's premise ('no second independent device/channel in evidence') is therefore UNCONFIRMED rather than affirmatively established. The verdict is NOT upgraded on this basis -- the gap is disclosed as open, not resolved in either direction. Resolving it needs either a prefetch decompressor + timeline correlation, or a UTF-16-aware string search of the Windows registry hives, neither performed in this session."
+    },
+    {
+      "issue": "v1 report language ('HMAC-sealed, independently verified with verify_tool_log.py') implied the audit trail proves real-time capture of 29 actual MCP calls.",
+      "correction": "See methodological_disclaimer above. verify_tool_log.py verifies chain/HMAC integrity of the entries as written; it does not and cannot verify that the entries were captured live, in real time, at each tool call. Re-running verify_tool_log.py WITHOUT --hmac-key-file (as the external audit did) also cannot confirm the HMAC layer -- that requires the key file, which is deliberately access-restricted (that is by design, not a flaw, but must be stated, not assumed).",
+      "impact": "Report language corrected in v2 report. No claim of live/real-time capture is made."
+    }
+  ],
+  "v1_companion_case_reopened": {
+    "case": "evidence/owl-2019-hd1-windows",
+    "status": "UNRESOLVED (was: ruled out)",
+    "why": "Same IM channel named in the corrected SMS ('confirmation will come later through pidgin') is installed and was executed multiple times on this machine. Identity link to Sarah McAvoy/Layla Aster could not be confirmed or refuted with the tools available in this session (UTF-16 registry encoding gap; MAM-compressed prefetch timestamps).",
+    "next_steps": [
+      "Decompress the 3 Pidgin .pf files (Windows 10 MAM container) and extract embedded last-run FILETIME(s); compare against 2017-02-01T00:41:15Z (the SMS timestamp).",
+      "Search SAM/SOFTWARE/SYSTEM/NTUSER.DAT with a UTF-16LE-aware string extractor (not plain ASCII grep) for 'McAvoy', 'Sarah', 'layster', 'Layla'.",
+      "Check Pidgin's own config/log files if present under the imaged user profile for buddy-list or chat-log content."
+    ]
+  },
+  "tool_execution_log": [
+    {
+      "seq": 1,
+      "event_id": "a090941f-e1fa-4d02-9ee3-0ed01a1dfe9f",
+      "timestamp": "2026-07-21T17:07:08.599153+00:00",
+      "mode": "claude_code",
+      "tool": "generate_forensic_hash",
+      "target": "evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db",
+      "result_summary": "sha256=0bc8bfcb...INTEGRITY_VERIFIED",
+      "input_hash": "de337afdcca5f00c82d0f8f5e9650494e83ed87edfccb894bd4b15a6b2410672",
+      "chain_version": "2",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "entry_hash": "d7d784a2248af4117fffaf6541df93e1bdeb4c48f29a96b553e8a9da926edfb2",
+      "entry_hmac": "ae23b561be864f6a6f6fee9af766bd3f6cd0214b8f8d650dc9dd5f78fa4455e2"
+    },
+    {
+      "seq": 2,
+      "event_id": "10d36314-9f25-45de-b0a3-209c5fb0cdd5",
+      "timestamp": "2026-07-21T17:07:08.599222+00:00",
+      "mode": "claude_code",
+      "tool": "list_files",
+      "target": "evidence/",
+      "result_summary": "55 entries; owl-2019-nexus5-quick + owl-2019-hd1-windows relevant to case scope",
+      "input_hash": "dd0ab9301dbb30f1a3b5a029f91e72275b4611706186927d1151840cbcff05ee",
+      "chain_version": "2",
+      "prev_hash": "d7d784a2248af4117fffaf6541df93e1bdeb4c48f29a96b553e8a9da926edfb2",
+      "entry_hash": "ffbb7fd583273433a152f2a2b20f7238fa6c9caa4810778bda331e557f0c1eec",
+      "entry_hmac": "84ae6e0a8f6db10356bc8a6732d0832a122976826288eb40bfc4c7ae430604fc"
+    },
+    {
+      "seq": 3,
+      "event_id": "6efd8905-aae4-45e6-926f-9516edb41ffb",
+      "timestamp": "2026-07-21T17:07:08.599260+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-nexus5-quick",
+      "result_summary": "pattern=birdtrader: no findings (quick logical extraction lacks this content)",
+      "input_hash": "6beab4890857e0045c7daa64319254bed76e41c404199fedbeff32a59c7390a1",
+      "chain_version": "2",
+      "prev_hash": "ffbb7fd583273433a152f2a2b20f7238fa6c9caa4810778bda331e557f0c1eec",
+      "entry_hash": "614ceb922a7751228d3b490673306ab01ea99b02a68de25628d5ed8c1a1700d2",
+      "entry_hmac": "faa09be73dba4066b4deaafbc42f4cb8280e75f12b7bf8e0a2c23ed600afab15"
+    },
+    {
+      "seq": 4,
+      "event_id": "57bcf5cb-ceb2-4056-9f06-efb221f7e2aa",
+      "timestamp": "2026-07-21T17:07:08.599291+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-nexus5-quick",
+      "result_summary": "pattern=layster82: no findings (quick logical extraction lacks this content)",
+      "input_hash": "697303edf5d061122c1158ccdcaa9dc7d1fa2d3bd49907c37aabfaf50a4c8c7c",
+      "chain_version": "2",
+      "prev_hash": "614ceb922a7751228d3b490673306ab01ea99b02a68de25628d5ed8c1a1700d2",
+      "entry_hash": "5d0c43195d61bd7b1bb70cbae086b58bf47a142fa6cf4bf53a26ca6826a0ab38",
+      "entry_hmac": "c660040cbc5f7870b5f5ce3d9a55d612363cb7fd3adf4f8ad1755c62868bfd91"
+    },
+    {
+      "seq": 5,
+      "event_id": "08574af7-c1ba-402e-a7e0-041a539113b3",
+      "timestamp": "2026-07-21T17:07:08.599319+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-nexus5-quick",
+      "result_summary": "pattern=musically: no findings (quick logical extraction lacks this content)",
+      "input_hash": "0b77dec0c30779f2c255883f500f4f46b42cb42d1af9a0797c9978d49facc1ea",
+      "chain_version": "2",
+      "prev_hash": "5d0c43195d61bd7b1bb70cbae086b58bf47a142fa6cf4bf53a26ca6826a0ab38",
+      "entry_hash": "d931b59a704e38b543b7975a9106beeead51d4a6ec2b60d833dee061af8ebffe",
+      "entry_hmac": "26af4f42409138a9f1247e5321ac69969e793f1e93b652330124a532506a01d5"
+    },
+    {
+      "seq": 6,
+      "event_id": "342d6182-13e2-4f8c-b549-00303ff18a6d",
+      "timestamp": "2026-07-21T17:07:08.599345+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-nexus5-quick",
+      "result_summary": "pattern=owl: no findings (quick logical extraction lacks this content)",
+      "input_hash": "ff016951b0a0f4e371c116dd0684b9ac8724bcea7f41c7a9e68a078d10c0ede2",
+      "chain_version": "2",
+      "prev_hash": "d931b59a704e38b543b7975a9106beeead51d4a6ec2b60d833dee061af8ebffe",
+      "entry_hash": "f0de42f3e0b5b8a8bce404dcb856d5b3ab92644a8a4369cfd88c8b02c9b6688f",
+      "entry_hmac": "ece0dc9d4b40c1f557567ab58a9c0210b8162346004facd1e9d5efc2bc5fa8fb"
+    },
+    {
+      "seq": 7,
+      "event_id": "501b82ee-857e-47a1-a5e6-b8431eddc26a",
+      "timestamp": "2026-07-21T17:07:08.599370+00:00",
+      "mode": "claude_code",
+      "tool": "sqlite3_direct_read",
+      "target": "evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db",
+      "result_summary": "21 SMS rows: Facebook/Twitter shortcodes + 1 generic SMS, no owl content",
+      "input_hash": "260aec2fe941a2b9f838ae143bf84474dc40a550d9bb60c4f4c760fb2e24ef48",
+      "chain_version": "2",
+      "prev_hash": "f0de42f3e0b5b8a8bce404dcb856d5b3ab92644a8a4369cfd88c8b02c9b6688f",
+      "entry_hash": "647ca3a87a9f41cf7dfdd7cd2a6c76ede220ec5464cb99c0bf2074ad3cfe4e34",
+      "entry_hmac": "19eb2725bea500f1562b9929c8f7910667bc72fea83ef4abd58d5920c8c439e2"
+    },
+    {
+      "seq": 8,
+      "event_id": "52dd2026-5196-4f91-b148-6ddbca0f9ea8",
+      "timestamp": "2026-07-21T17:07:08.599395+00:00",
+      "mode": "claude_code",
+      "tool": "list_files",
+      "target": "evidence/owl-2019-hd1-windows",
+      "result_summary": "unrelated Windows Pass-the-Hash case; ruled out as companion device",
+      "input_hash": "c9fa5cb682d6b55a41d16329fc151b92c8f569f181fb509c887a67ff066146f4",
+      "chain_version": "2",
+      "prev_hash": "647ca3a87a9f41cf7dfdd7cd2a6c76ede220ec5464cb99c0bf2074ad3cfe4e34",
+      "entry_hash": "128f040ddad801c0c20f8eef77f5c34b3a920e6f6ee0c3624628d8c932a35b38",
+      "entry_hmac": "33516cb395b698ea1fb57de23b64a58034099c31899927780bd674d3111a7982"
+    },
+    {
+      "seq": 9,
+      "event_id": "8cab0301-38d8-4481-99f5-5b9dd94ea3f9",
+      "timestamp": "2026-07-21T17:07:08.599419+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-hd1-windows",
+      "result_summary": "pattern=owl/mcavoy: no findings -- confirms unrelated case",
+      "input_hash": "1695d37a6d40c9ea9aa86ed8cc9e4def5d486d509b6c159d54a52bbd62e45c3e",
+      "chain_version": "2",
+      "prev_hash": "128f040ddad801c0c20f8eef77f5c34b3a920e6f6ee0c3624628d8c932a35b38",
+      "entry_hash": "d0e32155b95f27aa5a17150c9dbcf3359bbe84a3dc2f9dac36313dbe620de2e4",
+      "entry_hmac": "ba28fbb36ffec0de05a7a45d71f228dd0e283ee4684e1dc7a897e51cbceacf8e"
+    },
+    {
+      "seq": 10,
+      "event_id": "b7080f5e-5ddc-45ea-8ca9-ff236d786a2b",
+      "timestamp": "2026-07-21T17:07:08.599442+00:00",
+      "mode": "claude_code",
+      "tool": "mount_sift_evidence",
+      "target": "evidence/owl-2019-nexus5-full/LGE Nexus 5 Full Image.raw",
+      "result_summary": "BLOCKED by tool: mount_point sanitizer requires evidence-dir scope, but hardcoded _MOUNT_ROOT requires /mnt/analysis -- ",
+      "input_hash": "077a37f23715721385dfecc89b396df4ec0dd68a7c545dfc93e7c168c31482e5",
+      "chain_version": "2",
+      "prev_hash": "d0e32155b95f27aa5a17150c9dbcf3359bbe84a3dc2f9dac36313dbe620de2e4",
+      "entry_hash": "d663b84cabc77dd3f80c8d496a27bead88025a6b89aea5c3e14def61b534e5cb",
+      "entry_hmac": "b82ac417bb57eb06142ef75a78b803b671f5ec046b24f20cbd2dc059df9d64e4"
+    },
+    {
+      "seq": 11,
+      "event_id": "7954d36f-0075-4adc-bfe3-3b9697be63b2",
+      "timestamp": "2026-07-21T17:07:08.599465+00:00",
+      "mode": "claude_code",
+      "tool": "operator_manual_mount",
+      "target": "/dev/loop0 (offset=2032140288, partition 28 of GPT disk, 27.2GB)",
+      "result_summary": "ro,noload,noexec,nosuid,nodev mount of Android /data partition at evidence/owl-2019-nexus5-full/mnt -- performed by oper",
+      "input_hash": "d357090d7735aa31530082a9e888cdec5237bb38ba15b766f3f1976b076c44a7",
+      "chain_version": "2",
+      "prev_hash": "d663b84cabc77dd3f80c8d496a27bead88025a6b89aea5c3e14def61b534e5cb",
+      "entry_hash": "ffcccbcccc697b38603e8c51c6933e5ce02bf0aff31d40adb35c15c508e67f36",
+      "entry_hmac": "56aa8ae1438510fc20a95cf7cd958252616eb070b7e23ad9457ab1ce51b09f09"
+    },
+    {
+      "seq": 12,
+      "event_id": "aad5c00f-1efa-483d-a4cb-ea79bc971045",
+      "timestamp": "2026-07-21T17:07:08.599489+00:00",
+      "mode": "claude_code",
+      "tool": "list_files",
+      "target": "evidence/owl-2019-nexus5-full/mnt",
+      "result_summary": "Android /data root confirmed: com.zhiliaoapp.musically, com.android.chrome, com.cleanmaster.security, com.cmcm.locker, c",
+      "input_hash": "c4acdee9732a0af9a0f4bdfaf7335493f0b57c520f5ef602e0bcc065e8679606",
+      "chain_version": "2",
+      "prev_hash": "ffcccbcccc697b38603e8c51c6933e5ce02bf0aff31d40adb35c15c508e67f36",
+      "entry_hash": "704699cb6da8cee2f86c2c00ab0ca93e4e690b21e8af53530d75cb1d8341d56a",
+      "entry_hmac": "8075b7ce459d3110acb8b60ee5b9c20b8d2d8f86f201db9a79ad63cea80ed294"
+    },
+    {
+      "seq": 13,
+      "event_id": "9b9a208a-7f62-40f4-85c1-d49c62b2f538",
+      "timestamp": "2026-07-21T17:07:08.599517+00:00",
+      "mode": "claude_code",
+      "tool": "list_files",
+      "target": "evidence/owl-2019-nexus5-full/mnt/data/com.zhiliaoapp.musically",
+      "result_summary": "Permission denied -- app-UID-owned dir unreadable by unprivileged MCP server process on ro mount",
+      "input_hash": "d6da0698342b2778eb09d4de1fa0c4f199619dcb7350531b9938c0e7d296d608",
+      "chain_version": "2",
+      "prev_hash": "704699cb6da8cee2f86c2c00ab0ca93e4e690b21e8af53530d75cb1d8341d56a",
+      "entry_hash": "40266fb6fcc965b75c17b8d79a6b31dba72acc9d07be86c34719fe508df3f25c",
+      "entry_hmac": "fb66a9a5fcb5db8f03d5e052c9054e54d10bb15a985e2ec5629b626d7fc96860"
+    },
+    {
+      "seq": 14,
+      "event_id": "b9fa4509-e7bc-4080-8975-1294cd44793b",
+      "timestamp": "2026-07-21T17:07:08.599541+00:00",
+      "mode": "claude_code",
+      "tool": "operator_extraction_copy",
+      "target": "com.zhiliaoapp.musically, com.android.chrome",
+      "result_summary": "operator (Anna) ran sudo cp -a + chown of the two app dirs from the ro mount to evidence/owl-2019-nexus5-full/extracted/",
+      "input_hash": "fe9fd01e13585760731ab5f875bf0be3794d3a15fea8776bb8871d45c235d9b5",
+      "chain_version": "2",
+      "prev_hash": "40266fb6fcc965b75c17b8d79a6b31dba72acc9d07be86c34719fe508df3f25c",
+      "entry_hash": "73ac758e165b906b115dae9e7fc362f4726b1d7e05cceab8e009b4c4e6b750c9",
+      "entry_hmac": "93d27a7c08787b3467f067c1b73ced890c6d4079cb9d57334382c38e2c127949"
+    },
+    {
+      "seq": 15,
+      "event_id": "8be71e31-b5b8-4d45-a04c-0a5a197c81de",
+      "timestamp": "2026-07-21T17:07:08.599568+00:00",
+      "mode": "claude_code",
+      "tool": "list_files",
+      "target": "evidence/owl-2019-nexus5-full/extracted",
+      "result_summary": "com.android.chrome, com.zhiliaoapp.musically readable",
+      "input_hash": "45757ff02979f71a7045acba8e12dd21be35cbe85b84739e983bde2197954fca",
+      "chain_version": "2",
+      "prev_hash": "73ac758e165b906b115dae9e7fc362f4726b1d7e05cceab8e009b4c4e6b750c9",
+      "entry_hash": "b19dd7dade18e5dce587d977f31c6ff69996765dff9953454e26e918f02306dc",
+      "entry_hmac": "37072e7a32bfbde638c47289b024d3a0d5547a7c6f6827a9868ef97d3d3b0c50"
+    },
+    {
+      "seq": 16,
+      "event_id": "a677bec7-529c-49da-ac37-01c5fc686f98",
+      "timestamp": "2026-07-21T17:07:08.599591+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-nexus5-full/extracted (chrome)",
+      "result_summary": "pattern=birdtrader: FOUND in Bookmarks + Bookmarks.bak -- http://m.birdtrader.co.uk/owls/barn-owls-for-sale/557933; Pref",
+      "input_hash": "01d62a76bcf2e864699442aa0a58b0c12f48919f29a08b82f7c56cdd98c4eb5c",
+      "chain_version": "2",
+      "prev_hash": "b19dd7dade18e5dce587d977f31c6ff69996765dff9953454e26e918f02306dc",
+      "entry_hash": "387d12864793cf68a4704316adc676f2a413e0861d12a88179aaf9df7003b1d9",
+      "entry_hmac": "7e0fb6948ae83768e20008cc4857305727653f137ba91f491e51bee009610fda"
+    },
+    {
+      "seq": 17,
+      "event_id": "9559eecc-6a56-4621-ba27-a407072b763e",
+      "timestamp": "2026-07-21T17:07:08.599614+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-nexus5-full/extracted (musically)",
+      "result_summary": "pattern=layster82: FOUND in HttpCache -- userId=190723800861179904, nickName='Layla Aster', followed=true, following=tru",
+      "input_hash": "9df1e0303cfc76fd062e671ab0214fa09677b81d20e50aab636ddc24b8db0c81",
+      "chain_version": "2",
+      "prev_hash": "387d12864793cf68a4704316adc676f2a413e0861d12a88179aaf9df7003b1d9",
+      "entry_hash": "e42d4b6577a61f99bd005b153a59c5ec8f89ce93fd2dedef7c21efb5c4d5ab3b",
+      "entry_hmac": "3167109bc37d4232332adfc7aa315d722c7c24c6ed1b9c7498cbe45ac3f12fb5"
+    },
+    {
+      "seq": 18,
+      "event_id": "05dce7ea-38fe-472f-9eb3-bbb5eaf42843",
+      "timestamp": "2026-07-21T17:07:08.599637+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-nexus5-full/extracted (musically)",
+      "result_summary": "pattern=owl: no additional findings beyond the chrome bookmark and cached user records above",
+      "input_hash": "d3162c2623d7166f6a9488bd17ecc7f0537b1ba7a7d0545207b48254aeb9cfc9",
+      "chain_version": "2",
+      "prev_hash": "e42d4b6577a61f99bd005b153a59c5ec8f89ce93fd2dedef7c21efb5c4d5ab3b",
+      "entry_hash": "30b245b9ac9cf79973f02f8c1321340a373061e17a4574161fadcfdc9529c600",
+      "entry_hmac": "1433268c2d0832428bd08a873948393eaeeea61036fa1aa994246b7b87c67851"
+    },
+    {
+      "seq": 19,
+      "event_id": "41e36de4-9f05-40e2-b3c0-bb664754c801",
+      "timestamp": "2026-07-21T17:07:08.599663+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "musically.db / emmsg.db",
+      "result_summary": "pattern='How do you like' / 'email': no findings -- message bodies not recoverable in plaintext from local SQLite (EaseM",
+      "input_hash": "1eace1a5bd527bacd8c0a993a7373e2dd6c01c3fdee360ca495b08b5e5c49a84",
+      "chain_version": "2",
+      "prev_hash": "30b245b9ac9cf79973f02f8c1321340a373061e17a4574161fadcfdc9529c600",
+      "entry_hash": "fa395cdf880c8d16a2490ba304c2fd73646d9819bda94b6abb801baecfb9e6f1",
+      "entry_hmac": "8422797fdc0aa23ea2a69f4ea15e44934706d1667ff983cb36689d968cd13653"
+    },
+    {
+      "seq": 20,
+      "event_id": "0c0f8ce7-3fdc-4a3c-95e9-c097c6020e7c",
+      "timestamp": "2026-07-21T17:07:08.599687+00:00",
+      "mode": "claude_code",
+      "tool": "generate_forensic_hash",
+      "target": "evidence/owl-2019-nexus5-full/extracted/com.android.chrome/app_chrome/Default/Bookmarks",
+      "result_summary": "sha256=b05434c3...INTEGRITY_VERIFIED",
+      "input_hash": "edeb68f3caa77020aaffa3db9dcd03fb9d673057824a5b14f7d12051fd5b0245",
+      "chain_version": "2",
+      "prev_hash": "fa395cdf880c8d16a2490ba304c2fd73646d9819bda94b6abb801baecfb9e6f1",
+      "entry_hash": "bb65d287ecbf6dfb3a860765f9ec40e20b0c51889cbb4c61985a798f124950a9",
+      "entry_hmac": "2c0d56730cd65a5f5eca4d6c141a8ef2a0c882975b5999d07acda06bd2569595"
+    },
+    {
+      "seq": 21,
+      "event_id": "9c6abac7-632f-4171-b688-5bc92cae96f5",
+      "timestamp": "2026-07-21T17:07:08.599710+00:00",
+      "mode": "claude_code",
+      "tool": "generate_forensic_hash",
+      "target": "evidence/owl-2019-nexus5-full/extracted/com.zhiliaoapp.musically/databases/musically.db",
+      "result_summary": "sha256=04772f57...INTEGRITY_VERIFIED",
+      "input_hash": "53ad63efaad9bb03833604b75e24e130ffd3e27099d7fa1072b57577f9b0d3f9",
+      "chain_version": "2",
+      "prev_hash": "bb65d287ecbf6dfb3a860765f9ec40e20b0c51889cbb4c61985a798f124950a9",
+      "entry_hash": "2fa1a95df5b4e53e77760a95f5d7320cfa89154598f68f011f40e61c4fbdb891",
+      "entry_hmac": "036a44401f9216627c08c81e787a8ddeeaa118175c6691db9d075398997a09c3"
+    },
+    {
+      "seq": 22,
+      "event_id": "f30f25b9-86ab-4379-bd59-5a3edc73c06a",
+      "timestamp": "2026-07-21T17:07:08.599732+00:00",
+      "mode": "claude_code",
+      "tool": "list_files",
+      "target": "evidence/owl-2019-nexus5-full/mnt/data (top level)",
+      "result_summary": "confirms com.cleanmaster.security and com.cmcm.locker installed alongside com.zhiliaoapp.musically, com.snapchat.android",
+      "input_hash": "3f6369be9d9320ce37a66b175984fb68e97811125b93bca7304f5c53daf06772",
+      "chain_version": "2",
+      "prev_hash": "2fa1a95df5b4e53e77760a95f5d7320cfa89154598f68f011f40e61c4fbdb891",
+      "entry_hash": "708b22bf8a0717fd4e9ad5508a9458548b48712ed5997a5d3d73467b9646c5ae",
+      "entry_hmac": "01f0b6fa972187046b67ca0e16284ee35a6d8d181c891d4a34ad90a17f1a2847"
+    },
+    {
+      "seq": 23,
+      "event_id": "9408bd36-dc5c-4726-b3a1-4b47365b1413",
+      "timestamp": "2026-07-21T17:07:08.599755+00:00",
+      "mode": "claude_code",
+      "tool": "infer_intent",
+      "target": "MCP-retrieved evidence trajectory (call 1, hand-authored chat text)",
+      "result_summary": "verdict=NOISE; tool scoped to LLM-evasion/Carnegie detection, not general criminal-intent classification",
+      "input_hash": "1cc3da8f38ffe53a8570294cc974c1beeb13d275c7f608ab08f637613e060bc2",
+      "chain_version": "2",
+      "prev_hash": "708b22bf8a0717fd4e9ad5508a9458548b48712ed5997a5d3d73467b9646c5ae",
+      "entry_hash": "2b391ea266726d5e6487b6ac26aec0c80be622c4beeb35c31217b08befd33be5",
+      "entry_hmac": "6576f0080e5bb6d78ed207a9aaae1dcd778aa8512401b2ccf363eb9d08c0be55"
+    },
+    {
+      "seq": 24,
+      "event_id": "b7f3867f-204f-4ad4-bd5c-2d37dddf10cc",
+      "timestamp": "2026-07-21T17:07:08.599778+00:00",
+      "mode": "claude_code",
+      "tool": "audit_grice_maxims",
+      "target": "Musical.ly negotiation text (from case file transcription)",
+      "result_summary": "verdict=NOISE; 0 maxim violations, cooperative/non-deceptive phrasing",
+      "input_hash": "c5cc286a71e12e9914d46c7ded1402ef1f0629ef55faef761869951db9ee5164",
+      "chain_version": "2",
+      "prev_hash": "2b391ea266726d5e6487b6ac26aec0c80be622c4beeb35c31217b08befd33be5",
+      "entry_hash": "01c8451435c4e08db2dbc5f3e931c48a7475b3991d621087734521fc999f4156",
+      "entry_hmac": "5d6193a594f6f8714e017ea5302d0d97c151c9cbb7a1db0e3dff4e260a68a92c"
+    },
+    {
+      "seq": 25,
+      "event_id": "c3e2f208-42a1-421c-84c5-0bcef53dfad5",
+      "timestamp": "2026-07-21T17:07:08.599805+00:00",
+      "mode": "claude_code",
+      "tool": "detect_eco_overinterpretation",
+      "target": "full OWL-NEXUS5 artifact list",
+      "result_summary": "verdict=NORMAL_DISTRIBUTION; 0% obvious/staged ratio, rules out fabrication",
+      "input_hash": "d62d82934f7ab6e916b9aa700b8c077ea9a106a9689d7e6324a5c5c3ab05dd05",
+      "chain_version": "2",
+      "prev_hash": "01c8451435c4e08db2dbc5f3e931c48a7475b3991d621087734521fc999f4156",
+      "entry_hash": "e599c1f0ff86fed4d7b74352a550e0e211189db6010731a0707e34ae6654f4e0",
+      "entry_hmac": "f515260d41efde297e953558483cc44bc27aa5585547a3dd23a50d52927a48e9"
+    },
+    {
+      "seq": 26,
+      "event_id": "f1dd9dd5-673c-4351-8c2e-843d2f8d0351",
+      "timestamp": "2026-07-21T17:07:08.599828+00:00",
+      "mode": "claude_code",
+      "tool": "infer_intent",
+      "target": "MCP-tool-retrieved evidence only (call 2, no hand-authored text)",
+      "result_summary": "verdict=NOISE; 0 signals -- consistent with call 1",
+      "input_hash": "49ce23381ffdb0cfd03d6a3bff1ed1821b7f5629df56a5f04961ce40cd585474",
+      "chain_version": "2",
+      "prev_hash": "e599c1f0ff86fed4d7b74352a550e0e211189db6010731a0707e34ae6654f4e0",
+      "entry_hash": "9e0025147efbcc694d4ca02fe605b207ead66b4e2cc765c614fa54b4316ed13b",
+      "entry_hmac": "5aae04bbf6c5ee5808da9a6526d1c19876bd8a90286517ad6a896f384fb64a9c"
+    },
+    {
+      "seq": 27,
+      "event_id": "ccb47f27-8f44-4922-a275-bb38625b8855",
+      "timestamp": "2026-07-21T17:07:08.599850+00:00",
+      "mode": "claude_code",
+      "tool": "validate_and_correct_analysis",
+      "target": "candidate verdict SUSPICION (call 1)",
+      "result_summary": "correction_applied=false; SUSPICION + devil_advocate accepted without modification (llm_backend=ollama)",
+      "input_hash": "74ddb5cc663bea35ce7747cad5e93b088f5ecb8c861754a9cc45d86d6257c011",
+      "chain_version": "2",
+      "prev_hash": "9e0025147efbcc694d4ca02fe605b207ead66b4e2cc765c614fa54b4316ed13b",
+      "entry_hash": "e863cbbc98c7ea6bf3b078e9ec182069fc29cbe2915b2d5ddf4fa9b4220aefd6",
+      "entry_hmac": "5f610c5fa2b27797ae90a23786ca8b45c3b980d8eac245cda30d8edcc16a58a6"
+    },
+    {
+      "seq": 28,
+      "event_id": "83398a56-ee59-415f-ac00-6f97dbe6ac4b",
+      "timestamp": "2026-07-21T17:07:08.599873+00:00",
+      "mode": "claude_code",
+      "tool": "validate_and_correct_analysis",
+      "target": "candidate verdict SUSPICION (call 2, tool-retrieved evidence only)",
+      "result_summary": "correction_applied=true; escalated to INTENT (confidence 85) via Carnegie-bias framing (llm_backend=ollama) -- CONTRADIC",
+      "input_hash": "fca1eb05496ebde51fdd408e85480392ffbe5bd15472ce44e7a98868f082e19a",
+      "chain_version": "2",
+      "prev_hash": "e863cbbc98c7ea6bf3b078e9ec182069fc29cbe2915b2d5ddf4fa9b4220aefd6",
+      "entry_hash": "0c4fb7977ad2cc2103d972353a910068051484ae2f893a4d46cabfa009623869",
+      "entry_hmac": "25744d4e7d8a08053e236560745cd0c415cb229b89600bf53a2322d2add18965"
+    },
+    {
+      "seq": 29,
+      "event_id": "ee5c1e56-5a79-4cca-8504-f34d81447f5b",
+      "timestamp": "2026-07-21T17:07:08.599903+00:00",
+      "mode": "claude_code",
+      "tool": "contradiction_detector",
+      "target": "validate_and_correct_analysis call 1 vs call 2",
+      "result_summary": "BEFORE: correction_applied=false/SUSPICION | AFTER: correction_applied=true/INTENT(85) | REASON: same Ollama-backed self",
+      "input_hash": "23b59faab14332f67b3405032d5d9d188e0e2e69c1196ddf74df2153a4095a26",
+      "chain_version": "2",
+      "prev_hash": "0c4fb7977ad2cc2103d972353a910068051484ae2f893a4d46cabfa009623869",
+      "entry_hash": "51b04147a21580770873a4cad23242f14846818909503a35ba41d8e7052576e7",
+      "entry_hmac": "813a21fcc861ba298ad903746cda24496c193a712cadce4e88a04820f30351e8"
+    },
+    {
+      "seq": 30,
+      "event_id": "203677f6-e5be-4bfd-9f4a-47cec00b4cef",
+      "timestamp": "2026-07-21T18:33:33.704783+00:00",
+      "mode": "claude_code",
+      "tool": "external_audit_received",
+      "target": "ChatGPT adversarial review of OWL-NEXUS5-CASE_bundle_claude.json v1",
+      "result_summary": "Confirmed: chain-tip SHA matches, structurally valid. Flagged: (1) tool_execution_log entries span 0.00075s (reconstruct",
+      "input_hash": "ef91e6477a22c5c5496b2a5938db822fb7930bdfe01c73ed6f6c7355ccb0fd7d",
+      "chain_version": "2",
+      "prev_hash": "51b04147a21580770873a4cad23242f14846818909503a35ba41d8e7052576e7",
+      "entry_hash": "7df7842e55841fc4d1d991289ea93716968ee6e0e56dc4cc7185fb2de0c3b8bc",
+      "entry_hmac": "b1cbf5971d4d79a450d8a79a030d24720f58831e79411777cc503bec06b92ee7"
+    },
+    {
+      "seq": 31,
+      "event_id": "01902af3-e927-45ca-8a35-1f8664fa0334",
+      "timestamp": "2026-07-21T18:33:33.704917+00:00",
+      "mode": "claude_code",
+      "tool": "sqlite3_direct_read",
+      "target": "evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db (full table, no LIMIT)",
+      "result_summary": "CORRECTION: row +13045184333/1485909675436 = 'Sarah, the delivery is today 7 tonight the confirmation will come later th",
+      "input_hash": "2f29279edf46407b42528c6cd3a400f4568705173bf4e1697295a10fc841f39f",
+      "chain_version": "2",
+      "prev_hash": "7df7842e55841fc4d1d991289ea93716968ee6e0e56dc4cc7185fb2de0c3b8bc",
+      "entry_hash": "68ebad93b193d32e6534a1faead6f7f613586cd0e2d6ac44b7788579a68f5a60",
+      "entry_hmac": "cf6963368bf2aeba994a82e1ffd0cc4581573735a39bb78823c34f933197efd4"
+    },
+    {
+      "seq": 32,
+      "event_id": "7be7a571-b4f8-4e6f-bf4a-0233725c99f8",
+      "timestamp": "2026-07-21T18:33:33.704963+00:00",
+      "mode": "claude_code",
+      "tool": "list_files",
+      "target": "evidence/owl-2019-hd1-windows/prefetch",
+      "result_summary": "3 Pidgin prefetch entries confirmed: PIDGIN.EXE-86E18E41.pf, PIDGIN-2.11.0.EXE-93DF4765.pf, 'PIDGIN-2.11.0 (1).EXE-13893",
+      "input_hash": "69f0ab296c2f8a043649208e60c8c16bbb3a36929e1b4d7322322ee6265338b8",
+      "chain_version": "2",
+      "prev_hash": "68ebad93b193d32e6534a1faead6f7f613586cd0e2d6ac44b7788579a68f5a60",
+      "entry_hash": "99685868c17a3f73f96b54c4d2331278cfe7a24cc27ce8df33d47399021b5e7d",
+      "entry_hmac": "df772eb9f3993e903b55f70aa725fff42e0bf8b7545baa730a98da0fc7befbb1"
+    },
+    {
+      "seq": 33,
+      "event_id": "65c2e2cc-005f-4c14-918e-4ed33a8e36a8",
+      "timestamp": "2026-07-21T18:33:33.705033+00:00",
+      "mode": "claude_code",
+      "tool": "binary_header_probe",
+      "target": "PIDGIN*.pf headers",
+      "result_summary": "Both files start with 'MAM\\x04' -- Windows 10 MAM-compressed prefetch container. Cannot extract embedded last-run FILETI",
+      "input_hash": "3c44ea0e68cb09967807b655cc1382df66f7201eb3a5a1b94668b414a2e38523",
+      "chain_version": "2",
+      "prev_hash": "99685868c17a3f73f96b54c4d2331278cfe7a24cc27ce8df33d47399021b5e7d",
+      "entry_hash": "2bd3ba6ef03e26ef02347155ee055ade4b4d8d8f0cb3af28ba8602ec6912241d",
+      "entry_hmac": "602d380818b90c6675803f07474f3307c9629accdc82060d2ae3c8a531010d05"
+    },
+    {
+      "seq": 34,
+      "event_id": "a69f590a-b628-44ce-9cfd-e9296bd49195",
+      "timestamp": "2026-07-21T18:33:33.705092+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-hd1-windows (browser/NTUSER.DAT/full tree)",
+      "result_summary": "pattern=mcavoy: no ASCII findings -- INCONCLUSIVE, not a refutation: Windows registry hives (SAM/SOFTWARE/SYSTEM/NTUSER.",
+      "input_hash": "633bf1952b8964ffba49b8ae22836ab021da2517802833c4128f3eb03ed6494a",
+      "chain_version": "2",
+      "prev_hash": "2bd3ba6ef03e26ef02347155ee055ade4b4d8d8f0cb3af28ba8602ec6912241d",
+      "entry_hash": "24d5bc8787cacb39fa0a3fcad7d565d1ff07904a0045910c4f6e869933f6e57c",
+      "entry_hmac": "b3287e4f2f243172ce34cd6c985695f8605fb94a111493086dad4e0c74635dec"
+    },
+    {
+      "seq": 35,
+      "event_id": "6da4407f-6913-44f6-b242-439d2b90b41a",
+      "timestamp": "2026-07-21T18:33:33.705131+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-hd1-windows (browser/NTUSER.DAT/full tree)",
+      "result_summary": "pattern=Sarah: no ASCII findings -- INCONCLUSIVE, not a refutation: Windows registry hives (SAM/SOFTWARE/SYSTEM/NTUSER.D",
+      "input_hash": "cf63c9378dbae5f4a558cd7128c8e797a3ca99f21dca938aaf1635d5d1668eb1",
+      "chain_version": "2",
+      "prev_hash": "24d5bc8787cacb39fa0a3fcad7d565d1ff07904a0045910c4f6e869933f6e57c",
+      "entry_hash": "040366a9607d5cc1f9c8ebf39b3db83917017034c30e9acd6e199bb996b12de6",
+      "entry_hmac": "17858af4b0a9a38d740b4d52cf10dd8517ee6adee6bbc040826afbe67a159a0d"
+    },
+    {
+      "seq": 36,
+      "event_id": "4f93116f-2535-42f0-ad4c-472e2b6ce151",
+      "timestamp": "2026-07-21T18:33:33.705164+00:00",
+      "mode": "claude_code",
+      "tool": "search_pattern",
+      "target": "evidence/owl-2019-hd1-windows (browser/NTUSER.DAT/full tree)",
+      "result_summary": "pattern=layster: no ASCII findings -- INCONCLUSIVE, not a refutation: Windows registry hives (SAM/SOFTWARE/SYSTEM/NTUSER",
+      "input_hash": "4454200958ee9f10da8b79c281692588fae73bc32bad870f53fd88ea5645abe4",
+      "chain_version": "2",
+      "prev_hash": "040366a9607d5cc1f9c8ebf39b3db83917017034c30e9acd6e199bb996b12de6",
+      "entry_hash": "99fc8396674eb93131b4992dcfeded415a61e89c4ebf50f327d130f1cc26ca9a",
+      "entry_hmac": "d946208313e4669b7d12581a07dceee9c7911165094de2bdf079c8c22108e8f3"
+    },
+    {
+      "seq": 37,
+      "event_id": "3d7ba60a-7d57-4a6b-8ce4-12dddd3e7fc8",
+      "timestamp": "2026-07-21T18:33:33.705197+00:00",
+      "mode": "claude_code",
+      "tool": "contradiction_detector",
+      "target": "companion_case_ruled_out (v1) vs Pidgin lead (v2)",
+      "result_summary": "BEFORE: owl-2019-hd1-windows classified 'unrelated, ruled out' (v1, based only on absence of owl/mcavoy ASCII strings) |",
+      "input_hash": "74e5b576aed65abda1ebf73a0a1756d446959f72ddf42e20dea97799a1620af3",
+      "chain_version": "2",
+      "prev_hash": "99fc8396674eb93131b4992dcfeded415a61e89c4ebf50f327d130f1cc26ca9a",
+      "entry_hash": "18c9e4c608376f086cd80a9ef6f9be802f6eef46f424d025d2039341afb2b910",
+      "entry_hmac": "21cd5cdf0c754c9bf289157e0ab2ce8d7664843860b94de97e4065792450a4bc"
+    }
+  ],
+  "chain_tip_sha256": "18c9e4c608376f086cd80a9ef6f9be802f6eef46f424d025d2039341afb2b910",
+  "chain_tip_hmac": "21cd5cdf0c754c9bf289157e0ab2ce8d7664843860b94de97e4065792450a4bc"
+}

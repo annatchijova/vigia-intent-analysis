@@ -43,7 +43,7 @@ El sistema introduce el concepto de **Indicador de Intención (IoI)** como evolu
 Los pilares técnicos del sistema son tres:
 
 1. **Semiótica Peirciana operacionalizada**: el razonamiento abductivo (Terceridad) es el motor de inferencia central, no un post-procesador decorativo.
-2. **Determinismo estricto**: cada ejecución sobre el mismo input produce el mismo `bundle_hash` SHA-256. Esto es un requisito de admisibilidad Daubert, no una conveniencia de implementación.
+2. **Determinismo estricto de análisis**: cada ejecución sobre el mismo input produce el mismo `analysis_fingerprint` SHA-256. El `bundle_hash` es distinto por corrida porque también sella UUID y timestamps de custodia; ambos contratos son verificables y no deben confundirse. Esto es un requisito de admisibilidad Daubert, no una conveniencia de implementación.
 3. **Aislamiento de capas Zero-Trust**: el LLM (PeircePlanner/Ollama) está explícitamente excluido del loop de decisión matemática. Su única función es traducir el `ForensicBundle` sellado a narrativa humana. La decisión ya está cerrada cuando el LLM entra.
 
 El sistema cuenta con 151 módulos Python activos, más de 33 hipótesis abductivas implementadas cubrimendo 13 fases IR, integración con MITRE ATT&CK Enterprise v14.1, protocolo criptográfico P2 con 22 vectores canónicos, y cumplimiento Daubert de Nivel 3.
@@ -682,8 +682,29 @@ Script de conveniencia para interrogar el sistema vía Ollama desde línea de co
 ### 12.4 FastAPI Wrapper (`vigia_api.py`)
 
 Wrapper REST para integración con OpenWebUI. Expone:
-- `POST /analyze`: recibe caso JSON, ejecuta pipeline completo, retorna veredicto + bundle_hash
-- `POST /narrative`: genera narrativa vía `vigia_ask.sh` (Ollama)
+- `POST /analyze/path`: analiza un caso declarado en el repositorio mediante un
+  snapshot ligado al descriptor.
+- `POST /analyze/json`: analiza un caso JSON suministrado.
+- Los endpoints compatibles con OpenAI `GET /v1/models` y
+  `POST /v1/chat/completions`.
+
+El wrapper devuelve el veredicto forense del scorer standalone determinista y
+sella ese mismo payload. Su score compuesto de intención no es un posterior de
+riesgo de fabricación EBS calibrado: por eso la envoltura EBS registra
+`ABSTAIN` con `STANDALONE_SCORER_UNCALIBRATED_EBS_RISK`, mientras
+`caie_analysis` conserva veredicto, score, confianza y razón forenses. La API
+expone ambos campos para que un sello válido nunca se presente como prueba de
+otra decisión distinta.
+
+El JSON de casos suministrado por quien llama queda limitado a 1 MiB y 1.024
+artefactos antes de crear un temporal o iniciar el scoring. Los snapshots de
+casos del repositorio ligados al descriptor también se limitan a 1 MiB, incluso
+durante la copia posterior a la apertura. Son fronteras de disponibilidad HTTP,
+no validación del esquema forense ni límites sobre la adquisición local de
+evidencia o la ingestión binaria. Las rutas inválidas o que escapan el scope
+siguen respondiendo `404` opaco; un caso permitido rechazado sólo por el límite
+de tamaño declarado responde `422` con ese límite, sin fingir que el archivo
+no existe.
 
 ---
 
@@ -709,7 +730,7 @@ La decisión *Daubert v. Merrell Dow Pharmaceuticals* (1993) estableció cuatro 
 
 ### 13.3 Invariantes EBS v1 (No Negociables)
 
-- **I1 — Determinismo**: mismo input → mismo bundle
+- **I1 — Determinismo**: mismo input analítico → mismo `analysis_fingerprint`; cada sello de custodia conserva su UUID/timestamps y por eso su `bundle_hash` propio
 - **I2 — Integridad encadenada**: `bundle_hash` cubre TODO el contenido
 - **I3 — Política verificable**: `policy_spec` es independiente del runtime
 - **I4 — Acciones explícitas**: no existen efectos implícitos

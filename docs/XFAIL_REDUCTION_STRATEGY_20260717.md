@@ -312,7 +312,7 @@ distintos del motor, no contratos de código.
 | VIGIA-BEN-012 | SUSPICION/NOISE | Deuda de calibración — floor (kworker, 0.125) | KNOWN_LIMITATIONS §2172 |
 | VIGIA-FN-001 | NOISE/MALICE | Deuda de detector — exige contexto externo (RRHH) | BUGS_PENDIENTES §4940 |
 | VIGIA-FN-002 | NOISE/MALICE | Deuda de detector — exige contexto externo | BUGS_PENDIENTES §4941 |
-| VIGIA-FN-003 | SUSPICION/MALICE | Deuda de detector — exige análisis de memoria profundo (RWX) | BUGS_PENDIENTES §4955 |
+| VIGIA-FN-003 | SUSPICION/MALICE | Etiqueta histórica vs. gate B-068; RWX ya detectado | BUGS_PENDIENTES B-196 |
 | VIGIA_KIWI_006 | NOISE/SUSPICION | Deuda de detector — señal de concealment sin detector (score 0.0294) | BUGS_PENDIENTES §5452 |
 | VIGIA_KIWI_007 | NOISE/SUSPICION | Deuda de detector — señal de concealment sin detector (score 0.0518) | BUGS_PENDIENTES §5453 |
 
@@ -324,9 +324,11 @@ Consolidado por acción:
   CASE_RECOVERY §5 (recuperarlos rompería 4 NOISE correctos).
 - **Deuda de calibración (floor effect) — 3:** FP-003, NPS-2009, BEN-012.
   Acción: ticket de calibración del piso B-028/B-065; NO es xfail.
-- **Deuda de detector — 5:** FN-001, FN-002, FN-003, KIWI-006, KIWI-007.
-  Acción: ticket en BUGS_PENDIENTES. FN-001/002 exigen contexto externo,
-  FN-003 análisis de memoria profundo. KIWI-006/007 reproducidos en modo
+- **Deuda de detector — 4:** FN-001, FN-002, KIWI-006, KIWI-007.
+  Acción: ticket en BUGS_PENDIENTES. FN-001/002 exigen contexto externo.
+  FN-003 se reclasificó en B-196: la fractura RWX/inyección ya se detecta y el
+  resultado `SUSPICION` conserva el gate B-068 ante una sola colección de
+  memoria, por lo que no es deuda de detector. KIWI-006/007 reproducidos en modo
   motor aislado el 2026-07-17 (corrige la nota previa "testimony-path / sin
   adjudicar", que era errónea en dos frentes): NO son testimonio puro —
   KIWI-006 es `cultural_marker`+`log_entry`, KIWI-007 es

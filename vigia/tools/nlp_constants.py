@@ -103,7 +103,11 @@ ACP_WINDOW_SIZE: int = 20           # ventana deslizante ACP
 
 DB_PERMISSIONS: int = 0o640         # rw-r----- (owner+group)
 CONFIG_PERMISSIONS: int = 0o644     # rw-r--r--
+# Legacy input-root name. It is deliberately NOT a database destination:
+# VIGIA_EVIDENCE_DIR/PATH is source evidence and must remain read-only.
 EVIDENCE_PATH_ENV: str = "VIGIA_EVIDENCE_PATH"
+FORENSIC_DB_PATH_ENV: str = "VIGIA_FORENSIC_DB_PATH"
+WORK_DIR_ENV: str = "VIGIA_WORK_DIR"
 
 # Umbrales sigma periciales (Daubert-calibrados)
 SIGMA_WARNING: float = 1.96

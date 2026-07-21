@@ -12,6 +12,16 @@ Uso:
 import argparse
 import os
 import sqlite3
+import sys
+from pathlib import Path
+
+# The documented ``python3 vigia/tools/init_patterns_db.py`` invocation runs
+# this file outside package mode.  Keep the safety guard importable there as
+# well as through ``python -m`` and CI's explicit PYTHONPATH.
+if __package__ in {None, ""}:
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from vigia.security.output_boundary import validate_external_output_path
 
 DEFAULT_DB = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -190,8 +200,19 @@ PATTERNS = [
 
 
 def init_db(db_path: str) -> None:
-    os.makedirs(os.path.dirname(os.path.abspath(db_path)), exist_ok=True)
-    conn = sqlite3.connect(db_path)
+    """Initialize a derived pattern database outside acquired evidence."""
+    safe_db_path = validate_external_output_path(
+        db_path,
+        artifact_label="forensic pattern database",
+    )
+    os.makedirs(os.path.dirname(safe_db_path) or ".", mode=0o750, exist_ok=True)
+    # Parent creation is a state change; validate again before SQLite can
+    # create the DB, WAL, or journal files.
+    safe_db_path = validate_external_output_path(
+        safe_db_path,
+        artifact_label="forensic pattern database",
+    )
+    conn = sqlite3.connect(safe_db_path)
     conn.executescript(SCHEMA)
     # Limpiar patrones existentes para reinserción idempotente
     conn.execute("DELETE FROM nlp_patterns")
@@ -204,7 +225,7 @@ def init_db(db_path: str) -> None:
           for p in PATTERNS])
     conn.commit()
     count = conn.execute("SELECT COUNT(*) FROM nlp_patterns").fetchone()[0]
-    print(f"[init_db] OK — {count} patrones cargados en {db_path}")
+    print(f"[init_db] OK — {count} patrones cargados en {safe_db_path}")
     conn.close()
 
 

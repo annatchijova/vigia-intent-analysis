@@ -116,6 +116,30 @@ def _unanalyzed_marker(engine: str, error: Exception) -> Dict[str, Any]:
     }
 
 
+def _partial_analysis_marker(
+    engine: str, artifact_type: str, reason: str
+) -> Dict[str, Any]:
+    """Expose an intentionally bounded analysis as incomplete coverage.
+
+    The engine did run and its findings remain available, but a declared
+    subset of source material was not inspected. The derived z=0 marker
+    cannot manufacture corroboration; it only prevents the omitted suffix
+    from being represented as clean.
+    """
+    return {
+        "tool": f"{engine.upper()}_UNANALYZED",
+        "z_score": 0.0,
+        "confidence": 0.0,
+        "value": 0.0,
+        "metadata": {
+            "artifact_type": artifact_type,
+            "unanalyzed": True,
+            "signal_class": "derived",
+            "error": str(reason)[:200],
+        },
+    }
+
+
 def _motor_caie_summary(motor: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     B-094: traduce la CAIE viva del scorer (_vigia_score) al shape que la
@@ -786,6 +810,17 @@ class SIFTOrchestrator:
                         "[SIFT_SHIM] Android engine: %d findings, %d SMS, z=%.2f",
                         len(result.findings), result.total_sms, sig.z_score,
                     )
+                # B-167: a resource cap is not a clean pass over every SMS
+                # body. Preserve the engine output, but surface the omitted
+                # suffix through the same F7 path consumed by the agent.
+                if result.sms_content_truncated:
+                    signals.append(_partial_analysis_marker(
+                        "android_sms",
+                        "android_sms",
+                        "SMS content analysis bounded to "
+                        f"{result.sms_analyzed_rows} of "
+                        f"{result.sms_analyzable_rows} non-null bodies.",
+                    ))
             except Exception as e:
                 logger.error("[SIFT_SHIM] AndroidForensicsAnalyzer failed: %s", e)
                 signals.append(_unanalyzed_marker("android", e))
@@ -1186,7 +1221,18 @@ class SIFTOrchestrator:
         }
 
     def _analyze_ebs_json(self, json_path: str) -> Dict[str, Any]:
-        case_data = json.loads(Path(json_path).read_text(encoding="utf-8"))
+        raw_case_data = json.loads(Path(json_path).read_text(encoding="utf-8"))
+        # B-163: the agent presents these signals to the investigator while
+        # _resolve_hypothesis() delegates the verdict to _vigia_score(), which
+        # already normalizes legacy schemas. Projecting the raw JSON here made
+        # a single run describe ``?`` / ``unknown`` artifacts even though the
+        # decision path had preserved their IDs and taxonomy. Normalize once at
+        # this boundary so presentation and scoring use the same label-blind
+        # artifact representation. This does not interpret nested content or
+        # convert scenario prose into a score; B-162 still makes that gap
+        # ABSTAIN until a source-specific extractor exists.
+        from vigia.pipeline.vigia_integration_bridge import normalize_case_schema
+        case_data = normalize_case_schema(raw_case_data)
         case_id = case_data.get("case_id", self.case_id)
         artifacts = case_data.get("artifacts", [])
         signals = []
@@ -1204,10 +1250,23 @@ class SIFTOrchestrator:
                 "description": art.get("description", "")[:200],
                 "source": art.get("source_tool", "unknown"),
             })
-        # FIX P2: avg en Fraction — sin float()
-        if signals:
-            n   = Fraction(len(signals), 1)
-            avg = sum(self._frac(s["z_score"]) for s in signals) / n
+        # FIX P2: avg en Fraction — sin float(). The explicit legacy mode is a
+        # historical reproduction path: preserve its pre-B-163 raw artifact
+        # arithmetic while using the normalized representation for presentation
+        # and for the default motor path.
+        legacy_mode = os.environ.get("VIGIA_EBS_RESOLVE", "motor").strip().lower() == "legacy"
+        scoring_artifacts = (
+            raw_case_data.get("artifacts", []) if legacy_mode else artifacts
+        )
+        if scoring_artifacts:
+            avg = sum(
+                self._frac(
+                    str(artifact.get("raw_score", "0"))
+                ) * self._frac(
+                    str(artifact.get("prior_trust", "1/2"))
+                )
+                for artifact in scoring_artifacts
+            ) / Fraction(len(scoring_artifacts), 1)
         else:
             avg = Fraction(0, 1)
         expected = case_data.get("expected_verdict", "UNKNOWN")
@@ -1286,6 +1345,29 @@ class SIFTOrchestrator:
         # canal que vigia_agent._generate_narrative consume (inner.get("caie")).
         # Solo en modo motor y solo si hubo fracturas (el helper devuelve None
         # si no hay nada que explicar).
+        #
+        # B-195: ``description`` belongs to the case author, not to the
+        # deterministic scorer.  Keeping it under ``abduction.narrative``
+        # made an unverified scenario claim appear in the sealed report under
+        # “Razonamiento del motor abductivo”.  Build that field solely from
+        # the label-blind selector's own output; retain scenario prose in a
+        # separately labelled, non-authoritative field for human context.
+        scenario_context = case_data.get("description", "")
+        if not isinstance(scenario_context, str):
+            scenario_context = ""
+        if mode == "motor" and resolve_meta is not None:
+            motor_reason = str(resolve_meta.get("motor_reason", "")).strip()
+            deterministic_narrative = (
+                f"[MOTOR] Label-blind selection: {hypothesis}. "
+                f"{motor_reason or 'No additional selector rationale was emitted.'}"
+            )
+            narrative_provenance = "deterministic_motor_selection"
+        else:
+            deterministic_narrative = (
+                f"[LEGACY REPRODUCTION] Selected hypothesis: {hypothesis}. "
+                "Case scenario context is not analytical evidence."
+            )
+            narrative_provenance = "legacy_reproduction"
         _out: Dict[str, Any] = {
             "case_id": case_id, "signals": signals,
             "abduction": {
@@ -1293,7 +1375,10 @@ class SIFTOrchestrator:
                 "is_conclusive": is_conclusive,
                 "confidence": confidence_f,
                 "best_posterior": str(confidence_f),
-                "narrative": case_data.get("description", "")[:500],
+                "narrative": deterministic_narrative,
+                "narrative_provenance": narrative_provenance,
+                "scenario_context": scenario_context[:500],
+                "scenario_context_provenance": "case_description_unverified",
             },
             "pipeline_meta": pipeline_meta,
         }

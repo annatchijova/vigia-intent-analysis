@@ -49,6 +49,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import yaml
 
 from vigia.security import _utcnow, audit_logger, _sanitize_path
+from vigia.security.output_boundary import validate_external_output_path
 from vigia.tools.nlp_constants import (
     # Tipos base
     Language, InstitutionalEmitter, ForensicThresholds, LanguageConfig,
@@ -225,10 +226,15 @@ class ConfigLoader:
         )
 
     def save_default_config(self, path: str) -> None:
-        abs_path = os.path.abspath(os.path.expanduser(path))
+        abs_path = validate_external_output_path(
+            path, artifact_label="configuration template"
+        )
         parent = os.path.dirname(abs_path)
         if not os.path.exists(parent):
             os.makedirs(parent, mode=0o750)
+        abs_path = validate_external_output_path(
+            abs_path, artifact_label="configuration template"
+        )
         with open(abs_path, "w", encoding="utf-8") as f:
             if path.endswith((".yaml", ".yml")):
                 yaml.dump(self.DEFAULT_CONFIG, f, default_flow_style=False)
@@ -1645,31 +1651,38 @@ class VigiaAdversarialNLP:
         try:
             from vigia.forensics.forensic_reporter import generate_forensic_pdf
 
-            out_dir = os.getenv("VIGIA_PERICIAL_PDF_DIR", ".")
-            os.makedirs(out_dir, exist_ok=True)
+            out_dir = Path(os.getenv("VIGIA_PERICIAL_PDF_DIR", "."))
             stem = Path(document_path).stem
             safe_ts = verdict.timestamp.replace(":", "").replace("-", "")
-            output_path = str(Path(out_dir) / f"{stem}_pericial_{safe_ts}.pdf")
+            output_path = out_dir / f"{stem}_pericial_{safe_ts}.pdf"
 
-            evidence_dir = os.getenv("VIGIA_EVIDENCE_DIR", "")
-            if evidence_dir and str(Path(output_path).resolve()).startswith(
-                str(Path(evidence_dir).resolve())
-            ):
-                audit_logger.log_block(
-                    event_type="PDF_EXPORT_INTO_EVIDENCE_DIR",
-                    tool="VigiaAdversarialNLP",
-                    input_preview=output_path,
-                    reason="Refusing to write pericial PDF inside VIGIA_EVIDENCE_DIR "
-                           "(evidence directories are read-only).",
-                )
-                return None
+            # Validate the intended target before ``makedirs``. The previous
+            # order created VIGIA_PERICIAL_PDF_DIR inside evidence and only
+            # then refused the PDF itself, already mutating forensic input
+            # (B-176). Component-aware containment also avoids treating an
+            # unrelated ``evidence-copy`` directory as evidence.
+            evidence_dir = os.getenv("VIGIA_EVIDENCE_DIR", "").strip()
+            if evidence_dir:
+                target = output_path.resolve(strict=False)
+                evidence_root = Path(evidence_dir).resolve(strict=False)
+                if target == evidence_root or target.is_relative_to(evidence_root):
+                    audit_logger.log_block(
+                        event_type="PDF_EXPORT_INTO_EVIDENCE_DIR",
+                        tool="VigiaAdversarialNLP",
+                        input_preview=str(output_path),
+                        reason="Refusing to write pericial PDF inside VIGIA_EVIDENCE_DIR "
+                               "(evidence directories are read-only).",
+                    )
+                    return None
+
+            os.makedirs(out_dir, exist_ok=True)
 
             generate_forensic_pdf(
                 verdict,
-                output_path,
+                str(output_path),
                 case_metadata={"case_number": case_number or verdict.document_id},
             )
-            return output_path
+            return str(output_path)
         except Exception as exc:
             audit_logger.log_info(
                 event_type="PDF_EXPORT_FAILED",

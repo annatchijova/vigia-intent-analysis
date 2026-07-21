@@ -387,7 +387,8 @@ class VigiaPipeline:
         )
 
         # ── Agent Execution Logger — SANS Find Evil! entregable obligatorio ──
-        # Genera data/logs/{case_id}_execution.jsonl con cada paso del razonamiento
+        # Genera un JSONL derivado fuera de la evidencia con cada paso del
+        # razonamiento (B-190; VIGIA_EXECUTION_LOG_DIR/VIGIA_WORK_DIR).
         _case_id = (metadata or {}).get("case_id", "unknown")
         _exec_log = None
         if _EXEC_LOGGER_AVAILABLE and VigiaExecutionLogger is not None:
@@ -1369,8 +1370,13 @@ def _signals_from_dicts(signals_data: List[Dict[str, Any]]) -> List[SignalOutput
     inexistente. Verificado en ambos modos por
     tests/test_f0_l029_darvo_hardening.py (Kimi, veredicto §1).
     """
+    if not isinstance(signals_data, list):
+        raise ValueError("signals_data must be a list of signal objects")
+
     signals: List[SignalOutput] = []
-    for d in signals_data:
+    for index, d in enumerate(signals_data):
+        if not isinstance(d, dict):
+            raise ValueError(f"signals_data[{index}] must be an object")
         try:
             signals.append(SignalOutput(
                 tool_name=d["tool_name"],
@@ -1380,7 +1386,11 @@ def _signals_from_dicts(signals_data: List[Dict[str, Any]]) -> List[SignalOutput
                 metadata=d.get("metadata"),
             ))
         except Exception as e:
-            logger.warning("[run_vigia] Señal inválida ignorada: %s — %s", d, e)
+            # B-197: a partial decision would turn an invalid supplied signal
+            # into unrecorded absent evidence.  The caller must correct the
+            # boundary payload and rerun; it is not safe to silently continue
+            # with a subset whose provenance the sealed bundle cannot express.
+            raise ValueError(f"signals_data[{index}] rejected: {e}") from e
     return signals
 
 
@@ -1414,6 +1424,7 @@ def run_vigia(
             "posterior"   : float
             "risk"        : float
             "bundle_hash" : str
+            "analysis_fingerprint": str — stable deterministic replay id
             "bundle_json" : str — bundle completo serializado
             "narrative"   : str | None
             "verify"      : dict
@@ -1474,6 +1485,7 @@ def run_vigia(
         "posterior": sealed_dict["decision_trace"]["posterior"],
         "risk": sealed_dict["decision_trace"]["risk"],
         "bundle_hash": sealed_dict["integrity"]["bundle_hash"],
+        "analysis_fingerprint": sealed_dict["integrity"].get("analysis_fingerprint", ""),
         "bundle_json": _json.dumps(sealed_dict, sort_keys=True, indent=2, default=str),
         "narrative": narrative,
         "verify": {"passed": verify_ok, "message": verify_msg},
@@ -1501,7 +1513,7 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(
         description="VIGÍA Forensic Suite — Pipeline EBS v1",
-        epilog="Salida: JSON con decision, posterior, risk, bundle_hash",
+        epilog="Salida: JSON con decision, posterior, risk, bundle_hash, analysis_fingerprint",
     )
     parser.add_argument(
         "--signals", required=True,
@@ -1568,6 +1580,7 @@ def main() -> int:
         "posterior":  result["posterior"],
         "risk":       result["risk"],
         "bundle_hash": result["bundle_hash"],
+        "analysis_fingerprint": result["analysis_fingerprint"],
         "verify":     result["verify"],
         "mode":       result["mode"],
     }

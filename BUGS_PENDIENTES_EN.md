@@ -5775,9 +5775,18 @@ Full suite: 1366 passed, 0 regressions.
 Of 23 MCP tools, only 3 have `audit_logger.log_info(event_type="TOOL_INVOKED")`
 before path sanitization: `generate_forensic_hash`, `read_evidence`, `list_files`.
 These 3 are the evidence-touching tools (chain-of-custody anchor). The remaining
-20 Phase 2-4 analysis tools are not instrumented. Their invocations are recorded
-by the calling agent's `tool_execution_log` chain (v2 with HMAC), but not in the
-per-tool audit log.
+20 Phase 2-4 analysis tools are not instrumented. A calling agent can reconstruct
+a v2 HMAC `tool_execution_log` after a session, but that is not equivalent to
+tool-side instrumentation or contemporaneous capture.
+
+**OWL v2 confirmation (2026-07-21):** external bundle
+`results/OWL-NEXUS5-CASE_bundle_claude_v2.json` preserves 37 entries and the
+stdlib verifier confirms its hash chain. Its own report documents that entries
+were written by the agent in batches after MCP calls and that HMAC cannot be
+keyedly verified without the access-restricted key. The chain therefore proves
+subsequent relative integrity, not wall-clock timing, call order, or literal
+MCP response text. This is not a verifier defect; it is concrete evidence that
+B-122 remains partially open.
 
 Deferred: broader rollout needs to address `audit_logger` synchronous fsync
 performance before adding to all 20 tools.
@@ -7069,3 +7078,491 @@ discards the sealed bundle (§5.3).
 data (hypothesis + unanalyzed + self-corrections), so for cases with none of the
 latter it is thin (MINIMAL quality). Richer step-by-step instrumentation of the
 live run loop, and MCP exposure of the trace, are later phases.
+
+---
+
+## B-153 — FastAPI `/analyze/path` does not confine `case_path` [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Conditional P1: only when the wrapper is exposed to an untrusted network. |
+| **Files** | `vigia_api.py`, `vigia/vigia_api.py` |
+| **Detected by** | Codex audit, 2026-07-21, branch `codex`. |
+
+Both endpoints form `REPO / payload.case_path` and pass it to the pipeline
+without rejecting absolute paths, `..`, symlinks, directories, or scope
+escapes. An absolute right operand discards `REPO` in `pathlib`. With inert
+stubs, both wrappers accepted and forwarded an existing file outside the
+checkout. This proves a case-scope/chain-of-custody breach; it does not claim
+arbitrary exfiltration because the pipeline expects case-shaped JSON. There is
+no request authentication and the default bind was `0.0.0.0` (CORS is not auth).
+
+**Applied repair:** `vigia/api_case_paths.py` centralizes the boundary used by
+both wrappers. It accepts only regular, non-symlink `.json` files below
+`cases/` or `data/cases/`, and rejects absolute paths, `..`, directories,
+wrong extensions, and escapes without disclosing the local path. Both modes
+now bind to `127.0.0.1` by default and validate/normalize a file-backed case
+before scoring. Fifteen API regressions cover the vectors and the allowed case.
+An operator who deliberately exposes the service beyond loopback still needs a
+designed authentication policy; this patch does not invent one.
+
+---
+
+## B-154 — `/v1/chat/completions` crashes on valid scalar JSON [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3 — availability/protocol; evidence and verdict are unchanged. |
+| **File** | `vigia_api.py` |
+| **Detected by** | Codex audit, 2026-07-21. |
+
+`json.loads(text)` accepts `42` and `null`, but the endpoint immediately tests
+`"artifacts" in case_data`, raising uncaught `TypeError` rather than the usage
+guidance returned for `[]`.
+
+**Applied repair:** only a JSON object containing `artifacts` reaches the
+pipeline; scalar, `null`, list, invalid JSON, or non-text content receives the
+usage guidance. Regressions pin `42`, `null`, `[]`, and confirm that a valid
+object still reaches the inert test pipeline.
+
+---
+
+## B-155 — `PathGuard` permits prefix collision and `..` escape [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 — forensic-integrity / SIFT acquisition boundary. |
+| **Files** | `vigia/core/path_guard.py`, consumer `vigia/sift/sift_orchestrator.py` |
+| **Detected by** | Codex audit, 2026-07-21; controlled temporary fixture only. |
+
+The allowlist uses `str(abs_path).startswith(str(base))`, which is not
+component-aware containment. A sibling sharing a base prefix and paths with
+`..` pass; `safe_open()` opens the same path via `os.open()`. The orchestrator
+passes accepted paths to SIFT engines. Existing tests covered neither vector.
+
+**Applied repair:** `PathGuard` rejects `..` before normalization and compares
+trusted roots and candidates by path component without resolving links.
+`safe_open()` uses the same normalized lexical representation. Existing
+symlink, regular-file, `fstat`, and TOCTOU defenses remain in force.
+Regressions cover the prefix collision, traversal, positive reading, and the
+`safe_read` rejection.
+
+---
+
+## B-156 — Volatility/RegRipper validators fail open outside their allowlists [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 — defense in depth and direct Python consumers. |
+| **Files** | `vigia/sift/memory_forensics.py`, `vigia/sift/registry_timeline_reconstructor.py` |
+| **Detected by** | Codex audit, 2026-07-21. |
+
+Both validators compute `allowed`, but when it is false they raise only if the
+path also does not exist. Existing files outside the declared roots are
+returned, as the controlled reproduction confirmed. SIFT normally places
+PathGuard first, but B-155 bypasses it and direct consumers have no such layer.
+
+**Applied repair:** both validators now delegate to `PathGuard` with their
+configured allowlist. An existing file outside a root raises `PermissionError`;
+absence remains `FileNotFoundError`, while other explicit boundary rejections
+remain visible. Regressions pin both engine rejections and acceptance of a
+regular in-root file.
+
+---
+
+## B-157 — Packaged API wrapper defaults to `vigia/` instead of checkout root [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 — local availability/operation; it neither changes the engine nor exposes data. |
+| **File** | `vigia/vigia_api.py` |
+| **Detected by** | Codex audit, 2026-07-21. |
+
+Without `VIGIA_REPO`, the module uses `Path(__file__).parent` —
+`checkout/vigia/` — while it looks for `data/cases`, `cases`,
+`scripts/vigia_ask.sh`, and `forensics/verify_ebs_v1.py` at the checkout root.
+`python -m vigia.vigia_api` is therefore incomplete unless the operator knows
+to configure the environment variable.
+
+**Applied repair:** the package parent (checkout root) is now the default,
+independent of the working directory; `VIGIA_REPO` remains an explicit
+override. A regression imports the package wrapper with that variable unset.
+
+---
+
+## B-158 — API returns internal exception details and checkout path [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Conditional P3 — diagnostic disclosure to clients that can reach the API. |
+| **Files** | `vigia_api.py`, `vigia/vigia_api.py` |
+| **Detected by** | Codex audit, 2026-07-21. |
+
+Both analysis endpoints raise `HTTPException(500, str(e))`: a pipeline
+exception can return local paths, binary names, or internal failure details to
+the caller. Root `/health` also returns `str(REPO)`. A controlled inert
+exception confirms that its text is preserved in the public `detail`. This
+does not change evidence or verdicts, and requires a client that can reach the
+endpoint.
+
+**Applied repair:** both wrappers log the context server-side and return one
+stable detail: `Error interno en el pipeline forense.` `/health` reports only
+operational status. Controlled-exception regressions verify that no public
+`detail` preserves internal text.
+
+---
+
+## B-159 — The public Mode 2 contract claimed an identical replay, while its reports carry an independent conclusion [DOCUMENTED + wording corrected — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 epistemic/provenance integrity; not scorer corruption. |
+| **Scope** | `README.md`, `CLAUDE.md`, `KNOWN_LIMITATIONS.md`, Mode 1/Mode 2 comparison. |
+| **Detected by** | Codex audit of batch replay and temporary executions, 2026-07-21. |
+
+README claimed that the deterministic verdict was identical in every mode and
+that Claude only narrated an already sealed bundle. That did not match the
+operational contract or preserved artifacts: `CLAUDE.md` permits Mode 2 to emit
+rungs Mode 1 does not have, and archived Mode 2 reports include their own
+conclusions (for example `VIGIA-BREAK-015_claude*.json`: `MALICE`) while the
+current deterministic agent and the archived agent bundle seal `SUSPICION`.
+Mode 2 does not modify that bundle; it produces an MCP investigation with a
+different evidence reach, aggregation, and report schema.
+
+The check did not rewrite `results/agent_batch`: temporary executions of the
+current agent in `/tmp` again sealed `SUSPICION` for BREAK-012 and BREAK-015.
+For BREAK-012, the canonical case has already been relabeled from `BENIGN` to
+`SUSPICION` because it contains two subjects (exonerated jdoe; suspected
+unknown attacker); historical `BENIGN` reports do not establish a current
+divergence.
+
+**BREAK-015 characterization:** the case declares
+`SPATIAL_IDENTITY_COLLAPSE`, `BIOMETRIC_IMPOSTURE`, and
+`IDENTITY_BIFURCATION`, but the Mode 1 scorer recomputes live CAIE and has no
+deterministic producer for those three classes. The current run measured
+`caie_fractures=0`, `fracture_malice_boost=0`, and score `0.2382`, inside the
+`SUSPICION` band (< `0.33`). Giving the declared fractures direct authority to
+reach `MALICE` would reopen the L-063 class (examiner JSON with verdict
+authority). A real fix requires a deterministic detector and negative corpus
+for identity bifurcation; no threshold was retuned and no PASS was forced.
+
+**Applied repair:** the identity-of-verdict promises were replaced with the
+verifiable contract: Mode 1 is the corpus-wide sealed output; Mode 2 cannot
+mutate or replace it, but its interactive report can be an independent
+investigation. When they differ, both artifacts and their limits are preserved.
+Neither scorer behavior nor case labels changed.
+
+---
+
+## B-160 — The Android extractor ignored a valid `calls` table inside `contacts2.db` [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 — silent mobile-evidence coverage loss; it does not itself justify a more severe verdict. |
+| **File** | `vigia/sift/android_forensics.py` (`analyze`, `_analyze_contacts`, `_analyze_call_log`). |
+| **Detected by** | Codex audit of the `OWL-NEXUS5` false negative, 2026-07-21. |
+
+Android discovery treated `contacts2.db` exclusively as a contacts database
+(`raw_contacts` or `contacts`) and only looked for call history in files named
+`calllog.db`. In the real extraction
+`evidence/owl-2019-nexus5-quick/Agent Data/contacts2.db`, the SQLite database
+is readable and contains a `calls` table with **7** rows, but neither contacts
+table. The live result was `contacts_parsed=False`, `calls_parsed=False`,
+`total_calls=0`, and recorded "could not count contacts"; all seven call records
+are left unanalyzed.
+
+This is not B-072: B-072 correctly prevents an unparseable schema from being
+turned into an *empty* contacts book or call history. Here the schema is
+recognizable and evidence exists, but dispatch follows the filename rather
+than the available table. Nor does it alone explain OWL's `NOISE`: the
+coordination SMS remains outside L-041, the case JSON contains 20
+`unknown`/zero-score placeholders, and the mobile path emits one aggregate
+signal (B-052-P2). It is an independent coverage loss that needs a repair with
+`contacts2.db`-with-`calls` tests while preserving B-072's fail-closed
+semantics.
+
+**Applied repair:** after treating `contacts2.db` as contacts, discovery also
+routes it through the existing call counter. The absence of a `calls` table in
+that file is normal and adds neither a note nor a false `EMPTY_CALL_LOG`; a
+readable `calls` table, including an empty one, retains B-072 semantics. No
+heuristic over call content was added.
+
+**Verification:** two red-first tests pin (a) seven calls in `contacts2.db` →
+`calls_parsed=True`, `total_calls=7`, no `EMPTY_CONTACTS`; and (b) a parseable
+empty `calls` table → `EMPTY_CALL_LOG`, no `EMPTY_CONTACTS`.
+`tests/test_b072_b074_mobile_verdict_fixes.py`: **35 passed**. On the real OWL
+extraction, the live result now reports 21 SMS and 7 calls, with
+`contacts_parsed=False` correctly preserved. A complete temporary-bundle run
+still sealed **ABSTAIN** and 0 Android findings: the fix recovers coverage, but
+does not pretend that counting calls resolves L-041, the case JSON placeholders,
+or B-052-P2.
+
+---
+
+## B-161 — The reasoning-trace verifier did not anchor its declared tail [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 forensic/provenance integrity. It does not alter a sealed Mode-1 verdict, but weakens a claimed process-evidence sibling. |
+| **File** | `vigia/core/reasoning_trace.py:verify_reasoning_trace`. |
+| **Detected by** | Codex audit of `OWL-NEXUS5-CASE_bundle_chatgpt_reasoning_trace.json`, 2026-07-21. |
+
+`ForensicReasoningTrace.seal()` writes `chain_tip_sha256` (and, when a key is
+configured, `chain_tip_hmac`) beside its v2 `tool_execution_log`. However,
+`verify_reasoning_trace()` calls `verify_tool_execution_log(log)` without
+passing either declared tail anchor. It therefore verifies only the internal
+links handed to it; it never checks that the final entry equals the trace's
+declared `chain_tip_sha256`.
+
+**Red proof (in memory; no evidence artifact was edited):** the OWL trace had
+three entries. Removing its final entry, replacing `chain_tip_sha256` with the
+new final entry hash, and calling `verify_reasoning_trace(bundle, trace)` still
+returned `valid=True, errors=[]`. The actual OWL trace also reported
+`hmac_checked=False` and `tip_checked=False` because no persistent HMAC key
+was supplied.
+
+This is a distinct wiring omission from the residual documented in R3-5. Even
+after the verifier begins checking the declared SHA-256 tail, a writer who can
+rewrite the entire hash-only sibling (including its tip) remains undetectable
+without a persisted HMAC key or another external authenticator. The immediate
+defect is narrower and testable: an unchanged declared tail must detect a
+truncated or appended log, exactly as `verify_bundle_tool_log()` already does.
+
+**Applied repair:** `verify_reasoning_trace()` now passes
+`trace["chain_tip_sha256"]` and, when present, `trace["chain_tip_hmac"]` into
+`verify_tool_execution_log()`. A missing declared SHA-256 tail is itself a
+verification error. The public verifier now gives the declared tail the same
+R3-5 treatment as `verify_bundle_tool_log()`.
+
+**Verification:** red-first tests now reject a truncated trace with its
+original declared tail and reject a forged declared HMAC when the verifier is
+given the configured key. `tests/test_reasoning_trace.py`,
+`tests/test_reasoning_trace_bundle_gate.py`, and
+`tests/test_r3_5_chain_tip_truncation.py`: **60 passed**. The existing OWL
+trace still verifies, now with `tip_checked=True`; it remains honestly
+hash-only (`hmac_checked=False`) until a persisted HMAC key is supplied.
+
+---
+
+## B-162 — The legacy adapter silently erased an unmodeled structured-evidence schema [PARTIALLY REMEDIATED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 evidence-integrity / honest-degradation failure. |
+| **Files** | `vigia/pipeline/vigia_integration_bridge.py:_normalize_artifact_legacy`, `vigia_scorer.py` normalization gate. |
+| **Detected by** | Codex audit of `OWL-NEXUS5-CASE`, 2026-07-21. |
+
+The legacy adapter expected `artifact_id`, `forensic_anomalies`, and
+`analyst_flags`. The OWL scenario uses `id`, nested structured `content`, and
+mobile/social types such as `web_search` and `instant_message`. Before any
+mapping, all 20 artifacts silently became `artifact_id="?"`,
+`evidence_type="unknown"`, and zero-score signals. The run then sealed
+`NOISE`, without a `normalization_failures` marker or an `ABSTAIN` disposition.
+
+Repository-wide measurement found 24 legacy artifacts with unmapped types;
+20 belong to OWL. Mapping those type names alone is not a verdict repair:
+the adapter has no deterministic extractor for the nested message, URL, and
+account semantics, so each artifact still receives the minimum raw score and
+OWL remains `NOISE` (measured score `0.0627`). Treating scenario prose such as
+`metadata.significance` as an anomaly or score would instead make an authored
+case narrative authoritative, reopening the label-leak / examiner-assertion
+class.
+
+**Applied repair:** the normalizer preserves `id` as `artifact_id`, recognizes
+the mobile/social taxonomy only as a collection class, and attaches
+`structured_content_without_semantic_extractor` when structured content lacks a
+deterministic extractor. The existing gate converts the would-be `NOISE` to
+`ABSTAIN`. Neither `metadata.significance`, narrative text, nor
+`expected_verdict` becomes a score input.
+
+**Verification:** red-first tests establish that the ID and
+`instant_message` class are preserved, that the minimal case ends in `ABSTAIN`
+with the exact loss marker, and that changing its expected label between
+`SUSPICION` and `MALICE` changes no normalized artifact.
+`tests/test_b162_structured_legacy_degradation.py`,
+`tests/test_label_leak_normalize_case_schema.py`,
+`tests/test_b066_b067_mobile_whitelist.py`,
+`tests/test_p1_metadata_normalization_integrity.py`, and
+`tests/test_b6_artifact_type_map_consistency.py`: **58 passed**. A real
+temporary-bundle run of `vigia_agent.py` on the OWL JSON changed `NOISE` to
+**`ABSTAIN`** (`motor_score=0.0627`), with a valid checksum and reasoning trace,
+without promoting prose into evidence.
+
+**Open residual:** this repairs the false-clean outcome; it does not extract
+forensic meaning from nested chat, URL, or account records. A source-specific
+Android / Chrome / Musical.ly extractor must operate over hash-bound raw
+artifacts before VIGÍA may derive a score or its own `SUSPICION`.
+
+**Cross-mode confirmation, without verdict authority (2026-07-21):** the
+work products preserved in
+`results/OWL-NEXUS5-CASE_{report,bundle}_claude*` and
+`results/OWL-NEXUS5-CASE_{report,bundle}_chatgpt.*` verify their checksums and
+agree that legacy `NOISE` does not adequately describe the recovered evidence.
+Claude v1 traversed the extraction through 29 MCP calls and ChatGPT performed a
+read-only manual image review. Claude v2 corrected the scope: a delivery SMS
+was outside the original query and the Windows/Pidgin companion is
+**UNRESOLVED**, not ruled out. It retains `SUSPICION`, not `INTENT`/`MALICE`,
+because the cross-device link was not materialized. They are neither a motor
+regression oracle nor a score input: they differ, for example, on which message
+text is recoverable and what can be inferred about the second device. That
+disagreement is preserved and reinforces that VIGÍA must keep emitting
+`ABSTAIN` until a deterministic, source-specific, hash-bound extractor
+materializes the facts it proposes to score.
+
+---
+
+## B-163 — The agent shim projected signals from raw JSON, not from the schema it scores [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 evidence/provenance coherence and explainability. |
+| **File** | `sift_orchestrator.py:_analyze_ebs_json`. |
+| **Detected by** | Codex follow-up to B-162 on `OWL-NEXUS5-CASE`, 2026-07-21. |
+
+Agent mode has two consumers of the same legacy EBS JSON. Abductive selection
+calls `_vigia_score()`, which normalizes its input; signal rendering in
+`_analyze_ebs_json()` iterated the unnormalized JSON. Thus OWL's engine
+correctly sealed `ABSTAIN` for normalization loss, while its narrative showed
+20 `artifact_id="?"`, `evidence_type="unknown"`, zero-score, unknown-source
+signals. The explanation did not describe the artifacts the engine actually
+evaluated.
+
+This does not authorize a score change or an interpretation of `content`: the
+repair must use the same deterministic, label-blind normalizer to construct
+presentation signals, retaining `expected_verdict` only as historical
+passthrough for `legacy` mode. A case with structured content must still
+remain `ABSTAIN` until a source-specific raw extractor exists.
+
+**Applied repair:** `_analyze_ebs_json()` normalizes the case once on entry,
+before projecting signals and before delegating selection to the motor. It uses
+the same deterministic, label-blind normalizer as the scorer; it does not
+change `raw_score` from content or `metadata.significance`.
+
+**Verification:** `tests/test_b163_agent_normalization_projection.py` was red
+before the patch (`?` / `unknown`) and now pins both projection equivalence with
+the normalizer and label-flip invariance. Together with B-162, Phase-1, and the
+SUSPICION verdict regression:
+`tests/test_b163_agent_normalization_projection.py`,
+`tests/test_b162_structured_legacy_degradation.py`,
+`tests/test_fase1_resolve.py`, `tests/test_b097_motor_suspicion_verdict.py`, and
+`tests/test_label_leak_normalize_case_schema.py`: **35 passed**. OWL now keeps
+20 IDs, zero placeholders, zero `unknown` types, and five canonical types; its
+hypothesis remains honestly `ABSTAIN_DETECTED`.
+
+---
+
+## B-164 — `mount_sift_evidence` required two disjoint roots, making it unreachable [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 operational/forensic: the privileged MCP tool could not mount valid available evidence. |
+| **File** | `vigia/vigia_sift_bridge.py:mount_sift_evidence`. |
+| **Detected by** | Strict MCP resolution of `OWL-NEXUS5-CASE`, followed by Codex audit, 2026-07-21. |
+
+The tool first passed both `image_path` and `mount_point` through
+`_sanitize_path_local()`, which confines them to `VIGIA_EVIDENCE_DIR`. It then
+required that same `mount_point` to resolve under `/mnt/analysis`. Unless the
+evidence directory itself happened to be `/mnt/analysis`, no request could
+satisfy both contracts: it was rejected before the privilege check and before a
+mount was attempted. This is why OWL's raw analysis needed a manual read-only
+mount even though the MCP tool existed.
+
+**Applied repair:** the source image remains mandatory evidence-root content.
+The mount point no longer accepts an arbitrary path: it accepts only a 1–64
+character `[A-Za-z0-9._-]` leaf and creates that private (`0700`) leaf below
+`VIGIA_EVIDENCE_DIR/mounted/`. The mounted filesystem therefore stays beneath
+the same trust anchor and is available to `list_files`, `read_evidence`, and
+`search_pattern`, without granting a caller authority to choose a privileged
+destination outside evidence. The leaf is explicitly `lstat`-checked to reject
+symlinks and regular files.
+
+**Deliberate limit:** mounting still requires the MCP process to have root
+privilege; that is a real gate and is now reached before an unprivileged
+request can create a leaf. The repair neither mounts an image during tests nor
+alters the raw image or the existing forensic mount.
+
+**Verification:** `tests/test_b164_mcp_mount_root.py` was red before the patch
+(`_MOUNT_ROOT` and the leaf sanitizer did not exist). It now pins the
+evidence-local path, subsequent evidence-sanitizer access, rejection of
+empty/traversal/absolute/hierarchical/NUL input, and the fact that a valid
+request reaches the privilege gate instead of the impossible path gate; it also
+rejects an existing leaf that is a regular file or symlink: **11 passed**.
+
+---
+
+## B-165 — The Android extractor denied Android evidence while parsing its Chrome profile [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 coverage/provenance: a result could contain parsed Android browsing while declaring Android artifacts absent. |
+| **File** | `vigia/sift/android_forensics.py:AndroidForensicsAnalyzer.analyze`. |
+| **Detected by** | Codex follow-up on the accessible raw extraction of `OWL-NEXUS5-CASE`, 2026-07-21. |
+
+The original Android marker set contained only platform DBs (`mmssms.db`,
+`contacts2.db`, `packages.xml`, etc.). OWL's accessible extraction preserves a
+real Android Chrome profile at
+`com.android.chrome/app_chrome/Default/History`, but not those global DBs. The
+analyzer parsed its 93 URLs and, beforehand, added the contradictory note “No
+Android-specific artifacts found.”
+
+**Applied repair:** a SQLite `History` file counts as Android coverage only
+when it occupies the exact Android Chrome package layout. A generic Chromium
+`History` file does not suffice. When this is the only marker, the result now
+records an explicit Android application-profile note without platform-wide
+markers. It adds no finding, score, confidence, or verdict: recognizing a
+source does not turn its contents or package name into intent or malice.
+
+**Verification:** `tests/test_b165_android_package_profile_coverage.py` was
+red and now pins the valid layout, rejection of a desktop Chromium `History`,
+and the zero-findings / `z_score=0.0` invariant. Together with marker, SQLite
+read-only, and empty-data semantics:
+`tests/test_b165_android_package_profile_coverage.py`,
+`tests/test_b139_bounded_marker_scan.py`, `tests/test_b071_sqlite_readonly.py`,
+and `tests/test_b072_b074_mobile_verdict_fixes.py`: **64 passed**. On OWL raw:
+93 browser entries, an accurate coverage note, zero findings, and a zero
+signal.
+
+---
+
+## B-166 — The batch reused bundles after evidence, runtime, or configuration changed [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 provenance/measurement: a cached metric could be presented as a result from the current runtime. |
+| **Files** | `run_all_agent.py`, `vigia_agent.py`, new `vigia/core/runtime_fingerprint.py`. |
+| **Detected by** | Codex audit of the `OWL-NEXUS5` batch, 2026-07-21. |
+
+`run_all_agent.py` accepted any existing bundle with an `agent_verdict`. It did
+not compare its `evidence_sha256`, source identity, or route-affecting
+configuration. The 201-case batch made the failure visible: it marked 200
+cases `CACHED:motor` even though the current `vigia_agent.py` SHA
+(`3e49…a279e`) already differed from the SHA recorded in those bundles
+(`3038…3120`). `motor` described only the historical bundle's EBS adapter
+mode; it did not prove that the current runtime produced it.
+
+**Applied repair:** every new bundle seals a `runtime_fingerprint` in addition
+to its evidence hash. It is a versioned SHA-256 manifest of deterministic entry
+points and the `.py` files under `vigia/`, together with the interpreter version
+and the `VIGIA_*` / `PYTHONHASHSEED` context that can alter a decision.
+Secret-shaped values contribute only presence/absence to the hash and are never
+serialized into a bundle. The runner mirrors the agent's default
+`VIGIA_EVIDENCE_DIR` and reuses a bundle only when its sealed verdict, case
+hash, and runtime/context fingerprint all match. A historical bundle without a
+fingerprint reruns once; output names the reason, for example
+`[RERUN:runtime_or_context_changed_or_legacy_bundle]`.
+
+**Declared limit:** the fingerprint identifies VIGÍA's source tree, Python, and
+relevant process configuration; it is not a substitute for a lockfile and does
+not attest external binaries or dependencies. When that layer matters to a
+case, rerun and preserve the execution environment.
+
+**Verification:** `tests/test_b166_batch_cache_provenance.py` pins exact
+equality, evidence mutation, runtime mutation, legacy bundles, symlinks,
+`VIGIA_EBS_RESOLVE`, and the default evidence root. Together with existing
+sealed-comparator contracts:
+`tests/test_b166_batch_cache_provenance.py`,
+`tests/test_b058_batch_reads_sealed_verdict.py`, and
+`tests/test_b10_comparator_reads_sealed_verdict.py`: **34 passed**.
+A direct read-only OWL run with an internal temporary output emitted `ABSTAIN`
+(exit 4), and its top-level fingerprint matched the one recorded in
+`AGENT_INITIALIZED`.

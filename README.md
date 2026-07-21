@@ -396,6 +396,14 @@ pip install -e ".[dev]"
 
 ```bash
 export VIGIA_EVIDENCE_DIR="/path/to/read-only/evidence"   # required
+export VIGIA_WORK_DIR="/path/to/private/work"             # derived state; outside evidence
+# Optional execution JSONL; defaults to $VIGIA_WORK_DIR/logs, then user state.
+# Must NEVER point inside VIGIA_EVIDENCE_DIR.
+export VIGIA_EXECUTION_LOG_DIR="/path/to/private/work/logs"
+# Optional durable ACP/temporal/entanglement SQLite; defaults under VIGIA_WORK_DIR or user state.
+export VIGIA_FORENSIC_DB_PATH="/path/to/private/work/vigia_forensic.db"
+# Optional persistent sealed-bundle ledger; defaults under VIGIA_WORK_DIR or user state.
+export VIGIA_CHAIN_DB_PATH="/path/to/private/work/vigia_chain.db"
 export VIGIA_HMAC_KEY="your-hmac-key-min-32-chars"        # bundle integrity
 export ANTHROPIC_API_KEY="sk-..."                          # Claude Code / API mode
 export VIGIA_LLM_BACKEND=ollama                            # local mode
@@ -515,9 +523,15 @@ no incorrect verdict reaches the bundle.
 
 ## Deployment Modes
 
-> **Mode Architecture:** Mode 1 is the forensic core. Modes 2-5 are optional enrichment layers. Mode 2 (Claude Code) is implemented because the hackathon requires agentic framework integration, but the deterministic verdict is identical in all modes.
+> **Mode Architecture:** Mode 1 is the forensic core and the only corpus-wide,
+> deterministic verdict contract. Modes 2-5 may reuse deterministic local tools,
+> but have separate investigation and reporting contracts. A Mode 2 report is not
+> a replay or replacement of a sealed Mode 1 bundle; when its wider tool-driven
+> investigation reaches a different conclusion, both outputs and their scopes
+> must remain visible.
 
-VIGÍA runs in five modes. The deterministic scoring core is identical across all of them.
+VIGÍA runs in five modes. They can reuse local deterministic components, but
+their evidence reach and reporting contracts are not interchangeable.
 
 ---
 
@@ -583,15 +597,17 @@ Generate a sealed ForensicBundle and Amicus Curiae narrative.
 > **No Anthropic API key required.** Mode 2 works with a Claude Code Pro or Max
 > subscription — no separate `ANTHROPIC_API_KEY` needed. Claude Code reads
 > `CLAUDE.md`, calls the 21 MCP tools directly, and conducts the full Peircean
-> investigation interactively. The deterministic scoring core runs locally
-> (Mode 1 under the hood); Claude provides the narrative layer, audit trail
-> generation, Amicus Curiae reports, and interactive reasoning — but never
-> touches the sealed verdict. When `reason_with_llm` is called, it falls back
-> gracefully (FALLBACK mode) since the Anthropic API subprocess is not
-> available in the Claude Code session — this is documented as L-055 and does
-> not affect the deterministic verdict. Complete forensic reports, CRONOS audit
-> trails, and sealed bundles are fully producible in this mode. See
-> `results/kiwi/` and `cronos/` for examples of Mode 2 output.
+> investigation interactively. The deterministic tools remain local, while
+> Mode 2 assembles a separately scoped investigation, audit trail, and Amicus
+> Curiae report. It does not mutate a sealed Mode 1 bundle. It can, however,
+> evaluate evidence and context that the fixed Mode 1 JSON scorer does not
+> model; a different Mode 2 conclusion is therefore an independent report, not
+> proof that the sealed Mode 1 verdict changed. Preserve both artifacts and
+> their scopes. When `reason_with_llm` is called, it falls back gracefully
+> (FALLBACK mode) since the Anthropic API subprocess is not available in the
+> Claude Code session — this is documented as L-055. Complete forensic reports,
+> CRONOS audit trails, and sealed bundles are fully producible in this mode.
+> See `results/kiwi/` and `cronos/` for examples of Mode 2 output.
 
 ---
 
@@ -700,7 +716,12 @@ VIGÍA operates in three distinct modes. The primary evaluated mode is the agent
 
 **Python scorer only (no agent):** The deterministic scoring pipeline runs in isolation, without the agent reasoning layer. Over the canonical corpus of 52 structurally diverse cases — spanning insider threat, memory forensics, log fabrication, false flags, multi-source fraud, and adversarial steganography — the scorer achieves 100% correct verdicts. The full case set is available at `data/cases/vigia_cases_canonical_v2.json` for independent review. On BREAK cases, the scorer returns UNKNOWN — expected behavior in this mode without the agent reasoning layer.
 
-**Agent + LLM (Claude via MCP or Ollama offline):** With a language model backend, Claude or Ollama operates exclusively on the narrative layer over already-sealed ForensicBundles. It cannot modify verdicts or scores. This mode provides an additional advantage — enriched Peircean narrative and disambiguation of structurally ambiguous cases — but is not the primary evaluated mode.
+**Mode 2 / 3 investigation reports (Claude via MCP or Ollama):** These modes
+reuse local deterministic tools but can perform a broader, interactive evidence
+review and produce a separately scoped report. They cannot modify an already
+sealed Mode 1 bundle, its score, or its verdict. If their report differs, the
+right response is to preserve and compare both artifacts—not to overwrite the
+sealed result or describe the difference as an identical deterministic replay.
 
 These numbers are not inflated. They reflect results on a specific, diverse, documented corpus. All modes are documented in `KNOWN_LIMITATIONS.md`.
 
@@ -1285,11 +1306,13 @@ specific accuracy report raises this score; a flawless-looking result with no er
 analysis lowers it."* The limitations are forensic assets, not liabilities. A system
 that cannot describe its own failure modes is not Daubert-admissible.
 
-**On the LLM trust boundary:** The LLM (Claude Code, Ollama, or fallback) handles
-only narrative translation of already-sealed `ForensicBundle` objects. It does not
-compute scores, set thresholds, or emit verdicts. This boundary is marked in the
-[architecture diagram](./vigia_diagrams__1_.html) and enforced by the code — not by
-a system prompt.
+**On the LLM trust boundary:** A model cannot compute, change, or replace the
+score or verdict inside an already-sealed Mode 1 bundle. Mode 2/3 reports may
+use model-guided, tool-driven investigation outside that seal; they are
+separately scoped artifacts, not mutations of it. This boundary is marked in
+the [architecture diagram](./vigia_diagrams__1_.html) and documented under
+L-056 — it is a contract to preserve in code and artifacts, not a system-prompt
+assumption.
 
 ## Judging Criteria Alignment
 
@@ -1552,16 +1575,29 @@ Expected output: `1366 passed, 33 xfailed`
 
 ---
 
-### Deterministic outputs — same input → same SHA-256
+### Deterministic outputs — same input → same analytical fingerprint
 
-**Claim:** Identical evidence always produces a bit-for-bit identical bundle.
-Verified by running the same case three times and comparing SHA-256 hashes.
+**Claim:** Identical evidence produces a bit-for-bit identical *analytical
+projection* and therefore the same `integrity.analysis_fingerprint`. The full
+`bundle_hash` is deliberately unique per execution because it seals that
+execution's UUID and custody timestamps as well as the analysis. Both hashes
+are independently verifiable: one compares deterministic replay; the other
+protects the complete per-run forensic artifact.
 
 ```bash
 PYTHONPATH=$(pwd) python3 tests/check_determinism.py
 ```
 
-Expected output: three matching hashes — determinism confirmed.
+Expected output: three matching hashes for the selected deterministic tool.
+That script does not create or compare full EBS bundles; use the regression
+suite for the `analysis_fingerprint` contract:
+
+```bash
+python3 -m pytest -q tests/test_b198_analysis_fingerprint.py
+```
+
+Expected result: identical `analysis_fingerprint` values for equivalent
+analysis, and distinct full `bundle_hash` values for distinct custody events.
 
 ---
 

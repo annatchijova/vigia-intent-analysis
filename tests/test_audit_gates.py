@@ -85,8 +85,7 @@ _vigia_score = _scorer._vigia_score
 
 def _single_source_clones() -> dict:
     """
-    Four artifacts from the SAME tool and the SAME evidence_type, with a
-    STATISTICAL_UNIFORMITY violation that pushes the score upward.
+    Four artifacts from the SAME tool and the SAME evidence_type.
     There is no real heterogeneous corroboration: it is a single source repeated.
     """
     arts = [
@@ -106,17 +105,14 @@ def _single_source_clones() -> dict:
     return {
         "case_id": "FP-CORROBORATION-CLONES",
         "artifacts": arts,
-        "temporal_violations": [
-            {"type": "STATISTICAL_UNIFORMITY", "severity": 0.9,
-             "cause": {"artifact_id": "log_0"}, "effect": {"artifact_id": "log_1"}}
-        ],
+        "temporal_violations": [],
         "caie_fractures": [],
         "expected_verdict": "SUSPICION",
         "peirce_chain": {},
     }
 
 
-def test_malice_requires_independent_sources():
+def test_malice_requires_independent_sources(monkeypatch):
     """H-05 — RESOLVED (B-068 gate, R4-3 v2): this test now guards the gate.
 
     History: the original version was xfail(strict=False) and only asserted
@@ -127,6 +123,11 @@ def test_malice_requires_independent_sources():
     caps the verdict at SUSPICION. That is exactly the property H-05
     demanded, so the test is rewritten as a direct, always-armed guard:
 
+    The fixture receives a live-CAIE-shaped fracture through a narrow test
+    double. It used to use a JSON-only `STATISTICAL_UNIFORMITY` declaration for
+    that score mass; L-064 correctly removed its authority, so retaining it
+    would make this a test of the wrong gate.
+
     1. The score must stay above the MALICE threshold — otherwise the gate
        is not the deciding factor and the guard silently stops testing it
        (the trap the old NOTE warned about). If a recalibration drops the
@@ -134,7 +135,23 @@ def test_malice_requires_independent_sources():
     2. Four same-tool same-type artifacts must NOT reach MALICE, and the
        reason must attribute the cap to the corroboration gate.
     """
+    from types import SimpleNamespace
+    from vigia.tools.caie import CrossArtifactIncongruenceEngine
+
+    monkeypatch.setattr(
+        CrossArtifactIncongruenceEngine,
+        "detect_fractures",
+        lambda _self: [SimpleNamespace(
+            fracture_type="DOCUMENT_FORGERY",
+            severity=0.9,
+            artifact_a="log_0",
+            artifact_b="log_1",
+            interpretation="test-only live CAIE fracture",
+            ttp_id=None,
+        )],
+    )
     result = _vigia_score(_single_source_clones())
+    assert result.get("caie_fractures_source") == "live_caie"
     score = float(result.get("score", 0))
     assert score > 0.33, (
         "The clone fixture no longer crosses the MALICE threshold "

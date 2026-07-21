@@ -23,6 +23,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
+from vigia.core.path_guard import PathGuard
 from vigia.sift._math_utils import _entropy_shannon, noisy_or_correlated
 
 logger = logging.getLogger(__name__)
@@ -172,14 +173,14 @@ class RegRipperInterface:
 
     @staticmethod
     def _validate_path(path: str) -> Path:
-        p = Path(path).resolve()
-        if p.is_symlink():
-            raise ValueError(f"Symlinks prohibidos: {path}")
-        allowed = any(p == base or (base in p.parents or p == base) for base in ALLOWED_BASE_PATHS)
-        if not allowed:
-            if not p.exists():
-                raise FileNotFoundError(f"Hive no encontrado: {path}")
-        return p
+        check = PathGuard(allowed_base_paths=ALLOWED_BASE_PATHS).validate(path)
+        if check.valid:
+            return Path(os.path.abspath(os.fspath(path)))
+        if check.reason == "FILE_NOT_FOUND":
+            raise FileNotFoundError(f"Hive no encontrado: {path}")
+        if check.reason == "OUTSIDE_ALLOWLIST":
+            raise PermissionError(f"Hive outside configured allowlist: {path}")
+        raise ValueError(f"Hive path rejected: {check.reason}")
 
     def run_plugin(self, hive_path: str, plugin: str) -> str:
         try:

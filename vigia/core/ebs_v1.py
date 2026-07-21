@@ -38,7 +38,7 @@ RATIONALE (Gemini + DeepSeek auditors):
     Daubert: changing the narrative model must not change the evidence.
 
 INVARIANTS:
-    I1 Determinism:          same input -> same bundle
+    I1 Determinism:          same analytical input -> same analysis_fingerprint
     I2 Chained integrity:    bundle_hash covers ALL content
     I3 Verifiable policy:    policy_spec independent of runtime
     I4 Explicit actions:     no implicit side effects
@@ -576,13 +576,18 @@ else:
 if _USE_PYDANTIC:
     class IntegrityBlock(BaseModel):
         """
-        Chained SHA-256 hashes.
+        Chained SHA-256 hashes plus an optional stable analytical replay
+        fingerprint. ``bundle_hash`` remains the identity of a concrete,
+        timestamped custody event.
         Produced by bundle_builder.py — never by ForensicBundle itself.
         """
         bundle_hash: str = ""
         graph_hash: str = ""
         policy_hash: str = ""
         decision_hash: str = ""
+        # Stable identifier of the analysis projection.  Unlike bundle_hash,
+        # it deliberately excludes per-run UUID and wall-clock custody fields.
+        analysis_fingerprint: str = ""
         engine_attestation_hash: str = ""
         ecl_hash: str = ""
         sealed_at: str = Field(default_factory=_now_iso)
@@ -597,6 +602,9 @@ else:
         graph_hash: str = ""
         policy_hash: str = ""
         decision_hash: str = ""
+        # Stable identifier of the analysis projection.  Unlike bundle_hash,
+        # it deliberately excludes per-run UUID and wall-clock custody fields.
+        analysis_fingerprint: str = ""
         engine_attestation_hash: str = ""
         ecl_hash: str = ""
         sealed_at: str = dc_field(default_factory=_now_iso)

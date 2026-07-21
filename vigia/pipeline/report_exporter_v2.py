@@ -3,6 +3,7 @@
 import hashlib
 import json
 import datetime
+import os
 from io import BytesIO
 from typing import Dict, Any, Optional
 
@@ -15,6 +16,9 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 
 import base64
+
+from vigia.core.atomic_io import atomic_write_bytes
+from vigia.security.output_boundary import validate_external_output_path
 
 
 # ---------------------------------------------------------------------------
@@ -104,6 +108,10 @@ def export_pdf(
     Genera PDF forense con anexos, hash y firma.
     Retorna metadata verificable.
     """
+
+    safe_output_path = validate_external_output_path(
+        output_path, artifact_label="forensic PDF export"
+    )
 
     styles = getSampleStyleSheet()
     buffer = BytesIO()
@@ -248,11 +256,14 @@ def export_pdf(
     pdf_hash = sha256_bytes(pdf_bytes)
     signature = sign_hash(pdf_hash, private_key)
 
-    with open(output_path, "wb") as f:
-        f.write(pdf_bytes)
+    os.makedirs(os.path.dirname(safe_output_path) or ".", exist_ok=True)
+    safe_output_path = validate_external_output_path(
+        safe_output_path, artifact_label="forensic PDF export"
+    )
+    atomic_write_bytes(safe_output_path, pdf_bytes)
 
     return {
-        "output_path": output_path,
+        "output_path": safe_output_path,
         "pdf_hash": pdf_hash,
         "signature": signature,
         "generated_at": utc_now(),

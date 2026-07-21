@@ -30,8 +30,11 @@ import os
 import re
 # subprocess REMOVED (P2-11 fix) — all calls migrated to sandboxed_execute
 import shutil
+import stat
 import uuid
 import sys
+import inspect
+from functools import wraps
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -136,6 +139,74 @@ MAX_TEXTS_IN_LIST  = 20       # máximo ítems por llamada de lista
 MAX_TOTAL_BYTES    = 500_000  # 500 KB total por llamada
 MAX_FILE_PREVIEW   = 100_000  # máximo bytes de preview de archivo
 
+# Los eventos TOOL_INVOKED deben demostrar que una herramienta fue llamada sin
+# copiar evidencia potencialmente sensible al audit trail. Para strings, el
+# digest cubre como máximo este prefijo y el evento declara si quedó truncado;
+# jamás se escanea un payload entero sólo para registrar su invocación.
+_AUDIT_ARGUMENT_PREFIX_BYTES = 4096
+
+
+def _audit_argument_value(value: object) -> str:
+    """Return a bounded, non-plaintext description of an MCP argument."""
+    if isinstance(value, str):
+        encoded = value.encode("utf-8", errors="replace")
+        prefix = encoded[:_AUDIT_ARGUMENT_PREFIX_BYTES]
+        suffix = ", truncated=true" if len(encoded) > len(prefix) else ""
+        return (
+            f"str(bytes={len(encoded)}, sha256_prefix="
+            f"{hashlib.sha256(prefix).hexdigest()}{suffix})"
+        )
+    if isinstance(value, bytes):
+        prefix = value[:_AUDIT_ARGUMENT_PREFIX_BYTES]
+        suffix = ", truncated=true" if len(value) > len(prefix) else ""
+        return (
+            f"bytes(length={len(value)}, sha256_prefix="
+            f"{hashlib.sha256(prefix).hexdigest()}{suffix})"
+        )
+    if isinstance(value, dict):
+        return f"dict(items={len(value)})"
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return f"{type(value).__name__}(items={len(value)})"
+    if value is None or isinstance(value, (bool, int, float)):
+        return repr(value)
+    return type(value).__name__
+
+
+def _audit_argument_summary(func, args: tuple, kwargs: dict) -> str:
+    """Bind call arguments for audit context without retaining their plaintext."""
+    try:
+        bound = inspect.signature(func).bind_partial(*args, **kwargs)
+        bound.apply_defaults()
+        values = bound.arguments.items()
+    except TypeError:
+        values = tuple((f"arg_{index}", value) for index, value in enumerate(args))
+        values += tuple((name, value) for name, value in kwargs.items())
+    return "; ".join(
+        f"{name}={_audit_argument_value(value)}" for name, value in values
+    ) or "no_arguments"
+
+
+def _audit_mcp_entry(func):
+    """Record every MCP tool entry before rate limits or tool execution."""
+    @wraps(func)
+    async def _audited(*args, **kwargs):
+        audit_logger.log_info(
+            event_type="TOOL_INVOKED",
+            tool=func.__name__,
+            message=_audit_argument_summary(func, args, kwargs),
+        )
+        result = func(*args, **kwargs)
+        if inspect.isawaitable(result):
+            return await result
+        return result
+
+    return _audited
+
+
+def _register_mcp_tool(func):
+    """Register an MCP tool through the mandatory entry-audit boundary."""
+    return mcp.tool()(_audit_mcp_entry(func))
+
 # H4/TANDA 2: MAX_PATTERN_LENGTH y _ALLOWED_PATTERN se movieron con la
 # función canónica a vigia.security.sandbox (MAX_GREP_PATTERN_LENGTH,
 # _ALLOWED_GREP_PATTERN) — una sola fuente para el contrato del validador.
@@ -147,11 +218,27 @@ MAX_FILE_PREVIEW   = 100_000  # máximo bytes de preview de archivo
 # sin argumentos nombrados.
 
 def _sanitize_path_local(path: str) -> str:
+    """Constrain a forensic read to evidence or a controlled mounted volume.
+
+    ``VIGIA_EVIDENCE_DIR`` is the immutable input root. A mounted image is
+    materialized below the separate work root, but must remain reachable by
+    the same read-only MCP tools. Select the matching root before invoking the
+    canonical sanitizer so a legitimate mounted path does not create a
+    spurious traversal event against the evidence root.
     """
-    Wrapper de conveniencia: llama a vigia.security._sanitize_path con
-    base_dir=EVIDENCE_BASE_DIR.  Todas las tools internas del bridge usan
-    esta funcion para confinar acceso al directorio de evidencia.
-    """
+    try:
+        candidate = Path(path).resolve(strict=False)
+    except (OSError, RuntimeError, TypeError):
+        candidate = None
+    if candidate is not None:
+        for root in (EVIDENCE_BASE_DIR, _MOUNT_ROOT):
+            try:
+                candidate.relative_to(Path(root).resolve(strict=False))
+            except ValueError:
+                continue
+            return _sanitize_path(path, base_dir=root)
+    # Preserve the canonical sanitizer's detailed fail-closed error and audit
+    # event for a path outside either authorised read root.
     return _sanitize_path(path, base_dir=EVIDENCE_BASE_DIR)
 
 
@@ -237,17 +324,135 @@ else:
         f"Set VIGIA_EVIDENCE_DIR for production use.",
         file=sys.stderr, flush=True,
     )
-# P0 FIX: Honey token directory - secure file storage
-_HONEY_TOKEN_DIR = os.path.join(EVIDENCE_BASE_DIR, "honey_tokens")
+
+
+def _resolve_work_root() -> str:
+    """Return a private operational root that cannot overlap evidence.
+
+    Honey tokens, quarantine copies, and mount points are VIGÍA-generated
+    state. Placing any of them under ``VIGIA_EVIDENCE_DIR`` changes a forensic
+    input tree before analysis. A caller can configure durable state with
+    ``VIGIA_WORK_DIR``; otherwise a mode-0700 temporary root is used.
+    """
+    configured = os.getenv("VIGIA_WORK_DIR", "").strip()
+    if not configured:
+        root = tempfile.mkdtemp(prefix="vigia_work_")
+        os.chmod(root, 0o700)
+        return root
+
+    candidate = Path(configured)
+    if "\x00" in configured or ".." in candidate.parts:
+        print(
+            "[VIGIA][CRITICAL] VIGIA_WORK_DIR contains an unsafe path component. "
+            "Refusing to start.",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.exit(1)
+    try:
+        raw_absolute = candidate.absolute()
+        resolved = candidate.resolve(strict=False)
+        evidence_root = Path(EVIDENCE_BASE_DIR).resolve(strict=False)
+    except (OSError, RuntimeError) as exc:
+        print(
+            f"[VIGIA][CRITICAL] Cannot resolve VIGIA_WORK_DIR: {exc}. Refusing to start.",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.exit(1)
+
+    # Validate before mkdir: an unsafe configuration must not create even one
+    # directory below evidence. Reject symlinked components as well, so a
+    # visually separate work path cannot resolve into forensic input.
+    if (
+        resolved != raw_absolute
+        or resolved == evidence_root
+        or resolved.is_relative_to(evidence_root)
+        or evidence_root.is_relative_to(resolved)
+    ):
+        print(
+            "[VIGIA][CRITICAL] VIGIA_WORK_DIR must be a non-symlink root "
+            "disjoint from VIGIA_EVIDENCE_DIR. Refusing to start.",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.exit(1)
+    try:
+        os.makedirs(raw_absolute, mode=0o700, exist_ok=True)
+        os.chmod(raw_absolute, 0o700)
+    except OSError as exc:
+        print(
+            f"[VIGIA][CRITICAL] Cannot create VIGIA_WORK_DIR: {exc}. Refusing to start.",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.exit(1)
+    return str(raw_absolute)
+
+
+# B-173: evidence is read-only; all VIGÍA-created state is work state.
+WORK_BASE_DIR = _resolve_work_root()
+
+# P0 FIX: Honey token directory - secure file storage.
+_HONEY_TOKEN_DIR = os.path.join(WORK_BASE_DIR, "honey_tokens")
 os.makedirs(_HONEY_TOKEN_DIR, exist_ok=True)
 os.chmod(_HONEY_TOKEN_DIR, 0o700)  # Owner only
 
 # Purgatorio Forense: cuarentena de evidencia malformada
 # Permisos 0o700: solo el proceso VIGIA puede leer/escribir.
-# Nunca bajo /tmp — hereda la seguridad de EVIDENCE_BASE_DIR.
-_PURGATORY_DIR = os.path.join(EVIDENCE_BASE_DIR, "purgatory")
+# B-173: never below immutable evidence; WORK_BASE_DIR is 0o700 and disjoint.
+_PURGATORY_DIR = os.path.join(WORK_BASE_DIR, "purgatory")
 os.makedirs(_PURGATORY_DIR, exist_ok=True)
 os.chmod(_PURGATORY_DIR, 0o700)  # Owner only
+
+# B-164/B-173: mounted evidence must be reachable by controlled read tools but
+# cannot be materialized inside immutable input. _sanitize_path_local accepts
+# only EVIDENCE_BASE_DIR or this private mount subtree.
+_MOUNT_ROOT = os.path.join(WORK_BASE_DIR, "mounted")
+os.makedirs(_MOUNT_ROOT, mode=0o700, exist_ok=True)
+os.chmod(_MOUNT_ROOT, 0o700)
+_MOUNT_LEAF_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
+
+
+def _sanitize_mount_point(mount_point: str) -> str:
+    """Create and return one private, work-local mount leaf.
+
+    Mounting is privileged. The source image remains confined to
+    ``EVIDENCE_BASE_DIR`` while the target is a simple leaf beneath
+    ``_MOUNT_ROOT``—never an arbitrary absolute path or request-controlled
+    hierarchy. The mounted filesystem remains available through the normal
+    evidence-reading tools without mutating the source evidence tree.
+    """
+    if not isinstance(mount_point, str) or not _MOUNT_LEAF_RE.fullmatch(mount_point):
+        raise ValueError(
+            "mount_point must be a 1–64 character leaf containing only "
+            "letters, digits, '.', '_' or '-'."
+        )
+
+    # This root is created at bridge startup, before MCP input is processed.
+    safe_root = _sanitize_path(
+        _MOUNT_ROOT,
+        base_dir=WORK_BASE_DIR,
+        must_exist=True,
+    )
+    if not os.path.isdir(safe_root):
+        raise ValueError("mount_point root is not a directory")
+
+    candidate = os.path.join(safe_root, mount_point)
+    try:
+        os.mkdir(candidate, mode=0o700)
+    except FileExistsError:
+        pass
+
+    # Check the raw leaf too: resolving first would hide a symlink that points
+    # back inside the evidence root.
+    leaf_stat = os.lstat(candidate)
+    if stat.S_ISLNK(leaf_stat.st_mode):
+        raise ValueError("mount_point resolves through a symlink")
+    if not stat.S_ISDIR(leaf_stat.st_mode):
+        raise ValueError("mount_point exists but is not a directory")
+
+    return _sanitize_path(candidate, base_dir=safe_root, must_exist=True)
 
 # _AUDIT_LOG_PATH eliminada — audit_logger (vigia.security) maneja su propia ruta.
 
@@ -771,16 +976,11 @@ HIGH_RISK_PHONETIC   = HIGH_RISK_SET
 # BASE TOOLS — SIFT INTEGRATION
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=100, window_seconds=60, raise_on_limit=False)
 async def list_files(directory: str = ".") -> list:
     """List files and directories. Entry point for filesystem exploration."""
     try:
-        audit_logger.log_info(
-            event_type="TOOL_INVOKED",
-            tool="list_files",
-            message=f"directory={directory!r}",
-        )
         path = _sanitize_path_local(directory)
         return os.listdir(path)
     except (ValueError, OSError) as e:
@@ -1012,7 +1212,7 @@ async def _quarantine_malformed_evidence(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=100, window_seconds=60, raise_on_limit=False)
 async def read_evidence(path: str, max_bytes: int = 5000) -> dict:
     """
@@ -1026,11 +1226,6 @@ async def read_evidence(path: str, max_bytes: int = 5000) -> dict:
     ensuring the hash corresponds to the content in the report.
     """
     try:
-        audit_logger.log_info(
-            event_type="TOOL_INVOKED",
-            tool="read_evidence",
-            message=f"path={path!r} max_bytes={max_bytes}",
-        )
         path = _sanitize_path_local(path)
     except ValueError as e:
         return {"error": str(e)}
@@ -1149,7 +1344,7 @@ async def read_evidence(path: str, max_bytes: int = 5000) -> dict:
         return {"error": f"Cannot open file: {exc}"}
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def search_pattern(pattern: str, folder: str = ".") -> dict | str:
     """
@@ -1157,7 +1352,7 @@ async def search_pattern(pattern: str, folder: str = ".") -> dict | str:
 
     P2 fix (2026-04 audit): replaced direct subprocess.check_output with
     safe_grep() which enforces memory/CPU limits via setrlimit, depth
-    limiting, and path confinement to EVIDENCE_BASE_DIR.
+    limiting, and path confinement to evidence or a controlled mounted volume.
     """
     try:
         pattern = _sanitize_grep_pattern(pattern)
@@ -1170,7 +1365,7 @@ async def search_pattern(pattern: str, folder: str = ".") -> dict | str:
         max_depth=CONFIG.max_grep_depth,
         max_memory_mb=CONFIG.sandbox_memory_mb,
         max_cpu_seconds=CONFIG.sandbox_cpu_seconds,
-        allowed_dirs=[EVIDENCE_BASE_DIR],
+        allowed_dirs=[EVIDENCE_BASE_DIR, _MOUNT_ROOT],
     )
 
     if result["error"]:
@@ -1186,7 +1381,7 @@ async def search_pattern(pattern: str, folder: str = ".") -> dict | str:
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def list_processes(filter_name: str = "") -> list:
     """
@@ -1210,7 +1405,7 @@ async def list_processes(filter_name: str = "") -> list:
     return processes[:50]
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def audit_network() -> dict | str:
     """
@@ -1235,11 +1430,11 @@ async def audit_network() -> dict | str:
         return {"error": f"Network audit failed: {str(e)}"}
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def mount_sift_evidence(
     image_path: str,
-    mount_point: str = "/mnt/analysis"
+    mount_point: str = "default"
 ) -> dict:
     """
     Mount forensic image using SIFT tools (ewfmount for E01, mount for dd).
@@ -1248,15 +1443,11 @@ async def mount_sift_evidence(
     P2 fix: migrated from subprocess.check_output to sandboxed_execute.
     """
     try:
-        image_path  = _sanitize_path_local(image_path)
-        mount_point = _sanitize_path_local(mount_point)
+        # A mount source is immutable forensic input, never a prior mounted
+        # output under the operational work root.
+        image_path = _sanitize_path(image_path, base_dir=EVIDENCE_BASE_DIR)
     except ValueError as e:
         return {"error": str(e)}
-
-    _MOUNT_ROOT = "/mnt/analysis"
-    resolved_mount = os.path.realpath(os.path.abspath(mount_point))
-    if not resolved_mount.startswith(_MOUNT_ROOT + os.sep) and resolved_mount != _MOUNT_ROOT:
-        return {"error": f"mount_point must resolve inside {_MOUNT_ROOT}. Got: {resolved_mount}"}
 
     if os.geteuid() != 0:
         return {"error": "Root privileges required for mounting images. Re-run as root or via sudo."}
@@ -1265,16 +1456,19 @@ async def mount_sift_evidence(
         return {"error": f"Image not found: {image_path}"}
 
     ext = os.path.splitext(image_path)[1].lower()
+    if ext not in (".e01", ".ewf", ".dd", ".img", ".raw"):
+        return {"error": f"Unsupported image format: {ext}. Use .E01 or .dd/.img/.raw"}
 
     try:
-        os.makedirs(mount_point, exist_ok=True)
+        mount_point = _sanitize_mount_point(mount_point)
+    except ValueError as e:
+        return {"error": str(e)}
 
+    try:
         if ext in (".e01", ".ewf"):
             cmd = ["ewfmount", "--", image_path, mount_point]
-        elif ext in (".dd", ".img", ".raw"):
-            cmd = ["mount", "-o", "ro,loop,noexec,nosuid,nodev", "--", image_path, mount_point]
         else:
-            return {"error": f"Unsupported image format: {ext}. Use .E01 or .dd/.img"}
+            cmd = ["mount", "-o", "ro,loop,noexec,nosuid,nodev", "--", image_path, mount_point]
 
         result = await sandboxed_execute(
             cmd=cmd,
@@ -1303,7 +1497,7 @@ async def mount_sift_evidence(
 # INTEGRITY TOOLS
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=100, window_seconds=60, raise_on_limit=False)
 async def generate_forensic_hash(file_path: str) -> dict:
     """
@@ -1311,11 +1505,6 @@ async def generate_forensic_hash(file_path: str) -> dict:
     If this hash changes by a single bit, evidence was tampered with.
     """
     try:
-        audit_logger.log_info(
-            event_type="TOOL_INVOKED",
-            tool="generate_forensic_hash",
-            message=f"file_path={file_path!r}",
-        )
         file_path = _sanitize_path_local(file_path)
     except ValueError as e:
         return {"error": str(e)}
@@ -1346,7 +1535,7 @@ async def generate_forensic_hash(file_path: str) -> dict:
         return {"error": f"Integrity audit failed: {str(e)}"}
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def calculate_shannon_entropy(data: str) -> dict:
     """
@@ -1428,7 +1617,7 @@ async def calculate_shannon_entropy(data: str) -> dict:
     return await asyncio.to_thread(_compute, data)
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def audit_image_metadata(image_path: str) -> dict:
     """
@@ -1506,7 +1695,7 @@ async def audit_image_metadata(image_path: str) -> dict:
 # INTENTIONALITY ANALYSIS TOOLS — THE HEART OF VIGÍA
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def analyze_stylometry(
     texts       : list,
@@ -1645,7 +1834,7 @@ async def analyze_stylometry(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def calculate_human_entropy(
     messages              : list,
@@ -1825,7 +2014,7 @@ async def calculate_human_entropy(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def infer_intent(
     message_history : list,
@@ -2074,7 +2263,7 @@ async def infer_intent(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def detect_habit_incongruence(
     process_name      : str,
@@ -2199,7 +2388,7 @@ async def detect_habit_incongruence(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def detect_human_jitter(
     timestamps       : list,
@@ -2326,7 +2515,7 @@ async def detect_human_jitter(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def audit_grice_maxims(messages: list) -> dict:
     """
@@ -2674,7 +2863,7 @@ async def audit_grice_maxims(messages: list) -> dict:
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def detect_eco_overinterpretation(evidence_list: list) -> dict:
     """
@@ -2821,7 +3010,7 @@ def _deactivate_honey_token_impl(file_path: str) -> dict:
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def deactivate_honey_token(file_path: str) -> dict:
     """
@@ -2833,7 +3022,7 @@ async def deactivate_honey_token(file_path: str) -> dict:
     return _deactivate_honey_token_impl(file_path)
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def activate_honey_token(variable_name: str, fake_value: str, ttl_hours: float = 0.0) -> dict:
     """
@@ -2962,7 +3151,7 @@ async def activate_honey_token(variable_name: str, fake_value: str, ttl_hours: f
 # LLM REASONING — NOVEL CASE ANALYSIS
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def reason_with_llm(evidence: str, context: str = "") -> dict:
     """
@@ -3042,7 +3231,7 @@ async def reason_with_llm(evidence: str, context: str = "") -> dict:
         }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def validate_and_correct_analysis(
     evidence      : str,
@@ -3112,7 +3301,7 @@ If analysis is sound, return it unchanged with:
 # DICTIONARY MANAGEMENT TOOLS
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def reload_phonetic_dict() -> dict:
     """
@@ -3143,7 +3332,7 @@ async def reload_phonetic_dict() -> dict:
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=100, window_seconds=60, raise_on_limit=False)
 async def get_phonetic_dict_stats() -> dict:
     """
@@ -3175,11 +3364,11 @@ async def get_phonetic_dict_stats() -> dict:
 #   + TrustFusion: nueva tool MCP que cierra el ciclo Temporal→Provenance→Correlation
 #   + Whitelist del planner actualizada con las nuevas tools
 
-mcp.tool()(audit_document_integrity)   # PDF/DOCX: fonts, producer, gender/role coherence
-mcp.tool()(analyze_image_layers)       # ELA: Error Level Analysis para detección de paste-in
-mcp.tool()(detect_document_geometry)   # Márgenes, alineación, consistencia de folio
-mcp.tool()(ocr_semantic_validator)     # OCR + validación semántica de campos obligatorios (AR)
-mcp.tool()(vision_intent_audit)        # CLIP zero-shot: intencionalidad visual en imágenes
+_register_mcp_tool(audit_document_integrity)   # PDF/DOCX: fonts, producer, gender/role coherence
+_register_mcp_tool(analyze_image_layers)       # ELA: Error Level Analysis para detección de paste-in
+_register_mcp_tool(detect_document_geometry)   # Márgenes, alineación, consistencia de folio
+_register_mcp_tool(ocr_semantic_validator)     # OCR + validación semántica de campos obligatorios (AR)
+_register_mcp_tool(vision_intent_audit)        # CLIP zero-shot: intencionalidad visual en imágenes
 
 # ---------------------------------------------------------------------------
 # CAIE — Cross-Artifact Incongruence Engine (Kimi P0 → v2.0 hardened)
@@ -3191,7 +3380,7 @@ if os.getenv("VIGIA_CAIE_ENABLED", "true").lower() != "true":
 if os.getenv("VIGIA_CAIE_ENABLED", "true").lower() == "true":
     try:
         from vigia.tools.caie import cross_artifact_analysis
-        mcp.tool()(cross_artifact_analysis)
+        _register_mcp_tool(cross_artifact_analysis)
         audit_logger.log_info(
             event_type="CAIE_REGISTERED",
             tool="vigia_sift_bridge",
@@ -3219,7 +3408,7 @@ if os.getenv("VIGIA_TRUST_FUSION_ENABLED", "true").lower() != "true":
 if os.getenv("VIGIA_TRUST_FUSION_ENABLED", "true").lower() == "true":
     try:
         from vigia.core.trust_fusion import trust_fusion_analysis
-        mcp.tool()(trust_fusion_analysis)
+        _register_mcp_tool(trust_fusion_analysis)
         audit_logger.log_info(
             event_type="TRUST_FUSION_REGISTERED",
             tool="vigia_sift_bridge",
@@ -3244,7 +3433,7 @@ if os.getenv("VIGIA_TRUST_FUSION_ENABLED", "true").lower() == "true":
 if os.getenv("VIGIA_PAIRED_REVIEW_ENABLED", "true").lower() == "true":
     try:
         from vigia.tools.paired_review import compare_paired_bundles
-        mcp.tool()(compare_paired_bundles)
+        _register_mcp_tool(compare_paired_bundles)
         audit_logger.log_info(
             event_type="PAIRED_REVIEW_REGISTERED",
             tool="vigia_sift_bridge",
@@ -3263,7 +3452,7 @@ if os.getenv("VIGIA_PAIRED_REVIEW_ENABLED", "true").lower() == "true":
 if os.getenv("VIGIA_NLP_ENABLED", "true").lower() == "true":
     try:
         from vigia.tools.adversarial_nlp import analyze_document_register
-        mcp.tool()(analyze_document_register)
+        _register_mcp_tool(analyze_document_register)
         audit_logger.log_info(
             event_type="NLP_FORENSICS_REGISTERED",
             tool="vigia_sift_bridge",
@@ -3282,7 +3471,7 @@ if os.getenv("VIGIA_NLP_ENABLED", "true").lower() == "true":
 if os.getenv("VIGIA_ENTANGLEMENT_ENABLED", "true").lower() == "true":
     try:
         from vigia.tools.entanglement import analyze_document_entanglement
-        mcp.tool()(analyze_document_entanglement)
+        _register_mcp_tool(analyze_document_entanglement)
         audit_logger.log_info(
             event_type="ENTANGLEMENT_REGISTERED",
             tool="vigia_sift_bridge",
@@ -3675,4 +3864,3 @@ def _sanitize_path(raw: str, base_dir: str | None = None, **kwargs) -> str:  # t
     if not _os.path.isabs(raw):
         raw = str(_Path(_base) / raw)
     return _sp(raw, base_dir=_base, **kwargs)
-
