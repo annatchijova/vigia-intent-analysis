@@ -164,6 +164,48 @@ wrapper finding and affects the forensic acquisition layer.
    mechanism; changing root policy is a product decision, correcting the
    containment predicate is not.
 
+## C-04 — Memory and registry engine allowlists fail open [CONFIRMED]
+
+**Severity:** P1 defense-in-depth and direct-consumer boundary. The standalone
+memory and registry interfaces advertise allowlist enforcement but accept any
+existing path outside their roots.
+
+Both `Volatility3Interface._validate_path()`
+(`vigia/sift/memory_forensics.py:313-322`) and
+`RegRipperInterface._validate_path()`
+(`vigia/sift/registry_timeline_reconstructor.py:176-182`) compute a proper
+component-aware `allowed` boolean. Their rejection block, however, raises only
+when the path is outside **and does not exist**:
+
+```python
+if not allowed:
+    if not p.exists():
+        raise FileNotFoundError(...)
+return p
+```
+
+The default roots include `/tmp/vigia` but not
+`/tmp/vigia-forge-codex-audit`. With the controlled existing SQLite fixture
+outside every declared root, both validators returned that outside path:
+
+```text
+memory_validator_returns_outside=True
+registry_validator_returns_outside=True
+```
+
+This is separate from C-03. SIFT normally puts PathGuard in front of these
+engines, but C-03 can bypass that layer, and direct Python consumers can call
+the interfaces without it. The intended “if no allowlist is configured”
+fallback was not implemented: the defaults ensure an allowlist is always
+configured.
+
+### Repair proposal — not implemented
+
+Reject whenever `allowed` is false, regardless of existence. If the product
+needs an opt-in unrestricted local mode, make it an explicit, audited
+configuration instead of interpreting every existing file as authorized. Add
+positive and outside-existing regression tests to both engine validators.
+
 ## Checked, not relabeled as new
 
 `L-063`, `L-064`, and `L-065` are already accurately documented doctrine
