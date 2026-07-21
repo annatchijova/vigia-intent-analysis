@@ -254,9 +254,11 @@ doctrine questions: fallback JSON CAIE fracture authority, the
 `STATISTICAL_UNIFORMITY` producer gap, and unverified provenance-chain hashes.
 The first two were subsequently resolved on `codex` as B-170 and B-171:
 JSON-only declarations are retained but have no verdict authority, and the
-scorer abstains until their producers run. L-065 remains documented. The same
-historical audit classification applies to `L-062`, `B-149`/`L-066`, `L-057`,
-and `B-151(b)`.
+scorer abstains until their producers run. L-062 was subsequently mitigated by
+B-172: a categorical temporal claim must match its unique artifact pair; its
+separate skew-tolerance decision remains open. L-065 remains documented. The
+same historical audit classification applies to `B-149`/`L-066`, `L-057`, and
+`B-151(b)`.
 
 ## C-07 — Mode 1 / Mode 2 verdict-contract drift [DOCUMENTED + wording corrected]
 

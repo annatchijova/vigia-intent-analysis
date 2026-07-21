@@ -8258,3 +8258,46 @@ identidad exacta de score/trust frente a la misma evidencia sin SU, con CAIE
 vivo y caído. Las regresiones de fracturas CAIE vivas, Decimal severity y el
 gate de corroboración independiente se conservan con una fractura CAIE viva
 test-only, no con un boost JSON.
+
+---
+
+## B-172 / L-062 — una declaración temporal podía imponer `MALICE` sin coincidir con los artefactos [MITIGADO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Limitación mitigada** | Porción de autoridad de `L-062`: una afirmación JSON `EFFECT_BEFORE_CAUSE` ya no puede disparar por sí sola el gate categórico. La tolerancia de relojes H-01 continúa abierta. |
+| **Severidad** | P2 de integridad/autoridad de veredicto, con alcance en todos los modos que llaman al scorer determinista. |
+| **Archivo** | `vigia_scorer.py`, `tests/test_b172_hard_temporal_pair_validation.py`, `tests/characterization/test_temporal_gate_curve.py`, `KNOWN_LIMITATIONS.md`, `docs/CODEX_AUDIT_2026-07-21.md`. |
+| **Detectado por** | Auditoría de entradas de autoridad de veredicto y la curva de caracterización temporal L-062/H-01. |
+
+El gate histórico evaluaba solamente la declaración
+`temporal_violations[].type == "EFFECT_BEFORE_CAUSE"` y una severidad alta. Si
+el JSON afirmaba una inversión de cinco segundos, el scorer emitía `MALICE`
+aunque los timestamps de los artefactos reales mostraran que el supuesto efecto
+ocurrió después de la causa. La copia anidada de timestamps y `delta_seconds`
+eran una alegación del examinador, no una derivación verificable.
+
+**Prueba roja:** `test_asserted_inversion_contradicted_by_artifacts_abstains`
+declara `effect < cause`, pero entrega artefactos donde el efecto sucede dos
+segundos después de la causa. Antes de B-172 obtenía `MALICE`; esa conclusión
+no era falsificable desde la evidencia fuente.
+
+**Corrección aplicada:** B-172 reconstruye el par desde IDs de artefacto
+únicos y sus timestamps ISO-8601 de nivel superior. Ambos timestamps deben
+tener zona horaria explícita, pertenecer a la ventana de plausibilidad fija de
+CAIE y satisfacer realmente `effect < cause`. Sólo ese par verificado conserva
+el gate histórico. Una alegación de severidad alta que no verifica se retiene
+en `unverified_hard_temporal_violations`, se excluye de todas las penalidades
+temporales y produce `ABSTAIN`, con razón y par previo sellados. El resultado
+expone `hard_temporal_authority` y, cuando existe, el par validado.
+
+**Límite deliberado:** esto no decide H-01. Una inversión real, incluso de
+fracción de segundo, conserva por ahora el gate categórico anterior; los dos
+`xfail` de `tests/test_audit_temporal_skew.py` siguen marcando esa doctrina
+pendiente. Tampoco reemplaza L-065: B-172 valida coherencia entre la alegación
+y los artefactos presentes, no autentica por sí sola la cadena de procedencia.
+
+**Validación:** 74 tests pasan y 4 `xfail` documentados se conservan en la
+batería de autoridad temporal, CAIE, `Fraction` y severidad `Decimal`. El caso
+canónico con inversión real de cinco segundos mantiene `MALICE`; una alegación
+contradicha o con artefacto ausente ahora emite `ABSTAIN`.

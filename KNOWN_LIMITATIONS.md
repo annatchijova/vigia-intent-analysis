@@ -2773,9 +2773,9 @@ assertion and is tracked separately.
 
 ---
 
-## L-062 — Scorer Hard Temporal Gate Trusts `temporal_violations` Without Validating It Against Artifact Timestamps [DOCUMENTED]
+## L-062 — Scorer Hard Temporal Gate Trusted `temporal_violations` Without Validating It Against Artifact Timestamps [MITIGATED B-172; H-01 tolerance remains]
 
-**Registered 2026-07-17. Status: DOCUMENTED — fix tracked as H-01 (Tanda 4 of the XFail Reduction Protocol, `docs/XFAIL_REDUCTION_STRATEGY_20260717.md`).**
+**Registered 2026-07-17. Claim-authority portion mitigated 2026-07-21 by B-172. The separate H-01 tolerance-window decision remains open.**
 **Mode affected:** all modes that call `vigia_scorer._vigia_score` (the deterministic core).
 **Discovered:** 2026-07-17, temporal-gate characterization (`tests/characterization/test_temporal_gate_curve.py`).
 **Severity class:** integrity/contract gap (P2-class). NOT a runtime-exploitable vulnerability — it requires control of the case-construction input, not a network/attacker surface — but it is a Daubert integrity concern because it sits at the highest-authority verdict rung.
@@ -2819,16 +2819,24 @@ does not validate the asserted pair. Under Daubert this is a falsifiability
 gap: the gate's conclusion is not independently reproducible from the artifact
 timestamps.
 
-### Mitigation / planned fix
+### B-172 mitigation and remaining H-01 work
 
-Tracked as H-01 (Tanda 4). Two admissible fixes, both documented in the
-strategy doc: (a) the hard gate validates the asserted `EFFECT_BEFORE_CAUSE`
-pair against the real artifact timestamps before firing; or (b)
-`temporal_violations` population is gated by a validating producer (the CAIE
-TCV path is the existing validated producer) with its own test. The current
-behavior is pinned by `tests/characterization/test_temporal_gate_curve.py`;
-when the fix lands, those pins fail on purpose and must be updated with the
-window decision.
+B-172 reconstructs every categorical `EFFECT_BEFORE_CAUSE` claim from the
+referenced artifact IDs and their top-level ISO-8601 timestamps. The pair must
+be unique, timezone-explicit, within CAIE's fixed plausibility window, and
+actually satisfy `effect < cause`. A high-severity claim that fails any part of
+that check is retained as `unverified_hard_temporal_violations`, contributes no
+temporal trust penalty, and forces `ABSTAIN` rather than categorical `MALICE`.
+The validated pair is exposed in the sealed score result.
+
+This deliberately does **not** decide the tolerance policy: a verified negative
+ordering still follows the former categorical gate, including a small skew. H-01
+remains tracked in the strategy document for the cross-clock tolerance and CAIE
+severity-scaling design.
+
+`tests/test_b172_hard_temporal_pair_validation.py` covers a contradicted
+assertion, a missing artifact, and a real inversion. The revised temporal-curve
+characterization preserves H-01's no-tolerance negative-delta pin separately.
 
 ---
 

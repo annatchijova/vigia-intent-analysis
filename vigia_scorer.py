@@ -62,6 +62,7 @@ import json
 import logging
 import math
 import sys
+from datetime import datetime, timezone
 from fractions import Fraction
 
 # ── P0 Lookup Tables — eliminan funciones transcendentales del scoring path ──
@@ -261,6 +262,80 @@ _ABSTAIN_REASONS: dict[str, str] = {
         "assert benignity; re-acquisition required (P2-D)."
     ),
 }
+
+# B-172 / L-062: the hard temporal gate is categorical, so it validates only
+# timestamps inside the same fixed forensic plausibility window used by CAIE's
+# TCV rule.  A naive, epoch-sentinel, or future-overflow timestamp cannot
+# become a "physical law" conclusion merely because a case JSON says it did.
+_HARD_TEMPORAL_PLAUSIBLE_MIN = datetime(2000, 1, 1, tzinfo=timezone.utc)
+_HARD_TEMPORAL_PLAUSIBLE_MAX = datetime(2038, 1, 19, 3, 14, 7, tzinfo=timezone.utc)
+
+
+def _parse_hard_temporal_timestamp(value: object) -> datetime | None:
+    """Parse one artifact timestamp for the categorical temporal gate.
+
+    This boundary is stricter than ordinary display parsing: a hard MALICE
+    outcome requires an explicit timezone and a timestamp within the fixed
+    forensic window.  Missing/ambiguous data must remain unverified rather
+    than being assumed into a physical-law violation.
+    """
+    if not isinstance(value, str) or not value.strip():
+        return None
+    normalized = value.strip()
+    if normalized.endswith(("Z", "z")):
+        normalized = normalized[:-1] + "+00:00"
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    parsed = parsed.astimezone(timezone.utc)
+    if not (_HARD_TEMPORAL_PLAUSIBLE_MIN <= parsed < _HARD_TEMPORAL_PLAUSIBLE_MAX):
+        return None
+    return parsed
+
+
+def _validate_hard_temporal_violation(
+    violation: dict,
+    artifact_by_id: dict[str, dict],
+    duplicate_artifact_ids: set[str],
+) -> tuple[dict | None, str | None]:
+    """Validate a declared EFFECT_BEFORE_CAUSE against source artifacts.
+
+    The case's nested timestamps are an examiner claim and intentionally have
+    no authority here.  Only the two referenced artifact timestamps establish
+    the ordering.  This is a pair check, not the unresolved H-01 skew-window
+    policy: any verified negative ordering retains the legacy hard gate.
+    """
+    cause = violation.get("cause")
+    effect = violation.get("effect")
+    if not isinstance(cause, dict) or not isinstance(effect, dict):
+        return None, "missing_cause_or_effect_reference"
+    cause_id = cause.get("artifact_id")
+    effect_id = effect.get("artifact_id")
+    if not isinstance(cause_id, str) or not isinstance(effect_id, str):
+        return None, "missing_artifact_id"
+    if not cause_id or not effect_id or cause_id == effect_id:
+        return None, "invalid_artifact_pair"
+    if cause_id in duplicate_artifact_ids or effect_id in duplicate_artifact_ids:
+        return None, "ambiguous_artifact_id"
+    cause_artifact = artifact_by_id.get(cause_id)
+    effect_artifact = artifact_by_id.get(effect_id)
+    if cause_artifact is None or effect_artifact is None:
+        return None, "artifact_not_found"
+    cause_time = _parse_hard_temporal_timestamp(cause_artifact.get("timestamp"))
+    effect_time = _parse_hard_temporal_timestamp(effect_artifact.get("timestamp"))
+    if cause_time is None or effect_time is None:
+        return None, "artifact_timestamp_unparseable_or_out_of_range"
+    if not effect_time < cause_time:
+        return None, "artifact_order_not_effect_before_cause"
+    return {
+        "cause_artifact_id": cause_id,
+        "effect_artifact_id": effect_id,
+        "cause_timestamp": cause_time.isoformat(),
+        "effect_timestamp": effect_time.isoformat(),
+    }, None
 
 
 def _normalize_case(c):
@@ -477,14 +552,77 @@ def _vigia_score(case: dict) -> dict:
     violations    = case.get("temporal_violations", [])
     provenance    = case.get("provenance_analysis", {})
 
-    # B-171 / L-064: STATISTICAL_UNIFORMITY in a case bundle is presently an
-    # examiner-declared claim, not the output of a deterministic scorer
-    # producer. Preserve it for the evidence package and fail closed below,
-    # but remove only that unverified declaration from every scoring input.
-    # Otherwise it would retain hidden authority through
-    # _compute_temporal_factor even after its explicit malice boost was
-    # removed. Other temporal violations keep their existing authority and
-    # gates unchanged.
+    # B-172 / L-062: reconstruct every claimed hard temporal pair from the
+    # actual source artifacts before it can drive MALICE.  Do not trust the
+    # timestamp copies or delta inside the declaration itself.
+    _artifact_by_id: dict[str, dict] = {}
+    _duplicate_artifact_ids: set[str] = set()
+    for _artifact in artifacts_all:
+        if not isinstance(_artifact, dict):
+            continue
+        _artifact_id = _artifact.get("artifact_id")
+        if not isinstance(_artifact_id, str) or not _artifact_id:
+            continue
+        if _artifact_id in _artifact_by_id:
+            _duplicate_artifact_ids.add(_artifact_id)
+        else:
+            _artifact_by_id[_artifact_id] = _artifact
+
+    _validated_hard_temporal_violations: list[dict] = []
+    _unverified_hard_temporal_violations: list[dict] = []
+    for _violation in violations:
+        if not (
+            isinstance(_violation, dict)
+            and _violation.get("type") == "EFFECT_BEFORE_CAUSE"
+        ):
+            continue
+        _pair, _validation_reason = _validate_hard_temporal_violation(
+            _violation,
+            _artifact_by_id,
+            _duplicate_artifact_ids,
+        )
+        if _validation_reason is None:
+            _validated_hard_temporal_violations.append({
+                "violation": _violation,
+                "pair": _pair,
+            })
+        else:
+            _unverified_hard_temporal_violations.append({
+                "violation": _violation,
+                "reason": _validation_reason,
+            })
+    _validated_hard_temporal_ids = {
+        id(_entry["violation"])
+        for _entry in _validated_hard_temporal_violations
+    }
+
+    def _sev_float(raw, default: float = 0.5) -> float:
+        """Coerce CAIE Decimal / JSON severity at the scorer boundary.
+
+        B-057 established that a live CAIE ``Decimal`` and a JSON ``float``
+        must cross this boundary through one finite, clamped representation;
+        otherwise mixed arithmetic can fail before a verdict is produced.
+        Defined before B-172's validation gate so that gate applies those exact
+        same semantics as the later CAIE-fracture accumulator.
+        """
+        try:
+            value = float(raw)
+        except (TypeError, ValueError):
+            return default
+        if not math.isfinite(value):
+            return default
+        return max(0.0, min(1.0, value))
+
+    _unverified_hard_temporal_gate_claims = [
+        _entry for _entry in _unverified_hard_temporal_violations
+        if _sev_float(_entry["violation"].get("severity", 0), 0.0) >= 0.9
+    ]
+
+    # B-171 / L-064 + B-172 / L-062: preserve examiner declarations for the
+    # evidence package and fail closed below, but remove only unverified claims
+    # from every scoring input.  Otherwise they retain hidden authority through
+    # _compute_temporal_factor even after their explicit decision path is
+    # closed. Other temporal violations keep their existing authority.
     _unverified_statistical_uniformity_violations = [
         v for v in violations
         if isinstance(v, dict) and v.get("type") == "STATISTICAL_UNIFORMITY"
@@ -493,7 +631,13 @@ def _vigia_score(case: dict) -> dict:
         v for v in violations
         if not (
             isinstance(v, dict)
-            and v.get("type") == "STATISTICAL_UNIFORMITY"
+            and (
+                v.get("type") == "STATISTICAL_UNIFORMITY"
+                or (
+                    v.get("type") == "EFFECT_BEFORE_CAUSE"
+                    and id(v) not in _validated_hard_temporal_ids
+                )
+            )
         )
     ]
 
@@ -1126,24 +1270,6 @@ def _vigia_score(case: dict) -> dict:
         fractures if _caie_source == "live_caie" else []
     )
 
-    def _sev_float(raw, default: float = 0.5) -> float:
-        """
-        B-057 FIX: las fracturas del CAIE VIVO llevan severity como
-        decimal.Decimal (aritmética interna de caie.py); las del fallback
-        JSON llevan float. `Decimal * float` crudo → TypeError — crasheaba
-        _vigia_score entero en cuanto CAIE vivo emitía una fractura
-        maliciosa (reproducido con VIGIA-BREAK-016). Misma familia de
-        frontera de tipos que B-024/B-026: coerción + Finite Math Shield
-        en el boundary, nunca aritmética mixta.
-        """
-        try:
-            v = float(raw)
-        except (TypeError, ValueError):
-            return default
-        if not math.isfinite(v):
-            return default
-        return max(0.0, min(1.0, v))
-
     # Invariant-4 hardening (docs/SCORER_ARCHITECTURE_DOSSIER_20260712.md D-E):
     # the boost/penalty accumulators were plain float `+=`, which makes the
     # accumulated value depend on fracture EMISSION ORDER. A constructed
@@ -1171,18 +1297,13 @@ def _vigia_score(case: dict) -> dict:
     fracture_malice_boost        = float(min(Fraction(1, 2),  sum(_boost_terms,   Fraction(0))))
     fracture_credibility_penalty = float(min(Fraction(7, 20), sum(_penalty_terms, Fraction(0))))
 
-    # Hard gate: physical law violation — unconditional MALICE override.
-    # Severity is read through _sev_float (the same coercion shield every other
-    # severity consumer uses): this is the highest-authority branch in the
-    # scorer (unconditional MALICE), yet it read raw examiner JSON directly, so
-    # a string/None severity ("high", null) raised TypeError on the `>= 0.9`
-    # comparison and crashed the whole scorer. Non-numeric -> 0.0 (default),
-    # which does NOT fire the gate — a malformed severity must not fabricate an
-    # unconditional MALICE. Ref: docs/SCORER_ARCHITECTURE_DOSSIER_20260712.md D-E.
+    # B-172 / L-062: a categorical MALICE gate must be grounded in a pair the
+    # scorer just re-derived from artifact timestamps.  Severity keeps the
+    # legacy threshold after that proof; the separate H-01 tolerance policy for
+    # small real negative deltas remains deliberately unresolved.
     hard_temporal = any(
-        v.get("type") == "EFFECT_BEFORE_CAUSE"
-        and _sev_float(v.get("severity", 0), 0.0) >= 0.9
-        for v in violations
+        _sev_float(_entry["violation"].get("severity", 0), 0.0) >= 0.9
+        for _entry in _validated_hard_temporal_violations
     )
 
     # -----------------------------------------------------------------------
@@ -1480,6 +1601,18 @@ def _vigia_score(case: dict) -> dict:
         "fracture_credibility_penalty": _dround(fracture_credibility_penalty, _DETERMINISTIC_OUTPUT_PREC),
         "diversity_bonus":              _dround(diversity_bonus, _DETERMINISTIC_OUTPUT_PREC),
         "hard_temporal_gate":           hard_temporal,
+        "hard_temporal_authority": (
+            "validated_artifact_pair"
+            if hard_temporal
+            else (
+                "unverified_json_no_verdict_authority"
+                if _unverified_hard_temporal_gate_claims
+                else "no_hard_temporal_claim"
+            )
+        ),
+        "validated_hard_temporal_pairs": [
+            _entry["pair"] for _entry in _validated_hard_temporal_violations
+        ],
         "effective_trusts":             effective_trusts,
         "temporal_violations":          len(violations),
         "statistical_uniformity_authority": (
@@ -1704,7 +1837,7 @@ def _vigia_score(case: dict) -> dict:
         base_result["artifacts_rejected"] = len(_caie_artifacts_rejected)
         base_result["rejected_details"] = _caie_artifacts_rejected
 
-    # B-170/L-063 + B-171/L-064 authority gate. This is deliberately after
+    # B-170/L-063 + B-171/L-064 + B-172/L-062 authority gate. This is deliberately after
     # every normal scoring and integrity gate. A JSON-only statement with no
     # live producer may remain in the evidence package, but cannot support a
     # final substantive verdict. Preserve the score-only outcome as provenance;
@@ -1713,6 +1846,7 @@ def _vigia_score(case: dict) -> dict:
     if (
         _unverified_json_caie_fractures
         or _unverified_statistical_uniformity_violations
+        or _unverified_hard_temporal_gate_claims
     ):
         _pre_unverified_authority_verdict = base_result["verdict"]
         _pre_unverified_authority_reason = base_result["reason"]
@@ -1748,6 +1882,20 @@ def _vigia_score(case: dict) -> dict:
             _authority_gaps.append(
                 "STATISTICAL_UNIFORMITY was declared in case JSON but no "
                 "deterministic scorer producer derived it from raw intervals"
+            )
+        if _unverified_hard_temporal_gate_claims:
+            base_result["unverified_hard_temporal_violations"] = list(
+                _unverified_hard_temporal_gate_claims
+            )
+            base_result["pre_unverified_hard_temporal_verdict"] = (
+                _pre_unverified_authority_verdict
+            )
+            base_result["pre_unverified_hard_temporal_reason"] = (
+                _pre_unverified_authority_reason
+            )
+            _authority_gaps.append(
+                "EFFECT_BEFORE_CAUSE was declared in case JSON but its "
+                "artifact pair did not verify the claimed ordering"
             )
         base_result["reason"] = (
             "UNVERIFIED DECISION INPUT: " + "; ".join(_authority_gaps) + ". "
