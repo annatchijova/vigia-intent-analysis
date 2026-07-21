@@ -249,11 +249,14 @@ the public detail is stable and free of the injected text.
 
 ## Checked, not relabeled as new
 
-`L-063`, `L-064`, and `L-065` are already accurately documented doctrine
-questions: fallback JSON CAIE fracture authority, the
+At the time of the initial audit, `L-063`, `L-064`, and `L-065` were documented
+doctrine questions: fallback JSON CAIE fracture authority, the
 `STATISTICAL_UNIFORMITY` producer gap, and unverified provenance-chain hashes.
-Their characterization tests passed and remain known, not duplicate Codex
-findings. The same applies to `L-062`, `B-149`/`L-066`, `L-057`, and `B-151(b)`.
+The first two were subsequently resolved on `codex` as B-170 and B-171:
+JSON-only declarations are retained but have no verdict authority, and the
+scorer abstains until their producers run. L-065 remains documented. The same
+historical audit classification applies to `L-062`, `B-149`/`L-066`, `L-057`,
+and `B-151(b)`.
 
 ## C-07 — Mode 1 / Mode 2 verdict-contract drift [DOCUMENTED + wording corrected]
 

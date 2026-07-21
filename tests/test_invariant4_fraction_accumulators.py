@@ -15,8 +15,10 @@ exactly, so:
       multiplication has no ordering), so 0-2-term cases — the entire corpus —
       are bit-identical to the pre-fix engine (verified corpus-wide by
       scripts/experiments/fraction_gate.py);
-  (c) cap semantics are unchanged: CAIE-fracture sum capped at 0.5 FIRST,
-      then STATISTICAL_UNIFORMITY terms added, then capped again.
+  (c) the live-CAIE fracture sum still caps at 0.5. B-171 removed the former
+      JSON-only `STATISTICAL_UNIFORMITY` term from this accumulator: it is now
+      retained as unverified evidence and causes ABSTAIN, rather than adding
+      score authority.
 """
 
 import copy
@@ -130,8 +132,9 @@ class TestBitCompatibilityWithLegacyTerms:
         r = emit([0.95, 1.0])
         assert r["fracture_malice_boost"] == 0.5
 
-    def test_su_terms_add_after_first_cap_then_recap(self, emit):
-        # Fracture mass alone saturates the cap; SU on top must not exceed it.
+    def test_unverified_su_cannot_add_score_authority(self, emit):
+        # Fracture mass alone saturates the live-CAIE cap. A JSON-only SU
+        # declaration cannot add to it and makes the output explicitly abstain.
         case = copy.deepcopy(CASE)
         case["temporal_violations"] = [
             {"type": "STATISTICAL_UNIFORMITY", "severity": 0.85},
@@ -144,3 +147,7 @@ class TestBitCompatibilityWithLegacyTerms:
         finally:
             caie_mod.CrossArtifactIncongruenceEngine.detect_fractures = _ORIG_DETECT
         assert r["fracture_malice_boost"] == 0.5
+        assert r["verdict"] == "ABSTAIN"
+        assert r["statistical_uniformity_authority"] == (
+            "unverified_json_no_verdict_authority"
+        )

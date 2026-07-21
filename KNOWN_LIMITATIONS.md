@@ -2878,19 +2878,19 @@ still inert; a live CAIE run still discards case JSON and recomputes evidence.
 
 ---
 
-## L-064 — `STATISTICAL_UNIFORMITY` Malice Boost Has No Runtime Producer (All Modes) [DOCUMENTED]
+## L-064 — `STATISTICAL_UNIFORMITY` Malice Boost Has No Runtime Producer (All Modes) [RESOLVED B-171]
 
-**Registered 2026-07-18. Status: DOCUMENTED — doctrine decision pending (T cluster). L-number PROVISIONAL until merge.**
+**Registered 2026-07-18. Resolved 2026-07-21 by B-171. Historical condition retained below as an audit record.**
 **Mode affected:** all modes calling `vigia_scorer._vigia_score` (NOT gated by CAIE availability — worse reach than L-063).**
 **Discovered:** 2026-07-18 pattern hunt (T-2), characterized in `tests/characterization/test_verdict_authority_inputs.py`.
 **Severity class:** integrity/contract gap (P2-class, sibling of L-062).
 
 ### Description
 
-`case["temporal_violations"]` entries of `type == "STATISTICAL_UNIFORMITY"` add
-`sev*0.35` to `fracture_malice_boost` (`vigia_scorer.py`, SU-terms block),
-**unconditionally in every mode**. A fabricated entry (severity 1.0) flips a
-NOISE case to SUSPICION (measured: score 0.055 -> 0.375).
+Historically, `case["temporal_violations"]` entries of
+`type == "STATISTICAL_UNIFORMITY"` added `sev*0.35` to
+`fracture_malice_boost` **unconditionally in every mode**. A fabricated entry
+(severity 1.0) could flip NOISE to SUSPICION (measured: score 0.055 -> 0.375).
 
 Data-flow finding (verified 2026-07-18): **no runtime module emits
 `STATISTICAL_UNIFORMITY`.** A grep of `vigia/` finds it only as a weight-table
@@ -2900,17 +2900,34 @@ author it into case JSON. An in-code comment previously described it as coming
 "from the temporal engine" — a producer that does not exist; the comment has
 been corrected (honesty fix, behavior unchanged).
 
-### Forensic implication
+### Fix and current contract
 
-Same class as L-062 (the hard temporal gate), one rung lower in severity
-(boost, not unconditional MALICE), but with wider reach: it is not gated by
-CAIE availability, so it fires in standalone mode too.
+B-171 removes every JSON-only score path: both the explicit malice boost and
+the temporal-trust penalty. A declared violation remains counted in
+`temporal_violations` and is retained as
+`unverified_statistical_uniformity_violations`, but its score contribution is
+zero. `statistical_uniformity_authority` explicitly reports
+`unverified_json_no_verdict_authority`.
 
-### Doctrine decision (pending, Anna)
+Because a declared regularity claim can be decision-relevant yet has no
+producer under the scorer's contract, the final result is `ABSTAIN` and retains
+the score-only pre-gate verdict/reason. This applies in live and fallback CAIE
+modes: availability of CAIE does not validate a statistic CAIE never produced.
+The separately callable MCP jitter detector is not treated as a producer; it
+has a different input/output contract and is not wired into the sealed scorer.
 
-Options: (a) require a producing detector before the boost is trusted; (b)
-remove the SU boost path entirely (no producer => dead-but-exploitable input);
-(c) accept as documented. Behavior is pinned unchanged until decided.
+**Known corpus effect:** `case_002_log_fabrication` retains its scenario label
+`expected_verdict: SUSPICION`, but its current deterministic result is
+`ABSTAIN` until the case carries raw interval evidence and a deterministic
+scorer detector derives the statistical claim. The label documents the
+scenario; it does not override the evidence contract.
+
+### Validation
+
+`tests/characterization/test_verdict_authority_inputs.py::TestT2StatisticalUniformity`
+proves the former NOISE -> SUSPICION transition is gone in both live and
+fallback CAIE modes. `tests/test_invariant4_fraction_accumulators.py` proves a
+declared SU claim cannot add to a live CAIE fracture boost.
 
 ---
 

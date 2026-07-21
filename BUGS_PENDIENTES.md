@@ -8213,3 +8213,48 @@ pendientes.
 `tests/characterization/test_verdict_authority_inputs.py::TestT1FallbackFractureAuthority`
 verifica: JSON reconocido + CAIE ausente = `ABSTAIN`, boost `0`, disclosure
 sellada; tipo no reconocido = inerte; CAIE vivo = recomputa y descarta el JSON.
+
+---
+
+## B-171 / L-064 — `STATISTICAL_UNIFORMITY` declarada en JSON podía subir el veredicto en todos los modos [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Limitación cerrada** | `L-064` — resuelta por degradación honesta: la regularidad declarada permanece visible, pero no es un resultado de un productor del scorer. |
+| **Severidad** | P2 de integridad/autoridad de veredicto, con alcance en todos los modos. |
+| **Archivo** | `vigia_scorer.py`, `KNOWN_LIMITATIONS.md`, `tests/characterization/test_verdict_authority_inputs.py`, `tests/test_audit_gates.py`. |
+| **Detectado por** | Cierre del canal T-2 de entradas de autoridad de veredicto. |
+
+`temporal_violations[].type == "STATISTICAL_UNIFORMITY"` añadía
+`severity * 0.35` a `fracture_malice_boost` aun cuando ningún módulo del runtime
+del scorer había calculado esa estadística. Un JSON construido a mano podía
+mover `NOISE -> SUSPICION` tanto con CAIE vivo como sin CAIE. La existencia de
+un tool MCP de jitter no mitigaba el problema: recibe otra forma de entrada,
+usa otro contrato y no alimentaba el bundle ni el scorer.
+
+**Prueba roja:** una base de tres logs de score bajo obtiene una única
+`STATISTICAL_UNIFORMITY` desde JSON. Antes de B-171 emitía `SUSPICION` con boost
+positivo en los dos modos. La caracterización también confirmó el impacto real:
+`case_002_log_fabrication` pasaba de `UNKNOWN` (0.0839) a `SUSPICION` (0.3354)
+sólo por esa declaración.
+
+**Corrección aplicada:** el scorer ya no agrega términos SU al acumulador ni
+permite que esa declaración reduzca el trust vía `_compute_temporal_factor`.
+La declaración se preserva en `unverified_statistical_uniformity_violations` y
+el campo `statistical_uniformity_authority` declara explícitamente que no posee
+autoridad. Cuando aparece, el resultado final es `ABSTAIN`, conserva el
+veredicto y la razón de score previos, y exige una reejecución con un productor
+determinista que derive la regularidad desde intervalos crudos.
+
+**Límite deliberado:** no se fingió que el MCP jitter era ese productor ni se
+aceptaron `interval_seconds_std`, `uniformity_flag` o texto narrativo como
+prueba calculada. Construir el detector correcto requiere un contrato nuevo de
+secuencias temporales crudas, aritmética exacta, corpus negativo y calibración.
+La etiqueta de escenario de `case_002_log_fabrication` se mantiene; el motor
+ahora abstiene honestamente hasta que exista esa evidencia.
+
+**Validación:** `TestT2StatisticalUniformity` prueba `ABSTAIN`, boost `0` e
+identidad exacta de score/trust frente a la misma evidencia sin SU, con CAIE
+vivo y caído. Las regresiones de fracturas CAIE vivas, Decimal severity y el
+gate de corroboración independiente se conservan con una fractura CAIE viva
+test-only, no con un boost JSON.

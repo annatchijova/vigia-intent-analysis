@@ -477,6 +477,26 @@ def _vigia_score(case: dict) -> dict:
     violations    = case.get("temporal_violations", [])
     provenance    = case.get("provenance_analysis", {})
 
+    # B-171 / L-064: STATISTICAL_UNIFORMITY in a case bundle is presently an
+    # examiner-declared claim, not the output of a deterministic scorer
+    # producer. Preserve it for the evidence package and fail closed below,
+    # but remove only that unverified declaration from every scoring input.
+    # Otherwise it would retain hidden authority through
+    # _compute_temporal_factor even after its explicit malice boost was
+    # removed. Other temporal violations keep their existing authority and
+    # gates unchanged.
+    _unverified_statistical_uniformity_violations = [
+        v for v in violations
+        if isinstance(v, dict) and v.get("type") == "STATISTICAL_UNIFORMITY"
+    ]
+    _score_authoritative_violations = [
+        v for v in violations
+        if not (
+            isinstance(v, dict)
+            and v.get("type") == "STATISTICAL_UNIFORMITY"
+        )
+    ]
+
     if not artifacts_all:
         return {"verdict": "ERROR", "score": 0.0, "confidence": 0.0, "fractures": [], "error": "No artifacts provided — cannot evaluate intentionality without evidence"}
 
@@ -748,7 +768,10 @@ def _vigia_score(case: dict) -> dict:
             _epc_k = min(15, max(0, len(chain) - 3))  # P0: Fraction lookup, no float pow
             epc_factor = _EPC_FACTOR_TABLE[_epc_k]
 
-        temp_factor = _compute_temporal_factor(violations, a.get("artifact_id", ""))
+        temp_factor = _compute_temporal_factor(
+            _score_authoritative_violations,
+            a.get("artifact_id", ""),
+        )
         effective   = _dround(prov_trust * epc_factor * temp_factor, _DETERMINISTIC_OUTPUT_PREC)
 
         # P2 + acquisition_assurance: CAIE formula with contextual spoofability.
@@ -1004,9 +1027,9 @@ def _vigia_score(case: dict) -> dict:
     #   does not exist — NO runtime module emits STATISTICAL_UNIFORMITY. Grep of
     #   vigia/ finds it only as a weight-table key (here + trust_fusion) and in
     #   corpus-conversion scripts (scripts/convert_*_cases.py) that author it
-    #   into case JSON. So this is an examiner-JSON-only channel with verdict
-    #   authority and no validating producer — the same class as L-062, tracked
-    #   as L-064. Kept behavior-unchanged pending the doctrine decision.
+    #   into case JSON. B-171/L-064 removed its score authority: declared
+    #   uniformity is preserved but causes ABSTAIN until a deterministic scorer
+    #   producer derives it from raw interval evidence.
     #
     # LIMITATION: boost=0.45 and penalty=0.25 coefficients are heuristic.
     #   Roadmap: Bayesian calibration on labelled case dataset.
@@ -1147,23 +1170,6 @@ def _vigia_score(case: dict) -> dict:
 
     fracture_malice_boost        = float(min(Fraction(1, 2),  sum(_boost_terms,   Fraction(0))))
     fracture_credibility_penalty = float(min(Fraction(7, 20), sum(_penalty_terms, Fraction(0))))
-
-    # STATISTICAL_UNIFORMITY (examiner-JSON-only channel — no runtime producer;
-    # see the honesty correction above and L-064). A fabricated entry here adds
-    # sev*0.35 to the malice boost and can flip NOISE->SUSPICION in ANY mode
-    # (unlike caie_fractures, this is not gated by CAIE availability). Behavior
-    # is unchanged here; the exposure is documented, not yet adjudicated.
-    # Same exact-summation treatment; note the pre-existing semantics are
-    # preserved: the CAIE-fracture sum is capped FIRST, then SU terms add on
-    # top of the capped value, then the cap applies again.
-    _su_terms = [
-        Fraction(_sev_float(v.get("severity", 0), 0.0) * 0.35)
-        for v in violations
-        if v.get("type") == "STATISTICAL_UNIFORMITY"
-    ]
-    fracture_malice_boost = float(
-        min(Fraction(1, 2), Fraction(fracture_malice_boost) + sum(_su_terms, Fraction(0)))
-    )
 
     # Hard gate: physical law violation — unconditional MALICE override.
     # Severity is read through _sev_float (the same coercion shield every other
@@ -1476,6 +1482,11 @@ def _vigia_score(case: dict) -> dict:
         "hard_temporal_gate":           hard_temporal,
         "effective_trusts":             effective_trusts,
         "temporal_violations":          len(violations),
+        "statistical_uniformity_authority": (
+            "unverified_json_no_verdict_authority"
+            if _unverified_statistical_uniformity_violations
+            else "no_statistical_uniformity"
+        ),
         "caie_fractures":               len(fractures),
         # B-094: detalles de fractura (tipo/severidad/interpretación) para que
         # el path motor pueda SURFACEARLAS en el bundle/narrativa. La fractura
@@ -1693,34 +1704,55 @@ def _vigia_score(case: dict) -> dict:
         base_result["artifacts_rejected"] = len(_caie_artifacts_rejected)
         base_result["rejected_details"] = _caie_artifacts_rejected
 
-    # B-170 / L-063 authority gate.  This is deliberately after every normal
-    # scoring and integrity gate: regardless of what a JSON-only recognised
-    # CAIE declaration would otherwise accompany, the scorer cannot issue a
-    # final substantive verdict while its producer is unavailable.  Preserve
-    # the pre-gate outcome as provenance; do not silently replace it with an
-    # ABSTAIN that makes the lost authority impossible to reconstruct.
-    if _unverified_json_caie_fractures:
-        _pre_caie_authority_verdict = base_result["verdict"]
-        _pre_caie_authority_reason = base_result["reason"]
+    # B-170/L-063 + B-171/L-064 authority gate. This is deliberately after
+    # every normal scoring and integrity gate. A JSON-only statement with no
+    # live producer may remain in the evidence package, but cannot support a
+    # final substantive verdict. Preserve the score-only outcome as provenance;
+    # do not silently replace it with ABSTAIN and make the lost authority
+    # impossible to reconstruct.
+    if (
+        _unverified_json_caie_fractures
+        or _unverified_statistical_uniformity_violations
+    ):
+        _pre_unverified_authority_verdict = base_result["verdict"]
+        _pre_unverified_authority_reason = base_result["reason"]
         verdict = "ABSTAIN"
         confidence = 0.0
         base_result["verdict"] = "ABSTAIN"
         base_result["confidence"] = 0.0
+        _authority_gaps = []
+        if _unverified_json_caie_fractures:
+            base_result["unverified_json_caie_fractures"] = list(
+                _unverified_json_caie_fractures
+            )
+            base_result["pre_unverified_caie_authority_verdict"] = (
+                _pre_unverified_authority_verdict
+            )
+            base_result["pre_unverified_caie_authority_reason"] = (
+                _pre_unverified_authority_reason
+            )
+            _authority_gaps.append(
+                "recognised CAIE fracture type(s) were supplied only in case JSON "
+                "while CAIE was unavailable"
+            )
+        if _unverified_statistical_uniformity_violations:
+            base_result["unverified_statistical_uniformity_violations"] = list(
+                _unverified_statistical_uniformity_violations
+            )
+            base_result["pre_unverified_statistical_uniformity_verdict"] = (
+                _pre_unverified_authority_verdict
+            )
+            base_result["pre_unverified_statistical_uniformity_reason"] = (
+                _pre_unverified_authority_reason
+            )
+            _authority_gaps.append(
+                "STATISTICAL_UNIFORMITY was declared in case JSON but no "
+                "deterministic scorer producer derived it from raw intervals"
+            )
         base_result["reason"] = (
-            "UNVERIFIED CAIE FRACTURE DECLARATION: recognised fracture type(s) "
-            "were supplied only in case JSON while CAIE was unavailable. They "
-            "are preserved in unverified_json_caie_fractures and contributed "
-            "zero score authority. Re-run with live CAIE before issuing a "
-            "substantive verdict."
-        )
-        base_result["unverified_json_caie_fractures"] = list(
-            _unverified_json_caie_fractures
-        )
-        base_result["pre_unverified_caie_authority_verdict"] = (
-            _pre_caie_authority_verdict
-        )
-        base_result["pre_unverified_caie_authority_reason"] = (
-            _pre_caie_authority_reason
+            "UNVERIFIED DECISION INPUT: " + "; ".join(_authority_gaps) + ". "
+            "The declaration is preserved and contributed zero score authority. "
+            "Re-run with its live producer before issuing a substantive verdict."
         )
 
     base_result["quadripartite_state"] = _apply_quadripartite(

@@ -19,10 +19,10 @@ recomputing it against evidence):
       can produce or reject it. An unrecognised type remains inert.
 
   T-2 (L-064) — `temporal_violations[].type == "STATISTICAL_UNIFORMITY"`. No
-      runtime module emits it; only corpus-conversion scripts author it into
-      case JSON. Read verbatim in ALL modes (not gated by CAIE availability):
-      a fabricated entry adds sev*0.35 to the malice boost and flips
-      NOISE -> SUSPICION.
+      scorer producer emits it; corpus-conversion scripts author it into case
+      JSON. It is preserved but has zero score authority in every mode. A
+      declared entry produces ABSTAIN until a deterministic producer derives
+      it from raw interval evidence.
 
   T-3 (L-065) — per-artifact `provenance_chain`. Only len() is consulted; the
       hash strings are NEVER recomputed or matched against artifact content.
@@ -39,6 +39,7 @@ Run: PYTHONPATH=$(pwd) pytest tests/characterization/ -v --no-cov
 from __future__ import annotations
 
 import builtins
+import copy
 
 import pytest
 
@@ -69,7 +70,7 @@ def _clean_case() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# T-2 (L-064) — STATISTICAL_UNIFORMITY: phantom producer, all modes
+# T-2 (L-064) — declared STATISTICAL_UNIFORMITY: no producer, no authority
 # ---------------------------------------------------------------------------
 
 class TestT2StatisticalUniformity:
@@ -80,26 +81,35 @@ class TestT2StatisticalUniformity:
             "fresh low-score baseline"
         )
 
-    def test_fabricated_su_flips_noise_to_suspicion(self):
-        """PIN: a fabricated STATISTICAL_UNIFORMITY (no runtime producer) in the
-        case JSON boosts malice and flips the verdict. If a validating producer
-        or a gate lands, this pin moves."""
-        case = _clean_case()
+    def test_declared_su_is_retained_but_abstains(self):
+        """A declared uniformity claim is visible but cannot move the score or
+        support a substantive verdict without a deterministic producer."""
+        baseline = _vigia_score(_clean_case())
+        case = copy.deepcopy(_clean_case())
         case["temporal_violations"] = [{
             "type": "STATISTICAL_UNIFORMITY", "severity": 1.0,
             "cause": {"artifact_id": "a0"}, "effect": {"artifact_id": "a1"},
         }]
         r = _vigia_score(case)
-        assert r["verdict"] == "SUSPICION", (
-            "CHARACTERIZATION PIN MOVED (T-2): a fabricated STATISTICAL_UNIFORMITY "
-            f"no longer flips NOISE->SUSPICION (got {r['verdict']}). If this is "
-            "the L-064 doctrine fix, update the pin and the L-064 entry."
+        assert r["verdict"] == "ABSTAIN"
+        assert r["score"] == baseline["score"], (
+            "A JSON-only uniformity declaration still changed the score before "
+            "the ABSTAIN gate; it has hidden scoring authority."
         )
-        assert r.get("fracture_malice_boost", 0) > 0
+        assert r["mean_effective_trust"] == baseline["mean_effective_trust"], (
+            "A JSON-only uniformity declaration still changed temporal trust; "
+            "it has hidden scoring authority."
+        )
+        assert r.get("fracture_malice_boost", 0) == 0
+        assert r.get("statistical_uniformity_authority") == (
+            "unverified_json_no_verdict_authority"
+        )
+        assert len(r.get("unverified_statistical_uniformity_violations", [])) == 1
+        assert r.get("pre_unverified_statistical_uniformity_verdict") == baseline["verdict"]
 
-    def test_su_fires_without_caie(self):
-        """PIN: unlike caie_fractures, the SU boost is NOT gated by CAIE
-        availability — it fires in fallback mode too."""
+    def test_declared_su_abstains_without_caie(self):
+        """The absence of CAIE does not restore authority to a JSON-only
+        uniformity declaration."""
         case = _clean_case()
         case["temporal_violations"] = [{
             "type": "STATISTICAL_UNIFORMITY", "severity": 1.0,
@@ -118,7 +128,8 @@ class TestT2StatisticalUniformity:
         finally:
             builtins.__import__ = _real
         assert r.get("caie_fractures_source") == "json_fallback"
-        assert r["verdict"] == "SUSPICION"
+        assert r["verdict"] == "ABSTAIN"
+        assert r.get("fracture_malice_boost", 0) == 0
 
 
 # ---------------------------------------------------------------------------
