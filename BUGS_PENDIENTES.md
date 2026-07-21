@@ -7680,3 +7680,34 @@ devuelven el único detalle estable `Error interno en el pipeline forense.`.
 que ningún `detail` público conserva el texto interno.
 
 ---
+
+## B-159 — El contrato público de Modo 2 afirma replay idéntico, pero sus informes tienen autoridad de conclusión independiente [DOCUMENTADO + texto corregido — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de integridad epistemológica/provenance; no es corrupción del scorer. |
+| **Alcance** | `README.md`, `CLAUDE.md`, `KNOWN_LIMITATIONS.md`, comparación de Modo 1/Modo 2. |
+| **Detectado por** | Auditoría Codex sobre replay batch y ejecuciones temporales, 2026-07-21. |
+
+El README afirmaba que el veredicto determinista era idéntico en todos los
+modos y que Claude sólo narraba sobre un bundle sellado. Esa afirmación no
+coincidía con el contrato operativo ni con los artefactos: `CLAUDE.md` permite
+que Modo 2 emita escalones que Modo 1 no tiene, y los informes Mode 2 archivados
+incluyen conclusiones propias (por ejemplo `VIGIA-BREAK-015_claude*.json`:
+`MALICE`) mientras el agente determinista actual y el bundle archivado sellan
+`SUSPICION`. Modo 2 no modifica ese bundle; produce una investigación MCP con
+alcance de evidencia, agregación y esquema de reporte distintos.
+
+La comprobación no reescribió `results/agent_batch`: ejecuciones en `/tmp` del
+agente actual volvieron a sellar `SUSPICION` para BREAK-012 y BREAK-015. Para
+BREAK-012, además, el caso canónico ya fue relabelado de `BENIGN` a
+`SUSPICION` porque tiene dos sujetos (jdoe exonerado; atacante desconocido
+sospechado); informes históricos con `BENIGN` no prueban una divergencia actual.
+
+**Corrección aplicada:** se reemplazaron las promesas de identidad de veredicto
+por el contrato verificable: Modo 1 es la salida sellada corpus-wide; Modo 2 no
+puede mutarla ni reemplazarla, pero su informe interactivo puede ser una
+investigación independiente. Si divergen, se preservan ambos artefactos y sus
+límites. El scorer y las etiquetas no se tocaron.
+
+---

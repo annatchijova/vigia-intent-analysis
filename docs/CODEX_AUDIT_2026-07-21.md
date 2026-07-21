@@ -255,6 +255,42 @@ questions: fallback JSON CAIE fracture authority, the
 Their characterization tests passed and remain known, not duplicate Codex
 findings. The same applies to `L-062`, `B-149`/`L-066`, `L-057`, and `B-151(b)`.
 
+## C-07 — Mode 1 / Mode 2 verdict-contract drift [DOCUMENTED + wording corrected]
+
+**Severity:** P2 epistemic/provenance integrity. This does not establish a
+scorer defect and does not make an archived mismatch a regression by itself.
+
+The batch runner reported 201 cached sealed bundles. It is therefore a replay
+of archived Mode 1 output, not a fresh comparison with Claude/MCP. Two fresh,
+non-destructive agent runs were written only under `/tmp`:
+
+| Case | Canonical expectation | Fresh sealed Mode 1 verdict | Interpretation |
+|---|---|---|---|
+| `VIGIA-BREAK-012` | `SUSPICION` | `SUSPICION` | The two-subject label correction is reflected in the current path. |
+| `VIGIA-BREAK-015` | `MALICE` | `SUSPICION` | The documented calibration/doctrine tension remains; no threshold was retuned. |
+
+`VIGIA-BREAK-012` used to be labelled `BENIGN`; commit `15c773ad` corrected
+the collapsed subject semantics. Historical Claude reports preserve the useful
+distinction (`jdoe=NOISE`, `attacker=SUSPICION`), but their old top-level label
+must not be used to evaluate the current canonical case.
+
+The larger issue is public-contract drift. README simultaneously described Mode
+2 as a narrative-only, identical deterministic replay, while its later accuracy
+section correctly says Mode 2 is a fresh semantic investigation whose results
+are not comparable to Mode 1. `CLAUDE.md` also permits Mode 2 to emit `INTENT`,
+which Mode 1 cannot emit, and archived Mode 2 reports carry independent
+conclusions (notably `MALICE` for BREAK-015). The two modes share local tools,
+but not one sealed decision contract.
+
+### Remediation — documentation only
+
+README, `CLAUDE.md`, and L-056 now state the enforceable boundary: Mode 2 does
+not mutate or replace a Mode 1 seal. It may issue a separately scoped report;
+where outputs differ, retain both artifacts and investigate the evidence reach
+rather than silently treating either output as an override. This preserves the
+claim that no model changes a sealed Mode 1 verdict without making the false
+claim that a Mode 2 investigation is always the same verdict.
+
 ## Test evidence
 
 | Command / probe | Result | Meaning |

@@ -2310,6 +2310,16 @@ intended.**
 **Affects:** Any case where Mode 1 (`vigia_agent.py`) and Mode 2 (Claude
 Code + MCP `cross_artifact_analysis`) are compared on the same evidence.
 
+### Contract clarification — 2026-07-21 (Codex)
+
+Mode 2 is not a byte-for-byte replay of the Mode 1 agent bundle. Mode 1 seals
+the output of its fixed JSON/scorer path. Mode 2 runs a tool-driven Peircean
+investigation and records a separately scoped report. The two paths may reuse
+deterministic components, but their evidence reach, aggregation, and report
+schema differ. Mode 2 must never mutate or overwrite a Mode 1 seal; conversely,
+a Mode 2 conclusion must not be described as if it were the already-sealed Mode
+1 verdict. README and `CLAUDE.md` now state this explicitly.
+
 ### Background — three known divergence types between modes
 
 | Type | Source | Mechanism | Status |

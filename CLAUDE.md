@@ -18,11 +18,13 @@ finding you emit may be presented to a court. Operate accordingly.
 
 ## Deployment Modes
 
-VIGÍA runs in five modes. Identify which mode is active before proceeding. The
-deterministic scoring core is **identical across all of them** — the LLM only ever
-enriches the narrative layer over an already-sealed `ForensicBundle`; it never changes
-a verdict or a score. See `README.md` ("Deployment Modes") for the authoritative
-description.
+VIGÍA runs in five modes. Identify which mode is active before proceeding. Mode 1 is
+the deterministic sealed-verdict contract. Mode 2 reuses deterministic local tools,
+but its tool-driven Peircean investigation and report are separately scoped: they do
+not mutate a sealed Mode 1 bundle, yet they are not an identical replay of Mode 1.
+When the two reports differ, preserve both outputs and their scope notes rather than
+silently treating one as an override. See `README.md` ("Deployment Modes") for the
+authoritative description.
 
 | Mode | How to identify | Entry point | LLM available |
 |------|-----------------|-------------|---------------|

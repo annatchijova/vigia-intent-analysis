@@ -7200,3 +7200,35 @@ endpoint.
 stable detail: `Error interno en el pipeline forense.` `/health` reports only
 operational status. Controlled-exception regressions verify that no public
 `detail` preserves internal text.
+
+---
+
+## B-159 — The public Mode 2 contract claimed an identical replay, while its reports carry an independent conclusion [DOCUMENTED + wording corrected — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 epistemic/provenance integrity; not scorer corruption. |
+| **Scope** | `README.md`, `CLAUDE.md`, `KNOWN_LIMITATIONS.md`, Mode 1/Mode 2 comparison. |
+| **Detected by** | Codex audit of batch replay and temporary executions, 2026-07-21. |
+
+README claimed that the deterministic verdict was identical in every mode and
+that Claude only narrated an already sealed bundle. That did not match the
+operational contract or preserved artifacts: `CLAUDE.md` permits Mode 2 to emit
+rungs Mode 1 does not have, and archived Mode 2 reports include their own
+conclusions (for example `VIGIA-BREAK-015_claude*.json`: `MALICE`) while the
+current deterministic agent and the archived agent bundle seal `SUSPICION`.
+Mode 2 does not modify that bundle; it produces an MCP investigation with a
+different evidence reach, aggregation, and report schema.
+
+The check did not rewrite `results/agent_batch`: temporary executions of the
+current agent in `/tmp` again sealed `SUSPICION` for BREAK-012 and BREAK-015.
+For BREAK-012, the canonical case has already been relabeled from `BENIGN` to
+`SUSPICION` because it contains two subjects (exonerated jdoe; suspected
+unknown attacker); historical `BENIGN` reports do not establish a current
+divergence.
+
+**Applied repair:** the identity-of-verdict promises were replaced with the
+verifiable contract: Mode 1 is the corpus-wide sealed output; Mode 2 cannot
+mutate or replace it, but its interactive report can be an independent
+investigation. When they differ, both artifacts and their limits are preserved.
+Neither scorer behavior nor case labels changed.
