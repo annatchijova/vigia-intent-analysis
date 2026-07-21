@@ -8969,3 +8969,34 @@ CWD de evidencia pese a tener `VIGIA_WORK_DIR`; queda verde y genera
 B-191, hardening de cadena y triage pasan **57 tests**. El test de integración
 real posterior confirmó que un match del detector produce el JSONL en el work
 directory, no en el checkout.
+
+---
+
+## B-193 — el adaptador de casos podía sobrescribir evidencia con su export [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el CLI del adaptador aceptaba cualquier segundo argumento como output y lo abría con `"w"`, incluida evidencia adquirida. |
+| **Archivo** | `vigia/tools/vigia_case_adapter.py`, `tests/test_b193_case_adapter_output_boundary.py`. |
+| **Modo** | Conversión directa `python3 vigia/tools/vigia_case_adapter.py <caso.json> [output.json]`. |
+| **Principio afectado** | El adaptador lee evidencia para derivar señales; su JSON de salida no puede recibir autoridad para alterar el input ni ser publicado parcialmente. |
+
+**Observación reproducida:** con un caso mínimo externo y
+`VIGIA_EVIDENCE_DIR=<evidence>`, la invocación CLI con
+`<evidence>/derived.json` terminaba con exit `0` y creaba el archivo dentro de
+evidencia. No había validación de path, control de symlink, creación segura de
+padres ni publicación atómica. Es una ruptura de separación source/derived,
+no una modificación de la lógica de adaptación.
+
+**Corrección aplicada:** se incorporó `save_signals()`: valida el destino con
+la frontera compartida antes y después de crear el padre externo `0750`, y
+publica el JSON mediante `atomic_write_text()` (tempfile, fsync, replace y
+fsync del directorio). El CLI usa esa función y reporta el path canonicalizado.
+Los exports externos legítimos mantienen el mismo contenido JSON.
+
+**Validación:** B-193 fue inducido antes mediante la escritura CLI directa.
+Después, sus tres tests verifican rechazo dentro de evidencia, rechazo a través
+de symlink y export externo canónico conservando el contenido. Con B-190–B-192
+y hardening de cadena pasan **37 tests**. La validación protege la autoridad de
+escritura; no pretende resolver por sí sola una sustitución hostil de directorio
+entre operaciones de filesystem fuera del modelo de permisos del proceso.
