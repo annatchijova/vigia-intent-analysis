@@ -9122,3 +9122,40 @@ corroboración independiente (por ejemplo identidad, red, pago o adquisición
 física), no aumentar pesos ni añadir una regla que ya existe. B-195 además
 separa la frase narrativa sobre exfiltración TLS del razonamiento sellado: no
 puede usarse como la corroboración que falta.
+
+---
+
+## B-197 — `run_vigia()` descartaba señales malformadas y sellaba la decisión parcial [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad de entrada y degradación honesta: un entry point público podía transformar evidencia suministrada pero inválida en ausencia de evidencia sin que el bundle pudiera atestiguarlo. |
+| **Archivo** | `vigia/pipeline/pipeline.py`, `tests/test_b197_pipeline_signal_boundary.py`. |
+| **Modo** | `run_vigia()` (CLI/Python API e Integration Bridge). |
+| **Principio afectado** | La frontera debe rechazar una solicitud incompleta antes de decidir; no puede conservar sólo las partes que lograron parsear y presentar el resultado como análisis del conjunto aportado. |
+
+**Observación reproducida:** `_signals_from_dicts()` envolvía cada construcción
+de `SignalOutput` en `except Exception`, emitía un warning y continuaba. Con
+una señal válida seguida por `{"z_score": 9.0, "confidence": 1.0}` sin
+`tool_name`, el helper retornaba una señal en vez de fallar; `run_vigia()`
+entonces entraba a `run_full()` y sellaba un resultado para el subconjunto. El
+bundle no contiene el conteo de objetos rechazados, su índice ni la causa de
+conversión, de modo que un lector no podía distinguir «una evidencia» de «dos
+evidencias, una perdida en la frontera». La variante con sólo la señal inválida
+terminaba en error más tarde por cero señales, pero la variante mixta ocultaba
+el problema.
+
+**Corrección aplicada:** la frontera exige que `signals_data` sea una lista y
+que cada entrada sea un objeto. Si la construcción o validación de
+`SignalOutput` falla, `_signals_from_dicts()` lanza `ValueError` con el índice
+`signals_data[i]` y encadena la causa original. `run_vigia()` por tanto no
+inicia el pipeline, no sella un bundle y no presenta un veredicto parcial. Las
+señales válidas conservan el mismo contrato de transporte; no se modificó el
+scorer ni se introdujo un fallback de etiqueta.
+
+**Validación:** las dos pruebas B-197 fueron rojas antes: tanto el helper como
+`run_vigia()` aceptaban la lista mixta. Después verifican rechazo visible en
+ambas fronteras. Junto con las regresiones F0/B-062/B-064 y la integración EBS
+pasan **30 tests**. El cambio prefiere un error explícito sobre una abstención
+sintética: el operador debe corregir o documentar la evidencia malformada antes
+de iniciar otra corrida.

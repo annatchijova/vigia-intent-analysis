@@ -1370,8 +1370,13 @@ def _signals_from_dicts(signals_data: List[Dict[str, Any]]) -> List[SignalOutput
     inexistente. Verificado en ambos modos por
     tests/test_f0_l029_darvo_hardening.py (Kimi, veredicto §1).
     """
+    if not isinstance(signals_data, list):
+        raise ValueError("signals_data must be a list of signal objects")
+
     signals: List[SignalOutput] = []
-    for d in signals_data:
+    for index, d in enumerate(signals_data):
+        if not isinstance(d, dict):
+            raise ValueError(f"signals_data[{index}] must be an object")
         try:
             signals.append(SignalOutput(
                 tool_name=d["tool_name"],
@@ -1381,7 +1386,11 @@ def _signals_from_dicts(signals_data: List[Dict[str, Any]]) -> List[SignalOutput
                 metadata=d.get("metadata"),
             ))
         except Exception as e:
-            logger.warning("[run_vigia] Señal inválida ignorada: %s — %s", d, e)
+            # B-197: a partial decision would turn an invalid supplied signal
+            # into unrecorded absent evidence.  The caller must correct the
+            # boundary payload and rerun; it is not safe to silently continue
+            # with a subset whose provenance the sealed bundle cannot express.
+            raise ValueError(f"signals_data[{index}] rejected: {e}") from e
     return signals
 
 
