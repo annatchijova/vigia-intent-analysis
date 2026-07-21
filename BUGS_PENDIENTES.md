@@ -8558,3 +8558,32 @@ control positivo externo, traversal por ID y output symlink. Con B-178/B-179 y
 las regresiones B-062/B-064 de atomicidad/registro, pasan 21 tests. La
 corrección no modifica contenido forense, scores ni veredictos; restaura la
 separación entre entrada preservada y paquete derivado.
+
+---
+
+## B-181 — `EvidenceLedger.export_json()` tenía atomicidad sin frontera de salida [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: un ledger encadenado podía escribirse en la evidencia de origen, por ruta directa o padre symlink. |
+| **Archivo** | `vigia/pipeline/security_evidence_registry.py`, `tests/test_b181_evidence_ledger_export_boundary.py`. |
+| **Modo** | API `EvidenceLedger.export_json(path)`. |
+| **Principio afectado** | Una escritura atómica preserva el ledger destino, pero no autoriza que ese destino sea la evidencia fuente. Atomicidad y autorización son garantías distintas. |
+
+**Observación reproducida:** la exportación usaba correctamente
+`atomic_write_text(path, ...)`, pero recibía `path` sin validación. Con
+`path=<evidence>/ledger.json` creaba el ledger en la entrada preservada. Con un
+padre `ledger-redirect -> evidence`, el helper atómico creaba el tempfile y
+publicaba el JSON a través del symlink. Ambos resultados fueron inducidos antes
+del parche; la exportación externa servía como control positivo.
+
+**Corrección aplicada:** el ledger pasa su destino por
+`validate_external_output_path()` antes de crear el padre y una segunda vez
+antes de invocar `atomic_write_text`. Conserva el write atómico B-064, por lo
+que el nuevo control añade autorización sin debilitar la resistencia a crash.
+El error es fail-closed (`SecurityError`) y no deja tempfiles ni directorios
+dentro de evidencia.
+
+**Validación:** tres regresiones cubren destino directo, padre symlink y
+exportación externa; con B-178 a B-180 y las regresiones B-062/B-064 pasan 24
+tests. El JSON, la cadena hash y sus semánticas no cambian.

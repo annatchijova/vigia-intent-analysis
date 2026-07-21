@@ -5,7 +5,10 @@ from __future__ import annotations
 import hashlib
 import json
 import datetime
+import os
 from typing import Any, Dict, List, Optional
+
+from vigia.security.output_boundary import validate_external_output_path
 
 
 # ---------------------------------------------------------------------------
@@ -187,7 +190,14 @@ class EvidenceLedger:
         # B-064: escritura atómica (patrón L-023) — el ledger exportado no
         # puede quedar truncado en disco por un crash a mitad de escritura.
         from vigia.core.atomic_io import atomic_write_text
-        atomic_write_text(path, json.dumps(self.to_dict(), indent=2))
+        safe_path = validate_external_output_path(
+            path, artifact_label="evidence ledger export"
+        )
+        os.makedirs(os.path.dirname(safe_path) or ".", exist_ok=True)
+        safe_path = validate_external_output_path(
+            safe_path, artifact_label="evidence ledger export"
+        )
+        atomic_write_text(safe_path, json.dumps(self.to_dict(), indent=2))
 
     # -----------------------------------------------------------------------
     # Hash global
