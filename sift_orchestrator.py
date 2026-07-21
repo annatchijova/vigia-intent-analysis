@@ -1332,6 +1332,29 @@ class SIFTOrchestrator:
         # canal que vigia_agent._generate_narrative consume (inner.get("caie")).
         # Solo en modo motor y solo si hubo fracturas (el helper devuelve None
         # si no hay nada que explicar).
+        #
+        # B-195: ``description`` belongs to the case author, not to the
+        # deterministic scorer.  Keeping it under ``abduction.narrative``
+        # made an unverified scenario claim appear in the sealed report under
+        # “Razonamiento del motor abductivo”.  Build that field solely from
+        # the label-blind selector's own output; retain scenario prose in a
+        # separately labelled, non-authoritative field for human context.
+        scenario_context = case_data.get("description", "")
+        if not isinstance(scenario_context, str):
+            scenario_context = ""
+        if mode == "motor" and resolve_meta is not None:
+            motor_reason = str(resolve_meta.get("motor_reason", "")).strip()
+            deterministic_narrative = (
+                f"[MOTOR] Label-blind selection: {hypothesis}. "
+                f"{motor_reason or 'No additional selector rationale was emitted.'}"
+            )
+            narrative_provenance = "deterministic_motor_selection"
+        else:
+            deterministic_narrative = (
+                f"[LEGACY REPRODUCTION] Selected hypothesis: {hypothesis}. "
+                "Case scenario context is not analytical evidence."
+            )
+            narrative_provenance = "legacy_reproduction"
         _out: Dict[str, Any] = {
             "case_id": case_id, "signals": signals,
             "abduction": {
@@ -1339,7 +1362,10 @@ class SIFTOrchestrator:
                 "is_conclusive": is_conclusive,
                 "confidence": confidence_f,
                 "best_posterior": str(confidence_f),
-                "narrative": case_data.get("description", "")[:500],
+                "narrative": deterministic_narrative,
+                "narrative_provenance": narrative_provenance,
+                "scenario_context": scenario_context[:500],
+                "scenario_context_provenance": "case_description_unverified",
             },
             "pipeline_meta": pipeline_meta,
         }

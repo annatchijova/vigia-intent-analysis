@@ -1057,6 +1057,19 @@ class VIGIAAgent:
             narrative_parts.append(str(_reasoner_narr))
         narrative_parts.append("")
 
+        # B-195: scenario prose supplied in an EBS JSON can help an examiner
+        # orient themselves, but it is not an output of the deterministic
+        # selector and cannot be printed as motor reasoning.  Keep it visibly
+        # separate in the sealed report so a claim's provenance survives the
+        # handoff rather than being upgraded by presentation alone.
+        _scenario_context = abduction.get("scenario_context")
+        if isinstance(_scenario_context, str) and _scenario_context:
+            narrative_parts.append(
+                "--- CASE CONTEXT (UNVERIFIED INPUT — NOT ANALYTICAL EVIDENCE) ---"
+            )
+            narrative_parts.append(_scenario_context)
+            narrative_parts.append("")
+
         if signals:
             top_signals = sorted(signals, key=_to_frac_z, reverse=True)[:5]
             narrative_parts.append("--- TOP SIGNALS (top 5 by z-score) ---")

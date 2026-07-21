@@ -9040,3 +9040,47 @@ regresiones de frontera y paridad API pasan **28 tests**. Una escritura directa
 de contenido regular *dentro* de un case root que el atacante ya controla sigue
 fuera de esta defensa: eso es autoridad de modificación de evidencia, no una
 evasión de confinamiento de path.
+
+---
+
+## B-195 — el adaptador JSON presentaba la narrativa del caso como razonamiento del motor [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 epistemológico y de trazabilidad: una afirmación escrita por quien construyó el caso podía quedar sellada y visualizada como si la hubiera deducido el selector determinista. |
+| **Archivos** | `sift_orchestrator.py`, `vigia_agent.py`, `tests/test_b195_case_description_provenance.py`. |
+| **Modo** | Agente determinista sobre caso EBS JSON; afecta el bundle, su narrativa y el indicador `analytical_reasoning`. |
+| **Principio afectado** | El contexto de escenario puede conservarse, pero su procedencia y falta de autoridad analítica deben sobrevivir cada transformación y handoff. La presentación no puede elevar un claim a evidencia. |
+
+**Observación reproducida:** `_analyze_ebs_json()` era label-blind para el
+scorer, pero copiaba `case_data["description"]` literalmente a
+`abduction["narrative"]`. Luego `vigia_agent._generate_narrative()` lo imprimía
+bajo **“Razonamiento del motor abductivo”** y `_seal_bundle()` lo usaba para
+declarar `analytical_reasoning=True`. La inducción B-195 entregó una sola señal
+de memoria y un `description` con la afirmación no respaldada “exfiltration was
+completed and the operator was physically identified”; antes del fix esa frase
+aparecía como razonamiento del motor aunque no estuviera en ningún artefacto ni
+en el resultado del scorer. `VIGIA-FN-003` manifestó el mismo defecto: su
+escenario decía que la exfiltración ocurría dentro de TLS, pero el motor sólo
+había probado una fractura de inyección y concluía `SUSPICION` por falta de
+corroboración.
+
+**Corrección aplicada:** el campo `abduction.narrative` se construye ahora
+únicamente a partir de la selección label-blind y de `motor_reason`, con
+`narrative_provenance="deterministic_motor_selection"`. El texto de entrada se
+preserva, sin alterar el score, como `scenario_context` con
+`scenario_context_provenance="case_description_unverified"`; el reporte del
+agente lo muestra en una sección separada, **“CASE CONTEXT (UNVERIFIED INPUT —
+NOT ANALYTICAL EVIDENCE)”**. El modo `legacy` queda explícitamente rotulado como
+reproducción, no como razonamiento nuevo.
+
+**Validación:** las dos pruebas B-195 fueron rojas antes: la claim inyectada
+ocupaba el campo de razonamiento y aparecía antes de cualquier contexto
+etiquetado. Después quedan verdes y prueban que el relato del selector contiene
+su razón propia, que el input se conserva con procedencia no verificada y que
+el agente no mezcla ambas secciones. Junto con B-163, `fase1_resolve` y la suite
+de robustez de narrativa pasan **67 tests**. Una ejecución directa de FN-003
+conserva `SUSPICION` y su misma razón de gate; la frase sobre TLS ya no aparece
+en el bloque de motor. Esta corrección no convierte descripciones de artefactos
+en datos inocuos: esas descripciones siguen siendo observaciones del artefacto
+y deben tener su propia procedencia de adquisición para servir como evidencia.
