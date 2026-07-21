@@ -2692,9 +2692,9 @@ change and calibration corpus.
 
 ---
 
-## L-060 — `SecurityAudit` Writes `security_audit.log` Into `VIGIA_EVIDENCE_DIR` [DOCUMENTED]
+## L-060 — `SecurityAudit` Wrote `security_audit.log` Into `VIGIA_EVIDENCE_DIR` [RESOLVED B-135]
 
-**Registered 2026-07-14. Status: DOCUMENTED — fix tracked as B-135.**
+**Registered 2026-07-14. Resolved 2026-07-16 by B-135. Historical condition retained as an audit record.**
 **Mode affected:** Mode 1 (`vigia_agent.py`) when `VIGIA_EVIDENCE_DIR` is set.
 **Discovered:** VIGIA-MAGNET-2022-iOS-JESS Mode 1 runs, 2026-07-14.
 
@@ -2726,17 +2726,23 @@ affect the correctness of VIGÍA's analysis. The risk is Daubert credibility: a
 defense expert could point to the modified evidence directory as a chain-of-custody
 gap.
 
-### Mitigation
+### Resolution and validation
 
-Set `VIGIA_LOG_DIR` before running `vigia_agent.py`:
+B-135 changed the default to:
 
-```bash
-export VIGIA_LOG_DIR="/tmp/vigia_logs"
-python3 vigia_agent.py --evidence "$VIGIA_EVIDENCE_DIR" --case-id CASE-001
+```python
+_DEFAULT_LOG_DIR: Final[str] = os.getenv("VIGIA_LOG_DIR", "/var/log/vigia")
 ```
 
-See B-135 for the planned fix (changing `_DEFAULT_LOG_DIR` to use `VIGIA_LOG_DIR`
-instead of `VIGIA_EVIDENCE_DIR`).
+`VIGIA_EVIDENCE_DIR` now only identifies evidence. `VIGIA_LOG_DIR` controls the
+audit destination; an explicit `SecurityAudit(log_path=...)` still has priority,
+and the pre-existing secure temporary fallback is used when the configured log
+directory cannot be written.
+
+`tests/test_b135_security_log_dir.py` verifies all five relevant contracts:
+the default ignores `VIGIA_EVIDENCE_DIR`, honours `VIGIA_LOG_DIR`, retains the
+`/var/log/vigia` fallback, leaves an evidence directory byte-for-byte empty in
+an end-to-end write, and preserves explicit log-path precedence.
 
 ---
 
