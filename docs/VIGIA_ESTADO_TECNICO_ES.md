@@ -696,6 +696,11 @@ riesgo de fabricación EBS calibrado: por eso la envoltura EBS registra
 expone ambos campos para que un sello válido nunca se presente como prueba de
 otra decisión distinta.
 
+El JSON de casos suministrado por quien llama queda limitado a 1 MiB y 1.024
+artefactos antes de crear un temporal o iniciar el scoring. Son fronteras de
+disponibilidad HTTP, no validación del esquema forense ni límites sobre la
+adquisición local de evidencia o la ingestión binaria.
+
 ---
 
 ## 13. Cumplimiento Daubert

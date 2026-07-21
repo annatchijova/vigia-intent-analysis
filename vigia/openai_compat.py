@@ -16,6 +16,7 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+from vigia.api_payload import CasePayloadError, validate_case_payload
 
 
 class ChatRequest(BaseModel):
@@ -93,40 +94,45 @@ def install_openai_compatibility(
                         "o usá `/analyze/path` con el nombre de un caso existente."
                     )
                 else:
-                    temporary_case = tempfile.NamedTemporaryFile(
-                        suffix=".json", delete=False, mode="w"
-                    )
-                    json.dump(case_data, temporary_case)
-                    temporary_case.close()
                     try:
-                        result = run_pipeline(Path(temporary_case.name))
-                        try:
-                            narrative = run_narrative(Path(temporary_case.name))
-                        except Exception:
-                            narrative = ""
-                        content = (
-                            "**VIGÍA — Análisis Forense**\n\n"
-                            f"**Veredicto:** {result.get('verdict', 'UNKNOWN')}\n"
-                            f"**Score:** {result.get('score', 0.0):.4f} | "
-                            f"**Confianza:** {result.get('confidence', 0.0):.2f}\n"
-                            f"**Razón:** {result.get('reason', '')}\n"
-                            f"**Bundle hash:** `{result.get('bundle_hash', 'N/A')}`\n"
-                            f"**Verificación EBS:** {result.get('verify', 'N/A')}\n"
-                            f"**Veredicto forense sellado:** "
-                            f"{result.get('sealed_forensic_verdict', 'N/A')}\n"
-                            f"**Decisión EBS:** {result.get('ebs_decision', 'N/A')}\n"
-                            f"**Alcance del sello:** {result.get('seal_scope', 'N/A')}\n"
-                            f"**Pipeline:** {result.get('pipeline_ms', 0)}ms\n"
+                        validate_case_payload(case_data)
+                    except CasePayloadError as exc:
+                        content = f"VIGÍA rechazó el caso: {exc}."
+                    else:
+                        temporary_case = tempfile.NamedTemporaryFile(
+                            suffix=".json", delete=False, mode="w"
                         )
-                        if narrative:
-                            content += f"\n**Análisis Peirciano:**\n{narrative}"
-                    except Exception:
-                        content = "Error interno en pipeline forense. Contacte al administrador."
-                    finally:
+                        json.dump(case_data, temporary_case)
+                        temporary_case.close()
                         try:
-                            os.unlink(temporary_case.name)
+                            result = run_pipeline(Path(temporary_case.name))
+                            try:
+                                narrative = run_narrative(Path(temporary_case.name))
+                            except Exception:
+                                narrative = ""
+                            content = (
+                                "**VIGÍA — Análisis Forense**\n\n"
+                                f"**Veredicto:** {result.get('verdict', 'UNKNOWN')}\n"
+                                f"**Score:** {result.get('score', 0.0):.4f} | "
+                                f"**Confianza:** {result.get('confidence', 0.0):.2f}\n"
+                                f"**Razón:** {result.get('reason', '')}\n"
+                                f"**Bundle hash:** `{result.get('bundle_hash', 'N/A')}`\n"
+                                f"**Verificación EBS:** {result.get('verify', 'N/A')}\n"
+                                f"**Veredicto forense sellado:** "
+                                f"{result.get('sealed_forensic_verdict', 'N/A')}\n"
+                                f"**Decisión EBS:** {result.get('ebs_decision', 'N/A')}\n"
+                                f"**Alcance del sello:** {result.get('seal_scope', 'N/A')}\n"
+                                f"**Pipeline:** {result.get('pipeline_ms', 0)}ms\n"
+                            )
+                            if narrative:
+                                content += f"\n**Análisis Peirciano:**\n{narrative}"
                         except Exception:
-                            pass
+                            content = "Error interno en pipeline forense. Contacte al administrador."
+                        finally:
+                            try:
+                                os.unlink(temporary_case.name)
+                            except Exception:
+                                pass
             except (json.JSONDecodeError, TypeError, ValueError):
                 content = _usage_guidance()
 

@@ -9289,3 +9289,37 @@ verificación normal `PASS` y los contratos de rutas/compatibilidad OpenAI:
 **32 tests** pasan. La configuración rota sigue siendo responsabilidad del
 operador; el cambio sólo impide que VIGÍA la convierta en una afirmación forense
 falsa.
+
+---
+
+## B-201 — el API aceptaba casos JSON remotos sin límite de tamaño ni cardinalidad [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de disponibilidad: una petición no confiable podía materializar un archivo temporal y despachar al scorer un grafo sintético de tamaño no acotado. No cambiaba por sí misma un veredicto ni afectaba la adquisición local de evidencia. |
+| **Archivos** | `vigia/api_payload.py`, `vigia_api.py`, `vigia/vigia_api.py`, `vigia/openai_compat.py`, `tests/test_b201_api_payload_boundary.py`, estados técnicos EN/ES. |
+| **Modo** | `POST /analyze/json` y el caso JSON embebido en `POST /v1/chat/completions`, para ambos wrappers públicos. |
+| **Principio afectado** | La frontera HTTP debe validar disponibilidad antes de persistir o analizar datos no confiables. Un límite de transporte no sustituye la validación semántica forense ni debe restringir la adquisición local. |
+
+**Observación reproducida:** los dos endpoints aceptaban cualquier diccionario
+JSON y el shim OpenAI-compatible lo escribía directamente a un temporal antes
+de llamar al pipeline. Con un payload controlado de 1.025 artefactos, ambos
+wrappers alcanzaban el scorer; si el request fallaba más tarde, la respuesta
+era un error genérico. No existía contrato explícito de bytes ni de
+cardinalidad, aunque el corpus versionado alcanza sólo 217.373 bytes y 101
+artefactos por caso.
+
+**Corrección aplicada:** `validate_case_payload()` define una frontera común
+para los dos wrappers: objeto JSON serializable, máximo 1.048.576 bytes UTF-8
+y máximo 1.024 artefactos. Se ejecuta antes de crear un temporal, narrativa o
+scoring. `/analyze/json` rechaza con HTTP 422; el contrato compatible con
+OpenAI devuelve una explicación de input clara. Los límites aplican sólo a
+casos entregados por HTTP: ni la ingestión local, ni artefactos binarios, ni el
+motor determinista cambian de alcance o de semántica.
+
+**Validación:** B-201 se escribió roja primero: el request de 1.025 artefactos
+alcanzaba el pipeline en ambas rutas. Después exige que los dos wrappers
+rechacen antes de escribir o invocar al scorer. Junto con fronteras FastAPI,
+paridad de imports y B-199 pasan **36 tests**; `py_compile` y `git diff
+--check` también pasan. El umbral es deliberadamente amplio respecto del
+corpus, pero explícito y verificable en vez de implícito e ilimitado.

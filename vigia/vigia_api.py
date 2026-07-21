@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from vigia.api_case_paths import CasePathError, snapshot_case_file
 from vigia.api_defaults import DEFAULT_CORS_ORIGINS, DEFAULT_HOST, DEFAULT_PORT
+from vigia.api_payload import CasePayloadError, validate_case_payload
 from vigia.openai_compat import ChatRequest, install_openai_compatibility
 
 REPO = Path(os.environ.get("VIGIA_REPO", Path(__file__).resolve().parent.parent))
@@ -180,6 +181,10 @@ def analyze_by_path(payload: CasePath):
 @app.post("/analyze/json")
 def analyze_by_json(payload: CasePayload):
     """Analiza un caso pasado como JSON crudo en el body."""
+    try:
+        validate_case_payload(payload.case_data)
+    except CasePayloadError as exc:
+        raise HTTPException(422, str(exc)) from None
     tf = tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w")
     json.dump(payload.case_data, tf)
     tf.close()
