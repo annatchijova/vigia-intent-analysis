@@ -7380,7 +7380,46 @@ temporary-bundle run of `vigia_agent.py` on the OWL JSON changed `NOISE` to
 without promoting prose into evidence.
 
 **Open residual:** this repairs the false-clean outcome; it does not extract
-forensic meaning from nested chat, URL, or account records. The agent renderer
-still presents OWL primary signals as `unknown`. A source-specific Android /
-Chrome / Musical.ly extractor must operate over hash-bound raw artifacts before
-VIGÍA may derive a score or its own `SUSPICION`.
+forensic meaning from nested chat, URL, or account records. A source-specific
+Android / Chrome / Musical.ly extractor must operate over hash-bound raw
+artifacts before VIGÍA may derive a score or its own `SUSPICION`.
+
+---
+
+## B-163 — The agent shim projected signals from raw JSON, not from the schema it scores [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 evidence/provenance coherence and explainability. |
+| **File** | `sift_orchestrator.py:_analyze_ebs_json`. |
+| **Detected by** | Codex follow-up to B-162 on `OWL-NEXUS5-CASE`, 2026-07-21. |
+
+Agent mode has two consumers of the same legacy EBS JSON. Abductive selection
+calls `_vigia_score()`, which normalizes its input; signal rendering in
+`_analyze_ebs_json()` iterated the unnormalized JSON. Thus OWL's engine
+correctly sealed `ABSTAIN` for normalization loss, while its narrative showed
+20 `artifact_id="?"`, `evidence_type="unknown"`, zero-score, unknown-source
+signals. The explanation did not describe the artifacts the engine actually
+evaluated.
+
+This does not authorize a score change or an interpretation of `content`: the
+repair must use the same deterministic, label-blind normalizer to construct
+presentation signals, retaining `expected_verdict` only as historical
+passthrough for `legacy` mode. A case with structured content must still
+remain `ABSTAIN` until a source-specific raw extractor exists.
+
+**Applied repair:** `_analyze_ebs_json()` normalizes the case once on entry,
+before projecting signals and before delegating selection to the motor. It uses
+the same deterministic, label-blind normalizer as the scorer; it does not
+change `raw_score` from content or `metadata.significance`.
+
+**Verification:** `tests/test_b163_agent_normalization_projection.py` was red
+before the patch (`?` / `unknown`) and now pins both projection equivalence with
+the normalizer and label-flip invariance. Together with B-162, Phase-1, and the
+SUSPICION verdict regression:
+`tests/test_b163_agent_normalization_projection.py`,
+`tests/test_b162_structured_legacy_degradation.py`,
+`tests/test_fase1_resolve.py`, `tests/test_b097_motor_suspicion_verdict.py`, and
+`tests/test_label_leak_normalize_case_schema.py`: **35 passed**. OWL now keeps
+20 IDs, zero placeholders, zero `unknown` types, and five canonical types; its
+hypothesis remains honestly `ABSTAIN_DETECTED`.

@@ -1187,6 +1187,17 @@ class SIFTOrchestrator:
 
     def _analyze_ebs_json(self, json_path: str) -> Dict[str, Any]:
         case_data = json.loads(Path(json_path).read_text(encoding="utf-8"))
+        # B-163: the agent presents these signals to the investigator while
+        # _resolve_hypothesis() delegates the verdict to _vigia_score(), which
+        # already normalizes legacy schemas. Projecting the raw JSON here made
+        # a single run describe ``?`` / ``unknown`` artifacts even though the
+        # decision path had preserved their IDs and taxonomy. Normalize once at
+        # this boundary so presentation and scoring use the same label-blind
+        # artifact representation. This does not interpret nested content or
+        # convert scenario prose into a score; B-162 still makes that gap
+        # ABSTAIN until a source-specific extractor exists.
+        from vigia.pipeline.vigia_integration_bridge import normalize_case_schema
+        case_data = normalize_case_schema(case_data)
         case_id = case_data.get("case_id", self.case_id)
         artifacts = case_data.get("artifacts", [])
         signals = []
