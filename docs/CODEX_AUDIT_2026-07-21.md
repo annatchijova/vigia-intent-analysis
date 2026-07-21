@@ -92,6 +92,78 @@ chain-of-custody, even where no secret is returned verbatim.
 Authentication and remote deployment are owner decisions, so this audit does
 not choose or implement them.
 
+## C-02 — OpenAI-compatible chat crashes on scalar JSON [CONFIRMED]
+
+**Severity:** P3 availability/protocol degradation. No scorer decision or
+evidence is changed; a single malformed-but-valid chat request receives a
+server error instead of the endpoint's normal usage guidance.
+
+`vigia_api.py:146-212` parses the last user message with `json.loads(text)`
+and then immediately evaluates `"artifacts" in case_data`. JSON scalars such
+as `42` and `null` parse successfully but are not containers, so that membership
+test raises an uncaught `TypeError`. `ChatRequest.messages` is an untyped list,
+so this boundary does not reject or normalize message content first.
+
+Controlled direct calls, without a server or pipeline execution:
+
+```text
+'42'  -> TypeError: argument of type 'int' is not iterable
+'null' -> TypeError: argument of type 'NoneType' is not iterable
+'[]'   -> normal usage guidance
+```
+
+The repair is small and should be covered by a regression test: accept only a
+JSON object for forensic-case handling (`isinstance(case_data, dict)`), return
+the existing usage guidance for all other JSON values, and validate the outer
+message contract at the boundary. The package wrapper has no OpenAI-compatible
+chat route, so C-02 is root-wrapper specific.
+
+## C-03 — PathGuard allowlist accepts prefix collisions and `..` escapes [CONFIRMED]
+
+**Severity:** P1 forensic-integrity boundary. This is not remote code execution;
+it becomes exploitable when a caller can supply a path to a SIFT input. It can
+make the live SIFT pipeline read evidence outside the configured allowlist,
+which is precisely the boundary the guard claims to enforce.
+
+`vigia/core/path_guard.py:89-93` authorizes a path with a raw string prefix:
+
+```python
+allowed = any(str(abs_path).startswith(str(base)) for base in self._allowed)
+```
+
+That is not a directory-containment relation. With allowed base `/tmp/vigia`,
+the sibling `/tmp/vigia-forge-codex-audit/cronos.sqlite3` passes. A second
+controlled probe, using
+`/tmp/vigia-forge-codex-audit/../vigia-codex-pytest.log` under base
+`/tmp/vigia-forge-codex-audit`, also passed despite resolving outside the base.
+
+This is not only a validation-reporting error. `safe_open()` validates and then
+calls `os.open()` using the same unnormalized path (`path_guard.py:212-232`).
+Against the controlled SQLite file outside `/tmp/vigia`, `safe_open()` actually
+opened a nonempty regular file. No content was emitted. The focused existing
+PathGuard tests passed 6/6 because they cover a plainly outside path and valid
+directories, not prefix collision or `..` cases.
+
+The guard is instantiated by `vigia/sift/sift_orchestrator.py:223` and its
+`_safe_path()` result is passed to memory, registry, event-log, prefetch,
+browser, USB, and shellbag engines. `vigia_agent.py` builds those inputs from
+the selected evidence path. C-03 is therefore distinct from the FastAPI
+wrapper finding and affects the forensic acquisition layer.
+
+### Repair proposal — not implemented
+
+1. Replace string-prefix comparison with a component-aware containment check
+   against canonical trusted roots. A path must be equal to, or a descendant
+   of, a root; `/tmp/vigia-evil` must not satisfy `/tmp/vigia`.
+2. Reject traversal before authorization and preserve the existing explicit
+   checks for symlinks, regular files, descriptor `fstat`, and locking.
+3. Add regression tests for prefix collision and `..` escape in both
+   `validate()` and `safe_open()`/`safe_read()`, plus a positive descendant
+   fixture. Do not weaken the existing visible-rejection behavior.
+4. Review `PathGuard`'s declared default roots separately from its containment
+   mechanism; changing root policy is a product decision, correcting the
+   containment predicate is not.
+
 ## Checked, not relabeled as new
 
 `L-063`, `L-064`, and `L-065` are already accurately documented doctrine
