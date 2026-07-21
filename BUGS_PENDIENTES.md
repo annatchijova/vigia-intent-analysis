@@ -4951,12 +4951,14 @@ clases con implicaciones distintas para "cómo resolverlo":
    corroboración — cambio de scorer, no de hoy; candidato a L-0XX nuevo
    (BREAK-015) que documente la tensión explícitamente en vez de dejarlo
    como un fallo mudo.
-3. **Gap de motor real y cerrable (distinto en naturaleza de 1):**
-   `VIGIA-FN-003` exige análisis de memoria profundo (regiones RWX,
-   parent-process-mismatch) que el motor no ejecuta hoy — a diferencia de 1,
-   esto NO requiere una fuente de datos externa nueva, sería extender un
-   engine que ya existe. Candidato genuino a backlog de ingeniería (no de
-   doctrina).
+3. **Diagnóstico histórico corregido — no es gap de motor:**
+   `VIGIA-FN-003` ya activa la fractura
+   `PROCESS_INJECTION_ANTIFORENSIC` sobre regiones RWX y
+   `parent-process-mismatch`. El `SUSPICION` actual no significa que el
+   detector no corra: el gate B-068 rechaza elevar dos observaciones de la
+   misma colección de memoria a corroboración independiente de `MALICE`.
+   Véase B-196. Es una adjudicación de suficiencia/procedencia de evidencia,
+   no backlog de detector.
 4. **Guard H-02 (FP-CULTURAL ×2):** ya rastreado por separado, sin cambio de
    estado hoy.
 
@@ -9084,3 +9086,39 @@ conserva `SUSPICION` y su misma razón de gate; la frase sobre TLS ya no aparece
 en el bloque de motor. Esta corrección no convierte descripciones de artefactos
 en datos inocuos: esas descripciones siguen siendo observaciones del artefacto
 y deben tener su propia procedencia de adquisición para servir como evidencia.
+
+---
+
+## B-196 — `VIGIA-FN-003` se mantenía como deuda de detector aunque el detector ya estaba activo [RESUELTO — reclasificado, Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de gobernanza de corpus: el backlog atribuía un `SUSPICION` a una capacidad ausente, lo que invitaba a retocar el scorer para forzar una conclusión que la evidencia actual no corrobora. |
+| **Archivos** | `BUGS_PENDIENTES.md`, `docs/XFAIL_REDUCTION_STRATEGY_20260717.md`; observación en el bundle sellado `results/agent_batch/VIGIA-FN-003_agent_bundle.json`. |
+| **Modo** | Agente determinista / motor EBS. |
+| **Principio afectado** | Un veredicto menor que la etiqueta de un escenario no prueba ausencia de detección. La taxonomía de fallos debe distinguir detector, gate de corroboración y expectativa histórica. |
+
+**Observación reproducida:** el bundle de `VIGIA-FN-003` no omite la señal de
+memoria: CAIE registra la fractura viva `PROCESS_INJECTION_ANTIFORENSIC`, de
+severidad `0.85`, y el boost exacto `0.3825`. Una reejecución actual del modo
+`motor` devuelve `SUSPICION` con score `0.6022` y explica que, aunque supera
+el umbral de `MALICE`, no abre una rama de corroboración: las dos observaciones
+duras pertenecen a una sola colección/dominio de memoria. Al retirar metadata
+de inyección el boost desaparece; al retirar el mismatch de parent process el
+caso sigue siendo `SUSPICION`. El detector, por tanto, sí participa y altera
+materialmente el resultado.
+
+**Contraste:** `VIGIA-CAN-042`, con la misma clase de fractura, alcanza
+`MALICE` (`0.6524`) porque aporta cuatro artefactos repartidos entre dos
+colecciones de evidencia y satisface B-068. No es evidencia de que FN-003
+necesite un detector RWX nuevo, sino del límite deliberado que evita contar
+dos observaciones del mismo volcado como dos fuentes independientes.
+
+**Resolución:** se retira FN-003 de la deuda de detector y se reclasifica como
+disputa entre la etiqueta histórica `MALICE` y la suficiencia de la adquisición
+disponible. La etiqueta del escenario se conserva por trazabilidad: no se
+reescribe el corpus para hacer coincidir el motor. Elevarlo requeriría nueva
+corroboración independiente (por ejemplo identidad, red, pago o adquisición
+física), no aumentar pesos ni añadir una regla que ya existe. B-195 además
+separa la frase narrativa sobre exfiltración TLS del razonamiento sellado: no
+puede usarse como la corroboración que falta.
