@@ -1575,16 +1575,29 @@ Expected output: `1366 passed, 33 xfailed`
 
 ---
 
-### Deterministic outputs — same input → same SHA-256
+### Deterministic outputs — same input → same analytical fingerprint
 
-**Claim:** Identical evidence always produces a bit-for-bit identical bundle.
-Verified by running the same case three times and comparing SHA-256 hashes.
+**Claim:** Identical evidence produces a bit-for-bit identical *analytical
+projection* and therefore the same `integrity.analysis_fingerprint`. The full
+`bundle_hash` is deliberately unique per execution because it seals that
+execution's UUID and custody timestamps as well as the analysis. Both hashes
+are independently verifiable: one compares deterministic replay; the other
+protects the complete per-run forensic artifact.
 
 ```bash
 PYTHONPATH=$(pwd) python3 tests/check_determinism.py
 ```
 
-Expected output: three matching hashes — determinism confirmed.
+Expected output: three matching hashes for the selected deterministic tool.
+That script does not create or compare full EBS bundles; use the regression
+suite for the `analysis_fingerprint` contract:
+
+```bash
+python3 -m pytest -q tests/test_b198_analysis_fingerprint.py
+```
+
+Expected result: identical `analysis_fingerprint` values for equivalent
+analysis, and distinct full `bundle_hash` values for distinct custody events.
 
 ---
 

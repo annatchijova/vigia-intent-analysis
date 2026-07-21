@@ -221,10 +221,14 @@ The decision path must be reproducible bit-for-bit and tamper-evident.
   everywhere: type-tagged (so `1`, `"1"`, `1.0`, `True` are distinguishable — check
   `bool` before `int`), recursively key-sorted, and stamped with a
   `CANONICALIZE_VERSION`. Divergent ad-hoc encoders are how one input gets two hashes.
-- **Seal with SHA-256 over the canonical bytes**, storing the digest, the version, and
-  chain-of-custody metadata (inputs, tool versions, timestamp recorded *outside* the
-  sealed payload). The verifier is stdlib-only and independent of the producing code.
-- **Prove it.** Produce the result at least twice and assert the seals match; better,
+- **Separate replay identity from custody identity.** Seal the complete per-run
+  artifact (including UUID and custody timestamps) with SHA-256, and expose a
+  second canonical fingerprint over the deterministic analytical projection.
+  Never call those two values interchangeable: the first proves integrity of a
+  particular execution; the second proves reproducible analysis. The verifier
+  is stdlib-only and independent of the producing code.
+- **Prove it.** Produce the result at least twice and assert the analytical
+  fingerprints match while the per-run custody seals remain distinct; better,
   re-order inputs and run in a fresh process. Common leaks: a stray float, `set`/`dict`
   ordering, an unpinned timestamp or RNG seed, `PYTHONHASHSEED` randomization,
   locale-dependent formatting.

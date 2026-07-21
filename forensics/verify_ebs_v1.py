@@ -18,9 +18,12 @@ CONSTANTES LOCALES:
 
 VALIDACIONES R1-R5:
     R1 — Integridad de hashes (bundle_hash, graph_hash, policy_hash,
-         decision_hash — los CUATRO hashes de contenido del IntegrityBlock
-         se re-derivan; antes del 2026-07-18 decision_hash se sellaba pero
-         ningun verificador lo recomputaba: era un campo decorativo)
+         decision_hash y, cuando esta declarado, analysis_fingerprint). El
+         primero identifica una corrida completa; el ultimo permite comparar
+         la proyeccion analitica sin UUID/timestamps. Todos los digests
+         declarados se re-derivan; antes del 2026-07-18 decision_hash se
+         sellaba pero ningun verificador lo recomputaba: era un campo
+         decorativo.
     R2 — Cumplimiento de politica (max_delta, allowed_roles)
     R3 — Coherencia de decision (risk <-> epsilon <-> ACCEPT/REJECT/ABSTAIN)
     R4 — engine_attestation_hash: PRESENCIA + FORMATO solamente. Este
@@ -50,6 +53,7 @@ USO:
 PROTOCOLO DE HASH (identico a bundle_builder.py):
     graph_hash  = SHA256(evidence_graph SIN el campo graph_hash)
     policy_hash = SHA256(policy_spec)
+    analysis_fingerprint = SHA256(proyeccion analitica sin UUID/timestamps)
     bundle_hash = SHA256(bundle_id + version + timestamp +
                          evidence_graph_CON_graph_hash + decision_trace +
                          policy_spec + actions + system_state)
@@ -286,6 +290,44 @@ def _check_decision_hash(bundle: Dict) -> Tuple[bool, str]:
     return True, "decision_hash integro (re-derivado de decision_trace)"
 
 
+def _analysis_projection(bundle_payload: Dict) -> Dict:
+    """Mirror BundleBuilder's stable analytical projection (B-198).
+
+    The full bundle seal intentionally includes UUID/timestamps as a custody
+    event.  This projection omits only those operational fields so repeated
+    analysis can be compared without weakening the full seal.
+    """
+    projection = dict(bundle_payload)
+    projection.pop("bundle_id", None)
+    projection.pop("timestamp", None)
+    graph = dict(projection.get("evidence_graph", {}))
+    graph.pop("generated_at", None)
+    projection["evidence_graph"] = graph
+    policy = dict(projection.get("policy_spec", {}))
+    policy.pop("created_at", None)
+    projection["policy_spec"] = policy
+    state = dict(projection.get("system_state", {}))
+    state.pop("timestamp", None)
+    projection["system_state"] = state
+    return projection
+
+
+def _check_analysis_fingerprint(bundle: Dict) -> Tuple[bool, str]:
+    """Re-derive an optional B-198 stable replay identifier.
+
+    Old EBS bundles predate the field and retain their historical verification
+    contract.  New bundles must not carry an unverified decorative digest.
+    """
+    stored = bundle.get("integrity", {}).get("analysis_fingerprint", "")
+    if not stored:
+        return True, "analysis_fingerprint absent — legacy bundle; not required"
+    payload = {k: v for k, v in bundle.items() if k != "integrity"}
+    projection = _analysis_projection(payload)
+    if not _sha256_dict_matches(projection, stored):
+        return False, "analysis_fingerprint NO coincide — analytical projection changed"
+    return True, "analysis_fingerprint integro (proyeccion analitica reproducible)"
+
+
 def _check_bundle_hash(bundle: Dict) -> Tuple[bool, str]:
     """
     bundle_hash = SHA256(todo el contenido incluyendo evidence_graph con graph_hash asignado).
@@ -516,10 +558,13 @@ def verify_bundle(
     ok_d, msg_d = _check_decision_hash(bundle)
     result.add("R1_DECISION_HASH", ok_d, msg_d, severity="ERROR" if not ok_d else "INFO")
 
+    ok_a, msg_a = _check_analysis_fingerprint(bundle)
+    result.add("R1_ANALYSIS_FINGERPRINT", ok_a, msg_a, severity="ERROR" if not ok_a else "INFO")
+
     ok_b, msg_b = _check_bundle_hash(bundle)
     result.add("R1_BUNDLE_HASH", ok_b, msg_b, severity="ERROR" if not ok_b else "INFO")
 
-    hash_ok = ok_g and ok_p and ok_d and ok_b
+    hash_ok = ok_g and ok_p and ok_d and ok_a and ok_b
 
     # R2: cumplimiento de politica
     ok_pc, msg_pc, violations = _check_policy_compliance(bundle)

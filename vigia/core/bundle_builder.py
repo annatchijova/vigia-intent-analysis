@@ -21,10 +21,11 @@ PROTOCOLO DE HASHING:
     2. policy_hash  = SHA256(policy_dict)
     3. decision_hash = SHA256(decision_dict)
     4. evidence_graph con graph_hash asignado -> graph_dict_final
-    5. bundle_hash  = SHA256(bundle_id + version + timestamp +
+    5. analysis_fingerprint = SHA256(proyeccion analitica determinista)
+    6. bundle_hash  = SHA256(bundle_id + version + timestamp +
                              graph_dict_final + decision_dict +
                              policy_dict + actions + system_state)
-       [bundle_hash cubre TODO — Invariante I2]
+       [bundle_hash cubre TODO el artefacto de custodia — Invariante I2]
 
 SALIDA:
     dict sellado compatible con verify_ebs_v1.py y con SIFT.
@@ -164,6 +165,37 @@ def _sha256_dict_matches(obj: Dict, stored: str) -> bool:
     )
 
 
+def _analysis_projection(bundle_payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Return the stable analytical content of a full EBS payload.
+
+    ``bundle_hash`` is intentionally an identity for a specific custody event:
+    it includes the newly assigned ``bundle_id`` and timestamps.  Those fields
+    must remain sealed, but cannot identify a deterministic replay.  This
+    projection removes *only* that operational identity metadata; all
+    analytical content, configuration attestation, graph hash, and policy
+    remain in scope.
+
+    The helper is local and pure so ``quick_verify`` and the standalone
+    verifier can independently re-derive the same contract.
+    """
+    projection = dict(bundle_payload)
+    projection.pop("bundle_id", None)
+    projection.pop("timestamp", None)
+
+    graph = dict(projection.get("evidence_graph", {}))
+    graph.pop("generated_at", None)
+    projection["evidence_graph"] = graph
+
+    policy = dict(projection.get("policy_spec", {}))
+    policy.pop("created_at", None)
+    projection["policy_spec"] = policy
+
+    state = dict(projection.get("system_state", {}))
+    state.pop("timestamp", None)
+    projection["system_state"] = state
+    return projection
+
+
 def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -258,6 +290,12 @@ class BundleBuilder:
         config_for_hash["caie_enabled"] = caie_analysis is not None
         bundle_payload["config_attestation"]["config_hash"] = _sha256_dict(config_for_hash)
 
+        # B-198: two hashes have intentionally different scopes.  The full
+        # custody seal remains unique per run and covers every payload field;
+        # the analysis fingerprint makes a deterministic replay comparable
+        # without pretending that two separately timestamped executions are
+        # the same custody event.
+        analysis_fingerprint = _sha256_dict(_analysis_projection(bundle_payload))
         bundle_hash = _sha256_dict(bundle_payload)
 
         integrity = IntegrityBlock(
@@ -265,6 +303,7 @@ class BundleBuilder:
             graph_hash=graph_hash,
             policy_hash=policy_hash,
             decision_hash=decision_hash,
+            analysis_fingerprint=analysis_fingerprint,
             engine_attestation_hash=engine_attestation_hash,
             ecl_hash=ecl_hash,
         )
@@ -356,6 +395,7 @@ class BundleBuilder:
             integrity = sealed_dict.get("integrity", {})
             stored_bundle_hash = integrity.get("bundle_hash", "")
             stored_graph_hash = integrity.get("graph_hash", "")
+            stored_analysis_fingerprint = integrity.get("analysis_fingerprint", "")
 
             # Verificar graph_hash (prueba v2 y cae a v1 — R3-2)
             graph = sealed_dict.get("evidence_graph", {})
@@ -371,6 +411,19 @@ class BundleBuilder:
             if not _sha256_dict_matches(payload, stored_bundle_hash):
                 recomputed_bundle = _sha256_dict(payload)
                 return False, f"bundle_hash invalido: {recomputed_bundle[:8]}!={stored_bundle_hash[:8]}"
+
+            # Optional for historical bundles.  New B-198 bundles declare a
+            # deterministic analysis identity in addition to their per-run
+            # custody seal, so a decorative or corrupted field must fail.
+            if stored_analysis_fingerprint and not _sha256_dict_matches(
+                _analysis_projection(payload), stored_analysis_fingerprint
+            ):
+                recomputed_analysis = _sha256_dict(_analysis_projection(payload))
+                return (
+                    False,
+                    "analysis_fingerprint invalido: "
+                    f"{recomputed_analysis[:8]}!={stored_analysis_fingerprint[:8]}",
+                )
 
             return True, "OK — bundle integro"
 

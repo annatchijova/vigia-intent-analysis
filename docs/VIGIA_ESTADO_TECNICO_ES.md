@@ -43,7 +43,7 @@ El sistema introduce el concepto de **Indicador de Intención (IoI)** como evolu
 Los pilares técnicos del sistema son tres:
 
 1. **Semiótica Peirciana operacionalizada**: el razonamiento abductivo (Terceridad) es el motor de inferencia central, no un post-procesador decorativo.
-2. **Determinismo estricto**: cada ejecución sobre el mismo input produce el mismo `bundle_hash` SHA-256. Esto es un requisito de admisibilidad Daubert, no una conveniencia de implementación.
+2. **Determinismo estricto de análisis**: cada ejecución sobre el mismo input produce el mismo `analysis_fingerprint` SHA-256. El `bundle_hash` es distinto por corrida porque también sella UUID y timestamps de custodia; ambos contratos son verificables y no deben confundirse. Esto es un requisito de admisibilidad Daubert, no una conveniencia de implementación.
 3. **Aislamiento de capas Zero-Trust**: el LLM (PeircePlanner/Ollama) está explícitamente excluido del loop de decisión matemática. Su única función es traducir el `ForensicBundle` sellado a narrativa humana. La decisión ya está cerrada cuando el LLM entra.
 
 El sistema cuenta con 151 módulos Python activos, más de 33 hipótesis abductivas implementadas cubrimendo 13 fases IR, integración con MITRE ATT&CK Enterprise v14.1, protocolo criptográfico P2 con 22 vectores canónicos, y cumplimiento Daubert de Nivel 3.
@@ -709,7 +709,7 @@ La decisión *Daubert v. Merrell Dow Pharmaceuticals* (1993) estableció cuatro 
 
 ### 13.3 Invariantes EBS v1 (No Negociables)
 
-- **I1 — Determinismo**: mismo input → mismo bundle
+- **I1 — Determinismo**: mismo input analítico → mismo `analysis_fingerprint`; cada sello de custodia conserva su UUID/timestamps y por eso su `bundle_hash` propio
 - **I2 — Integridad encadenada**: `bundle_hash` cubre TODO el contenido
 - **I3 — Política verificable**: `policy_spec` es independiente del runtime
 - **I4 — Acciones explícitas**: no existen efectos implícitos

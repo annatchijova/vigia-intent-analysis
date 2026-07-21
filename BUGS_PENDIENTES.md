@@ -9159,3 +9159,46 @@ ambas fronteras. Junto con las regresiones F0/B-062/B-064 y la integración EBS
 pasan **30 tests**. El cambio prefiere un error explícito sobre una abstención
 sintética: el operador debe corregir o documentar la evidencia malformada antes
 de iniciar otra corrida.
+
+---
+
+## B-198 — se confundía la repetición analítica con el sello de custodia por corrida [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 epistemológico y de verificabilidad: el producto afirmaba que igual input producía el mismo `bundle_hash`, aunque ese hash identifica deliberadamente artefactos de custodia distintos. No alteraba el veredicto ni era indeterminismo del scorer. |
+| **Archivos** | `vigia/core/ebs_v1.py`, `vigia/core/bundle_builder.py`, `vigia/pipeline/pipeline.py`, `forensics/verify_ebs_v1.py`, `tests/test_b198_analysis_fingerprint.py`, `README.md`, ambas copias de `VIGIA_ESTADO_TECNICO_ES.md`, `docs/ENGINEERING_DISCIPLINE.md`; `vigia/models/ebs.py` queda explícitamente rotulado como ruta legacy, no como contrato de replay. |
+| **Modo** | Pipeline EBS v1, API/CLI `run_vigia()` y verificador stdlib-only. |
+| **Principio afectado** | Determinismo no significa borrar identidad ni tiempo de una cadena de custodia. Las dos propiedades deben tener nombres, scopes y verificadores distintos. |
+
+**Observación reproducida:** dos llamadas idénticas a `run_vigia()` conservaron
+la misma decisión, posterior, riesgo y proyección de contenido analítico, pero
+produjeron distinto `integrity.bundle_hash`. La diferencia se redujo exactamente
+a `bundle_id`, `timestamp`, `evidence_graph.generated_at`,
+`policy_spec.created_at`, `system_state.timestamp`, `integrity.sealed_at` y el
+`bundle_hash` que deriva de esos campos. Es correcto que el sello completo los
+cubra: son la identidad y el momento de *esa* corrida. El problema era el claim
+contrario en README/estado técnico y su evidencia citada: `tests/check_determinism.py`
+ejecuta una herramienta aislada y elimina timestamps antes de hashear; no crea
+ni compara bundles EBS. El test histórico T13 sólo lograba hashes iguales
+forzando manualmente UUID y todos los timestamps.
+
+**Corrección aplicada:** los bundles nuevos incluyen
+`integrity.analysis_fingerprint`, SHA-256 de la proyección analítica canónica
+que excluye sólo UUID y metadatos de tiempo por corrida. El `bundle_hash` no se
+debilitó ni se reutiliza: sigue sellando el payload completo de custodia. El
+pipeline y su CLI exponen ambas huellas. `quick_verify()` y el verificador
+independiente re-derivan `analysis_fingerprint` cuando está declarado; si se
+altera, fallan. Los bundles históricos que no tienen ese campo siguen siendo
+válidos bajo su contrato previo y el verificador lo marca explícitamente como
+legacy, no como una falsa comprobación.
+
+**Validación:** la regresión B-198 fue roja antes (no existía la huella y los
+dos verificadores aceptaban un digest decorativo). Después prueba: (1) mismo
+contenido analítico → mismo `analysis_fingerprint` pero sellos de custodia
+distintos; (2) corrupción del fingerprint rechazada por ambos verificadores;
+(3) compatibilidad de un bundle sin ese campo; y (4) exposición por el entry
+point público. Con las suites de sellado, contrato del verificador e
+integración EBS pasan **25 tests**. La nueva huella no prueba que dos corridas
+ocurrieron al mismo tiempo ni reemplaza al `bundle_hash`; prueba sólo que su
+proyección analítica declarada coincide.

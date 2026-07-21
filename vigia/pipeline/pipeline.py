@@ -1424,6 +1424,7 @@ def run_vigia(
             "posterior"   : float
             "risk"        : float
             "bundle_hash" : str
+            "analysis_fingerprint": str — stable deterministic replay id
             "bundle_json" : str — bundle completo serializado
             "narrative"   : str | None
             "verify"      : dict
@@ -1484,6 +1485,7 @@ def run_vigia(
         "posterior": sealed_dict["decision_trace"]["posterior"],
         "risk": sealed_dict["decision_trace"]["risk"],
         "bundle_hash": sealed_dict["integrity"]["bundle_hash"],
+        "analysis_fingerprint": sealed_dict["integrity"].get("analysis_fingerprint", ""),
         "bundle_json": _json.dumps(sealed_dict, sort_keys=True, indent=2, default=str),
         "narrative": narrative,
         "verify": {"passed": verify_ok, "message": verify_msg},
@@ -1511,7 +1513,7 @@ def main() -> int:
 
     parser = argparse.ArgumentParser(
         description="VIGÍA Forensic Suite — Pipeline EBS v1",
-        epilog="Salida: JSON con decision, posterior, risk, bundle_hash",
+        epilog="Salida: JSON con decision, posterior, risk, bundle_hash, analysis_fingerprint",
     )
     parser.add_argument(
         "--signals", required=True,
@@ -1578,6 +1580,7 @@ def main() -> int:
         "posterior":  result["posterior"],
         "risk":       result["risk"],
         "bundle_hash": result["bundle_hash"],
+        "analysis_fingerprint": result["analysis_fingerprint"],
         "verify":     result["verify"],
         "mode":       result["mode"],
     }
