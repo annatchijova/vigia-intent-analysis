@@ -13,10 +13,10 @@ recomputing it against evidence):
 
   T-1 (L-063) — `caie_fractures` in CAIE-fallback mode. When live CAIE is
       importable the JSON fractures are RECOMPUTED and discarded
-      (caie_fractures_source == "live_caie"). When the import fails, the JSON
-      `caie_fractures` are consumed directly: a fabricated fracture with a
-      RECOGNISED malicious type flips NOISE -> SUSPICION. An unrecognised type
-      does nothing (bounds the exposure — the attacker must know the type set).
+      (caie_fractures_source == "live_caie"). When CAIE is unavailable, a
+      declared recognised CAIE fracture is preserved for review but has
+      zero verdict authority: its boost is zero and the run abstains until CAIE
+      can produce or reject it. An unrecognised type remains inert.
 
   T-2 (L-064) — `temporal_violations[].type == "STATISTICAL_UNIFORMITY"`. No
       runtime module emits it; only corpus-conversion scripts author it into
@@ -122,7 +122,7 @@ class TestT2StatisticalUniformity:
 
 
 # ---------------------------------------------------------------------------
-# T-1 (L-063) — caie_fractures carry authority in fallback mode
+# T-1 (L-063) — declared caie_fractures have no authority in fallback mode
 # ---------------------------------------------------------------------------
 
 def _score_in_fallback(case: dict) -> dict:
@@ -162,27 +162,43 @@ class TestT1FallbackFractureAuthority:
         """PIN: with live CAIE, JSON fractures are recomputed and discarded."""
         r = _vigia_score(_one_artifact_case("FALSE_FLAG_PATTERN"))
         assert r.get("caie_fractures_source") == "live_caie"
+        assert r.get("caie_fracture_authority") == "live_caie"
         # The fabricated fracture does NOT drive the verdict in live mode.
         assert r["verdict"] == "NOISE"
 
-    def test_fallback_recognised_type_flips_verdict(self):
-        """PIN: in fallback mode a fabricated fracture with a RECOGNISED
-        malicious type flips NOISE -> SUSPICION (verdict authority from JSON)."""
+    def test_fallback_recognised_type_is_retained_but_cannot_decide(self):
+        """A JSON-only recognised fracture is disclosed, contributes no boost,
+        and produces ABSTAIN until its named CAIE producer is available."""
         r = _score_in_fallback(_one_artifact_case("FALSE_FLAG_PATTERN"))
         assert r.get("caie_fractures_source") == "json_fallback"
-        assert r["verdict"] == "SUSPICION", (
-            "CHARACTERIZATION PIN MOVED (T-1): a fabricated recognised-type "
-            f"fracture no longer carries authority in fallback (got {r['verdict']}). "
-            "If this is the L-063 doctrine fix (cap fallback authority), update "
-            "the pin and L-063."
-        )
+        assert r["verdict"] == "ABSTAIN"
+        assert r.get("fracture_malice_boost", 0) == 0
+        assert r.get("caie_fracture_authority") == "unverified_json_no_verdict_authority"
+        assert r.get("unverified_json_caie_fractures") == [
+            _one_artifact_case("FALSE_FLAG_PATTERN")["caie_fractures"][0]
+        ]
+        # El veredicto previo ya no recibe el boost JSON artificial: el gate
+        # transforma ese NOISE potencialmente falso-limpio en ABSTAIN.
+        assert r.get("pre_unverified_caie_authority_verdict") == "NOISE"
 
     def test_fallback_unrecognised_type_is_inert(self):
         """PIN (bound): an UNRECOGNISED fracture type does nothing — the T-1
         exposure requires the attacker to know the recognised type set."""
         r = _score_in_fallback(_one_artifact_case("NOT_A_REAL_FRACTURE_TYPE"))
+        assert r.get("caie_fractures_source") == "json_fallback"
+        assert r.get("caie_fracture_authority") == "unverified_json_no_verdict_authority"
         assert r["verdict"] == "NOISE"
         assert r.get("fracture_malice_boost", 0) == 0
+
+    def test_fallback_credibility_type_also_abstains(self):
+        """A JSON-only CAIE declaration has no score authority in either
+        direction: recognised credibility penalties cannot silently clean a
+        case while their producer is unavailable."""
+        r = _score_in_fallback(_one_artifact_case("VERDICT_CONFLICT"))
+        assert r.get("caie_fractures_source") == "json_fallback"
+        assert r["verdict"] == "ABSTAIN"
+        assert r.get("fracture_malice_boost", 0) == 0
+        assert r.get("fracture_credibility_penalty", 0) == 0
 
 
 # ---------------------------------------------------------------------------

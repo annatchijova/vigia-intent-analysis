@@ -1079,6 +1079,30 @@ def _vigia_score(case: dict) -> dict:
         # tests/test_m3_scorer_caie_parity.py against the live CAIE catalogue.
     }
 
+    # B-170 / L-063: ``caie_fractures`` are an output of CAIE, not an input
+    # that a fallback scorer may promote to evidence on its own.  The old
+    # broad-except fallback preserved the JSON declaration *and* consumed it as
+    # a boost/penalty, so a caller who knew a recognised type could manufacture
+    # a NOISE -> SUSPICION transition while CAIE was unavailable.  Preserve the
+    # declaration for an examiner, but give JSON-only material zero score or
+    # verdict authority.  A recognised declared CAIE type means the missing
+    # producer is decision-relevant, so the final result abstains rather than
+    # calling the case clean or escalating it from an unverified assertion.
+    _known_caie_fracture_types = (
+        MALICIOUS_FRACTURE_TYPES | CREDIBILITY_REDUCING_TYPES
+    )
+    _declared_json_caie_fractures = (
+        [f for f in fractures if isinstance(f, dict)]
+        if _caie_source == "json_fallback" else []
+    )
+    _unverified_json_caie_fractures = [
+        f for f in _declared_json_caie_fractures
+        if str(f.get("fracture_type", "")) in _known_caie_fracture_types
+    ]
+    _fractures_with_score_authority = (
+        fractures if _caie_source == "live_caie" else []
+    )
+
     def _sev_float(raw, default: float = 0.5) -> float:
         """
         B-057 FIX: las fracturas del CAIE VIVO llevan severity como
@@ -1113,7 +1137,7 @@ def _vigia_score(case: dict) -> dict:
     # bit-identity corpus-wide on every change to this block.
     _boost_terms   = []
     _penalty_terms = []
-    for f in fractures:
+    for f in _fractures_with_score_authority:
         sev = _sev_float(f.get("severity", 0.5))
         ft  = f.get("fracture_type", "")
         if ft in MALICIOUS_FRACTURE_TYPES:
@@ -1460,6 +1484,18 @@ def _vigia_score(case: dict) -> dict:
         # explicación en la narrativa sellada.
         "caie_fracture_details":        list(fractures),
         "caie_fractures_source":        _caie_source,
+        # B-170 / L-063: disclosure is intentionally separate from authority.
+        # A fallback declaration survives in the sealed result, but it did not
+        # alter the score.  Consumers must not re-label it as a live CAIE
+        # finding without rerunning the named producer.
+        "caie_fracture_authority": (
+            "live_caie"
+            if _caie_source == "live_caie"
+            else (
+                "unverified_json_no_verdict_authority"
+                if _declared_json_caie_fractures else "no_caie_fracture"
+            )
+        ),
         "peirce_chain":                 case.get("peirce_chain", {}),
         "expected_verdict":             case.get("expected_verdict", "UNKNOWN"),
         # FASE 2: artefactos exculpatorios apartados (semántica V1) + los
@@ -1656,6 +1692,36 @@ def _vigia_score(case: dict) -> dict:
     if _caie_artifacts_rejected:
         base_result["artifacts_rejected"] = len(_caie_artifacts_rejected)
         base_result["rejected_details"] = _caie_artifacts_rejected
+
+    # B-170 / L-063 authority gate.  This is deliberately after every normal
+    # scoring and integrity gate: regardless of what a JSON-only recognised
+    # CAIE declaration would otherwise accompany, the scorer cannot issue a
+    # final substantive verdict while its producer is unavailable.  Preserve
+    # the pre-gate outcome as provenance; do not silently replace it with an
+    # ABSTAIN that makes the lost authority impossible to reconstruct.
+    if _unverified_json_caie_fractures:
+        _pre_caie_authority_verdict = base_result["verdict"]
+        _pre_caie_authority_reason = base_result["reason"]
+        verdict = "ABSTAIN"
+        confidence = 0.0
+        base_result["verdict"] = "ABSTAIN"
+        base_result["confidence"] = 0.0
+        base_result["reason"] = (
+            "UNVERIFIED CAIE FRACTURE DECLARATION: recognised fracture type(s) "
+            "were supplied only in case JSON while CAIE was unavailable. They "
+            "are preserved in unverified_json_caie_fractures and contributed "
+            "zero score authority. Re-run with live CAIE before issuing a "
+            "substantive verdict."
+        )
+        base_result["unverified_json_caie_fractures"] = list(
+            _unverified_json_caie_fractures
+        )
+        base_result["pre_unverified_caie_authority_verdict"] = (
+            _pre_caie_authority_verdict
+        )
+        base_result["pre_unverified_caie_authority_reason"] = (
+            _pre_caie_authority_reason
+        )
 
     base_result["quadripartite_state"] = _apply_quadripartite(
         verdict=verdict,

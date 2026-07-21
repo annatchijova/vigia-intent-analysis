@@ -2832,43 +2832,49 @@ window decision.
 
 ---
 
-## L-063 — Fallback-Mode `caie_fractures` Carry Verdict Authority From Case JSON (Recognised Types) [DOCUMENTED]
+## L-063 — Fallback-Mode `caie_fractures` Carry Verdict Authority From Case JSON (Recognised Types) [RESOLVED B-170]
 
-**Registered 2026-07-18. Status: DOCUMENTED — doctrine decision pending (T cluster, docs/PATTERN_HUNT_20260718.md). L-number PROVISIONAL until merge (see L-061/L-062 collision).**
+**Registered 2026-07-18. Resolved 2026-07-21 by B-170. Historical condition retained below as an audit record.**
 **Mode affected:** `vigia_scorer._vigia_score` when `from vigia.tools.caie import ...` fails (standalone / CAIE-unavailable mode — a documented, supported mode, file header §"Deployment Modes").**
 **Discovered:** 2026-07-18 pattern hunt (T-1), characterized in `tests/characterization/test_verdict_authority_inputs.py`.
 **Severity class:** integrity/contract gap (P2-class, sibling of L-062) — requires control of the case-construction input, not a runtime attack surface.
 
 ### Description
 
-When live CAIE is importable, the scorer **recomputes** fractures from the
-evidence and discards any `caie_fractures` supplied in the case JSON
-(`caie_fractures_source == "live_caie"`). When the import fails, it falls back
-to `case.get("caie_fractures", [])` (`vigia_scorer.py:684`) and consumes them
-directly: a fabricated fracture whose `fracture_type` is in
-`MALICIOUS_FRACTURE_TYPES` adds `sev*0.45` to the malice boost and can flip a
-NOISE verdict to SUSPICION.
+Historically, when live CAIE was importable, the scorer **recomputed** fractures
+from evidence and discarded any `caie_fractures` supplied in case JSON
+(`caie_fractures_source == "live_caie"`). When the import failed, it fell back
+to `case.get("caie_fractures", [])` and consumed them directly: a fabricated
+fracture whose `fracture_type` was in `MALICIOUS_FRACTURE_TYPES` added
+`sev*0.45` to the malice boost and could flip NOISE to SUSPICION.
 
-Characterized bound (verified 2026-07-18): the exposure requires a
-**recognised** type. A fabricated fracture with an unrecognised type is inert
-(no boost, stays NOISE). `caie_fractures_source == "json_fallback"` is sealed,
-so the degraded mode is disclosed — but the disclosure does not remove the
-authority the fabricated fracture carries.
+The characterized bound (verified 2026-07-18) required a **recognised** type.
+An unrecognised type was inert, but `caie_fractures_source == "json_fallback"`
+only disclosed the degraded mode; it did not remove the declared fracture's
+authority.
 
 ### Forensic implication
 
-In standalone mode, an examiner-authored `caie_fractures` entry with a known
-type name influences the verdict with no validating producer. The mitigating
-facts: (a) live mode ignores it entirely; (b) the fallback is disclosed via
-`caie_fractures_source`; (c) only recognised types work.
+### Fix and current contract
 
-### Doctrine decision (pending, Anna)
+B-170 separates disclosure from authority. In CAIE fallback mode every
+JSON-declared fracture remains in `caie_fracture_details`, but contributes
+neither a malice boost nor a credibility penalty. The sealed
+`caie_fracture_authority` field reports that the material is
+`unverified_json_no_verdict_authority`.
 
-Options: (a) cap the verdict in fallback mode (fabricated fractures cannot
-exceed SUSPICION without live corroboration); (b) treat `json_fallback` as
-narrative-only for fracture authority; (c) accept as documented and rely on
-the `caie_fractures_source` disclosure. Behavior is pinned unchanged until
-decided.
+If the declaration contains a recognised CAIE fracture type, the final result
+is `ABSTAIN`, with `unverified_json_caie_fractures` and the score-only
+pre-gate verdict/reason retained in the sealed output. The operator must rerun
+with live CAIE before VIGÍA can issue a substantive verdict. Live CAIE remains
+unchanged: it recomputes its own fractures and may use them normally.
+
+### Validation
+
+`tests/characterization/test_verdict_authority_inputs.py::TestT1FallbackFractureAuthority`
+proves the former NOISE -> SUSPICION escalation is gone: the same recognised
+JSON declaration now yields zero boost and `ABSTAIN`; an unrecognised type is
+still inert; a live CAIE run still discards case JSON and recomputes evidence.
 
 ---
 

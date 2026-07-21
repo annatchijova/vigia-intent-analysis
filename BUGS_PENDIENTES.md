@@ -8168,3 +8168,47 @@ búsqueda registra entrada antes de procesar el patrón sensible y que ninguna
 registración evade la frontera compartida. Junto con el contrato de montaje
 B-164: **13 passed**. La prueba no monta imágenes ni ejecuta un subprocess
 real.
+
+---
+
+## B-170 — El fallback de CAIE otorgaba autoridad de veredicto a fracturas declaradas en JSON [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de integridad/autoridad de veredicto en modo degradado. |
+| **Archivo** | `vigia_scorer.py`, `KNOWN_LIMITATIONS.md`, `tests/characterization/test_verdict_authority_inputs.py`. |
+| **Detectado por** | Cierre de L-063, tras el barrido de entradas de autoridad de veredicto. |
+
+Cuando `vigia.tools.caie` no se podía importar, `_vigia_score()` recuperaba
+`case["caie_fractures"]` y lo usaba como si fuera salida de CAIE. Un caller que
+conociera un `fracture_type` malicioso reconocido podía declarar una fractura
+con severidad alta y obtener un salto determinista `NOISE -> SUSPICION`, sin que
+el productor que normalmente deriva esa afirmación hubiera corrido. El campo
+`caie_fractures_source="json_fallback"` quedaba sellado, pero una etiqueta de
+procedencia no elimina por sí misma la autoridad que ya se aplicó.
+
+**Prueba roja:** el caso de caracterización bloquea deliberadamente el import
+de CAIE y entrega un único `FALSE_FLAG_PATTERN` desde JSON. Antes de B-170 el
+resultado era `SUSPICION` y `fracture_malice_boost > 0`; la entrada no provenía
+de artefactos ni de una ejecución CAIE viva.
+
+**Corrección aplicada:** las fracturas declaradas permanecen como material
+auditable (`caie_fracture_details`), pero en fallback no participan ni del
+boost de malicia ni de la penalidad de credibilidad. El resultado declara
+`caie_fracture_authority="unverified_json_no_verdict_authority"`. Si la lista
+contiene un tipo que CAIE reconocería, la ausencia del productor pasa a ser
+decisión-relevante: VIGÍA emite `ABSTAIN`, conserva la lista en
+`unverified_json_caie_fractures`, y registra el veredicto/razón de score previo
+al gate. Así el sistema no fabrica ni una escalada ni una limpieza a partir de
+una afirmación no verificable; exige reejecución con CAIE vivo.
+
+**Límite deliberado:** B-170 no inventa un productor ni intenta validar una
+fractura desde texto libre. Tampoco modifica CAIE vivo: cuando está disponible,
+éste sigue recalculando sus fracturas desde artefactos y conserva su autoridad
+normal. L-064 y L-065 son canales de autoridad distintos y permanecen
+pendientes.
+
+**Validación:**
+`tests/characterization/test_verdict_authority_inputs.py::TestT1FallbackFractureAuthority`
+verifica: JSON reconocido + CAIE ausente = `ABSTAIN`, boost `0`, disclosure
+sellada; tipo no reconocido = inerte; CAIE vivo = recomputa y descarta el JSON.
