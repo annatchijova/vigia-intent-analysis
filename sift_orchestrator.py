@@ -1221,7 +1221,7 @@ class SIFTOrchestrator:
         }
 
     def _analyze_ebs_json(self, json_path: str) -> Dict[str, Any]:
-        case_data = json.loads(Path(json_path).read_text(encoding="utf-8"))
+        raw_case_data = json.loads(Path(json_path).read_text(encoding="utf-8"))
         # B-163: the agent presents these signals to the investigator while
         # _resolve_hypothesis() delegates the verdict to _vigia_score(), which
         # already normalizes legacy schemas. Projecting the raw JSON here made
@@ -1232,7 +1232,7 @@ class SIFTOrchestrator:
         # convert scenario prose into a score; B-162 still makes that gap
         # ABSTAIN until a source-specific extractor exists.
         from vigia.pipeline.vigia_integration_bridge import normalize_case_schema
-        case_data = normalize_case_schema(case_data)
+        case_data = normalize_case_schema(raw_case_data)
         case_id = case_data.get("case_id", self.case_id)
         artifacts = case_data.get("artifacts", [])
         signals = []
@@ -1250,10 +1250,23 @@ class SIFTOrchestrator:
                 "description": art.get("description", "")[:200],
                 "source": art.get("source_tool", "unknown"),
             })
-        # FIX P2: avg en Fraction — sin float()
-        if signals:
-            n   = Fraction(len(signals), 1)
-            avg = sum(self._frac(s["z_score"]) for s in signals) / n
+        # FIX P2: avg en Fraction — sin float(). The explicit legacy mode is a
+        # historical reproduction path: preserve its pre-B-163 raw artifact
+        # arithmetic while using the normalized representation for presentation
+        # and for the default motor path.
+        legacy_mode = os.environ.get("VIGIA_EBS_RESOLVE", "motor").strip().lower() == "legacy"
+        scoring_artifacts = (
+            raw_case_data.get("artifacts", []) if legacy_mode else artifacts
+        )
+        if scoring_artifacts:
+            avg = sum(
+                self._frac(
+                    str(artifact.get("raw_score", "0"))
+                ) * self._frac(
+                    str(artifact.get("prior_trust", "1/2"))
+                )
+                for artifact in scoring_artifacts
+            ) / Fraction(len(scoring_artifacts), 1)
         else:
             avg = Fraction(0, 1)
         expected = case_data.get("expected_verdict", "UNKNOWN")

@@ -9388,3 +9388,38 @@ La separación no modifica el snapshot, los veredictos ni la selección de casos
 `422`, el motivo de límite y que el scorer no sea invocado. Junto con B-202,
 B-194 y los límites JSON, pasan **29 tests**; `py_compile` y `git diff --check`
 pasan.
+
+---
+
+## B-204 — el modo legacy promediaba artefactos normalizados por B-163, no los crudos históricos [RESUELTO — Codex+Claude 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 de reproducción histórica: el modo explícito `VIGIA_EBS_RESOLVE=legacy` existe solo para reproducir bundles pre-B-163, pero su promedio dejó de reproducirlos cuando B-163 normalizó el caso en la frontera del adaptador. |
+| **Archivos** | `sift_orchestrator.py`, `tests/test_b204_legacy_avg_raw_reproduction.py`. |
+| **Modo** | Solo `VIGIA_EBS_RESOLVE=legacy` (nunca default). El path motor no cambia de valor. |
+| **Principio afectado** | Un modo de reproducción histórica que no reproduce la aritmética histórica es una afirmación falsa de fidelidad (§5.3 degradación honesta). |
+
+**Observación reproducida:** para un artefacto legacy sin `raw_score` ni
+`prior_trust`, la normalización B-163 sintetiza `raw_score >= 0.05` (clamp
+inferior) y `prior_trust` 0.70–0.90 por capa peirceana. El promedio del
+adaptador en modo legacy pasaba de `0` (crudo: defaults `0` × `1/2`) a
+`17/400` (sintetizado: `0.05 × 0.85`) — un valor que ningún bundle histórico
+contiene. `confidence_f` e `is_conclusive` del modo legacy derivan de ese
+promedio.
+
+**Corrección aplicada:** `_analyze_ebs_json` conserva `raw_case_data` junto al
+caso normalizado y selecciona la fuente del promedio según el modo: artefactos
+crudos solo bajo legacy explícito, normalizados para presentación y para el
+path motor (donde el promedio es solo informativo — la hipótesis y la
+confianza salen de `_resolve_hypothesis`). Una sola aritmética, dos entradas
+explícitas.
+
+**Validación:** B-204 fue roja primero contra el código previo (promedio
+`17/400` en modo legacy); con el fix exige `0` crudo, verifica que el modo
+motor sigue promediando la representación normalizada, que ambos modos
+coinciden en casos canónicos (idempotencia del normalizador) y que la
+presentación (`signals`) de B-163 no regresa a proyección cruda. La batería
+existente de modo legacy/motor (`test_fase1_resolve`, `test_tanda_a_triage`,
+`test_b058`, `test_b163`, `test_b166`, `test_b195` — 52 tests) pasa sin
+cambios.
