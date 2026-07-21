@@ -9352,8 +9352,9 @@ descriptor confiable; no se reabre ni se cambia la semántica del caso.
 
 **Validación:** B-202 fue roja primero al demostrar que el fixture sobredimensionado
 llegaba a crear un temporal. Ahora exige rechazo previo a ese punto y prueba el
-guard de crecimiento post-apertura con un stream de 1 MiB + 1 byte. Con B-194
-(race/symlink), fronteras FastAPI y la regresión nueva pasan **26 tests**;
+guard de crecimiento post-apertura con un stream de 1 MiB + 1 byte, incluida la
+eliminación del temporal parcial que ese stream hubiera creado. Con B-194
+(race/symlink), fronteras FastAPI y la regresión nueva pasan **27 tests**;
 `py_compile` y `git diff --check` pasan. Este contrato afecta sólo la selección
 HTTP de fixtures: un caso local mayor se puede adquirir y analizar por las
 rutas forenses/CLI correspondientes, sin ser truncado ni reinterpretado por

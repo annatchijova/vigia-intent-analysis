@@ -195,6 +195,13 @@ def snapshot_case_file(
                 _copy_case_snapshot_bounded(source, target)
                 target.flush()
                 os.fsync(target.fileno())
+    except CasePathError:
+        if snapshot is not None:
+            try:
+                snapshot.unlink()
+            except FileNotFoundError:
+                pass
+        raise
     except OSError as exc:
         if snapshot is not None:
             try:
