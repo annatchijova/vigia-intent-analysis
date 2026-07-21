@@ -2388,13 +2388,16 @@ intended resolution layer.
 
 ---
 
-## L-057 — 18 MCP tools without TOOL_INVOKED entry audit log [DOCUMENTED]
+## L-057 — MCP tools without a uniform `TOOL_INVOKED` entry audit log [RESOLVED — B-169, 2026-07-21]
 
 **Scope:** Mode 2 (Claude Code + MCP), Mode 5 (OpenWebUI). Modes 1, 3, 4 unaffected.
 
-**Status:** DOCUMENTED — partial mitigation applied in B-122 (2026-07-14).
+**Status:** RESOLVED — B-169 replaced the partial B-122 instrumentation with
+one mandatory registration boundary for every MCP tool exposed by the active
+bridge. The historical condition below is retained so prior bundles and audit
+claims are not rewritten.
 
-### What is missing
+### Historical condition (before B-169)
 
 `vigia/vigia_sift_bridge.py` exposes 22 MCP tools. B-122 added
 `audit_logger.log_info(event_type="TOOL_INVOKED")` at entry to the three
@@ -2450,24 +2453,21 @@ or supplied by the agent, so the chain-of-custody gap is lower severity.
 `deactivate_honey_token` already has an audit log call at exit (not entry).
 The gap is the invocation record before the operation, not the outcome record.
 
-### Mitigation (follow-up to B-122)
+### Resolution (B-169)
 
-Apply the same B-122 pattern to each remaining tool:
+`vigia/vigia_sift_bridge.py` now routes every local decorator and every
+external `mcp.tool()` registration through `_register_mcp_tool()`. Its
+`_audit_mcp_entry()` wrapper emits `TOOL_INVOKED` before rate limiting,
+sanitization, sandboxing or tool execution, so blocked and failed attempts
+are present too. Argument summaries preserve parameter names, scalar values,
+collection cardinality, and a SHA-256 of at most a 4 KiB string/bytes prefix;
+they never write raw evidence, prompts, paths or token values into the audit
+trail merely to prove a call occurred.
 
-```python
-audit_logger.log_info(
-    event_type="TOOL_INVOKED",
-    tool="<tool_name>",
-    message=f"<primary_arg>={value!r}",  # or f"n_items={len(arg)}" for list args
-)
-```
-
-Insert before the first `_sanitize_path_local()` call (file-touching tools)
-or immediately after `try:` (computation tools with no path argument).
-
-For `search_pattern` and `mount_sift_evidence` the log must precede the
-`sandboxed_execute` call so that blocked or timed-out subprocess attempts
-are also captured.
+This resolves entry-audit coverage for the bridge process. It does **not**
+change the separate B-122/L-057 provenance limit for historical bundles, nor
+does it prove wall-clock ordering, an external client's identity, or that a
+post-hoc tool-log response came from the claimed live service.
 
 ### Known performance note
 

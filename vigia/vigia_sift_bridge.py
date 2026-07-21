@@ -33,6 +33,8 @@ import shutil
 import stat
 import uuid
 import sys
+import inspect
+from functools import wraps
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -136,6 +138,74 @@ MAX_TEXT_LENGTH    = 50_000   # 50 KB por texto individual
 MAX_TEXTS_IN_LIST  = 20       # máximo ítems por llamada de lista
 MAX_TOTAL_BYTES    = 500_000  # 500 KB total por llamada
 MAX_FILE_PREVIEW   = 100_000  # máximo bytes de preview de archivo
+
+# Los eventos TOOL_INVOKED deben demostrar que una herramienta fue llamada sin
+# copiar evidencia potencialmente sensible al audit trail. Para strings, el
+# digest cubre como máximo este prefijo y el evento declara si quedó truncado;
+# jamás se escanea un payload entero sólo para registrar su invocación.
+_AUDIT_ARGUMENT_PREFIX_BYTES = 4096
+
+
+def _audit_argument_value(value: object) -> str:
+    """Return a bounded, non-plaintext description of an MCP argument."""
+    if isinstance(value, str):
+        encoded = value.encode("utf-8", errors="replace")
+        prefix = encoded[:_AUDIT_ARGUMENT_PREFIX_BYTES]
+        suffix = ", truncated=true" if len(encoded) > len(prefix) else ""
+        return (
+            f"str(bytes={len(encoded)}, sha256_prefix="
+            f"{hashlib.sha256(prefix).hexdigest()}{suffix})"
+        )
+    if isinstance(value, bytes):
+        prefix = value[:_AUDIT_ARGUMENT_PREFIX_BYTES]
+        suffix = ", truncated=true" if len(value) > len(prefix) else ""
+        return (
+            f"bytes(length={len(value)}, sha256_prefix="
+            f"{hashlib.sha256(prefix).hexdigest()}{suffix})"
+        )
+    if isinstance(value, dict):
+        return f"dict(items={len(value)})"
+    if isinstance(value, (list, tuple, set, frozenset)):
+        return f"{type(value).__name__}(items={len(value)})"
+    if value is None or isinstance(value, (bool, int, float)):
+        return repr(value)
+    return type(value).__name__
+
+
+def _audit_argument_summary(func, args: tuple, kwargs: dict) -> str:
+    """Bind call arguments for audit context without retaining their plaintext."""
+    try:
+        bound = inspect.signature(func).bind_partial(*args, **kwargs)
+        bound.apply_defaults()
+        values = bound.arguments.items()
+    except TypeError:
+        values = tuple((f"arg_{index}", value) for index, value in enumerate(args))
+        values += tuple((name, value) for name, value in kwargs.items())
+    return "; ".join(
+        f"{name}={_audit_argument_value(value)}" for name, value in values
+    ) or "no_arguments"
+
+
+def _audit_mcp_entry(func):
+    """Record every MCP tool entry before rate limits or tool execution."""
+    @wraps(func)
+    async def _audited(*args, **kwargs):
+        audit_logger.log_info(
+            event_type="TOOL_INVOKED",
+            tool=func.__name__,
+            message=_audit_argument_summary(func, args, kwargs),
+        )
+        result = func(*args, **kwargs)
+        if inspect.isawaitable(result):
+            return await result
+        return result
+
+    return _audited
+
+
+def _register_mcp_tool(func):
+    """Register an MCP tool through the mandatory entry-audit boundary."""
+    return mcp.tool()(_audit_mcp_entry(func))
 
 # H4/TANDA 2: MAX_PATTERN_LENGTH y _ALLOWED_PATTERN se movieron con la
 # función canónica a vigia.security.sandbox (MAX_GREP_PATTERN_LENGTH,
@@ -822,16 +892,11 @@ HIGH_RISK_PHONETIC   = HIGH_RISK_SET
 # BASE TOOLS — SIFT INTEGRATION
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=100, window_seconds=60, raise_on_limit=False)
 async def list_files(directory: str = ".") -> list:
     """List files and directories. Entry point for filesystem exploration."""
     try:
-        audit_logger.log_info(
-            event_type="TOOL_INVOKED",
-            tool="list_files",
-            message=f"directory={directory!r}",
-        )
         path = _sanitize_path_local(directory)
         return os.listdir(path)
     except (ValueError, OSError) as e:
@@ -1063,7 +1128,7 @@ async def _quarantine_malformed_evidence(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=100, window_seconds=60, raise_on_limit=False)
 async def read_evidence(path: str, max_bytes: int = 5000) -> dict:
     """
@@ -1077,11 +1142,6 @@ async def read_evidence(path: str, max_bytes: int = 5000) -> dict:
     ensuring the hash corresponds to the content in the report.
     """
     try:
-        audit_logger.log_info(
-            event_type="TOOL_INVOKED",
-            tool="read_evidence",
-            message=f"path={path!r} max_bytes={max_bytes}",
-        )
         path = _sanitize_path_local(path)
     except ValueError as e:
         return {"error": str(e)}
@@ -1200,7 +1260,7 @@ async def read_evidence(path: str, max_bytes: int = 5000) -> dict:
         return {"error": f"Cannot open file: {exc}"}
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def search_pattern(pattern: str, folder: str = ".") -> dict | str:
     """
@@ -1237,7 +1297,7 @@ async def search_pattern(pattern: str, folder: str = ".") -> dict | str:
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def list_processes(filter_name: str = "") -> list:
     """
@@ -1261,7 +1321,7 @@ async def list_processes(filter_name: str = "") -> list:
     return processes[:50]
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def audit_network() -> dict | str:
     """
@@ -1286,7 +1346,7 @@ async def audit_network() -> dict | str:
         return {"error": f"Network audit failed: {str(e)}"}
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def mount_sift_evidence(
     image_path: str,
@@ -1351,7 +1411,7 @@ async def mount_sift_evidence(
 # INTEGRITY TOOLS
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=100, window_seconds=60, raise_on_limit=False)
 async def generate_forensic_hash(file_path: str) -> dict:
     """
@@ -1359,11 +1419,6 @@ async def generate_forensic_hash(file_path: str) -> dict:
     If this hash changes by a single bit, evidence was tampered with.
     """
     try:
-        audit_logger.log_info(
-            event_type="TOOL_INVOKED",
-            tool="generate_forensic_hash",
-            message=f"file_path={file_path!r}",
-        )
         file_path = _sanitize_path_local(file_path)
     except ValueError as e:
         return {"error": str(e)}
@@ -1394,7 +1449,7 @@ async def generate_forensic_hash(file_path: str) -> dict:
         return {"error": f"Integrity audit failed: {str(e)}"}
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def calculate_shannon_entropy(data: str) -> dict:
     """
@@ -1476,7 +1531,7 @@ async def calculate_shannon_entropy(data: str) -> dict:
     return await asyncio.to_thread(_compute, data)
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def audit_image_metadata(image_path: str) -> dict:
     """
@@ -1554,7 +1609,7 @@ async def audit_image_metadata(image_path: str) -> dict:
 # INTENTIONALITY ANALYSIS TOOLS — THE HEART OF VIGÍA
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def analyze_stylometry(
     texts       : list,
@@ -1693,7 +1748,7 @@ async def analyze_stylometry(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=10, window_seconds=60, raise_on_limit=False)
 async def calculate_human_entropy(
     messages              : list,
@@ -1873,7 +1928,7 @@ async def calculate_human_entropy(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def infer_intent(
     message_history : list,
@@ -2122,7 +2177,7 @@ async def infer_intent(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def detect_habit_incongruence(
     process_name      : str,
@@ -2247,7 +2302,7 @@ async def detect_habit_incongruence(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def detect_human_jitter(
     timestamps       : list,
@@ -2374,7 +2429,7 @@ async def detect_human_jitter(
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def audit_grice_maxims(messages: list) -> dict:
     """
@@ -2722,7 +2777,7 @@ async def audit_grice_maxims(messages: list) -> dict:
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=30, window_seconds=60, raise_on_limit=False)
 async def detect_eco_overinterpretation(evidence_list: list) -> dict:
     """
@@ -2869,7 +2924,7 @@ def _deactivate_honey_token_impl(file_path: str) -> dict:
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def deactivate_honey_token(file_path: str) -> dict:
     """
@@ -2881,7 +2936,7 @@ async def deactivate_honey_token(file_path: str) -> dict:
     return _deactivate_honey_token_impl(file_path)
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def activate_honey_token(variable_name: str, fake_value: str, ttl_hours: float = 0.0) -> dict:
     """
@@ -3010,7 +3065,7 @@ async def activate_honey_token(variable_name: str, fake_value: str, ttl_hours: f
 # LLM REASONING — NOVEL CASE ANALYSIS
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def reason_with_llm(evidence: str, context: str = "") -> dict:
     """
@@ -3090,7 +3145,7 @@ async def reason_with_llm(evidence: str, context: str = "") -> dict:
         }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def validate_and_correct_analysis(
     evidence      : str,
@@ -3160,7 +3215,7 @@ If analysis is sound, return it unchanged with:
 # DICTIONARY MANAGEMENT TOOLS
 # ─────────────────────────────────────────────────────────────────────────────
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def reload_phonetic_dict() -> dict:
     """
@@ -3191,7 +3246,7 @@ async def reload_phonetic_dict() -> dict:
     }
 
 
-@mcp.tool()
+@_register_mcp_tool
 @rate_limit(max_calls=100, window_seconds=60, raise_on_limit=False)
 async def get_phonetic_dict_stats() -> dict:
     """
@@ -3223,11 +3278,11 @@ async def get_phonetic_dict_stats() -> dict:
 #   + TrustFusion: nueva tool MCP que cierra el ciclo Temporal→Provenance→Correlation
 #   + Whitelist del planner actualizada con las nuevas tools
 
-mcp.tool()(audit_document_integrity)   # PDF/DOCX: fonts, producer, gender/role coherence
-mcp.tool()(analyze_image_layers)       # ELA: Error Level Analysis para detección de paste-in
-mcp.tool()(detect_document_geometry)   # Márgenes, alineación, consistencia de folio
-mcp.tool()(ocr_semantic_validator)     # OCR + validación semántica de campos obligatorios (AR)
-mcp.tool()(vision_intent_audit)        # CLIP zero-shot: intencionalidad visual en imágenes
+_register_mcp_tool(audit_document_integrity)   # PDF/DOCX: fonts, producer, gender/role coherence
+_register_mcp_tool(analyze_image_layers)       # ELA: Error Level Analysis para detección de paste-in
+_register_mcp_tool(detect_document_geometry)   # Márgenes, alineación, consistencia de folio
+_register_mcp_tool(ocr_semantic_validator)     # OCR + validación semántica de campos obligatorios (AR)
+_register_mcp_tool(vision_intent_audit)        # CLIP zero-shot: intencionalidad visual en imágenes
 
 # ---------------------------------------------------------------------------
 # CAIE — Cross-Artifact Incongruence Engine (Kimi P0 → v2.0 hardened)
@@ -3239,7 +3294,7 @@ if os.getenv("VIGIA_CAIE_ENABLED", "true").lower() != "true":
 if os.getenv("VIGIA_CAIE_ENABLED", "true").lower() == "true":
     try:
         from vigia.tools.caie import cross_artifact_analysis
-        mcp.tool()(cross_artifact_analysis)
+        _register_mcp_tool(cross_artifact_analysis)
         audit_logger.log_info(
             event_type="CAIE_REGISTERED",
             tool="vigia_sift_bridge",
@@ -3267,7 +3322,7 @@ if os.getenv("VIGIA_TRUST_FUSION_ENABLED", "true").lower() != "true":
 if os.getenv("VIGIA_TRUST_FUSION_ENABLED", "true").lower() == "true":
     try:
         from vigia.core.trust_fusion import trust_fusion_analysis
-        mcp.tool()(trust_fusion_analysis)
+        _register_mcp_tool(trust_fusion_analysis)
         audit_logger.log_info(
             event_type="TRUST_FUSION_REGISTERED",
             tool="vigia_sift_bridge",
@@ -3292,7 +3347,7 @@ if os.getenv("VIGIA_TRUST_FUSION_ENABLED", "true").lower() == "true":
 if os.getenv("VIGIA_PAIRED_REVIEW_ENABLED", "true").lower() == "true":
     try:
         from vigia.tools.paired_review import compare_paired_bundles
-        mcp.tool()(compare_paired_bundles)
+        _register_mcp_tool(compare_paired_bundles)
         audit_logger.log_info(
             event_type="PAIRED_REVIEW_REGISTERED",
             tool="vigia_sift_bridge",
@@ -3311,7 +3366,7 @@ if os.getenv("VIGIA_PAIRED_REVIEW_ENABLED", "true").lower() == "true":
 if os.getenv("VIGIA_NLP_ENABLED", "true").lower() == "true":
     try:
         from vigia.tools.adversarial_nlp import analyze_document_register
-        mcp.tool()(analyze_document_register)
+        _register_mcp_tool(analyze_document_register)
         audit_logger.log_info(
             event_type="NLP_FORENSICS_REGISTERED",
             tool="vigia_sift_bridge",
@@ -3330,7 +3385,7 @@ if os.getenv("VIGIA_NLP_ENABLED", "true").lower() == "true":
 if os.getenv("VIGIA_ENTANGLEMENT_ENABLED", "true").lower() == "true":
     try:
         from vigia.tools.entanglement import analyze_document_entanglement
-        mcp.tool()(analyze_document_entanglement)
+        _register_mcp_tool(analyze_document_entanglement)
         audit_logger.log_info(
             event_type="ENTANGLEMENT_REGISTERED",
             tool="vigia_sift_bridge",

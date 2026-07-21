@@ -8125,3 +8125,46 @@ credenciales incompatible con OpenWebUI.
 pipeline local stubbed desde ambos imports; junto a
 `tests/test_vigia_api_boundaries.py`: **23 passed**. Las pruebas no abren
 sockets ni leen archivos fuera de fixtures.
+
+---
+
+## B-169 — El audit trail MCP omitía la mayoría de las invocaciones de herramientas [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de procedencia de ejecución (Mode 2 / Mode 5). No modifica los veredictos, el scorer ni los bundles existentes. |
+| **Archivos** | `vigia/vigia_sift_bridge.py`, `KNOWN_LIMITATIONS.md`, `tests/test_b169_mcp_invocation_audit.py`. |
+| **Detectado por** | Revisión Codex de la superficie MCP y seguimiento de L-057, 2026-07-21. |
+
+La bridge activa tenía tres `TOOL_INVOKED` escritos a mano
+(`list_files`, `read_evidence`, `generate_forensic_hash`), pero otras
+herramientas con consecuencias relevantes —`search_pattern`,
+`mount_sift_evidence`, `reason_with_llm` y activación/desactivación de honey
+tokens— podían ejecutarse sin evento de entrada. Además, las herramientas
+externas registradas con `mcp.tool()(...)` al final del archivo no atravesaban
+ninguna frontera común. El trail podía mostrar un resultado o un log interno,
+pero no demostrar uniformemente que la herramienta había sido invocada con
+una clase de parámetros determinada.
+
+**Prueba roja:** una llamada stubbed a `search_pattern` retornaba normalmente
+con cero eventos `TOOL_INVOKED`; un contrato AST encontró 22 decoradores MCP
+directos y múltiples registraciones externas que evitaban todo wrapper común.
+
+**Corrección aplicada:** `_register_mcp_tool()` es ahora la única ruta de
+registro MCP. Envuelve tanto las 22 herramientas locales como las externas
+opcionales y escribe `TOOL_INVOKED` antes de rate limit, validación, sandbox o
+ejecución. La telemetría conserva nombre de argumento, tipo/cardinalidad y un
+SHA-256 de prefijo de hasta 4 KiB para `str`/`bytes`; no vuelca texto de
+evidencia, prompts, rutas ni secretos al log sólo para auditar la llamada. Se
+retiraron los tres logs manuales anteriores para no duplicar eventos.
+
+**Límite honesto:** el cambio acredita la entrada en el proceso bridge que
+escribió la cadena HMAC. No autentica por sí mismo al cliente MCP, no vuelve
+retroactivamente completos a bundles anteriores y no prueba tiempo de pared ni
+que una respuesta post-hoc provenga de una sesión viva.
+
+**Validación:** `tests/test_b169_mcp_invocation_audit.py` prueba que una
+búsqueda registra entrada antes de procesar el patrón sensible y que ninguna
+registración evade la frontera compartida. Junto con el contrato de montaje
+B-164: **13 passed**. La prueba no monta imágenes ni ejecuta un subprocess
+real.
