@@ -8171,10 +8171,11 @@ real.
 
 ---
 
-## B-170 — El fallback de CAIE otorgaba autoridad de veredicto a fracturas declaradas en JSON [RESUELTO — Codex 2026-07-21]
+## B-170 / L-063 — El fallback de CAIE otorgaba autoridad de veredicto a fracturas declaradas en JSON [RESUELTO — Codex 2026-07-21]
 
 | Campo | Valor |
 |-------|-------|
+| **Limitación cerrada** | `L-063` — resuelta por degradación honesta: JSON conserva evidencia declarada, no autoridad de veredicto. |
 | **Severidad** | P2 de integridad/autoridad de veredicto en modo degradado. |
 | **Archivo** | `vigia_scorer.py`, `KNOWN_LIMITATIONS.md`, `tests/characterization/test_verdict_authority_inputs.py`. |
 | **Detectado por** | Cierre de L-063, tras el barrido de entradas de autoridad de veredicto. |
