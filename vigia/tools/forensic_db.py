@@ -30,14 +30,13 @@ import hashlib
 import json
 import os
 import sqlite3
-import stat
 import statistics
 import threading
 from contextlib import contextmanager
-from pathlib import Path
 from typing import Any, Dict, Generator, Optional
 
 from vigia.security import _utcnow, audit_logger
+from vigia.security.output_boundary import SecurityError, validate_external_output_path
 from vigia.tools.nlp_constants import (
     ACP_WINDOW_SIZE,
     DB_PERMISSIONS,
@@ -45,66 +44,6 @@ from vigia.tools.nlp_constants import (
     MAX_DB_SIZE,
     EVIDENCE_PATH_ENV,
 )
-
-
-class SecurityError(Exception):
-    """Violación de seguridad en operaciones de persistencia forense."""
-    pass
-
-
-def validate_external_output_path(output_path: str, *, artifact_label: str) -> str:
-    """Return a canonical output target that cannot mutate source evidence.
-
-    A caller-provided output path carries write authority.  Derived artifacts
-    must be validated before their parent directory exists, and every existing
-    component is checked with ``lstat`` so an intermediate symlink cannot turn
-    an apparently external target into an evidence write.
-    """
-    if not isinstance(output_path, str) or not output_path.strip():
-        raise SecurityError("Output path must be a non-empty string")
-    if "\x00" in output_path:
-        raise SecurityError("Output path contains a null byte")
-
-    raw_target = Path(os.path.abspath(os.path.expanduser(output_path)))
-    current = Path(raw_target.anchor)
-    for component in raw_target.parts[1:]:
-        current /= component
-        try:
-            metadata = os.lstat(current)
-        except FileNotFoundError:
-            # Descendants cannot exist until this component does.
-            break
-        except OSError as exc:
-            raise SecurityError(
-                f"Cannot inspect output path component: {current}"
-            ) from exc
-        if stat.S_ISLNK(metadata.st_mode):
-            raise SecurityError(
-                f"Output path contains symlink component: {current}"
-            )
-
-    try:
-        target = raw_target.resolve(strict=False)
-    except OSError as exc:
-        raise SecurityError(f"Cannot resolve output path: {raw_target}") from exc
-
-    evidence_dir = os.environ.get("VIGIA_EVIDENCE_DIR", "").strip()
-    if evidence_dir:
-        try:
-            evidence_root = Path(
-                os.path.abspath(os.path.expanduser(evidence_dir))
-            ).resolve(strict=False)
-        except OSError as exc:
-            raise SecurityError(
-                f"Cannot resolve VIGIA_EVIDENCE_DIR: {evidence_dir}"
-            ) from exc
-        if target == evidence_root or target.is_relative_to(evidence_root):
-            raise SecurityError(
-                f"Refusing to write {artifact_label} inside VIGIA_EVIDENCE_DIR "
-                "(forensic evidence is read-only)"
-            )
-
-    return str(target)
 
 
 class ForensicDatabaseManager:

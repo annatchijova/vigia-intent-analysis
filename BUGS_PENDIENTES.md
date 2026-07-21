@@ -8524,3 +8524,37 @@ SIFT sobre el mismo guard.
 el padre symlink que resuelve a evidencia y el control positivo externo. La
 familia B-175 a B-179 queda en 15 tests passing. El cambio no toca detección,
 score, modelado ni veredictos: sólo retira autoridad de escritura indebida.
+
+---
+
+## B-180 — constructor de paquetes sellados podía escribir en evidencia y recibir traversal por `case_id` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una API de empaquetado podía contaminar la fuente con PDF copiado, ledger, manifest, firma y ZIP; el identificador del caso también podía escapar del output externo. |
+| **Archivo** | `vigia/security/output_boundary.py` (nuevo), `vigia/pipeline/evidence_bundle.py`, `vigia/tools/forensic_db.py`, `vigia/tools/adversarial_nlp.py`, `tests/test_b180_evidence_bundle_output_boundary.py`. |
+| **Modo** | `build_evidence_bundle()` de la API de bundles verificables; el guard compartido cubre además SIFT y plantillas periciales. |
+| **Principio afectado** | Un directorio de salida y un identificador de caso son ambos inputs de autoridad. Ningún artefacto derivado puede cruzar hacia `VIGIA_EVIDENCE_DIR`. |
+
+**Observación reproducida:** `build_evidence_bundle()` ejecutaba
+`os.makedirs(output_dir)` sin validar, luego escribía bajo
+`<output_dir>/<case_id>_bundle/` el PDF, `ledger.json`, `manifest.json` y
+potencialmente firma/ZIP. Con `output_dir=<evidence>` el paquete completo se
+creaba dentro de la fuente. Aun después de validar sólo `output_dir`, un
+`case_id="../evidence/b180"` habría permitido que `os.path.join()` construyera
+un bundle fuera del root externo. Un directorio de salida symlink hacia
+evidencia era el tercer vector equivalente.
+
+**Corrección aplicada:** B-180 mueve el contrato genérico a
+`vigia.security.output_boundary`: `validate_external_output_path()` valida
+vacío/NUL, rechaza cada componente symlink con `lstat`, canonicaliza y bloquea
+pertenencia por componentes a `VIGIA_EVIDENCE_DIR`, antes y después de crear
+un padre externo. Lo usan el paquete, exportación SIFT y plantilla de config.
+El builder además valida que `case_id` sea una etiqueta no vacía sin NUL,
+separadores ni `.`/`..`; todas sus rutas hijas se derivan sólo de ese ID seguro.
+
+**Validación:** cuatro regresiones B-180 cubren output directo en evidencia,
+control positivo externo, traversal por ID y output symlink. Con B-178/B-179 y
+las regresiones B-062/B-064 de atomicidad/registro, pasan 21 tests. La
+corrección no modifica contenido forense, scores ni veredictos; restaura la
+separación entre entrada preservada y paquete derivado.

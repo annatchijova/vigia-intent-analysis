@@ -49,6 +49,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import yaml
 
 from vigia.security import _utcnow, audit_logger, _sanitize_path
+from vigia.security.output_boundary import validate_external_output_path
 from vigia.tools.nlp_constants import (
     # Tipos base
     Language, InstitutionalEmitter, ForensicThresholds, LanguageConfig,
@@ -66,7 +67,7 @@ from vigia.tools.nlp_constants import (
     # Cognitive markers
     CognitiveMarkers,
 )
-from vigia.tools.forensic_db import ForensicDatabaseManager, validate_external_output_path
+from vigia.tools.forensic_db import ForensicDatabaseManager
 
 # CAIE integration (opcional — no bloquea si no está disponible)
 try:
