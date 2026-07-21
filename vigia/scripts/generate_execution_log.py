@@ -88,6 +88,7 @@ def process_case(
     case: Dict[str, Any],
     detector: SemioticDetectorV2,
     output_path: Optional[str] = None,
+    output_dir: Optional[str] = None,
 ) -> str:
     """
     Procesa un caso individual y genera su JSONL de ejecución.
@@ -109,16 +110,20 @@ def process_case(
         print(f"[WARN] {case_id}: sin texto ni artefactos, omitiendo.", file=sys.stderr)
         return ""
 
-    # Determinar output_dir
+    # An explicit output path retains the historical file-name behavior.  With
+    # no explicit destination, delegate to VigiaExecutionLogger's private
+    # operational default instead of reviving the CWD-relative data/logs path.
     if output_path:
         log_path = Path(output_path)
-        output_dir = str(log_path.parent)
+        resolved_output_dir = str(log_path.parent)
         log_filename = log_path.stem
     else:
-        output_dir = "data/logs"
         log_filename = case_id
 
-    logger = VigiaExecutionLogger(log_filename, output_dir=output_dir)
+    logger = VigiaExecutionLogger(
+        log_filename,
+        output_dir=resolved_output_dir if output_path else output_dir,
+    )
 
     # VISIBLE_VARIABLES — qué artefactos se exponen
     artifacts = case.get("artifacts", [{"artifact_id": "ART-001", "type": "text"}])
@@ -154,6 +159,19 @@ def process_case(
     for i, match in enumerate(matches[:5]):
         peirce = match.get("peirce_layer", "FIRSTNESS")
         art_id = f"ART-{i+1:03d}"
+        weight_num = match.get("weight_num")
+        weight_den = match.get("weight_den")
+        if (
+            not isinstance(weight_num, int)
+            or isinstance(weight_num, bool)
+            or not isinstance(weight_den, int)
+            or isinstance(weight_den, bool)
+            or weight_num < 0
+            or weight_den <= 0
+        ):
+            raise ValueError(
+                "detector match lacks a valid canonical weight_num/weight_den"
+            )
 
         logger.log_event(
             phase=ir_phase,
@@ -163,10 +181,11 @@ def process_case(
             intent_hypothesis=match.get("description", "")[:100],
             devil_advocate=_generate_devil_advocate(case, verdict),
             tool_called="semiotic_detector_v2",
-            confidence=int(match.get("weight", 0.5) * 100),
+            confidence=(weight_num * 100) // weight_den,
             verdict_partial=verdict if i == len(matches) - 1 else None,
             pattern_detected=match.get("pattern_name"),
-            pattern_weight=match.get("weight"),
+            pattern_weight_num=weight_num,
+            pattern_weight_den=weight_den,
         )
 
     # ABDUCTIVE_HYPOTHESIS
@@ -227,13 +246,13 @@ def process_case(
 
 def process_dataset(
     dataset: List[Dict[str, Any]],
-    output_dir: str = "data/logs",
+    output_dir: Optional[str] = None,
 ) -> List[str]:
-    """Procesa múltiples casos y genera un log por cada uno."""
+    """Procesa casos con salida privada por defecto o un directorio externo."""
     detector = SemioticDetectorV2()
     logs = []
     for case in dataset:
-        log_path = process_case(case, detector, output_path=None)
+        log_path = process_case(case, detector, output_dir=output_dir)
         if log_path:
             logs.append(log_path)
     return logs
@@ -251,8 +270,14 @@ def main() -> None:
                         help="JSON con lista de artefactos/casos (batch)")
     parser.add_argument("--output", type=Path,
                         help="Ruta de salida del JSONL (solo para --case)")
-    parser.add_argument("--output-dir", type=str, default="data/logs",
-                        help="Directorio de salida para batch (default: data/logs)")
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        help=(
+            "Directorio externo para batch. Default: VIGIA_EXECUTION_LOG_DIR, "
+            "VIGIA_WORK_DIR/logs o estado privado."
+        ),
+    )
     args = parser.parse_args()
 
     if not args.case and not args.input:
@@ -278,10 +303,13 @@ def main() -> None:
         cases = data if isinstance(data, list) else [data]
         logs = []
         for case in cases:
-            log_path = process_case(case, detector, output_path=None)
+            log_path = process_case(
+                case, detector, output_dir=args.output_dir
+            )
             if log_path:
                 logs.append(log_path)
-        print(f"\n[OK] {len(logs)} logs generados en {args.output_dir}")
+        destination = args.output_dir or "private operational log directory"
+        print(f"\n[OK] {len(logs)} logs generados en {destination}")
 
 
 if __name__ == "__main__":

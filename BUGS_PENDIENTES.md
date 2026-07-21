@@ -8900,3 +8900,72 @@ desde CWD de evidencia y output externo permitido. Además pasan
 passed** (una advertencia histórica de timestamp no sellado). La inducción
 confirma el cierre de la autoridad de escritura; no afirma atomicidad ante
 caída de energía de la secuencia JSONL, que queda fuera de este fix.
+
+---
+
+## B-191 — el generador de execution logs se rompía al encontrar una señal [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de trazabilidad: el modo que debe registrar hallazgos SANS abortaba antes de emitir el primer `FORENSIC_FINDING` cuando el detector devolvía una señal normal. |
+| **Archivo** | `vigia/scripts/generate_execution_log.py`, `tests/test_b191_execution_log_generator_schema.py`. |
+| **Modo** | Generador JSONL individual/batch de Agent Execution Logs. |
+| **Principio afectado** | Un trail forense debe consumir el contrato canónico del detector y conservar pesos exactos, no inventar un valor de display ni fallar en el camino con evidencia. |
+
+**Observación reproducida:** `SemioticDetectorV2.analyze()` emite cada match
+con `weight_num` y `weight_den`, y mantiene `_weight` sólo como display. El
+generador pedía en cambio `match["weight"]` con fallback `0.5` y llamaba a
+`VigiaExecutionLogger.log_event(pattern_weight=...)`; esa firma no existe.
+Una inducción mínima con un match válido `7/10` produjo exactamente
+`TypeError: ... unexpected keyword argument 'pattern_weight'`. Por tanto un
+caso sin matches podía aparentar funcionar, mientras que el camino que debía
+registrar un hallazgo no terminaba su log ni su veredicto final.
+
+**Corrección aplicada:** el generador consume exclusivamente
+`weight_num`/`weight_den`, los valida como enteros racionales no negativos con
+denominador positivo, calcula la confianza de display mediante aritmética
+entera y llama a la firma existente `pattern_weight_num` /
+`pattern_weight_den`. Un schema de detector no canónico ahora falla con un
+error explícito en vez de registrar un 50% inventado. La decisión del motor
+no se modifica: sólo se restaura el consumidor de su output y su trazabilidad
+exacta.
+
+**Validación:** la prueba B-191 usó el mismo schema canónico del detector, fue
+roja antes (`TypeError`) y verde después; verifica que el JSONL conserva
+`_pattern_weight = 7/10` en su representación canónica. Junto con B-190 y el
+hardening de cadena pasan **33 tests**. No se afirma que este generador sea el
+autoridad de veredicto: su función es registrar fielmente la salida ya
+producida por el detector y la capa de decisión.
+
+---
+
+## B-192 — el script de execution logs reintroducía el default inseguro [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad operacional: aunque el logger central ya tenía un default privado (B-190), el script que lo invoca le imponía el antiguo `data/logs` relativo al CWD. |
+| **Archivo** | `vigia/scripts/generate_execution_log.py`, `tests/test_b192_execution_log_script_output_boundary.py`. |
+| **Modo** | Generador standalone individual y batch de Agent Execution Logs. |
+| **Principio afectado** | Una frontera de escritura sólo vale si cada entry point conserva sus defaults seguros; un wrapper no puede recuperar autoridad ambiental que el componente protegido ya había eliminado. |
+
+**Observación reproducida:** una ejecución real del script con
+`VIGIA_WORK_DIR=<tmp>` siguió publicando en `data/logs/` del checkout porque
+`process_case(..., output_path=None)` sobrescribía el default del logger. La
+inducción desde un CWD igual a `VIGIA_EVIDENCE_DIR` fue rechazada por B-190,
+evitando contaminar evidencia, pero el modo no podía completar aunque tenía un
+work directory válido. Esto refutó la hipótesis de que corregir sólo el
+constructor cubría todos los entry points.
+
+**Corrección aplicada:** `process_case` y `process_dataset` aceptan un
+`output_dir` opcional; al no recibirlo delegan al default privado de
+`VigiaExecutionLogger`. El CLI deja de preseleccionar `data/logs`, propaga
+`--output-dir` al batch y describe el orden de destinos seguro. Un `--output`
+o `--output-dir` explícito sigue siendo posible, pero queda sujeto a la misma
+validación contra evidencia y symlinks de B-190.
+
+**Validación:** B-192 fue roja antes por `SecurityError` al iniciar desde un
+CWD de evidencia pese a tener `VIGIA_WORK_DIR`; queda verde y genera
+`<work>/logs/B192-001_execution.jsonl` sin crear nada en evidencia. Con B-190,
+B-191, hardening de cadena y triage pasan **57 tests**. El test de integración
+real posterior confirmó que un match del detector produce el JSONL en el work
+directory, no en el checkout.
