@@ -28,7 +28,7 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from vigia.api_case_paths import CasePathError, resolve_case_path
+from vigia.api_case_paths import CasePathError, snapshot_case_file
 from vigia.api_defaults import DEFAULT_CORS_ORIGINS, DEFAULT_HOST, DEFAULT_PORT
 from vigia.openai_compat import ChatRequest, install_openai_compatibility
 
@@ -146,18 +146,17 @@ def list_cases():
 def analyze_by_path(payload: CasePath):
     """Analiza un caso forense VIGÍA dado su path relativo al repo (ej: data/cases/VIGIA-REAL-001.json). USAR ESTE ENDPOINT para analizar casos existentes."""
     try:
-        case_path = resolve_case_path(REPO, payload.case_path)
+        with snapshot_case_file(REPO, payload.case_path) as case_snapshot:
+            pipeline = _run_pipeline(case_snapshot)
+            try:
+                narrative = _run_narrative(case_snapshot)
+            except Exception:
+                narrative = "[narrativa no disponible]"
+        return {**pipeline, "narrative": narrative, "case": Path(payload.case_path).name}
     except CasePathError:
         # El mismo 404 para ruta inválida o inexistente evita convertir este
         # endpoint en un oráculo de paths locales.
         raise HTTPException(404, "Caso no encontrado en los directorios permitidos")
-    try:
-        pipeline = _run_pipeline(case_path)
-        try:
-            narrative = _run_narrative(case_path)
-        except Exception:
-            narrative = "[narrativa no disponible]"
-        return {**pipeline, "narrative": narrative, "case": case_path.name}
     except Exception:
         logger.exception("Fallo interno al analizar un caso por path")
         raise HTTPException(500, "Error interno en el pipeline forense.") from None

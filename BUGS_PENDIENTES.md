@@ -9000,3 +9000,43 @@ de symlink y export externo canónico conservando el contenido. Con B-190–B-19
 y hardening de cadena pasan **37 tests**. La validación protege la autoridad de
 escritura; no pretende resolver por sí sola una sustitución hostil de directorio
 entre operaciones de filesystem fuera del modelo de permisos del proceso.
+
+---
+
+## B-194 — la API validaba el pathname de un caso pero abría ese pathname después [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de integridad y alcance forense, condicionado a que un actor pueda mutar concurrentemente el directorio de casos. No supone que un cliente HTTP, por sí solo, tenga permiso de escritura en el checkout. |
+| **Archivos** | `vigia/api_case_paths.py`, `vigia_api.py`, `vigia/vigia_api.py`, `tests/test_b194_api_case_snapshot_race.py`, `tests/test_vigia_api_boundaries.py`. |
+| **Modo** | FastAPI `POST /analyze/path`, ambas rutas de importación documentadas. |
+| **Principio afectado** | La selección de evidencia sólo es válida si el objeto que se analiza es el mismo que fue autorizado. `lstat()` seguido de `open(path)` no preserva esa identidad frente a sustitución entre operaciones. |
+
+**Observación reproducida:** `resolve_case_path()` ya rechazaba rutas absolutas,
+traversal y symlinks que existieran durante su inspección. Sin embargo devolvía
+un `Path` y el pipeline lo abría más tarde por nombre. En un directorio temporal
+controlado, se autorizó `data/cases/allowed.json`, se reemplazó esa hoja por un
+symlink a `outside/case.json` y un `open()` ordinario leyó el JSON externo. La
+inducción confirma una carrera de pathname; no afirma exfiltración de un secreto
+arbitrario, porque el pipeline requiere JSON con forma de caso y la exposición
+depende de la configuración de narración y despliegue.
+
+**Corrección aplicada:** `snapshot_case_file()` conserva la validación léxica y
+de archivo regular, pero su apertura autoritativa parte de un descriptor del
+repositorio y recorre `data/cases` o `cases` componente por componente mediante
+`dir_fd`, `O_DIRECTORY` y `O_NOFOLLOW`. Un symlink de hoja o de directorio que
+aparezca después de validar falla cerrado. El descriptor de archivo ya ligado se
+copia a un temporal privado con `fsync`; tanto el pipeline determinista como la
+narración opcional consumen esa instantánea y nunca reabren el pathname aportado
+por el cliente. La plataforma que no ofrece estas primitivas rehúsa el caso en
+vez de volver silenciosamente al patrón vulnerable.
+
+**Validación:** los tests B-194 fueron rojos antes (la primitiva no existía) y
+verdes después. Simulan, por separado, sustitución de la hoja y del directorio
+raíz tras la resolución inicial; ambos producen `CasePathError`. El contrato de
+endpoint verifica también que las dos APIs devuelven 404 sin invocar el pipeline.
+La prueba manual aislada obtuvo `SWAP_REJECTED` con el `ELOOP` esperado. Con las
+regresiones de frontera y paridad API pasan **28 tests**. Una escritura directa
+de contenido regular *dentro* de un case root que el atacante ya controla sigue
+fuera de esta defensa: eso es autoridad de modificación de evidencia, no una
+evasión de confinamiento de path.

@@ -12,6 +12,8 @@ from pathlib import Path
 import pytest
 from fastapi import HTTPException
 
+import vigia.api_case_paths as case_paths
+
 
 WRAPPERS = ("vigia_api", "vigia.vigia_api")
 
@@ -102,6 +104,34 @@ def test_analyze_path_rejects_symlink_directory_and_wrong_extension(
         with pytest.raises(HTTPException) as error:
             api_module.analyze_by_path(api_module.CasePath(case_path=requested))
         assert error.value.status_code == 404
+
+
+def test_analyze_path_rejects_symlink_swapped_after_initial_validation(
+    tmp_path, monkeypatch, api_module
+):
+    """The wrapper must consume the descriptor-bound snapshot, not reopen a path."""
+    repo, allowed = _fixture_repo(tmp_path)
+    outside = tmp_path / "outside.json"
+    outside.write_text('{"case_id": "outside", "artifacts": []}')
+    original_resolver = case_paths.resolve_case_path
+
+    def replace_after_resolution(root, requested):
+        selected = original_resolver(root, requested)
+        selected.unlink()
+        selected.symlink_to(outside)
+        return selected
+
+    monkeypatch.setattr(case_paths, "resolve_case_path", replace_after_resolution)
+    monkeypatch.setattr(api_module, "REPO", repo)
+    _install_inert_pipeline(monkeypatch, api_module)
+
+    with pytest.raises(HTTPException) as error:
+        api_module.analyze_by_path(
+            api_module.CasePath(case_path="data/cases/allowed.json")
+        )
+
+    assert error.value.status_code == 404
+    assert allowed.is_symlink()
 
 
 @pytest.mark.parametrize("payload", ["42", "null", "[]"])
