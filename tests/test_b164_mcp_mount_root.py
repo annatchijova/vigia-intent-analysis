@@ -1,14 +1,14 @@
-"""B-164 — MCP image mounting must have one reachable, confined root.
+"""B-164/B-173 — MCP image mounting must have reachable, confined roots.
 
 ``mount_sift_evidence`` used the evidence-root sanitizer for *both* its
 source image and its target, then separately required the target to be under
 ``/mnt/analysis``.  Unless the evidence root itself was ``/mnt/analysis``, no
 request could reach the privilege check or the mount operation.
 
-The repaired contract keeps the image in the evidence root and creates a
-private leaf directory beneath an evidence-local mount root.  That makes the
-mounted filesystem available to the normal evidence-reading tools without
-giving the MCP caller an arbitrary privileged mount path.
+The repaired contract keeps the image in the immutable evidence root and
+creates a private leaf beneath a distinct operational mount root. That makes
+the mounted filesystem available to normal evidence-reading tools without
+giving the MCP caller an arbitrary privileged mount path or mutating evidence.
 """
 
 from __future__ import annotations
@@ -23,14 +23,17 @@ import vigia.vigia_sift_bridge as bridge
 
 def _isolated_mount_roots(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> tuple[Path, Path]:
     evidence_root = tmp_path / "evidence"
-    mount_root = evidence_root / "mounted"
+    work_root = tmp_path / "work"
+    mount_root = work_root / "mounted"
+    evidence_root.mkdir()
     mount_root.mkdir(parents=True)
     monkeypatch.setattr(bridge, "EVIDENCE_BASE_DIR", str(evidence_root))
+    monkeypatch.setattr(bridge, "WORK_BASE_DIR", str(work_root))
     monkeypatch.setattr(bridge, "_MOUNT_ROOT", str(mount_root))
     return evidence_root, mount_root
 
 
-def test_b164_creates_a_private_mount_leaf_inside_evidence(
+def test_b164_creates_a_private_mount_leaf_outside_evidence(
     monkeypatch: pytest.MonkeyPatch, tmp_path: Path
 ) -> None:
     """The target is both reachable and readable through evidence tools."""
@@ -40,7 +43,7 @@ def test_b164_creates_a_private_mount_leaf_inside_evidence(
 
     assert target == str(mount_root / "nexus5")
     assert Path(target).is_dir()
-    # Later MCP readers still use the evidence-root confinement contract.
+    # Later MCP readers accept the controlled mount root as a read-only source.
     assert bridge._sanitize_path_local(target) == target
 
 

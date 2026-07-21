@@ -71,6 +71,11 @@ export VIGIA_EVIDENCE_DIR="/path/to/read-only/evidence"
 # Default: /var/log/vigia. Must NEVER point inside VIGIA_EVIDENCE_DIR.
 export VIGIA_LOG_DIR="/var/log/vigia"
 
+# Optional — private operational state for the MCP bridge (B-173): mounted
+# filesystems, quarantine copies, and honey tokens. Must be outside evidence.
+# Default: a private mode-0700 temporary directory for the server lifetime.
+export VIGIA_WORK_DIR="/var/lib/vigia/work"
+
 # Optional — enables LLM semantic analysis
 export ANTHROPIC_API_KEY="sk-..."          # Claude Code / API mode
 export VIGIA_LLM_BACKEND=ollama            # local mode
@@ -448,7 +453,8 @@ rather than duplicating their content here:
 ## Invariants — Non-Negotiable
 
 1. **Evidence is read-only.** Never write to `VIGIA_EVIDENCE_DIR`. Write extracted
-   artifacts to a separate working directory only.
+   artifacts, mounted filesystems, quarantine copies, and honey tokens only to
+   the separate `VIGIA_WORK_DIR` working directory.
 
 2. **Hash before reading.** `generate_forensic_hash` precedes `read_evidence` on
    every artifact. No exceptions. An unhashed file has no chain of custody.

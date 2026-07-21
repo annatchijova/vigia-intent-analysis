@@ -8301,3 +8301,40 @@ y los artefactos presentes, no autentica por sí sola la cadena de procedencia.
 batería de autoridad temporal, CAIE, `Fraction` y severidad `Decimal`. El caso
 canónico con inversión real de cinco segundos mantiene `MALICE`; una alegación
 contradicha o con artefacto ausente ahora emite `ABSTAIN`.
+
+---
+
+## B-173 — el import del bridge MCP mutaba `VIGIA_EVIDENCE_DIR` con estado operativo [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: la mutación ocurría antes de leer un artefacto y cambiaba el listado/mtime del árbol de evidencia. |
+| **Archivo** | `vigia/vigia_sift_bridge.py`, `tests/test_b173_bridge_work_root.py`, `tests/test_b164_mcp_mount_root.py`, `CLAUDE.md`. |
+| **Modos** | MCP activo (`launch_vigia_mcp.sh` ejecuta este bridge); cualquier import del módulo con `VIGIA_EVIDENCE_DIR` configurado. |
+| **Principio afectado** | Invariante 1 de `CLAUDE.md`: evidencia read-only; los artefactos extraídos deben ir a un directorio de trabajo separado. |
+
+**Observación reproducida:** con un directorio de evidencia vacío,
+`VIGIA_EVIDENCE_DIR=<evidence> python3 -c 'import vigia.vigia_sift_bridge'`
+creaba inmediatamente `honey_tokens/`, `purgatory/` y `mounted/` debajo de la
+entrada. No era necesario invocar una herramienta. B-164 había hecho que el
+mount fuera alcanzable al ubicarlo bajo el mismo root de lectura; eso reparó un
+gate imposible pero confundió la raíz de entrada con la raíz operacional.
+
+**Corrección aplicada:** B-173 introduce `VIGIA_WORK_DIR`, una raíz privada
+`0700` disjunta de la evidencia. Si no se configura, el bridge crea una raíz
+temporal privada por proceso. Honey tokens, cuarentena y mount points viven
+allí. El bridge rechaza antes de crear directorios una workdir anidada, igual o
+padre de `VIGIA_EVIDENCE_DIR`, y también rechaza componentes symlink. Las
+herramientas de lectura aceptan sólo la evidencia original o el subárbol
+controlado `WORK_BASE_DIR/mounted`; la fuente de `mount_sift_evidence` continúa
+restringida exclusivamente a evidencia original.
+
+**Validación:** 30 pruebas MCP pasan: import subprocess sin mutar evidencia,
+rechazo de workdir insegura, mount root legible pero confinado, targets
+malformados/symlinks rechazados, auditoría de invocación y sanitización grep.
+
+**Límite deliberado:** el Purgatorio conserva una copia operativa y su hash;
+no la reetiqueta como evidencia fuente ni resuelve por sí mismo L-065 (la
+autenticación de cadenas de procedencia). El directorio de trabajo debe
+preservarse explícitamente si el operador necesita retener ese estado entre
+reinicios.

@@ -218,11 +218,27 @@ def _register_mcp_tool(func):
 # sin argumentos nombrados.
 
 def _sanitize_path_local(path: str) -> str:
+    """Constrain a forensic read to evidence or a controlled mounted volume.
+
+    ``VIGIA_EVIDENCE_DIR`` is the immutable input root. A mounted image is
+    materialized below the separate work root, but must remain reachable by
+    the same read-only MCP tools. Select the matching root before invoking the
+    canonical sanitizer so a legitimate mounted path does not create a
+    spurious traversal event against the evidence root.
     """
-    Wrapper de conveniencia: llama a vigia.security._sanitize_path con
-    base_dir=EVIDENCE_BASE_DIR.  Todas las tools internas del bridge usan
-    esta funcion para confinar acceso al directorio de evidencia.
-    """
+    try:
+        candidate = Path(path).resolve(strict=False)
+    except (OSError, RuntimeError, TypeError):
+        candidate = None
+    if candidate is not None:
+        for root in (EVIDENCE_BASE_DIR, _MOUNT_ROOT):
+            try:
+                candidate.relative_to(Path(root).resolve(strict=False))
+            except ValueError:
+                continue
+            return _sanitize_path(path, base_dir=root)
+    # Preserve the canonical sanitizer's detailed fail-closed error and audit
+    # event for a path outside either authorised read root.
     return _sanitize_path(path, base_dir=EVIDENCE_BASE_DIR)
 
 
@@ -308,36 +324,104 @@ else:
         f"Set VIGIA_EVIDENCE_DIR for production use.",
         file=sys.stderr, flush=True,
     )
-# P0 FIX: Honey token directory - secure file storage
-_HONEY_TOKEN_DIR = os.path.join(EVIDENCE_BASE_DIR, "honey_tokens")
+
+
+def _resolve_work_root() -> str:
+    """Return a private operational root that cannot overlap evidence.
+
+    Honey tokens, quarantine copies, and mount points are VIGÍA-generated
+    state. Placing any of them under ``VIGIA_EVIDENCE_DIR`` changes a forensic
+    input tree before analysis. A caller can configure durable state with
+    ``VIGIA_WORK_DIR``; otherwise a mode-0700 temporary root is used.
+    """
+    configured = os.getenv("VIGIA_WORK_DIR", "").strip()
+    if not configured:
+        root = tempfile.mkdtemp(prefix="vigia_work_")
+        os.chmod(root, 0o700)
+        return root
+
+    candidate = Path(configured)
+    if "\x00" in configured or ".." in candidate.parts:
+        print(
+            "[VIGIA][CRITICAL] VIGIA_WORK_DIR contains an unsafe path component. "
+            "Refusing to start.",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.exit(1)
+    try:
+        raw_absolute = candidate.absolute()
+        resolved = candidate.resolve(strict=False)
+        evidence_root = Path(EVIDENCE_BASE_DIR).resolve(strict=False)
+    except (OSError, RuntimeError) as exc:
+        print(
+            f"[VIGIA][CRITICAL] Cannot resolve VIGIA_WORK_DIR: {exc}. Refusing to start.",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.exit(1)
+
+    # Validate before mkdir: an unsafe configuration must not create even one
+    # directory below evidence. Reject symlinked components as well, so a
+    # visually separate work path cannot resolve into forensic input.
+    if (
+        resolved != raw_absolute
+        or resolved == evidence_root
+        or resolved.is_relative_to(evidence_root)
+        or evidence_root.is_relative_to(resolved)
+    ):
+        print(
+            "[VIGIA][CRITICAL] VIGIA_WORK_DIR must be a non-symlink root "
+            "disjoint from VIGIA_EVIDENCE_DIR. Refusing to start.",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.exit(1)
+    try:
+        os.makedirs(raw_absolute, mode=0o700, exist_ok=True)
+        os.chmod(raw_absolute, 0o700)
+    except OSError as exc:
+        print(
+            f"[VIGIA][CRITICAL] Cannot create VIGIA_WORK_DIR: {exc}. Refusing to start.",
+            file=sys.stderr,
+            flush=True,
+        )
+        sys.exit(1)
+    return str(raw_absolute)
+
+
+# B-173: evidence is read-only; all VIGÍA-created state is work state.
+WORK_BASE_DIR = _resolve_work_root()
+
+# P0 FIX: Honey token directory - secure file storage.
+_HONEY_TOKEN_DIR = os.path.join(WORK_BASE_DIR, "honey_tokens")
 os.makedirs(_HONEY_TOKEN_DIR, exist_ok=True)
 os.chmod(_HONEY_TOKEN_DIR, 0o700)  # Owner only
 
 # Purgatorio Forense: cuarentena de evidencia malformada
 # Permisos 0o700: solo el proceso VIGIA puede leer/escribir.
-# Nunca bajo /tmp — hereda la seguridad de EVIDENCE_BASE_DIR.
-_PURGATORY_DIR = os.path.join(EVIDENCE_BASE_DIR, "purgatory")
+# B-173: never below immutable evidence; WORK_BASE_DIR is 0o700 and disjoint.
+_PURGATORY_DIR = os.path.join(WORK_BASE_DIR, "purgatory")
 os.makedirs(_PURGATORY_DIR, exist_ok=True)
 os.chmod(_PURGATORY_DIR, 0o700)  # Owner only
 
-# B-164: mounted evidence remains beneath the same trust anchor as every
-# evidence-reading MCP tool.  Previously a target was confined to
-# EVIDENCE_BASE_DIR and then required to be below /mnt/analysis: two
-# unrelated roots, which made a valid request impossible.
-_MOUNT_ROOT = os.path.join(EVIDENCE_BASE_DIR, "mounted")
+# B-164/B-173: mounted evidence must be reachable by controlled read tools but
+# cannot be materialized inside immutable input. _sanitize_path_local accepts
+# only EVIDENCE_BASE_DIR or this private mount subtree.
+_MOUNT_ROOT = os.path.join(WORK_BASE_DIR, "mounted")
 os.makedirs(_MOUNT_ROOT, mode=0o700, exist_ok=True)
 os.chmod(_MOUNT_ROOT, 0o700)
 _MOUNT_LEAF_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 
 
 def _sanitize_mount_point(mount_point: str) -> str:
-    """Create and return one private, evidence-local mount leaf.
+    """Create and return one private, work-local mount leaf.
 
-    Mounting is privileged.  The image remains confined to
-    ``EVIDENCE_BASE_DIR`` and a caller may select only a simple leaf name under
+    Mounting is privileged. The source image remains confined to
+    ``EVIDENCE_BASE_DIR`` while the target is a simple leaf beneath
     ``_MOUNT_ROOT``—never an arbitrary absolute path or request-controlled
-    hierarchy.  The mounted filesystem consequently remains available through
-    the normal evidence-reading tools without enlarging their authority.
+    hierarchy. The mounted filesystem remains available through the normal
+    evidence-reading tools without mutating the source evidence tree.
     """
     if not isinstance(mount_point, str) or not _MOUNT_LEAF_RE.fullmatch(mount_point):
         raise ValueError(
@@ -348,7 +432,7 @@ def _sanitize_mount_point(mount_point: str) -> str:
     # This root is created at bridge startup, before MCP input is processed.
     safe_root = _sanitize_path(
         _MOUNT_ROOT,
-        base_dir=EVIDENCE_BASE_DIR,
+        base_dir=WORK_BASE_DIR,
         must_exist=True,
     )
     if not os.path.isdir(safe_root):
@@ -1268,7 +1352,7 @@ async def search_pattern(pattern: str, folder: str = ".") -> dict | str:
 
     P2 fix (2026-04 audit): replaced direct subprocess.check_output with
     safe_grep() which enforces memory/CPU limits via setrlimit, depth
-    limiting, and path confinement to EVIDENCE_BASE_DIR.
+    limiting, and path confinement to evidence or a controlled mounted volume.
     """
     try:
         pattern = _sanitize_grep_pattern(pattern)
@@ -1281,7 +1365,7 @@ async def search_pattern(pattern: str, folder: str = ".") -> dict | str:
         max_depth=CONFIG.max_grep_depth,
         max_memory_mb=CONFIG.sandbox_memory_mb,
         max_cpu_seconds=CONFIG.sandbox_cpu_seconds,
-        allowed_dirs=[EVIDENCE_BASE_DIR],
+        allowed_dirs=[EVIDENCE_BASE_DIR, _MOUNT_ROOT],
     )
 
     if result["error"]:
@@ -1359,7 +1443,9 @@ async def mount_sift_evidence(
     P2 fix: migrated from subprocess.check_output to sandboxed_execute.
     """
     try:
-        image_path = _sanitize_path_local(image_path)
+        # A mount source is immutable forensic input, never a prior mounted
+        # output under the operational work root.
+        image_path = _sanitize_path(image_path, base_dir=EVIDENCE_BASE_DIR)
     except ValueError as e:
         return {"error": str(e)}
 
