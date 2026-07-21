@@ -267,6 +267,15 @@ class AndroidForensicsAnalyzer:
             except Exception as e:
                 logger.error("[ANDROID] Contacts analysis failed: %s", e)
                 result.analysis_notes.append(f"Contacts parse error: {e}")
+            # B-160: some logical Android extractions keep the call-history
+            # table in contacts2.db. Dispatch by the readable table as well as
+            # the conventional filename; an absent calls table here is normal
+            # and must not be reported as an empty call log (B-072).
+            try:
+                self._analyze_call_log(db, result, report_missing_table=False)
+            except Exception as e:
+                logger.error("[ANDROID] Embedded call-log analysis failed: %s", e)
+                result.analysis_notes.append(f"Embedded call-log parse error: {e}")
 
         # 4. Call log
         for db in self._safe_rglob(evidence_path, "calllog.db", limit=3):
@@ -508,7 +517,13 @@ class AndroidForensicsAnalyzer:
 
     # ── Call Log ────────────────────────────────────────────────────────────
 
-    def _analyze_call_log(self, db_path: Path, result: AndroidAnalysisResult) -> None:
+    def _analyze_call_log(
+        self,
+        db_path: Path,
+        result: AndroidAnalysisResult,
+        *,
+        report_missing_table: bool = True,
+    ) -> None:
         conn = self._safe_sqlite_connect(db_path)
         if conn is None:
             result.analysis_notes.append(f"calllog.db: could not open {db_path}")
@@ -520,7 +535,8 @@ class AndroidForensicsAnalyzer:
                 result.total_calls = count
                 parsed = True
             except sqlite3.OperationalError:
-                result.analysis_notes.append("calllog.db: 'calls' table not found")
+                if report_missing_table:
+                    result.analysis_notes.append(f"{db_path.name}: 'calls' table not found")
         finally:
             conn.close()
 

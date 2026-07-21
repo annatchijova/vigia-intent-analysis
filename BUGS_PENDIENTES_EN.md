@@ -7242,3 +7242,48 @@ verifiable contract: Mode 1 is the corpus-wide sealed output; Mode 2 cannot
 mutate or replace it, but its interactive report can be an independent
 investigation. When they differ, both artifacts and their limits are preserved.
 Neither scorer behavior nor case labels changed.
+
+---
+
+## B-160 — The Android extractor ignored a valid `calls` table inside `contacts2.db` [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 — silent mobile-evidence coverage loss; it does not itself justify a more severe verdict. |
+| **File** | `vigia/sift/android_forensics.py` (`analyze`, `_analyze_contacts`, `_analyze_call_log`). |
+| **Detected by** | Codex audit of the `OWL-NEXUS5` false negative, 2026-07-21. |
+
+Android discovery treated `contacts2.db` exclusively as a contacts database
+(`raw_contacts` or `contacts`) and only looked for call history in files named
+`calllog.db`. In the real extraction
+`evidence/owl-2019-nexus5-quick/Agent Data/contacts2.db`, the SQLite database
+is readable and contains a `calls` table with **7** rows, but neither contacts
+table. The live result was `contacts_parsed=False`, `calls_parsed=False`,
+`total_calls=0`, and recorded "could not count contacts"; all seven call records
+are left unanalyzed.
+
+This is not B-072: B-072 correctly prevents an unparseable schema from being
+turned into an *empty* contacts book or call history. Here the schema is
+recognizable and evidence exists, but dispatch follows the filename rather
+than the available table. Nor does it alone explain OWL's `NOISE`: the
+coordination SMS remains outside L-041, the case JSON contains 20
+`unknown`/zero-score placeholders, and the mobile path emits one aggregate
+signal (B-052-P2). It is an independent coverage loss that needs a repair with
+`contacts2.db`-with-`calls` tests while preserving B-072's fail-closed
+semantics.
+
+**Applied repair:** after treating `contacts2.db` as contacts, discovery also
+routes it through the existing call counter. The absence of a `calls` table in
+that file is normal and adds neither a note nor a false `EMPTY_CALL_LOG`; a
+readable `calls` table, including an empty one, retains B-072 semantics. No
+heuristic over call content was added.
+
+**Verification:** two red-first tests pin (a) seven calls in `contacts2.db` →
+`calls_parsed=True`, `total_calls=7`, no `EMPTY_CONTACTS`; and (b) a parseable
+empty `calls` table → `EMPTY_CALL_LOG`, no `EMPTY_CONTACTS`.
+`tests/test_b072_b074_mobile_verdict_fixes.py`: **35 passed**. On the real OWL
+extraction, the live result now reports 21 SMS and 7 calls, with
+`contacts_parsed=False` correctly preserved. A complete temporary-bundle run
+still sealed **ABSTAIN** and 0 Android findings: the fix recovers coverage, but
+does not pretend that counting calls resolves L-041, the case JSON placeholders,
+or B-052-P2.
