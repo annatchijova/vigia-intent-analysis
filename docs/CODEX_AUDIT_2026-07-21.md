@@ -274,6 +274,21 @@ the collapsed subject semantics. Historical Claude reports preserve the useful
 distinction (`jdoe=NOISE`, `attacker=SUSPICION`), but their old top-level label
 must not be used to evaluate the current canonical case.
 
+### Why BREAK-015 remains `SUSPICION`
+
+This is not label leakage and was not corrected by a threshold change. The
+current case declares `SPATIAL_IDENTITY_COLLAPSE`, `BIOMETRIC_IMPOSTURE`, and
+`IDENTITY_BIFURCATION`. Mode 1 recomputes live CAIE rather than granting those
+examiner-declared fields verdict authority. The direct current scorer result is
+therefore `caie_fractures=0`, `fracture_malice_boost=0`, score `0.2382`, and
+`SUSPICION` (the `MALICE` threshold is `> 0.33`). The declared spatial event is
+not the existing `EFFECT_BEFORE_CAUSE` hard gate.
+
+Treating these declared fields as live fractures merely to make the case pass
+would recreate L-063's input-authority vulnerability. The defensible future
+work is a deterministic identity-bifurcation detector plus negative controls,
+not a scoring-floor change or an injected `MALICE` verdict.
+
 The larger issue is public-contract drift. README simultaneously described Mode
 2 as a narrative-only, identical deterministic replay, while its later accuracy
 section correctly says Mode 2 is a fresh semantic investigation whose results

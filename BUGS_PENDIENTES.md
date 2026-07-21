@@ -7704,6 +7704,17 @@ BREAK-012, además, el caso canónico ya fue relabelado de `BENIGN` a
 `SUSPICION` porque tiene dos sujetos (jdoe exonerado; atacante desconocido
 sospechado); informes históricos con `BENIGN` no prueban una divergencia actual.
 
+**Caracterización de BREAK-015:** el caso declara
+`SPATIAL_IDENTITY_COLLAPSE`, `BIOMETRIC_IMPOSTURE` e
+`IDENTITY_BIFURCATION`, pero el scorer Modo 1 recalcula CAIE vivo y no tiene
+un productor determinista para esas tres clases. La ejecución actual midió
+`caie_fractures=0`, `fracture_malice_boost=0` y score `0.2382`, que pertenece
+a la banda `SUSPICION` (< `0.33`). Convertir las fracturas declaradas en
+autoridad directa para obtener `MALICE` reabriría la clase L-063 (JSON del
+examinador con autoridad de veredicto). Un arreglo real requiere un detector
+determinista y corpus negativo para esa clase de bifurcación de identidad; no
+se retocaron umbrales ni se forzó un PASS.
+
 **Corrección aplicada:** se reemplazaron las promesas de identidad de veredicto
 por el contrato verificable: Modo 1 es la salida sellada corpus-wide; Modo 2 no
 puede mutarla ni reemplazarla, pero su informe interactivo puede ser una

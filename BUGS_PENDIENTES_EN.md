@@ -7227,6 +7227,16 @@ For BREAK-012, the canonical case has already been relabeled from `BENIGN` to
 unknown attacker); historical `BENIGN` reports do not establish a current
 divergence.
 
+**BREAK-015 characterization:** the case declares
+`SPATIAL_IDENTITY_COLLAPSE`, `BIOMETRIC_IMPOSTURE`, and
+`IDENTITY_BIFURCATION`, but the Mode 1 scorer recomputes live CAIE and has no
+deterministic producer for those three classes. The current run measured
+`caie_fractures=0`, `fracture_malice_boost=0`, and score `0.2382`, inside the
+`SUSPICION` band (< `0.33`). Giving the declared fractures direct authority to
+reach `MALICE` would reopen the L-063 class (examiner JSON with verdict
+authority). A real fix requires a deterministic detector and negative corpus
+for identity bifurcation; no threshold was retuned and no PASS was forced.
+
 **Applied repair:** the identity-of-verdict promises were replaced with the
 verifiable contract: Mode 1 is the corpus-wide sealed output; Mode 2 cannot
 mutate or replace it, but its interactive report can be an independent
