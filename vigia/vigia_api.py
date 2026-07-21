@@ -15,13 +15,20 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from vigia.api_case_paths import CasePathError, resolve_case_path
+from vigia.api_defaults import DEFAULT_CORS_ORIGINS, DEFAULT_HOST, DEFAULT_PORT
+from vigia.openai_compat import ChatRequest, install_openai_compatibility
 
 REPO = Path(os.environ.get("VIGIA_REPO", Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(REPO))
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="VIGÍA Forensic Intelligence API", version="1.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=list(DEFAULT_CORS_ORIGINS),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class CasePayload(BaseModel):
@@ -97,6 +104,13 @@ def _run_narrative(case_path: Path) -> str:
     return out
 
 
+list_models, chat_completions = install_openai_compatibility(
+    app,
+    run_pipeline=lambda case_path: _run_pipeline(case_path),
+    run_narrative=lambda case_path: _run_narrative(case_path),
+)
+
+
 @app.get("/health")
 def health():
     return {"status": "VIGÍA operativo"}
@@ -158,7 +172,7 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
         app,
-        host=os.environ.get("VIGIA_HOST", "127.0.0.1"),
-        port=int(os.environ.get("VIGIA_PORT", "8000")),
+        host=os.environ.get("VIGIA_HOST", DEFAULT_HOST),
+        port=int(os.environ.get("VIGIA_PORT", str(DEFAULT_PORT))),
         reload=False,
     )

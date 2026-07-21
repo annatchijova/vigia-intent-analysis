@@ -267,7 +267,7 @@ OpenWebUI, Claude Code, and any HTTP client.
 ```bash
 export $(grep -v '^#' .env | xargs)
 python3 vigia_api.py
-# Starts at http://0.0.0.0:8000
+# Starts at http://127.0.0.1:8000 (loopback only)
 ```
 
 ### Change the port
@@ -294,7 +294,14 @@ OpenWebUI allows connecting external models via "OpenAI-compatible API".
 1. Start VIGÍA first: `python3 vigia_api.py`
 2. In OpenWebUI → **Settings → Connections → OpenAI API**
 3. URL: `http://127.0.0.1:8000` (or whichever port you configured)
-4. API Key: any string (VIGÍA does not validate the key in development mode)
+4. API Key: any string (VIGÍA does not validate it; this local gateway has no
+   application authentication layer)
+
+> **Security boundary:** by default the API listens only on `127.0.0.1`.
+> Do not set `VIGIA_HOST=0.0.0.0` or publish the port directly: CORS is not
+> authentication and the gateway does not validate API keys. If remote access
+> is required, place it behind an authenticated reverse proxy and a deliberate
+> network access policy.
 
 > **Note for non-standard OpenWebUI port installations:**
 > OpenWebUI installed via `pipx` runs on the port passed to
@@ -306,7 +313,7 @@ OpenWebUI allows connecting external models via "OpenAI-compatible API".
 
 ```bash
 curl http://127.0.0.1:8000/health
-# Expected response: {"status":"ok"}
+# Expected response: {"status":"VIGÍA operativo"}
 ```
 
 ---

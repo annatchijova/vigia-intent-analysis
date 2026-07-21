@@ -8086,3 +8086,42 @@ lenguaje genérico de coordinación en intención.
 **Validación:** `tests/test_b167_android_sms_truncation.py` se escribió rojo
 contra el HEAD previo y fija tanto la telemetría del analizador como la
 propagación del marcador a `n_unanalyzed_artifacts` del shim.
+
+---
+
+## B-168 — Las dos entradas FastAPI prometían el mismo gateway pero exponían contratos distintos [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de superficie API / seguridad de despliegue. No altera el scoring ni los bundles. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py`, nuevos `vigia/api_defaults.py` y `vigia/openai_compat.py`, `INSTALL.md`, `INSTALL_ES.md`. |
+| **Detectado por** | Auditoría Codex de la superficie menos ejercitada (API), 2026-07-21. |
+
+Ambos módulos se describían como gateway FastAPI para OpenWebUI, pero sólo el
+script raíz exponía el contrato OpenAI-compatible que ese cliente necesita:
+`GET /v1/models` y `POST /v1/chat/completions`. Ejecutar o importar
+`vigia.vigia_api` producía una API que parecía sana (`/health`, `/cases` y los
+dos endpoints directos), pero no podía completar el handshake de OpenWebUI.
+Al mismo tiempo, el wrapper empaquetado aceptaba CORS desde `*`, mientras que
+el raíz aplicaba una lista explícita. La diferencia permitía que una elección
+de import path cambiara tanto la funcionalidad publicada como el límite de
+navegador, sin señal al operador.
+
+**Prueba roja:** `tests/test_b168_api_contract_parity.py` falló contra el
+HEAD previo: faltaban ambos endpoints bajo `vigia.vigia_api` y la inspección
+de `app.user_middleware` encontró `allow_origins=['*']` sólo en ese wrapper.
+
+**Corrección aplicada:** el shim OpenAI-compatible vive ahora una sola vez en
+`vigia/openai_compat.py` y ambos wrappers lo instalan con sus propias funciones
+de pipeline/narrativa. `vigia/api_defaults.py` concentra host loopback,
+puerto y CORS por defecto para que las dos entradas no vuelvan a divergir.
+Los documentos de instalación ahora reflejan el host real `127.0.0.1`, el
+estado real de `/health`, y declaran el límite importante: la API no valida
+keys, CORS no autentica, y una exposición remota exige un reverse proxy
+autenticado y una política de red deliberada. No se inventó un protocolo de
+credenciales incompatible con OpenWebUI.
+
+**Validación:** la prueba de paridad fija endpoints, CORS y ejecución del
+pipeline local stubbed desde ambos imports; junto a
+`tests/test_vigia_api_boundaries.py`: **23 passed**. Las pruebas no abren
+sockets ni leen archivos fuera de fixtures.

@@ -29,13 +29,20 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from vigia.api_case_paths import CasePathError, resolve_case_path
+from vigia.api_defaults import DEFAULT_CORS_ORIGINS, DEFAULT_HOST, DEFAULT_PORT
+from vigia.openai_compat import ChatRequest, install_openai_compatibility
 
 REPO = Path(os.environ.get("VIGIA_REPO", Path(__file__).resolve().parent))
 sys.path.insert(0, str(REPO))
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="VIGÍA Forensic Intelligence API", version="1.0")
-app.add_middleware(CORSMiddleware, allow_origins=["https://your-openwebui-domain.com"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=list(DEFAULT_CORS_ORIGINS),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class CasePayload(BaseModel):
@@ -116,138 +123,11 @@ def health():
     return {"status": "VIGÍA operativo"}
 
 
-# ---------------------------------------------------------------------------
-# Shim OpenAI-compatible — requerido por OpenWebUI
-# OpenWebUI espera /v1/models y /v1/chat/completions.
-# Estos endpoints traducen el protocolo de chat al pipeline forense VIGÍA.
-# ---------------------------------------------------------------------------
-
-@app.get("/v1/models")
-def list_models():
-    """OpenWebUI llama esto al conectar para descubrir modelos disponibles."""
-    return {
-        "object": "list",
-        "data": [
-            {
-                "id":       "vigia-forensic",
-                "object":   "model",
-                "owned_by": "vigia",
-                "created":  1716000000,
-            }
-        ],
-    }
-
-
-class ChatMessage(BaseModel):
-    role: str
-    content: str
-
-class ChatRequest(BaseModel):
-    model: str = "vigia-forensic"
-    messages: list
-    stream: bool = False
-
-
-def _usage_guidance() -> str:
-    """Return the protocol help without treating malformed input as a case."""
-    return (
-        "**VIGÍA Forensic Intelligence API**\n\n"
-        "Para analizar un caso, enviá el JSON objeto del caso completo como mensaje "
-        "(debe incluir `artifacts`).\n\n"
-        "O usá los endpoints directos:\n"
-        "- `POST /analyze/path` — caso existente por nombre\n"
-        "- `POST /analyze/json` — caso como JSON en el body\n"
-        "- `GET /cases` — listar casos disponibles\n"
-        "- `GET /health` — estado del sistema"
-    )
-
-
-@app.post("/v1/chat/completions")
-def chat_completions(req: ChatRequest):
-    """
-    Endpoint OpenAI-compatible para OpenWebUI.
-
-    El último mensaje del usuario se interpreta como:
-    - Si contiene JSON válido con campo 'artifacts': se analiza como caso forense.
-    - En cualquier otro caso: se responde con instrucciones de uso.
-    """
-    import time
-
-    # Extraer el último mensaje del usuario
-    user_messages = [m for m in req.messages if (
-        (isinstance(m, dict) and m.get("role") == "user") or
-        (hasattr(m, "role") and m.role == "user")
-    )]
-    if not user_messages:
-        content = "No se recibió mensaje de usuario."
-    else:
-        last = user_messages[-1]
-        text = last.get("content", "") if isinstance(last, dict) else last.content
-
-        # Intentar parsear solamente un objeto caso forense JSON. Escalares,
-        # listas y contenido OpenAI multimodal degradan a guía, no a 500.
-        try:
-            case_data = json.loads(text)
-            if not isinstance(case_data, dict):
-                content = _usage_guidance()
-            elif "artifacts" in case_data:
-                tf = tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w")
-                json.dump(case_data, tf)
-                tf.close()
-                try:
-                    result = _run_pipeline(Path(tf.name))
-                    try:
-                        narrative = _run_narrative(Path(tf.name))
-                    except Exception:
-                        narrative = ""
-                    verdict  = result.get("verdict", "UNKNOWN")
-                    score    = result.get("score", 0.0)
-                    conf     = result.get("confidence", 0.0)
-                    reason   = result.get("reason", "")
-                    bh       = result.get("bundle_hash", "N/A")
-                    verify   = result.get("verify", "N/A")
-                    ms       = result.get("pipeline_ms", 0)
-                    content  = (
-                        f"**VIGÍA — Análisis Forense**\n\n"
-                        f"**Veredicto:** {verdict}\n"
-                        f"**Score:** {score:.4f} | **Confianza:** {conf:.2f}\n"
-                        f"**Razón:** {reason}\n"
-                        f"**Bundle hash:** `{bh}`\n"
-                        f"**Verificación EBS:** {verify}\n"
-                        f"**Pipeline:** {ms}ms\n"
-                    )
-                    if narrative:
-                        content += f"\n**Análisis Peirciano:**\n{narrative}"
-                except Exception as e:
-                    content = "Error interno en pipeline forense. Contacte al administrador."
-                finally:
-                    try:
-                        os.unlink(tf.name)
-                    except Exception:
-                        pass
-            else:
-                content = (
-                    "VIGÍA recibió JSON sin campo `artifacts`. "
-                    "Enviá un caso forense con estructura `{\"artifacts\": [...]}` "
-                    "o usá `/analyze/path` con el nombre de un caso existente."
-                )
-        except (json.JSONDecodeError, TypeError, ValueError):
-            content = _usage_guidance()
-
-    return {
-        "id":      f"vigia-{int(time.time())}",
-        "object":  "chat.completion",
-        "created": int(time.time()),
-        "model":   req.model,
-        "choices": [
-            {
-                "index":         0,
-                "message":       {"role": "assistant", "content": content},
-                "finish_reason": "stop",
-            }
-        ],
-        "usage": {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0},
-    }
+list_models, chat_completions = install_openai_compatibility(
+    app,
+    run_pipeline=lambda case_path: _run_pipeline(case_path),
+    run_narrative=lambda case_path: _run_narrative(case_path),
+)
 
 
 @app.get("/cases")
@@ -307,6 +187,6 @@ def analyze_by_json(payload: CasePayload):
 if __name__ == "__main__":
     import os
     import uvicorn
-    _host = os.environ.get("VIGIA_HOST", "127.0.0.1")
-    _port = int(os.environ.get("VIGIA_PORT", "8000"))
+    _host = os.environ.get("VIGIA_HOST", DEFAULT_HOST)
+    _port = int(os.environ.get("VIGIA_PORT", str(DEFAULT_PORT)))
     uvicorn.run(app, host=_host, port=_port, reload=False)
