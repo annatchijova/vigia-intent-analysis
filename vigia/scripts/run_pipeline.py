@@ -24,6 +24,7 @@ Versión: 2.3
 
 import argparse
 import json
+import os
 import re
 import sys
 from datetime import datetime, timezone
@@ -94,6 +95,8 @@ def _validate_output_schema(result: Dict[str, Any]) -> None:
 # Se fija a v1 (comportamiento previo) para que el fix v2 (prefijo "s:"
 # en strings) no altere su salida/hash. v2 es solo para el sellado.
 from vigia.core.canonicalize import _canonicalize_v1 as _canonicalize  # noqa: F401
+from vigia.core.atomic_io import atomic_write_text
+from vigia.security.output_boundary import validate_external_output_path
 
 try:
     from vigia.core.semiotic_detector_v2 import SemioticDetectorV2
@@ -147,6 +150,18 @@ def run(input_path: str, output_path: str, negation_enabled: bool) -> None:
         output_path: JSON de salida con resultados del pipeline
         negation_enabled: Feature flag A/B para el Negation Handler
     """
+    safe_output_path = validate_external_output_path(
+        output_path,
+        artifact_label="pipeline result",
+    )
+    os.makedirs(os.path.dirname(safe_output_path) or ".", mode=0o750, exist_ok=True)
+    # Parent creation changes filesystem state; validate again before the
+    # atomic writer can create its temporary file or replace the target.
+    safe_output_path = validate_external_output_path(
+        safe_output_path,
+        artifact_label="pipeline result",
+    )
+
     data: List[Dict] = json.loads(
         Path(input_path).read_text(encoding="utf-8"),
         object_pairs_hook=_strict_json_hook
@@ -173,12 +188,12 @@ def run(input_path: str, output_path: str, negation_enabled: bool) -> None:
             print(f"[ERROR] {aid}: {e}", file=sys.stderr)
             errors += 1
 
-    Path(output_path).write_text(
+    atomic_write_text(
+        safe_output_path,
         json.dumps(_canonicalize(results), indent=2, sort_keys=True, ensure_ascii=True),
-        encoding="utf-8",
     )
 
-    print(f"[OK] {len(results)} artefactos procesados → {output_path}")
+    print(f"[OK] {len(results)} artefactos procesados → {safe_output_path}")
     if errors:
         print(f"[WARN] {errors} artefactos fallaron — revisar stderr.")
         sys.exit(1)

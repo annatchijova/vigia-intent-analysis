@@ -8830,3 +8830,33 @@ como ausencia de DB creada. También pasan `test_red_team.py` y el conjunto
 relevante: **7/7**. No cambia resultados cuando la DB distribuida está
 disponible; cuando falta, hace visible el límite en lugar de permitir una
 conclusión limpia sobre análisis semiótico no realizado.
+
+---
+
+## B-189 — el runner canónico podía publicar resultados dentro de la evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: `--output` tenía autoridad de escritura irrestricta; podía reemplazar o añadir un JSON de resultados dentro del input adquirido. |
+| **Archivo** | `vigia/scripts/run_pipeline.py`, `tests/test_b189_pipeline_output_boundary.py`. |
+| **Modo** | Pipeline determinista `python3 -m vigia.scripts.run_pipeline --input … --output …`. |
+| **Principio afectado** | El resultado derivado debe vivir fuera de evidencia y publicarse atómicamente; una ruta de salida no puede volver al árbol que se está examinando. |
+
+**Observación reproducida:** el runner leía el input y ejecutaba
+`Path(output_path).write_text(...)` sin validar, sin crear padre y sin
+publicación atómica. Un destino `<evidence>/pipeline-result.json` y un padre
+`result-redirect -> <evidence>` fueron escritos con éxito. Inversamente, un
+destino externo nuevo fallaba por `FileNotFoundError`. Las tres condiciones
+fueron inducidas antes del parche.
+
+**Corrección aplicada:** `run()` valida `--output` con
+`validate_external_output_path()`, crea el padre externo con `0750`, vuelve a
+validar antes de escribir y usa `atomic_write_text()` para temp+fsync+replace.
+El log imprime el destino canonicalizado. La decisión, la canonicalización v1
+de compatibilidad y el contenido JSON de una ejecución válida no cambian.
+
+**Validación:** B-189 cubre output directo en evidencia, escape por symlink y
+output externo con padre inexistente. Fue roja **3/3** antes del parche y
+verde **3/3** después. Además pasan las 23 pruebas de `test_tanda_a_triage.py`:
+**26/26**. El cambio impide contaminar adquisición y elimina el fallo espurio
+del output externo sin ampliar las conclusiones del pipeline.
