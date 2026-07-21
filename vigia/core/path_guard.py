@@ -43,12 +43,21 @@ class PathGuard:
     """
 
     def __init__(self, allowed_base_paths: Optional[list] = None):
-        self._allowed = allowed_base_paths or [
+        allowed = allowed_base_paths or [
             Path("/var/vigia"),
             Path("/tmp/vigia"),
             Path("/home/vigia/cases"),
             Path.home() / "vigia-repo" / "evidence",
         ]
+        # Canonicalización léxica de configuración: normaliza '.', '..' y
+        # rutas relativas sin seguir symlinks. Los roots son política local,
+        # no un input de evidencia.
+        self._allowed = [self._lexical_absolute(base) for base in allowed]
+
+    @staticmethod
+    def _lexical_absolute(path: os.PathLike[str] | str) -> Path:
+        """Return an absolute, lexically normalized path without resolving links."""
+        return Path(os.path.abspath(os.fspath(path)))
 
     def validate(self, path_str: str, for_read: bool = True,
                  allow_dir: bool = False) -> PathValidationResult:
@@ -62,11 +71,22 @@ class PathGuard:
         relaja el requisito de "archivo regular".
         """
         try:
-            p = Path(path_str)
-            # FIX P2 (V03): No usar resolve() que sigue symlinks.
-            # Usar absolute() y verificar cada componente.
-            abs_path = p.absolute()
-        except (OSError, ValueError) as e:
+            raw_path = os.fspath(path_str)
+            if not isinstance(raw_path, str):
+                raise ValueError("el path debe ser texto")
+            p = Path(raw_path)
+            # Un path que contiene '..' no tiene una identidad de adquisición
+            # estable: aunque termine dentro de un root permitido, se rechaza
+            # antes de cualquier normalización o chequeo de allowlist.
+            if ".." in p.parts:
+                return PathValidationResult(
+                    valid=False, reason="PATH_TRAVERSAL",
+                    inode=0, size=0, mtime=0.0, hash_prefix="",
+                )
+            # No usar resolve(): seguir symlinks antes de verificarlos perdería
+            # la evidencia de que el path los atravesó.
+            abs_path = self._lexical_absolute(p)
+        except (OSError, TypeError, ValueError) as e:
             return PathValidationResult(
                 valid=False, reason=f"Path inválido: {e}",
                 inode=0, size=0, mtime=0.0, hash_prefix="",
@@ -86,9 +106,10 @@ class PathGuard:
                 inode=0, size=0, mtime=0.0, hash_prefix="",
             )
 
-        # 2. Allowlist check (contra path absoluto, no resuelto)
+        # 2. Allowlist por componentes, no por prefijo textual. Por ejemplo,
+        # /tmp/vigia-neighbor NO está dentro de /tmp/vigia.
         allowed = any(
-            str(abs_path).startswith(str(base))
+            abs_path == base or base in abs_path.parents
             for base in self._allowed
         )
         if not allowed:
@@ -213,7 +234,7 @@ class PathGuard:
         if not check.valid:
             raise PermissionError(f"PathGuard REJECT: {check.reason}")
 
-        p = Path(path_str).absolute()
+        p = self._lexical_absolute(path_str)
 
         # FIX P2: Abrir con O_NOFOLLOW si es posible (previene race condition de symlink)
         if hasattr(os, "O_NOFOLLOW"):

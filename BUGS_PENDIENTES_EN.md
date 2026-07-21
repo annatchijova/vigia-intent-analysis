@@ -7109,7 +7109,7 @@ and valid-object inputs.
 
 ---
 
-## B-155 — `PathGuard` permits prefix collision and `..` escape [OPEN — Codex remediation in progress]
+## B-155 — `PathGuard` permits prefix collision and `..` escape [RESOLVED — Codex 2026-07-21]
 
 | Field | Value |
 |-------|-------|
@@ -7121,12 +7121,17 @@ The allowlist uses `str(abs_path).startswith(str(base))`, which is not
 component-aware containment. A sibling sharing a base prefix and paths with
 `..` pass; `safe_open()` opens the same path via `os.open()`. The orchestrator
 passes accepted paths to SIFT engines. Existing tests covered neither vector.
-**Planned repair:** component-aware containment plus regressions for `validate`
-and `safe_open`/`safe_read`, preserving symlink, `fstat`, and TOCTOU defenses.
+
+**Applied repair:** `PathGuard` rejects `..` before normalization and compares
+trusted roots and candidates by path component without resolving links.
+`safe_open()` uses the same normalized lexical representation. Existing
+symlink, regular-file, `fstat`, and TOCTOU defenses remain in force.
+Regressions cover the prefix collision, traversal, positive reading, and the
+`safe_read` rejection.
 
 ---
 
-## B-156 — Volatility/RegRipper validators fail open outside their allowlists [OPEN — Codex remediation in progress]
+## B-156 — Volatility/RegRipper validators fail open outside their allowlists [RESOLVED — Codex 2026-07-21]
 
 | Field | Value |
 |-------|-------|
@@ -7138,5 +7143,9 @@ Both validators compute `allowed`, but when it is false they raise only if the
 path also does not exist. Existing files outside the declared roots are
 returned, as the controlled reproduction confirmed. SIFT normally places
 PathGuard first, but B-155 bypasses it and direct consumers have no such layer.
-**Planned repair:** reject whenever `allowed` is false and pin both negative and
-positive cases.
+
+**Applied repair:** both validators now delegate to `PathGuard` with their
+configured allowlist. An existing file outside a root raises `PermissionError`;
+absence remains `FileNotFoundError`, while other explicit boundary rejections
+remain visible. Regressions pin both engine rejections and acceptance of a
+regular in-root file.

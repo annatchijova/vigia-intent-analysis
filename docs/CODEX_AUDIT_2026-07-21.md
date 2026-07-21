@@ -150,19 +150,17 @@ browser, USB, and shellbag engines. `vigia_agent.py` builds those inputs from
 the selected evidence path. C-03 is therefore distinct from the FastAPI
 wrapper finding and affects the forensic acquisition layer.
 
-### Repair proposal — not implemented
+### Remediation — implemented on `codex`
 
-1. Replace string-prefix comparison with a component-aware containment check
-   against canonical trusted roots. A path must be equal to, or a descendant
-   of, a root; `/tmp/vigia-evil` must not satisfy `/tmp/vigia`.
-2. Reject traversal before authorization and preserve the existing explicit
-   checks for symlinks, regular files, descriptor `fstat`, and locking.
-3. Add regression tests for prefix collision and `..` escape in both
-   `validate()` and `safe_open()`/`safe_read()`, plus a positive descendant
-   fixture. Do not weaken the existing visible-rejection behavior.
-4. Review `PathGuard`'s declared default roots separately from its containment
-   mechanism; changing root policy is a product decision, correcting the
-   containment predicate is not.
+`PathGuard` now rejects raw `..` components before authorization and compares
+the lexically normalized candidate against lexically normalized trusted roots
+by path component. A sibling such as `/tmp/vigia-evil` is no longer a
+descendant of `/tmp/vigia`. `safe_open()` uses the same representation, while
+the existing symlink, regular-file, descriptor `fstat`, lock, and post-read
+TOCTOU checks remain intact. `tests/test_path_confinement_regression.py`
+covers the former prefix collision, traversal vector, positive in-root read,
+and `safe_read` rejection. Root-policy review remains a separate product
+decision.
 
 ## C-04 — Memory and registry engine allowlists fail open [CONFIRMED]
 
@@ -199,12 +197,14 @@ the interfaces without it. The intended “if no allowlist is configured”
 fallback was not implemented: the defaults ensure an allowlist is always
 configured.
 
-### Repair proposal — not implemented
+### Remediation — implemented on `codex`
 
-Reject whenever `allowed` is false, regardless of existence. If the product
-needs an opt-in unrestricted local mode, make it an explicit, audited
-configuration instead of interpreting every existing file as authorized. Add
-positive and outside-existing regression tests to both engine validators.
+Both interfaces now delegate their input boundary to `PathGuard` configured
+with their own `ALLOWED_BASE_PATHS`. An existing outside path raises
+`PermissionError`; a missing path remains `FileNotFoundError`; traversal,
+symlink, and non-regular-file rejections remain explicit. The same regression
+module covers both engine interfaces for an existing outside fixture and a
+regular in-root fixture. There is still no implicit unrestricted mode.
 
 ## Checked, not relabeled as new
 

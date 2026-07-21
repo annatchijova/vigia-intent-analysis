@@ -7584,7 +7584,7 @@ degradar cualquier otro valor a guía de uso; test para `42`, `null`, `[]` y cas
 
 ---
 
-## B-155 — `PathGuard` permite colisión de prefijo y escape `..` [ABIERTO — corrección Codex en curso]
+## B-155 — `PathGuard` permite colisión de prefijo y escape `..` [RESUELTO — Codex 2026-07-21]
 
 | Campo | Valor |
 |-------|-------|
@@ -7597,12 +7597,17 @@ contención por componentes. Con base `/tmp/vigia`, un sibling
 `/tmp/vigia-forge-...` pasa; rutas con `..` también pasan. `safe_open()` abre la
 misma ruta con `os.open()`: la apertura externa fue reproducida. El
 orchestrator entrega paths aceptados a los motores SIFT. Los tests no cubrían
-prefijo ni `..`. **Corrección prevista:** contención por componentes y tests en
-`validate` y `safe_open`/`safe_read`, conservando symlink, `fstat` y TOCTOU.
+prefijo ni `..`.
+
+**Corrección aplicada:** `PathGuard` rechaza `..` antes de normalizar y compara
+roots y candidato por componentes léxicos, sin seguir symlinks. `safe_open()`
+usa la misma representación normalizada. Se conservan los chequeos existentes
+de symlink, regularidad, `fstat` y TOCTOU. Regresiones cubren colisión de
+prefijo, traversal, lectura positiva y rechazo de `safe_read`.
 
 ---
 
-## B-156 — Validadores Volatility/RegRipper fallan abiertos fuera de allowlist [ABIERTO — corrección Codex en curso]
+## B-156 — Validadores Volatility/RegRipper fallan abiertos fuera de allowlist [RESUELTO — Codex 2026-07-21]
 
 | Campo | Valor |
 |-------|-------|
@@ -7614,7 +7619,12 @@ Ambos validadores calculan `allowed`, pero si es falso sólo lanzan cuando el
 path además no existe; cualquier archivo existente fuera de `/tmp/vigia`,
 `/evidence`, etc. retorna. La reproducción controlada confirmó ambos retornos
 fuera de root. SIFT suele anteponer PathGuard, pero B-155 lo atraviesa y los
-consumidores directos llegan aquí sin esa capa. **Corrección prevista:**
-rechazar siempre que `allowed` sea falso y fijarlo con tests negativos/positivos.
+consumidores directos llegan aquí sin esa capa.
+
+**Corrección aplicada:** ambos validadores delegan en `PathGuard` con su
+allowlist configurada. Un archivo existente fuera de root ahora produce
+`PermissionError`; ausencia sigue siendo `FileNotFoundError` y otros rechazos
+explícitos siguen visibles. Regresiones fijan ambos rechazos y la aceptación de
+un archivo regular dentro de root.
 
 ---
