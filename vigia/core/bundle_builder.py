@@ -589,13 +589,17 @@ class BundleBuilder:
 # Construye un ForensicBundle desde el resultado de _vigia_score() y lo sella
 # con BundleBuilder.seal(). Sin dependencia de VigiaPipeline.
 #
-# Mapeo forense → EBS DecisionVerdict:
-#   MALICE    → REJECT
-#   SUSPICION → ABSTAIN
-#   NOISE     → ACCEPT
-#   UNKNOWN   → ABSTAIN
-#
 # El veredicto forense original se preserva en caie_analysis.verdict.
+#
+# Importante: el ``score`` del scorer standalone es una escala de intención
+# compuesta, con sus propios gates de corroboración.  No es el posterior de
+# fabricación que consume ``RiskBoundedDecisionLayer``.  Esta envoltura puede
+# sellar el análisis standalone, pero no debe inventar una traducción
+# ``MALICE -> REJECT`` / ``NOISE -> ACCEPT`` usando la misma cifra como riesgo
+# EBS: esa conversión producía bundles que el verificador independiente
+# rechazaba por incoherentes.  Hasta que exista una calibración explícita y
+# verificable entre ambas escalas, el DecisionTrace EBS declara ABSTAIN y el
+# payload CAIE conserva íntegros score, confianza y veredicto forenses.
 # ---------------------------------------------------------------------------
 
 def build_bundle(case: Dict[str, Any], scorer_result: Dict[str, Any]) -> Dict[str, Any]:
@@ -644,24 +648,25 @@ def build_bundle(case: Dict[str, Any], scorer_result: Dict[str, Any]) -> Dict[st
 
     graph = EvidenceGraph(nodes=nodes, edges=edges)
 
-    # ── DecisionTrace: mapeo veredicto forense → EBS DecisionVerdict ─────────
-    _VERDICT_MAP = {
-        "MALICE":    "REJECT",
-        "SUSPICION": "ABSTAIN",
-        "NOISE":     "ACCEPT",
-        "UNKNOWN":   "ABSTAIN",
-    }
+    # ── DecisionTrace: frontera explícita entre scorer y EBS ──────────────────
     raw_verdict = scorer_result.get("verdict", "UNKNOWN")
-    decision_verdict = _VERDICT_MAP.get(raw_verdict, "ABSTAIN")
     score      = float(scorer_result.get("score", 0.0) or 0.0)
     confidence = float(scorer_result.get("confidence", 0.0) or 0.0)
     confidence = min(1.0, max(0.0, confidence))
 
     decision_trace = DecisionTrace(
-        decision=decision_verdict,
-        posterior=confidence,
-        risk=score,
-        reason_code=f"VIGIA_SCORER:{raw_verdict}",
+        # The standalone scorer does not emit a calibrated P(fabrication).
+        # 0.5 is the neutral value that makes the EBS decision ABSTAIN under
+        # its declared policy, rather than turning a different score scale
+        # into an unauditable ACCEPT or REJECT claim.
+        decision="ABSTAIN",
+        posterior=0.5,
+        risk=0.5,
+        reason_code="STANDALONE_SCORER_UNCALIBRATED_EBS_RISK",
+        abstain_reason=(
+            "Standalone scorer intent score is sealed in caie_analysis but is "
+            "not a calibrated EBS fabrication-risk posterior."
+        ),
     )
 
     # ── PolicySpec y SystemState ──────────────────────────────────────────────
@@ -716,7 +721,7 @@ def build_bundle(case: Dict[str, Any], scorer_result: Dict[str, Any]) -> Dict[st
         caie_payload["devil_advocate"] = compose_devil_advocate_struct(
             pattern_signal_metadata=None,
             raw_verdict=raw_verdict,
-            mapped_verdict=decision_verdict,
+            mapped_verdict="ABSTAIN",
             score=score,
             confidence=confidence,
             scope_note="standalone scorer mode (vigia/core/bundle_builder.py build_bundle())",

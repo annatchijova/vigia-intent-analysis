@@ -682,8 +682,19 @@ Script de conveniencia para interrogar el sistema vía Ollama desde línea de co
 ### 12.4 FastAPI Wrapper (`vigia_api.py`)
 
 Wrapper REST para integración con OpenWebUI. Expone:
-- `POST /analyze`: recibe caso JSON, ejecuta pipeline completo, retorna veredicto + bundle_hash
-- `POST /narrative`: genera narrativa vía `vigia_ask.sh` (Ollama)
+- `POST /analyze/path`: analiza un caso declarado en el repositorio mediante un
+  snapshot ligado al descriptor.
+- `POST /analyze/json`: analiza un caso JSON suministrado.
+- Los endpoints compatibles con OpenAI `GET /v1/models` y
+  `POST /v1/chat/completions`.
+
+El wrapper devuelve el veredicto forense del scorer standalone determinista y
+sella ese mismo payload. Su score compuesto de intención no es un posterior de
+riesgo de fabricación EBS calibrado: por eso la envoltura EBS registra
+`ABSTAIN` con `STANDALONE_SCORER_UNCALIBRATED_EBS_RISK`, mientras
+`caie_analysis` conserva veredicto, score, confianza y razón forenses. La API
+expone ambos campos para que un sello válido nunca se presente como prueba de
+otra decisión distinta.
 
 ---
 

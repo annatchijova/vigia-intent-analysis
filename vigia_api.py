@@ -54,12 +54,12 @@ class CasePath(BaseModel):
 
 
 def _run_pipeline(case_path: Path) -> dict:
-    """Corre el scorer forense + pipeline EBS v1 para bundle hash."""
+    """Score one case and seal that exact standalone-scorer analysis."""
     import time, subprocess as _sub, tempfile as _tmp
     # Scorer forense (mismo que run_vigia_case.py)
     from vigia_scorer import _vigia_score, _normalize_case
-    from vigia.pipeline.vigia_integration_bridge import CaseAdapter, normalize_case_schema, validate_case_schema
-    from vigia.pipeline.pipeline import VigiaPipeline
+    from vigia.core.bundle_builder import build_bundle
+    from vigia.pipeline.vigia_integration_bridge import normalize_case_schema, validate_case_schema
 
     with open(case_path) as f:
         case = json.load(f)
@@ -72,14 +72,12 @@ def _run_pipeline(case_path: Path) -> dict:
     t0 = time.perf_counter()
     score = _vigia_score(case_norm)
 
-    # Pipeline EBS v1 para bundle hash
-    adapter = CaseAdapter()
-    signals, _ = adapter.to_signals(case_ebs)
-    drift = CaseAdapter.compute_drift(case_ebs)
-    result = VigiaPipeline().run_full(signals=signals, drift_score=drift)
+    # Seal the same direct scorer result returned to the caller.  Do not attach
+    # the hash of an independently-derived pipeline result: its vocabulary and
+    # risk semantics are different and can contradict this forensic verdict.
+    sd = build_bundle(case_ebs, score)
     elapsed = (time.perf_counter() - t0) * 1000
 
-    sd = result.get("sealed_dict", {})
     integ = sd.get("integrity", {})
     bh = integ.get("bundle_hash", "N/A")
     ts = integ.get("sealed_at", sd.get("timestamp", "N/A"))
@@ -93,6 +91,12 @@ def _run_pipeline(case_path: Path) -> dict:
     level = next((l for l in ["Level 3", "Level 2", "Level 1"] if l in v.stdout), "?")
     os.unlink(tf.name)
 
+    sealed_forensic_verdict = sd.get("caie_analysis", {}).get("verdict")
+    if sealed_forensic_verdict != score["verdict"]:
+        raise RuntimeError(
+            "direct scorer verdict differs from the verdict preserved in its seal"
+        )
+
     return {
         "verdict":     score["verdict"],
         "score":       score["score"],
@@ -101,6 +105,9 @@ def _run_pipeline(case_path: Path) -> dict:
         "bundle_hash": bh,
         "timestamp":   ts,
         "verify":      f"{verif} — {level}",
+        "sealed_forensic_verdict": sealed_forensic_verdict,
+        "ebs_decision": sd.get("decision_trace", {}).get("decision"),
+        "seal_scope": "DIRECT_SCORER_ANALYSIS_ONLY",
         "pipeline_ms": round(elapsed, 1),
     }
 

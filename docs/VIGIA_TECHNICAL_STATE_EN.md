@@ -586,8 +586,17 @@ Backend selection via `VIGIA_LLM_BACKEND` env var. The ForensicBundle is already
 ### 12.3 FastAPI Wrapper (`vigia_api.py`)
 
 REST wrapper for OpenWebUI integration. Exposes:
-- `POST /analyze`: receives case JSON, runs full pipeline, returns verdict + bundle_hash
-- `POST /narrative`: generates narrative via `vigia_ask.sh` (Ollama)
+- `POST /analyze/path`: analyses a declared repository case through a
+  descriptor-bound snapshot.
+- `POST /analyze/json`: analyses a supplied JSON case.
+- OpenAI-compatible `GET /v1/models` and `POST /v1/chat/completions` endpoints.
+
+The wrapper returns the deterministic standalone scorer's forensic verdict and
+seals that exact scorer payload. Its composite intent score is not a calibrated
+EBS fabrication-risk posterior: the EBS envelope therefore records `ABSTAIN`
+with `STANDALONE_SCORER_UNCALIBRATED_EBS_RISK`, while `caie_analysis` preserves
+the forensic verdict, score, confidence, and reason. API responses expose both
+fields so a valid seal is never presented as proof of a different decision.
 
 ---
 

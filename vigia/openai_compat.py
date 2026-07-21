@@ -112,6 +112,10 @@ def install_openai_compatibility(
                             f"**Razón:** {result.get('reason', '')}\n"
                             f"**Bundle hash:** `{result.get('bundle_hash', 'N/A')}`\n"
                             f"**Verificación EBS:** {result.get('verify', 'N/A')}\n"
+                            f"**Veredicto forense sellado:** "
+                            f"{result.get('sealed_forensic_verdict', 'N/A')}\n"
+                            f"**Decisión EBS:** {result.get('ebs_decision', 'N/A')}\n"
+                            f"**Alcance del sello:** {result.get('seal_scope', 'N/A')}\n"
                             f"**Pipeline:** {result.get('pipeline_ms', 0)}ms\n"
                         )
                         if narrative:

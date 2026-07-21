@@ -1366,7 +1366,13 @@ bundles, both containing a `bundle_hash` field:
 1. **Lightweight CLI bundle** (`vigia/core/bundle_builder.py::build_bundle()`):
    Seals scorer output for standalone use, junior analysts, and chatbot integration
    (OpenWebUI/Ollama). Input: dict from `_vigia_score()`. Contains: verdict,
-   score, CAIE fractures, peirce_chain, quadripartite_state.
+   score, CAIE fractures, peirce_chain, quadripartite_state. The direct scorer's
+   forensic verdict is preserved in `caie_analysis`; its composite intent score is
+   **not** treated as a calibrated EBS fabrication-risk posterior. Consequently
+   the EBS `decision_trace` explicitly records `ABSTAIN` with
+   `STANDALONE_SCORER_UNCALIBRATED_EBS_RISK`, while still sealing the complete
+   direct analysis. This prevents a chatbot or API caller from reading a valid
+   cryptographic seal as proof of a second, uncalibrated EBS decision.
 
 2. **Full forensic bundle** (`vigia/models/ebs.py::ForensicBundle.seal()`):
    Seals the complete pipeline output for SIFT integration. Input: ForensicBundle

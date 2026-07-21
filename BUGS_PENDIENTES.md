@@ -9202,3 +9202,56 @@ point público. Con las suites de sellado, contrato del verificador e
 integración EBS pasan **25 tests**. La nueva huella no prueba que dos corridas
 ocurrieron al mismo tiempo ni reemplaza al `bundle_hash`; prueba sólo que su
 proyección analítica declarada coincide.
+
+---
+
+## B-199 — la API devolvía un veredicto del scorer y el hash de otra decisión EBS [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 epistemológico/de interfaz: una respuesta HTTP podía presentar un veredicto forense y un `bundle_hash` válido como si atestiguaran la misma decisión, aunque provenían de dos motores y escalas distintas. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py`, `vigia/core/bundle_builder.py`, `vigia/openai_compat.py`, `tests/test_b199_api_seal_coherence.py`, `KNOWN_LIMITATIONS.md`, estados técnicos EN/ES. |
+| **Modo** | FastAPI/OpenWebUI, ambos imports soportados (`vigia_api` y `vigia.vigia_api`); el modo agente y las rutas de submission no fueron alterados. |
+| **Principio afectado** | Un sello de integridad sólo puede acompañar la afirmación exacta que contiene. Si dos capas usan semánticas de riesgo diferentes, la interfaz debe exhibirlas como distintas o abstenerse, nunca unirlas por cercanía de nombre. |
+
+**Observación reproducida:** cada wrapper calculaba primero `_vigia_score()` y
+devolvía sus campos `verdict`, `score`, `confidence` y `reason`. En paralelo
+adaptaba el mismo caso a `SignalOutput` y ejecutaba `VigiaPipeline.run_full()`
+solamente para tomar `bundle_hash` y el resultado de `verify_ebs_v1.py`. En
+`FP-CULTURAL-CLEAN-001`, por ejemplo, el scorer devolvía `NOISE` con score
+`0.0659`, mientras el bundle adjuntado contenía `decision_trace.decision =
+REJECT`, riesgo `0.982695` y razón `REJECT_POSTERIOR`. No es una mera
+traducción de vocabulario: `NOISE` significa evidencia insuficiente de
+intención, mientras `REJECT` EBS expresa alto riesgo de fabricación.
+
+**Causa raíz:** se intentó usar el pipeline EBS como una fábrica genérica de
+hashes para el scorer standalone. El adaptador de casos y el pipeline tienen
+otra representación de señales y otro modelo de riesgo. Cambiar simplemente a
+`build_bundle()` tampoco bastaba: esa función mapeaba `NOISE → ACCEPT` y
+`MALICE → REJECT` reutilizando el score compuesto de intención como
+`DecisionTrace.risk`. El verificador independiente rechazaba esos bundles: por
+ejemplo, `NOISE` con riesgo `0.0659` y epsilon `0.05` debía ser `ABSTAIN`, y
+`MALICE` con riesgo `0.823` también debía ser `ABSTAIN` bajo la política EBS.
+La coincidencia aparente de cifras no constituía una calibración.
+
+**Corrección aplicada:** los dos wrappers ya no ejecutan un segundo pipeline
+para obtener un hash. Sellan exactamente el dict devuelto por `_vigia_score()`
+y comprueban antes de responder que `caie_analysis.verdict` dentro del bundle
+coincida con el veredicto HTTP. El bundle preserva score, confianza, razón y
+veredicto forenses completos; como el scorer standalone no produce un posterior
+EBS de fabricación calibrado, su `decision_trace` registra `ABSTAIN`, riesgo y
+posterior neutrales `0.5`, y la razón
+`STANDALONE_SCORER_UNCALIBRATED_EBS_RISK`. Es una abstención sobre *la capa
+EBS*, no una modificación ni downgrade del veredicto forense directo. La API y
+la superficie OpenAI-compatible muestran explícitamente `sealed_forensic_verdict`,
+`ebs_decision` y `seal_scope=DIRECT_SCORER_ANALYSIS_ONLY`.
+
+**Validación:** la regresión B-199 se escribió roja primero. Construye bundles
+standalone controlados `NOISE`, `SUSPICION` y `MALICE`, verifica cada uno con el
+verificador independiente y exige que conserve el veredicto forense pero se
+abstenga en EBS. Después ejecuta ambos wrappers reales y exige `verify=PASS`,
+igualdad entre el veredicto retornado y el sellado, y el scope declarado. Con
+las fronteras FastAPI, paridad de imports y suites de sellado/verificador pasan
+**50 tests**. Esto no afirma que el pipeline EBS completo sea inválido: afirma
+que su decisión no puede utilizarse como prueba del scorer standalone hasta
+tener una traducción de artefactos y calibración de riesgo explícitas.
