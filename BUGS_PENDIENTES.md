@@ -8621,3 +8621,35 @@ fallan cerrados con `SecurityError` sin crear archivos fuente.
 evidencia, padre symlink y PDF externo atómico. Junto con B-178 a B-181 y
 B-062/B-064 pasan 27 tests. No afecta contenido analítico, hashes del informe,
 puntajes ni veredictos; limita exclusivamente la autoridad de publicación.
+
+---
+
+## B-183 — `BundleBuilder.save()` podía sellar un resultado dentro de evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: la API central de publicación de bundles podía crear o reemplazar un JSON derivado dentro de la evidencia fuente. |
+| **Archivo** | `vigia/core/bundle_builder.py`, `tests/test_b183_bundle_builder_output_boundary.py`. |
+| **Modo** | API Python `BundleBuilder.save()`, consumida por `run_vigia`, CLI y el bridge de integración. |
+| **Principio afectado** | El sellado criptográfico prueba el contenido del bundle, no autoriza su destino. Una cadena de custodia no puede comenzar modificando la evidencia que pretende describir. |
+
+**Observación reproducida:** aunque B-064 ya garantizaba tempfile, `fsync`,
+`replace` y hash desde disco, `BundleBuilder.save()` aceptaba un path arbitrario
+y ejecutaba `makedirs()` sobre su padre. Con
+`path=<evidence>/bundle.json` escribía el bundle sellado en la fuente. Con un
+padre `bundle-redirect -> evidence`, el tempfile y el `replace` se publicaban
+por esa redirección. Ambos fallos se indujeron antes del cambio; un destino
+externo fue el control positivo.
+
+**Corrección aplicada:** el sumidero público valida el destino con
+`validate_external_output_path()` antes de crear el directorio y una segunda
+vez antes de abrir el tempfile. Así heredan el límite la API, `run_vigia`, su
+CLI y cualquier caller futuro, sin confiar en que cada fachada recuerde
+validarlo. Se conserva íntegro el protocolo B-064: misma serialización
+canónica, `fsync`, publicación atómica y hash calculado desde lo escrito.
+
+**Validación:** tres regresiones B-183 cubren output directo en evidencia,
+padre symlink y bundle externo verificable. También pasan las tres regresiones
+atómicas L-023 y los dos tests de import/verify del pipeline: 6 seleccionados.
+No altera el bundle en memoria ni el veredicto: sólo niega un destino que nunca
+debió tener autoridad de escritura.

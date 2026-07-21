@@ -61,6 +61,7 @@ logger = logging.getLogger(__name__)
 from vigia.core.ebs_v1 import (
     ForensicBundle, IntegrityBlock, EBS_VERSION,
 )
+from vigia.security.output_boundary import validate_external_output_path
 
 
 # ---------------------------------------------------------------------------
@@ -298,10 +299,19 @@ class BundleBuilder:
         """
         import tempfile
 
+        # B-183: a sealed bundle is derived output, never source evidence.
+        # Validate before creating a parent directory and again immediately
+        # before publication, because ``path`` carries write authority.
+        abs_path = validate_external_output_path(
+            path, artifact_label="sealed forensic bundle"
+        )
         content = json.dumps(sealed_dict, sort_keys=True, indent=2, default=str)
-        abs_path = os.path.abspath(path)
         target_dir = os.path.dirname(abs_path)
         os.makedirs(target_dir, exist_ok=True)
+        abs_path = validate_external_output_path(
+            abs_path, artifact_label="sealed forensic bundle"
+        )
+        target_dir = os.path.dirname(abs_path)
 
         mem_hash = hashlib.sha256(content.encode("utf-8")).hexdigest()
 
