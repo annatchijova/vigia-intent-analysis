@@ -8338,3 +8338,32 @@ no la reetiqueta como evidencia fuente ni resuelve por sí mismo L-065 (la
 autenticación de cadenas de procedencia). El directorio de trabajo debe
 preservarse explícitamente si el operador necesita retener ese estado entre
 reinicios.
+
+---
+
+## B-174 — `safe_grep` autorizaba un directorio hermano por prefijo textual [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de confidencialidad: una búsqueda MCP podía leer fuera de sus roots autorizados si el directorio externo compartía el prefijo textual. |
+| **Archivo** | `vigia/security/sandbox.py`, `tests/test_b174_safe_grep_allowed_root.py`. |
+| **Modo** | MCP `search_pattern`, a través del helper reutilizable `safe_grep(..., allowed_dirs=...)`. |
+| **Principio afectado** | La lista de directorios permitidos expresa una frontera de autoridad de filesystem, no una coincidencia de cadenas. |
+
+**Observación reproducida:** con un root permitido `.../evidence`, un
+directorio hermano `.../evidence-escape/private.txt` y
+`allowed_dirs=[".../evidence"]`, el guard anterior hacía
+`safe_folder.startswith(allowed_dir)`. La condición era verdadera y `find` +
+`grep` devolvían el contenido de `private.txt`, aun cuando no era descendiente
+de la evidencia autorizada.
+
+**Corrección aplicada:** los roots permitidos se canonicalizan, se exige que
+existan, sean directorios y no contengan symlinks; luego la pertenencia se
+evalúa por componentes de `Path` (`==` o `is_relative_to`), nunca por prefijo
+de texto. Una subcarpeta real sigue siendo legible; un hermano, una raíz
+inválida o un symlink se rechazan antes de iniciar el subprocess.
+
+**Validación:** 32 pruebas de sandbox/MCP pasan, incluidas la reproducción que
+antes filtraba el texto externo y el control positivo de una carpeta hija real.
+El cambio no modifica señales, score ni veredicto: reduce exclusivamente la
+autoridad de lectura de la herramienta.
