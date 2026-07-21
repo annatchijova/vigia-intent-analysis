@@ -116,6 +116,30 @@ def _unanalyzed_marker(engine: str, error: Exception) -> Dict[str, Any]:
     }
 
 
+def _partial_analysis_marker(
+    engine: str, artifact_type: str, reason: str
+) -> Dict[str, Any]:
+    """Expose an intentionally bounded analysis as incomplete coverage.
+
+    The engine did run and its findings remain available, but a declared
+    subset of source material was not inspected. The derived z=0 marker
+    cannot manufacture corroboration; it only prevents the omitted suffix
+    from being represented as clean.
+    """
+    return {
+        "tool": f"{engine.upper()}_UNANALYZED",
+        "z_score": 0.0,
+        "confidence": 0.0,
+        "value": 0.0,
+        "metadata": {
+            "artifact_type": artifact_type,
+            "unanalyzed": True,
+            "signal_class": "derived",
+            "error": str(reason)[:200],
+        },
+    }
+
+
 def _motor_caie_summary(motor: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """
     B-094: traduce la CAIE viva del scorer (_vigia_score) al shape que la
@@ -786,6 +810,17 @@ class SIFTOrchestrator:
                         "[SIFT_SHIM] Android engine: %d findings, %d SMS, z=%.2f",
                         len(result.findings), result.total_sms, sig.z_score,
                     )
+                # B-167: a resource cap is not a clean pass over every SMS
+                # body. Preserve the engine output, but surface the omitted
+                # suffix through the same F7 path consumed by the agent.
+                if result.sms_content_truncated:
+                    signals.append(_partial_analysis_marker(
+                        "android_sms",
+                        "android_sms",
+                        "SMS content analysis bounded to "
+                        f"{result.sms_analyzed_rows} of "
+                        f"{result.sms_analyzable_rows} non-null bodies.",
+                    ))
             except Exception as e:
                 logger.error("[SIFT_SHIM] AndroidForensicsAnalyzer failed: %s", e)
                 signals.append(_unanalyzed_marker("android", e))

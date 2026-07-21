@@ -8043,3 +8043,46 @@ existentes del comparador sellado:
 Una corrida directa read-only de OWL, con output temporal interno, emitió
 `ABSTAIN` (exit 4) y el fingerprint top-level coincidió con el registrado en
 `AGENT_INITIALIZED`.
+
+---
+
+## B-167 — El límite de 500 cuerpos SMS podía ocultar una extracción Android parcial [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de degradación honesta / cobertura mobile. No convierte contenido en intención ni sube un veredicto. |
+| **Archivos** | `vigia/sift/android_forensics.py`, shim raíz `sift_orchestrator.py`. |
+| **Detectado por** | Auditoría Codex al investigar el falso negativo OWL-NEXUS5, 2026-07-21. |
+
+`AndroidForensicsAnalyzer._analyze_sms()` limitaba deliberadamente la lectura
+de cuerpos no nulos a 500 filas para acotar recursos, pero la consulta no
+tenía `ORDER BY`, no contaba la población de cuerpos elegibles y no registraba
+si el límite se alcanzaba. `total_sms` quedaba expuesto como si describiera
+una cobertura completa. El shim sólo emitía `*_UNANALYZED` cuando el analizador
+lanzaba una excepción; una extracción parcialmente inspeccionada podía por lo
+tanto mezclarse con otros artefactos y contribuir a un resultado limpio sin
+marcador de pérdida.
+
+**Prueba roja:** una `mmssms.db` SQLite sintética con 501 cuerpos no nulos
+devolvía `total_sms=501`, sin atributo de truncación y sin marcador
+`unanalyzed` en el resultado del shim. El cuerpo 501 quedaba fuera de la
+consulta de contenido y el bundle no tenía forma de distinguirlo de una base
+completamente inspeccionada.
+
+**Corrección aplicada:** el límite de 500 se conserva, ahora con orden
+determinista `ORDER BY _id ASC`. El resultado declara `sms_analyzable_rows`,
+`sms_analyzed_rows` y `sms_content_truncated`; el `SignalOutput` preserva esos
+campos. Cuando hay cuerpos omitidos, el shim agrega la señal derivada
+`ANDROID_SMS_UNANALYZED` (`artifact_type=android_sms`, `z=0`,
+`signal_class=derived`). No añade findings, no puntúa texto no inspeccionado y
+no fabrica corroboración; usa el mecanismo F7 existente para que el agente
+vea `results.unanalyzed_artifacts` y no generalice limpieza al sufijo no leído.
+
+Esto es independiente de L-041: B-167 declara cobertura parcial; L-041 sigue
+documentando que, aun dentro de las 500 filas leídas, el extractor sólo modela
+la regla calibrada de menciones salientes a apps cifradas y no debe convertir
+lenguaje genérico de coordinación en intención.
+
+**Validación:** `tests/test_b167_android_sms_truncation.py` se escribió rojo
+contra el HEAD previo y fija tanto la telemetría del analizador como la
+propagación del marcador a `n_unanalyzed_artifacts` del shim.

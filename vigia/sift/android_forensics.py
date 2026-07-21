@@ -35,6 +35,9 @@ logger = logging.getLogger(__name__)
 
 TOOL_NAME = "ANDROID_FORENSICS"
 ARTIFACT_RELIABILITY = Fraction(70, 100)
+# B-167: the parser intentionally bounds SMS body inspection. The cap is a
+# resource limit, never a claim that every available message body was read.
+SMS_CONTENT_ANALYSIS_LIMIT = 500
 
 # Chrome timestamp epoch: microseconds since 1601-01-01
 _CHROME_EPOCH_OFFSET = 11644473600
@@ -112,6 +115,11 @@ class AndroidAnalysisResult:
     is_rooted: bool = False
     root_method: str = ""
     total_sms: int = 0
+    # B-167: total_sms counts all rows; these fields describe the body-bearing
+    # subset that was actually eligible for content inspection.
+    sms_analyzable_rows: int = 0
+    sms_analyzed_rows: int = 0
+    sms_content_truncated: bool = False
     total_contacts: int = 0
     total_calls: int = 0
     # B-072: solo un conteo EXITOSO de 0 es evidencia de data_minimization
@@ -185,6 +193,9 @@ class AndroidAnalysisResult:
                 "is_rooted": self.is_rooted,
                 "root_method": self.root_method,
                 "total_sms": self.total_sms,
+                "sms_analyzable_rows": self.sms_analyzable_rows,
+                "sms_analyzed_rows": self.sms_analyzed_rows,
+                "sms_content_truncated": self.sms_content_truncated,
                 "total_contacts": self.total_contacts,
                 "total_calls": self.total_calls,
                 "encrypted_apps_count": n_encrypted,
@@ -469,14 +480,28 @@ class AndroidForensicsAnalyzer:
             try:
                 count = conn.execute("SELECT COUNT(*) FROM sms").fetchone()[0]
                 result.total_sms = count
+                result.sms_analyzable_rows = conn.execute(
+                    "SELECT COUNT(*) FROM sms WHERE body IS NOT NULL"
+                ).fetchone()[0]
             except sqlite3.OperationalError:
                 result.analysis_notes.append("mmssms.db: 'sms' table not found")
                 return
 
             rows = conn.execute(
                 "SELECT _id, address, body, date, type, thread_id "
-                "FROM sms WHERE body IS NOT NULL LIMIT 500"
+                "FROM sms WHERE body IS NOT NULL "
+                "ORDER BY _id ASC LIMIT ?",
+                (SMS_CONTENT_ANALYSIS_LIMIT,),
             ).fetchall()
+            result.sms_analyzed_rows = len(rows)
+            if result.sms_analyzable_rows > result.sms_analyzed_rows:
+                result.sms_content_truncated = True
+                result.analysis_notes.append(
+                    "mmssms.db: SMS content analysis truncated "
+                    f"({result.sms_analyzed_rows} of "
+                    f"{result.sms_analyzable_rows} non-null bodies); "
+                    "the remaining bodies were not analyzed."
+                )
 
             for row in rows:
                 body = str(row["body"] or "")
