@@ -387,7 +387,8 @@ class VigiaPipeline:
         )
 
         # ── Agent Execution Logger — SANS Find Evil! entregable obligatorio ──
-        # Genera data/logs/{case_id}_execution.jsonl con cada paso del razonamiento
+        # Genera un JSONL derivado fuera de la evidencia con cada paso del
+        # razonamiento (B-190; VIGIA_EXECUTION_LOG_DIR/VIGIA_WORK_DIR).
         _case_id = (metadata or {}).get("case_id", "unknown")
         _exec_log = None
         if _EXEC_LOGGER_AVAILABLE and VigiaExecutionLogger is not None:

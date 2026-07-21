@@ -397,6 +397,9 @@ pip install -e ".[dev]"
 ```bash
 export VIGIA_EVIDENCE_DIR="/path/to/read-only/evidence"   # required
 export VIGIA_WORK_DIR="/path/to/private/work"             # derived state; outside evidence
+# Optional execution JSONL; defaults to $VIGIA_WORK_DIR/logs, then user state.
+# Must NEVER point inside VIGIA_EVIDENCE_DIR.
+export VIGIA_EXECUTION_LOG_DIR="/path/to/private/work/logs"
 # Optional durable ACP/temporal/entanglement SQLite; defaults under VIGIA_WORK_DIR or user state.
 export VIGIA_FORENSIC_DB_PATH="/path/to/private/work/vigia_forensic.db"
 # Optional persistent sealed-bundle ledger; defaults under VIGIA_WORK_DIR or user state.

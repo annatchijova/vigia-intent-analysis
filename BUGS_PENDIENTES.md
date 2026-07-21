@@ -8860,3 +8860,43 @@ output externo con padre inexistente. Fue roja **3/3** antes del parche y
 verde **3/3** después. Además pasan las 23 pruebas de `test_tanda_a_triage.py`:
 **26/26**. El cambio impide contaminar adquisición y elimina el fallo espurio
 del output externo sin ampliar las conclusiones del pipeline.
+
+---
+
+## B-190 — el logger de ejecución podía alterar evidencia y escapar con `case_id` [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una traza derivada del pipeline podía escribirse en el árbol adquirido o en un destino construido desde una etiqueta de caso. |
+| **Archivo** | `vigia/core/execution_logger.py`, `vigia/pipeline/pipeline.py`, `tests/test_b190_execution_logger_output_boundary.py`. |
+| **Modo** | Pipeline determinista y cualquier consumidor directo de `VigiaExecutionLogger`. |
+| **Principio afectado** | La evidencia es de solo lectura: ni el trail que la describe ni el identificador de caso pueden obtener autoridad de escritura sobre ella. |
+
+**Observación reproducida:** el constructor recibía `output_dir="data/logs"`,
+creaba ese path relativo al CWD y concatenaba `case_id` sin tratarlo como un
+identificador no confiable. Con `VIGIA_EVIDENCE_DIR=<evidence>` se indujeron
+cuatro violaciones antes del parche: (1) `output_dir=<evidence>` creaba el
+JSONL dentro de la adquisición; (2) un padre symlink que apuntaba a evidencia
+también era aceptado; (3) `case_id="../evidence/escape"` escapaba del
+directorio de logs; y (4) iniciar el proceso desde la evidencia hacía que el
+default relativo publicara `data/logs` en ese mismo árbol. El logger no cambia
+un veredicto, pero sí podía modificar el objeto cuyo análisis pretende dejar
+trazado.
+
+**Corrección aplicada:** `case_id` ahora es una etiqueta no vacía sin NUL ni
+separadores de ruta. Cuando no se pasa un destino explícito, los logs usan
+`VIGIA_EXECUTION_LOG_DIR`, luego `$VIGIA_WORK_DIR/logs`, y finalmente estado
+privado XDG; nunca el CWD. El destino final se valida con la frontera común
+`validate_external_output_path()` antes y después de crear su padre externo
+con modo `0750`. Esa validación rechaza evidencia directa y todo componente
+symlink. Se documentó `VIGIA_EXECUTION_LOG_DIR` junto al resto del estado
+operativo privado. El logger mantiene el formato JSONL, la cadena de hashes y
+el comportamiento de destinos externos legítimos.
+
+**Validación:** las cinco pruebas B-190 fueron rojas antes del fix y verdes
+después: evidencia directa, padre symlink, traversal de `case_id`, default
+desde CWD de evidencia y output externo permitido. Además pasan
+`tests/test_hash_chain_hardening.py` y `tests/test_tanda_a_triage.py`: **55
+passed** (una advertencia histórica de timestamp no sellado). La inducción
+confirma el cierre de la autoridad de escritura; no afirma atomicidad ante
+caída de energía de la secuencia JSONL, que queda fuera de este fix.

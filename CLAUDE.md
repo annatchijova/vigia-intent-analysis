@@ -76,6 +76,10 @@ export VIGIA_LOG_DIR="/var/log/vigia"
 # Default: a private mode-0700 temporary directory for the server lifetime.
 export VIGIA_WORK_DIR="/var/lib/vigia/work"
 
+# Optional — derived execution JSONL logs. Default: $VIGIA_WORK_DIR/logs,
+# then an XDG-style user state directory. Must NEVER point inside evidence.
+export VIGIA_EXECUTION_LOG_DIR="/var/lib/vigia/work/logs"
+
 # Optional — durable operational SQLite state for ACP, temporal and
 # entanglement modules. Default: $VIGIA_WORK_DIR/vigia_forensic.db, then an
 # XDG-style user state directory. Must NEVER point inside VIGIA_EVIDENCE_DIR.
