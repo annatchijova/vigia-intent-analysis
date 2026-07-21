@@ -85,11 +85,35 @@ def _run_pipeline(case_path: Path) -> dict:
     tf = _tmp.NamedTemporaryFile(suffix=".json", delete=False, mode="w")
     json.dump(sd, tf, sort_keys=True, indent=2, default=str)
     tf.close()
-    v = _sub.run(["python3", str(REPO / "forensics/verify_ebs_v1.py"), tf.name],
-                  capture_output=True, text=True)
-    verif = "PASS" if "PASS" in v.stdout else "FAIL"
-    level = next((l for l in ["Level 3", "Level 2", "Level 1"] if l in v.stdout), "?")
-    os.unlink(tf.name)
+    verifier_path = REPO / "forensics" / "verify_ebs_v1.py"
+    try:
+        if not verifier_path.is_file():
+            logger.error("EBS verifier unavailable at configured repository")
+            verif, level = "UNAVAILABLE", "?"
+        else:
+            try:
+                v = _sub.run(
+                    ["python3", str(verifier_path), tf.name],
+                    capture_output=True,
+                    text=True,
+                )
+            except OSError:
+                logger.exception("EBS verifier process could not be started")
+                verif, level = "UNAVAILABLE", "?"
+            else:
+                if "Resultado   : PASS" in v.stdout:
+                    verif = "PASS"
+                elif "Resultado   : FAIL" in v.stdout:
+                    verif = "FAIL"
+                else:
+                    logger.error("EBS verifier did not produce a verification result")
+                    verif = "UNAVAILABLE"
+                level = next(
+                    (line for line in ["Level 3", "Level 2", "Level 1"] if line in v.stdout),
+                    "?",
+                )
+    finally:
+        os.unlink(tf.name)
 
     sealed_forensic_verdict = sd.get("caie_analysis", {}).get("verdict")
     if sealed_forensic_verdict != score["verdict"]:

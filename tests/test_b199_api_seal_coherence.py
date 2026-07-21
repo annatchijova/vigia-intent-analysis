@@ -82,3 +82,18 @@ def test_api_returns_the_same_forensic_verdict_its_bundle_preserves(
     assert result["sealed_forensic_verdict"] == result["verdict"]
     assert result["ebs_decision"] == "ABSTAIN"
     assert result["seal_scope"] == "DIRECT_SCORER_ANALYSIS_ONLY"
+
+
+@pytest.mark.parametrize("wrapper", ("vigia_api", "vigia.vigia_api"))
+def test_api_does_not_mislabel_an_unavailable_verifier_as_bundle_failure(
+    wrapper, tmp_path, monkeypatch
+):
+    module = importlib.import_module(wrapper)
+    monkeypatch.setattr(module, "REPO", tmp_path / "missing-configured-repository")
+    case_path = tmp_path / "case.json"
+    case_path.write_text(json.dumps(_case()), encoding="utf-8")
+
+    result = module._run_pipeline(case_path)
+
+    assert result["verify"].startswith("UNAVAILABLE —")
+    assert "FAIL" not in result["verify"]

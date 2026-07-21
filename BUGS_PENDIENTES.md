@@ -9255,3 +9255,37 @@ las fronteras FastAPI, paridad de imports y suites de sellado/verificador pasan
 **50 tests**. Esto no afirma que el pipeline EBS completo sea inválido: afirma
 que su decisión no puede utilizarse como prueba del scorer standalone hasta
 tener una traducción de artefactos y calibración de riesgo explícitas.
+
+---
+
+## B-200 — la API llamaba `FAIL` a un verificador que no había podido ejecutarse [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de degradación honesta: una configuración `VIGIA_REPO` inexistente o un error de proceso se mostraba al cliente como fallo criptográfico del bundle. |
+| **Archivos** | `vigia_api.py`, `vigia/vigia_api.py`, `tests/test_b199_api_seal_coherence.py`. |
+| **Modo** | FastAPI/OpenWebUI, ambos imports públicos. |
+| **Principio afectado** | Un resultado de verificación sólo puede decir `FAIL` si el verificador ejecutado alcanzó ese resultado. Ausencia de ejecutable, fallo de arranque o salida no reconocible son indisponibilidad operacional, no evidencia de alteración. |
+
+**Observación reproducida:** el entorno tenía `VIGIA_REPO` configurado a un
+checkout que ya no existe. Ambos wrappers construían correctamente el bundle,
+pero lanzaban `python3 <repo-inexistente>/forensics/verify_ebs_v1.py`. Como la
+subproceso devolvía stderr sin la palabra `PASS`, el código respondía
+`verify="FAIL — ?"`. Ese texto sugiere que el contenido sellado fue rechazado,
+cuando el programa de verificación ni siquiera se abrió.
+
+**Corrección aplicada:** la API comprueba que el ejecutable del verificador
+existe, captura errores al iniciar la subproceso y clasifica la salida de forma
+explícita. `PASS` y `FAIL` se emiten solamente si el CLI produjo
+`Resultado : PASS` o `Resultado : FAIL`; cualquier ausencia, error de arranque
+o salida no interpretable se devuelve como `UNAVAILABLE — ?` y se registra en
+el log del servidor sin exponer paths ni stderr al cliente. El archivo temporal
+del bundle se elimina también si el proceso no logra arrancar.
+
+**Validación:** la prueba nueva fuerza ambos wrappers a usar un `REPO` sin
+`forensics/verify_ebs_v1.py`. Era roja antes (`FAIL — ?`) y ahora exige
+`UNAVAILABLE — ?`, sin la palabra `FAIL`. La misma suite conserva el caso de
+verificación normal `PASS` y los contratos de rutas/compatibilidad OpenAI:
+**32 tests** pasan. La configuración rota sigue siendo responsabilidad del
+operador; el cambio sólo impide que VIGÍA la convierta en una afirmación forense
+falsa.
