@@ -66,7 +66,7 @@ from vigia.tools.nlp_constants import (
     # Cognitive markers
     CognitiveMarkers,
 )
-from vigia.tools.forensic_db import ForensicDatabaseManager
+from vigia.tools.forensic_db import ForensicDatabaseManager, validate_external_output_path
 
 # CAIE integration (opcional — no bloquea si no está disponible)
 try:
@@ -225,10 +225,15 @@ class ConfigLoader:
         )
 
     def save_default_config(self, path: str) -> None:
-        abs_path = os.path.abspath(os.path.expanduser(path))
+        abs_path = validate_external_output_path(
+            path, artifact_label="configuration template"
+        )
         parent = os.path.dirname(abs_path)
         if not os.path.exists(parent):
             os.makedirs(parent, mode=0o750)
+        abs_path = validate_external_output_path(
+            abs_path, artifact_label="configuration template"
+        )
         with open(abs_path, "w", encoding="utf-8") as f:
             if path.endswith((".yaml", ".yml")):
                 yaml.dump(self.DEFAULT_CONFIG, f, default_flow_style=False)

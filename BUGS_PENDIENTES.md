@@ -8493,3 +8493,34 @@ padre symlink que resolvía dentro de evidencia y el control positivo de una
 exportación SQLite externa. Junto con B-175/B-176/B-177, pasan 12 tests. No
 modifica señales, puntajes ni veredictos; sólo reduce la autoridad de salida de
 una herramienta pericial.
+
+---
+
+## B-179 — la plantilla de configuración pericial podía contaminar evidencia [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: una operación auxiliar podía crear directorios y sobrescribir un archivo de configuración en la evidencia fuente. |
+| **Archivo** | `vigia/tools/adversarial_nlp.py`, `vigia/tools/forensic_db.py`, `tests/test_b179_config_template_evidence_boundary.py`. |
+| **Modo** | API `ForensicEngine.save_config_template()` / `ConfigLoader.save_default_config()`. |
+| **Principio afectado** | El hecho de que un output sea una plantilla y no un resultado analítico no le concede autoridad sobre `VIGIA_EVIDENCE_DIR`. |
+
+**Observación reproducida:** `ConfigLoader.save_default_config(path)` convertía
+el path a absoluto, ejecutaba `os.makedirs(parent)` y abría el archivo en modo
+`"w"`, sin consultar la raíz de evidencia. Con
+`path=<evidence>/templates/defaults.json` creaba `templates/` y escribía el
+JSON de configuración. El comportamiento era alcanzable por la fachada pública
+`save_config_template()` del motor pericial.
+
+**Corrección aplicada:** B-179 extrae `validate_external_output_path()` como
+contrato común de output para el gestor SQLite y la plantilla. Rechaza vacío y
+NUL, componentes symlink existentes y todo destino que canónicamente sea
+descendiente de `VIGIA_EVIDENCE_DIR`. Cada caller lo aplica antes de crear
+padres y nuevamente después, antes de abrir/escribir. La plantilla externa se
+mantiene soportada; los tests B-178 conservan la cobertura de la exportación
+SIFT sobre el mismo guard.
+
+**Validación:** tres regresiones cubren el destino directo dentro de evidencia,
+el padre symlink que resuelve a evidencia y el control positivo externo. La
+familia B-175 a B-179 queda en 15 tests passing. El cambio no toca detección,
+score, modelado ni veredictos: sólo retira autoridad de escritura indebida.
