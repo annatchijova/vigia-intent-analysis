@@ -8431,3 +8431,33 @@ se invoca el renderer.
 y que el flujo externo crea el directorio, llama al renderer y preserva la
 evidencia. La batería integrada de boundaries de exportación, sandbox y MCP
 queda en 38 tests passing. No se modifican análisis, señales ni veredictos.
+
+---
+
+## B-177 — el agente autónomo permitía bundles dentro de evidencia si el CWD coincidía [RESUELTO — Codex 2026-07-21]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de integridad forense: el bundle sellado, checksum y trace podían contaminar la evidencia de entrada. |
+| **Archivo** | `vigia_agent.py`, `tests/test_b177_agent_output_evidence_boundary.py`. |
+| **Modo** | CLI del agente autónomo (Modo 1 / batch). |
+| **Principio afectado** | Estar dentro del CWD permitido no autoriza a escribir dentro de la evidencia; ambos límites son necesarios. |
+
+**Observación reproducida:** el guard anterior verificaba sólo que
+`Path(output).resolve()` fuera descendiente de `Path.cwd()`. Un operador que
+ejecutaba `vigia_agent.py` desde `VIGIA_EVIDENCE_DIR` recibía el output por
+defecto `<case-id>_bundle.json` dentro de esa misma evidencia. `atomic_write_text`
+podía crear además los directorios padre, y el flujo escribía tres siblings:
+bundle, `.sha256` y `_reasoning_trace.json`.
+
+**Corrección aplicada:** `_validate_agent_output_path()` define un contrato
+testeable: canonicaliza el target, exige pertenencia al workdir y rechaza por
+componentes cualquier solapamiento con `VIGIA_EVIDENCE_DIR`. `main()` lo llama
+antes de construir el agente o escribir archivos y usa la ruta absoluta
+resultante para los tres artifacts asociados. El cambio preserva los outputs
+normales en `results/` y rechaza destinos fuera del CWD como antes.
+
+**Validación:** tres regresiones cubren el output por defecto con CWD=evidencia,
+un target explícito dentro de evidencia y un sibling `results/` válido. También
+pasan el test end-to-end B-105 del bundle/trace/checksum y las fronteras B-175
+y B-176. No altera el análisis ni los veredictos, sólo su destino de escritura.

@@ -1945,6 +1945,57 @@ def _warn_missing_critical_deps() -> None:
             )
 
 
+def _validate_agent_output_path(
+    output_path: str,
+    *,
+    working_directory: Path | None = None,
+    evidence_directory: str | Path | None = None,
+) -> str:
+    """Return an agent output path confined to work and outside evidence.
+
+    The autonomous agent writes a sealed bundle plus verification and reasoning
+    siblings.  Keeping the bundle below the working directory is necessary but
+    insufficient: an operator can invoke the agent *from* the evidence tree.
+    In that configuration the former CWD-only check authorised a write into
+    immutable input (B-177).
+    """
+    if not isinstance(output_path, str) or not output_path.strip():
+        raise ValueError("output path must be a non-empty string")
+    if "\x00" in output_path:
+        raise ValueError("output path contains a null byte")
+
+    try:
+        work_root = (working_directory or Path.cwd()).resolve(strict=False)
+        requested = Path(output_path)
+        resolved = (
+            requested.resolve(strict=False)
+            if requested.is_absolute()
+            else (work_root / requested).resolve(strict=False)
+        )
+    except (OSError, RuntimeError) as exc:
+        raise ValueError(f"invalid output path: {exc}") from exc
+
+    if not resolved.is_relative_to(work_root):
+        raise ValueError(f"output path escapes working directory: {output_path!r}")
+
+    configured_evidence = (
+        evidence_directory
+        if evidence_directory is not None
+        else os.environ.get("VIGIA_EVIDENCE_DIR", "").strip()
+    )
+    if configured_evidence:
+        try:
+            evidence_root = Path(configured_evidence).resolve(strict=False)
+        except (OSError, RuntimeError) as exc:
+            raise ValueError(f"invalid evidence directory: {exc}") from exc
+        if resolved == evidence_root or resolved.is_relative_to(evidence_root):
+            raise ValueError(
+                "output path points inside forensic evidence; choose a separate results directory"
+            )
+
+    return str(resolved)
+
+
 def main() -> None:
     _warn_missing_critical_deps()
     parser = argparse.ArgumentParser(
@@ -2025,19 +2076,15 @@ Exit codes:
     safe_case_id = re.sub(r"[^a-zA-Z0-9_\-]", "_", args.case_id)
     output_path = args.output or f"{safe_case_id}_bundle.json"
 
-    # FIX P1-4: sanitize output to prevent path traversal
-    output_path_obj = Path(output_path)
+    # FIX P1-4/B-177: output must remain inside the work directory AND never
+    # overlap immutable evidence. The helper returns the canonical absolute
+    # path, binding the bundle, its checksum and its reasoning-trace sibling
+    # to the same safe destination.
     try:
-        resolved = output_path_obj.resolve()
-        cwd = Path.cwd().resolve()
-        # Use is_relative_to() — str.startswith() has edge cases with path prefixes
-        if not resolved.is_relative_to(cwd):
-            logger.error("[FATAL] Output path escapes working directory: %s", output_path)
-            sys.exit(2)
-    except (OSError, RuntimeError) as e:
+        output_path = _validate_agent_output_path(output_path)
+    except ValueError as e:
         logger.error("[FATAL] Invalid output path: %s — %s", output_path, e)
         sys.exit(2)
-    output_path = str(output_path_obj)
 
     # L-037: Build acquisition overrides from CLI flags
     _acq_overrides: Dict[str, Any] = {}
