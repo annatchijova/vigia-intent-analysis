@@ -9586,3 +9586,67 @@ matchea, horario solo sin canal no matchea, e input degenerado (`None`,
 string vacío, no-string) no crashea. Suite completa: **1856 passed**
 (+8 sobre B-206), 0 failed. `git diff --stat` confirma que
 `vigia_scorer.py`/`vigia_integration_bridge.py` no cambiaron.
+
+---
+
+## B-208 — PrefetchAnalyzer nunca descomprimía el contenedor MAM (Win10+); last_execution_time/run_count eran placeholders fijos [RESUELTO — Claude 2026-07-22]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 de cobertura forense: bloqueaba cualquier correlación temporal sobre prefetch moderno (todo Win10+ del corpus, no solo OWL). No alteraba veredictos — `to_signal()` usa severidad fija por tipo de hallazgo, nunca `run_count`/`last_execution_time`. |
+| **Archivos** | `vigia/sift/prefetch_analyzer.py`, `pyproject.toml` (`[project.optional-dependencies].prefetch`), `tests/test_b208_prefetch_pyscca_enrichment.py`. |
+| **Modo** | Cualquiera que use `PrefetchAnalyzer.analyze_directory()`/`_parse_pf()` sobre prefetch Win10+ real. |
+| **Detectado por** | Continuación de la investigación B-160/B-206 (correlación Pidgin↔SMS en OWL-NEXUS5), sesión 2026-07-22. |
+
+**Observación reproducida:** `_parse_pf()` reconoce la firma `MAM\x04`/`MAM\x03`
+(prefetch comprimido Win10+) pero nunca descomprimía el contenedor —
+retornaba `last_execution_time="unknown"` y `run_count=1` fijos para
+*todo* prefetch moderno, sin excepción. Confirmado con `xxd` sobre los
+tres `.pf` de Pidgin en `evidence/owl-2019-hd1-windows/prefetch/`
+(firma `MAM\x04` real).
+
+**Decisión de arquitectura (consultada con Anna):** implementar
+descompresión XPRESS Huffman + parseo binario SCCA a mano habría
+duplicado, sin forma independiente de validarlo, un parser de formato
+binario ya resuelto por una librería de referencia. `libscca-python`
+(pyscca, proyecto libyal — el que usan las herramientas forenses reales)
+ya está instalado en este entorno y funciona correctamente. Es una
+extensión compilada (no pip-puro, requiere la librería C `libscca` del
+sistema) — se integró como **enriquecimiento opcional con degradación
+honesta**: si `pyscca` no está disponible, `_parse_pf()` cae a los
+placeholders anteriores (`"unknown"`/`1`) sin romper nada; Mode 1 sigue
+offline/cero-dependencias sin este extra. Nuevo extra en `pyproject.toml`:
+`pip install vigia[prefetch]`.
+
+**Corrección aplicada:** `_enrich_via_pyscca()` abre el `.pf` con pyscca,
+toma el máximo de los hasta 8 slots de `last_run_time` (FILETIME, 100ns
+desde 1601-01-01) y lo convierte a ISO 8601 con aritmética entera exacta
+(`ticks // 10` → microsegundos, sin float). Si pyscca no está instalado,
+o lanza excepción sobre contenido que no puede parsear (p. ej. los
+fixtures sintéticos de `tests/test_prefetch_real.py`, que escriben solo
+la firma + ceros), `_parse_pf()` sigue devolviendo un `PrefetchRecord`
+válido con los placeholders — el chequeo de firma (que decide
+`unparsed_files`) es independiente y no cambió.
+
+**Verificado sobre evidencia real** (no versionada en git, local):
+`PIDGIN.EXE-86E18E41.pf` reporta ahora `run_count=7`,
+`last_execution_time="2017-02-02T21:25:05.097Z"` (antes: `1`/`"unknown"`).
+Cruzado contra el SMS de B-206 (recibido 2017-02-01T00:41:15Z, "confirmation
+will come later through pidgin"): las otras dos variantes de Pidgin
+(`PIDGIN-2.11.0(.EXE/ (1).EXE`) muestran una única ejecución cada una el
+mismo día, 2017-02-01 ~17:00-17:06 UTC — **~16 horas después** del SMS,
+consistente con "later" tal como dice el mensaje. Esto es corroboración
+temporal genuina, no ruido; no se cableó a ningún veredicto en esta sesión
+(fuera de alcance — el mismo criterio conservador que B-207).
+
+**Validación:** `tests/test_b208_prefetch_pyscca_enrichment.py` — 9 tests:
+conversión FILETIME contra la constante públicamente conocida
+`116444736000000000` (época Unix, verificable sin confiar en este código),
+selección del slot más reciente entre varios, degradación sin pyscca,
+degradación cuando pyscca lanza excepción, todos los slots en cero,
+integración completa en `_parse_pf` (con y sin pyscca), y regresión
+explícita de que los fixtures sintéticos de `test_prefetch_real.py` (SCCA
+válido por firma pero basura interna) siguen parseando. Suite completa
+(`tests/` + `vigia/tests/`, sin integration): **1865 passed** (+9 sobre
+B-207), 0 failed. `tests/test_prefetch_real.py` (21 tests preexistentes)
+sigue en verde sin modificaciones.

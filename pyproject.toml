@@ -53,6 +53,14 @@ full = [
     "scipy>=1.11",
     "scikit-learn>=1.3",
 ]
+# B-208: recuperación real de last_execution_time/run_count en prefetch
+# Win10+ (MAM-comprimido) vía pyscca (libscca-python). Extensión compilada
+# — requiere la librería C libscca del sistema, no es pip-puro. OPCIONAL:
+# vigia/sift/prefetch_analyzer.py degrada honestamente sin ella (placeholders
+# "unknown"/1), Mode 1 sigue offline/cero-dependencias sin este extra.
+prefetch = [
+    "libscca-python>=20221027",
+]
 # Entorno de desarrollo y tests
 dev = [
     "scipy>=1.11",

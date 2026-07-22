@@ -10,7 +10,9 @@ FIX P0: Todo valor numérico en evidence dict usa Fraction/str. NUNCA float.
 
 from __future__ import annotations
 
+import datetime
 import hashlib
+import logging
 import struct
 from dataclasses import dataclass, field
 from fractions import Fraction
@@ -20,8 +22,77 @@ from typing import Any, Dict, List, Optional, Tuple
 from vigia.core.ebs_v1 import SignalOutput, Z_CLIP_MAX
 from vigia.core.chain_of_custody import ChainOfCustody
 
+logger = logging.getLogger(__name__)
+
+# B-208: real last_execution_time/run_count recovery for MAM-compressed
+# (Win10+) prefetch requires XPRESS Huffman decompression + SCCA-structure
+# parsing. pyscca (libscca-python, libyal) already does this correctly and
+# is the reference implementation real forensic tools use — hand-rolling it
+# here would duplicate a well-audited binary-format parser with no
+# independent way to validate correctness. It is a compiled extension (not
+# pure pip), so it is treated as an OPTIONAL enrichment: Mode 1 stays
+# offline/zero-dependency without it, degrading only the precision of these
+# two fields, never the core detection path (filename/blacklist matching,
+# which is signature- and stem-based and does not depend on pyscca).
+try:
+    import pyscca
+    _PYSCCA_AVAILABLE = True
+except ImportError:
+    pyscca = None
+    _PYSCCA_AVAILABLE = False
+    logger.warning(
+        "[PREFETCH_ANALYZER] pyscca (libscca-python) not installed — "
+        "last_execution_time/run_count will report 'unknown'/1 placeholders "
+        "instead of real values recovered from Win10+ MAM-compressed prefetch. "
+        "Optional: pip install libscca-python (requires system libscca)."
+    )
+
+# FILETIME epoch (1601-01-01) in seconds before the Unix epoch, for exact
+# integer conversion of pyscca's 100ns-tick FILETIME integers to UTC.
+_FILETIME_EPOCH = datetime.datetime(1601, 1, 1, tzinfo=datetime.timezone.utc)
+
 TOOL_NAME = "PREFETCH_ANALYZER"
 ARTIFACT_RELIABILITY = Fraction(70, 100)
+
+
+def _enrich_via_pyscca(path: Path) -> Optional[Tuple[str, int]]:
+    """Best-effort real ``(last_execution_time, run_count)`` via pyscca.
+
+    Returns None on any failure — pyscca absent, or content pyscca cannot
+    parse (e.g. a synthetic/garbage .pf used in tests). This is deliberately
+    separate from the signature check in ``_parse_pf``: a signature-valid
+    file that pyscca cannot fully parse still yields a PrefetchRecord with
+    placeholder timing fields, it is never counted as unparsed for that
+    reason alone.
+    """
+    if not _PYSCCA_AVAILABLE:
+        return None
+    scca_file = pyscca.file()
+    try:
+        scca_file.open(str(path))
+        run_count = scca_file.run_count
+        latest_ticks = 0
+        for slot in range(8):
+            ticks = scca_file.get_last_run_time_as_integer(slot)
+            if ticks and ticks > latest_ticks:
+                latest_ticks = ticks
+        if latest_ticks == 0:
+            return None
+        # FILETIME: 100ns ticks since 1601-01-01 — integer division only,
+        # no float in this conversion (sub-microsecond remainder discarded,
+        # ISO 8601 report precision is microseconds).
+        microseconds = latest_ticks // 10
+        timestamp = _FILETIME_EPOCH + datetime.timedelta(microseconds=microseconds)
+        iso = timestamp.strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+        return iso, run_count
+    except Exception as exc:
+        logger.debug("[PREFETCH_ANALYZER] pyscca could not parse %s: %s", path, exc)
+        return None
+    finally:
+        try:
+            scca_file.close()
+        except Exception:
+            pass
 
 # LOL-bins y herramientas de hacking cuya ejecución es sospechosa.
 # Ruta: suspicious_executions → z=2.5 si >=3 hits, z=1.8 si 1-2 hits.
@@ -244,11 +315,19 @@ class PrefetchAnalyzer:
 
         file_hash = hashlib.sha256(data).hexdigest()[:16]
 
+        # B-208: real timing/run_count when pyscca can parse this file
+        # (requires MAM decompression it already implements); placeholders
+        # otherwise — same honest-degradation contract as before, now
+        # narrowed to only the two fields pyscca actually recovers.
+        enriched = _enrich_via_pyscca(path)
+        last_execution_time = enriched[0] if enriched else "unknown"
+        run_count = enriched[1] if enriched else 1
+
         return PrefetchRecord(
             filename=filename,
             hash=file_hash,
-            last_execution_time="unknown",
-            run_count=1,
+            last_execution_time=last_execution_time,
+            run_count=run_count,
             volume_serial="unknown",
             volume_path="unknown",
             dependencies=[],
