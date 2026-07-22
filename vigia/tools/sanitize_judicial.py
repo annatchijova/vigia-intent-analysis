@@ -10,6 +10,9 @@ import re
 import json
 import hashlib
 import argparse
+# B-209: os.urandom (salt) y os.chmod (0600) se usaban sin importar os —
+# NameError justo en los pasos de seguridad del sanitizador.
+import os
 from pathlib import Path
 from datetime import datetime
 

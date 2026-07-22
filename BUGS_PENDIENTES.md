@@ -9544,3 +9544,68 @@ además es dependencia de PRODUCCIÓN (la importan `vigia_api.py`,
 **Validación:** los 4 módulos de API colectan y pasan en local (3.11.15,
 mismo minor que el runner); suite completa verde. La verificación real del
 workflow es la próxima corrida CI de este push.
+
+---
+
+## B-208 — `vigia_planner.py` muerto en import: `urllib` sin importar + sanitizador huérfano de la unificación P2-001 [RESUELTO — Claude 2026-07-22]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 (módulo entero inimportable — `NameError: urllib` al definir `_NoRedirect` a nivel de módulo; cero callers de producción, así que nadie lo notó — misma clase que B-115/B-206) |
+| **Archivo** | `vigia/tools/vigia_planner.py` |
+| **Detectado por** | Barrido `ruff --select F821` sobre el repo (sesión 2026-07-22), import reproducido: `import vigia.tools.vigia_planner` → `NameError`. |
+
+**Tres defectos concatenados:** (1) `urllib.request`/`urllib.error` usados a
+nivel de módulo (guard SSRF del webhook) sin importarse — el módulo nunca
+importó en la vida de este repo; (2) la copia local de `_sanitize_llm_input`
+referenciaba `_LLM_DANGEROUS_TAGS`/`_CONTROL_CHARS`, movidas a
+`vigia/security/security.py` por la unificación P2-001 (Kimi 2026-05-02) —
+el docstring de security lo dice textual: "unificada con la versión del
+planner"; la copia quedó atrás; (3) `_MAX_INTERPRETATION_LEN` referenciada,
+jamás definida.
+
+**Corrección:** imports de `urllib`; copia local eliminada e import del
+sanitizador canónico desde `vigia.security` (idéntico: NFKC + tag strip +
+control chars + padding guard sin truncado ciego);
+`_MAX_INTERPRETATION_LEN = 500` (mismo tope que el fallback del mismo
+case-block, conservador contra padding).
+
+**Validación:** import OK, sanitizador canónico verificado, sentinel de
+padding activo a 500. Tests: `tests/test_b208_b209_dead_on_call_modules.py`.
+
+---
+
+## B-209 — barrido F821: `analyze_focus()` moría en cada llamada; imports faltantes en redteam temporal y sanitizador judicial [RESUELTO — Claude 2026-07-22]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2/P3 (funciones muertas-al-llamar en módulos sin callers de producción — la clase B-115/B-206/B-208) |
+| **Archivos** | `vigia/tools/visible_variables.py`, `vigia/forensics/temporal_forensics_redteam.py`, `vigia/tools/sanitize_judicial.py` |
+| **Detectado por** | Mismo barrido `ruff --select F821` de B-208; cada hallazgo reproducido antes de tocar (disciplina audit-before-patch). |
+
+**Corregidos:**
+1. `visible_variables.analyze_focus()`: usaba `visible_artifacts` en el
+   hash P1 ANTES de construirlo (`UnboundLocalError` reproducido en cada
+   llamada) y el rationale citaba `total_rules`, variable local de
+   `detect_phase()` inexistente en su scope. Fix: bloque P1 movido antes
+   del hash; rationale reescrito sobre el contrato real P0-3 (entero
+   0-100), sin inventar un conteo que no tiene. El path vivo del pipeline
+   (`get_visible_tools`) nunca pasó por acá — cero impacto en veredictos.
+2. `temporal_forensics_redteam`: `statistics.median` y `hashlib.sha256`
+   usados sin import — crash al correr el análisis completo.
+3. `sanitize_judicial`: `os.urandom` (salt) y `os.chmod` (0600) sin
+   `import os` — NameError justo en los pasos de seguridad.
+
+**Hallazgos DESCARTADOS del mismo barrido (falsos positivos / freeze
+deliberado — se documentan para que el próximo barrido no los re-abra):**
+- `vigia/security/security.py:142,165` y `vigia/forensics/vision_audit.py`
+  (`Decimal`, `Image.Image`, `np.ndarray`): anotaciones entre comillas que
+  nunca se evalúan en runtime; el código real usa imports lazy / `self.np`.
+- `caie_legacy_root.py:1464` (`daubert_note` — el bug B-001 original):
+  archivo deliberadamente congelado; `pipeline.py:1321` y
+  `bundle_builder.py:463` declaran textual que ningún módulo runtime lo
+  importa. "Arreglarlo" rompería la reproducción fiel de bundles
+  históricos sellados con ese comportamiento. NO TOCAR.
+
+**Validación:** ruff F821 residual = solo los 7 descartados documentados.
+Suite completa 1862 passed, 0 failed.
