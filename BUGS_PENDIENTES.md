@@ -9609,3 +9609,37 @@ deliberado — se documentan para que el próximo barrido no los re-abra):**
 
 **Validación:** ruff F821 residual = solo los 7 descartados documentados.
 Suite completa 1862 passed, 0 failed.
+
+---
+
+## B-210 — barrido F811: bloque de stubs duplicado en `ebs.py` (trampa de deduplicación) y doble import en `vigia/security/__init__.py` [RESUELTO — Claude 2026-07-22]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 (sin efecto en runtime HOY — pero el duplicado de ebs.py era una trampa activa para la próxima "limpieza") |
+| **Archivos** | `vigia/models/ebs.py`, `vigia/security/__init__.py` |
+| **Detectado por** | Mismo barrido ruff de B-208/B-209, señal F811 (redefiniciones). |
+
+**ebs.py:** las tres clases stub (`AbductionTrace`,
+`PolicyStabilityController`, `SelfAdaptiveRiskPolicy`) estaban definidas
+DOS veces, en bloques consecutivos. En Python gana la última definición —
+y la diferencia importa: el `SelfAdaptiveRiskPolicy` del primer bloque NO
+tenía los aliases `lambda_t`/`gamma_t` que `pipeline.py` y
+`risk_bounded_layer.decide()` sincronizan (`self._policy.lambda_t`). La
+trampa: el primer bloque parecía el canónico (mejores docstrings) y el
+segundo parecía la copia — quien "deduplicara" borrando el segundo rompía
+el pipeline en silencio. Eliminado el primer bloque (sombreado, jamás
+efectivo); verificado que las definiciones vigentes son idénticas o
+superconjunto, aliases presentes post-fix.
+
+**security/__init__.py:** dos bloques de import casi idénticos con el
+`__all__` atrapado entre ambos; el segundo agregaba `_sanitize_llm_input`
+que el `__all__` no listaba. Consolidado en un bloque único; el conjunto
+de nombres importables no cambia (verificado).
+
+**No tocados (F811 restantes, cosméticos y de bajo valor/riesgo):**
+`forensic_reporter.py:707` (re-import local de `canvas` ya guardado),
+`vigia_sift_bridge.py:2935` (re-import local de `timezone`).
+
+**Validación:** ruff F811/F821 limpio en ambos archivos; aliases
+`lambda_t`/`gamma_t` verificados; suite completa 1862 passed, 0 failed.

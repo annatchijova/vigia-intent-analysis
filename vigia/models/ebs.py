@@ -976,94 +976,16 @@ def make_default_policy(
 
 
 # =============================================================================
-# STUBS — clases requeridas por pipeline.py, pendientes de implementación full
-# Cumplen la interfaz mínima para que el pipeline no crashee en import/init.
-# =============================================================================
-
-from dataclasses import dataclass, field
-from typing import Optional, List
-
-@dataclass
-class AbductionTrace:
-    """Traza abductiva Peirce (Firstness/Secondness/Thirdness) del pipeline."""
-    peirce_firstness: str = ""
-    peirce_secondness: str = ""
-    peirce_thirdness: str = ""
-    tools_available: int = 0
-    tools_executed: int = 0
-    tools_skipped: int = 0
-    dominant_signal: str = ""
-    dominant_z_score: float = 0.0
-    cluster_name: str = ""
-    anomalies_found: int = 0
-    execution_plan_rationale: str = ""
-    abort_triggered: bool = False
-    inference_mode: str = "heuristic"
-    clustering_method: str = "heuristic_default"
-    correlation_penalties_applied: bool = False
-
-    def to_dict(self) -> dict:
-        return {
-            "peirce_firstness":  self.peirce_firstness,
-            "peirce_secondness": self.peirce_secondness,
-            "peirce_thirdness":  self.peirce_thirdness,
-            "dominant_signal":   self.dominant_signal,
-            "dominant_z_score":  self.dominant_z_score,
-            "cluster_name":      self.cluster_name,
-            "inference_mode":    self.inference_mode,
-            "abort_triggered":   self.abort_triggered,
-        }
-
-
-class PolicyStabilityController:
-    """Controlador de estabilidad de política — stub mínimo."""
-    def __init__(self):
-        self.stability_score: float = 1.0
-        self.drift_count: int = 0
-
-    def record_drift(self, delta: float = 0.0) -> None:
-        self.drift_count += 1
-        self.stability_score = max(0.0, self.stability_score - abs(delta) * 0.1)
-
-    def is_stable(self, threshold: float = 0.7) -> bool:
-        return self.stability_score >= threshold
-
-
-class SelfAdaptiveRiskPolicy:
-    """Política de riesgo auto-adaptativa — stub mínimo."""
-    def __init__(
-        self,
-        lambda_init: float = 0.5,
-        gamma_init: float = 0.5,
-        epsilon_init: float = 0.05,
-        stability_controller: Optional[PolicyStabilityController] = None,
-    ):
-        self.lambda_drift = lambda_init
-        self.gamma_stability = gamma_init
-        self.epsilon = epsilon_init
-        self._ctrl = stability_controller or PolicyStabilityController()
-
-    def update(self, observed_drift: float, observed_stability: float) -> None:
-        self._ctrl.record_drift(observed_drift - self.lambda_drift)
-        self.lambda_drift = round(
-            self.lambda_drift * 0.9 + observed_drift * 0.1, 6
-        )
-        self.gamma_stability = round(
-            self.gamma_stability * 0.9 + observed_stability * 0.1, 6
-        )
-
-    def get_params(self) -> dict:
-        return {
-            "lambda_drift":    self.lambda_drift,
-            "gamma_stability": self.gamma_stability,
-            "epsilon":         self.epsilon,
-            "stable":          self._ctrl.is_stable(),
-        }
-
-
-# =============================================================================
 # STUBS — AbductionTrace, PolicyStabilityController, SelfAdaptiveRiskPolicy
 # Requeridos por pipeline.py. Implementación mínima funcional.
+#
+# B-210: existía un bloque DUPLICADO de estas tres clases justo arriba de
+# este, sombreado por estas definiciones (en Python gana la última). El
+# duplicado eliminado era la trampa peligrosa: su SelfAdaptiveRiskPolicy NO
+# tenía los aliases lambda_t/gamma_t que pipeline.py y risk_bounded_layer
+# sincronizan — si alguien hubiera "deduplicado" borrando ESTE bloque (el
+# que parece copia), el pipeline habría roto en silencio. Estas definiciones
+# son las vigentes; no duplicar.
 # =============================================================================
 from dataclasses import dataclass as _dataclass
 from typing import Optional as _Optional
