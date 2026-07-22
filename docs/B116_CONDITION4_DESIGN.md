@@ -2,8 +2,13 @@
 
 **Fecha:** 2026-07-22
 **Rama:** `claude/pending-bugs-resolution-ream8s`
-**Estado:** MEDICIÓN + PROPUESTA. El gate sigue **SIN cablear** — cero callers
-de producción. Nada de este documento mueve un veredicto.
+**Estado:** EJECUTADO EN MODO SOMBRA (ver §5-bis) — decisión de Anna
+2026-07-22: WARN informativo. El gate quedó cableado como anexo
+`signal_quality_shadow` del scorer con **cero autoridad de veredicto**
+(corrida comparativa: 0 flips en 202 casos). Las secciones §1-§4 y §5 se
+conservan como registro histórico del razonamiento que llevó a esa
+decisión — sus afirmaciones "sin cablear" describen el estado ANTERIOR
+al §5-bis.
 **Alcance:** condición de desbloqueo 4 de B-116 ("un dry-run confirma 0 casos
 MALICE verdaderos degradados") medida con unidades honestas por primera vez.
 
@@ -140,6 +145,12 @@ exige: corrida comparativa nueva con gate pre-registrado + firma de Anna.
 
 
 ## 5. Qué NO propone este documento
+
+> **Nota de alcance (2026-07-22):** esta sección describe el estado previo
+> a §3-bis (los "27" eran la medición v1, luego corregida a 7) y previo a
+> la decisión WARN de §5-bis. Se conserva sin reescribir como registro del
+> razonamiento. Lo que sigue vigente sin cambios: no calibrar el
+> instrumento contra el resultado deseado, y no tocar la serie REAL/SRL.
 
 - No cablear nada hoy (condición 4 no cumplida; hacerlo degradaría 27 MALICE
   verdaderos a ABSTAIN).
