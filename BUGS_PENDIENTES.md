@@ -5805,6 +5805,22 @@ and docstring guard citing this bug.
 > scores que B-171 lee como fabricación y el gate como ruido). La
 > condición 4 queda bloqueada únicamente por la decisión doctrinal
 > cap-vs-WARN de Anna — ver §3-bis/§4 del diseño.
+>
+> **Update 2026-07-22 ter — CABLEADO EN MODO SOMBRA (decisión de Anna:
+> WARN, no cap):** `vigia/core/signal_quality_shadow.py` (línea base MODE C
+> congelada con proveniencia: dataset Tanda C sha256 60023fd5aef6bf41…)
+> + anexo `signal_quality_shadow` en el retorno principal de
+> `_vigia_score()` — evaluado DESPUÉS de fijar verdict/score/confidence,
+> import defensivo, contrato no-lanzar; cero autoridad de veredicto.
+> Corrida comparativa pre-registrada: **0 flips** de verdict/score/
+> confidence en 202 casos (snapshot antes de la edición vs después).
+> Distribución sombra: 117 QUALITY_OK, 84 WARN, 1 early-return sin anexo
+> (paths ERROR/exculpatorio retornan antes del Step 5 — esperado). Tests:
+> `tests/test_b116_shadow_mode.py` (5: presencia, cero autoridad, crash
+> del sombra no rompe scoring, no-imputación, no-lanzar). La promoción de
+> WARN a cualquier autoridad requiere corrida comparativa nueva + firma
+> de Anna. El estado POSPUESTO se levanta a: **CABLEADO COMO SOMBRA —
+> observación en curso**.
 
 | Campo | Valor |
 |-------|-------|

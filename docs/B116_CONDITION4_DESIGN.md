@@ -117,6 +117,28 @@ Los 7 restantes, verificados campo por campo, son TODOS clase C3
    0-flips y firma de Anna. Si 2 cierra en cap: NO cablear — degradaría
    7 MALICE reales del corpus.
 
+## 5-bis. EJECUTADO (2026-07-22, misma sesión — decisión de Anna: WARN)
+
+Anna resolvió el punto 2 como **WARN informativo**. Cableo sombra aplicado:
+
+- `vigia/core/signal_quality_shadow.py`: línea base MODE C congelada como
+  constantes con bloque de proveniencia (dataset, sha256, población,
+  método, falsador). Contrato: nunca lanza, nunca muta artefactos, cero
+  autoridad de veredicto.
+- `vigia_scorer._vigia_score()`: anexo `signal_quality_shadow` en el
+  retorno principal, evaluado DESPUÉS de fijar verdict/score/confidence,
+  con import defensivo (patrón CAIE en vivo). Los early-returns
+  (ERROR/exculpatorio) no llevan el anexo — retornan antes del Step 5.
+- **Gate pre-registrado cumplido: 0 flips** de verdict/score/confidence
+  sobre los 202 casos del corpus (snapshot pre-edición vs post-edición).
+  Distribución sombra: 117 QUALITY_OK / 84 WARN / 1 early-return.
+- Tests de contrato: `tests/test_b116_shadow_mode.py` (5).
+
+**Período de observación:** el anexo se acumula en bundles nuevos. La
+promoción de WARN a cualquier forma de autoridad (cap, factor, floor)
+exige: corrida comparativa nueva con gate pre-registrado + firma de Anna.
+
+
 ## 5. Qué NO propone este documento
 
 - No cablear nada hoy (condición 4 no cumplida; hacerlo degradaría 27 MALICE
