@@ -136,7 +136,15 @@ class SignalQualityGate:
         # acquisition/conversion placeholders (condition 4): a utility that
         # copied or hashed the artifact is not the analysis that produced
         # the signal.
-        for field in ("tool_name", "source_tool", "evidence_type"):
+        # B-116 MODE C (2026-07-22): `type` agregado como último eslabón.
+        # La serie VIGIA-REAL-*/SRL-* (el corpus más validado) declara el
+        # canal de adquisición en `type` (`registry`, `network_flow`,
+        # `bash_history`, ...) — la conversión nunca lo mapeó a
+        # evidence_type, y sin este eslabón 16 casos MALICE reales
+        # aparecían como mono-herramienta (clase C1 de
+        # docs/B116_CONDITION4_DESIGN.md). Mismo nivel epistémico que
+        # evidence_type: declaración del examinador sobre el canal.
+        for field in ("tool_name", "source_tool", "evidence_type", "type"):
             value = getattr(signal, field, None)
             if value is None and isinstance(signal, dict):
                 value = signal.get(field)

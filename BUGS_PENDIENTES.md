@@ -5792,6 +5792,19 @@ and docstring guard citing this bug.
 > C1), C3 tensión doctrinal mono-canal vs diversidad (6, cf. L-051). El
 > gate sigue SIN cablear. Camino al desbloqueo, gates pre-registrados y
 > decisiones pendientes de Anna: `docs/B116_CONDITION4_DESIGN.md`.
+>
+> **Update 2026-07-22 bis (excavación refutó C1/C2 — MALICE degradados
+> 27 → 7, todos doctrinales):** la serie REAL/SRL declara su canal en el
+> campo `type` que ni el gate ni el dry-run leían (C1 era artefacto del
+> instrumento, NO del corpus — backfill innecesario, corpus intacto), y
+> no transporta `raw_score` en JSON (C2 ídem: ahora
+> `UNMEASURABLE_FROM_JSON`, 24 casos). Fixes: eslabón `type` en
+> `_get_tool_name()` (tests `tests/test_b116_type_fallback.py`) +
+> honestidad de medición en `scripts/dryrun_b116_mode_c.py`. Residuo:
+> 7 casos, TODOS clase C3 doctrinal (mono-tool genuino o uniformidad de
+> scores que B-171 lee como fabricación y el gate como ruido). La
+> condición 4 queda bloqueada únicamente por la decisión doctrinal
+> cap-vs-WARN de Anna — ver §3-bis/§4 del diseño.
 
 | Campo | Valor |
 |-------|-------|

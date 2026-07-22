@@ -59,25 +59,63 @@ por primera vez el residuo tiene causas separables y accionables, y ninguna es
 "faltan z-scores" — esa condición (la 1) queda demostrada como resuelta en
 modo medición por este script.
 
-## 4. Camino propuesto al desbloqueo (en orden, cada paso con gate propio)
+## 3-bis. CORRECCIÓN por excavación (2026-07-22, misma sesión)
 
-1. **Backfill de metadata del corpus REAL/SRL** (resuelve C1, probablemente
-   reduce C2): poblar `evidence_type`/`source_tool` de esos ~20 casos desde
-   los bundles/narrativas originales. Toca el corpus más validado del
-   proyecto → **requiere tu autorización explícita**, con diff caso por caso
-   y sin tocar `raw_score` ni labels.
-2. **Re-medición MODE C post-backfill.** Gate pre-registrado: C1 = 0 y
-   C2 re-clasificada (débil real vs artefacto de baseline).
-3. **Decisión doctrinal sobre C3** (tuya, no de código): ¿el gate de calidad
-   actúa como cap de veredicto (choca con expected=MALICE mono-canal) o sus
-   checks de diversidad se degradan a WARN informativo cuando el scorer ya
-   aplicó su propio Daubert Corroboration Gate? Nota: el scorer YA tiene
-   corroboración de dos fuentes (vigia_scorer:1194-1240) — cablear el gate
-   con caps duplicaría esa doctrina con umbrales distintos.
-4. **Si y solo si 1-3 cierran:** cableo en **modo sombra** (shadow: el gate
-   evalúa y LOGUEA en pipeline_meta, sin tocar veredictos) por período de
-   observación, estilo B-129. Promoción a gate real solo con corrida
-   comparativa 0-flips y tu firma.
+La excavación del corpus (skill software-archaeology, autorizada por Anna
+antes de tocar nada) **refutó el diagnóstico de C1 y C2 como calidad de
+corpus** — eran artefactos del instrumento de medición:
+
+- **C1 refutada:** los 21 casos REAL/SRL declaran su canal de adquisición
+  en un campo `type` (`registry`, `network_flow`, `bash_history`,
+  `email_header`, ...) con diversidad real. El corpus nunca estuvo
+  degenerado — la cadena de fallback del gate y el dry-run no leían esa
+  clave. **Fix aplicado (sin tocar el corpus):** `type` agregado como
+  último eslabón de `_get_tool_name()` (módulo sin cablear, riesgo cero;
+  tests rojo-primero en `tests/test_b116_type_fallback.py`). El backfill
+  propuesto en §4 original quedó INNECESARIO.
+- **C2 refutada:** esos mismos casos no transportan `raw_score` en el JSON
+  (los scores los computa el pipeline del agente en memoria). El dry-run
+  imputaba 0.0 y los llamaba "débiles" — degradación deshonesta del
+  instrumento. **Fix aplicado:** clasificación `UNMEASURABLE_FROM_JSON`
+  (24 casos), excluidos de pasado/degradado y listados aparte.
+
+**Resultados corregidos (corpus: 178 medibles + 24 no-medibles-desde-JSON):**
+
+| | MODE B | MODE C v1 | **MODE C v2 (corregido)** |
+|---|---|---|---|
+| Degradados expected-MALICE | 42 | 27 | **7** |
+
+Los 7 restantes, verificados campo por campo, son TODOS clase C3
+(doctrinales, cero calidad de datos):
+
+| Caso | Razón gate | Estructura real |
+|---|---|---|
+| FF-GENUINE-001, case_003_false_flag | DEPENDENT | 2 de 3 señales de `list_processes` (66% > 60%) |
+| VIGIA-HMG-99999-11 | DEPENDENT | 3 de 4 de `search_pattern` (75%) |
+| VIGIA-REAL-M57-PAT-Dec11 | INSUFFICIENT | 3 de 3 de `vol3_windows_pslist` — mono-plugin genuino (caso L-051 de libro) |
+| VIGIA-CAN-009, CAN-018 | LOW_Z_VARIANCE | 4 tools distintas pero raws casi idénticos (0.90-0.95) — el gate lee uniformidad como "poca información"; la doctrina B-171 la lee como señal de fabricación. Tensión doctrinal genuina. |
+| VIGIA-CAN-046 | DEPENDENT | 3 de 4 de `sift_file_audit` (75%) |
+
+## 4. Camino al desbloqueo (actualizado post-corrección)
+
+1. ~~Backfill de metadata REAL/SRL~~ — **INNECESARIO** (refutado por
+   excavación; resuelto con el eslabón `type` sin tocar el corpus).
+2. **Decisión doctrinal sobre los 7 C3** (de Anna, no de código): ¿el gate
+   actúa como cap de veredicto (choca con expected=MALICE mono-canal) o
+   sus checks de diversidad/uniformidad se degradan a WARN informativo
+   dado que el scorer YA aplica su propio Daubert Corroboration Gate
+   (vigia_scorer:1194-1240)? Recomendación registrada: WARN — un cap
+   duplicaría doctrina con umbrales distintos, y el check de uniformidad
+   contradice frontalmente a B-171/STATISTICAL_UNIFORMITY.
+3. **Punto de cableo correcto:** los 24 casos UNMEASURABLE_FROM_JSON
+   demuestran que la medición definitiva solo existe DENTRO del scorer
+   (donde las señales ya tienen raw_score/z). El dry-run desde JSON es
+   cota inferior, no medición final.
+4. **Si 2 cierra en WARN:** cableo en **modo sombra** (el gate evalúa y
+   loguea en pipeline_meta, sin tocar veredictos) por período de
+   observación estilo B-129; promoción solo con corrida comparativa
+   0-flips y firma de Anna. Si 2 cierra en cap: NO cablear — degradaría
+   7 MALICE reales del corpus.
 
 ## 5. Qué NO propone este documento
 

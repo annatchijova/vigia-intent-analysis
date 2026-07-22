@@ -94,6 +94,7 @@ def main() -> None:
     reasons: Counter[str] = Counter()
     degraded_malice: list[str] = []
     fallback_types: Counter[str] = Counter()
+    unmeasurable: list[str] = []
     passed = 0
     evaluated = 0
     for path in cases:
@@ -103,12 +104,19 @@ def main() -> None:
             continue
         if not isinstance(case, dict):
             continue
+        arts = case.get("artifacts", [])
+        # Honestidad de medición (rev. 2026-07-22): la serie REAL/SRL no
+        # transporta raw_score en el JSON — los scores los computa el
+        # pipeline del agente en memoria. Imputar 0.0 producía la clase C2
+        # ("señales débiles") como artefacto del instrumento. Un caso sin
+        # raw_score completo NO es medible desde el JSON: se lista aparte,
+        # no se cuenta ni como pasado ni como degradado.
+        if not all(isinstance(a.get("raw_score"), (int, float)) for a in arts):
+            unmeasurable.append(path.stem)
+            continue
         sigs = []
-        for art in case.get("artifacts", []):
-            try:
-                raw = float(art.get("raw_score", 0.0))
-            except (TypeError, ValueError):
-                raw = 0.0
+        for art in arts:
+            raw = float(art["raw_score"])
             etype = str(art.get("evidence_type", "default"))
             if etype not in baseline:
                 fallback_types[etype] += 1
@@ -116,6 +124,10 @@ def main() -> None:
                 "tool_name": art.get("tool_name"),
                 "source_tool": art.get("source_tool"),
                 "evidence_type": etype,
+                # `type`: canal declarado por el examinador en la serie
+                # REAL/SRL — último eslabón del fallback de identidad de
+                # herramienta del gate (clase C1).
+                "type": art.get("type"),
                 "z_score": z_for(raw, etype, baseline, pooled),
             })
         result = gate.evaluate(sigs)
@@ -139,6 +151,11 @@ def main() -> None:
     print("\n  Evidence types WITHOUT own baseline (signals hit pooled fallback):")
     for t, n in fallback_types.most_common(15):
         print(f"    {t:28s} {n} signals")
+    print(f"\n  UNMEASURABLE_FROM_JSON (sin raw_score en el JSON — los scores")
+    print(f"  viven en el pipeline del agente; medirlos exige el punto de")
+    print(f"  cableo dentro del scorer, no este dry-run): {len(unmeasurable)}")
+    for stem in unmeasurable:
+        print(f"    - {stem}")
     print("\n  Gate remains UNWIRED. Condition 4 target: 0 degraded expected-MALICE.")
 
 
