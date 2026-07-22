@@ -5766,6 +5766,19 @@ and docstring guard citing this bug.
 > production callers): no verdict moved. Tests:
 > `tests/test_b116_placeholder_tools.py` (9, red-first).
 
+> **Update 2026-07-22 (clase B-206 purgada del gate; condición 4
+> re-medida sin cambios):** `_get_z_score()` devolvía `abs(z)` sin coerción
+> pese a declarar `-> float`; con z_scores `Fraction` (el transporte normal
+> del pipeline VIGÍA) los seis `f"{...:.2f}"` del módulo crashean en
+> Python < 3.12 (el pinneado por la CI) — reproducido. El crash era latente
+> por la misma razón que B-206: cero callers de producción. Fix:
+> `float(abs(...))` — contractual con la firma declarada; el gate opera en
+> espacio float por diseño (umbrales 2.0/0.5) y no está en el path sellado.
+> Tests: `tests/test_b116_gate_fraction_z.py` (4, rojo-primero; incluye
+> paridad Fraction/float). Dry-run re-medido post-fix: idéntico al
+> 2026-07-17 (MODE B: 87 pasan, 42 MALICE degradados) — la condición 4
+> sigue sin cumplirse, el gate sigue SIN cablear.
+
 | Campo | Valor |
 |-------|-------|
 | **Estado** | POSPUESTO — bloqueado por desajuste de interfaz y calidad de datos |
