@@ -9459,3 +9459,40 @@ alegación inverificable.
 `test_temporal_violations_none` nueva, `test_valid_high_severity_still_fires`);
 verdes con el fix. Suite completa (`tests/` + `vigia/tests/`, sin
 integration) verde antes del merge.
+
+---
+
+## B-206 — el material del signal_id formateaba Fraction con `.8f` — el bridge entero moría en Python 3.11 [RESUELTO — Claude 2026-07-22]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 en entornos con el Python pinneado por la CI (3.11): `CaseAdapter.artifact_to_signal()` fallaba para CADA artefacto, `to_signals()` terminaba en `CaseSchemaError` y el bridge de integración (Mode 4/API) quedaba 100% inoperante. En Python ≥ 3.12 el path funciona — por eso el bug fue invisible en las máquinas de desarrollo. |
+| **Archivo** | `vigia/pipeline/vigia_integration_bridge.py:755` (`_id_material`) |
+| **Modo** | Mode 4 / API (todo lo que entra por `VigiaIntegrationEngine.run_case`) |
+| **Detectado por** | Corrida de suite baseline post-merge codex en contenedor Python 3.11.15: `test_b184_keeps_a_valid_bundle_output_external` FAILED — único rojo de 1845. |
+
+**Observación reproducida (Firstness):** `TypeError: unsupported format
+string passed to Fraction.__format__` en
+`f"{raw_score:.8f}|{z:.8f}"` — `raw_score` y `z` son `Fraction`.
+`Fraction.__format__` con presentation types de float existe recién desde
+Python 3.12. La CI pinnea 3.11 en `pytest.yml` y `vigia-forensic-ci.yml`.
+
+**Por qué estuvo latente desde el origen (Thirdness):** el `except Exception`
+de `artifact_to_signal()` degradaba el crash a "artefacto ignorado", y antes
+de B-197 las señales descartadas se sellaban como decisión parcial sin error.
+El endurecimiento de B-197 (cero señales → `CaseSchemaError`, no sellar) más
+el test de B-184 que ejercita el camino feliz del bridge lo volvieron
+visible en la primera corrida sobre 3.11. La línea existe desde el import
+inicial del repo (`fb373be`).
+
+**Corrección aplicada:** helper `_decimal_8f()` — réplica exacta del formato
+`.8f` de 3.12+ en aritmética `Fraction` pura (`round(abs(x) * 10**8)`,
+half-even, sin floats). Los `signal_id` sellados en entornos 3.12+ NO
+cambian: misma cadena de material, mismo SHA-256. floats/ints conservan el
+comportamiento histórico de `f"{v:.8f}"`.
+
+**Validación:** roja primero (`test_b184_keeps_a_valid_bundle_output_external`
+en 3.11), verde con el fix. Tests nuevos:
+`tests/test_b206_fraction_format_signal_id.py` (6 — valores exactos, ties
+half-even, passthrough float, paridad con `format()` nativo en ≥3.12,
+conversión e2e del adaptador, determinismo del ID). Suite completa verde.
