@@ -7566,3 +7566,1605 @@ sealed-comparator contracts:
 A direct read-only OWL run with an internal temporary output emitted `ABSTAIN`
 (exit 4), and its top-level fingerprint matched the one recorded in
 `AGENT_INITIALIZED`.
+
+---
+
+## B-167 — The 500-SMS-body limit could hide a partial Android extraction [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 honest-degradation / mobile coverage. Does not turn content into intent or raise a verdict. |
+| **Files** | `vigia/sift/android_forensics.py`, root shim `sift_orchestrator.py`. |
+| **Detected by** | Codex audit while investigating the OWL-NEXUS5 false negative, 2026-07-21. |
+
+`AndroidForensicsAnalyzer._analyze_sms()` deliberately limited the reading of
+non-null bodies to 500 rows to bound resources, but the query had no
+`ORDER BY`, did not count the population of eligible bodies, and did not record
+whether the limit was reached. `total_sms` was exposed as if it described
+complete coverage. The shim only emitted `*_UNANALYZED` when the analyzer
+raised an exception; a partially inspected extraction could therefore blend in
+with other artifacts and contribute to a clean result without a loss marker.
+
+**Red test:** a synthetic SQLite `mmssms.db` with 501 non-null bodies
+returned `total_sms=501`, with no truncation attribute and no `unanalyzed`
+marker in the shim result. Body 501 was left out of the content query and the
+bundle had no way to distinguish it from a fully inspected database.
+
+**Fix applied:** the limit of 500 is kept, now with deterministic ordering
+`ORDER BY _id ASC`. The result declares `sms_analyzable_rows`,
+`sms_analyzed_rows` and `sms_content_truncated`; the `SignalOutput` preserves
+those fields. When bodies are omitted, the shim adds the derived signal
+`ANDROID_SMS_UNANALYZED` (`artifact_type=android_sms`, `z=0`,
+`signal_class=derived`). It adds no findings, does not score uninspected text,
+and does not fabricate corroboration; it uses the existing F7 mechanism so the
+agent sees `results.unanalyzed_artifacts` and does not generalize cleanliness
+to the unread suffix.
+
+This is independent of L-041: B-167 declares partial coverage; L-041 continues
+to document that, even within the 500 rows read, the extractor only models the
+calibrated rule of outbound mentions of encrypted apps and must not turn
+generic coordination language into intent.
+
+**Validation:** `tests/test_b167_android_sms_truncation.py` was written red
+against the previous HEAD and pins both the analyzer telemetry and the
+propagation of the marker to the shim's `n_unanalyzed_artifacts`.
+
+---
+
+## B-168 — The two FastAPI entry points promised the same gateway but exposed different contracts [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 API surface / deployment security. Does not alter scoring or bundles. |
+| **Files** | `vigia_api.py`, `vigia/vigia_api.py`, new `vigia/api_defaults.py` and `vigia/openai_compat.py`, `INSTALL.md`, `INSTALL_ES.md`. |
+| **Detected by** | Codex audit of the least-exercised surface (API), 2026-07-21. |
+
+Both modules described themselves as the FastAPI gateway for OpenWebUI, but
+only the root script exposed the OpenAI-compatible contract that client needs:
+`GET /v1/models` and `POST /v1/chat/completions`. Running or importing
+`vigia.vigia_api` produced an API that looked healthy (`/health`, `/cases` and
+the two direct endpoints) but could not complete the OpenWebUI handshake. At
+the same time, the packaged wrapper accepted CORS from `*`, while the root one
+applied an explicit list. The difference allowed a choice of import path to
+change both the published functionality and the browser boundary, with no
+signal to the operator.
+
+**Red test:** `tests/test_b168_api_contract_parity.py` failed against the
+previous HEAD: both endpoints were missing under `vigia.vigia_api` and
+inspection of `app.user_middleware` found `allow_origins=['*']` only in that
+wrapper.
+
+**Fix applied:** the OpenAI-compatible shim now lives exactly once in
+`vigia/openai_compat.py` and both wrappers install it with their own
+pipeline/narrative functions. `vigia/api_defaults.py` centralizes the default
+loopback host, port and CORS so the two entry points cannot diverge again.
+The install documents now reflect the real host `127.0.0.1`, the real state of
+`/health`, and declare the important limit: the API does not validate keys,
+CORS does not authenticate, and remote exposure requires an authenticated
+reverse proxy and a deliberate network policy. No credential protocol
+incompatible with OpenWebUI was invented.
+
+**Validation:** the parity test pins endpoints, CORS and execution of the
+stubbed local pipeline from both imports; together with
+`tests/test_vigia_api_boundaries.py`: **23 passed**. The tests open no
+sockets and read no files outside fixtures.
+
+---
+
+## B-169 — The MCP audit trail omitted most tool invocations [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 execution provenance (Mode 2 / Mode 5). Does not modify verdicts, the scorer or existing bundles. |
+| **Files** | `vigia/vigia_sift_bridge.py`, `KNOWN_LIMITATIONS.md`, `tests/test_b169_mcp_invocation_audit.py`. |
+| **Detected by** | Codex review of the MCP surface and L-057 follow-up, 2026-07-21. |
+
+The active bridge had three hand-written `TOOL_INVOKED` events
+(`list_files`, `read_evidence`, `generate_forensic_hash`), but other tools
+with relevant consequences — `search_pattern`, `mount_sift_evidence`,
+`reason_with_llm` and honey token activation/deactivation — could execute with
+no entry event. In addition, the external tools registered with
+`mcp.tool()(...)` at the end of the file crossed no common boundary. The trail
+could show a result or an internal log, but could not uniformly demonstrate
+that the tool had been invoked with a given class of parameters.
+
+**Red test:** a stubbed call to `search_pattern` returned normally with zero
+`TOOL_INVOKED` events; an AST contract found 22 direct MCP decorators and
+multiple external registrations that bypassed any common wrapper.
+
+**Fix applied:** `_register_mcp_tool()` is now the single MCP registration
+path. It wraps both the 22 local tools and the optional external ones and
+writes `TOOL_INVOKED` before rate limiting, validation, sandboxing or
+execution. The telemetry keeps argument name, type/cardinality and a SHA-256
+of a prefix of up to 4 KiB for `str`/`bytes`; it does not dump evidence text,
+prompts, paths or secrets into the log just to audit the call. The three
+previous manual logs were removed so events are not duplicated.
+
+**Honest limit:** the change attests the entry within the bridge process that
+wrote the HMAC chain. It does not by itself authenticate the MCP client, does
+not retroactively make earlier bundles complete, and does not prove wall-clock
+time or that a post-hoc response came from a live session.
+
+**Validation:** `tests/test_b169_mcp_invocation_audit.py` proves that a search
+logs the entry before processing the sensitive pattern and that no
+registration evades the shared boundary. Together with the B-164 mount
+contract: **13 passed**. The test mounts no images and runs no real
+subprocess.
+
+---
+
+## B-170 / L-063 — The CAIE fallback granted verdict authority to fractures declared in JSON [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Limitation closed** | `L-063` — resolved by honest degradation: JSON keeps declared evidence, not verdict authority. |
+| **Severity** | P2 verdict integrity/authority in degraded mode. |
+| **File** | `vigia_scorer.py`, `KNOWN_LIMITATIONS.md`, `tests/characterization/test_verdict_authority_inputs.py`. |
+| **Detected by** | Closure of L-063, after the sweep of verdict-authority inputs. |
+
+When `vigia.tools.caie` could not be imported, `_vigia_score()` retrieved
+`case["caie_fractures"]` and used it as if it were CAIE output. A caller who
+knew a recognized malicious `fracture_type` could declare a high-severity
+fracture and obtain a deterministic `NOISE -> SUSPICION` jump, without the
+producer that normally derives that claim ever having run. The field
+`caie_fractures_source="json_fallback"` was sealed, but a provenance label
+does not by itself remove authority that has already been applied.
+
+**Red test:** the characterization case deliberately blocks the CAIE import
+and supplies a single `FALSE_FLAG_PATTERN` from JSON. Before B-170 the result
+was `SUSPICION` and `fracture_malice_boost > 0`; the input came neither from
+artifacts nor from a live CAIE run.
+
+**Fix applied:** declared fractures remain as auditable material
+(`caie_fracture_details`), but in fallback they participate in neither the
+malice boost nor the credibility penalty. The result declares
+`caie_fracture_authority="unverified_json_no_verdict_authority"`. If the list
+contains a type CAIE would recognize, the producer's absence becomes
+decision-relevant: VIGÍA emits `ABSTAIN`, keeps the list in
+`unverified_json_caie_fractures`, and records the pre-gate verdict/score
+reason. The system thus fabricates neither an escalation nor a clean bill from
+an unverifiable claim; it demands a re-run with live CAIE.
+
+**Deliberate limit:** B-170 does not invent a producer or try to validate a
+fracture from free text. It also does not modify live CAIE: when available, it
+keeps recomputing its fractures from artifacts and retains its normal
+authority. L-064 and L-065 are distinct authority channels and remain open.
+
+**Validation:**
+`tests/characterization/test_verdict_authority_inputs.py::TestT1FallbackFractureAuthority`
+verifies: recognized JSON + absent CAIE = `ABSTAIN`, boost `0`, sealed
+disclosure; unrecognized type = inert; live CAIE = recomputes and discards the
+JSON.
+
+---
+
+## B-171 / L-064 — `STATISTICAL_UNIFORMITY` declared in JSON could raise the verdict in all modes [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Limitation closed** | `L-064` — resolved by honest degradation: declared regularity remains visible, but is not the output of a scorer producer. |
+| **Severity** | P2 verdict integrity/authority, with scope across all modes. |
+| **File** | `vigia_scorer.py`, `KNOWN_LIMITATIONS.md`, `tests/characterization/test_verdict_authority_inputs.py`, `tests/test_audit_gates.py`. |
+| **Detected by** | Closure of the T-2 verdict-authority input channel. |
+
+`temporal_violations[].type == "STATISTICAL_UNIFORMITY"` added
+`severity * 0.35` to `fracture_malice_boost` even when no module in the
+scorer's runtime had computed that statistic. A hand-built JSON could move
+`NOISE -> SUSPICION` both with live CAIE and without CAIE. The existence of a
+jitter MCP tool did not mitigate the problem: it receives a different input
+shape, uses a different contract, and fed neither the bundle nor the scorer.
+
+**Red test:** a base of three low-score logs receives a single
+`STATISTICAL_UNIFORMITY` from JSON. Before B-171 it emitted `SUSPICION` with a
+positive boost in both modes. The characterization also confirmed the real
+impact: `case_002_log_fabrication` moved from `UNKNOWN` (0.0839) to
+`SUSPICION` (0.3354) on that declaration alone.
+
+**Fix applied:** the scorer no longer adds SU terms to the accumulator nor
+lets that declaration reduce trust via `_compute_temporal_factor`. The
+declaration is preserved in `unverified_statistical_uniformity_violations` and
+the `statistical_uniformity_authority` field explicitly declares it holds no
+authority. When it appears, the final result is `ABSTAIN`, keeps the previous
+verdict and score reason, and demands a re-run with a deterministic producer
+that derives the regularity from raw intervals.
+
+**Deliberate limit:** the jitter MCP tool was not pretended to be that
+producer, nor were `interval_seconds_std`, `uniformity_flag` or narrative text
+accepted as computed proof. Building the correct detector requires a new
+contract of raw temporal sequences, exact arithmetic, a negative corpus and
+calibration. The scenario label of `case_002_log_fabrication` is kept; the
+engine now honestly abstains until that evidence exists.
+
+**Validation:** `TestT2StatisticalUniformity` proves `ABSTAIN`, boost `0` and
+exact score/trust identity against the same evidence without SU, with CAIE
+live and down. The regressions for live CAIE fractures, Decimal severity and
+the independent corroboration gate are preserved with a test-only live CAIE
+fracture, not with a JSON boost.
+
+---
+
+## B-172 / L-062 — a temporal declaration could impose `MALICE` without matching the artifacts [MITIGATED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Limitation mitigated** | Authority portion of `L-062`: a JSON `EFFECT_BEFORE_CAUSE` claim can no longer trigger the categorical gate on its own. The H-01 clock tolerance remains open. |
+| **Severity** | P2 verdict integrity/authority, with scope across all modes that call the deterministic scorer. |
+| **File** | `vigia_scorer.py`, `tests/test_b172_hard_temporal_pair_validation.py`, `tests/characterization/test_temporal_gate_curve.py`, `KNOWN_LIMITATIONS.md`, `docs/CODEX_AUDIT_2026-07-21.md`. |
+| **Detected by** | Audit of verdict-authority inputs and the L-062/H-01 temporal characterization curve. |
+
+The historical gate evaluated only the declaration
+`temporal_violations[].type == "EFFECT_BEFORE_CAUSE"` and a high severity. If
+the JSON asserted a five-second inversion, the scorer emitted `MALICE` even
+though the timestamps of the actual artifacts showed the alleged effect
+occurred after the cause. The nested copy of timestamps and `delta_seconds`
+were an examiner's allegation, not a verifiable derivation.
+
+**Red test:** `test_asserted_inversion_contradicted_by_artifacts_abstains`
+declares `effect < cause`, but supplies artifacts where the effect happens two
+seconds after the cause. Before B-172 it obtained `MALICE`; that conclusion
+was not falsifiable from the source evidence.
+
+**Fix applied:** B-172 rebuilds the pair from unique artifact IDs and their
+top-level ISO-8601 timestamps. Both timestamps must carry an explicit
+timezone, belong to CAIE's fixed plausibility window and actually satisfy
+`effect < cause`. Only that verified pair keeps the historical gate. A
+high-severity allegation that does not verify is retained in
+`unverified_hard_temporal_violations`, is excluded from all temporal
+penalties, and produces `ABSTAIN`, with the reason and prior pair sealed. The
+result exposes `hard_temporal_authority` and, when it exists, the validated
+pair.
+
+**Deliberate limit:** this does not decide H-01. A real inversion, even a
+sub-second one, keeps the previous categorical gate for now; the two `xfail`
+tests in `tests/test_audit_temporal_skew.py` continue to mark that pending
+doctrine. Nor does it replace L-065: B-172 validates coherence between the
+allegation and the artifacts present, it does not by itself authenticate the
+provenance chain.
+
+**Validation:** 74 tests pass and 4 documented `xfail` are preserved in the
+temporal authority, CAIE, `Fraction` and `Decimal` severity battery. The
+canonical case with a real five-second inversion keeps `MALICE`; a
+contradicted allegation or one with a missing artifact now emits `ABSTAIN`.
+
+---
+
+## B-173 — importing the MCP bridge mutated `VIGIA_EVIDENCE_DIR` with operational state [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 forensic integrity: the mutation occurred before reading any artifact and changed the listing/mtime of the evidence tree. |
+| **File** | `vigia/vigia_sift_bridge.py`, `tests/test_b173_bridge_work_root.py`, `tests/test_b164_mcp_mount_root.py`, `CLAUDE.md`. |
+| **Modes** | Active MCP (`launch_vigia_mcp.sh` runs this bridge); any import of the module with `VIGIA_EVIDENCE_DIR` set. |
+| **Principle affected** | Invariant 1 of `CLAUDE.md`: evidence is read-only; extracted artifacts must go to a separate working directory. |
+
+**Reproduced observation:** with an empty evidence directory,
+`VIGIA_EVIDENCE_DIR=<evidence> python3 -c 'import vigia.vigia_sift_bridge'`
+immediately created `honey_tokens/`, `purgatory/` and `mounted/` under the
+input. No tool invocation was needed. B-164 had made the mount reachable by
+placing it under the same read root; that repaired an impossible gate but
+conflated the input root with the operational root.
+
+**Fix applied:** B-173 introduces `VIGIA_WORK_DIR`, a private `0700` root
+disjoint from evidence. If not configured, the bridge creates a private
+per-process temporary root. Honey tokens, quarantine and mount points live
+there. The bridge rejects, before creating any directories, a workdir that is
+nested in, equal to, or a parent of `VIGIA_EVIDENCE_DIR`, and also rejects
+symlink components. The read tools accept only the original evidence or the
+controlled subtree `WORK_BASE_DIR/mounted`; the source of
+`mount_sift_evidence` remains restricted exclusively to original evidence.
+
+**Validation:** 30 MCP tests pass: subprocess import without mutating
+evidence, rejection of an unsafe workdir, mount root readable but confined,
+malformed/symlink targets rejected, invocation auditing and grep
+sanitization.
+
+**Deliberate limit:** the Purgatory keeps an operational copy and its hash; it
+does not relabel it as source evidence, nor does it by itself resolve L-065
+(authentication of provenance chains). The working directory must be
+explicitly preserved if the operator needs to retain that state across
+restarts.
+
+---
+
+## B-174 — `safe_grep` authorized a sibling directory by textual prefix [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 confidentiality: an MCP search could read outside its authorized roots if the external directory shared the textual prefix. |
+| **File** | `vigia/security/sandbox.py`, `tests/test_b174_safe_grep_allowed_root.py`. |
+| **Mode** | MCP `search_pattern`, via the reusable helper `safe_grep(..., allowed_dirs=...)`. |
+| **Principle affected** | The allowed-directory list expresses a filesystem authority boundary, not a string match. |
+
+**Reproduced observation:** with an allowed root `.../evidence`, a sibling
+directory `.../evidence-escape/private.txt` and
+`allowed_dirs=[".../evidence"]`, the previous guard did
+`safe_folder.startswith(allowed_dir)`. The condition was true and `find` +
+`grep` returned the contents of `private.txt`, even though it was not a
+descendant of the authorized evidence.
+
+**Fix applied:** allowed roots are canonicalized and required to exist, be
+directories, and contain no symlinks; membership is then evaluated by `Path`
+components (`==` or `is_relative_to`), never by text prefix. A real subfolder
+remains readable; a sibling, an invalid root or a symlink is rejected before
+the subprocess starts.
+
+**Validation:** 32 sandbox/MCP tests pass, including the reproduction that
+previously leaked the external text and the positive control of a real child
+folder. The change modifies no signals, score or verdict: it exclusively
+reduces the tool's read authority.
+
+---
+
+## B-175 — the graph exporter could write inside evidence [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 forensic integrity: a derived artifact could appear next to the input and change the tree that had to be preserved. |
+| **File** | `vigia/abduction/vigia_artifact_graph.py`, `tests/test_b175_artifact_graph_output_boundary.py`. |
+| **Modes** | Artifact Graph CLI: JSON, GEXF and GraphML. |
+| **Principle affected** | `VIGIA_EVIDENCE_DIR` is immutable input, even when it resides under a general allowed output root such as `/home` or `/tmp`. |
+
+**Reproduced observation:** the CLI built the default JSON output with
+`bundle_path.with_suffix(".graph.json")` and wrote it directly with
+`Path.write_text`, without going through `_validate_output_path`. A bundle at
+`VIGIA_EVIDENCE_DIR/case.json` therefore produced
+`VIGIA_EVIDENCE_DIR/case.graph.json`. The GEXF/GraphML exporters did call the
+validator, but it allowed any path under `/home` or `/tmp` without excluding
+the evidence root and only checked for a symlink in the immediate parent.
+
+**Fix applied:** JSON, GEXF and GraphML use the same validation. The target
+and `VIGIA_EVIDENCE_DIR` are canonicalized and compared by components; any
+target inside evidence, even via a redirect, aborts. Allowed-root validation
+also moved from text prefix to `Path.is_relative_to`, and every existing
+component of the output path is inspected with `lstat`: an intermediate or
+final symlink is rejected before writing.
+
+**Validation:** four regressions cover direct export into evidence, an
+intermediate redirect, the JSON CLI with its default output and a real child
+folder of an allowed root. Together with the B-164/B-169/B-173/B-174 bridge
+and sandbox tests, 36 tests pass. The fix affects write destinations
+exclusively; it changes neither the logical content of the graph nor
+verdicts.
+
+---
+
+## B-176 — the expert-report PDF rejection happened after creating a folder inside evidence [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 forensic integrity: an invalid PDF configuration altered the evidence tree even when it did not generate the PDF. |
+| **File** | `vigia/tools/adversarial_nlp.py`, `tests/test_b176_pericial_pdf_evidence_boundary.py`. |
+| **Mode** | Stylometric register analysis that activates the optional expert-report PDF. |
+| **Principle affected** | Validate the destination before any side effect; `VIGIA_EVIDENCE_DIR` never receives derived state. |
+
+**Reproduced observation:** `_export_pdf()` ran
+`os.makedirs(VIGIA_PERICIAL_PDF_DIR, exist_ok=True)` before checking whether
+the PDF ended up under `VIGIA_EVIDENCE_DIR`. With
+`VIGIA_PERICIAL_PDF_DIR=<evidence>/generated-reports`, the method correctly
+returned `None` and logged `PDF_EXPORT_INTO_EVIDENCE_DIR`, but had already
+created `generated-reports/` inside the evidence.
+
+**Fix applied:** the target is built and compared canonically with the
+evidence root before `makedirs`; the test uses component-wise membership
+(`==` / `is_relative_to`), so `evidence-copy` is not blocked by accident and a
+symlink into evidence cannot hide the destination. Only if the target is
+external is the folder created and the renderer invoked.
+
+**Validation:** two regressions prove that the rejection leaves the evidence
+empty and that the external flow creates the directory, calls the renderer
+and preserves the evidence. The combined battery of export boundaries,
+sandbox and MCP stands at 38 tests passing. No analyses, signals or verdicts
+are modified.
+
+---
+
+## B-177 — the autonomous agent allowed bundles inside evidence if the CWD matched [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 forensic integrity: the sealed bundle, checksum and trace could contaminate the input evidence. |
+| **File** | `vigia_agent.py`, `tests/test_b177_agent_output_evidence_boundary.py`. |
+| **Mode** | Autonomous agent CLI (Mode 1 / batch). |
+| **Principle affected** | Being inside the allowed CWD does not authorize writing inside the evidence; both boundaries are necessary. |
+
+**Reproduced observation:** the previous guard only verified that
+`Path(output).resolve()` was a descendant of `Path.cwd()`. An operator running
+`vigia_agent.py` from `VIGIA_EVIDENCE_DIR` received the default output
+`<case-id>_bundle.json` inside that same evidence. `atomic_write_text` could
+additionally create the parent directories, and the flow wrote three siblings:
+the bundle, `.sha256` and `_reasoning_trace.json`.
+
+**Fix applied:** `_validate_agent_output_path()` defines a testable contract:
+it canonicalizes the target, requires membership in the workdir and rejects,
+by components, any overlap with `VIGIA_EVIDENCE_DIR`. `main()` calls it before
+constructing the agent or writing files and uses the resulting absolute path
+for the three associated artifacts. The change preserves the normal outputs
+in `results/` and rejects destinations outside the CWD as before.
+
+**Validation:** three regressions cover the default output with CWD=evidence,
+an explicit target inside evidence and a valid `results/` sibling. The B-105
+end-to-end bundle/trace/checksum test and the B-175 and B-176 boundaries also
+pass. It alters neither the analysis nor the verdicts, only their write
+destination.
+
+---
+
+## B-178 — SQLite export for SIFT could write derived artifacts inside evidence [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 forensic integrity: a copy of the expert database could appear in the source evidence tree. |
+| **File** | `vigia/tools/forensic_db.py`, `tests/test_b178_forensic_db_export_boundary.py`. |
+| **Mode** | Optional SIFT export of the expert analysis (`export_db_path`), available through `analyze_document_register`. |
+| **Principle affected** | A caller-controlled output path is write authority; evidence cannot receive derived copies either by direct path or by redirect. |
+
+**Reproduced observation:** `ForensicDatabaseManager.export_for_sift()`
+canonicalized only the final name, created the parent if missing and passed
+the path to `sqlite3.Connection.backup()`. It never consulted
+`VIGIA_EVIDENCE_DIR`. An external source DB with
+`export_path=<evidence>/sift-export.db` created the SQLite copy inside
+evidence. A symlink parent (`export-redirect -> evidence`) could also
+redirect the export, because only the final file — which did not yet exist —
+was inspected.
+
+**Fix applied:** `_validate_sift_export_path()` rejects an empty path or one
+containing NUL, inspects every existing component with `lstat` and rejects
+symlinks, canonicalizes the target and forbids, by components, any overlap
+with `VIGIA_EVIDENCE_DIR`. The first validation happens before `makedirs`; a
+second happens after creating an external parent, before SQLite opens the
+file. The flow preserves legitimate export to an external workdir.
+
+**Validation:** three regressions cover the direct write that previously
+occurred, the symlink parent that resolved inside evidence and the positive
+control of an external SQLite export. Together with B-175/B-176/B-177, 12
+tests pass. It modifies no signals, scores or verdicts; it only reduces the
+output authority of an expert tool.
+
+---
+
+## B-179 — the expert configuration template could contaminate evidence [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 forensic integrity: an auxiliary operation could create directories and overwrite a configuration file in the source evidence. |
+| **File** | `vigia/tools/adversarial_nlp.py`, `vigia/tools/forensic_db.py`, `tests/test_b179_config_template_evidence_boundary.py`. |
+| **Mode** | `ForensicEngine.save_config_template()` / `ConfigLoader.save_default_config()` API. |
+| **Principle affected** | The fact that an output is a template rather than an analytical result grants it no authority over `VIGIA_EVIDENCE_DIR`. |
+
+**Reproduced observation:** `ConfigLoader.save_default_config(path)` converted
+the path to absolute, ran `os.makedirs(parent)` and opened the file in `"w"`
+mode, without consulting the evidence root. With
+`path=<evidence>/templates/defaults.json` it created `templates/` and wrote
+the configuration JSON. The behavior was reachable through the expert
+engine's public facade `save_config_template()`.
+
+**Fix applied:** B-179 extracts `validate_external_output_path()` as the
+common output contract for the SQLite manager and the template. It rejects
+empty and NUL, existing symlink components, and any destination that is
+canonically a descendant of `VIGIA_EVIDENCE_DIR`. Each caller applies it
+before creating parents and again afterwards, before opening/writing. The
+external template remains supported; the B-178 tests keep the coverage of the
+SIFT export over the same guard.
+
+**Validation:** three regressions cover the direct destination inside
+evidence, the symlink parent that resolves to evidence and the external
+positive control. The B-175 through B-179 family stands at 15 tests passing.
+The change touches no detection, score, modeling or verdicts: it only removes
+improper write authority.
+
+---
+
+## B-180 — sealed-bundle builder could write into evidence and accept traversal via `case_id` [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: a packaging API could contaminate the source with a copied PDF, ledger, manifest, signature, and ZIP; the case identifier could also escape the external output. |
+| **File** | `vigia/security/output_boundary.py` (new), `vigia/pipeline/evidence_bundle.py`, `vigia/tools/forensic_db.py`, `vigia/tools/adversarial_nlp.py`, `tests/test_b180_evidence_bundle_output_boundary.py`. |
+| **Mode** | `build_evidence_bundle()` of the verifiable-bundles API; the shared guard additionally covers SIFT and expert-report templates. |
+| **Principle affected** | An output directory and a case identifier are both authority inputs. No derived artifact may cross into `VIGIA_EVIDENCE_DIR`. |
+
+**Reproduced observation:** `build_evidence_bundle()` executed
+`os.makedirs(output_dir)` without validation, then wrote under
+`<output_dir>/<case_id>_bundle/` the PDF, `ledger.json`, `manifest.json`, and
+potentially signature/ZIP. With `output_dir=<evidence>` the entire bundle was
+created inside the source. Even after validating only `output_dir`, a
+`case_id="../evidence/b180"` would have allowed `os.path.join()` to build a
+bundle outside the external root. An output directory symlinked to evidence
+was the third, equivalent vector.
+
+**Fix applied:** B-180 moves the generic contract to
+`vigia.security.output_boundary`: `validate_external_output_path()` validates
+empty/NUL, rejects every symlink component via `lstat`, canonicalizes and
+blocks component-wise membership in `VIGIA_EVIDENCE_DIR`, both before and
+after creating an external parent. It is used by the bundle, the SIFT export,
+and the config template. The builder additionally validates that `case_id` is
+a non-empty label without NUL, separators, or `.`/`..`; all its child paths are
+derived only from that safe ID.
+
+**Validation:** four B-180 regressions cover direct output into evidence,
+external positive control, traversal via ID, and symlinked output. Together
+with B-178/B-179 and the B-062/B-064 atomicity/registry regressions, 21 tests
+pass. The fix does not modify forensic content, scores, or verdicts; it
+restores the separation between preserved input and derived bundle.
+
+---
+
+## B-181 — `EvidenceLedger.export_json()` had atomicity without an output boundary [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: a chained ledger could be written into the source evidence, via a direct path or a symlinked parent. |
+| **File** | `vigia/pipeline/security_evidence_registry.py`, `tests/test_b181_evidence_ledger_export_boundary.py`. |
+| **Mode** | `EvidenceLedger.export_json(path)` API. |
+| **Principle affected** | An atomic write preserves the destination ledger, but does not authorize that destination to be the source evidence. Atomicity and authorization are distinct guarantees. |
+
+**Reproduced observation:** the export correctly used
+`atomic_write_text(path, ...)`, but received `path` without validation. With
+`path=<evidence>/ledger.json` it created the ledger inside the preserved
+input. With a parent `ledger-redirect -> evidence`, the atomic helper created
+the tempfile and published the JSON through the symlink. Both outcomes were
+induced before the patch; the external export served as the positive control.
+
+**Fix applied:** the ledger passes its destination through
+`validate_external_output_path()` before creating the parent and a second time
+before invoking `atomic_write_text`. It retains the B-064 atomic write, so the
+new check adds authorization without weakening crash resistance. The error is
+fail-closed (`SecurityError`) and leaves no tempfiles or directories inside
+evidence.
+
+**Validation:** three regressions cover a direct destination, a symlinked
+parent, and an external export; with B-178 through B-180 and the B-062/B-064
+regressions, 24 tests pass. The JSON, the hash chain, and their semantics do
+not change.
+
+---
+
+## B-182 — the forensic PDF exporter v2 could publish inside evidence [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: a derived PDF view could appear in the source evidence tree, without atomic publication. |
+| **File** | `vigia/pipeline/report_exporter_v2.py`, `tests/test_b182_report_pdf_output_boundary.py`. |
+| **Mode** | Optional `export_pdf()` API of the standalone forensic exporter. |
+| **Principle affected** | A renderer does not gain write authority over evidence by receiving an `output_path`; a derived output must be confined and published atomically. |
+
+**Reproduced observation:** after building the PDF bytes, `export_pdf()`
+opened the caller-supplied `output_path` in binary write mode. There was no
+check against `VIGIA_EVIDENCE_DIR`, so `<evidence>/report.pdf` was a valid
+destination; a symlinked parent could also redirect the publication.
+`reportlab` is not installed in this environment despite being a declared
+dependency, so the regression installs a minimal simulated renderer and
+exercises the real build/publish branch: that isolates the filesystem boundary
+and reproduces the two writes before the fix without letting local renderer
+availability become an excuse not to test it.
+
+**Fix applied:** the exporter validates the destination through the shared
+contract `validate_external_output_path()` before rendering. Once the bytes
+are ready it creates only the external parent, validates again to close the
+redirection window, and uses `atomic_write_bytes()` to publish. The returned
+metadata contains the validated canonical path. External outputs remain
+supported; destinations inside evidence or passing through a symlink fail
+closed with `SecurityError` without creating source files.
+
+**Validation:** three B-182 regressions cover a direct destination inside
+evidence, a symlinked parent, and an atomic external PDF. Together with B-178
+through B-181 and B-062/B-064, 27 tests pass. It does not affect analytical
+content, report hashes, scores, or verdicts; it exclusively limits publication
+authority.
+
+---
+
+## B-183 — `BundleBuilder.save()` could seal a result inside evidence [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: the central bundle-publication API could create or replace a derived JSON inside the source evidence. |
+| **File** | `vigia/core/bundle_builder.py`, `tests/test_b183_bundle_builder_output_boundary.py`. |
+| **Mode** | Python API `BundleBuilder.save()`, consumed by `run_vigia`, the CLI, and the integration bridge. |
+| **Principle affected** | Cryptographic sealing proves the bundle's content, it does not authorize its destination. A chain of custody cannot begin by modifying the evidence it purports to describe. |
+
+**Reproduced observation:** although B-064 already guaranteed tempfile,
+`fsync`, `replace`, and hash-from-disk, `BundleBuilder.save()` accepted an
+arbitrary path and executed `makedirs()` on its parent. With
+`path=<evidence>/bundle.json` it wrote the sealed bundle into the source. With
+a parent `bundle-redirect -> evidence`, the tempfile and the `replace` were
+published through that redirection. Both failures were induced before the
+change; an external destination was the positive control.
+
+**Fix applied:** the public sink validates the destination with
+`validate_external_output_path()` before creating the directory and a second
+time before opening the tempfile. The API, `run_vigia`, its CLI, and any
+future caller thus inherit the boundary, without relying on each facade
+remembering to validate. The B-064 protocol is preserved intact: same
+canonical serialization, `fsync`, atomic publication, and hash computed from
+what was written.
+
+**Validation:** three B-183 regressions cover direct output into evidence, a
+symlinked parent, and a verifiable external bundle. The three L-023 atomic
+regressions and the pipeline's two import/verify tests also pass: 6 selected.
+It does not alter the in-memory bundle or the verdict: it only denies a
+destination that should never have had write authority.
+
+---
+
+## B-184 — the integration bridge could create outputs in evidence and escape via `case_id` [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: the bridge could create its results tree inside evidence; additionally, a case ID with separators redirected the report writer outside the declared output. |
+| **File** | `vigia/pipeline/vigia_integration_bridge.py`, `tests/test_b184_integration_bridge_output_boundary.py`. |
+| **Mode** | `VigiaIntegrationEngine.run_case()` — used by the demo, the MCP bridge, and Python callers of the legacy ↔ EBS integration. |
+| **Principle affected** | `output_dir` and `case_id` are distinct write-authority inputs. The former must stay outside evidence and the latter must be data, not a derived path. |
+
+**Reproduced observation:** the engine converted `output_dir` to absolute and
+executed `os.makedirs()` before calling the pipeline. With
+`output_dir=<evidence>/bridge-output` it created the source directory even
+when no bundle or report was requested; a symlinked output had the same
+effect. The second vector was more serious: `case_id="escape/../../evidence/pwn"`
+produced `report_escape/../../evidence/pwn.json`. With an existing external
+component, `atomic_write_text()` resolved those `..` and published a real JSON
+inside evidence. The regression reproduced it through the bridge flow, with
+minimal simulated pipeline and renderer, not by computing isolated paths.
+
+**Fix applied:** when any output is requested, the bridge validates the
+directory before creating anything and validates it again before deriving
+artifacts. The bundle and the report additionally pass through the guard right
+before use. `case_id` now only accepts non-empty labels without NUL, `.`/`..`,
+or platform separators; it is rejected before normalization or the pipeline.
+When no output is requested, the bridge stops creating an unnecessary
+directory.
+
+**Validation:** four B-184 regressions cover direct output inside evidence,
+symlinked output, real traversal via `case_id` into the report writer, and a
+valid external bundle. The B-178 through B-184 family plus B-062/B-064 passes
+34/34. It does not change evidence, score, or decision; it restores
+confinement and prevents a case identifier from becoming a write.
+
+---
+
+## B-185 — the operational SQLite could use evidence as default storage [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: ACP profiles, temporal history, and the SQLite audit trail could create the DB, WAL, and lockfile inside the evidence tree. |
+| **File** | `vigia/tools/forensic_db.py`, `vigia/tools/nlp_constants.py`, `tests/test_b185_forensic_db_source_boundary.py`, `tests/test_entanglement_groundtruth.py`, `README.md`, `CLAUDE.md`. |
+| **Mode** | Implicit `ForensicDatabaseManager()` in ACP, temporal, and Entanglement; also the constructor with an explicit `db_path`. |
+| **Principle affected** | Analyst persistence is operational state, not evidence. A singleton cannot take an input root as a write fallback. |
+
+**Reproduced observation:** without `db_path`, the singleton composed
+`$VIGIA_EVIDENCE_PATH/vigia_forensic.db` (or `/mnt/evidence`) and enabled WAL.
+In an investigation with the legacy root pointing at evidence, mere
+construction created the database and its sidecars. The explicit constructor
+also did not consult `VIGIA_EVIDENCE_DIR`: it accepted both
+`<evidence>/vigia_forensic.db` and `db-redirect -> evidence` followed by
+`db-redirect/vigia_forensic.db`. All three paths were induced before the
+patch; an external DB was the positive control.
+
+**Fix applied:** `VIGIA_FORENSIC_DB_PATH` is introduced as the explicit
+destination. Without it, the safe order is `VIGIA_WORK_DIR/vigia_forensic.db`
+and, if that is not configured either, an XDG-style user state directory. The
+legacy variable `VIGIA_EVIDENCE_PATH` keeps its input meaning but does not
+participate in choosing the destination. Every `db_path`, implicit or
+explicit, passes through `validate_external_output_path()` before creating
+parents and again before SQLite can create DB/WAL/lock. README, the MCP
+contract, and the Entanglement fixture document the new configuration.
+
+**Validation:** four B-185 regressions cover an explicit DB in evidence, a
+symlinked parent, a safe fallback even when the legacy variable points at
+evidence, and a valid external DB. B-178 (SIFT backup) and 21 Entanglement
+tests also pass; the two `TestIdenticalDocumentCollapse` tests are excluded,
+already marked in that file as a pending, independent chain-of-custody defect.
+It does not modify signal, score, or verdict: it separates the analyst's
+persistent state from the acquired bytes.
+
+---
+
+## B-186 — the persistent chain-of-custody ledger could contaminate evidence [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: the SQLite ledger creates a database and potential sidecars next to the evidence it purports to attest. |
+| **File** | `vigia/forensics/vigia_chain_of_custody.py`, `tests/test_b186_chain_ledger_output_boundary.py`, `README.md`, `CLAUDE.md`. |
+| **Mode** | `ChainOfCustody` API, `vigia_chain_of_custody.py --db` CLI, and any flow that persists sealed bundles. |
+| **Principle affected** | The ledger is investigator-derived state; it may not have the CWD or an evidence root as its implicit destination. |
+
+**Reproduced observation:** the previous constructor used
+`vigia_chain.db` relative to the working directory. If an operator launched
+the verifier from `VIGIA_EVIDENCE_DIR`, construction wrote the ledger into the
+input. An explicit `--db <evidence>/chain.db` was accepted; so was a path
+under a symlinked parent redirecting to evidence. Finally, a valid external
+path with a not-yet-existing parent failed before creating the ledger. All
+four conditions were induced before the patch.
+
+**Fix applied:** the default now resolves, in order,
+`VIGIA_CHAIN_DB_PATH`, `VIGIA_WORK_DIR/vigia_chain.db`, and an XDG-style
+state directory. The module remains runnable with stdlib only, so it
+incorporates a local guard equivalent to the output contract: it rejects NUL,
+inspects every existing component with `lstat` to deny symlinks, resolves the
+path, and forbids destinations equal to or descending from
+`VIGIA_EVIDENCE_DIR`. It creates the parent with `0750` permissions and
+validates again immediately before SQLite can create DB/WAL/journal. README
+and the MCP contract document the new variable.
+
+**Validation:** four B-186 regressions cover the explicit destination inside
+evidence, the escape via a symlinked parent, the safe default even with the
+CWD located inside evidence, and a new external destination. The 27 existing
+chain-of-custody hardening tests also pass: **31/31**. It does not alter the
+content of any bundle, the canonical hash, or the verdicts; it only separates
+the ledger's persistence from the acquired bytes.
+
+---
+
+## B-187 — the pattern initializer could delete or create SQLite inside evidence [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: the initializer performs `DELETE` and idempotent inserts; a misdirected `--db` could modify an acquired SQLite. |
+| **File** | `vigia/tools/init_patterns_db.py`, `tests/test_b187_patterns_db_output_boundary.py`. |
+| **Mode** | Fresh/CI initialization via `python3 vigia/tools/init_patterns_db.py [--db PATH]`. |
+| **Principle affected** | A corpus-building tool does not receive authority to rewrite evidence by accepting an arbitrary DB path. |
+
+**Reproduced observation:** `init_db()` created the parent, opened any SQLite
+path, installed the schema, and executed `DELETE FROM nlp_patterns`. With
+`VIGIA_EVIDENCE_DIR` configured, both
+`<evidence>/forensic_patterns.sqlite` and
+`patterns-redirect -> <evidence>` followed by
+`patterns-redirect/forensic_patterns.sqlite` were accepted and modified.
+Both escapes were induced before the patch; a new DB outside evidence was the
+positive control.
+
+**Fix applied:** the initializer uses
+`validate_external_output_path()` before creating the parent and validates
+again before SQLite can create DB/WAL/journal. It keeps its distributed
+patterns DB and the idempotent behavior for CI; it only denies destinations
+inside evidence or with symlink components. Since the documented invocation is
+direct, a minimal `sys.path` bootstrap was added so the guard import works
+both with `python3 vigia/tools/init_patterns_db.py` and as a module/in CI,
+without requiring `PYTHONPATH`.
+
+**Validation:** B-187 covers a direct destination in evidence, redirection via
+symlink, a valid external DB, and the documented direct invocation. The test
+was red before the patch (2 escapes reproduced) and green afterward: **4/4**.
+Together with B-186, **8/8** pass. It does not modify pattern semantics or
+verdicts; it removes write authority from the `--db` argument when it points
+at evidence.
+
+---
+
+## B-188 — the semiotic detector simulated a nonexistent fallback when the patterns DB was missing [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Honest-degradation P1: a missing semiotic dependency could fail with `no such table` after appearing to be a first-use fallback. |
+| **File** | `vigia/core/semiotic_detector_v2.py`, `tests/test_b188_missing_patterns_db_degradation.py`. |
+| **Mode** | `SemioticDetectorV2` used by the pipeline and by `vigia_case_adapter`; in agent mode, a detector failure must be `ABSTAIN`, never `NOISE`. |
+| **Principle affected** | An unavailable component cannot present itself as an empty detector or as a clean result. The failure must be explicit so the adapter preserves the fault and abstains. |
+
+**Reproduced observation:** `_load_patterns()` opened the DB with `mode=ro`;
+if it did not exist, it caught the error and created `:memory:` with the
+comment "fallback … first run". It immediately attempted `SELECT … FROM
+nlp_patterns` against that schema-less memory, so construction aborted with
+`sqlite3.OperationalError: no such table`. Additionally, the URI was built by
+path interpolation instead of serializing a file URI. The B-188 regression
+reproduced the failure with a missing path and verified that no file was
+created.
+
+**Fix applied:** the false fallback is removed. The path is converted to
+`Path(...).resolve().as_uri()` and opened only with `mode=ro`; any open or
+schema error is translated into an explicit `RuntimeError`: `semiotic pattern
+database unavailable`. No empty memory is fabricated that could return an
+absence of patterns with the appearance of analysis. The existing adapter
+already records that unavailability as `detector_fault`, sets confidence to
+zero, and emits `ABSTAIN`.
+
+**Validation:** B-188 was red before the patch with the contradictory
+`OperationalError` and green afterward, confirming both the explicit semantic
+error and the absence of a created DB. `test_red_team.py` and the relevant
+set also pass: **7/7**. It does not change results when the distributed DB is
+available; when it is missing, it makes the limit visible instead of allowing
+a clean conclusion about semiotic analysis that was never performed.
+
+---
+
+## B-189 — the canonical runner could publish results inside the evidence [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: `--output` had unrestricted write authority; it could replace or add a results JSON inside the acquired input. |
+| **File** | `vigia/scripts/run_pipeline.py`, `tests/test_b189_pipeline_output_boundary.py`. |
+| **Mode** | Deterministic pipeline `python3 -m vigia.scripts.run_pipeline --input … --output …`. |
+| **Principle affected** | The derived result must live outside evidence and be published atomically; an output path cannot lead back into the tree being examined. |
+
+**Reproduced observation:** the runner read the input and executed
+`Path(output_path).write_text(...)` without validation, without creating the
+parent, and without atomic publication. A destination
+`<evidence>/pipeline-result.json` and a parent
+`result-redirect -> <evidence>` were written successfully. Conversely, a new
+external destination failed with `FileNotFoundError`. All three conditions
+were induced before the patch.
+
+**Fix applied:** `run()` validates `--output` with
+`validate_external_output_path()`, creates the external parent with `0750`,
+validates again before writing, and uses `atomic_write_text()` for
+temp+fsync+replace. The log prints the canonicalized destination. The
+decision, the v1 compatibility canonicalization, and the JSON content of a
+valid run do not change.
+
+**Validation:** B-189 covers direct output into evidence, escape via symlink,
+and external output with a nonexistent parent. It was red **3/3** before the
+patch and green **3/3** afterward. The 23 tests of `test_tanda_a_triage.py`
+also pass: **26/26**. The change prevents contaminating the acquisition and
+eliminates the spurious external-output failure without expanding the
+pipeline's conclusions.
+
+---
+
+## B-190 — the execution logger could alter evidence and escape via `case_id` [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: a pipeline-derived trace could be written into the acquired tree or into a destination built from a case label. |
+| **File** | `vigia/core/execution_logger.py`, `vigia/pipeline/pipeline.py`, `tests/test_b190_execution_logger_output_boundary.py`. |
+| **Mode** | Deterministic pipeline and any direct consumer of `VigiaExecutionLogger`. |
+| **Principle affected** | Evidence is read-only: neither the trail describing it nor the case identifier may gain write authority over it. |
+
+**Reproduced observation:** the constructor received `output_dir="data/logs"`,
+created that path relative to the CWD, and concatenated `case_id` without
+treating it as an untrusted identifier. With `VIGIA_EVIDENCE_DIR=<evidence>`,
+four violations were induced before the patch: (1) `output_dir=<evidence>`
+created the JSONL inside the acquisition; (2) a symlinked parent pointing at
+evidence was also accepted; (3) `case_id="../evidence/escape"` escaped the
+logs directory; and (4) starting the process from within evidence made the
+relative default publish `data/logs` into that same tree. The logger does not
+change a verdict, but it could modify the very object whose analysis it is
+meant to trace.
+
+**Fix applied:** `case_id` is now a non-empty label without NUL or path
+separators. When no explicit destination is passed, logs use
+`VIGIA_EXECUTION_LOG_DIR`, then `$VIGIA_WORK_DIR/logs`, and finally private
+XDG state; never the CWD. The final destination is validated with the common
+boundary `validate_external_output_path()` before and after creating its
+external parent with mode `0750`. That validation rejects direct evidence and
+every symlink component. `VIGIA_EXECUTION_LOG_DIR` was documented alongside
+the rest of the private operational state. The logger keeps the JSONL format,
+the hash chain, and the behavior for legitimate external destinations.
+
+**Validation:** all five B-190 tests were red before the fix and green
+afterward: direct evidence, symlinked parent, `case_id` traversal, default
+from an evidence CWD, and permitted external output.
+`tests/test_hash_chain_hardening.py` and `tests/test_tanda_a_triage.py` also
+pass: **55 passed** (one historical unsealed-timestamp warning). The induction
+confirms the closure of write authority; it does not claim power-loss
+atomicity of the JSONL sequence, which is out of scope for this fix.
+
+---
+
+## B-191 — the execution-log generator broke upon encountering a signal [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Traceability P1: the mode that must record SANS findings aborted before emitting the first `FORENSIC_FINDING` when the detector returned a normal signal. |
+| **File** | `vigia/scripts/generate_execution_log.py`, `tests/test_b191_execution_log_generator_schema.py`. |
+| **Mode** | Individual/batch JSONL generator for Agent Execution Logs. |
+| **Principle affected** | A forensic trail must consume the detector's canonical contract and preserve exact weights, not invent a display value or fail on the path with evidence. |
+
+**Reproduced observation:** `SemioticDetectorV2.analyze()` emits each match
+with `weight_num` and `weight_den`, and keeps `_weight` only for display. The
+generator instead requested `match["weight"]` with a `0.5` fallback and called
+`VigiaExecutionLogger.log_event(pattern_weight=...)`; that signature does not
+exist. A minimal induction with a valid `7/10` match produced exactly
+`TypeError: ... unexpected keyword argument 'pattern_weight'`. A case with no
+matches could therefore appear to work, while the path that was supposed to
+record a finding did not finish its log or its final verdict.
+
+**Fix applied:** the generator consumes exclusively
+`weight_num`/`weight_den`, validates them as non-negative rational integers
+with a positive denominator, computes the display confidence via integer
+arithmetic, and calls the existing `pattern_weight_num` /
+`pattern_weight_den` signature. A non-canonical detector schema now fails with
+an explicit error instead of recording an invented 50%. The engine's decision
+is not modified: only the consumer of its output and its exact traceability
+are restored.
+
+**Validation:** the B-191 test used the detector's same canonical schema, was
+red before (`TypeError`) and green afterward; it verifies the JSONL preserves
+`_pattern_weight = 7/10` in its canonical representation. Together with B-190
+and the chain hardening, **33 tests** pass. No claim is made that this
+generator is the verdict authority: its role is to faithfully record the
+output already produced by the detector and the decision layer.
+
+---
+
+## B-192 — the execution-logs script reintroduced the unsafe default [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Operational-integrity P1: although the central logger already had a private default (B-190), the script invoking it imposed the old CWD-relative `data/logs`. |
+| **File** | `vigia/scripts/generate_execution_log.py`, `tests/test_b192_execution_log_script_output_boundary.py`. |
+| **Mode** | Standalone individual and batch generator for Agent Execution Logs. |
+| **Principle affected** | A write boundary is only worth anything if every entry point preserves its safe defaults; a wrapper cannot recover ambient authority that the protected component had already eliminated. |
+
+**Reproduced observation:** a real run of the script with
+`VIGIA_WORK_DIR=<tmp>` still published into the checkout's `data/logs/`
+because `process_case(..., output_path=None)` overrode the logger's default.
+The induction from a CWD equal to `VIGIA_EVIDENCE_DIR` was rejected by B-190,
+avoiding evidence contamination, but the mode could not complete even though
+it had a valid work directory. This refuted the hypothesis that fixing only
+the constructor covered all entry points.
+
+**Fix applied:** `process_case` and `process_dataset` accept an optional
+`output_dir`; when not given, they delegate to `VigiaExecutionLogger`'s
+private default. The CLI stops preselecting `data/logs`, propagates
+`--output-dir` to the batch, and describes the safe destination order. An
+explicit `--output` or `--output-dir` remains possible, but is subject to the
+same B-190 validation against evidence and symlinks.
+
+**Validation:** B-192 was red before with a `SecurityError` when starting from
+an evidence CWD despite having `VIGIA_WORK_DIR`; it is now green and generates
+`<work>/logs/B192-001_execution.jsonl` without creating anything in evidence.
+With B-190, B-191, chain hardening, and triage, **57 tests** pass. The
+subsequent real integration test confirmed that a detector match produces the
+JSONL in the work directory, not in the checkout.
+
+---
+
+## B-193 — the case adapter could overwrite evidence with its export [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | Forensic-integrity P1: the adapter CLI accepted any second argument as output and opened it with `"w"`, including acquired evidence. |
+| **File** | `vigia/tools/vigia_case_adapter.py`, `tests/test_b193_case_adapter_output_boundary.py`. |
+| **Mode** | Direct conversion `python3 vigia/tools/vigia_case_adapter.py <caso.json> [output.json]`. |
+| **Principle affected** | The adapter reads evidence to derive signals; its output JSON cannot receive authority to alter the input or be published partially. |
+
+**Reproduced observation:** with a minimal external case and
+`VIGIA_EVIDENCE_DIR=<evidence>`, the CLI invocation with
+`<evidence>/derived.json` finished with exit `0` and created the file inside
+evidence. There was no path validation, symlink control, safe parent creation,
+or atomic publication. It is a source/derived separation break, not a
+modification of the adaptation logic.
+
+**Fix applied:** `save_signals()` was added: it validates the destination with
+the shared boundary before and after creating the `0750` external parent, and
+publishes the JSON via `atomic_write_text()` (tempfile, fsync, replace, and
+directory fsync). The CLI uses that function and reports the canonicalized
+path. Legitimate external exports keep the same JSON content.
+
+**Validation:** B-193 was induced beforehand via the direct CLI write.
+Afterward, its three tests verify rejection inside evidence, rejection through
+a symlink, and a canonical external export preserving the content. Together
+with B-190–B-192 and chain hardening, **37 tests** pass. The validation
+protects write authority; it does not claim to resolve on its own a hostile
+directory substitution between filesystem operations outside the process's
+permission model.
+
+---
+
+## B-194 — the API validated a case's pathname but opened that pathname afterward [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 for forensic integrity and scope, conditioned on an actor being able to concurrently mutate the case directory. It does not assume an HTTP client, by itself, has write permission on the checkout. |
+| **Files** | `vigia/api_case_paths.py`, `vigia_api.py`, `vigia/vigia_api.py`, `tests/test_b194_api_case_snapshot_race.py`, `tests/test_vigia_api_boundaries.py`. |
+| **Mode** | FastAPI `POST /analyze/path`, both documented import routes. |
+| **Principle affected** | Evidence selection is only valid if the object analyzed is the same one that was authorized. `lstat()` followed by `open(path)` does not preserve that identity against substitution between operations. |
+
+**Reproduced observation:** `resolve_case_path()` already rejected absolute
+paths, traversal, and symlinks that existed during its inspection. However, it
+returned a `Path` and the pipeline opened it later by name. In a controlled
+temporary directory, `data/cases/allowed.json` was authorized, that leaf was
+replaced with a symlink to `outside/case.json`, and an ordinary `open()` read
+the external JSON. Induction confirms a pathname race; it does not assert
+exfiltration of an arbitrary secret, because the pipeline requires case-shaped
+JSON and exposure depends on the narration and deployment configuration.
+
+**Fix applied:** `snapshot_case_file()` keeps the lexical and regular-file
+validation, but its authoritative open starts from a repository descriptor and
+walks `data/cases` or `cases` component by component using `dir_fd`,
+`O_DIRECTORY`, and `O_NOFOLLOW`. A leaf or directory symlink that appears after
+validation fails closed. The already-bound file descriptor is copied to a
+private temporary file with `fsync`; both the deterministic pipeline and the
+optional narration consume that snapshot and never reopen the client-supplied
+pathname. A platform that does not offer these primitives refuses the case
+instead of silently falling back to the vulnerable pattern.
+
+**Validation:** the B-194 tests were red before (the primitive did not exist)
+and green after. They simulate, separately, substitution of the leaf and of the
+root directory after the initial resolution; both produce `CasePathError`. The
+endpoint contract also verifies that the two APIs return 404 without invoking
+the pipeline. The isolated manual test obtained `SWAP_REJECTED` with the
+expected `ELOOP`. Together with the boundary and API-parity regressions,
+**28 tests** pass. A direct write of regular content *inside* a case root the
+attacker already controls remains outside this defense: that is
+evidence-modification authority, not a path-confinement bypass.
+
+---
+
+## B-195 — the JSON adapter presented the case narrative as engine reasoning [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 epistemological and traceability: an assertion written by whoever built the case could be sealed and displayed as if the deterministic selector had deduced it. |
+| **Files** | `sift_orchestrator.py`, `vigia_agent.py`, `tests/test_b195_case_description_provenance.py`. |
+| **Mode** | Deterministic agent over an EBS JSON case; affects the bundle, its narrative, and the `analytical_reasoning` flag. |
+| **Principle affected** | Scenario context may be preserved, but its provenance and lack of analytical authority must survive every transformation and handoff. Presentation cannot elevate a claim to evidence. |
+
+**Reproduced observation:** `_analyze_ebs_json()` was label-blind for the
+scorer, but copied `case_data["description"]` verbatim into
+`abduction["narrative"]`. Then `vigia_agent._generate_narrative()` printed it
+under **"Razonamiento del motor abductivo"** and `_seal_bundle()` used it to
+declare `analytical_reasoning=True`. The B-195 induction supplied a single
+memory signal and a `description` with the unsupported assertion "exfiltration
+was completed and the operator was physically identified"; before the fix that
+sentence appeared as engine reasoning even though it was in no artifact nor in
+the scorer's result. `VIGIA-FN-003` exhibited the same defect: its scenario
+said the exfiltration occurred inside TLS, but the engine had only proven an
+injection fracture and concluded `SUSPICION` for lack of corroboration.
+
+**Fix applied:** the `abduction.narrative` field is now built solely from the
+label-blind selection and from `motor_reason`, with
+`narrative_provenance="deterministic_motor_selection"`. The input text is
+preserved, without altering the score, as `scenario_context` with
+`scenario_context_provenance="case_description_unverified"`; the agent's report
+displays it in a separate section, **"CASE CONTEXT (UNVERIFIED INPUT —
+NOT ANALYTICAL EVIDENCE)"**. The `legacy` mode is explicitly labeled as a
+reproduction, not as new reasoning.
+
+**Validation:** the two B-195 tests were red before: the injected claim
+occupied the reasoning field and appeared before any labeled context. After
+the fix they are green and prove that the selector's account contains its own
+rationale, that the input is preserved with unverified provenance, and that
+the agent does not mix the two sections. Together with B-163, `fase1_resolve`,
+and the narrative-robustness suite, **67 tests** pass. A direct run of FN-003
+keeps `SUSPICION` and its same gate rationale; the TLS sentence no longer
+appears in the engine block. This fix does not turn artifact descriptions into
+innocuous data: those descriptions remain observations of the artifact and
+must have their own acquisition provenance to serve as evidence.
+
+---
+
+## B-196 — `VIGIA-FN-003` was kept as detector debt even though the detector was already active [RESOLVED — reclassified, Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 corpus governance: the backlog attributed a `SUSPICION` to a missing capability, which invited tweaking the scorer to force a conclusion the current evidence does not corroborate. |
+| **Files** | `BUGS_PENDIENTES.md`, `docs/XFAIL_REDUCTION_STRATEGY_20260717.md`; observation in the sealed bundle `results/agent_batch/VIGIA-FN-003_agent_bundle.json`. |
+| **Mode** | Deterministic agent / EBS engine. |
+| **Principle affected** | A verdict lower than a scenario's label does not prove absence of detection. The failure taxonomy must distinguish detector, corroboration gate, and historical expectation. |
+
+**Reproduced observation:** the `VIGIA-FN-003` bundle does not omit the memory
+signal: CAIE records the live fracture `PROCESS_INJECTION_ANTIFORENSIC`, with
+severity `0.85`, and the exact boost `0.3825`. A current re-run in `motor`
+mode returns `SUSPICION` with score `0.6022` and explains that, although it
+exceeds the `MALICE` threshold, it does not open a corroboration branch: the
+two hard observations belong to a single memory collection/domain. Removing
+the injection metadata makes the boost disappear; removing the parent-process
+mismatch leaves the case still `SUSPICION`. The detector therefore does
+participate and materially alters the outcome.
+
+**Contrast:** `VIGIA-CAN-042`, with the same fracture class, reaches
+`MALICE` (`0.6524`) because it contributes four artifacts spread across two
+evidence collections and satisfies B-068. This is not evidence that FN-003
+needs a new RWX detector, but of the deliberate limit that prevents counting
+two observations of the same dump as two independent sources.
+
+**Resolution:** FN-003 is withdrawn from detector debt and reclassified as a
+dispute between the historical `MALICE` label and the sufficiency of the
+available acquisition. The scenario's label is preserved for traceability: the
+corpus is not rewritten to match the engine. Elevating it would require new
+independent corroboration (for example identity, network, payment, or physical
+acquisition), not increasing weights or adding a rule that already exists.
+B-195 furthermore separates the narrative sentence about TLS exfiltration from
+the sealed reasoning: it cannot be used as the missing corroboration.
+
+---
+
+## B-197 — `run_vigia()` discarded malformed signals and sealed the partial decision [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 for input integrity and honest degradation: a public entry point could turn supplied-but-invalid evidence into absence of evidence without the bundle being able to attest to it. |
+| **File** | `vigia/pipeline/pipeline.py`, `tests/test_b197_pipeline_signal_boundary.py`. |
+| **Mode** | `run_vigia()` (CLI/Python API and Integration Bridge). |
+| **Principle affected** | The boundary must reject an incomplete request before deciding; it cannot keep only the parts that managed to parse and present the result as an analysis of the supplied set. |
+
+**Reproduced observation:** `_signals_from_dicts()` wrapped each
+`SignalOutput` construction in `except Exception`, emitted a warning, and
+continued. Given a valid signal followed by `{"z_score": 9.0, "confidence": 1.0}`
+without `tool_name`, the helper returned one signal instead of failing;
+`run_vigia()` then entered `run_full()` and sealed a result for the subset.
+The bundle contains neither the count of rejected objects, their index, nor
+the conversion cause, so a reader could not distinguish "one piece of
+evidence" from "two pieces of evidence, one lost at the boundary". The
+variant with only the invalid signal ended in an error later due to zero
+signals, but the mixed variant hid the problem.
+
+**Fix applied:** the boundary requires `signals_data` to be a list and each
+entry to be an object. If `SignalOutput` construction or validation fails,
+`_signals_from_dicts()` raises `ValueError` with the index `signals_data[i]`
+and chains the original cause. `run_vigia()` therefore does not start the
+pipeline, does not seal a bundle, and does not present a partial verdict.
+Valid signals keep the same transport contract; the scorer was not modified
+and no label fallback was introduced.
+
+**Validation:** the two B-197 tests were red before: both the helper and
+`run_vigia()` accepted the mixed list. Afterward they verify visible rejection
+at both boundaries. Together with the F0/B-062/B-064 regressions and the EBS
+integration, **30 tests** pass. The change prefers an explicit error over a
+synthetic abstention: the operator must correct or document the malformed
+evidence before starting another run.
+
+---
+
+## B-198 — analytical repeatability was conflated with the per-run custody seal [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 epistemological and verifiability: the product claimed that identical input produced the same `bundle_hash`, even though that hash deliberately identifies distinct custody artifacts. It did not alter the verdict, nor was it scorer nondeterminism. |
+| **Files** | `vigia/core/ebs_v1.py`, `vigia/core/bundle_builder.py`, `vigia/pipeline/pipeline.py`, `forensics/verify_ebs_v1.py`, `tests/test_b198_analysis_fingerprint.py`, `README.md`, both copies of `VIGIA_ESTADO_TECNICO_ES.md`, `docs/ENGINEERING_DISCIPLINE.md`; `vigia/models/ebs.py` is explicitly labeled a legacy path, not a replay contract. |
+| **Mode** | EBS v1 pipeline, `run_vigia()` API/CLI, and stdlib-only verifier. |
+| **Principle affected** | Determinism does not mean erasing identity or time from a chain of custody. The two properties must have distinct names, scopes, and verifiers. |
+
+**Reproduced observation:** two identical calls to `run_vigia()` kept the
+same decision, posterior, risk, and analytical content projection, but
+produced different `integrity.bundle_hash`. The difference reduced exactly
+to `bundle_id`, `timestamp`, `evidence_graph.generated_at`,
+`policy_spec.created_at`, `system_state.timestamp`, `integrity.sealed_at`, and
+the `bundle_hash` that derives from those fields. It is correct that the full
+seal covers them: they are the identity and moment of *that* run. The problem
+was the contrary claim in the README/technical state and its cited evidence:
+`tests/check_determinism.py` runs an isolated tool and strips timestamps
+before hashing; it neither creates nor compares EBS bundles. The historical
+T13 test only achieved equal hashes by manually forcing the UUID and all
+timestamps.
+
+**Fix applied:** new bundles include `integrity.analysis_fingerprint`, the
+SHA-256 of the canonical analytical projection that excludes only the UUID and
+per-run time metadata. The `bundle_hash` was neither weakened nor reused: it
+still seals the full custody payload. The pipeline and its CLI expose both
+fingerprints. `quick_verify()` and the independent verifier re-derive
+`analysis_fingerprint` when it is declared; if it is altered, they fail.
+Historical bundles lacking that field remain valid under their previous
+contract and the verifier explicitly flags it as legacy, not as a false check.
+
+**Validation:** the B-198 regression was red before (the fingerprint did not
+exist and both verifiers accepted a decorative digest). Afterward it proves:
+(1) same analytical content → same `analysis_fingerprint` but distinct custody
+seals; (2) fingerprint corruption rejected by both verifiers; (3)
+compatibility of a bundle without that field; and (4) exposure through the
+public entry point. Together with the sealing, verifier-contract, and EBS
+integration suites, **25 tests** pass. The new fingerprint does not prove that
+two runs occurred at the same time, nor does it replace the `bundle_hash`; it
+proves only that their declared analytical projection matches.
+
+---
+
+## B-199 — the API returned a scorer verdict and the hash of a different EBS decision [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 epistemological/interface: an HTTP response could present a forensic verdict and a valid `bundle_hash` as if they attested to the same decision, even though they came from two different engines and scales. |
+| **Files** | `vigia_api.py`, `vigia/vigia_api.py`, `vigia/core/bundle_builder.py`, `vigia/openai_compat.py`, `tests/test_b199_api_seal_coherence.py`, `KNOWN_LIMITATIONS.md`, EN/ES technical states. |
+| **Mode** | FastAPI/OpenWebUI, both supported imports (`vigia_api` and `vigia.vigia_api`); the agent mode and submission routes were not altered. |
+| **Principle affected** | An integrity seal can only accompany the exact assertion it contains. If two layers use different risk semantics, the interface must exhibit them as distinct or abstain, never join them by name proximity. |
+
+**Reproduced observation:** each wrapper first computed `_vigia_score()` and
+returned its `verdict`, `score`, `confidence`, and `reason` fields. In
+parallel it adapted the same case to `SignalOutput` and ran
+`VigiaPipeline.run_full()` solely to take `bundle_hash` and the result of
+`verify_ebs_v1.py`. In `FP-CULTURAL-CLEAN-001`, for example, the scorer
+returned `NOISE` with score `0.0659`, while the attached bundle contained
+`decision_trace.decision = REJECT`, risk `0.982695`, and reason
+`REJECT_POSTERIOR`. This is not a mere vocabulary translation: `NOISE` means
+insufficient evidence of intent, while EBS `REJECT` expresses high risk of
+fabrication.
+
+**Root cause:** the EBS pipeline was being used as a generic hash factory for
+the standalone scorer. The case adapter and the pipeline have a different
+signal representation and a different risk model. Simply switching to
+`build_bundle()` was not enough either: that function mapped `NOISE → ACCEPT`
+and `MALICE → REJECT`, reusing the composite intent score as
+`DecisionTrace.risk`. The independent verifier rejected those bundles: for
+example, `NOISE` with risk `0.0659` and epsilon `0.05` should be `ABSTAIN`,
+and `MALICE` with risk `0.823` should also be `ABSTAIN` under the EBS policy.
+The apparent coincidence of figures did not constitute a calibration.
+
+**Fix applied:** the two wrappers no longer run a second pipeline to obtain a
+hash. They seal exactly the dict returned by `_vigia_score()` and check before
+responding that `caie_analysis.verdict` inside the bundle matches the HTTP
+verdict. The bundle preserves the full forensic score, confidence, reason, and
+verdict; since the standalone scorer does not produce a calibrated EBS
+fabrication posterior, its `decision_trace` records `ABSTAIN`, neutral risk
+and posterior `0.5`, and the reason
+`STANDALONE_SCORER_UNCALIBRATED_EBS_RISK`. This is an abstention on *the EBS
+layer*, not a modification or downgrade of the direct forensic verdict. The
+API and the OpenAI-compatible surface explicitly show `sealed_forensic_verdict`,
+`ebs_decision`, and `seal_scope=DIRECT_SCORER_ANALYSIS_ONLY`.
+
+**Validation:** the B-199 regression was written red first. It builds
+controlled standalone bundles `NOISE`, `SUSPICION`, and `MALICE`, verifies
+each with the independent verifier, and requires that it preserve the forensic
+verdict but abstain on EBS. It then runs both real wrappers and requires
+`verify=PASS`, equality between the returned verdict and the sealed one, and
+the declared scope. Together with the FastAPI boundaries, import parity, and
+sealing/verifier suites, **50 tests** pass. This does not assert that the full
+EBS pipeline is invalid: it asserts that its decision cannot be used as proof
+of the standalone scorer until there is an explicit artifact translation and
+risk calibration.
+
+---
+
+## B-200 — the API called `FAIL` on a verifier that had not been able to run [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 honest degradation: a nonexistent `VIGIA_REPO` configuration or a process error was shown to the client as a cryptographic failure of the bundle. |
+| **Files** | `vigia_api.py`, `vigia/vigia_api.py`, `tests/test_b199_api_seal_coherence.py`. |
+| **Mode** | FastAPI/OpenWebUI, both public imports. |
+| **Principle affected** | A verification result may only say `FAIL` if the executed verifier reached that result. A missing executable, a startup failure, or unrecognizable output is operational unavailability, not evidence of tampering. |
+
+**Reproduced observation:** the environment had `VIGIA_REPO` set to a checkout
+that no longer exists. Both wrappers built the bundle correctly, but launched
+`python3 <nonexistent-repo>/forensics/verify_ebs_v1.py`. Since the subprocess
+returned stderr without the word `PASS`, the code responded
+`verify="FAIL — ?"`. That text suggests the sealed content was rejected,
+when the verification program never even opened.
+
+**Fix applied:** the API checks that the verifier executable exists, captures
+errors when starting the subprocess, and classifies the output explicitly.
+`PASS` and `FAIL` are emitted only if the CLI produced
+`Resultado : PASS` or `Resultado : FAIL`; any absence, startup error, or
+uninterpretable output is returned as `UNAVAILABLE — ?` and recorded in the
+server log without exposing paths or stderr to the client. The bundle's
+temporary file is also deleted if the process fails to start.
+
+**Validation:** the new test forces both wrappers to use a `REPO` without
+`forensics/verify_ebs_v1.py`. It was red before (`FAIL — ?`) and now requires
+`UNAVAILABLE — ?`, without the word `FAIL`. The same suite retains the normal
+`PASS` verification case and the route/OpenAI-compatibility contracts:
+**32 tests** pass. The broken configuration remains the operator's
+responsibility; the change only prevents VIGÍA from turning it into a false
+forensic assertion.
+
+---
+
+## B-201 — the API accepted remote JSON cases with no size or cardinality limit [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 availability: an untrusted request could materialize a temporary file and dispatch to the scorer a synthetic graph of unbounded size. It did not by itself change a verdict or affect local evidence acquisition. |
+| **Files** | `vigia/api_payload.py`, `vigia_api.py`, `vigia/vigia_api.py`, `vigia/openai_compat.py`, `tests/test_b201_api_payload_boundary.py`, EN/ES technical states. |
+| **Mode** | `POST /analyze/json` and the JSON case embedded in `POST /v1/chat/completions`, for both public wrappers. |
+| **Principle affected** | The HTTP boundary must validate availability before persisting or analyzing untrusted data. A transport limit does not replace forensic semantic validation, nor should it restrict local acquisition. |
+
+**Reproduced observation:** the two endpoints accepted any JSON dictionary and
+the OpenAI-compatible shim wrote it directly to a temporary file before
+calling the pipeline. With a controlled payload of 1,025 artifacts, both
+wrappers reached the scorer; if the request failed later, the response was a
+generic error. There was no explicit byte or cardinality contract, even though
+the versioned corpus reaches only 217,373 bytes and 101 artifacts per case.
+
+**Fix applied:** `validate_case_payload()` defines a common boundary for the
+two wrappers: a serializable JSON object, at most 1,048,576 UTF-8 bytes and at
+most 1,024 artifacts. It runs before creating a temporary file, narrative, or
+scoring. `/analyze/json` rejects with HTTP 422; the OpenAI-compatible contract
+returns a clear input explanation. The limits apply only to cases delivered
+over HTTP: neither local ingestion, nor binary artifacts, nor the
+deterministic engine change scope or semantics.
+
+**Validation:** B-201 was written red first: the 1,025-artifact request
+reached the pipeline on both routes. Afterward it requires that the two
+wrappers reject before writing or invoking the scorer. Together with FastAPI
+boundaries, import parity, and B-199, **36 tests** pass; `py_compile` and
+`git diff --check` also pass. The threshold is deliberately generous relative
+to the corpus, but explicit and verifiable instead of implicit and unbounded.
+
+---
+
+## B-202 — `/analyze/path` could snapshot an allowed fixture with no byte limit [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 availability: the route was correctly confined, but a very large JSON inside an allowed root could be copied in full to temporary disk before reaching the pipeline. |
+| **Files** | `vigia/api_case_paths.py`, `tests/test_b202_api_path_snapshot_boundary.py`, EN/ES technical states. |
+| **Mode** | `POST /analyze/path` in both FastAPI wrappers; it does not modify the CLI, ingestion, or forensic extraction of large files. |
+| **Principle affected** | Confining a pathname and sealing the snapshot prevents evidence substitution, but does not bound its cost. The same boundary must preserve provenance and availability. |
+
+**Reproduced observation:** `snapshot_case_file()` safely opened the
+descriptor of a regular JSON under `cases/` or `data/cases/` and then copied
+it in full with `copyfileobj()`. A fixture of more than 1 MiB inside an
+allowed root reached `NamedTemporaryFile`; thus a traversal/symlink protection
+did not prevent an unbounded temporary copy. The largest versioned fixture
+today measures 217,373 bytes, so the limit does not exclude the current
+corpus.
+
+**Fix applied:** after `openat` with `O_NOFOLLOW`, VIGÍA checks the
+descriptor's size before creating the temporary file and rejects more than
+1 MiB with `CasePathError`. The copy also keeps a byte counter: if the inode
+grows after the `fstat`, no bytes exceeding the limit are written and the
+incomplete temporary file is deleted via the exception path. The route stays
+bound to the same trusted descriptor; it is not reopened and the case's
+semantics do not change.
+
+**Validation:** B-202 was red first by demonstrating that the oversized
+fixture got as far as creating a temporary file. It now requires rejection
+before that point and tests the post-open growth guard with a 1 MiB + 1 byte
+stream, including deletion of the partial temporary file that stream would
+have created. Together with B-194 (race/symlink), FastAPI boundaries, and the
+new regression, **27 tests** pass; `py_compile` and `git diff --check` pass.
+This contract affects only HTTP fixture selection: a larger local case can be
+acquired and analyzed through the corresponding forensic/CLI routes, without
+being truncated or reinterpreted by the API.
+
+---
+
+## B-203 — the API presented an allowed case rejected for size as a `404` [RESOLVED — Codex 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 honest degradation: the B-202 availability limit worked, but the HTTP layer hid its reason under the same response used for nonexistent or forbidden paths. |
+| **Files** | `vigia/api_case_paths.py`, `vigia_api.py`, `vigia/vigia_api.py`, `tests/test_b203_api_case_limit_contract.py`, EN/ES technical states. |
+| **Mode** | `POST /analyze/path`, both public imports. |
+| **Principle affected** | An API may hide local path details without turning a declared, verifiable policy into a false assertion of nonexistence. |
+
+**Reproduced observation:** after B-202, a regular, allowed
+`data/cases/oversized.json` was rejected before the pipeline and temporary
+file, but both wrappers caught every `CasePathError` and returned
+`404 Caso no encontrado`. The same status and text are correctly used for
+traversal, symlinks, and files that do not exist, but did not describe the
+already-verified fact: there was an allowed fixture that exceeded the
+documented budget.
+
+**Fix applied:** `CaseSnapshotLimitError` specializes the path error for the
+single declared size rejection. Both wrappers translate it to `422` with the
+byte limit; all other `CasePathError` cases continue to return the opaque
+`404`, so the route does not become a filesystem oracle. The separation does
+not modify the snapshot, the verdicts, or case selection.
+
+**Validation:** B-203 was red first in both wrappers (`404`); it now requires
+`422`, the limit reason, and that the scorer not be invoked. Together with
+B-202, B-194, and the JSON limits, **29 tests** pass; `py_compile` and
+`git diff --check` pass.
+
+---
+
+## B-204 — legacy mode averaged artifacts normalized by B-163, not the historical raw ones [RESOLVED — Codex+Claude 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3 historical reproduction: the explicit `VIGIA_EBS_RESOLVE=legacy` mode exists solely to reproduce pre-B-163 bundles, but its average stopped reproducing them when B-163 normalized the case at the adapter boundary. |
+| **Files** | `sift_orchestrator.py`, `tests/test_b204_legacy_avg_raw_reproduction.py`. |
+| **Mode** | Only `VIGIA_EBS_RESOLVE=legacy` (never default). The motor path does not change value. |
+| **Principle affected** | A historical reproduction mode that does not reproduce the historical arithmetic is a false claim of fidelity (§5.3 honest degradation). |
+
+**Reproduced observation:** for a legacy artifact without `raw_score` or
+`prior_trust`, B-163 normalization synthesizes `raw_score >= 0.05` (lower
+clamp) and `prior_trust` 0.70–0.90 per Peircean layer. The adapter's average
+in legacy mode went from `0` (raw: defaults `0` × `1/2`) to
+`17/400` (synthesized: `0.05 × 0.85`) — a value no historical bundle
+contains. Legacy mode's `confidence_f` and `is_conclusive` derive from that
+average.
+
+**Fix applied:** `_analyze_ebs_json` keeps `raw_case_data` alongside the
+normalized case and selects the average's source by mode: raw artifacts only
+under explicit legacy, normalized ones for presentation and for the motor
+path (where the average is informational only — the hypothesis and confidence
+come from `_resolve_hypothesis`). A single arithmetic, two explicit inputs.
+
+**Validation:** B-204 was red first against the previous code (average
+`17/400` in legacy mode); with the fix it requires raw `0`, verifies that
+motor mode still averages the normalized representation, that both modes
+agree on canonical cases (normalizer idempotence), and that B-163's
+presentation (`signals`) does not regress to a raw projection. The existing
+legacy/motor mode battery (`test_fase1_resolve`, `test_tanda_a_triage`,
+`test_b058`, `test_b163`, `test_b166`, `test_b195` — 52 tests) passes
+unchanged.
+
+---
+
+## B-205 — the B-171/B-172 field scans crashed on degenerate input [RESOLVED — Claude 2026-07-21]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 boundary robustness: `_vigia_score({"artifacts": None})` raised `TypeError` instead of returning the clean `ERROR` that the Round 4 contract guarantees (the scorer never crashes on degenerate input). Same defect with `"temporal_violations": None`. |
+| **Files** | `vigia_scorer.py`, `tests/test_r4_boundaries.py`, `tests/test_hard_gate_severity_shield.py`. |
+| **Mode** | All modes that call the deterministic scorer. |
+| **Detected by** | Full-suite run prior to merging the `codex` branch — each fix's targeted batteries did not include the Round 4 contracts. |
+
+**Reproduced observation:** B-171/B-172 introduced scans of
+`artifacts` and `temporal_violations` (temporal pair reconstruction,
+SU authority withdrawal) that run BEFORE the historical guard
+`if not artifacts_all: → ERROR` (line ~644). A field present with value
+`None` — the key exists, so the `.get()` default does not apply — reached
+the `for` and crashed. On `main` both cases returned a clean `ERROR`.
+
+**Fix applied:** `isinstance(list)` coercion of both fields immediately
+after reading them: a non-list falls back to `[]`, which lands on the same
+`ERROR` path that `main` produced. No scoring semantics change for any
+well-formed input.
+
+**Sibling fallout (same origin, no number of its own):** the fixture in
+`test_hard_gate_severity_shield.py` declared `EFFECT_BEFORE_CAUSE` over
+artifacts without timestamps; under the B-172 contract that is an
+unverifiable allegation → ABSTAIN, and the valid-severity test failed. The
+fixture now carries corroborating timestamps (effect < cause), preserving
+the shield's original intent: to test severity coercion, not an
+unverifiable allegation.
+
+**Validation:** all three red first (`test_artifacts_none`, new
+`test_temporal_violations_none`, `test_valid_high_severity_still_fires`);
+green with the fix. Full suite (`tests/` + `vigia/tests/`, without
+integration) green before the merge.
+
+---
+
+## B-206 — signal_id material formatted Fraction with `.8f` — the entire bridge died on Python 3.11 [RESOLVED — Claude 2026-07-22]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 in environments with the CI-pinned Python (3.11): `CaseAdapter.artifact_to_signal()` failed for EVERY artifact, `to_signals()` ended in `CaseSchemaError`, and the integration bridge (Mode 4/API) was left 100% inoperative. On Python >= 3.12 the path works — which is why the bug was invisible on development machines. |
+| **File** | `vigia/pipeline/vigia_integration_bridge.py:755` (`_id_material`) |
+| **Mode** | Mode 4 / API (everything that enters through `VigiaIntegrationEngine.run_case`) |
+| **Detected by** | Post-codex-merge baseline suite run in a Python 3.11.15 container: `test_b184_keeps_a_valid_bundle_output_external` FAILED — the only red out of 1845. |
+
+**Reproduced observation (Firstness):** `TypeError: unsupported format
+string passed to Fraction.__format__` in
+`f"{raw_score:.8f}|{z:.8f}"` — `raw_score` and `z` are `Fraction`.
+`Fraction.__format__` with float presentation types exists only since
+Python 3.12. CI pins 3.11 in `pytest.yml` and `vigia-forensic-ci.yml`.
+
+**Why it stayed latent since the origin (Thirdness):** the `except Exception`
+in `artifact_to_signal()` degraded the crash to "artifact ignored", and
+before B-197 the discarded signals were sealed as a partial decision with no
+error. The B-197 hardening (zero signals → `CaseSchemaError`, do not seal)
+plus the B-184 test that exercises the bridge's happy path made it visible
+on the first run over 3.11. The line has existed since the repo's initial
+import (`fb373be`).
+
+**Fix applied:** helper `_decimal_8f()` — an exact replica of the 3.12+
+`.8f` format in pure `Fraction` arithmetic (`round(abs(x) * 10**8)`,
+half-even, no floats). `signal_id` values sealed in 3.12+ environments do
+NOT change: same material string, same SHA-256. floats/ints keep the
+historical `f"{v:.8f}"` behavior.
+
+**Validation:** red first (`test_b184_keeps_a_valid_bundle_output_external`
+on 3.11), green with the fix. New tests:
+`tests/test_b206_fraction_format_signal_id.py` (6 — exact values, half-even
+ties, float passthrough, parity with native `format()` on >=3.12, e2e
+adapter conversion, ID determinism). Full suite green.
+
+---
+
+## B-207 — the pytest.yml workflow did not install fastapi: 4 API test modules not collected (S-1 drift, fourth occurrence) [RESOLVED — Claude 2026-07-22]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | CI P1: the "VIGÍA Test Suite" job (pytest.yml) aborted collection with exit 2 — `test_b168_api_contract_parity`, `test_b201_api_payload_boundary`, `test_b203_api_case_limit_contract`, `test_vigia_api_boundaries` (`ModuleNotFoundError: fastapi`). No test ran in that job. |
+| **Files** | `requirements.txt`, `.github/workflows/pytest.yml` |
+| **Detected by** | CI run 2026-07-22T22:26Z reported by Anna. |
+
+**Cause (Thirdness — the class, not the instance):** B-168 pinned `fastapi`
+in `requirements-ci.txt` ("Keep it in the minimal CI environment"), but the
+`pytest.yml` workflow installs `requirements.txt` + loose extras — it never
+reads `requirements-ci.txt`. It is the SAME class of drift that the S-1
+contract (`tests/test_requirements_ci_contract.py`) closes for
+requirements-ci (defusedxml/T-2, psutil, pytest-cov), in the opposite
+direction: the contract guarantees a file that one of the two workflows does
+not install. `fastapi` is moreover a PRODUCTION dependency (imported by
+`vigia_api.py`, `vigia/vigia_api.py` and `vigia/openai_compat.py`), so its
+absence from `requirements.txt` was a real installation gap, not just a CI
+one.
+
+**Fix applied (two layers):**
+1. `fastapi>=0.100.0` added to `requirements.txt` (same pin as
+   requirements-ci) — closes the instance and the production gap.
+2. `pytest.yml` installs `-r requirements.txt -r requirements-ci.txt` —
+   the file the S-1 contract guarantees complete for the suite becomes
+   authoritative in this job too; the redundant loose extras (pytest,
+   pytest-asyncio, pytest-cov, scikit-learn) leave the workflow (they
+   already come from requirements-ci). `scipy` is kept explicit (it is not
+   in any requirements file and the calibration tests use it).
+
+**Validation:** the 4 API modules collect and pass locally (3.11.15, same
+minor as the runner); full suite green. The real verification of the
+workflow is the next CI run of this push.
+
+---
+
+## B-208 — `vigia_planner.py` dead on import: `urllib` not imported + sanitizer orphaned by the P2-001 unification [RESOLVED — Claude 2026-07-22]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (entire module unimportable — `NameError: urllib` while defining `_NoRedirect` at module level; zero production callers, so nobody noticed — same class as B-115/B-206) |
+| **File** | `vigia/tools/vigia_planner.py` |
+| **Detected by** | `ruff --select F821` sweep over the repo (2026-07-22 session), import reproduced: `import vigia.tools.vigia_planner` → `NameError`. |
+
+**Three concatenated defects:** (1) `urllib.request`/`urllib.error` used at
+module level (the webhook's SSRF guard) without being imported — the module
+never imported once in the life of this repo; (2) the local copy of
+`_sanitize_llm_input` referenced `_LLM_DANGEROUS_TAGS`/`_CONTROL_CHARS`,
+moved to `vigia/security/security.py` by the P2-001 unification (Kimi
+2026-05-02) — the security docstring says so verbatim: "unified with the
+planner's version"; the copy was left behind; (3) `_MAX_INTERPRETATION_LEN`
+referenced, never defined.
+
+**Fix:** `urllib` imports; local copy removed and the canonical sanitizer
+imported from `vigia.security` (identical: NFKC + tag strip + control chars
++ padding guard without blind truncation);
+`_MAX_INTERPRETATION_LEN = 500` (same cap as the fallback in the same
+case-block, conservative against padding).
+
+**Validation:** import OK, canonical sanitizer verified, padding sentinel
+active at 500. Tests: `tests/test_b208_b209_dead_on_call_modules.py`.
+
+---
+
+## B-209 — F821 sweep: `analyze_focus()` died on every call; missing imports in temporal redteam and judicial sanitizer [RESOLVED — Claude 2026-07-22]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2/P3 (dead-on-call functions in modules with no production callers — the B-115/B-206/B-208 class) |
+| **Files** | `vigia/tools/visible_variables.py`, `vigia/forensics/temporal_forensics_redteam.py`, `vigia/tools/sanitize_judicial.py` |
+| **Detected by** | Same `ruff --select F821` sweep as B-208; each finding reproduced before touching anything (audit-before-patch discipline). |
+
+**Fixed:**
+1. `visible_variables.analyze_focus()`: used `visible_artifacts` in the
+   P1 hash BEFORE building it (`UnboundLocalError` reproduced on every
+   call) and the rationale cited `total_rules`, a local variable of
+   `detect_phase()` nonexistent in its scope. Fix: P1 block moved before
+   the hash; rationale rewritten over the real P0-3 contract (integer
+   0-100), without inventing a count it does not have. The pipeline's live
+   path (`get_visible_tools`) never went through here — zero impact on
+   verdicts.
+2. `temporal_forensics_redteam`: `statistics.median` and `hashlib.sha256`
+   used without import — crash when running the full analysis.
+3. `sanitize_judicial`: `os.urandom` (salt) and `os.chmod` (0600) without
+   `import os` — NameError right at the security steps.
+
+**REJECTED findings from the same sweep (false positives / deliberate
+freeze — documented so the next sweep does not re-open them):**
+- `vigia/security/security.py:142,165` and `vigia/forensics/vision_audit.py`
+  (`Decimal`, `Image.Image`, `np.ndarray`): quoted annotations that are
+  never evaluated at runtime; the real code uses lazy imports / `self.np`.
+- `caie_legacy_root.py:1464` (`daubert_note` — the original B-001 bug):
+  deliberately frozen file; `pipeline.py:1321` and
+  `bundle_builder.py:463` declare verbatim that no runtime module imports
+  it. "Fixing it" would break the faithful reproduction of historical
+  bundles sealed with that behavior. DO NOT TOUCH.
+
+**Validation:** residual ruff F821 = only the 7 documented rejects.
+Full suite 1862 passed, 0 failed.
+
+---
+
+## B-210 — F811 sweep: duplicated stub block in `ebs.py` (deduplication trap) and double import in `vigia/security/__init__.py` [RESOLVED — Claude 2026-07-22]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3 (no runtime effect TODAY — but the ebs.py duplicate was an active trap for the next "cleanup") |
+| **Files** | `vigia/models/ebs.py`, `vigia/security/__init__.py` |
+| **Detected by** | Same ruff sweep as B-208/B-209, F811 signal (redefinitions). |
+
+**ebs.py:** the three stub classes (`AbductionTrace`,
+`PolicyStabilityController`, `SelfAdaptiveRiskPolicy`) were defined
+TWICE, in consecutive blocks. In Python the last definition wins —
+and the difference matters: the first block's `SelfAdaptiveRiskPolicy` did
+NOT have the `lambda_t`/`gamma_t` aliases that `pipeline.py` and
+`risk_bounded_layer.decide()` synchronize (`self._policy.lambda_t`). The
+trap: the first block looked like the canonical one (better docstrings) and
+the second looked like the copy — anyone "deduplicating" by deleting the
+second would silently break the pipeline. First block removed (shadowed,
+never effective); verified that the surviving definitions are identical or
+a superset, aliases present post-fix.
+
+**security/__init__.py:** two nearly identical import blocks with the
+`__all__` trapped between them; the second added `_sanitize_llm_input`,
+which `__all__` did not list. Consolidated into a single block; the set of
+importable names does not change (verified).
+
+**Not touched (remaining F811s, cosmetic and low value/risk):**
+`forensic_reporter.py:707` (local re-import of `canvas` already guarded),
+`vigia_sift_bridge.py:2935` (local re-import of `timezone`).
+
+**Validation:** ruff F811/F821 clean in both files; `lambda_t`/`gamma_t`
+aliases verified; full suite 1862 passed, 0 failed.
