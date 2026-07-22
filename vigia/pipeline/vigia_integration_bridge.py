@@ -247,6 +247,7 @@ _LEGACY_TYPE_TO_EVIDENCE: Dict[str, str] = {
     "account_registration":       "app_data",
     "web_search":                 "web_search",
     "instant_message":            "chat_message",
+    "sms":                        "sms",
     "social_media_search":        "social_media",
     "installed_app":              "app_data",
     "system_event":               "log_entry",

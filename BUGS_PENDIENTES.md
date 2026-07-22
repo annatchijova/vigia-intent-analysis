@@ -9459,3 +9459,72 @@ alegación inverificable.
 `test_temporal_violations_none` nueva, `test_valid_high_severity_still_fires`);
 verdes con el fix. Suite completa (`tests/` + `vigia/tests/`, sin
 integration) verde antes del merge.
+
+---
+
+## B-206 — el SMS de coordinación de L-041 nunca estuvo en el case JSON de OWL-NEXUS5 [MITIGADO — Claude 2026-07-22]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de completitud de evidencia: el mensaje que el propio escenario fue diseñado para probar (`L-041`, descubierto 2026-06-30) nunca llegó a `data/cases/OWL-NEXUS5-CASE.json` — ningún fix de extractor semántico ni de normalización puede verlo si el artefacto no está en el archivo que Mode 1 lee. |
+| **Archivos** | `data/cases/OWL-NEXUS5-CASE.json`, `vigia/pipeline/vigia_integration_bridge.py` (`_LEGACY_TYPE_TO_EVIDENCE`), `tests/test_b206_owl_sms_artifact_present.py`. |
+| **Modo** | Solo afecta la lectura de este case JSON específico vía `_analyze_ebs_json`. |
+| **Detectado por** | Continuación de la investigación de B-160/B-163/L-041 (bundle NOISE → ABSTAIN de OWL-NEXUS5), sesión 2026-07-22. |
+
+**Observación reproducida:** los tres bundles históricos de OWL-NEXUS5 (ChatGPT,
+fallback agent, y el motor re-corrido hoy tras B-163/B-205) coinciden en que
+ninguno vio el SMS "Sarah, the delivery is today 7 tonight the confirmation
+will come later through pidgin" (+13045184333, `sms._id=6`) ni su respuesta
+"Thank you!" (`sms._id=5`). Verificado con `sqlite3` contra
+`evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db` (SHA-256
+`0bc8bfcb4fbebe9cccc9fd3d37ffad5de7e33b09f3d524c648787dde2bf5fce6`, tablas
+`android_metadata`/`sms` íntegras, ambos mensajes legibles). `grep -i
+"pidgin\|13045184333"` contra el case JSON no encontró coincidencias: el
+mensaje simplemente nunca fue incorporado al archivo, aunque la evidencia
+cruda que lo contiene está presente y accesible en el repo desde antes.
+
+**Nota lateral:** el intento previo de Codex de leer esa base con un `for db
+in $(find ... -iname '*mmssms*')` sin comillas falló con "unable to open
+database file" — no por un problema forense, sino porque el espacio en
+`Agent Data/` partió el path en dos palabras por word-splitting de bash. La
+base nunca estuvo dañada.
+
+**Corrección aplicada:** se agregaron `ART-021`/`ART-022` (tipo legacy `sms`)
+al case JSON con el contenido verificado de `mmssms.db`, y se agregó
+`"sms": "sms"` a `_LEGACY_TYPE_TO_EVIDENCE` — antes ausente, así que un
+artefacto `type: "sms"` habría caído al fallback `"default"` en vez del
+perfil CAIE dedicado (`sms`: spoofability 0.40, ya existente en
+`vigia/tools/caie.py`, distinto del de `chat_message`). El `id` legacy
+(`ART-021`/`ART-022`) se preserva como `artifact_id` por el mecanismo B-162
+ya existente — no fue necesario tocar esa lógica.
+
+**Alcance del extractor semántico (medido, no atacado en esta sesión):**
+corriendo `normalize_case_schema` contra los 265 JSON de `data/cases/**`,
+**un solo caso** (este) tiene artefactos legacy sin extractor semántico
+(`structured_content_without_semantic_extractor`) — los 20 originales, y
+ahora también los 2 SMS nuevos (siguen sin contribuir score real más allá
+del piso `raw_score=0.05`; el motor sigue en `ABSTAIN` honesto, ver B-160).
+Generalizar ese extractor (alcance ampliado de L-041) queda pendiente,
+deliberadamente no atacado aquí — bajo riesgo de calibración dado el
+alcance medido, pero requiere el protocolo dry-run + adversarial completo
+antes de cablearlo al scorer.
+
+**Hallazgo lateral no atacado:** `PrefetchAnalyzer._parse_pf()`
+(`vigia/sift/prefetch_analyzer.py`) reconoce la firma `MAM\x04` (Win10+
+comprimido) pero nunca la descomprime — devuelve `last_execution_time`
+fijo en `"unknown"` y `run_count=1` fijo para *todo* prefetch moderno, no
+solo Pidgin. Confirmado con `xxd` sobre los tres `.pf` de Pidgin en
+`evidence/owl-2019-hd1-windows/prefetch/`. Esto bloquea cualquier
+correlación temporal entre la ejecución de Pidgin y el SMS de confirmación
+en este caso, y probablemente afecta a todo el corpus con evidencia
+Prefetch Win10+. No tiene número de bug propio todavía — requiere
+descompresión XPRESS Huffman + parseo del formato binario real de
+Prefetch; es un esfuerzo de implementación mayor, deliberadamente fuera de
+alcance de esta sesión.
+
+**Validación:** `tests/test_b206_owl_sms_artifact_present.py` — 3 tests:
+mapeo legacy `sms`→`sms` (no colapsa a `chat_message`/`default`), presencia
+de los dos artefactos SMS con su contenido exacto, y supervivencia del
+`artifact_id` tras `normalize_case_schema`. Suite completa (`tests/` +
+`vigia/tests/`, sin integration): **1848 passed** (+3 sobre el estado
+post-merge de la rama codex), 0 failed.

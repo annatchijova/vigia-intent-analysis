@@ -358,6 +358,36 @@
       "metadata": {
         "significance": "Musical.ly ChatActivity session confirms active chat usage at time of owl trade messages"
       }
+    },
+    {
+      "id": "ART-021",
+      "type": "sms",
+      "source": "mmssms.db",
+      "path": "evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db",
+      "timestamp": "2017-02-01T00:41:15Z",
+      "content": {
+        "address": "+13045184333",
+        "direction": "received",
+        "message": "Sarah, the delivery is today 7 tonight the confirmation will come later through pidgin"
+      },
+      "metadata": {
+        "significance": "CRITICAL — the coordination message the scenario was built to test (L-041, discovered 2026-06-30). Confirms a same-day delivery time and names Pidgin as the channel for a second confirmation, corroborating the Musical.ly negotiation (ART-011..ART-015) with an independent SMS channel. Not present in this case file prior to 2026-07-22; added from the verified raw extraction after B-160/L-041 traced the case's NOISE-then-ABSTAIN history to its absence here. Source verified: sqlite3 query against evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db, sms._id=6, date=1485909675436 (epoch ms). File sha256: 0bc8bfcb4fbebe9cccc9fd3d37ffad5de7e33b09f3d524c648787dde2bf5fce6."
+      }
+    },
+    {
+      "id": "ART-022",
+      "type": "sms",
+      "source": "mmssms.db",
+      "path": "evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db",
+      "timestamp": "2017-02-01T00:41:45Z",
+      "content": {
+        "address": "+13045184333",
+        "direction": "sent",
+        "message": "Thank you!"
+      },
+      "metadata": {
+        "significance": "Reply sent 30 seconds after ART-021's delivery/confirmation message — acknowledgement, not negotiation content. Source verified: sqlite3 query against evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db, sms._id=5, date=1485909705759 (epoch ms)."
+      }
     }
   ],
   "peirce_chain": {
