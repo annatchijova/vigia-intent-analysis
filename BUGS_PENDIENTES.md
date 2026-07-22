@@ -9509,3 +9509,38 @@ en 3.11), verde con el fix. Tests nuevos:
 `tests/test_b206_fraction_format_signal_id.py` (6 — valores exactos, ties
 half-even, passthrough float, paridad con `format()` nativo en ≥3.12,
 conversión e2e del adaptador, determinismo del ID). Suite completa verde.
+
+---
+
+## B-207 — el workflow pytest.yml no instalaba fastapi: 4 módulos de tests de API sin colectar (deriva S-1, cuarta ocurrencia) [RESUELTO — Claude 2026-07-22]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 de CI: el job "VIGÍA Test Suite" (pytest.yml) abortaba la colección con exit 2 — `test_b168_api_contract_parity`, `test_b201_api_payload_boundary`, `test_b203_api_case_limit_contract`, `test_vigia_api_boundaries` (`ModuleNotFoundError: fastapi`). Ningún test corría en ese job. |
+| **Archivos** | `requirements.txt`, `.github/workflows/pytest.yml` |
+| **Detectado por** | Corrida CI 2026-07-22T22:26Z reportada por Anna. |
+
+**Causa (Thirdness — la clase, no la instancia):** B-168 pinneó `fastapi`
+en `requirements-ci.txt` ("Keep it in the minimal CI environment"), pero el
+workflow `pytest.yml` instala `requirements.txt` + extras sueltos — nunca
+lee `requirements-ci.txt`. Es la MISMA clase de deriva que el contrato S-1
+(`tests/test_requirements_ci_contract.py`) cierra para requirements-ci
+(defusedxml/T-2, psutil, pytest-cov), en el sentido inverso: el contrato
+garantiza un archivo que uno de los dos workflows no instala. `fastapi`
+además es dependencia de PRODUCCIÓN (la importan `vigia_api.py`,
+`vigia/vigia_api.py` y `vigia/openai_compat.py`), así que su ausencia de
+`requirements.txt` era un hueco real de instalación, no solo de CI.
+
+**Corrección aplicada (dos capas):**
+1. `fastapi>=0.100.0` agregado a `requirements.txt` (mismo pin que
+   requirements-ci) — cierra la instancia y el hueco de producción.
+2. `pytest.yml` instala `-r requirements.txt -r requirements-ci.txt` —
+   el archivo que el contrato S-1 garantiza completo para la suite pasa a
+   ser autoritativo también en este job; los extras sueltos redundantes
+   (pytest, pytest-asyncio, pytest-cov, scikit-learn) salen del workflow
+   (ya vienen de requirements-ci). `scipy` se conserva explícito (no está
+   en ningún requirements y los tests de calibración lo usan).
+
+**Validación:** los 4 módulos de API colectan y pasan en local (3.11.15,
+mismo minor que el runner); suite completa verde. La verificación real del
+workflow es la próxima corrida CI de este push.
