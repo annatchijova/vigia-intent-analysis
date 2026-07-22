@@ -9528,3 +9528,61 @@ de los dos artefactos SMS con su contenido exacto, y supervivencia del
 `artifact_id` tras `normalize_case_schema`. Suite completa (`tests/` +
 `vigia/tests/`, sin integration): **1848 passed** (+3 sobre el estado
 post-merge de la rama codex), 0 failed.
+
+---
+
+## B-207 — extractor semántico de coordinación/transacción: candidato diseñado, NO cableado [MEDIDO, NOT APPLIED — Claude 2026-07-22]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 — el gap (B-160/B-206) sigue produciendo `ABSTAIN` en el único caso afectado. No es P1 porque el motor ya no miente (NOISE); ABSTAIN es honesto. |
+| **Archivos** | `vigia/tools/coordination_language.py` (nuevo, no cableado), `scripts/dryrun_coordination_language.py` (nuevo), `tests/test_b207_coordination_language_detector.py` (nuevo). **`vigia_scorer.py` y `vigia_integration_bridge.py` NO se tocaron.** |
+| **Modo** | Ninguno — el detector no participa de ningún pipeline de scoring. |
+| **Detectado por** | Continuación directa de B-206/L-041, sesión 2026-07-22. |
+
+**Por qué NO se cableó:** el precedente explícito de este repo para calibrar
+cualquier parámetro o regla nueva del scorer es L-033 (gamma de event logs,
+`docs/A3_EXPERIMENT_DESIGN.md`): exige **≥20 señales, ≥3 casos por
+polaridad, ambas polaridades representadas**, con 5 gates (signal-level,
+corpus A/B, invariantes, LOCO stability, diagnóstico). L-033 mismo sigue
+`NOT APPLIED` por no alcanzar ese mínimo con 7 señales de una sola
+polaridad. Medido para este candidato: **1/265 casos** del corpus
+(`data/cases/**`) tiene artefactos legacy con `content` rico sin extractor
+semántico (B-160), y **cero** son casos negativos conocidos para esta clase
+de contenido. Cablear una regla de keywords/regex al scorer con un solo
+caso positivo y cero negativos reales sería exactamente el error que L-033
+ya bloqueó — y el propio L-041 advierte contra un set genérico de
+precio/hora/ubicación por el mismo riesgo de falso positivo.
+
+**Diseño del candidato:** regla deliberadamente angosta, no el set genérico
+que L-041 desaconseja. Flaggea un texto SOLO si menciona un canal de
+confirmación secundario ("confirmation will come through X", "message me
+on X to confirm") **Y** hace un compromiso concreto de entrega/horario
+("today"/"tonight"/hora explícita + verbo de entrega) **en el mismo
+mensaje**. Exigir ambas condiciones a la vez —siguiendo el mismo principio
+de corroboración múltiple que ya usan otros gates de este repo (Daubert
+Corroboration Gate, B-172 hard temporal pair)— es lo que evita que
+coordinación ordinaria dispare el detector. Estructura calcada de
+`ENCRYPTED_APPS` en `android_forensics.py::_analyze_sms()` (dict de
+patrones + severidad `Fraction`, sin floats).
+
+**Medición (`scripts/dryrun_coordination_language.py`, exit 0, no altera
+nada):** sobre 201 casos / 1035 artefactos reales, matchea exactamente el
+artefacto esperado (`OWL-NEXUS5-CASE/ART-021`, el SMS de B-206) y ningún
+otro. Sobre un set sintético de 10 mensajes de coordinación ordinaria
+(citas, saludos, logística sin transacción) — construido a mano porque el
+corpus no tiene negativos reales para esta clase de contenido — **0 falsos
+positivos**.
+
+**Qué desbloquearía el cableado:** un corpus con más casos de schema legacy
+content-rico, con positivos y negativos reales (no sintéticos) suficientes
+para pasar el protocolo G1–G5 de L-033. Hasta entonces, este módulo queda
+como candidato medido y reproducible, no como parte del decision path.
+
+**Validación:** `tests/test_b207_coordination_language_detector.py` — 8
+tests: verdadero positivo (SMS real de OWL), la respuesta "Thank you!"
+sola no matchea, 10 negativos sintéticos, canal solo sin horario no
+matchea, horario solo sin canal no matchea, e input degenerado (`None`,
+string vacío, no-string) no crashea. Suite completa: **1856 passed**
+(+8 sobre B-206), 0 failed. `git diff --stat` confirma que
+`vigia_scorer.py`/`vigia_integration_bridge.py` no cambiaron.
