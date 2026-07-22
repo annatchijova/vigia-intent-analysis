@@ -5779,6 +5779,20 @@ and docstring guard citing this bug.
 > 2026-07-17 (MODE B: 87 pasan, 42 MALICE degradados) — la condición 4
 > sigue sin cumplirse, el gate sigue SIN cablear.
 
+> **Update 2026-07-22 (MODE C — condición 1 demostrada en modo medición,
+> condición 4 medida con unidades honestas):**
+> `scripts/dryrun_b116_mode_c.py` computa z reales por señal
+> (mediana/MAD·1.4826 de la población benigna del dataset Tanda C
+> `signal_calibration_dataset_20260709.json`, baseline propia para tipos
+> con n≥5, fallback agrupado declarado). Resultado corpus 202: pasan 117
+> (MODE B: 87); degradados expected-MALICE **27** (MODE B: 42), separables
+> en 3 clases con causa raíz: C1 metadata degenerada de la serie REAL/SRL
+> (16, `evidence_type`/`source_tool` nunca poblados en la conversión), C2
+> señales débiles bajo baseline agrupada (5, indistinguible hasta resolver
+> C1), C3 tensión doctrinal mono-canal vs diversidad (6, cf. L-051). El
+> gate sigue SIN cablear. Camino al desbloqueo, gates pre-registrados y
+> decisiones pendientes de Anna: `docs/B116_CONDITION4_DESIGN.md`.
+
 | Campo | Valor |
 |-------|-------|
 | **Estado** | POSPUESTO — bloqueado por desajuste de interfaz y calidad de datos |
