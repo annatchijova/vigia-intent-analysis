@@ -1,0 +1,200 @@
+{
+  "abduction_trace": {
+    "abort_reason": null,
+    "abort_triggered": false,
+    "anomalies_found": [],
+    "cluster_name": null,
+    "clustering_method": "heuristic_default",
+    "correlation_penalties_applied": false,
+    "dominant_signal": null,
+    "dominant_z_score": 0.0,
+    "execution_plan_rationale": [],
+    "inference_mode": "FALLBACK",
+    "peirce_firstness": "0 senal(es) procesadas via FALLBACK. 14 cluster(s) de inferencia. Se\u00f1al dominante: ninguna (z=0.00)",
+    "peirce_secondness": "Sin anomalias significativas (z < 2.0)",
+    "peirce_thirdness": "Patron ambiguo \u2014 posible fabricacion parcial. P(fabricacion)=1.000. Evidencia insuficiente para certeza. Decision: REJECT.",
+    "tools_available": [
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI"
+    ],
+    "tools_executed": [],
+    "tools_skipped": [
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI",
+      "GCI"
+    ]
+  },
+  "actions": [],
+  "bundle_id": "ee5174fc-d7ce-4f66-b6f2-8640f1e5d531",
+  "bundle_version": "1.0",
+  "caie_analysis": {
+    "composite_score": "0.5277",
+    "devil_advocate": {
+      "aggregation": {
+        "k": 3,
+        "method": "top_k_already_validated_matches_v2",
+        "total_gap_mass": "0"
+      },
+      "counterfactual_summary": {
+        "primary_alternative_hypothesis": null
+      },
+      "decision_context": {
+        "confidence": 0.999958,
+        "mapped_verdict": "REJECT",
+        "raw_verdict": "MALICE",
+        "score": "0.5277"
+      },
+      "devil_advocate_source": "deterministic_no_pattern_data_available",
+      "meta": {
+        "deterministic": true,
+        "generated_from": "case_pattern_library"
+      },
+      "narrative": "Eco's Razor (Abductive Falsification) applied to verdict REJECT. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (standalone scorer mode (vigia/pipeline/pipeline.py); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+      "pattern_evidence_gaps": [],
+      "version": "r7-da-v1"
+    },
+    "fractures": [],
+    "fractures_detected": 0,
+    "golden_rules_triggered": 0,
+    "key_fractures": [],
+    "structural_verdict": "NOISE",
+    "verdict": "MALICE"
+  },
+  "config_attestation": {
+    "caie_enabled": true,
+    "caie_verdict": "MALICE",
+    "canonical_version": "1.0.0",
+    "config_hash": "625e9f9137b7b3ac97ef52450cdd0bd63b7f8f07c95553fdaf05ca976ad03156",
+    "deviation_from_canonical": false,
+    "modified_params": [],
+    "vigia_version": "1.0"
+  },
+  "decision_trace": {
+    "abstain_reason": "",
+    "components_used": 14,
+    "consistency_score": 1.0,
+    "decision": "REJECT",
+    "drift_score": 1.0,
+    "epsilon_used": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability": 1.0,
+    "lambda_drift": 2.0,
+    "log_lr": 10.0818,
+    "lr": 23903.973994074604,
+    "omega_intention": 1.0,
+    "posterior": 0.999958,
+    "reason_code": "REJECT_POSTERIOR",
+    "risk": 2.999874,
+    "signal_contributions": []
+  },
+  "evidence_graph": {
+    "bootstrap_rounds": 500,
+    "edges": [],
+    "generated_at": "2026-07-23T03:19:35.011170+00:00",
+    "graph_hash": "94147b51c639cd0c5f361fc885bdd59a257ffaf3f770203ff7b7a3a787b57f53",
+    "nodes": [],
+    "stability_threshold": 0.85
+  },
+  "integrity": {
+    "analysis_fingerprint": "c5a15110a0ed91838793ea113dd9e01fc14d0df9dc372fb5b8d6bf35141312f9",
+    "bundle_hash": "9e8de684fbea4a87023d60c6f5d87a647bc840ee2616e8dbde5149ac072f4154",
+    "decision_hash": "3e08cb52d46a9412cbdd871b024d1f268ac71545f6d46c0756cc1e72daf675b9",
+    "ecl_hash": "",
+    "engine_attestation_hash": "ddaa7e2f33e9a7970cd202d74e66eee29647daaf58f19845bf8e0c2afc5022bc",
+    "graph_hash": "94147b51c639cd0c5f361fc885bdd59a257ffaf3f770203ff7b7a3a787b57f53",
+    "policy_hash": "0ab1014d64e939c55cbd9c171bde5a36f13146453f602e9a44ae0b093a49cb69",
+    "sealed_at": "2026-07-23T03:19:35.011706+00:00"
+  },
+  "policy_spec": {
+    "created_at": "2026-07-23T03:19:34.992446+00:00",
+    "description": "VIGIA default policy \u2014 SANS FIND EVIL 2026",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability_init": 2.0,
+    "lambda_drift_init": 2.0,
+    "rules": [
+      {
+        "allowed_roles": [
+          "system",
+          "analyst"
+        ],
+        "description": "Maximum allowed change in posterior probability",
+        "max_delta": 0.1,
+        "requires_approval": false,
+        "variable": "posterior"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Maximum allowed drift correction",
+        "max_delta": 0.15,
+        "requires_approval": false,
+        "variable": "drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Graph stability changes require explicit approval",
+        "max_delta": 0.05,
+        "requires_approval": true,
+        "variable": "graph_stability"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Adaptive drift sensitivity adjustment",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "lambda_drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Adaptive structural sensitivity adjustment",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "gamma_stability"
+      }
+    ],
+    "version": "1.0"
+  },
+  "system_state": {
+    "calibration_model_hash": "",
+    "drift_score": 1.0,
+    "engine_version": "vigia-ebs-v1.0",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability_global": 1.0,
+    "lambda_drift": 2.0,
+    "timestamp": "2026-07-23T03:19:35.011161+00:00"
+  },
+  "timestamp": "2026-07-23T03:19:35.011205+00:00"
+}
