@@ -996,7 +996,7 @@ Los bundles completos están en:
 - `results/agent_batch/VIGIA-BREAK-012_agent_bundle.json`
 - `evidence/VIGIA-BREAK-012.json` — archivo de caso original
 
-Las 28 limitaciones documentadas están en [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
+Las 64 limitaciones documentadas están en [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
 
 Cada hallazgo en VIGÍA traza hasta la ejecución específica de herramienta que lo
 produjo via `audit_trail[].entry_sha256`. Esto no es una demo que parece impecable.
@@ -1165,7 +1165,7 @@ Un campo `devil_advocate` vacío invalida el veredicto bajo el estándar Daubert
 ---
 
 > **Sobre las afirmaciones de precisión:** VIGÍA no afirma cero alucinaciones. El sistema
-> documenta 22 limitaciones conocidas (L-001 a L-022 en `KNOWN_LIMITATIONS.md`)
+> documenta 64 limitaciones conocidas (L-001 a L-066 en `KNOWN_LIMITATIONS.md`)
 > porque una metodología forense que no puede describir sus propios modos de falla no es
 > admisible bajo Daubert. Las limitaciones documentadas son un activo forense, no una
 > responsabilidad. El reporte de precisión refleja casos de prueba adversariales reales
@@ -1189,7 +1189,7 @@ después del hecho. La arquitectura no produce veredictos incorrectos que necesi
 corrección; previene su emisión. Los `self_correction_events` en el bundle
 (visibles en `verify_tool_log.py`) documentan activaciones de compuertas, no auto-revisión del LLM.
 
-**Sobre el reporte de precisión:** VIGÍA documenta 22 limitaciones conocidas
+**Sobre el reporte de precisión:** VIGÍA documenta 64 limitaciones conocidas
 ([`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md)). Según el Judge Pack: *"Un reporte de
 precisión honesto y específico sube esta puntuación; un resultado impecable sin análisis de
 errores la baja."* Las limitaciones son activos forenses, no responsabilidades. Un sistema
@@ -1265,7 +1265,7 @@ vigia-intent-analysis/
 ├── LICENSE                              ← Apache 2.0
 ├── README.md                            ← Versión en inglés
 ├── README_ES.md                         ← Este archivo (versión en español)
-├── KNOWN_LIMITATIONS.md                 ← L-001 a L-019 (transparencia Daubert)
+├── KNOWN_LIMITATIONS.md                 ← L-001 a L-066 (transparencia Daubert)
 ├── SUBMISSION_COMPLIANCE.md             ← Índice completo de cumplimiento para jueces
 ├── INSTALL.md                           ← Guía de instalación extendida (EN)
 ├── INSTALL_ES.md                        ← Guía de instalación (ES)

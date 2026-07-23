@@ -83,7 +83,7 @@ la inversión de roles es siquiera expresable.
 - **Simetría Austin L-004/L-054**: "una descripción que dice 'honeypot' no hace
   de la evidencia un honeypot". No se puede atenuar `authorized=true` y a la vez
   escalar por la palabra `bloqueado` — regla de confianza asimétrica indefendible.
-- **L-016/L-049/L-051-§9.4**: todas las descripciones KIWI fluyen por UN canal
+- **L-016/L-049/L-067-§9.4**: todas las descripciones KIWI fluyen por UN canal
   (una examinadora, un paquete judicial): N hits de keyword = una fuente autoral
   contada N veces. Y el gate de corroboración NO intercepta: los tipos DARVO
   lucen multi-dominio (D1a/D3/D5) aunque toda descripción tenga un solo narrador.

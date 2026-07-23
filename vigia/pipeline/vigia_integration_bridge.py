@@ -647,6 +647,28 @@ def validate_case_schema(case: Dict[str, Any]) -> None:
 # CASE ADAPTER — artefactos JSON → SignalOutput[]
 # ===========================================================================
 
+def _decimal_8f(value: Any) -> str:
+    """
+    Representación '.8f' de un score para el material del signal_id.
+
+    B-206: `f"{x:.8f}"` sobre Fraction requiere Python >= 3.12
+    (Fraction.__format__ con presentation types no existe en 3.11 — la CI
+    pinnea 3.11 y CADA artefacto fallaba la conversión, dejando el bridge
+    entero inoperante vía CaseSchemaError). Esta réplica usa aritmética
+    exacta de Fraction con el mismo redondeo (half-even a 8 decimales) que
+    Fraction.__format__ en 3.12+, de modo que los signal_id ya sellados en
+    entornos 3.12+ no cambian. Sin floats: el material del ID queda en el
+    path determinista.
+    """
+    from fractions import Fraction as _F
+    if not isinstance(value, _F):
+        # floats/ints conservan el comportamiento histórico de f"{v:.8f}"
+        return f"{value:.8f}"
+    sign = "-" if value < 0 else ""
+    scaled = round(abs(value) * 10**8)  # round(Fraction) → int, half-even exacto
+    return f"{sign}{scaled // 10**8}.{scaled % 10**8:08d}"
+
+
 class CaseAdapter:
     """
     Traduce el formato de caso VIGÍA (JSON) al contrato SignalOutput.
@@ -748,11 +770,13 @@ class CaseAdapter:
                 # en máquinas distintas o con relojes desincronizados producen el
                 # mismo signal_id. El ID incluye: tool, case_id, artifact_id,
                 # raw_score y z_score — cualquier cambio en el dato cambia el ID.
+                # B-206: _decimal_8f en vez de f"{...:.8f}" — Fraction no
+                # soporta ese format spec en Python < 3.12.
                 import hashlib as _hl
                 _id_material = (
                     f"{tool_name}|{case_id}|"
                     f"{artifact.get('artifact_id', 'unk')}|"
-                    f"{raw_score:.8f}|{z:.8f}"
+                    f"{_decimal_8f(raw_score)}|{_decimal_8f(z)}"
                 ).encode("utf-8")
                 _id_digest = _hl.sha256(_id_material).hexdigest()[:16]
                 signal_id = f"{tool_name}-{_id_digest}"

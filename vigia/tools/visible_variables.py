@@ -463,22 +463,12 @@ class VisibleVariablesEngine:
         # Razonamiento
         reasoning = f"Fase={phase.value}, Consistencia={consistency}% " \
                    f"({consistency}/100 reglas satisfechas)"
-        
-        # Hash reproducible (P1: incluye visible_artifacts para determinismo total)
-        analysis_data = json.dumps({
-            "bundle_id": bundle_id,
-            "phase": phase.value,
-            "consistency": consistency,
-            "visible_vars": sorted([
-                f"{k.value}:{v}" for k, vals in visible_vars.items() for v in vals
-            ]),
-            "visible_artifacts": sorted([
-                f"{cat.value}:{name}" for cat, name in visible_artifacts
-            ]),
-        }, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
-        focus_hash = hashlib.sha256(analysis_data.encode()).hexdigest()
-        
-        # P1: construir visible_artifacts desde signals para pasar al AbductiveIntentEngine
+
+        # P1: construir visible_artifacts desde signals para pasar al
+        # AbductiveIntentEngine. B-209: este bloque DEBE preceder a
+        # analysis_data — el hash lo referencia; en el orden original la
+        # referencia previa a la asignación producía UnboundLocalError en
+        # CADA llamada a analyze_focus() desde que se agregó el P1.
         visible_artifacts: List[Tuple[VariableCategory, str]] = []
         for sig in signals:
             stype = sig.get("type", "unknown")
@@ -496,11 +486,34 @@ class VisibleVariablesEngine:
             cat = cat_map.get(stype, VariableCategory.IOC)
             visible_artifacts.append((cat, sig.get("label", stype)))
 
+        # Hash reproducible (P1: incluye visible_artifacts para determinismo total)
+        analysis_data = json.dumps({
+            "bundle_id": bundle_id,
+            "phase": phase.value,
+            "consistency": consistency,
+            "visible_vars": sorted([
+                f"{k.value}:{v}" for k, vals in visible_vars.items() for v in vals
+            ]),
+            "visible_artifacts": sorted([
+                f"{cat.value}:{name}" for cat, name in visible_artifacts
+            ]),
+        }, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+        focus_hash = hashlib.sha256(analysis_data.encode()).hexdigest()
+
         return FocusAnalysis(
             bundle_id=bundle_id,
             detected_phase=phase,
             consistency_score=consistency,
-            consistency_rationale=f"({consistency}/100) = {consistency} reglas de {total_rules} satisfechas",
+            # B-209: el rationale citaba `total_rules`, variable local de
+            # detect_phase() que nunca existió en este scope (NameError).
+            # El contrato P0-3 de detect_phase retorna solo (fase, entero
+            # 0-100); el rationale declara exactamente eso, sin inventar un
+            # conteo de reglas que no tiene.
+            consistency_rationale=(
+                f"consistency_score={consistency}/100 — porcentaje entero de "
+                f"reglas de fase satisfechas (cálculo en detect_phase, "
+                f"contrato P0-3)"
+            ),
             visible_categories=visible_categories,
             visible_variables=visible_vars,
             visible_artifacts=visible_artifacts,

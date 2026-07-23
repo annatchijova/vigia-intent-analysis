@@ -1588,12 +1588,29 @@ def _vigia_score(case: dict) -> dict:
             )
 
     # -----------------------------------------------------------------------
+    # B-116 (2026-07-22): SignalQualityGate en MODO SOMBRA — WARN informativo.
+    # Decisión doctrinal de Anna: no cap (el scorer ya tiene su Daubert
+    # Corroboration Gate; el check de uniformidad del gate contradice B-171).
+    # Se evalúa DESPUÉS de fijar verdict/score/confidence y solo se anexa al
+    # resultado: cero autoridad de veredicto. El módulo garantiza no-lanzar.
+    # -----------------------------------------------------------------------
+    try:
+        from vigia.core.signal_quality_shadow import shadow_signal_quality
+        _signal_quality_shadow = shadow_signal_quality(artifacts)
+    except Exception as _sqs_exc:  # import roto ≠ scoring roto
+        _signal_quality_shadow = {
+            "mode": "shadow_warn",
+            "error": f"{type(_sqs_exc).__name__}: {_sqs_exc}",
+        }
+
+    # -----------------------------------------------------------------------
     # Step 5: Quadripartite 8-state cascade (Q1)
     # Non-destructive: base verdict field is unchanged.
     # Adds "quadripartite_state" with the full render_for_report output.
     # -----------------------------------------------------------------------
     base_result = {
         "verdict":                      verdict,
+        "signal_quality_shadow":        _signal_quality_shadow,
         "score":                        final_score,
         "confidence":                   confidence,
         "reason":                       reason,

@@ -463,14 +463,14 @@ class SIFTOrchestrator:
                     "verdict_ceiling_reason": (
                         "§9.4-LIM: evidencia fuerte confinada al canal D3 "
                         "(sin triangulación D2/D4/D5) — techo doctrinal "
-                        "SUSPICION (L-051)."
+                        "SUSPICION (L-067)."
                     ),
                 }
                 _gate_log = (
                     "\nREFUTATION GATE LOG — §9.4-LIM\n"
                     f"  Candidato : {hypothesis} (max_z={float(max_z):.2f})\n"
                     "  Gate      : techo D3-only sin triangulación "
-                    "(verdict_ceiling=SUSPICION, L-051)\n"
+                    "(verdict_ceiling=SUSPICION, L-067)\n"
                     "  Resultado : candidato CAPEADO pre-emisión → el "
                     "veredicto sellado es SUSPICION. La hipótesis cruda se "
                     "preserva arriba; el LLM no puede anular este gate."
