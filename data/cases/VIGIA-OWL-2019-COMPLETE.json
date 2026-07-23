@@ -1,0 +1,626 @@
+{
+  "case_id": "VIGIA-OWL-2019-COMPLETE",
+  "name": "Project OWL — Illegal Owl Trade (COMPLETE: Nexus 5 + HD1 companion computer)",
+  "description": "Complete Project OWL case combining two devices belonging to Sarah McAvoy (mcavoys87@gmail.com): the LGE Nexus 5 phone (negotiation with seller layster82 on Musical.ly) and the HD1 HP companion computer (owl-purchase research on birdtrader.co.uk, owl husbandry materials, Pidgin under the same account, and deleted owl files). Two independent devices for the same subject and the same deliberate owl-trade preparation satisfy two-source corroboration (lifts the L-051 single-device ceiling that capped OWL-NEXUS5 at SUSPICION).",
+  "source_image": {
+    "file": "LGE Nexus 5 Full Image.raw",
+    "sha1": "F46EE05CE1A2210501EA512ED9E4C7EC59222CCA",
+    "md5": "B334843A07A9E16494EEBDF3079E6BC6",
+    "imaging_tool": "Magnet ACQUIRE v2.0.0.5412",
+    "imaging_start_utc": "2017-02-06T20:51:09Z",
+    "imaging_end_utc": "2017-02-06T22:13:08Z",
+    "examiner": "Magnet Forensics",
+    "evidence_number": "MD1"
+  },
+  "device_info": {
+    "manufacturer": "LGE",
+    "model": "Nexus 5",
+    "codename": "hammerhead",
+    "os": "Android 6.0.1",
+    "build_id": "M4B30Z",
+    "security_patch": "2016-10-05",
+    "serial": "08ebf545d00af782",
+    "encryption": "unencrypted",
+    "rooted": true,
+    "root_method": "TWRP + SuperSU v2.79",
+    "first_boot_utc": "2017-02-06T19:53:18Z"
+  },
+  "subject": {
+    "name": "Sarah McAvoy",
+    "google_account": "mcavoys87@gmail.com",
+    "google_uid": "101797553944830818468",
+    "phone_number": "1(304)638-8446",
+    "tiktok_accounts": [
+      "SarahMcavoy",
+      "sarahmcavoy"
+    ],
+    "twitter_handle": "mcavoys87",
+    "skype_account": "mcavoys87@gmail.com",
+    "musical_ly_userid": "190719500932296704"
+  },
+  "counterparty": {
+    "name": "Layla Aster",
+    "musical_ly_nickname": "layster82",
+    "musical_ly_userid": "190723800861179904",
+    "email": "Layster82@gmail.com"
+  },
+  "artifacts": [
+    {
+      "id": "ART-001",
+      "type": "account_registration",
+      "source": "accounts.db",
+      "path": "/data/system/users/0/accounts.db",
+      "timestamp": "2017-01-24T14:28:06Z",
+      "content": {
+        "account": "mcavoys87@gmail.com",
+        "type": "com.google",
+        "first_name": "Sarah",
+        "last_name": "Mcavoy"
+      },
+      "metadata": {
+        "significance": "Device provisioned with primary Google account",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-002",
+      "type": "account_registration",
+      "source": "accounts.db",
+      "path": "/data/system/users/0/accounts.db",
+      "timestamp": "2017-01-30T22:03:15Z",
+      "content": {
+        "account": "SarahMcavoy",
+        "type": "com.zhiliaoapp.account"
+      },
+      "metadata": {
+        "significance": "Musical.ly/TikTok account creation — platform used for illegal trade communication",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-003",
+      "type": "account_registration",
+      "source": "accounts.db",
+      "path": "/data/system/users/0/accounts.db",
+      "timestamp": "2017-01-30T23:01:58Z",
+      "content": {
+        "account": "mcavoys87@gmail.com",
+        "type": "com.skype.contacts.sync"
+      },
+      "metadata": {
+        "significance": "Skype used for noise/distractor communication, not trade discussion",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-004",
+      "type": "account_registration",
+      "source": "accounts.db",
+      "path": "/data/system/users/0/accounts.db",
+      "timestamp": "2017-02-01T17:04:42Z",
+      "content": {
+        "account": "mcavoys87",
+        "type": "com.twitter.android.auth.login"
+      },
+      "metadata": {
+        "significance": "Twitter used for noise generation only",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-005",
+      "type": "web_search",
+      "source": "recent_tasks/95_task.xml",
+      "path": "/data/system/recent_tasks/95_task.xml",
+      "timestamp": "2017-02-03T17:54:24Z",
+      "content": {
+        "query": "Tina and password",
+        "app": "com.google.android.googlequicksearchbox",
+        "uri": "search://Tina%20and%20password"
+      },
+      "metadata": {
+        "significance": "Anomalous search — possible attempt to find credentials or password recovery for contact 'Tina'. Could indicate use of alias or secondary identity.",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-006",
+      "type": "web_search",
+      "source": "chrome_history_strings",
+      "path": "raw_partition_strings",
+      "timestamp": "2017-01-24T00:00:00Z",
+      "content": {
+        "query": "where to buy owls",
+        "urls": [
+          "http://m.birdtrader.co.uk/birds-of-prey-for-sale/owls",
+          "http://m.birdtrader.co.uk/birds-of-prey-for-sale/owls?sstr=Baby%20owl&ads_dist=5",
+          "http://m.birdtrader.co.uk/owls/barn-owls-for-sale/557933",
+          "http://m.birdtrader.co.uk/owls/bonding-pair-asian-wood-owls/558006",
+          "http://m.birdtrader.co.uk/owls/tawny-owls-for-sale/557493"
+        ]
+      },
+      "metadata": {
+        "significance": "Direct evidence of browsing owl trading marketplace. Specific listings viewed: Barn Owls (Lincolnshire), Asian Wood Owls (Northamptonshire), Tawny Owls (Londonderry). Birdtrader cookies confirm visits with ad tracking IDs 557933, 558006, 557493.",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-007",
+      "type": "web_search",
+      "source": "chrome_history_strings",
+      "path": "raw_partition_strings",
+      "timestamp": "2017-01-24T00:00:00Z",
+      "content": {
+        "query": "how to take care of owls"
+      },
+      "metadata": {
+        "significance": "Research into owl husbandry — demonstrates pre-purchase planning intent",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-008",
+      "type": "web_search",
+      "source": "chrome_history_strings",
+      "path": "raw_partition_strings",
+      "timestamp": "2017-01-30T00:00:00Z",
+      "content": {
+        "query": "harry potter bird name"
+      },
+      "metadata": {
+        "significance": "Pop-culture reference to owls (Hedwig) — indicates personal interest in owls",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-009",
+      "type": "web_search",
+      "source": "recent_tasks/105_task.xml",
+      "path": "/data/system/recent_tasks/105_task.xml",
+      "timestamp": "2017-02-03T17:57:53Z",
+      "content": {
+        "query": "Green sea turtle",
+        "app": "com.android.chrome"
+      },
+      "metadata": {
+        "significance": "Distractor noise — non-owl animal search",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-010",
+      "type": "social_media_search",
+      "source": "facebook_cached_data",
+      "path": "raw_partition_strings",
+      "timestamp": "2017-01-30T00:00:00Z",
+      "content": {
+        "platform": "Facebook",
+        "query": "snowy owl facts",
+        "images_viewed": [
+          "beautiful_owl_photos_featured.jpg (shareably.net)",
+          "familyowlscameraden.jpg (owlday.com)",
+          "Snowy_Owl_Barrow_Alaska.jpg (Wikipedia)",
+          "Snowy_Owl_-_Schnee-Eule.jpg (Wikipedia)"
+        ]
+      },
+      "metadata": {
+        "significance": "Facebook searches for owl content — pattern consistent with owl interest/research",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-011",
+      "type": "instant_message",
+      "source": "musical.ly_chat_cache",
+      "path": "raw_partition_strings (com.zhiliaoapp.musically)",
+      "timestamp": "2017-01-30T22:00:00Z",
+      "content": {
+        "platform": "Musical.ly (TikTok)",
+        "from": "sarahmcavoy (190719500932296704)",
+        "to": "layster82 (190723800861179904 / Layla Aster)",
+        "message": "Hi Layla I accidentally deleted the string of emails we sent so I lost your contact. do you. are to send me your email again sorry for the inconvenience. also if it's easier you can send me information through here as well"
+      },
+      "metadata": {
+        "significance": "CRITICAL — Sarah initiates contact with Layla Aster requesting email for transaction. References prior email correspondence about owl trade. Demonstrates deliberate, ongoing communication channel for illegal transaction.",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-012",
+      "type": "instant_message",
+      "source": "musical.ly_chat_cache",
+      "path": "raw_partition_strings (com.zhiliaoapp.musically)",
+      "timestamp": "2017-01-30T22:01:00Z",
+      "content": {
+        "platform": "Musical.ly (TikTok)",
+        "from": "layster82 (Layla Aster)",
+        "to": "sarahmcavoy",
+        "message": "The email is Layster82gmail"
+      },
+      "metadata": {
+        "significance": "Layla provides email contact (Layster82@gmail.com) for transaction coordination",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-013",
+      "type": "instant_message",
+      "source": "musical.ly_chat_cache",
+      "path": "raw_partition_strings (com.zhiliaoapp.musically)",
+      "timestamp": "2017-01-30T22:02:00Z",
+      "content": {
+        "platform": "Musical.ly (TikTok)",
+        "from": "layster82 (Layla Aster)",
+        "to": "sarahmcavoy",
+        "type": "image",
+        "image_url": "https://a1.hyphenate.io/musically/musically/chatfiles/66560c50-e73f-11e6-be73-fff3b1707aec",
+        "image_size": {
+          "width": 220,
+          "height": 310
+        }
+      },
+      "metadata": {
+        "significance": "CRITICAL — Layla sends image of owl for sale. Image dimensions suggest animal/product photo. Followed by message 'How do you like him' confirming image depicts specific owl being offered.",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-014",
+      "type": "instant_message",
+      "source": "musical.ly_chat_cache",
+      "path": "raw_partition_strings (com.zhiliaoapp.musically)",
+      "timestamp": "2017-01-30T22:02:30Z",
+      "content": {
+        "platform": "Musical.ly (TikTok)",
+        "from": "layster82 (Layla Aster)",
+        "to": "sarahmcavoy",
+        "message": "How do you like him"
+      },
+      "metadata": {
+        "significance": "Seller presenting specific owl to buyer. Use of 'him' indicates live animal.",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-015",
+      "type": "instant_message",
+      "source": "musical.ly_chat_cache",
+      "path": "raw_partition_strings (com.zhiliaoapp.musically)",
+      "timestamp": "2017-01-30T22:03:00Z",
+      "content": {
+        "platform": "Musical.ly (TikTok)",
+        "from": "sarahmcavoy",
+        "to": "layster82",
+        "message": "is that an image of the exact one you have or is it a photo of what it will look like?"
+      },
+      "metadata": {
+        "significance": "CRITICAL — Buyer verifying authenticity of offered animal. This demonstrates purchase intent and transactional negotiation.",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-016",
+      "type": "installed_app",
+      "source": "app_directory",
+      "path": "/data/app/",
+      "timestamp": "2017-01-30T00:00:00Z",
+      "content": {
+        "app": "CM Security AppLock AntiVirus",
+        "package": "com.cleanmaster.security",
+        "purpose": "AppLock protecting Musical.ly and Snapchat"
+      },
+      "metadata": {
+        "significance": "Anti-forensic behavior — CM Security AppLock was used to protect communication apps behind secondary PIN/password. Per scenario design, intruder selfie should exist from incorrect PIN entry before imaging.",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-017",
+      "type": "installed_app",
+      "source": "app_directory",
+      "path": "/data/app/",
+      "timestamp": "2017-01-30T00:00:00Z",
+      "content": {
+        "app": "CM Locker",
+        "package": "com.cmcm.locker"
+      },
+      "metadata": {
+        "significance": "Additional screen lock app — layered security to protect device access",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-018",
+      "type": "system_event",
+      "source": "dropbox/SYSTEM_BOOT",
+      "path": "/data/system/dropbox/SYSTEM_BOOT@1486410798644.txt",
+      "timestamp": "2017-02-06T19:53:18Z",
+      "content": {
+        "build": "google/hammerhead/hammerhead:6.0.1/M4B30Z/3437181:user/release-keys",
+        "hardware": "hammerhead",
+        "bootloader": "HHZ20h"
+      },
+      "metadata": {
+        "significance": "Last system boot before imaging — confirms device state at acquisition time",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-019",
+      "type": "system_event",
+      "source": "dropbox/event_log",
+      "path": "/data/system/dropbox/event_log@1486410797384.txt",
+      "timestamp": "2017-02-06T19:52:27Z",
+      "content": {
+        "free_storage": "26466492416 bytes (24.6 GB)",
+        "skype_anr": "com.skype.raider ANR on Bluetooth broadcast"
+      },
+      "metadata": {
+        "significance": "System state snapshot — Skype crashed on boot, large free storage suggests limited user data or cleanup",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-020",
+      "type": "musical_ly_activity",
+      "source": "app_telemetry_cache",
+      "path": "raw_partition_strings",
+      "timestamp": "2017-01-30T22:11:03Z",
+      "content": {
+        "app": "com.zhiliaoapp.musically",
+        "version": "5.0.3",
+        "activity": "ChatActivity",
+        "device_id": "688cc0e601b78cd3",
+        "advertising_id": "e2215033-ad7c-459d-ac6a-1d625fe78cb9",
+        "event": "START"
+      },
+      "metadata": {
+        "significance": "Musical.ly ChatActivity session confirms active chat usage at time of owl trade messages",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-021",
+      "type": "sms",
+      "source": "mmssms.db",
+      "path": "evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db",
+      "timestamp": "2017-02-01T00:41:15Z",
+      "content": {
+        "address": "+13045184333",
+        "direction": "received",
+        "message": "Sarah, the delivery is today 7 tonight the confirmation will come later through pidgin"
+      },
+      "metadata": {
+        "significance": "CRITICAL — the coordination message the scenario was built to test (L-041, discovered 2026-06-30). Confirms a same-day delivery time and names Pidgin as the channel for a second confirmation, corroborating the Musical.ly negotiation (ART-011..ART-015) with an independent SMS channel. Not present in this case file prior to 2026-07-22; added from the verified raw extraction after B-160/L-041 traced the case's NOISE-then-ABSTAIN history to its absence here. Source verified: sqlite3 query against evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db, sms._id=6, date=1485909675436 (epoch ms). File sha256: 0bc8bfcb4fbebe9cccc9fd3d37ffad5de7e33b09f3d524c648787dde2bf5fce6.",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-022",
+      "type": "sms",
+      "source": "mmssms.db",
+      "path": "evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db",
+      "timestamp": "2017-02-01T00:41:45Z",
+      "content": {
+        "address": "+13045184333",
+        "direction": "sent",
+        "message": "Thank you!"
+      },
+      "metadata": {
+        "significance": "Reply sent 30 seconds after ART-021's delivery/confirmation message — acknowledgement, not negotiation content. Source verified: sqlite3 query against evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db, sms._id=5, date=1485909705759 (epoch ms).",
+        "device": "Nexus5"
+      }
+    },
+    {
+      "id": "ART-101",
+      "type": "account_registration",
+      "source": "HD1 .purple/accounts.xml",
+      "path": "Users/Sarah M/AppData/Roaming/.purple/accounts.xml",
+      "timestamp": "2017-01-24T00:00:00Z",
+      "content": {
+        "account": "mcavoys87@gmail.com",
+        "protocol": "prpl-msn",
+        "client": "Pidgin"
+      },
+      "metadata": {
+        "device": "HD1",
+        "significance": "Same identity as the Nexus 5 subject present on the companion computer, tying both devices to Sarah McAvoy"
+      }
+    },
+    {
+      "id": "ART-102",
+      "type": "web_search",
+      "source": "HD1 chrome_history.sqlite",
+      "path": "Users/Sarah M/AppData/Local/Google/Chrome/User Data/Default/History",
+      "timestamp": "2017-01-27T17:00:20Z",
+      "content": {
+        "queries": [
+          "can you buy snowy owl eggs",
+          "owl wingspans in america"
+        ],
+        "visited": [
+          "birdtrader.co.uk/list-all-adverts?sstr=snowy+owls",
+          "21food.com fertile-snowy-owl-eggs-for-sale",
+          "huntington.craigslist.org search owls"
+        ]
+      },
+      "metadata": {
+        "device": "HD1",
+        "significance": "Browsing a live exotic-bird marketplace for owls for sale on the companion computer, matching the birdtrader.co.uk marketplace referenced on the phone"
+      }
+    },
+    {
+      "id": "ART-103",
+      "type": "web_search",
+      "source": "HD1 chrome_history.sqlite",
+      "path": "Users/Sarah M/AppData/Local/Google/Chrome/User Data/Default/History",
+      "timestamp": "2017-01-27T17:31:50Z",
+      "content": {
+        "visited": [
+          "birdtrader.co.uk/owls/breeding-pair-ashy-faced/557508",
+          "birdtrader.co.uk/owls/dark-breasted-barn-owls/557507"
+        ],
+        "then_opened": "mail.google.com inbox message"
+      },
+      "metadata": {
+        "device": "HD1",
+        "significance": "Viewing specific owl for-sale listings then opening Gmail, consistent with moving a specific purchase to email coordination"
+      }
+    },
+    {
+      "id": "ART-104",
+      "type": "file_metadata",
+      "source": "HD1 Users/Sarah M/Downloads",
+      "path": "Users/Sarah M/Downloads/Owl_Keeping.pdf",
+      "timestamp": "2017-01-27T00:00:00Z",
+      "content": {
+        "files": [
+          "Owl_Emergency_Care.pdf",
+          "Owl_Keeping.pdf",
+          "Bibliography - Snowy Owl 14 April 2014 - GLOW posting.xls",
+          "Sightings2005.xls"
+        ]
+      },
+      "metadata": {
+        "device": "HD1",
+        "significance": "Owl husbandry and emergency-care manuals plus a snowy-owl bibliography downloaded, indicating preparation to keep a specific animal"
+      }
+    },
+    {
+      "id": "ART-105",
+      "type": "installed_app",
+      "source": "HD1 prefetch + filesystem",
+      "path": "Users/Sarah M/AppData/Roaming/Microsoft/Windows/Pidgin/PIDGIN.EXE",
+      "timestamp": "2017-02-02T21:25:05Z",
+      "content": {
+        "app": "Pidgin 2.11.0",
+        "install_path": "AppData/Roaming/Microsoft/Windows/Pidgin",
+        "note": "portable install outside Program Files"
+      },
+      "metadata": {
+        "device": "HD1",
+        "significance": "Pidgin deployed to an atypical portable location inside the Windows folder rather than Program Files"
+      }
+    },
+    {
+      "id": "ART-106",
+      "type": "prefetch",
+      "source": "HD1 Windows/Prefetch",
+      "path": "Windows/Prefetch/PIDGIN.EXE-86E18E41.pf",
+      "timestamp": "2017-02-02T21:25:05Z",
+      "content": {
+        "executable": "PIDGIN.EXE",
+        "run_count": 7
+      },
+      "metadata": {
+        "device": "HD1",
+        "significance": "Pidgin executed seven times on the companion computer, the channel the phone SMS referenced for the delivery confirmation"
+      }
+    },
+    {
+      "id": "ART-107",
+      "type": "system_event",
+      "source": "HD1 .purple/prefs.xml + blist.xml",
+      "path": "Users/Sarah M/AppData/Roaming/.purple/prefs.xml",
+      "timestamp": "2017-02-02T21:25:05Z",
+      "content": {
+        "logging_enabled": true,
+        "log_ims": 1,
+        "log_chats": 1,
+        "log_mode": "automatic",
+        "logs_dir_present": false,
+        "buddy_list_empty": true
+      },
+      "metadata": {
+        "device": "HD1",
+        "significance": "Automatic chat logging was enabled yet no conversation logs exist and the buddy list is empty; records are not recoverable (deletion or never-logged cannot be distinguished)"
+      }
+    },
+    {
+      "id": "ART-108",
+      "type": "file_timestamp",
+      "source": "HD1 $RECYCLE.BIN/S-1-5-21-929903582-3707417421-3176878646-1002",
+      "path": "$RECYCLE.BIN owl deletions",
+      "timestamp": "2017-02-03T00:00:00Z",
+      "content": {
+        "deleted_recoverable": [
+          "Snowy_Owl.pdf",
+          "Great Horned Owl Info.pdf",
+          "Great Horned Owl.jpg",
+          "Pygmy Owl.jpg",
+          "Luna Owl.jpg",
+          "Next pet.jpg"
+        ]
+      },
+      "metadata": {
+        "device": "HD1",
+        "significance": "Six owl images and PDFs including files named Luna Owl and Next pet were deleted to the Recycle Bin (recoverable soft-delete, not secure erasure)"
+      }
+    }
+  ],
+  "peirce_chain": {
+    "firstness": "Mobile device contains accounts on multiple communication platforms (Google, Musical.ly, Skype, Twitter, Facebook, Snapchat) with owl-related search history and browsing of birdtrader.co.uk owl sale listings.",
+    "secondness": "Musical.ly chat messages show direct negotiation between Sarah McAvoy (sarahmcavoy) and Layla Aster (layster82) involving: (1) request for email contact to coordinate transaction, (2) exchange of owl image with 'How do you like him', (3) buyer verification 'is that the exact one you have'. CM Security AppLock deployed to protect communication apps. Anti-forensic consciousness demonstrated.",
+    "thirdness": "Across two of the subject's own devices, the same deliberate owl-trade preparation appears: on the Nexus 5 a negotiation with a known seller (layster82) over Musical.ly with app compartmentalization; on the HD1 companion computer, browsing of specific owl for-sale listings on birdtrader.co.uk, owl husbandry materials, Pidgin under the same account, and deletion of owl files. Two independent devices for the same subject and the same objective establish deliberate, premeditated participation in illegal wildlife trade (INTENT). MALICE is not reached: no completed transaction or payment record is present on either device, and the HD1 deletions are recoverable soft-deletes."
+  },
+  "temporal_violations": [],
+  "caie_fractures": [
+    {
+      "type": "compartmentalization",
+      "description": "Owl trade discussed exclusively on Musical.ly (protected by AppLock), while Skype conversations explicitly excluded trade topics per scenario design. This compartmentalization indicates awareness that the activity was illicit."
+    },
+    {
+      "type": "anti_forensic_awareness",
+      "description": "CM Security AppLock installed specifically to protect Musical.ly and Snapchat. Subject deleted prior email thread with Layla ('I accidentally deleted the string of emails we sent'). Device rooted with TWRP/SuperSU. Encryption disabled — potentially to facilitate wipe/reset."
+    },
+    {
+      "type": "cross_device_corroboration",
+      "description": "Independent second device (HD1 HP computer) for the same subject Sarah McAvoy shows the same owl-purchase preparation, corroborating the phone and satisfying the two-source bar."
+    },
+    {
+      "type": "records_absent",
+      "description": "On HD1, Pidgin automatic chat logging was enabled but no conversation logs exist and the buddy list is empty; owl images and PDFs were deleted to the Recycle Bin."
+    }
+  ],
+  "expected_verdict": "INTENT",
+  "_label_correction_20260710": "MALICE->SUSPICION (firma Anna). Doctrina §9.4-LIM (L-051): un solo dispositivo/canal (Nexus 5, todo D3) sin triangulacion independiente topea en SUSPICION. Coincide con el dictamen sellado del examinador (FORENSIC_REPORT_OWL-NEXUS5.md §7.3, override manual 2026-07-03): la negociacion y la intencion estan en el telefono; la confirmacion de compra vive en la HP companion — sin ella no hay MALICE. El Amicus §IV lo documenta: no hay transaccion completada ni registros de pago en este dispositivo.",
+  "expected_mitre_ttps": [
+    "T1036",
+    "T1070.004",
+    "T1071.001",
+    "T1592"
+  ],
+  "_migration_note": {
+    "date": "2026-07-06",
+    "source": "results/agent_batch/OWL-NEXUS5-CASE_agent_bundle.json",
+    "method": "señales computadas por el pipeline determinista (modo motor, B-075/B-076) extraídas de pipeline_results.signals del bundle sellado; codificación Fraction canónica preservada",
+    "n_signals": 20
+  },
+  "schema_version": 1,
+  "case_name": "VIGIA-OWL-2019-COMPLETE",
+  "_label_correction_20260723": "SUSPICION->INTENT for the OWL case AS A WHOLE. OWL-NEXUS5 alone was capped at SUSPICION under L-051 (single device, no independent triangulation). HD1 is the independent second device (same subject Sarah McAvoy) recovered 2026-07-23; it supplies the corroboration. MALICE still NOT reached: no completed-payment proof on either device; HD1 Recycle-bin deletions are recoverable soft-deletes; the absence of Pidgin logs is not proven to be deletion. Sealed bundles: OWL-NEXUS5_bundle_claude_fable.json and OWL-HD1_bundle_claude_fable.json.",
+  "source_image_nexus5": {
+    "file": "LGE Nexus 5 Full Image.raw",
+    "sha1": "F46EE05CE1A2210501EA512ED9E4C7EC59222CCA",
+    "md5": "B334843A07A9E16494EEBDF3079E6BC6",
+    "imaging_tool": "Magnet ACQUIRE v2.0.0.5412",
+    "imaging_start_utc": "2017-02-06T20:51:09Z",
+    "imaging_end_utc": "2017-02-06T22:13:08Z",
+    "examiner": "Magnet Forensics",
+    "evidence_number": "MD1"
+  },
+  "source_image_hd1": {
+    "file": "HD1.E01",
+    "sha256": "f3174609fc4bf912824103b2f164922461b9549aa03c4fca8a57b837840cb9cb",
+    "source_drive": "Toshiba MQ01ACF050 500GB",
+    "source_serial": "16OGCPA5T",
+    "note": "Extracted from owl.zip; imaged and freed after sealing; decisive artifacts preserved under evidence/owl-2019-hd1-windows/"
+  },
+  "device_info_hd1": {
+    "manufacturer": "HP",
+    "type": "companion computer",
+    "os": "Windows",
+    "primary_user": "Sarah M / Sarah McAvoy",
+    "drive": "Toshiba MQ01ACF050 500GB serial 16OGCPA5T"
+  }
+}
