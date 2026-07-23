@@ -12,6 +12,10 @@ signal-quality gate is SHADOW/WARN). Full assessment and per-file evidence:
 `docs/CALIBRATION_ARCHAEOLOGY_20260723.md`.
 
 Moved (each had zero test/CI/live references — verified before moving):
+- `data/calibration_dataset.json` — early Bayes-derived calibration dataset; its
+  generator was already retired here and its only test (`tests/test_signal_calibration_dataset.py`)
+  was removed on 2026-07-23 (validated a dormant fossil, cost suite time), leaving
+  it fully orphaned.
 - `data/calibration_ladder_dataset_20260705.json` — ladder study dataset; only its
   own generator referenced it.
 - `scripts/generate_ladder_dataset.py` — standalone generator for the above.
