@@ -1,0 +1,84 @@
+{
+  "case_id": "JESS-M1",
+  "chain_tip_sha256": "0739bda9a3fdaf67cc5b6e33074d99d9f307b1d4df833f2ba7fc56c2f1cd4298",
+  "confidence_stored": "3/5",
+  "confidence_submitted": "1/1",
+  "confidence_warnings": [
+    "Confidence 1 capped at 3/5 (diversity ceiling: 1/3 observation groups)"
+  ],
+  "contradictions": [],
+  "diversity": "1/3",
+  "quality": "MINIMAL",
+  "sealed_at": "2026-07-23T03:25:39.509262+00:00",
+  "steps": [
+    {
+      "kind": "objective",
+      "payload": {
+        "case_id": "JESS-M1",
+        "objective": "Forensic intent analysis of data/cases/converted/VIGIA-MAGNET-2022-iOS-JESS.json",
+        "trace_version": "1.0"
+      },
+      "seq": 0
+    },
+    {
+      "kind": "hypothesis",
+      "payload": {
+        "description": "SUSPICION_DETECTED",
+        "label": "primary"
+      },
+      "seq": 1
+    },
+    {
+      "kind": "decision",
+      "payload": {
+        "confidence": "1/1",
+        "verdict": "SUSPICION"
+      },
+      "seq": 2
+    }
+  ],
+  "tool_execution_log": [
+    {
+      "chain_version": "2",
+      "entry_hash": "aed61fdce42e66b2e836d341a62fb8e6f3bb763409d363c10f81319b0490f2f9",
+      "event_id": "rt-JESS-M1:0",
+      "input_hash": "07d678485827f58a1d795eb9dff4e90df48c2e9fbd428bf5ddc1221690df9de8",
+      "mode": "python_fallback",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "result_summary": "Forensic intent analysis of data/cases/converted/VIGIA-MAGNET-2022-iOS-JESS.json",
+      "seq": 1,
+      "target": "JESS-M1",
+      "timestamp": "2026-07-23T03:25:39.509262+00:00",
+      "tool": "reasoning:objective"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "4f190de42a36d62903f5b33c7da72ebc68bc2c59e960122f11ffa6a3e826c9ed",
+      "event_id": "rt-JESS-M1:1",
+      "input_hash": "41cfc99a9767ba531191e0a69a80e68b193b8c732aa43b611bf2e132ff19c0b8",
+      "mode": "python_fallback",
+      "prev_hash": "aed61fdce42e66b2e836d341a62fb8e6f3bb763409d363c10f81319b0490f2f9",
+      "result_summary": "primary: SUSPICION_DETECTED",
+      "seq": 2,
+      "target": "JESS-M1",
+      "timestamp": "2026-07-23T03:25:39.509262+00:00",
+      "tool": "reasoning:hypothesis"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "0739bda9a3fdaf67cc5b6e33074d99d9f307b1d4df833f2ba7fc56c2f1cd4298",
+      "event_id": "rt-JESS-M1:2",
+      "input_hash": "c097485eabd2d3418de0f877c4e11ec525146fce480e157886f889b7b324fc8f",
+      "mode": "python_fallback",
+      "prev_hash": "4f190de42a36d62903f5b33c7da72ebc68bc2c59e960122f11ffa6a3e826c9ed",
+      "result_summary": "{'verdict': 'SUSPICION', 'confidence': '1/1'}",
+      "seq": 3,
+      "target": "JESS-M1",
+      "timestamp": "2026-07-23T03:25:39.509262+00:00",
+      "tool": "reasoning:decision"
+    }
+  ],
+  "trace_id": "rt-JESS-M1",
+  "trace_version": "1.0",
+  "verdict": "SUSPICION"
+}

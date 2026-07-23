@@ -1,0 +1,84 @@
+{
+  "case_id": "FLAREON-2017-M1",
+  "chain_tip_sha256": "1b61137a32e97a00f74547d7eca9e13dfd121bdf69f9fa44ffa1a6e7757a4c8d",
+  "confidence_stored": "3/5",
+  "confidence_submitted": "1/1",
+  "confidence_warnings": [
+    "Confidence 1 capped at 3/5 (diversity ceiling: 1/3 observation groups)"
+  ],
+  "contradictions": [],
+  "diversity": "1/3",
+  "quality": "MINIMAL",
+  "sealed_at": "2026-07-23T03:25:37.922192+00:00",
+  "steps": [
+    {
+      "kind": "objective",
+      "payload": {
+        "case_id": "FLAREON-2017-M1",
+        "objective": "Forensic intent analysis of data/cases/VIGIA-FLAREON-4.json",
+        "trace_version": "1.0"
+      },
+      "seq": 0
+    },
+    {
+      "kind": "hypothesis",
+      "payload": {
+        "description": "MALICIOUS_INTENT_DETECTED",
+        "label": "primary"
+      },
+      "seq": 1
+    },
+    {
+      "kind": "decision",
+      "payload": {
+        "confidence": "1/1",
+        "verdict": "MALICE"
+      },
+      "seq": 2
+    }
+  ],
+  "tool_execution_log": [
+    {
+      "chain_version": "2",
+      "entry_hash": "26e66c2048d0b855ee1cd17632f246d08e1e1ada1ab95296dab8006a6dab4861",
+      "event_id": "rt-FLAREON-2017-M1:0",
+      "input_hash": "0c0b69cb06cdd2d67dd9af1c5be79b80926212a68b21d97377a552c83ecb659c",
+      "mode": "python_fallback",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "result_summary": "Forensic intent analysis of data/cases/VIGIA-FLAREON-4.json",
+      "seq": 1,
+      "target": "FLAREON-2017-M1",
+      "timestamp": "2026-07-23T03:25:37.922192+00:00",
+      "tool": "reasoning:objective"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "35f00326ad20d6200758b23719b427930577dbb7cb46e8907febfa239e46c2b8",
+      "event_id": "rt-FLAREON-2017-M1:1",
+      "input_hash": "2f2f9b461752b6f92991533a5ac729c8e0cbb89a886c79b680043f9153b21e71",
+      "mode": "python_fallback",
+      "prev_hash": "26e66c2048d0b855ee1cd17632f246d08e1e1ada1ab95296dab8006a6dab4861",
+      "result_summary": "primary: MALICIOUS_INTENT_DETECTED",
+      "seq": 2,
+      "target": "FLAREON-2017-M1",
+      "timestamp": "2026-07-23T03:25:37.922192+00:00",
+      "tool": "reasoning:hypothesis"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "1b61137a32e97a00f74547d7eca9e13dfd121bdf69f9fa44ffa1a6e7757a4c8d",
+      "event_id": "rt-FLAREON-2017-M1:2",
+      "input_hash": "fb5c03b9e683233d6677ed9d1fedafc4d39c07ae3a863a1e8b19a99ffa1b7d19",
+      "mode": "python_fallback",
+      "prev_hash": "35f00326ad20d6200758b23719b427930577dbb7cb46e8907febfa239e46c2b8",
+      "result_summary": "{'verdict': 'MALICE', 'confidence': '1/1'}",
+      "seq": 3,
+      "target": "FLAREON-2017-M1",
+      "timestamp": "2026-07-23T03:25:37.922192+00:00",
+      "tool": "reasoning:decision"
+    }
+  ],
+  "trace_id": "rt-FLAREON-2017-M1",
+  "trace_version": "1.0",
+  "verdict": "MALICE"
+}

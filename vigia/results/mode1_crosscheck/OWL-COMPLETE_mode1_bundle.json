@@ -1,0 +1,728 @@
+{
+  "agent_verdict": "ABSTAIN",
+  "analysis_timestamp": "2026-07-23T03:25:38.485060+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "OWL-COMPLETE-M1",
+    "end_time": "2026-07-23T03:25:38.485065+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "OWL-COMPLETE-M1",
+        "entry_sha256": "f3af982b1b9d8733c420277ac7b111488a5e69dd938d693df3688ecef502319f",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "OWL-COMPLETE-M1"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: beb127ad3f5b7a01...; runtime fingerprint: 01c251ee907a2273...",
+        "outputs_summary": {
+          "agent_sha256": "beb127ad3f5b7a016937d0adeb7fb756f28840e6d5be840c779a6a2285f99a8a",
+          "agent_version": "1.0.0-SANS-2026",
+          "runtime_fingerprint": "01c251ee907a22737c7b64ce8b114dd86baaa14f183a5a6980daf037d96a10be"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-23T03:25:38.054983+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "OWL-COMPLETE-M1",
+        "entry_sha256": "7530fbfa5b90e4f178bfa98d74da2bf893ac4063f5e259b5e5f5205791a2f2b8",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-OWL-2019-COMPLETE.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-23T03:25:38.055066+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "OWL-COMPLETE-M1",
+        "entry_sha256": "78228b8fa4c597dcafd26d22ce3aa25f2221520f432e6b541a0580907f238a85",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-OWL-2019-COMPLETE.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 8b12efc7358428ec...",
+        "outputs_summary": {
+          "sha256": "8b12efc7358428eca474a7714a14478f2d8c00900cd63ddcbd07bcb80ebe47c3"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-23T03:25:38.055144+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "OWL-COMPLETE-M1",
+        "entry_sha256": "d77c82562f549134487b8a8f50acdc42996dd3dd0146fa77fdea58cd7a23505b",
+        "inputs_summary": {
+          "evidence": "data/cases/VIGIA-OWL-2019-COMPLETE.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-23T03:25:38.055229+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "OWL-COMPLETE-M1",
+        "entry_sha256": "f3858e3a3b3b921e2a31605a3d0210a8064ef5115bc0c19c728181c3f413fd98",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 30 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "UNDETERMINED",
+            "best_posterior": "17/100",
+            "confidence": "17/100",
+            "is_conclusive": "False",
+            "narrative": "[MOTOR] Label-blind selection: UNDETERMINED. Anomaly without sufficient structural support (score=0.0826)",
+            "narrative_provenance": "deterministic_motor_selection",
+            "scenario_context": "Complete Project OWL case combining two devices belonging to Sarah McAvoy (mcavoys87@gmail.com): the LGE Nexus 5 phone (negotiation with seller layster82 on Musical.ly) and the HD1 HP companion comput...",
+            "scenario_context_provenance": "case_description_unverified"
+          },
+          "case_id": "VIGIA-OWL-2019-COMPLETE",
+          "pipeline_meta": {
+            "artifact_count": "30",
+            "avg_score": "17/400",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.17",
+              "motor_reason": "Anomaly without sufficient structural support (score=0.0826)",
+              "motor_score": "0.0826",
+              "motor_verdict": "UNKNOWN",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "17/20",
+              "description": "{'account': 'mcavoys87@gmail.com', 'type': 'com.google', 'first_name': 'Sarah', 'last_name': 'Mcavoy'}",
+              "evidence_type": "app_data",
+              "source": "accounts.db",
+              "z_score": "17/400"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "17/20",
+              "description": "{'account': 'SarahMcavoy', 'type': 'com.zhiliaoapp.account'}",
+              "evidence_type": "app_data",
+              "source": "accounts.db",
+              "z_score": "17/400"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "17/20",
+              "description": "{'account': 'mcavoys87@gmail.com', 'type': 'com.skype.contacts.sync'}",
+              "evidence_type": "app_data",
+              "source": "accounts.db",
+              "z_score": "17/400"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "17/20",
+              "description": "{'account': 'mcavoys87', 'type': 'com.twitter.android.auth.login'}",
+              "evidence_type": "app_data",
+              "source": "accounts.db",
+              "z_score": "17/400"
+            },
+            {
+              "artifact_id": "ART-005",
+              "confidence": "17/20",
+              "description": "{'query': 'Tina and password', 'app': 'com.google.android.googlequicksearchbox', 'uri': 'search://Tina%20and%20password'}",
+              "evidence_type": "web_search",
+              "source": "recent_tasks/95_task.xml",
+              "z_score": "17/400"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-23T03:25:38.484453+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "OWL-COMPLETE-M1",
+        "entry_sha256": "decada18986e56db37846d0adb2e736fd678081f101ec34b088b1b9a705f4081",
+        "inputs_summary": {
+          "n_signals": "30"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-23T03:25:38.484679+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "OWL-COMPLETE-M1",
+        "entry_sha256": "6ba7db0419954bf3a61bdf5af0750e95497dce67e23d2b751a8c71ba93546d9d",
+        "inputs_summary": {
+          "verdict": "UNDETERMINED"
+        },
+        "iteration": 0,
+        "note": "Exit code 4 (ABSTAIN) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "ABSTAIN",
+          "exit_code": "4"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-23T03:25:38.485007+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-23T03:25:38.035238+00:00",
+    "total_entries": 7
+  },
+  "case_id": "OWL-COMPLETE-M1",
+  "evidence_path": "data/cases/VIGIA-OWL-2019-COMPLETE.json",
+  "evidence_sha256": "8b12efc7358428eca474a7714a14478f2d8c00900cd63ddcbd07bcb80ebe47c3",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE OWL-COMPLETE-M1 ===\nEvidence: data/cases/VIGIA-OWL-2019-COMPLETE.json\nEvidence SHA-256: 8b12efc7358428eca474a7714a14478f2d8c00900cd63ddcbd07bcb80ebe47c3\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: UNDETERMINED\nPosterior confidence: 17/100\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 30 se\u00f1al(es): 30 primaria(s) de ['HD1 $RECYCLE.BIN/S-1-5-21-929903582-3707417421-3176878646-1002', 'HD1 .purple/accounts.xml', 'HD1 .purple/prefs.xml + blist.xml', 'HD1 Users/Sarah M/Downloads', 'HD1 Windows/Prefetch', 'HD1 chrome_history.sqlite', 'HD1 prefetch + filesystem', 'accounts.db', 'app_directory', 'app_telemetry_cache', 'chrome_history_strings', 'dropbox/SYSTEM_BOOT', 'dropbox/event_log', 'facebook_cached_data', 'mmssms.db', 'musical.ly_chat_cache', 'recent_tasks/105_task.xml', 'recent_tasks/95_task.xml'], 0 derivada(s)/no-analizada(s). Top z: {'account': 'mcavoys87@gmail.com', 'type=0.04, {'account': 'SarahMcavoy', 'type': 'com.=0.04, {'account': 'mcavoys87@gmail.com', 'type=0.04.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: UNDETERMINED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\n[MOTOR] Label-blind selection: UNDETERMINED. Anomaly without sufficient structural support (score=0.0826)\n\n--- CASE CONTEXT (UNVERIFIED INPUT \u2014 NOT ANALYTICAL EVIDENCE) ---\nComplete Project OWL case combining two devices belonging to Sarah McAvoy (mcavoys87@gmail.com): the LGE Nexus 5 phone (negotiation with seller layster82 on Musical.ly) and the HD1 HP companion computer (owl-purchase research on birdtrader.co.uk, owl husbandry materials, Pidgin under the same account, and deleted owl files). Two independent devices for the same subject and the same deliberate owl-trade preparation satisfy two-source corroboration (lifts the L-051 single-device ceiling that cappe\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [{'account': 'mcavoys87@gmail.com', 'type': 'com.google', 'first_name':] z=0.043 conf=0.85 \u2014 \n  [{'account': 'SarahMcavoy', 'type': 'com.zhiliaoapp.account'}] z=0.043 conf=0.85 \u2014 \n  [{'account': 'mcavoys87@gmail.com', 'type': 'com.skype.contacts.sync'}] z=0.043 conf=0.85 \u2014 \n  [{'account': 'mcavoys87', 'type': 'com.twitter.android.auth.login'}] z=0.043 conf=0.85 \u2014 \n  [{'query': 'Tina and password', 'app': 'com.google.android.googlequicks] z=0.043 conf=0.85 \u2014 \n\n--- FINAL ALERT LEVEL ---\nINDETERMINATE \u2014 ABSTAIN verdict (UNDETERMINED): the evidence was not (fully) analyzed, so no alert level can be asserted.\nReconciliation: ABSTAIN verdict \u2014 the per-signal magnitude level (LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.) describes only the analyzed portion and is not an assessment of the unanalyzed evidence.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 30 | Derived: 0 | Total: 30",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "UNDETERMINED",
+      "best_posterior": "17/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 17
+      },
+      "is_conclusive": false,
+      "narrative": "[MOTOR] Label-blind selection: UNDETERMINED. Anomaly without sufficient structural support (score=0.0826)",
+      "narrative_provenance": "deterministic_motor_selection",
+      "scenario_context": "Complete Project OWL case combining two devices belonging to Sarah McAvoy (mcavoys87@gmail.com): the LGE Nexus 5 phone (negotiation with seller layster82 on Musical.ly) and the HD1 HP companion computer (owl-purchase research on birdtrader.co.uk, owl husbandry materials, Pidgin under the same account, and deleted owl files). Two independent devices for the same subject and the same deliberate owl-trade preparation satisfy two-source corroboration (lifts the L-051 single-device ceiling that cappe",
+      "scenario_context_provenance": "case_description_unverified"
+    },
+    "case_id": "VIGIA-OWL-2019-COMPLETE",
+    "pipeline_meta": {
+      "artifact_count": 30,
+      "avg_score": "17/400",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.17",
+        "motor_reason": "Anomaly without sufficient structural support (score=0.0826)",
+        "motor_score": "0.0826",
+        "motor_verdict": "UNKNOWN",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'account': 'mcavoys87@gmail.com', 'type': 'com.google', 'first_name': 'Sarah', 'last_name': 'Mcavoy'}",
+        "evidence_type": "app_data",
+        "source": "accounts.db",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'account': 'SarahMcavoy', 'type': 'com.zhiliaoapp.account'}",
+        "evidence_type": "app_data",
+        "source": "accounts.db",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'account': 'mcavoys87@gmail.com', 'type': 'com.skype.contacts.sync'}",
+        "evidence_type": "app_data",
+        "source": "accounts.db",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'account': 'mcavoys87', 'type': 'com.twitter.android.auth.login'}",
+        "evidence_type": "app_data",
+        "source": "accounts.db",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'query': 'Tina and password', 'app': 'com.google.android.googlequicksearchbox', 'uri': 'search://Tina%20and%20password'}",
+        "evidence_type": "web_search",
+        "source": "recent_tasks/95_task.xml",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-006",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'query': 'where to buy owls', 'urls': ['http://m.birdtrader.co.uk/birds-of-prey-for-sale/owls', 'http://m.birdtrader.co.uk/birds-of-prey-for-sale/owls?sstr=Baby%20owl&ads_dist=5', 'http://m.birdtrade",
+        "evidence_type": "web_search",
+        "source": "chrome_history_strings",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-007",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'query': 'how to take care of owls'}",
+        "evidence_type": "web_search",
+        "source": "chrome_history_strings",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-008",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'query': 'harry potter bird name'}",
+        "evidence_type": "web_search",
+        "source": "chrome_history_strings",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-009",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'query': 'Green sea turtle', 'app': 'com.android.chrome'}",
+        "evidence_type": "web_search",
+        "source": "recent_tasks/105_task.xml",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-010",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'platform': 'Facebook', 'query': 'snowy owl facts', 'images_viewed': ['beautiful_owl_photos_featured.jpg (shareably.net)', 'familyowlscameraden.jpg (owlday.com)', 'Snowy_Owl_Barrow_Alaska.jpg (Wikipe",
+        "evidence_type": "social_media",
+        "source": "facebook_cached_data",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-011",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'platform': 'Musical.ly (TikTok)', 'from': 'sarahmcavoy (190719500932296704)', 'to': 'layster82 (190723800861179904 / Layla Aster)', 'message': \"Hi Layla I accidentally deleted the string of emails w",
+        "evidence_type": "chat_message",
+        "source": "musical.ly_chat_cache",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-012",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'platform': 'Musical.ly (TikTok)', 'from': 'layster82 (Layla Aster)', 'to': 'sarahmcavoy', 'message': 'The email is Layster82gmail'}",
+        "evidence_type": "chat_message",
+        "source": "musical.ly_chat_cache",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-013",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'platform': 'Musical.ly (TikTok)', 'from': 'layster82 (Layla Aster)', 'to': 'sarahmcavoy', 'type': 'image', 'image_url': 'https://a1.hyphenate.io/musically/musically/chatfiles/66560c50-e73f-11e6-be73",
+        "evidence_type": "chat_message",
+        "source": "musical.ly_chat_cache",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-014",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'platform': 'Musical.ly (TikTok)', 'from': 'layster82 (Layla Aster)', 'to': 'sarahmcavoy', 'message': 'How do you like him'}",
+        "evidence_type": "chat_message",
+        "source": "musical.ly_chat_cache",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-015",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'platform': 'Musical.ly (TikTok)', 'from': 'sarahmcavoy', 'to': 'layster82', 'message': 'is that an image of the exact one you have or is it a photo of what it will look like?'}",
+        "evidence_type": "chat_message",
+        "source": "musical.ly_chat_cache",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-016",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'app': 'CM Security AppLock AntiVirus', 'package': 'com.cleanmaster.security', 'purpose': 'AppLock protecting Musical.ly and Snapchat'}",
+        "evidence_type": "app_data",
+        "source": "app_directory",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-017",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'app': 'CM Locker', 'package': 'com.cmcm.locker'}",
+        "evidence_type": "app_data",
+        "source": "app_directory",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-018",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'build': 'google/hammerhead/hammerhead:6.0.1/M4B30Z/3437181:user/release-keys', 'hardware': 'hammerhead', 'bootloader': 'HHZ20h'}",
+        "evidence_type": "log_entry",
+        "source": "dropbox/SYSTEM_BOOT",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-019",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'free_storage': '26466492416 bytes (24.6 GB)', 'skype_anr': 'com.skype.raider ANR on Bluetooth broadcast'}",
+        "evidence_type": "log_entry",
+        "source": "dropbox/event_log",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-020",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'app': 'com.zhiliaoapp.musically', 'version': '5.0.3', 'activity': 'ChatActivity', 'device_id': '688cc0e601b78cd3', 'advertising_id': 'e2215033-ad7c-459d-ac6a-1d625fe78cb9', 'event': 'START'}",
+        "evidence_type": "social_media",
+        "source": "app_telemetry_cache",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-021",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'address': '+13045184333', 'direction': 'received', 'message': 'Sarah, the delivery is today 7 tonight the confirmation will come later through pidgin'}",
+        "evidence_type": "sms",
+        "source": "mmssms.db",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-022",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'address': '+13045184333', 'direction': 'sent', 'message': 'Thank you!'}",
+        "evidence_type": "sms",
+        "source": "mmssms.db",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-101",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'account': 'mcavoys87@gmail.com', 'protocol': 'prpl-msn', 'client': 'Pidgin'}",
+        "evidence_type": "app_data",
+        "source": "HD1 .purple/accounts.xml",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-102",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'queries': ['can you buy snowy owl eggs', 'owl wingspans in america'], 'visited': ['birdtrader.co.uk/list-all-adverts?sstr=snowy+owls', '21food.com fertile-snowy-owl-eggs-for-sale', 'huntington.craig",
+        "evidence_type": "web_search",
+        "source": "HD1 chrome_history.sqlite",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-103",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'visited': ['birdtrader.co.uk/owls/breeding-pair-ashy-faced/557508', 'birdtrader.co.uk/owls/dark-breasted-barn-owls/557507'], 'then_opened': 'mail.google.com inbox message'}",
+        "evidence_type": "web_search",
+        "source": "HD1 chrome_history.sqlite",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-104",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'files': ['Owl_Emergency_Care.pdf', 'Owl_Keeping.pdf', 'Bibliography - Snowy Owl 14 April 2014 - GLOW posting.xls', 'Sightings2005.xls']}",
+        "evidence_type": "file_metadata",
+        "source": "HD1 Users/Sarah M/Downloads",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-105",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'app': 'Pidgin 2.11.0', 'install_path': 'AppData/Roaming/Microsoft/Windows/Pidgin', 'note': 'portable install outside Program Files'}",
+        "evidence_type": "app_data",
+        "source": "HD1 prefetch + filesystem",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-106",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'executable': 'PIDGIN.EXE', 'run_count': 7}",
+        "evidence_type": "prefetch",
+        "source": "HD1 Windows/Prefetch",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-107",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'logging_enabled': True, 'log_ims': 1, 'log_chats': 1, 'log_mode': 'automatic', 'logs_dir_present': False, 'buddy_list_empty': True}",
+        "evidence_type": "log_entry",
+        "source": "HD1 .purple/prefs.xml + blist.xml",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      },
+      {
+        "artifact_id": "ART-108",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "{'deleted_recoverable': ['Snowy_Owl.pdf', 'Great Horned Owl Info.pdf', 'Great Horned Owl.jpg', 'Pygmy Owl.jpg', 'Luna Owl.jpg', 'Next pet.jpg']}",
+        "evidence_type": "file_timestamp",
+        "source": "HD1 $RECYCLE.BIN/S-1-5-21-929903582-3707417421-3176878646-1002",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 17
+        }
+      }
+    ]
+  },
+  "runtime_fingerprint": "01c251ee907a22737c7b64ce8b114dd86baaa14f183a5a6980daf037d96a10be",
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": false,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 30,
+    "n_total_signals": 30,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

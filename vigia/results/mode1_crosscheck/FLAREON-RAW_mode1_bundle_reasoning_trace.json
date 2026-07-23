@@ -1,0 +1,84 @@
+{
+  "case_id": "FLAREON-RAW-M1",
+  "chain_tip_sha256": "d17bfeb3227e950111793a7e4e8dd9f36f16b8ec86d12ef1ce90b20d87cc28ed",
+  "confidence_stored": "3/5",
+  "confidence_submitted": "1/1",
+  "confidence_warnings": [
+    "Confidence 1 capped at 3/5 (diversity ceiling: 1/3 observation groups)"
+  ],
+  "contradictions": [],
+  "diversity": "1/3",
+  "quality": "MINIMAL",
+  "sealed_at": "2026-07-23T03:27:47.377957+00:00",
+  "steps": [
+    {
+      "kind": "objective",
+      "payload": {
+        "case_id": "FLAREON-RAW-M1",
+        "objective": "Forensic intent analysis of evidence/flare-on/flareon4",
+        "trace_version": "1.0"
+      },
+      "seq": 0
+    },
+    {
+      "kind": "hypothesis",
+      "payload": {
+        "description": "UNDETERMINED",
+        "label": "primary"
+      },
+      "seq": 1
+    },
+    {
+      "kind": "decision",
+      "payload": {
+        "confidence": "1/1",
+        "verdict": "ABSTAIN"
+      },
+      "seq": 2
+    }
+  ],
+  "tool_execution_log": [
+    {
+      "chain_version": "2",
+      "entry_hash": "5df2b7507bc470fe2fe6c73ae02f411f5d3bbb2b46f89791bb3dd6fcc1f25caf",
+      "event_id": "rt-FLAREON-RAW-M1:0",
+      "input_hash": "1ed0cf6b886eefeb55dc3183607c39fe9087726449ef7bb624eecd2fccfde970",
+      "mode": "python_fallback",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "result_summary": "Forensic intent analysis of evidence/flare-on/flareon4",
+      "seq": 1,
+      "target": "FLAREON-RAW-M1",
+      "timestamp": "2026-07-23T03:27:47.377957+00:00",
+      "tool": "reasoning:objective"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "2a9e0ff23958b6d3443051199bcf560c61ddd8d3e79cb4ee2de04d1136b0dcef",
+      "event_id": "rt-FLAREON-RAW-M1:1",
+      "input_hash": "a1311514d166b40906a4b4f50545313e9959c2d798f0e7bb9a82401c909dfce3",
+      "mode": "python_fallback",
+      "prev_hash": "5df2b7507bc470fe2fe6c73ae02f411f5d3bbb2b46f89791bb3dd6fcc1f25caf",
+      "result_summary": "primary: UNDETERMINED",
+      "seq": 2,
+      "target": "FLAREON-RAW-M1",
+      "timestamp": "2026-07-23T03:27:47.377957+00:00",
+      "tool": "reasoning:hypothesis"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "d17bfeb3227e950111793a7e4e8dd9f36f16b8ec86d12ef1ce90b20d87cc28ed",
+      "event_id": "rt-FLAREON-RAW-M1:2",
+      "input_hash": "fddbc64e15d27f44258f3b79c6873e7d5b8114bfddb1cb67134182213469404d",
+      "mode": "python_fallback",
+      "prev_hash": "2a9e0ff23958b6d3443051199bcf560c61ddd8d3e79cb4ee2de04d1136b0dcef",
+      "result_summary": "{'verdict': 'ABSTAIN', 'confidence': '1/1'}",
+      "seq": 3,
+      "target": "FLAREON-RAW-M1",
+      "timestamp": "2026-07-23T03:27:47.377957+00:00",
+      "tool": "reasoning:decision"
+    }
+  ],
+  "trace_id": "rt-FLAREON-RAW-M1",
+  "trace_version": "1.0",
+  "verdict": "ABSTAIN"
+}

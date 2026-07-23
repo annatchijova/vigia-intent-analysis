@@ -1,0 +1,84 @@
+{
+  "case_id": "OWL-COMPLETE-M1",
+  "chain_tip_sha256": "2ba33da861236ee2bb94569d2a51156eef312d9846d3e93982565db9539ccc16",
+  "confidence_stored": "3/5",
+  "confidence_submitted": "1/1",
+  "confidence_warnings": [
+    "Confidence 1 capped at 3/5 (diversity ceiling: 1/3 observation groups)"
+  ],
+  "contradictions": [],
+  "diversity": "1/3",
+  "quality": "MINIMAL",
+  "sealed_at": "2026-07-23T03:25:38.485060+00:00",
+  "steps": [
+    {
+      "kind": "objective",
+      "payload": {
+        "case_id": "OWL-COMPLETE-M1",
+        "objective": "Forensic intent analysis of data/cases/VIGIA-OWL-2019-COMPLETE.json",
+        "trace_version": "1.0"
+      },
+      "seq": 0
+    },
+    {
+      "kind": "hypothesis",
+      "payload": {
+        "description": "UNDETERMINED",
+        "label": "primary"
+      },
+      "seq": 1
+    },
+    {
+      "kind": "decision",
+      "payload": {
+        "confidence": "1/1",
+        "verdict": "ABSTAIN"
+      },
+      "seq": 2
+    }
+  ],
+  "tool_execution_log": [
+    {
+      "chain_version": "2",
+      "entry_hash": "2964c1b217cb7c3d0d36e14a0d0fbce43298efcadd0f4ba064fc3da255a9cd0f",
+      "event_id": "rt-OWL-COMPLETE-M1:0",
+      "input_hash": "c9b220389c76c5ab2e156f7d13ba6061aa3789e238b55da000317695bfd19a8c",
+      "mode": "python_fallback",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "result_summary": "Forensic intent analysis of data/cases/VIGIA-OWL-2019-COMPLETE.json",
+      "seq": 1,
+      "target": "OWL-COMPLETE-M1",
+      "timestamp": "2026-07-23T03:25:38.485060+00:00",
+      "tool": "reasoning:objective"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "b2bc0a7143a1dc374252809f919fbc1023a3c26f42eb05bc7d4ec5eebe86875f",
+      "event_id": "rt-OWL-COMPLETE-M1:1",
+      "input_hash": "a1311514d166b40906a4b4f50545313e9959c2d798f0e7bb9a82401c909dfce3",
+      "mode": "python_fallback",
+      "prev_hash": "2964c1b217cb7c3d0d36e14a0d0fbce43298efcadd0f4ba064fc3da255a9cd0f",
+      "result_summary": "primary: UNDETERMINED",
+      "seq": 2,
+      "target": "OWL-COMPLETE-M1",
+      "timestamp": "2026-07-23T03:25:38.485060+00:00",
+      "tool": "reasoning:hypothesis"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "2ba33da861236ee2bb94569d2a51156eef312d9846d3e93982565db9539ccc16",
+      "event_id": "rt-OWL-COMPLETE-M1:2",
+      "input_hash": "fddbc64e15d27f44258f3b79c6873e7d5b8114bfddb1cb67134182213469404d",
+      "mode": "python_fallback",
+      "prev_hash": "b2bc0a7143a1dc374252809f919fbc1023a3c26f42eb05bc7d4ec5eebe86875f",
+      "result_summary": "{'verdict': 'ABSTAIN', 'confidence': '1/1'}",
+      "seq": 3,
+      "target": "OWL-COMPLETE-M1",
+      "timestamp": "2026-07-23T03:25:38.485060+00:00",
+      "tool": "reasoning:decision"
+    }
+  ],
+  "trace_id": "rt-OWL-COMPLETE-M1",
+  "trace_version": "1.0",
+  "verdict": "ABSTAIN"
+}

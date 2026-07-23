@@ -1,0 +1,344 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-07-23T03:25:39.509262+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "JESS-M1",
+    "end_time": "2026-07-23T03:25:39.509266+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "JESS-M1",
+        "entry_sha256": "e5ee82d5449213dbe2371f8c28101610073e02797f7b6a92cf9a859081ecaf11",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "JESS-M1"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: beb127ad3f5b7a01...; runtime fingerprint: b303fe5d55f496ba...",
+        "outputs_summary": {
+          "agent_sha256": "beb127ad3f5b7a016937d0adeb7fb756f28840e6d5be840c779a6a2285f99a8a",
+          "agent_version": "1.0.0-SANS-2026",
+          "runtime_fingerprint": "b303fe5d55f496ba18a352434b52429edb2c465cd597e98697bd7e67fe0374c8"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-23T03:25:39.153588+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "JESS-M1",
+        "entry_sha256": "a2203ad3f7bc65ff2a856eab06bb499efd6f4db7f633fe476b637333d41e0027",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-MAGNET-2022-iOS-JESS.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-23T03:25:39.153670+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "JESS-M1",
+        "entry_sha256": "fc4b4fb0310047f16134ad07ba6294216429dc71d31ba710fb65a4dda6afd9e5",
+        "inputs_summary": {
+          "path": "data/cases/converted/VIGIA-MAGNET-2022-iOS-JESS.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: f8be4261e3400aea...",
+        "outputs_summary": {
+          "sha256": "f8be4261e3400aead2854b3845ac5db10fac63eb1740b4ea7036909c82e5f2c7"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-23T03:25:39.153746+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "JESS-M1",
+        "entry_sha256": "b24367e1444c60af5ff76a55c849ff5591f23034c1cda033357df5526df0881a",
+        "inputs_summary": {
+          "evidence": "data/cases/converted/VIGIA-MAGNET-2022-iOS-JESS.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-23T03:25:39.153828+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "JESS-M1",
+        "entry_sha256": "d52e245b2d54d714cb7bb752d958fd5c0b5731d9692d18bdc170926b6ec3ae27",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 6 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "7/25",
+            "confidence": "7/25",
+            "is_conclusive": "False",
+            "narrative": "[MOTOR] Label-blind selection: SUSPICION_DETECTED. Significant signal with structural support (score=0.1395)",
+            "narrative_provenance": "deterministic_motor_selection",
+            "scenario_context": "iPhone 8 (iOS 15.0.2) belonging to Patrick Bentley (pbentley0107@gmail.com, +1-973-294-1683), Champlain College student in Burlington VT. GrayKey extraction 2022-02-14. Device exhibits deliberate oper...",
+            "scenario_context_provenance": "case_description_unverified"
+          },
+          "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+          "pipeline_meta": {
+            "artifact_count": "6",
+            "avg_score": "319/600",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "SUSPICION",
+            "resolve": {
+              "motor_confidence": "0.28",
+              "motor_reason": "Significant signal with structural support (score=0.1395)",
+              "motor_score": "0.1395",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "iOS-JESS-001",
+              "confidence": "19/20",
+              "description": "Three encrypted messaging apps installed within 10 minutes: Signal (22:02), Wire (22:06), WeChat (22:07) on 2022-01-21. Combined with empty contacts database, empty call history, iCloud backup NEVER, ",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "57/80"
+            },
+            {
+              "artifact_id": "iOS-JESS-002",
+              "confidence": "19/20",
+              "description": "Safari history 2022-02-11 03:59-04:15 UTC: Subject searched what to do if you get hacked, how to fix a computer from being hacked, computer fix near me (Burlington VT Yelp), hacked computer what to do",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "19/25"
+            },
+            {
+              "artifact_id": "iOS-JESS-003",
+              "confidence": "9/10",
+              "description": "Suspicious iMessage from naomakile3zro@outlook.com containing ow.ly shortened URL with malformed content (extraneous whitespace, symbols). Randomly-generated sender address pattern. Arrived 2 days bef",
+              "evidence_type": "log_entry",
+              "source": "read_evidence",
+              "z_score": "81/200"
+            },
+            {
+              "artifact_id": "iOS-JESS-004",
+              "confidence": "19/20",
+              "description": "Safari search for whatsmyip.com on 2022-01-21 20:42 UTC. IP address reconnaissance on same day as encrypted app installations. Indicates OPSEC awareness -- checking network exposure before configuring",
+              "evidence_type": "log_entry",
+              "source": "search_pattern",
+              "z_score": "19/40"
+            },
+            {
+              "artifact_id": "iOS-JESS-005",
+              "confidence": "9/10",
+              "description": "Credential reuse pattern: 0107 suffix in email (pbentley0107@gmail.com), chess username (ChessGod0107), WiFi password (NetherConqueror0107). Plaintext password God@Chess! in keychain. Previous passcod",
+              "evidence_type": "registry_key",
+              "source": "read_evidence",
+              "z_score": "63/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-23T03:25:39.508893+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "JESS-M1",
+        "entry_sha256": "19cade242df52b190f7d74b249ad2ae7c3c9ce73083b63f69db1691b28779e7d",
+        "inputs_summary": {
+          "n_signals": "6"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-23T03:25:39.509021+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "JESS-M1",
+        "entry_sha256": "7841a17df47dc915eb75cca13be92c46921f12d717a44b510b0671cef99aec9e",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-23T03:25:39.509217+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-23T03:25:39.133812+00:00",
+    "total_entries": 7
+  },
+  "case_id": "JESS-M1",
+  "evidence_path": "data/cases/converted/VIGIA-MAGNET-2022-iOS-JESS.json",
+  "evidence_sha256": "f8be4261e3400aead2854b3845ac5db10fac63eb1740b4ea7036909c82e5f2c7",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE JESS-M1 ===\nEvidence: data/cases/converted/VIGIA-MAGNET-2022-iOS-JESS.json\nEvidence SHA-256: f8be4261e3400aead2854b3845ac5db10fac63eb1740b4ea7036909c82e5f2c7\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 7/25\nConclusive: NO \u2014 requires human review\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['read_evidence', 'search_pattern'], 0 derivada(s)/no-analizada(s). Top z: Safari history 2022-02-11 03:59-04:15 UT=0.76, Three encrypted messaging apps installed=0.71, Device in Before First Unlock (BFU) stat=0.52.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: no \u2014 requiere revisi\u00f3n humana.\n\nRazonamiento del motor abductivo:\n[MOTOR] Label-blind selection: SUSPICION_DETECTED. Significant signal with structural support (score=0.1395)\n\n--- CASE CONTEXT (UNVERIFIED INPUT \u2014 NOT ANALYTICAL EVIDENCE) ---\niPhone 8 (iOS 15.0.2) belonging to Patrick Bentley (pbentley0107@gmail.com, +1-973-294-1683), Champlain College student in Burlington VT. GrayKey extraction 2022-02-14. Device exhibits deliberate operational security posture: three encrypted messaging apps (Signal, Wire, WeChat) installed within 10 minutes, empty contacts and call history despite 24+ days of use, iCloud backup never enabled, Total Wireless prepaid carrier, BFU lock state at seizure. Safari history reveals IP reconnaissance (what\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Safari history 2022-02-11 03:59-04:15 UTC: Subject searched what to do] z=0.760 conf=0.95 \u2014 \n  [Three encrypted messaging apps installed within 10 minutes: Signal (22] z=0.713 conf=0.95 \u2014 \n  [Device in Before First Unlock (BFU) state at GrayKey seizure. BFU mean] z=0.522 conf=0.95 \u2014 \n  [Safari search for whatsmyip.com on 2022-01-21 20:42 UTC. IP address re] z=0.475 conf=0.95 \u2014 \n  [Suspicious iMessage from naomakile3zro@outlook.com containing ow.ly sh] z=0.405 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "7/25",
+      "confidence": {
+        "__fraction__": true,
+        "den": 25,
+        "num": 7
+      },
+      "is_conclusive": false,
+      "narrative": "[MOTOR] Label-blind selection: SUSPICION_DETECTED. Significant signal with structural support (score=0.1395)",
+      "narrative_provenance": "deterministic_motor_selection",
+      "scenario_context": "iPhone 8 (iOS 15.0.2) belonging to Patrick Bentley (pbentley0107@gmail.com, +1-973-294-1683), Champlain College student in Burlington VT. GrayKey extraction 2022-02-14. Device exhibits deliberate operational security posture: three encrypted messaging apps (Signal, Wire, WeChat) installed within 10 minutes, empty contacts and call history despite 24+ days of use, iCloud backup never enabled, Total Wireless prepaid carrier, BFU lock state at seizure. Safari history reveals IP reconnaissance (what",
+      "scenario_context_provenance": "case_description_unverified"
+    },
+    "case_id": "VIGIA-MAGNET-2022-iOS-JESS",
+    "pipeline_meta": {
+      "artifact_count": 6,
+      "avg_score": "319/600",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "SUSPICION",
+      "resolve": {
+        "motor_confidence": "0.28",
+        "motor_reason": "Significant signal with structural support (score=0.1395)",
+        "motor_score": "0.1395",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "iOS-JESS-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Three encrypted messaging apps installed within 10 minutes: Signal (22:02), Wire (22:06), WeChat (22:07) on 2022-01-21. Combined with empty contacts database, empty call history, iCloud backup NEVER, ",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 80,
+          "num": 57
+        }
+      },
+      {
+        "artifact_id": "iOS-JESS-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Safari history 2022-02-11 03:59-04:15 UTC: Subject searched what to do if you get hacked, how to fix a computer from being hacked, computer fix near me (Burlington VT Yelp), hacked computer what to do",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "iOS-JESS-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Suspicious iMessage from naomakile3zro@outlook.com containing ow.ly shortened URL with malformed content (extraneous whitespace, symbols). Randomly-generated sender address pattern. Arrived 2 days bef",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 81
+        }
+      },
+      {
+        "artifact_id": "iOS-JESS-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Safari search for whatsmyip.com on 2022-01-21 20:42 UTC. IP address reconnaissance on same day as encrypted app installations. Indicates OPSEC awareness -- checking network exposure before configuring",
+        "evidence_type": "log_entry",
+        "source": "search_pattern",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 19
+        }
+      },
+      {
+        "artifact_id": "iOS-JESS-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Credential reuse pattern: 0107 suffix in email (pbentley0107@gmail.com), chess username (ChessGod0107), WiFi password (NetherConqueror0107). Plaintext password God@Chess! in keychain. Previous passcod",
+        "evidence_type": "registry_key",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "iOS-JESS-006",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 19
+        },
+        "description": "Device in Before First Unlock (BFU) state at GrayKey seizure. BFU means device had been powered off or rebooted before law enforcement obtained it. BFU state maximizes encryption protections and limit",
+        "evidence_type": "log_entry",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 209
+        }
+      }
+    ]
+  },
+  "runtime_fingerprint": "b303fe5d55f496ba18a352434b52429edb2c465cd597e98697bd7e67fe0374c8",
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 6,
+    "n_total_signals": 6,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

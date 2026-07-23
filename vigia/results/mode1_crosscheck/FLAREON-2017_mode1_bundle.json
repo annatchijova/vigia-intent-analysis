@@ -1,0 +1,496 @@
+{
+  "agent_verdict": "MALICE",
+  "analysis_timestamp": "2026-07-23T03:25:37.922192+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "FLAREON-2017-M1",
+    "end_time": "2026-07-23T03:25:37.922197+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "FLAREON-2017-M1",
+        "entry_sha256": "1d7597243e9b72bd51cd33703baab725fa3d56c2e4959f401f3cbc5bc7c5e993",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "FLAREON-2017-M1"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: beb127ad3f5b7a01...; runtime fingerprint: 01c251ee907a2273...",
+        "outputs_summary": {
+          "agent_sha256": "beb127ad3f5b7a016937d0adeb7fb756f28840e6d5be840c779a6a2285f99a8a",
+          "agent_version": "1.0.0-SANS-2026",
+          "runtime_fingerprint": "01c251ee907a22737c7b64ce8b114dd86baaa14f183a5a6980daf037d96a10be"
+        },
+        "seq": 1,
+        "timestamp": "2026-07-23T03:25:37.580658+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "FLAREON-2017-M1",
+        "entry_sha256": "0d78d02b166b8c152ec5f21efa6f7fd7aa843464f23f97d81aa4899e29d0b840",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-FLAREON-4.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-07-23T03:25:37.580782+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "FLAREON-2017-M1",
+        "entry_sha256": "de1523866870f32f1899614cd7e007ba4f13bc64139a3a4165b78878bd4cf612",
+        "inputs_summary": {
+          "path": "data/cases/VIGIA-FLAREON-4.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: b47694cba5c4b6c7...",
+        "outputs_summary": {
+          "sha256": "b47694cba5c4b6c7ab3db06ae9bd8e7d733ff097a4efde4273416a6b0d12949d"
+        },
+        "seq": 3,
+        "timestamp": "2026-07-23T03:25:37.580869+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "FLAREON-2017-M1",
+        "entry_sha256": "a5cd196fc32addbf54515725c6d0751acb4f982c702113bced756c76fc871df8",
+        "inputs_summary": {
+          "evidence": "data/cases/VIGIA-FLAREON-4.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-07-23T03:25:37.580976+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "FLAREON-2017-M1",
+        "entry_sha256": "37bf34a09cb882ad42d28f55163e95eb267cf308cec12e6efb36bdff3a966cf8",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 14 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+            "best_posterior": "19/20",
+            "confidence": "19/20",
+            "is_conclusive": "True",
+            "narrative": "[MOTOR] Label-blind selection: MALICIOUS_INTENT_DETECTED. Intent score 0.8106 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 14 artifacts) (B-068 gate, R4-3 v2)",
+            "narrative_provenance": "deterministic_motor_selection",
+            "scenario_context": "FLARE-On 4 challenge set released in 2017 by FireEye FLARE team. The zip archive (8,293,788 bytes, SHA-256: 760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7) contains 12 challenges acr...",
+            "scenario_context_provenance": "case_description_unverified"
+          },
+          "case_id": "VIGIA-FLAREON-4",
+          "pipeline_meta": {
+            "artifact_count": "14",
+            "avg_score": "20511/28000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "INTENT",
+            "resolve": {
+              "motor_confidence": "0.95",
+              "motor_reason": "Intent score 0.8106 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 14 artifacts) (B-068 gate, R4-3 v2)",
+              "motor_score": "0.8106",
+              "motor_verdict": "MALICE",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "flareon4-zip-001",
+              "confidence": "99/100",
+              "description": "Outer zip archive Flare-On4_Challenges.zip. SHA-256 verified against task specification. Size: 8,293,788 bytes. AES-256 encrypted (PK compat v5.1), password: 'flare'. Contains 13 files in 12 folders (",
+              "evidence_type": "file_hash",
+              "source": "generate_forensic_hash",
+              "z_score": "1881/2000"
+            },
+            {
+              "artifact_id": "flareon4-ch01-login-html",
+              "confidence": "9/10",
+              "description": "Challenge 01 \u2014 login.html (877 bytes). HTML/JavaScript client-side authentication. The JavaScript applies ROT13 to user input and compares against hardcoded ciphertext 'PyvragFvqrYbtvafNerRnfl@syner-b",
+              "evidence_type": "web_artifact",
+              "source": "read_evidence",
+              "z_score": "63/100"
+            },
+            {
+              "artifact_id": "flareon4-ch02-igniteme",
+              "confidence": "9/10",
+              "description": "Challenge 02 \u2014 IgniteMe.exe (3,072 bytes). PE32 console Intel 80386, 3 sections. Extremely compact PE (3 KB). Imports: GetStdHandle, ReadFile, WriteFile, ExitProcess (KERNEL32.dll only). Prompts 'G1v3",
+              "evidence_type": "binary",
+              "source": "generate_forensic_hash",
+              "z_score": "18/25"
+            },
+            {
+              "artifact_id": "flareon4-ch03-greek-to-me",
+              "confidence": "9/10",
+              "description": "Challenge 03 \u2014 greek_to_me.exe (2,048 bytes). PE32 console Intel 80386, 2 sections. Name 'it's all Greek to me' \u2014 references incomprehensible content. Tiny 2 KB PE with only 2 sections suggests shellc",
+              "evidence_type": "binary",
+              "source": "generate_forensic_hash",
+              "z_score": "27/40"
+            },
+            {
+              "artifact_id": "flareon4-ch04-notepad",
+              "confidence": "9/10",
+              "description": "Challenge 04 \u2014 notepad.exe (76,288 bytes). PE32 GUI Intel 80386, 3 sections. Timestamp 2008-04-14 \u2014 predating the challenge by 9 years, suggesting this is a modified copy of the Windows XP/Vista Notep",
+              "evidence_type": "binary",
+              "source": "generate_forensic_hash",
+              "z_score": "153/200"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-07-23T03:25:37.921611+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "FLAREON-2017-M1",
+        "entry_sha256": "aeace8deddcd56841001abd1978b9f53cf75eb87c8b5bf0fcd922cbc632628b0",
+        "inputs_summary": {
+          "n_signals": "14"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-07-23T03:25:37.921774+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "FLAREON-2017-M1",
+        "entry_sha256": "8befc5f9b657580017c00129e89939ecf7a37a5b740b8e6016eda1b494c4994f",
+        "inputs_summary": {
+          "verdict": "MALICIOUS_INTENT_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 1 (MALICE) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "MALICE",
+          "exit_code": "1"
+        },
+        "seq": 7,
+        "timestamp": "2026-07-23T03:25:37.922033+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-07-23T03:25:37.560776+00:00",
+    "total_entries": 7
+  },
+  "case_id": "FLAREON-2017-M1",
+  "evidence_path": "data/cases/VIGIA-FLAREON-4.json",
+  "evidence_sha256": "b47694cba5c4b6c7ab3db06ae9bd8e7d733ff097a4efde4273416a6b0d12949d",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE FLAREON-2017-M1 ===\nEvidence: data/cases/VIGIA-FLAREON-4.json\nEvidence SHA-256: b47694cba5c4b6c7ab3db06ae9bd8e7d733ff097a4efde4273416a6b0d12949d\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: MALICIOUS_INTENT_DETECTED\nPosterior confidence: 19/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 14 se\u00f1al(es): 14 primaria(s) de ['generate_forensic_hash', 'read_evidence'], 0 derivada(s)/no-analizada(s). Top z: Outer zip archive Flare-On4_Challenges.z=0.94, Challenge 10 \u2014 shell.php (3,586 bytes). =0.81, Challenge 04 \u2014 notepad.exe (76,288 bytes=0.77.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: MALICIOUS_INTENT_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n[MOTOR] Label-blind selection: MALICIOUS_INTENT_DETECTED. Intent score 0.8106 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 14 artifacts) (B-068 gate, R4-3 v2)\n\n--- CASE CONTEXT (UNVERIFIED INPUT \u2014 NOT ANALYTICAL EVIDENCE) ---\nFLARE-On 4 challenge set released in 2017 by FireEye FLARE team. The zip archive (8,293,788 bytes, SHA-256: 760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7) contains 12 challenges across folders 01\u201312. Notable artifacts: challenge 01 (login.html, 877 bytes) is a client-side JavaScript authentication challenge where the flag 'ClientSideLoginsAreEasy@flare-on.com' is obscured via ROT13; challenge 02 (IgniteMe.exe, 3,072 bytes) is a tiny PE32 console binary with XOR-based key deriv\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Outer zip archive Flare-On4_Challenges.zip. SHA-256 verified against t] z=0.941 conf=0.99 \u2014 \n  [Challenge 10 \u2014 shell.php (3,586 bytes). PHP webshell. Base64-encoded 2] z=0.810 conf=0.90 \u2014 \n  [Challenge 04 \u2014 notepad.exe (76,288 bytes). PE32 GUI Intel 80386, 3 sec] z=0.765 conf=0.90 \u2014 \n  [Challenge 12a \u2014 20170801_1300_filtered.pcap (5,747,603 bytes). libpcap] z=0.765 conf=0.90 \u2014 \n  [Challenge 12b \u2014 coolprogram.exe (86,528 bytes). PE32 GUI Intel 80386, ] z=0.765 conf=0.90 \u2014 \n\n--- FINAL ALERT LEVEL ---\nHIGH \u2014 MALICE verdict from Bayesian posterior aggregation. Individual z-scores below threshold (distributed evidence pattern: no single dominant signal, but aggregate posterior is decisive). Alert floored (B-028/B-065).\nReconciliation: verdict MALICE rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 14 | Derived: 0 | Total: 14",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "MALICIOUS_INTENT_DETECTED",
+      "best_posterior": "19/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 19
+      },
+      "devil_advocate": {
+        "aggregation": {
+          "k": 3,
+          "method": "top_k_already_validated_matches_v2",
+          "total_gap_mass": "0"
+        },
+        "counterfactual_summary": {
+          "primary_alternative_hypothesis": null
+        },
+        "decision_context": {
+          "confidence": "19/20",
+          "mapped_verdict": "MALICIOUS_INTENT_DETECTED",
+          "raw_verdict": "MALICIOUS_INTENT_DETECTED",
+          "score": "20511/28000"
+        },
+        "devil_advocate_source": "deterministic_no_pattern_data_available",
+        "meta": {
+          "deterministic": true,
+          "generated_from": "case_pattern_library"
+        },
+        "narrative": "Eco's Razor (Abductive Falsification) applied to verdict MALICIOUS_INTENT_DETECTED. Pattern-matching data was not available on this code path \u2014 CasePatternLibrary is not invoked here by design (agent audit-trail mode (vigia_agent.py \u2014 JSON-replay / autonomous path); see KNOWN_LIMITATIONS.md). No structured counter-hypothesis could be derived deterministically. This is a documented scope limitation of the current code path, not an absence of falsification attempt.",
+        "pattern_evidence_gaps": [],
+        "version": "r7-da-v1"
+      },
+      "is_conclusive": true,
+      "narrative": "[MOTOR] Label-blind selection: MALICIOUS_INTENT_DETECTED. Intent score 0.8106 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 14 artifacts) (B-068 gate, R4-3 v2)",
+      "narrative_provenance": "deterministic_motor_selection",
+      "scenario_context": "FLARE-On 4 challenge set released in 2017 by FireEye FLARE team. The zip archive (8,293,788 bytes, SHA-256: 760f1130aa0166a25a50c334d5ecc1537a71e3761360fa17b83ab63a402748b7) contains 12 challenges across folders 01\u201312. Notable artifacts: challenge 01 (login.html, 877 bytes) is a client-side JavaScript authentication challenge where the flag 'ClientSideLoginsAreEasy@flare-on.com' is obscured via ROT13; challenge 02 (IgniteMe.exe, 3,072 bytes) is a tiny PE32 console binary with XOR-based key deriv",
+      "scenario_context_provenance": "case_description_unverified"
+    },
+    "case_id": "VIGIA-FLAREON-4",
+    "pipeline_meta": {
+      "artifact_count": 14,
+      "avg_score": "20511/28000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "INTENT",
+      "resolve": {
+        "motor_confidence": "0.95",
+        "motor_reason": "Intent score 0.8106 exceeds MALICE threshold \u2014 corroboration branch: cross-domain (3 domains, 14 artifacts) (B-068 gate, R4-3 v2)",
+        "motor_score": "0.8106",
+        "motor_verdict": "MALICE",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "flareon4-zip-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 99
+        },
+        "description": "Outer zip archive Flare-On4_Challenges.zip. SHA-256 verified against task specification. Size: 8,293,788 bytes. AES-256 encrypted (PK compat v5.1), password: 'flare'. Contains 13 files in 12 folders (",
+        "evidence_type": "file_hash",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 2000,
+          "num": 1881
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch01-login-html",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 01 \u2014 login.html (877 bytes). HTML/JavaScript client-side authentication. The JavaScript applies ROT13 to user input and compares against hardcoded ciphertext 'PyvragFvqrYbtvafNerRnfl@syner-b",
+        "evidence_type": "web_artifact",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 63
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch02-igniteme",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 02 \u2014 IgniteMe.exe (3,072 bytes). PE32 console Intel 80386, 3 sections. Extremely compact PE (3 KB). Imports: GetStdHandle, ReadFile, WriteFile, ExitProcess (KERNEL32.dll only). Prompts 'G1v3",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch03-greek-to-me",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 03 \u2014 greek_to_me.exe (2,048 bytes). PE32 console Intel 80386, 2 sections. Name 'it's all Greek to me' \u2014 references incomprehensible content. Tiny 2 KB PE with only 2 sections suggests shellc",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch04-notepad",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 04 \u2014 notepad.exe (76,288 bytes). PE32 GUI Intel 80386, 3 sections. Timestamp 2008-04-14 \u2014 predating the challenge by 9 years, suggesting this is a modified copy of the Windows XP/Vista Notep",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch05-pewpewboat",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 05 \u2014 pewpewboat.exe (80,560 bytes). ELF 64-bit LSB executable, x86-64, dynamically linked, for GNU/Linux 2.6.32, stripped. Name references a Battleship-style shooting game. Cross-platform Li",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch06-payload-dll",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 06 \u2014 payload.dll (105,984 bytes). PE32+ DLL (GUI) x86-64, 7 sections. 64-bit DLL with 7 sections \u2014 more complex than typical CTF DLLs. Name 'payload' is unambiguous: this is the challenge pa",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch07-zsud",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 07 \u2014 zsud.exe (385,536 bytes). PE32 GUI Intel 80386, 6 sections. Name 'zsud' may be a reference to Zork-like text adventure or a custom protocol. Size 385 KB with 6 sections suggests a subst",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch08-flair-apk",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 08 \u2014 flair.apk (3,848,256 bytes). Android package (APK) with AndroidManifest.xml and APK Signing Block. Name 'flair' may reference TGI Friday's 'flair' \u2014 a cultural in-joke. Largest non-PCAP",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch09-remorse-hex",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 09 \u2014 remorse.ino.hex (12,503 bytes). Arduino Intel HEX firmware file (ASCII text, CRLF). '.ino' extension indicates Arduino sketch source; '.hex' indicates compiled Intel HEX firmware. Requi",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch10-shell-php",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 10 \u2014 shell.php (3,586 bytes). PHP webshell. Base64-encoded 2,268-byte payload XOR-decrypted with MD5-derived key from POST parameter 'o_o'. MD5 check: if MD5(decrypted) == '43a141570e0c926e0",
+        "evidence_type": "web_artifact",
+        "source": "read_evidence",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 81
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch11-covfefe",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 11 \u2014 covfefe.exe (20,480 bytes). PE32 console Intel 80386, 3 sections. Name references the famous 2017 Trump typo-tweet 'covfefe' \u2014 a cultural in-joke for the 2017 CTF edition. Small 20 KB P",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 40,
+          "num": 27
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch12-pcap",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 12a \u2014 20170801_1300_filtered.pcap (5,747,603 bytes). libpcap v2.4 Ethernet capture. Filename encodes date 2017-08-01 13:00 'filtered' \u2014 suggests traffic was pre-filtered to contain only rele",
+        "evidence_type": "network_traffic",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      },
+      {
+        "artifact_id": "flareon4-ch12-coolprogram",
+        "confidence": {
+          "__fraction__": true,
+          "den": 10,
+          "num": 9
+        },
+        "description": "Challenge 12b \u2014 coolprogram.exe (86,528 bytes). PE32 GUI Intel 80386, 9 sections. Name 'coolprogram' is deliberately banal \u2014 a masquerading tactic. 9 PE sections is unusually high and suggests runtime",
+        "evidence_type": "binary",
+        "source": "generate_forensic_hash",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 153
+        }
+      }
+    ]
+  },
+  "runtime_fingerprint": "01c251ee907a22737c7b64ce8b114dd86baaa14f183a5a6980daf037d96a10be",
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 14,
+    "n_total_signals": 14,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}
