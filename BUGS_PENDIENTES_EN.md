@@ -5589,6 +5589,249 @@ re-execution in batch loops). Regression:
 
 ---
 
+## B-111 — Mode 3 (Ollama/hermes3:8b): unreliable behavior on dense testimonial evidence — N=2, STOCHASTIC
+
+| Field | Value |
+|-------|-------|
+| **Status** | OBSERVED — insufficient evidence to escalate to KNOWN_LIMITATIONS |
+| **Severity** | P3 (experimental — Mode 3 already classified as non-primary) |
+| **Detected in** | Blind comparative experiment 2026-07-13, KIWI-006 and KIWI-007 |
+| **N observations** | 2 KIWI-006 runs (1 hallucination, 1 clean) + 1 KIWI-007 run (truncated JSON) |
+
+### Observations
+
+**Run 1 — KIWI-006, first execution:** `hermes3:8b` hallucinated
+`"carnegie_pattern": "JAILBREAK_ATTEMPT"` and
+`"security_alert": "EVIDENCE_DELIMITER_MISMATCH"` — fields that do not exist in the
+VIGÍA schema. The model interpreted the content of the testimony (surveillance,
+blocked contacts, witness coordination) as evidence of an attack on
+itself. The correct Peircean analysis was also present in the same
+response, embedded alongside the hallucinated fields. Valid JSON.
+
+**Run 2 — KIWI-007, first execution:** `hermes3:8b` returned invalid JSON
+(object truncated midway through the A02 field, after completing A01). The tool
+detected the failure and returned `"error": "LLM did not return valid JSON."` with the
+fragment in `"raw_response"`. Required manual synthesis for A02 and A03.
+
+**Run 3 — KIWI-006, re-execution with IDENTICAL prompt (2026-07-13, same session):**
+Clean result. No hallucination. Complete valid JSON. Correct Peircean chain.
+Verdict NOISE 0.25, reasonable and consistent with CAIE.
+
+### State of the evidence
+
+N=2 runs of KIWI-006 (1 hallucination / 1 clean with the same prompt). The
+behavior is **stochastic, not deterministic** — the same input does not reproduce
+the same error. N=1 for KIWI-007 (truncated), no re-run yet.
+
+Does not escalate to KNOWN_LIMITATIONS because:
+- N insufficient to establish an error frequency
+- The KIWI-006 re-run was clean → not a consistent pattern
+- Mode 3 is already classified as experimental/complementary in the README and CLAUDE.md
+
+### What to watch in future runs
+
+- Does the jailbreak hallucination reappear in KIWI-006 with a third run?
+- Does KIWI-007 truncate consistently, or was it a one-off event?
+- Do other dense testimonial cases (KIWI-007 analogues) show the same pattern?
+- If the hallucination rate is confirmed in >20% of runs on testimonial cases:
+  escalate to KNOWN_LIMITATIONS with a recommendation of `gemma3:27b` for Mode 3
+  in production on dense narrative.
+
+### Note on non-reproducibility
+
+The non-reproducibility of the error is itself a relevant data point: a
+consistent error is caught in testing; a stochastic one can reach production with
+no prior signal. If further samples confirm that the rate is not negligible,
+that opacity argument would be the basis for the formal limitation, not the
+current two isolated events.
+
+---
+
+## B-112 — CAIE catalogue gap candidate: SELF_INCRIMINATION_LOG — self-incriminating evidence epistemically distinct from a third-party-spoofable log
+
+| Field | Value |
+|-------|-------|
+| Detected | 2026-07-13 |
+| Source case | KIWI-001-A02 and KIWI-003-A03/A04 (case file MPF7779408) |
+| Status | CANDIDATE — N=1 real judicial case |
+
+### Description
+
+When the actor himself voluntarily submits credentials or logs that incriminate him in judicial documentation, the artifact is epistemically irrefutable even though CAIE assigns it `spoofability=0.85` (log_entry). The spoofability metric models an external attacker who fabricates evidence; it does not apply when the evidence comes from the accuser himself.
+
+In KIWI-001 (A02) and KIWI-003 (A03/A04), the complainant (actor_a) submitted his own stalking-server credentials and admitted having hacked an ex-partner. CAIE computes adjusted=0.0071 and 0.0081 respectively due to spoofability=0.85 — values that underestimate the real epistemic weight. If a `SELF_INCRIMINATION_LOG` fracture existed, the composite would exceed the SUSPICION threshold in both cases without any need for manual escalation.
+
+### Generalization restriction
+
+The three KIWI cases (001, 002, 003) belong to the same judicial case file (MPF7779408) viewed from different angles — **they are not 3 independent samples, they are 1 real case looked at 3 times**. The observation is N=1 of a real judicial case. A second independent case file with the same structure (an accuser who submits self-incriminating evidence) is needed before generalizing this pattern as a real catalogue gap and implementing the fracture.
+
+### Escalation criterion
+
+Observe the pattern in a second independent judicial case file (other than MPF7779408). Do not implement the fracture until then.
+
+---
+
+## B-113 — CAIE catalogue gap candidate: INSTITUTIONAL_REJECTION — independent institutional rejection as forensic corroboration
+
+| Field | Value |
+|-------|-------|
+| Detected | 2026-07-13 |
+| Source case | KIWI-003-A05 (case file MPF7779408) |
+| Status | CANDIDATE — N=1 real judicial case |
+
+### Description
+
+In KIWI-003-A05, three court orders presented 6 formal irregularities and two police stations independently refused to execute the ordered search. The institutional rejection by two independent bodies constitutes forensic corroboration of the documentary irregularity — a source of evidence that CAIE does not capture because `document_geometry` only models the physical artifact, not the institutional reaction to it.
+
+If an `INSTITUTIONAL_REJECTION` fracture existed, artifact A05 would go from adjusted=0.0327 to a significantly higher weight, given that the police rejection eliminates the "isolated administrative error" explanation as a benign hypothesis.
+
+### Generalization restriction
+
+Same restriction as B-112: the three KIWI cases are the same case file MPF7779408 — **N=1 real case**. It is not evidence of a systematic gap in the CAIE catalogue until it is observed in a second independent case file involving institutional rejection of documentation in a forensic context.
+
+### Escalation criterion
+
+Observe the pattern in a second independent judicial case file (other than MPF7779408). Do not implement the fracture until then.
+
+---
+
+## B-114 — `add_from_tool_result()` in CAIE builds an `Artifact` without going through the `add_artifact()` guardrails [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — 2026-07-16, post-hackathon session (delegation to `add_artifact()`; see B-136 for the larger finding from the same audit) |
+| **Severity** | P3 (guardrail bypass, not exploited in the tested case) |
+| **File** | `vigia/tools/caie.py` |
+| **Function** | `CrossArtifactIncongruenceEngine.add_from_tool_result()` (line ~1135) vs `add_artifact()` (line ~1089) |
+| **Detected in** | Level 1 sanity check of the CLIP pipeline (2026-07-13), branch `claude/clip-pipeline-sanity-check-roh22k` |
+
+### Description
+
+`add_from_tool_result()` builds an `Artifact` and appends it directly to
+`self._artifacts` (line ~1169), instead of delegating to `add_artifact()`. This
+skips two guardrails that `add_artifact()` does apply to any caller that
+goes through it:
+
+1. **`_MAX_ARTIFACTS`** — anti-flooding (DoS) protection. `add_from_tool_result()`
+   does not check the limit before appending.
+2. **`evidence_type` whitelist** — `add_artifact()` rejects types that are not
+   in `_VALID_EVIDENCE_TYPES` (derived from `EVIDENCE_PROFILES`).
+   `add_from_tool_result()` does not validate this; an arbitrary `evidence_type`
+   would get in with no defined spoofability weighting.
+
+`vision_intent_audit` (CLIP) uses `add_from_tool_result()` with
+`evidence_type="document_visual"`, which IS in the whitelist — it was not
+exploited in the CLIP sanity check run in this session. But the bypass is
+structural: **any MCP tool that uses `add_from_tool_result()` instead of
+`add_artifact()` inherits the same hole** — it is not CLIP-specific.
+
+### Escalation criterion
+
+Review which other MCP tools (besides `vision_intent_audit`) call
+`add_from_tool_result()`, and whether any of them can pass an `evidence_type`
+influenced by external input (not hardcoded as in vision_audit.py).
+If so, escalate to P1/P2 — it is a whitelist bypass path with
+attacker influence. Candidate fix: have `add_from_tool_result()` delegate
+to `add_artifact()` instead of appending directly.
+
+### Fix applied (2026-07-16)
+
+The candidate fix from the previous paragraph, exactly as stated: `add_from_tool_result()`
+builds the `Artifact` and returns `self.add_artifact(...)` (bool), so
+`_MAX_ARTIFACTS` and the `evidence_type` whitelist also apply to this
+path. Intentional side effect of the delegation: the wrapper's artifacts
+are now indexed in `_temporal_index`/`_network_index` like those of any
+other caller (previously they were invisible to the TCV and NETWORK_VS_HOST rules).
+
+Caller census executed (this entry's escalation criterion): 4 sites —
+`vision_audit` (correct signature, whitelisted types, not exploitable) and 3 sites
+with the broken call that never reached the append (see B-136). The scorer
+(`vigia_scorer.py:652`) feeds CAIE via direct `add_artifact()`, so
+this fix does not touch the verdict path.
+
+### Verification
+
+- Red tests: `tests/test_b114_caie_guardrail_delegation.py` (6 tests):
+  flooding rejected at `_MAX_ARTIFACTS`, `evidence_type` outside the whitelist
+  rejected, whitelisted addition intact (score extraction,
+  digital_perfection override), temporal indexing now applied.
+- Comparative corpus gate: no verdict changes (see commit).
+
+---
+
+## B-115 — `VigiaAdversarialNLP._inject_caie_fractures()` calls `add_from_tool_result()` with nonexistent kwargs — never injected anything into CAIE [SUBSUMED INTO B-136]
+
+| Field | Value |
+|-------|-------|
+| **Status** | SUBSUMED INTO B-136 (2026-07-16) — real scope: 3 sites with the same broken call, and the destination engine is discarded anyway. The mechanical kwargs fix was evaluated and REFUTED (it would make the trail worse: false success toward a discarded object). The "normalization decision" dissolved: `verdict.confidence` IS ALREADY `(mcp-1)/4` (adversarial_nlp.py:1131) |
+| **Severity** | P2 (silently broken since its introduction — same class of bug as the missing `await` in `vision_intent_audit`) |
+| **File** | `vigia/tools/adversarial_nlp.py:1585-1604` (`_inject_caie_fractures`) |
+| **Detected in** | Wiring of the expert-report PDF into the pipeline (2026-07-13), branch `claude/clip-pipeline-sanity-check-roh22k` |
+
+### Description
+
+`_inject_caie_fractures()` calls:
+
+```python
+caie.add_from_tool_result(
+    source_tool="vigia_adversarial_nlp",
+    evidence_type="linguistic_forensics",
+    raw_score=verdict.mcp,
+    description=fractura,
+    metadata={...},
+)
+```
+
+but the real signature of `CrossArtifactIncongruenceEngine.add_from_tool_result()`
+(`vigia/tools/caie.py:1135-1141`) is
+`(self, tool_name: str, result: dict, evidence_type: str = "log_entry", provenance_chain=None)`.
+None of `source_tool`, `raw_score`, `description`, `metadata` exists as a
+parameter — every call raises `TypeError`, caught by the generic `except Exception`
+at lines 1599-1604 and logged as `CAIE_INJECTION_FAILED`. Result:
+**no stylometric analysis fracture (SDA-NR/CLI/ACP/ROI) ever reached
+CAIE**, since this code was written — same pattern as the missing `await`
+in `vision_intent_audit` (fix applied in this same branch), but here the fix
+is not mechanical.
+
+### Why it was not fixed at the time
+
+A naive fix (renaming the kwargs to `tool_name`/`result`) is not enough: the real
+signature of `add_from_tool_result()` does NOT accept a direct `raw_score` — it derives
+it internally from known keys of the dict (`suspicion_score`,
+`visual_malice_score`, `probability_*`). `verdict.mcp` is 1.0–5.0 (Expert
+Certainty Multiplier), it is not in that list, and `Artifact.__post_init__` clamps
+`raw_score` to `[0.0, 1.0]` — passing raw `mcp` would collapse everything to 1.0. The
+correct normalization needs to be decided (`(mcp-1)/4`? use `verdict.confidence`
+instead?) and that is a forensic-methodology decision, not a mechanical fix
+— out of scope for the task that motivated this finding.
+
+### Escalation criterion
+
+Decide the `mcp`→`raw_score` normalization (or whether to use
+`verdict.confidence`), and use `add_artifact()` instead of
+`add_from_tool_result()` directly — see B-114: `add_from_tool_result()` does not
+go through the `add_artifact()` guardrails (anti-flooding limit, `evidence_type`
+whitelist), so replicating that pattern here would perpetuate the same hole.
+
+---
+
+## REVIEW-001 — VIGIA-BREAK-012 label review (BENIGN vs SUSPICION)
+
+| Field | Value |
+|-------|-------|
+| **Status** | PENDING REVIEW |
+| **Severity** | P4 (label hygiene) |
+
+Adversarial case designed to confuse: 4/5 compromised sources
+report an anomaly, 1 legitimate one says the opposite. The engine gives SUSPICION
+(consistent with the majority of sources). The label says BENIGN (because
+the correct source is the only legitimate one). It deserves its own dossier —
+the question is not whether the engine fails but whether BENIGN is the correct
+label when the engine cannot distinguish compromised sources
+from legitimate ones.
+
+---
+
 ## B-116 — `signal_quality_gate.py` designed and functional in isolation, NOT wired to scorer — dry-run shows 122/199 cases degraded
 
 > **Update 2026-07-17 (condition 4 re-measured, Kimi-endorsed placeholder

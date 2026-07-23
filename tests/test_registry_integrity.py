@@ -137,18 +137,11 @@ def _b_heading_ids(fname: str) -> set[str]:
     return ids
 
 
-import pytest
-
-
-@pytest.mark.xfail(
-    reason="Sentinela (patrón B-097): EN aún sin B-111..B-115 — la "
-           "traducción está en curso en esta misma sesión (2026-07-23). "
-           "Transiciona a XPASS con el empalme; entonces se promueve a "
-           "guarda dura quitando este decorador.",
-    strict=False,
-)
 def test_es_en_registry_parity() -> None:
     """Ambos registros documentan el MISMO conjunto de bugs B-*.
+
+    Sentinela promovida a guarda dura el 2026-07-23 (patrón B-097): el
+    empalme EN de B-111..B-115 + REVIEW-001 aterrizó en esta sesión.
 
     Deriva detectada dos veces (2026-07-22: EN sin B-167..B-210;
     2026-07-23: EN sin B-111..B-115 y ES sin B-145..B-152). Un registro
