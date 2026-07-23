@@ -39,11 +39,15 @@ import os
 import re
 import sys
 import unicodedata
+# B-208: urllib se usaba a nivel de módulo (_NoRedirect, webhook SSRF guard)
+# sin importarse — el módulo entero moría en import con NameError.
+import urllib.error
+import urllib.request
 import uuid  # _derive_session_nonce: uuid usado solo para IDs STIX (no nonces forenses)
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Final
 
 # Garantiza que 'vigia/' se resuelve independientemente del cwd de invocación.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -52,7 +56,21 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # Se importa aquí y se reexporta para que cualquier código que haga
 # `from vigia_planner import LLMBackend` siga funcionando sin cambios.
 from vigia.config import CONFIG, LLMBackend                  # noqa: F401 (reexport)
-from vigia.security import _utcnow as _utcnow_security, _sanitize_path, audit_logger, rate_limit
+from vigia.security import (
+    _sanitize_llm_input,
+    _sanitize_path,
+    _utcnow as _utcnow_security,
+    audit_logger,
+    rate_limit,
+)
+
+# B-208: tope de sanitización para el campo `interpretation` de cada señal
+# en message_history (case "infer_intent"). La constante se referenciaba pero
+# nunca existió (la unificación P2-001 movió el sanitizador a security.py y
+# esta quedó atrás). 500 = el mismo tope que usa el fallback de ese mismo
+# case-block para el dump completo de last_result — conservador contra
+# padding attacks.
+_MAX_INTERPRETATION_LEN: Final[int] = 500
 
 # ── Tools forenses: registro en el planner ────────────────────────────────────
 # Se importan con try/except porque sus dependencias pesadas (PyMuPDF, PIL,
@@ -1274,80 +1292,13 @@ SIGNAL_TO_ATTACK: dict[str, str] = {
     "SIGNIFICANT_SILENCE": "T1564",
 }
 
-def _sanitize_llm_input(text: str, max_length: int = 5000) -> str:
-    """
-    Sanitize text before it enters an LLM prompt.
-
-    RED TEAM HARDENING (P0_CRITICO):
-
-    0. NFKC normalization (MANDATORY FIRST): Destroys homoglyph characters,
-       zero-width spaces, and Unicode ghost characters used for tokenizer evasion.
-       Must run BEFORE any regex to prevent bypass via confusable characters.
-    1. Strip XML/HTML tags that could confuse the LLM into role-switching
-       (e.g. </s>, <human>, [INST], <tool_result>)
-    2. Remove control characters (null, BEL, ESC, etc.)
-    3. Padding anomaly detection: NEVER blind-truncate. An attacker can push
-       injection payloads to the end of oversized inputs expecting truncation
-       to destroy the detection signal. Return a forensic sentinel instead.
-    4. Log all stripping events to forensic audit trail.
-
-    This is NOT a replacement for LLMShield (which catches prompt injection
-    patterns). This sanitizes structural noise in forensic signals that could
-    accidentally trigger LLM confusion.
-    """
-    if not isinstance(text, str):
-        return ""
-
-    # STEP 0: NFKC normalization (P0_CRITICO - MUST BE FIRST)
-    # Destroys homoglyphs, zero-width joiners (U+200D), zero-width non-joiners
-    # (U+200C), soft hyphens (U+00AD), and other invisible Unicode characters
-    # used to evade tokenizer-level detection.
-    text = unicodedata.normalize("NFKC", text)
-
-    original_len = len(text)
-
-    # STEP 1: Strip dangerous XML/role-switch tags
-    cleaned = _LLM_DANGEROUS_TAGS.sub("[TAG_REMOVED]", text)
-
-    # STEP 2: Strip control characters
-    cleaned = _CONTROL_CHARS.sub("", cleaned)
-
-    # STEP 3: Padding anomaly guard (P0_CRITICO - NO blind truncation)
-    # Blind truncation cleaned[:max_length] allows an attacker to push the
-    # injection payload to the END of the string, knowing the defender will
-    # truncate it away. If oversized after all sanitization, flag and reject.
-    if len(cleaned) > max_length:
-        audit_logger.log_block(
-            event_type="EVIDENCE_PADDING_ANOMALY",
-            tool="_sanitize_llm_input",
-            input_preview=cleaned[:200],
-            reason=(
-                f"Input length {len(cleaned)} exceeds max_length={max_length} "
-                "after NFKC+tag+control sanitization. "
-                "Possible buffer-padding attack: injection payload may have been "
-                "pushed to end of oversized input to survive blind truncation. "
-                "Input REJECTED."
-            ),
-        )
-        return (
-            f"[EVIDENCE_PADDING_ANOMALY_DETECTED: "
-            f"Input length {len(cleaned)} exceeds {max_length}. "
-            "Possible buffer-hijack attempt. Original evidence rejected "
-            "and flagged in forensic audit trail.]"
-        )
-
-    # STEP 4: Log if sanitization removed significant content
-    if len(cleaned) < original_len - 10:
-        audit_logger.log_info(
-            event_type="LLM_INPUT_SANITIZED",
-            tool="_sanitize_llm_input",
-            message=(
-                f"Stripped {original_len - len(cleaned)} chars from LLM input "
-                f"(homoglyphs/NFKC normalization, dangerous tags, or control chars)."
-            ),
-        )
-
-    return cleaned
+# B-208: la copia local de _sanitize_llm_input se eliminó. La unificación
+# P2-001 (Kimi 2026-05-02) movió la versión canónica —idéntica: NFKC + tag
+# strip + control chars + padding guard sin truncado ciego— a
+# vigia/security/security.py, pero esta copia quedó atrás referenciando
+# _LLM_DANGEROUS_TAGS y _CONTROL_CHARS, que ya no existían en este módulo:
+# NameError garantizado en cuanto se llamara. El módulo ahora importa el
+# sanitizador canónico desde vigia.security (ver imports).
 
 # =============================================================================
 # NAVAJA DE ECO — Motor de Refutación Abductiva (P0 Parche Táctico)

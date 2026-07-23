@@ -918,6 +918,7 @@ example (N=1/2) lives in "Accuracy by Mode", not here.*
 | L-048 | Tool-log chain tail truncation (chain_tip_sha256) | core/tool_log_chain.py | **RESOLVED** (R3-5) |
 | L-049 | Spoofable-type flood saturates to MALICE (R4-3) | vigia_scorer.py | Mitigated (B-091 tail decay + gate v2; mobile-band residual closed by B-092) |
 | L-050 | Non-finite fail-closed on value/z_score/confidence × 4 impls | ebs_v1.py, signal_contract.py | **RESOLVED** (B-083/B-083b) |
+| L-067 | §9.4-LIM: SUSPICION doctrinal ceiling for D3-only macOS/mobile (sealed 2026-07-10; renumbered from second L-051 on 2026-07-23) | sift_orchestrator.py verdict_ceiling | Sealed doctrine |
 | L-051 | Formal specification of arbitration contract (Axiom A1) — renumbered from shared L-029 | Scoring/CAIE precedence | [OPEN] — design gap, not a bug |
 | L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
 | L-055 | Anthropic API and Claude Code Max plan are separate auth products — no bridge from subprocess | vigia/config.py:LLMBackend | DOCUMENTED — product boundary, no code fix possible |
@@ -2080,9 +2081,17 @@ finding with no evidentiary basis.
 
 ---
 
-## L-051 — §9.4-LIM: SUSPICION is the doctrinal ceiling for macOS/mobile D3-only cases (sealed decision, pure option (ii))
+## L-067 — §9.4-LIM: SUSPICION is the doctrinal ceiling for macOS/mobile D3-only cases (sealed decision, pure option (ii))
 
 **Sealed 2026-07-10 (collective + Anna's signature; see `docs/B052_P2_DESIGN.md` §10).**
+
+**Numbering note (2026-07-23, L-029/L-051 and B-093/B-106 precedent):** this
+entry was originally recorded as **L-051**, colliding with "Formal
+Specification of Arbitration Contract" (born 2026-06-25, holder of L-051
+since its own renumbering on 2026-07-08 — chronologically earlier, keeps the
+number). Renumbered to **L-067** (next free ID). Historic sealed bundles and
+commit messages citing "L-051" for the D3-only SUSPICION ceiling point here;
+`sift_orchestrator.py` narrative strings updated for future bundles.
 
 A case whose evidence comes exclusively from the D3 physical channel (the
 device's own local filesystem — ALL macOS/mobile logical domains: browser,

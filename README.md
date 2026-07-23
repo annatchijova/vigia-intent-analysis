@@ -1276,7 +1276,7 @@ An empty `devil_advocate` field invalidates the verdict under the Daubert standa
 
 
 > **On accuracy claims:** VIGÍA does not claim zero hallucination. The system
-> documents 22 known limitations (L-001 through L-022 in `KNOWN_LIMITATIONS.md`)
+> documents 64 known limitations (L-001 through L-066 in `KNOWN_LIMITATIONS.md`)
 > because a forensic methodology that cannot describe its own failure modes is not
 > Daubert-admissible. Documented limitations are a forensic asset, not a liability.
 > The accuracy report reflects real adversarial test cases including BREAK corpus
@@ -1300,7 +1300,7 @@ after the fact. The architecture does not produce incorrect verdicts that need
 correction; it prevents their emission. The `self_correction_events` in the bundle
 (visible in `verify_tool_log.py`) document gate firings, not LLM self-revision.
 
-**On the accuracy report:** VIGÍA documents 22 known limitations
+**On the accuracy report:** VIGÍA documents 64 known limitations
 ([`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md)). Per the Judge Pack: *"An honest,
 specific accuracy report raises this score; a flawless-looking result with no error
 analysis lowers it."* The limitations are forensic assets, not liabilities. A system
@@ -1377,7 +1377,7 @@ The absence of expected artifacts is itself evidence.
 vigia-intent-analysis/
 ├── LICENSE                              ← Apache 2.0
 ├── README.md                            ← This file
-├── KNOWN_LIMITATIONS.md                 ← L-001 to L-019 (Daubert transparency)
+├── KNOWN_LIMITATIONS.md                 ← L-001 to L-066 (Daubert transparency)
 ├── SUBMISSION_COMPLIANCE.md             ← Full compliance index for judges
 ├── INSTALL.md                           ← Extended installation guide (EN)
 ├── INSTALL_ES.md                        ← Guía de instalación (ES)

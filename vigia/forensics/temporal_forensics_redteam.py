@@ -24,9 +24,14 @@ Rob T. Lee Classification: Temporal Adversary Detection (TAD)
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sqlite3
+# B-209: hashlib y statistics se usaban (doc_hash SHA-256, median de fechas)
+# sin importarse — NameError al ejecutar el análisis completo o el cálculo
+# de mediana de referencias temporales.
+import statistics
 from dataclasses import dataclass, field
 from datetime import datetime, date
 from typing import Dict, List, Set, Tuple, Optional, FrozenSet

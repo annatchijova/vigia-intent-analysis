@@ -8,7 +8,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install -r requirements.txt && pip install pytest pytest-asyncio pytest-cov scikit-learn scipy
+      # B-207: instalar TAMBIÉN requirements-ci.txt — es el archivo que el
+      # contrato S-1 (tests/test_requirements_ci_contract.py) garantiza
+      # completo para la suite. Instalar solo requirements.txt dejó este job
+      # sin fastapi (4 módulos de tests de API sin colectar, exit 2).
+      - run: pip install -r requirements.txt -r requirements-ci.txt && pip install scipy
       - run: python -m pytest tests/ vigia/tests/ -q --tb=short --no-cov
         env:
           PYTHONPATH: ${{ github.workspace }}
