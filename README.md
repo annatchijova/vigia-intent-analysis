@@ -904,70 +904,6 @@ false positives on the detection corpus.
 
 ---
 
-### Por qué el modo Claude alcanza el 100% y el modo agente Python el 97,5%
-
-Los dos números miden cosas fundamentalmente distintas y no son comparables entre sí.
-Surgen de metodologías de evaluación diferentes aplicadas a modos de operación
-diferentes.
-
-**Modo Claude/MCP (Dominio A) — 100%, evaluado caso por caso:**
-
-Claude Code (Modo 2) realiza cada investigación como una sesión de razonamiento
-fresca, orientada a la evidencia. Lee los artefactos brutos a través de la cadena
-de extracción MCP, aplica la tríada de Peirce completa (Primeridad / Segundidad /
-Terceridad), evalúa el contexto exculpatorio de forma semántica (autorización escrita,
-excepciones documentadas, procedencia del corpus), ejecuta el Protocolo de Refutación
-Obligatorio en todo candidato a INTENT/MALICE, y selecciona ABSTAIN cuando la
-evidencia es insuficiente en lugar de forzar un veredicto. Como cada investigación
-es una sesión de razonamiento completa — y no un paso por umbrales fijos — el
-investigador puede clasificar correctamente casos como VIGIA-BEN-014 (periodista con
-autorización editorial que usa Tor) como NOISE, aun cuando la conexión Tor es
-estructuralmente anómala, porque puede evaluar el memo de autorización como un hecho
-forense en lugar de ignorarlo.
-
-Este modo no tiene un número de precisión agregado por diseño: agregar
-investigaciones individuales en un único porcentaje confundiría casos con calidad
-de evidencia, completitud de artefactos y certeza epistémica muy distintas. El
-número 100% significa que cada investigación ejecutada en este modo llegó al
-veredicto que la evidencia completa sustenta — no significa que el 100% de todos
-los casos posibles se clasificaría correctamente.
-
-**Modo agente Python (Dominio B) — 97,5%, evaluado en el corpus de detección de 162 casos:**
-
-El Modo 1 (`vigia_agent.py`) aplica el pipeline de puntuación determinístico — un
-motor matemático fijo que opera con cero llamadas a LLM y cero tokens. No puede
-evaluar el contexto exculpatorio de forma semántica: el piso de alerta B-028/B-065
-impide que cualquier hipótesis SUSPICION se presente como alerta LOW independientemente
-de la magnitud por señal, y el filtro D1 Eco que aparta los artefactos con
-`semantic_role: "exculpatory"` puede ser neutralizado por el piso cuando queda una
-señal incriminatoria residual de magnitud media (L-054, L-056). Esta es una decisión
-doctrinal deliberada — sobre-alertar en casos benignos es preferible a sub-alertar en
-casos maliciosos con metadatos exculpatorios plantados — y su costo es una tasa
-medible de falsos positivos en casos de uso autorizado.
-
-Los 4 casos fallidos en 162 son todos de esta categoría: llamadas de severidad
-adyacente (SUSPICION donde se esperaba NOISE, o NOISE donde se esperaba SUSPICION
-para señales muy débiles) o sobre-alerta doctrinal (L-054 contexto exculpatorio no
-modelado). Ninguno es una detección fallida de actividad maliciosa real — los casos
-canónicos del corpus de detección, los casos benignos y los casos CTF FLARE-ON
-pasan todos al 100%. El 97,5% refleja puntuación determinística honesta, no un
-clasificador con fugas.
-
-**Por qué los números divergen en el mismo caso:**
-
-Cuando el mismo caso se ejecuta en ambos modos (ejemplo: VIGIA-BEN-014), el Modo 2
-devuelve NOISE (contexto exculpatorio evaluado correctamente, composite MCP 0,0070,
-por debajo del umbral NOISE) mientras el Modo 1 devuelve SUSPICION (la conexión Tor
-produce una señal residual z=0,49, el piso B-028/B-065 impide el colapso a LOW,
-posterior 21/100). Ninguno está equivocado según su propio contrato: el Modo 1
-señala correctamente la anomalía estructural y delega en revisión humana; el Modo 2
-evalúa correctamente el contexto completo y lo resuelve. El piso no es un bug — es
-la postura Daubert conservadora del motor determinístico. El número 97,5% documenta
-exactamente cuánto cuesta esa postura en términos de falsos positivos en el corpus
-de detección.
-
----
-
 VIGÍA separates evaluation into three distinct domains. Only Domain A
 constitutes the system's accuracy claim.
 
@@ -1380,7 +1316,7 @@ vigia-intent-analysis/
 ├── KNOWN_LIMITATIONS.md                 ← L-001 to L-066 (Daubert transparency)
 ├── SUBMISSION_COMPLIANCE.md             ← Full compliance index for judges
 ├── INSTALL.md                           ← Extended installation guide (EN)
-├── INSTALL_ES.md                        ← Guía de instalación (ES)
+├── INSTALL_ES.md                        ← Installation guide (ES)
 ├── SECURITY.md                          ← Security policy
 ├── AUTHORS.md                           ← Anna Tchijova + VIGÍA AI Collective
 ├── DAUBERT_JUDICIAL.md / _ES.md         ← Daubert compliance rationale
