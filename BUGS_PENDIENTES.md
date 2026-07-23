@@ -6316,6 +6316,16 @@ Fraction exactos sondeados). El cableo del CCS sigue POSPUESTO: las 4
 dimensiones requieren decisiones de método D1-D4 (§5 del informe) antes
 de cualquier sombra.
 
+**Update 2026-07-23 bis — D1 medida, resultado negativo honesto:** las
+dos opciones de temporal_coherence (TCV vs severidad) implementadas en
+Fraction puro y corridas sobre el corpus
+(`scripts/dryrun_b123_d1_temporal_coherence.py`): 0 desacuerdos entre
+opciones, 1/202 casos ejercita la dimensión (2 declaran
+EFFECT_BEFORE_CAUSE, 1 valida contra artefactos). Elegir método hoy
+sería doctrina sin evidencia; cablear sería cosmético (1.0 casi
+constante). D1 DIFERIDA por cobertura de corpus — el bloqueo de B-123
+queda cuantificado y re-medible en un comando (informe §6).
+
 ---
 
 ## B-124 — Verdict/governance cluster: 6 modules designed, tested, NOT wired — same pattern as B-123
