@@ -1,0 +1,84 @@
+{
+  "case_id": "ZONE38-REDTEAM-2026-07-23",
+  "chain_tip_sha256": "955eed5e0e9189d7435dedd5c0e449576b273239e09bc5af7b70377a4091ca88",
+  "confidence_stored": "3/5",
+  "confidence_submitted": "1/1",
+  "confidence_warnings": [
+    "Confidence 1 capped at 3/5 (diversity ceiling: 1/3 observation groups)"
+  ],
+  "contradictions": [],
+  "diversity": "1/3",
+  "quality": "MINIMAL",
+  "sealed_at": "2026-07-23T20:36:56.718333+00:00",
+  "steps": [
+    {
+      "kind": "objective",
+      "payload": {
+        "case_id": "ZONE38-REDTEAM-2026-07-23",
+        "objective": "Forensic intent analysis of /home/labestiadevigia/vigia-repo/cases/ZONE38-REDTEAM-2026-07-23.json",
+        "trace_version": "1.0"
+      },
+      "seq": 0
+    },
+    {
+      "kind": "hypothesis",
+      "payload": {
+        "description": "NO_SEMIOTIC_ANOMALY_DETECTED",
+        "label": "primary"
+      },
+      "seq": 1
+    },
+    {
+      "kind": "decision",
+      "payload": {
+        "confidence": "1/1",
+        "verdict": "NOISE"
+      },
+      "seq": 2
+    }
+  ],
+  "tool_execution_log": [
+    {
+      "chain_version": "2",
+      "entry_hash": "9367301552cf90ed36a39a41b54bff205239d5ac8a960ad21c04f7729ea58c40",
+      "event_id": "rt-ZONE38-REDTEAM-2026-07-23:0",
+      "input_hash": "0e5382f8612d39533d2601672e63b802ee97302540705c786f31e446d90e8416",
+      "mode": "python_fallback",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "result_summary": "Forensic intent analysis of /home/labestiadevigia/vigia-repo/cases/ZONE38-REDTEAM-2026-07-23.json",
+      "seq": 1,
+      "target": "ZONE38-REDTEAM-2026-07-23",
+      "timestamp": "2026-07-23T20:36:56.718333+00:00",
+      "tool": "reasoning:objective"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "7942b893973e958434129087a638e158e65d6f70fe122329376f5e4b720e3c86",
+      "event_id": "rt-ZONE38-REDTEAM-2026-07-23:1",
+      "input_hash": "5def143131da2d54a27f64d1eae7fa103a44118c2ba8c2ff0304b0f7a5792808",
+      "mode": "python_fallback",
+      "prev_hash": "9367301552cf90ed36a39a41b54bff205239d5ac8a960ad21c04f7729ea58c40",
+      "result_summary": "primary: NO_SEMIOTIC_ANOMALY_DETECTED",
+      "seq": 2,
+      "target": "ZONE38-REDTEAM-2026-07-23",
+      "timestamp": "2026-07-23T20:36:56.718333+00:00",
+      "tool": "reasoning:hypothesis"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "955eed5e0e9189d7435dedd5c0e449576b273239e09bc5af7b70377a4091ca88",
+      "event_id": "rt-ZONE38-REDTEAM-2026-07-23:2",
+      "input_hash": "823fe4482447199903468927f56ac17db9c05028fdd5d8bc95019347df0584e0",
+      "mode": "python_fallback",
+      "prev_hash": "7942b893973e958434129087a638e158e65d6f70fe122329376f5e4b720e3c86",
+      "result_summary": "{'verdict': 'NOISE', 'confidence': '1/1'}",
+      "seq": 3,
+      "target": "ZONE38-REDTEAM-2026-07-23",
+      "timestamp": "2026-07-23T20:36:56.718333+00:00",
+      "tool": "reasoning:decision"
+    }
+  ],
+  "trace_id": "rt-ZONE38-REDTEAM-2026-07-23",
+  "trace_version": "1.0",
+  "verdict": "NOISE"
+}
