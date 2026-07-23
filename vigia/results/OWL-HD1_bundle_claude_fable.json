@@ -1,0 +1,216 @@
+{
+  "ebs_bundle_version": "MODE2-1.0",
+  "generated_by": "VIGIA Autonomous Agent (Claude Code / Claude Fable, Mode 2)",
+  "generated_at": "2026-07-23T03:00:00Z",
+  "case_id": "VIGIA-OWL-2019-HD1",
+  "seal": {
+    "algorithm": "SHA-256 over canonical(v2) decision_payload",
+    "canonicalize_version": "2",
+    "digest": "da4e0867af69d1038d4aa352d18495cf817b5b43d48f3b0f90beb6047ee967e8",
+    "determinism_check": "PASS (3 seals identical: repeat + key-reorder)"
+  },
+  "decision_payload": {
+    "schema": "VIGIA-MODE2-BUNDLE",
+    "canonicalize_version": "2",
+    "case_id": "VIGIA-OWL-2019-HD1",
+    "device": "HP companion computer (Toshiba MQ01ACF050 500GB, serial 16OGCPA5T), Windows, user 'Sarah M' / 'Sarah McAvoy'",
+    "evidence_e01_sha256": "f3174609fc4bf912824103b2f164922461b9549aa03c4fca8a57b837840cb9cb",
+    "subject": "Sarah McAvoy (mcavoys87@gmail.com) \u2014 same subject as OWL-NEXUS5",
+    "analyst_verdict_hd1_standalone": "INTENT",
+    "analyst_verdict_owl_combined": "INTENT",
+    "verdict_basis": "F-001 owl-purchase research/materials (CONFIRMED) + F-004 independent second device for the same subject (CONFIRMED), Refutation Protocol passed. MALICE not reached: no completed-payment proof, deletions are recoverable soft-deletes, Pidgin log absence not proven to be deletion.",
+    "relation_to_owl_nexus5": "HD1 is the independent corroborating device whose absence capped OWL-NEXUS5 at SUSPICION under L-051. With HD1, the OWL case as a whole meets two-source corroboration and is graded INTENT.",
+    "findings": [
+      {
+        "finding_id": "F-001",
+        "title": "Owl-purchase research and acquisition materials on the companion computer",
+        "verdict": "INTENT",
+        "confidence": "HIGH",
+        "status": "CONFIRMED",
+        "artifact": "browser/chrome_history.sqlite; Users/Sarah M/Downloads; Users/Sarah M/Desktop",
+        "tools_used": [
+          "sqlite (chrome history)",
+          "list_files",
+          "generate_forensic_hash"
+        ],
+        "firstness": "Chrome history (user Sarah M) records owl-for-sale browsing: birdtrader.co.uk specific owl listings (breeding-pair-ashy-faced/557508, dark-breasted-barn-owls/557507, snowy-owls searches), 21food snowy-owl-eggs-for-sale, craigslist owls, then a Gmail message opened immediately after. Downloads hold Owl_Emergency_Care.pdf, Owl_Keeping.pdf, a Snowy Owl bibliography (.xls) and Sightings2005.xls; Desktop holds saved owl web pages.",
+        "secondness": "Casual interest in owls does not require browsing a UK exotic-bird marketplace for specific for-sale listings, downloading owl husbandry/emergency-care manuals, and compiling a snowy-owl bibliography. The cluster is preparation to acquire and keep a specific animal.",
+        "thirdness": "Deliberate, staged acquisition research for a protected owl, conducted on a second device belonging to the same subject as the Nexus 5.",
+        "carnegie": "None.",
+        "mitre_ttps": [
+          "T1592",
+          "T1071.001"
+        ],
+        "devil_advocate": "An enthusiast or student researching owls for a report could accumulate the same files. Rebuttal: a report does not explain browsing a live for-sale marketplace for specific listings alongside the phone-side negotiation with a known seller.",
+        "corroboration": "Matches the OWL-NEXUS5 phone case (same birdtrader.co.uk site, same subject Sarah McAvoy / mcavoys87@gmail.com).",
+        "self_correction": "Chrome history preserved (browser/chrome_history.sqlite) and owl docs copied to hd1_preserved_claude_fable/ for re-verification after the E01 is freed."
+      },
+      {
+        "finding_id": "F-002",
+        "title": "Same-subject Pidgin channel with logging enabled but conversation logs absent",
+        "verdict": "SUSPICION",
+        "confidence": "MEDIUM",
+        "status": "INFERRED",
+        "artifact": "Users/Sarah M/AppData/Roaming/.purple/ ; Windows/Prefetch/PIDGIN*.pf",
+        "tools_used": [
+          "prefetch (pyscca)",
+          "read (.purple xml)"
+        ],
+        "firstness": "Pidgin ran 7 times (prefetch run_count 7) from a portable path (Users\\Sarah M\\AppData\\Roaming\\Microsoft\\Windows\\Pidgin, not Program Files). accounts.xml shows one account, mcavoys87@gmail.com (prpl-msn). prefs.xml has logging enabled (log_ims=1, log_chats=1, log='automatic'). Yet no .purple\\logs directory exists and blist.xml is empty.",
+        "secondness": "With automatic IM/chat logging enabled and seven executions, completed conversations would be written to .purple\\logs. Their total absence, together with an empty buddy list, is anomalous.",
+        "thirdness": "Consistent with removal of the Pidgin conversation record (the expected owl-purchase 'confirmation through pidgin'), but not proven: 'ran but never chatted' cannot be excluded from this artifact alone. Rated SUSPICION/INFERRED, not INTENT.",
+        "carnegie": "None.",
+        "mitre_ttps": [
+          "T1070"
+        ],
+        "devil_advocate": "Pidgin may have been launched repeatedly without ever completing a logged conversation (login failures), leaving no logs despite the setting. This benign reading is NOT refuted.",
+        "corroboration": "The account mcavoys87@gmail.com is the same identity as the Nexus 5 subject; the SMS on the phone referenced confirmation 'through pidgin'.",
+        "self_correction": "Explicitly did not assert deletion; the absence is reported as records-not-recoverable. .purple xml preserved."
+      },
+      {
+        "finding_id": "F-003",
+        "title": "Deletion of six owl-acquisition files to the Recycle Bin",
+        "verdict": "SUSPICION",
+        "confidence": "MEDIUM",
+        "status": "CONFIRMED",
+        "artifact": "$RECYCLE.BIN/S-1-5-21-929903582-3707417421-3176878646-1002",
+        "tools_used": [
+          "recycle bin $I parse",
+          "list_files"
+        ],
+        "firstness": "Six deleted files recovered from the Recycle Bin, all owl-related: Snowy_Owl.pdf, Great Horned Owl Info.pdf, Great Horned Owl.jpg, Pygmy Owl.jpg, Luna Owl.jpg, and 'Next pet.jpg' (originals under Users\\Sarah M\\Desktop and \\Downloads). $R contents present and recovered.",
+        "secondness": "Deleting owl images and care PDFs \u2014 including one named 'Next pet.jpg' and 'Luna Owl.jpg' \u2014 is a purposive removal of acquisition materials, not routine cleanup of junk.",
+        "thirdness": "Concealment of owl-acquisition materials. This is a soft delete (Recycle Bin, recoverable) \u2014 not secure erasure \u2014 so it evidences an intent to tidy/hide, not the aggravated anti-forensic destruction that would support MALICE.",
+        "carnegie": "None.",
+        "mitre_ttps": [
+          "T1070.004"
+        ],
+        "devil_advocate": "A user changing their mind about a pet could delete these files innocently. Rebuttal: possible in isolation, but co-located with the purchase research and the phone-side negotiation it reads as concealment; either way it stays at SUSPICION because the delete is recoverable.",
+        "corroboration": "Same subject, same owl subject-matter as F-001 and the Nexus 5.",
+        "self_correction": "$I and $R files preserved to hd1_preserved_claude_fable/recyclebin_1002/."
+      },
+      {
+        "finding_id": "F-004",
+        "title": "Cross-device corroboration lifts the OWL single-device ceiling",
+        "verdict": "INTENT",
+        "confidence": "HIGH",
+        "status": "CONFIRMED",
+        "artifact": "HD1 (this device) + OWL-NEXUS5 (phone)",
+        "tools_used": [
+          "cross-case correlation"
+        ],
+        "firstness": "HD1 is an HP computer (root folders hp/, SWSETUP/, SYSTEM.SAV/) whose Sarah M profile carries the owl-purchase research; its Pidgin account and identity resolve to Sarah McAvoy / mcavoys87@gmail.com, the same subject as the OWL-NEXUS5 Nexus 5.",
+        "secondness": "The OWL-NEXUS5 verdict was capped at SUSPICION under doctrine L-051 precisely for lack of an independent second source. HD1 is that independent second device.",
+        "thirdness": "Two independent devices belonging to the same subject, showing the same deliberate owl-trade preparation, satisfy the two-source corroboration bar. For the OWL case as a whole this supports elevation from SUSPICION to INTENT.",
+        "carnegie": "None.",
+        "mitre_ttps": [],
+        "devil_advocate": "The two devices sharing owl content could reflect one innocent hobby spanning phone and computer. Rebuttal: the phone carries an actual negotiation with a named seller (layster82); the computer carries the marketplace browsing and acquisition materials \u2014 together they describe a transaction, not a hobby.",
+        "corroboration": "OWL-NEXUS5_bundle_claude_fable.json (decision_hash 1fc52828...).",
+        "self_correction": "MALICE is NOT claimed: no completed-payment record and no aggravated anti-forensic destruction are proven on either device; the emitted combined grade is INTENT."
+      }
+    ]
+  },
+  "chain_of_custody": {
+    "evidence_e01": "HD1.E01 (extracted from owl.zip)",
+    "evidence_e01_sha256": "f3174609fc4bf912824103b2f164922461b9549aa03c4fca8a57b837840cb9cb",
+    "source_drive": "Toshiba MQ01ACF050 500GB serial 16OGCPA5T (from HD1.source_info)",
+    "acquisition": "ewfmount (libewf) -> raw ewf1 -> ntfs-3g ro loop offset=512753664",
+    "preserved_artifacts": "evidence/owl-2019-hd1-windows/hd1_preserved_claude_fable/ (owl docs, .purple xml, recycle-bin $I/$R) + browser/chrome_history.sqlite + prefetch/",
+    "hmac_key_present": false,
+    "note": "E01 and owl.zip scheduled for deletion after this seal; decisive artifacts preserved above; E01 SHA-256 recorded for custody."
+  },
+  "tool_execution_log": [
+    {
+      "seq": 1,
+      "event_id": "8034bb4c-3b88-4ec4-a24a-1a68a47c56f8",
+      "timestamp": "2026-07-23T02:56:19.807230+00:00",
+      "mode": "claude_code",
+      "tool": "generate_forensic_hash",
+      "target": "HD1.E01",
+      "result_summary": "SHA-256 f3174609...0cb9cb INTEGRITY_VERIFIED",
+      "input_hash": "b065fd8dc4134ef06f105f214c04d89a5eaf94a406c816c286ac7505c7db6883",
+      "chain_version": "2",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "entry_hash": "0a3010b4bbd88473225705a5ac8fbecad54bf9a490fa021e310d0221c08d1701"
+    },
+    {
+      "seq": 2,
+      "event_id": "1d995334-4b02-4139-8c8e-fbae34fe31fa",
+      "timestamp": "2026-07-23T02:56:19.807272+00:00",
+      "mode": "claude_code",
+      "tool": "mount",
+      "target": "HD1.E01 p3 (NTFS 448.7G)",
+      "result_summary": "ewfmount+ntfs-3g ro loop offset; HP computer, users Sarah M / Sarah McAvoy",
+      "input_hash": "0871c3c601a3a3684614ee076d8f08c1fbeec3d1f7c9bb404ce630882e008d7a",
+      "chain_version": "2",
+      "prev_hash": "0a3010b4bbd88473225705a5ac8fbecad54bf9a490fa021e310d0221c08d1701",
+      "entry_hash": "6b8c400628b73e4b96f652396e7a89db9deed7dc5c1f81c49260c9ac7c58053a"
+    },
+    {
+      "seq": 3,
+      "event_id": "a5f1f850-41fb-4c23-9d3a-90376a716e6b",
+      "timestamp": "2026-07-23T02:56:19.807299+00:00",
+      "mode": "claude_code",
+      "tool": "sqlite_chrome_history",
+      "target": "browser/chrome_history.sqlite",
+      "result_summary": "birdtrader.co.uk owl listings, snowy-owl-eggs, craigslist owls; 463 urls",
+      "input_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "chain_version": "2",
+      "prev_hash": "6b8c400628b73e4b96f652396e7a89db9deed7dc5c1f81c49260c9ac7c58053a",
+      "entry_hash": "a30e9abf6fd4adbe9ac2742cf4406e752468615aaeef40ec0742fb14ec3a51e9"
+    },
+    {
+      "seq": 4,
+      "event_id": "d7f2b88e-6684-460e-b529-9ee7516e8930",
+      "timestamp": "2026-07-23T02:56:19.807323+00:00",
+      "mode": "claude_code",
+      "tool": "list_files",
+      "target": "Users/Sarah M/Downloads+Desktop",
+      "result_summary": "Owl_Emergency_Care.pdf, Owl_Keeping.pdf, Snowy Owl bibliography, saved owl pages",
+      "input_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "chain_version": "2",
+      "prev_hash": "a30e9abf6fd4adbe9ac2742cf4406e752468615aaeef40ec0742fb14ec3a51e9",
+      "entry_hash": "f183032eaa32721e25c00a159a6a593d5d2de70130d6d11a3dce03fad40b5084"
+    },
+    {
+      "seq": 5,
+      "event_id": "55d1f34c-a906-44d6-a7e2-4a2047988ae8",
+      "timestamp": "2026-07-23T02:56:19.807345+00:00",
+      "mode": "claude_code",
+      "tool": "prefetch_pyscca",
+      "target": "Windows/Prefetch/PIDGIN*.pf",
+      "result_summary": "Pidgin run_count 7, portable path, account mcavoys87@gmail.com",
+      "input_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "chain_version": "2",
+      "prev_hash": "f183032eaa32721e25c00a159a6a593d5d2de70130d6d11a3dce03fad40b5084",
+      "entry_hash": "2b071e0a42d7de9315dbc114f7c5268873ce41b03bde8270cd793eee322880e9"
+    },
+    {
+      "seq": 6,
+      "event_id": "8dd209b1-4874-4e6c-8278-990d86906de8",
+      "timestamp": "2026-07-23T02:56:19.807366+00:00",
+      "mode": "claude_code",
+      "tool": "read_purple_config",
+      "target": ".purple/prefs.xml+accounts.xml+blist.xml",
+      "result_summary": "logging enabled (automatic) but no logs dir, empty buddy list",
+      "input_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "chain_version": "2",
+      "prev_hash": "2b071e0a42d7de9315dbc114f7c5268873ce41b03bde8270cd793eee322880e9",
+      "entry_hash": "27a42ea9aaee4b142edc2b315df99c2a7bb798b3e6e89c5ed50d5008078d3ebd"
+    },
+    {
+      "seq": 7,
+      "event_id": "cd43d899-7646-4353-a312-5a14a56d1def",
+      "timestamp": "2026-07-23T02:56:19.807386+00:00",
+      "mode": "claude_code",
+      "tool": "recyclebin_parse",
+      "target": "$RECYCLE.BIN/...-1002",
+      "result_summary": "6 deleted owl files (Snowy_Owl.pdf, Luna Owl.jpg, Next pet.jpg, ...), $R recovered",
+      "input_hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "chain_version": "2",
+      "prev_hash": "27a42ea9aaee4b142edc2b315df99c2a7bb798b3e6e89c5ed50d5008078d3ebd",
+      "entry_hash": "21d3d50263f9bd974f21ea636cd79c7660f9fe0e3bd8221b4c6897f9f24810a6"
+    }
+  ],
+  "chain_tip_sha256": "21d3d50263f9bd974f21ea636cd79c7660f9fe0e3bd8221b4c6897f9f24810a6"
+}
