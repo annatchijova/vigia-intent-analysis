@@ -1973,6 +1973,31 @@ oscillation string routing is non-contradictory. No action required.
 
 ## Bugs de Sesión 2026-06-29 — Windows Disk Evidence & RAW Mode
 
+### B-031 [FIXED] — `provenance_chain` mal tipado (string/dict) producía `len()` incorrecto en el factor EPC [entrada retrospectiva 2026-07-23]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — el shield existe en `vigia_scorer.py` y está cubierto por `tests/test_r4_boundaries.py` |
+| **Archivo** | `vigia_scorer.py` (bloque `effective_trusts`, comentario `# B-031`) |
+| **Detectado en** | Banda 2026-06-29 (evolución citada en `docs/PROPUESTA_TANDA_B.md` y `docs/REDTEAM_ROUND4_BOUNDARIES.md`) |
+
+**Nota de proveniencia:** entrada RECONSTRUIDA el 2026-07-23 por el contrato
+de integridad referencial (`tests/test_registry_integrity.py`): el ID se
+citaba en cinco superficies (código de producción, dos dossiers, ambos
+registros) pero nunca tuvo entrada propia. Fuentes de esta reconstrucción:
+el comentario en código, la tabla de REDTEAM_ROUND4 ("`provenance_chain` =
+'str' → NOISE, no crash — B-031 retypes non-list chain → []") y el test R4
+que lo ejercita. No se reconstruyó lo que las fuentes no respaldan (fecha
+exacta del fix, commit).
+
+**Descripción:** un `provenance_chain` que llegaba como string o dict (en
+vez de list) producía un `len()` semánticamente incorrecto en el cómputo
+del factor EPC — `len("abc")==3` contaba caracteres como si fueran eslabones
+de custodia. Fix: coerción `isinstance(list)`; un no-list cae a `[]`, que
+aterriza en el path `chain_status BROKEN` (EPC 1/10, conservador).
+
+---
+
 ### B-032 [FIXED] — vigia_agent.py mapped *.evtx to event_stream kwarg instead of event_logs
 
 | Campo | Valor |
@@ -2970,7 +2995,7 @@ Clamp del argumento a `±LOG_LR_EXP_CAP = 700.0` antes de `math.exp`:
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | P1 (narrativa honesta) FIXED — 2026-07-03; **P2 CERRADO 2026-07-10 — NOT ADOPTED por decisión sellada §9.4 (opción (ii) pura, colectivo + firma de Anna)**: el split por dominios lógicos manufactura corroboración — todos los dominios macOS son D3, mismo canal físico. SUSPICION es el techo doctrinal para D3-only (**L-051 / §9.4-LIM**). La implementación del split queda como registro histórico en la rama `claude/b052-p2-domain-signals-xk5ecq` (`c5c8d38`+`a74d360`, **NO MERGEAR**); `densidad_causal_D3` descartada por experimento pre-registrado (r=0.9185, zona gris fail-closed). Mitigación implementada: clase `suspicion_class` (GENERIC \| D3_RICH_NO_TRIANGULATION) en narrativa + pipeline_meta, solo texto (`docs/B052_P2_DESIGN.md` §10; 12 tests). |
+| **Estado** | P1 (narrativa honesta) FIXED — 2026-07-03; **P2 CERRADO 2026-07-10 — NOT ADOPTED por decisión sellada §9.4 (opción (ii) pura, colectivo + firma de Anna)**: el split por dominios lógicos manufactura corroboración — todos los dominios macOS son D3, mismo canal físico. SUSPICION es el techo doctrinal para D3-only (**L-067 / §9.4-LIM**, ex-L-051). La implementación del split queda como registro histórico en la rama `claude/b052-p2-domain-signals-xk5ecq` (`c5c8d38`+`a74d360`, **NO MERGEAR**); `densidad_causal_D3` descartada por experimento pre-registrado (r=0.9185, zona gris fail-closed). Mitigación implementada: clase `suspicion_class` (GENERIC \| D3_RICH_NO_TRIANGULATION) en narrativa + pipeline_meta, solo texto (`docs/B052_P2_DESIGN.md` §10; 12 tests). |
 | **Severidad** | MEDIA — la narrativa Peircean del motor v2 es inalcanzable para evidencia mobile por diseño |
 | **Archivos** | `sift_orchestrator.py` (shim, ruta mobile-only); P2: `vigia/sift/{macos,ios,android,google_takeout}_forensics.py` |
 | **Detectado en** | `AUDITORIA_MACOS_NARRATIVA.md` (2026-07-03) |
@@ -5789,7 +5814,7 @@ and docstring guard citing this bug.
 > en 3 clases con causa raíz: C1 metadata degenerada de la serie REAL/SRL
 > (16, `evidence_type`/`source_tool` nunca poblados en la conversión), C2
 > señales débiles bajo baseline agrupada (5, indistinguible hasta resolver
-> C1), C3 tensión doctrinal mono-canal vs diversidad (6, cf. L-051). El
+> C1), C3 tensión doctrinal mono-canal vs diversidad (6, cf. L-067, ex-L-051). El
 > gate sigue SIN cablear. Camino al desbloqueo, gates pre-registrados y
 > decisiones pendientes de Anna: `docs/B116_CONDITION4_DESIGN.md`.
 >
@@ -7641,6 +7666,587 @@ KIWI-002↔003, label-blind en ambas APIs, dedup, fixture RT, HMAC,
 determinismo orden-independiente); registro del bridge con py_compile (el
 smoke test MCP requiere entorno con `mcp` — L-045; pendiente para la
 próxima sesión con bridge vivo); gate 0-flips compartido con F1.
+
+---
+
+## B-145 — VIGIA-REAL-007 (Nitroba) `expected_verdict`: hallazgo de INTEGRIDAD DE ETIQUETA, no un defecto de scoring — MALICE estaba mal desde el primer commit del caso, corregido 2026-07-12 en las 3 copias activas; 4 portadores no activos todavía leen MALICE (censo extendido 2026-07-19, punto 4) [PARCIALMENTE RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | PARCIALMENTE RESUELTO — las 3 copias fuente de caso **activas** (`data/cases/{,converted/,legacy/}`) fueron corregidas el 2026-07-12 (`cf8a37c5`, `3f3a271f`). El censo extendido 2026-07-19 (punto 4) encontró **4 portadores no activos** todavía en `MALICE`; `data/vigia_forensic_cases.json` (la única fuente viva sin fecha) fue entonces re-etiquetada a `SUSPICION` (2026-07-19). **3 portadores no-consumidores permanecen en `MALICE` por decisión:** `cases/input/VIGIA-REAL-007.json` (`OUTSIDE_ALLOWLIST`) y 2 snapshots de calibración fechados (insumos de calibración offline congelados — editarlos rompería la reproducibilidad de B-076). Ninguno alimenta la métrica publicada (todos fuera de `CASES_DIRS`). |
+| **Severidad** | P2 — integridad de la **etiqueta** de ground truth. Clasificado por separado de un defecto del motor de scoring: ningún sitio de `vigia_scorer.py` produjo jamás un veredicto incorrecto contra esta evidencia. |
+| **Archivo** | `data/cases/VIGIA-REAL-007.json`, `data/cases/converted/VIGIA-REAL-007.json`, `data/cases/legacy/VIGIA-REAL-007.json`, `cases/input/VIGIA-REAL-007.json` (4 copias trackeadas del caso, según el patrón de copias-sombra R3-3/R3-3b/R3-3c) |
+| **Detectado en** | Arqueología de historia git solicitada por @annatchijova, 2026-07-18 — traza completa `git log -p --follow` de `expected_verdict` a través de las 4 copias, todas las ramas, tras des-shallowear el clon (`git fetch --unshallow`; el clon shallow de la sesión de trabajo solo exponía un commit squasheado). |
+
+**Afirmación bajo investigación:** se reportó que el caso tenía `expected_verdict:
+SUSPICION` "desde siempre" en una copia hosteada de forma independiente (aprobada
+por Rob T. Lee), divergiendo a `MALICE` en este repo "en algún momento" vía una
+edición fuera de la autorización de escritura normal, luego restaurada a
+`SUSPICION`.
+
+**Lo que la historia git realmente muestra (con alcance Daubert — afirmado solo
+donde hay evidencia directa):**
+
+1. **No existe ningún commit de corrupción en la historia trackeada de este
+   repo.** `MALICE` está presente en el *primer* commit que introduce cada copia:
+   - `f4e8946d` (2026-04-28 23:48:59 -0300, "data: agregar 71 casos SYN + 15
+     casos BEN al corpus") crea `data/cases/VIGIA-REAL-007.json` desde cero
+     (61 inserciones, 0 borrados) con `"expected_verdict": "MALICE"` ya
+     presente. (Nota: el mensaje del commit describe casos SYN/BEN; también
+     agregó silenciosamente este caso REAL — un desajuste menor entre mensaje
+     de commit y contenido, no evidencia de manipulación en sí mismo.)
+   - `4016b39b` (2026-05-18) crea `data/cases/converted/VIGIA-REAL-007.json`
+     vía `scripts/convert_legacy_cases.py`, ya en `MALICE`.
+   - `05956f77` (2026-05-19) crea `data/cases/legacy/VIGIA-REAL-007.json`
+     (`_consolidation.consolidated_at: 2026-04-28T05:51:15Z`, coincidiendo con
+     la fuente `f4e8946d`), ya en `MALICE`.
+   - `bde03ae2` (2026-05-02) es el commit que introduce la ur-fuente,
+     `data/vigia_forensic_cases.json` ("Digital Corpora Nitroba Harassment"),
+     y también lee ya `"expected_verdict": "MALICE"`.
+   - No hay ningún commit en `git log --all` que cambie este campo
+     DE `SUSPICION` A `MALICE`. Si la copia hosteada de forma independiente
+     era genuinamente `SUSPICION` desde su creación, la divergencia es
+     anterior a la historia git de este repo — no ocurrió como un evento de
+     edición dentro del repo, y no puede reconstruirse forensemente más allá
+     desde esta base de código sola.
+   - **Corrección a la afirmación original:** "restaurado hace días" solo es
+     exacto para `data/cases/{,converted/,legacy/}VIGIA-REAL-007.json`. No
+     describe un acto de *restaurar* un valor SUSPICION previo — el registro
+     git muestra una *corrección por primera vez* de una etiqueta que era
+     `MALICE` desde el momento en que cada copia entró a este repositorio.
+
+2. **La corrección (2026-07-12) fue un re-etiquetado deliberado, documentado y
+   de autor único — no una escritura sin supervisión.**
+   - `cf8a37c5447f60a64bd69f597aff28101965115f` (Anna Tchijova, 2026-07-12
+     20:14:03 -0300): `data/cases/VIGIA-REAL-007.json`
+     ```
+     -  "expected_verdict": "MALICE",
+     +  "expected_verdict": "SUSPICION",
+     ```
+     Mensaje del commit: *"anonymous harassment via willselfdestruct.com shows
+     clear intentionality but NO concealment layer (no log deletion, no
+     timestamp manipulation, no process masquerading). Under VIGIA's verdict
+     scale, SUSPICION is correct — MALICE requires active anti-forensics.
+     The motor already sealed SUSPICION correctly."* Alcance: 3 archivos
+     (`README.md`, `README_ES.md`, este único archivo de caso). También
+     actualiza las métricas de corpus publicadas 167/199 → 174/199.
+   - `3f3a271f12d64bbd26c4687a9390e92e167920da` (Anna Tchijova, 2026-07-12
+     23:05:51 -0300): el mismo diff `MALICE → SUSPICION` aplicado a
+     `data/cases/converted/VIGIA-REAL-007.json` y
+     `data/cases/legacy/VIGIA-REAL-007.json`, dentro de un commit mucho más
+     grande que regeneró los 199 bundles de agente post-M1/M2/M3/Rule-16.
+     Mensaje del commit: *"Also syncs Nitroba MALICE->SUSPICION relabel in
+     converted/ and legacy/ copies (missed in the original relabel commit)."*
+     Cada otra línea `expected_verdict` tocada por este commit es una adición
+     pura (solo `+`, archivos de bundle regenerados nuevos bajo
+     `results/agent_batch/`) — confirmado diffeando el commit completo:
+     ninguna otra etiqueta *fuente* de caso fue cambiada en silencio. Esto
+     descarta el patrón de "divergencia silenciosa sistémica" B-095/case_008
+     para este evento — el re-etiquetado estuvo acotado a Nitroba únicamente,
+     ambas veces.
+
+3. **Brecha residual — `cases/input/VIGIA-REAL-007.json` todavía lee `MALICE`.**
+   Creado en `625f293e` (2026-07-02, "move case JSONs from evidence/ to
+   cases/input/"), nunca tocado por ninguno de los dos commits de
+   re-etiquetado. Confirmado por lectura directa al momento de esta auditoría
+   (2026-07-18): línea 95, `"expected_verdict": "MALICE"`. Según
+   `docs/AUDITORIA_FALSOS_NEGATIVOS_MODO_AGENTE.md:149,486`, `cases/input/`
+   está marcado `OUTSIDE_ALLOWLIST` por PathGuard — no es consumido por el
+   pipeline activo de scoring/corpus, así que este residual **no** afecta
+   ninguna métrica publicada. Es una inconsistencia viva, no corregida
+   actualmente (esta auditoría es de solo lectura por instrucciones; no se
+   modificó ningún archivo de caso).
+
+4. **Censo extendido (2026-07-19) — el residual es más amplio que una copia.**
+   Un escaneo de árbol completo de cada portador del string `VIGIA-REAL-007`,
+   extrayendo la etiqueta específica del caso (no un grep a nivel de archivo),
+   muestra que la corrección `MALICE → SUSPICION` alcanzó solamente las tres
+   copias fuente de caso *activas*. Cuatro portadores **no activos** todavía
+   leen `MALICE` para este caso al 2026-07-19:
+   - `cases/input/VIGIA-REAL-007.json` — `MALICE` (ya documentado en el punto 3;
+     `OUTSIDE_ALLOWLIST`).
+   - `data/vigia_forensic_cases.json` — `case_id=VIGIA-REAL-007 → MALICE`. Es la
+     ur-fuente del punto 1. **No** se carga como caso individual: está listada
+     en `SKIP_STEMS` (`run_all_agent.py:36-37`; igualmente referenciada en
+     contexto de skip por `scripts/redteam_round3_emergent.py:144` y
+     `scripts/dryrun_signal_quality_gate.py:45`). Misma forma que las copias
+     corregidas (`expected_verdict` a secas, sin campo motor), así que es una
+     etiqueta genuinamente des-sincronizada — solo que no una que la métrica
+     batch consuma. El punto 3 no la listó como residual vivo; esta entrada
+     corrige esa omisión.
+   - `data/calibration_ladder_dataset_20260705.json` — `cases[54]:
+     {expected: MALICE, motor_verdict: SUSPICION}`.
+   - `data/signal_calibration_dataset_20260709.json` — `records[422..424]:
+     {ground_truth: MALICE, case_motor_verdict: SUSPICION}` (3 registros).
+
+   **Refutación — ¿algo de esto invierte la métrica de corpus publicada? No.**
+   El conjunto de casos activo que lee el runner determinista es `CASES_DIRS`
+   (`run_all_agent.py:22-28`: `data/cases`, `converted`, `benign`,
+   `consolidated_canonical`, `legacy`). Ninguno de los cuatro portadores
+   residuales está en él. La guarda de copias-sombra R3-3
+   (`check_label_consistency`) escanea solo `CASES_DIRS`, así que pasa — las
+   tres copias activas coinciden en `SUSPICION` — y por diseño no ve estos
+   cuatro. La precisión de corpus publicada queda por lo tanto intacta; esto
+   sigue siendo INTEGRIDAD DE ETIQUETA, no un defecto de scoring.
+
+   **Caveat honesto — los dos datasets de calibración son snapshots offline
+   congelados, no bugs.** Cada registro 007 porta la etiqueta de ground truth
+   vieja (`MALICE`) Y el veredicto actual del motor (`SUSPICION`) lado a lado,
+   en un archivo cuyo nombre lleva fecha estampada. El análisis de consumidores
+   (2026-07-19) confirma que la estructura es deliberada:
+   `calibration_ladder_dataset_20260705.json` es referenciado solo por su
+   generador (`scripts/generate_ladder_dataset.py:110`) y por un **comentario**
+   en `vigia_scorer.py:1181` documentando que el umbral SUSPICION 0.18→0.10
+   (B-076) se calibró offline contra él — el scorer **no** lo carga en runtime;
+   la constante calibrada está horneada en el código. `signal_calibration_dataset_
+   20260709.json` es referenciado solo por su generador, un experimento de
+   refit offline (`scripts/experiment_a4_profile_refit.py:51`), y un test.
+   Ninguno es ground truth de runtime. Editarlos alteraría retroactivamente el
+   insumo de una calibración documentada (B-076 es anterior al re-etiquetado
+   del 2026-07-12), rompiendo su reproducibilidad. **No** fueron editados, por
+   decisión.
+
+   **Resolución (2026-07-19):** `data/vigia_forensic_cases.json` — el único
+   residual que es una fuente viva sin fecha y sin campo motor, misma clase que
+   las tres copias ya corregidas — fue re-etiquetado `MALICE → SUSPICION` para
+   `case_id VIGIA-REAL-007` (parche quirúrgico de una sola línea, anclado en la
+   línea de descripción única; JSON re-validado; diff = 1 línea;
+   `confidence_expected: 91` dejado intacto, coincidiendo con el alcance mínimo
+   de `cf8a37c5`; suite completa en verde, 1624 passed).
+   `cases/input/VIGIA-REAL-007.json` permanece en `MALICE` por su estatus previo
+   `OUTSIDE_ALLOWLIST` (sin cambios). Los dos datasets de calibración permanecen
+   en `MALICE` por la decisión de arriba. Estado neto de fuentes vivas: 007
+   ahora lee `SUSPICION` en toda fuente que el pipeline pudiera cargar; los
+   portadores `MALICE` restantes son todos no-consumidores documentados.
+
+**Clasificación: INTEGRIDAD DE ETIQUETA, no un bug del motor de scoring.** En
+ningún punto de esta historia se demostró que el veredicto propio del motor
+determinista para esta evidencia estuviera equivocado — el hallazgo es que el
+*comparador de ground truth* (`expected_verdict`) contra el que se lo medía
+portaba un valor incorrecto desde el momento en que el caso entró al control de
+versiones. Enmarcado en el propio lenguaje de `cf8a37c5`: "the motor already
+sealed SUSPICION correctly." Ningún code path, gate o cómputo en Fraction de
+`vigia_scorer.py` está implicado.
+
+**REFUTATION GATE LOG — B-145**
+```
+Candidate verdict : label was corrupted by an unauthorized/unsupervised
+                     write at some point after initial (correct) creation
+Gate applied       : full-history git archaeology (git log -p --follow,
+                     --all, post-unshallow) across all 4 tracked copies
+Gate rule          : a corruption event requires a commit transitioning
+                     SUSPICION -> MALICE; none exists in `git log --all`
+Gate result        : Candidate REJECTED. Evidence instead shows MALICE
+                     present at first commit of every copy (f4e8946d,
+                     4016b39b, 05956f77, bde03ae2); no prior SUSPICION
+                     value is recorded in this repository's history.
+Forensic note      : the independently-hosted copy's claimed SUSPICION
+                     origin cannot be confirmed or refuted from this
+                     repo's git history alone — it is outside this
+                     evidence set. Documented as an open gap, not
+                     asserted either way.
+```
+
+**Verificación:** `git log --all --follow -p -- <cada una de las 4 rutas>`,
+hunks de diff y metadata completa de commits reproducidos arriba; `git show
+cf8a37c5 --stat` y `git show 3f3a271f --stat` confirman el alcance de archivos;
+`grep -n expected_verdict` re-ejecutado contra las 4 copias vivas confirma el
+estado actual en disco (`SUSPICION` ×3, `MALICE` ×1 en `cases/input/`). No se
+modificó ningún archivo de caso como parte de esta entrada.
+
+---
+
+## B-146 — Verificación cross-versión de bundles sellados: VERIFICADA PRESENTE, no una brecha (propuesta Punto 4 de Qwen, refutada por auditoría de código 2026-07-19)
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | NO ES UN BUG — la feature ya está implementada y testeada. Registrado para que no se re-investigue. |
+| **Severidad** | N/A (resultado de auditoría, sin defecto) |
+| **Archivo** | `vigia/core/canonicalize.py`, `vigia/core/bundle_builder.py`, `vigia/core/ebs_v1.py`, `tests/test_canonicalize_lockstep.py` |
+| **Propuesto por** | Modelo externo (Qwen), 2026-07-19, como "Point 4 — cross-version verification of sealed bundles". Verificado contra código vivo según §4.1 antes de aceptación. |
+
+**Afirmación bajo investigación (Qwen):** si el formato de
+serialización/hash del bundle sellado evoluciona, ¿puede un VIGÍA *más nuevo*
+verificar un bundle sellado por una versión *más vieja* sin un fallo falso?
+Remedio propuesto: anclar un campo explícito `vigia_schema_version` dentro del
+payload hasheado para que un verificador futuro aplique las reglas históricas.
+
+**Lo que el código vivo muestra — el mecanismo ya existe:**
+
+1. `canonicalize.py:58` — `CANONICALIZE_VERSION = "2"` es la versión de las
+   reglas de serialización. `_canonicalize_v1` (líneas 73-111) se preserva
+   *explícitamente* "solo para verificar bundles historicos" (docstring
+   líneas 22-37).
+2. El contrato de verificación es exactamente la propuesta de Qwen: los
+   verificadores **prueban v2 y caen a v1** (`canonicalize.py:26-28`: "la
+   verificación prueba v2 y CAE A v1: todo bundle sellado bajo v1 sigue
+   verificando idéntico (results/)"). Un bundle sellado bajo las reglas
+   viejas verifica bit-idéntico bajo el código nuevo.
+3. Los campos de versión están dentro del payload sellado:
+   `bundle_builder.py:227,231,241` (`vigia_version`, `canonical_version:
+   "1.0.0"`, `bundle_version`); `ebs_v1.py:74` (`EBS_VERSION = "1.0"`),
+   `ebs_v1.py:744` (`bundle_version` serializado en el dict del bundle).
+4. `tests/test_canonicalize_lockstep.py` (12 passed, 2026-07-19) verifica el
+   encoder canónico en lockstep "para v2 y para el fallback v1".
+5. Evidencia corroborante del fix de CI del mismo día (commit `b2d4ad80`): la
+   copia de verificador borrada `tests/verify_ebs_v1_parcheado.py` "had already
+   lost the R3-2 dual-canon fallback, so it would REJECT historical v1 bundles
+   if ever run" (`test_canonicalize_lockstep.py:48-50`). El fallback dual-canon
+   *es* el mecanismo de verificación cross-versión — su pérdida se trata como
+   defecto, confirmando que el invariante es de primera clase.
+
+**REFUTATION GATE LOG — B-146**
+```
+Candidate finding : sealed bundles lack a version anchor, so a future VIGÍA
+                    could falsely reject (or wrongly validate) an old bundle
+Gate applied      : live-code audit of the canonicalize / bundle_builder /
+                    ebs_v1 sealing core + lockstep test
+Gate rule         : the proposal is a real gap only if no in-payload version
+                    exists AND the verifier does not dispatch on it
+Gate result       : REJECTED. CANONICALIZE_VERSION + bundle_version/EBS_VERSION
+                    are present in the hashed payload; the verifier tries v2
+                    and falls back to v1; the lockstep test covers both. The
+                    feature Qwen proposed already exists.
+Residual (optional): an explicit end-to-end "seal-under-v1, verify-under-current"
+                    regression test would be belt-and-suspenders. The lockstep
+                    test plus the historical `results/` v1 bundles (which still
+                    verify) already exercise the path; no defect blocks this.
+```
+
+**Verificación:** `grep -n CANONICALIZE_VERSION vigia/core/canonicalize.py`;
+lectura completa de `canonicalize.py` (encoders v1 + v2 + docstring
+dual-canon); `grep -n "version" vigia/core/bundle_builder.py
+vigia/core/ebs_v1.py`; `pytest tests/test_canonicalize_lockstep.py` → 12
+passed. No se cambió código.
+
+---
+
+## B-147 — Agotamiento adversarial de recursos / ReDoS en parseo de artefactos (propuesta Punto 3 de Qwen): dos vectores nombrados REFUTADOS; una brecha latente de guarda de ingesta encontrada
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO (2026-07-19) — los dos vectores que Qwen nombró están refutados (ver abajo). La única brecha latente (`disk_forensics.py:131`) fue endurecida con una guarda de degradación honesta + tests rojos primero. |
+| **Severidad** | P3 — endurecimiento de disponibilidad. No se encontró ningún camino explotable vivo. |
+| **Archivo** | `vigia/tools/caie.py` (`_extract_assertions`), parser JSON (empírico), `vigia/sift/{pcap_parser,memory_forensics,disk_forensics}.py`, `vigia/vigia_command_center.py` |
+| **Propuesto por** | Modelo externo (Qwen), 2026-07-19, como "Point 3 — parsing pathologies / ReDoS / Billion Laughs". Verificado contra código vivo + empíricamente según §1.3 antes de aceptación. |
+
+**Afirmación bajo investigación (Qwen):** un artefacto maliciosamente
+construido (JSON anidado profundamente, o texto que dispare backtracking
+catastrófico de regex en `_extract_assertions`) cuelga u OOMea el pipeline en
+lugar de ser rechazado limpiamente; degradar honestamente a
+`UNANALYZED | RESOURCE_EXHAUSTION`.
+
+**Resultado vector por vector:**
+
+1. **Backtracking catastrófico en las regexes de `_extract_assertions` —
+   REFUTADO.** `caie.py:1020-1089`: la función **no usa regex en absoluto**.
+   Lee metadata ya parseada vía `dict.get()`, chequeos de tipo con
+   `isinstance`, y membresía de substring plana (`"lsass" in target`). No hay
+   superficie de regex que atacar en esta función.
+2. **Cuelgue / OOM por JSON anidado profundo — REFUTADO empíricamente.**
+   `python3 -c` con un array anidado a profundidad 100000 y un objeto anidado
+   a profundidad 100000 levantan ambos un **`RecursionError` acotado y
+   atrapable** (salida de proceso 0; sin timeout a 20s, sin OOM, sin
+   segfault). El parser JSON de CPython no se cuelga por profundidad de
+   anidamiento; "Billion Laughs" es un ataque de expansión de entidades XML y
+   no aplica a `json.loads`.
+3. **DoS por volumen (inundación de artefactos) — YA CUBIERTO.** En `caie.py`,
+   `CrossArtifactIncongruenceEngine.add_artifact` aplica `_MAX_ARTIFACTS`
+   (Kimi P0) y rechaza el exceso (evento de auditoría
+   `CAIE_ARTIFACT_LIMIT`).
+
+**Auditoría de parseo de ingesta (el residual real, angosto).** Se auditaron
+cuatro sitios `json.loads` externos/semi-confiables para degradación honesta:
+
+| Sitio | Guarda presente | Disposición |
+|------|---------------|-------------|
+| `pcap_parser.py:86` | `except json.JSONDecodeError` → `RuntimeError` con contexto | Con guarda |
+| `memory_forensics.py:362` | `except (json.JSONDecodeError, subprocess.TimeoutExpired)` → log + `[]` | Con guarda |
+| `vigia_command_center.py:154` | `except json.JSONDecodeError: continue` + `except Exception: pass` externo | Con guarda |
+| `disk_forensics.py:131` | **ninguna** — `json.loads(parsed_json or "{}")` sin envolver | **Brecha (latente)** |
+
+**El hallazgo de `disk_forensics.py:131`, acotado con honestidad:**
+- `MFTTimelineAnalyzer.analyze(self, mft_bytes, parsed_json: Optional[str] = None, ...)`
+  parsea `parsed_json` (un parámetro externo) sin try/except. Un valor
+  malformado levanta `json.JSONDecodeError` (o `RecursionError` con
+  anidamiento profundo) sin atrapar, crasheando el análisis MFT en lugar de
+  degradar.
+- **No explotable en vivo hoy:** ningún caller dentro del repo pasa
+  `parsed_json` (`grep parsed_json` encuentra solo la firma); su default es
+  `None` → `json.loads("{}")` → siempre válido. El crash requiere un caller
+  externo que inyecte JSON malformado.
+- **Por qué igualmente vale la pena endurecerlo:** 10 líneas más arriba (mismo
+  método), el input externo hermano `timestamp_utc` *sí* está guardado, con
+  la fundamentación explícita "FIX P2 (Kimi post-patch): capturar ValueError
+  si timestamp_utc es inválido — no crashear". El `json.loads(parsed_json)`
+  sin envolver rompe ese mismo contrato defensivo en el otro input externo
+  del mismo método.
+
+**REFUTATION GATE LOG — B-147**
+```
+Candidate finding : crafted artifacts (deep JSON / regex backtracking) hang or
+                    OOM the pipeline; needs UNANALYZED/RESOURCE_EXHAUSTION guard
+Gate applied      : code read of _extract_assertions; empirical json.loads depth
+                    test; audit of 4 ingestion parse sites; caller trace of
+                    parsed_json
+Gate rule         : a vector is real only if it (a) has an exploitable surface
+                    and (b) fails unbounded (hang/OOM/crash) rather than bounded
+Gate result       : Vectors 1-3 REJECTED (no regex; bounded RecursionError;
+                    _MAX_ARTIFACTS already caps volume). One latent gap survives
+                    (disk_forensics.py:131), but is NOT live-reachable with
+                    malicious input in the current wiring — recorded as a
+                    hardening candidate, not a live vulnerability.
+```
+
+**Resolución (2026-07-19).** `disk_forensics.py:131` envuelto en
+`try/except (json.JSONDecodeError, RecursionError, ValueError)` más un chequeo
+de forma `isinstance(_parsed, dict)` → ante cualquier fallo, loguea un warning
+de frontera y degrada a cero entradas MFT (degradación honesta, espejando la
+guarda de `timestamp_utc` 10 líneas más arriba). Rojos primero:
+`tests/test_disk_forensics_ingest_guard.py` — tres casos adversariales (JSON
+malformado → JSONDecodeError; anidamiento a profundidad 100000 →
+RecursionError; payload válido-pero-lista → AttributeError) crasheaban todos
+pre-fix y ahora degradan a `total_entries == 0`; un cuarto test de regresión
+confirma que un payload bien formado sigue parseando (1 entrada). Gate
+comparativo: suite completa **1628 passed** (1624 previos + 4 nuevos), 0
+flips — el JSON válido no se ve afectado por construcción (mismo camino
+`.get("entries")` vía la rama `isinstance(dict)`).
+
+**Verificación:** lectura de `caie.py:1020-1089`; test JSON de profundidad
+100000 en `python3` (array y objeto → RecursionError acotado, exit 0);
+`sed`/lectura de los 4 sitios de ingesta; `grep -rn parsed_json vigia/` (solo
+la firma — ningún caller lo inyecta). No se cambió código como parte de esta
+entrada de auditoría.
+
+---
+
+## B-148 — Conflación ausencia≡negativo en CAIE: "red nunca analizada" emitido como "analizada, sin actividad", alimentando una acusación falsa de fabricación (propuesto como "B-154"; id real asignado B-148) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO (2026-07-19) — modelo NetworkObservation de cuatro estados en `_extract_assertions`; tests rojos primero; gate comparativo de corpus 0/201 flips. |
+| **Severidad** | P2 — consistencia arquitectónica + integridad de evidencia. Una regla que ACUSA (fabricación de logs, severidad 0.75-0.95) estaba disparando sobre AUSENCIA de datos. |
+| **Archivo** | `vigia/tools/caie.py` (`_extract_assertions`, rama de memoria ~1057-1089; consumido por la regla LOG_VS_MEMORY en `detect_fractures` ~1528) |
+| **Detectado** | Auditoría de consistencia arquitectónica (2026-07-19): "¿VIGÍA aplica sus propios principios cuando audita?" — verificado contra `disposition.py` de Forge ("Findings and audit completeness are separate dimensions"; "inspired by VIGÍA's abstention gates") y `detect_negation` de `quality.py` de Cronos ("absence ... attenuating context, not positive confirmation"). Ambos están portados DESDE VIGÍA, y sin embargo este camino de CAIE regresionó respecto de la doctrina. |
+
+**El bug.** Para un artefacto `memory_process`/`lsass_session`/`kernel_structure`,
+el viejo modelo bivaluado emitía `memory_shows_no_network_activity` siempre que
+`has_network` fuera falso — incluso cuando los campos de red estaban
+**ausentes** (memoria nunca analizada a nivel red). Esa aserción es el único
+input de la regla de fabricación LOG_VS_MEMORY (`caie.py:1528-1558`), así que
+"no analicé la capa de red" se usaba para acusar a un log de fabricación. "No
+encontré conexiones" y "no analicé la capa de red" son estados epistémicos
+OPUESTOS; el modelo de datos perdía la distinción.
+
+**El fix (modelo de cuatro estados, a nivel de aserción).** La PRESENCIA de la
+clave (`in meta`), no la veracidad de `.get()`, decide si la capa de red fue
+analizada:
+- `ANALYZED_WITH_ACTIVITY` → `memory_shows_network_activity`
+- `ANALYZED_NO_ACTIVITY` (campos presentes, válidos, vacíos) → `memory_shows_no_network_activity` (puede alimentar la regla)
+- `NOT_ANALYZED` (sin campos de red en absoluto) → `memory_network_not_analyzed` (NO debe acusar)
+- `ANALYSIS_FAILED` (campo presente, tipo incorrecto) → `memory_network_analysis_failed` (NO debe acusar)
+
+**Rojos primero + gate.** `tests/test_caie_b154_network_absence.py` (5 tests):
+los casos ausente y malformado disparaban `memory_shows_no_network_activity`
+pre-fix (ROJO) y ahora no; los casos presente-vacío y poblado quedan sin
+cambios (guardas de regresión). **Gate comparativo de corpus (mandato de Anna,
+broken==0): 0 flips de veredicto en 201 casos** — baseline (caie.py revertido)
+vs corregido producen veredictos sellados bit-idénticos; conjuntos de casos
+idénticos, 0 asimetría. Es decir, ningún caso real dependía de la acusación
+disparada por ausencia.
+
+**La suite misma codificaba el bug (la corroboración más fuerte).** Cinco tests
+adversariales existentes dependían de LOG_VS_MEMORY disparado por ausencia.
+Cuatro eran mis-codificaciones genuinas — su fixture canónico de "la memoria
+contradice el log" usaba memoria con red AUSENTE (`_S1_ARTIFACTS`:
+`{"pid": 4521}`, "Process memory shows nothing"); corregidos a
+presente-pero-vacío (`network_connections: []`), una contradicción genuina de
+"analizada, sin actividad". El quinto es la sonda T-5 real → **B-149**.
+
+**Verificación:** rojos primero, ROJO y luego VERDE; suite completa 1632
+passed / 31 xfailed; diff del gate de corpus sin `scripts` = 0 flips
+(corridas de script + crudas preservadas).
+
+---
+
+## B-149 — T-5: un IoC de C2 de severidad alta puede colapsar a NOISE cuando el artefacto de memoria exculpatorio nunca fue analizado a nivel red (aflorado por B-148) [ABIERTO — solo sintético]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO — solo sintético (0/201 casos de corpus). Documentado como limitación, no parcheado en silencio. Deliberadamente NO empaquetado dentro de B-148. |
+| **Severidad** | P2 (latente) — un IoC de C2 real y corroborado nunca debería leerse como NOISE ("nada que ver acá"). Actualmente reproducible solo sintéticamente. |
+| **Archivo** | `vigia_scorer.py` (Noisy-OR ponderado por spoofability / cascada de veredicto); sonda: `vigia/tests/adversarial/test_spoofability_correlation_attack.py::test_red_team_anchor_bypass` (ahora `xfail(strict=True)`) |
+
+**Por qué B-148 lo hizo aflorar.** La regla de fabricación LOG_VS_MEMORY
+cumplía doble función: además de detectar fabricación, su disparo sobre
+memoria sin red era INCIDENTALMENTE el mecanismo que impedía que un log de C2
+de alta spoofability colapsara a NOISE. B-148 correctamente detiene el disparo
+por ausencia (era un falso positivo), lo que remueve esa protección
+incidental. Medido post-B-148: un IoC de C2 (`raw_score=0.95`, `log_entry`) +
+un artefacto de memoria exculpatorio NO ANALIZADO a nivel red sin `verdict`
+explícito → **veredicto = NOISE** (`test_red_team_anchor_bypass`), mientras
+que con un artefacto exculpatorio de veredicto explícito se sostiene en
+SUSPICION (`test_metadata_convention...`, ahora un pass de contradicción
+genuina).
+
+**Alcance honesto.** El gate de corpus de B-148 muestra que **0/201 casos
+reales** exhiben esto — la protección anti-colapso descansaba sobre un falso
+positivo, pero ningún caso real dependía de ella tampoco. Así que T-5 es un
+comportamiento latente, no una regresión viva de corpus.
+
+**Fix apropiado (diferido, necesita una decisión).** Un IoC de severidad alta,
+corroborado independientemente, debe resistir el colapso a NOISE **por sus
+propios méritos** — no vía una fractura acoplada a memoria ausente. Es un
+cambio a nivel de scorer (p. ej. un piso de IoC que la ponderación por
+spoofability no pueda empujar por debajo de SUSPICION), NO un re-acoplamiento
+al bug de ausencia que B-148 corrigió. Trackeado por separado para que el fix
+correcto se diseñe deliberadamente. Cuando aterrice, el `xfail(strict=True)`
+sobre `test_red_team_anchor_bypass` pasa a XPASS y se remueve el marcador.
+
+---
+
+## B-150 — `_parse_iso_timestamp` interpretaba timestamps tz-naive en la zona horaria local del host (fuga de determinismo) [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO (2026-07-19) — los timestamps naive ahora se asumen UTC explícitamente, con log de divulgación; test rojo primero de invariancia de TZ. |
+| **Severidad** | P3 — determinismo/portabilidad (§5.2). Latente: los timestamps del corpus llevan sufijo Z (aware), así que no hay impacto de veredicto en ningún host; la fuga solo dispara con un input tz-naive. |
+| **Archivo** | `vigia/sift/_math_utils.py:200-224` (`_parse_iso_timestamp`) — consumido por el timeline de disco/MFT (`disk_forensics.py` `_analysis_epoch`) y `event_log_correlator.py`. |
+| **Detectado** | Auditoría de invariantes temporales (2026-07-19, el "residual B-150" de la familia Punto-3/temporal de ChatGPT). Id real asignado B-150. |
+
+**El bug.** `dt = datetime.fromisoformat(ts_str)` produce un datetime **naive**
+para un string sin offset (p. ej. `"2026-07-19T10:00:00"`), y
+`int(dt.timestamp())` sobre un datetime naive lo interpreta en la **zona
+horaria local del proceso**. El mismo timestamp naive sella por lo tanto un
+epoch distinto en un host UTC vs uno `America/New_York` — delta medido de
+14400s (4h, EDT). Una fuga de determinismo en un valor que puede llegar a un
+veredicto sellado vía `_analysis_epoch`.
+
+**El fix.** Después de `fromisoformat`, si `dt.tzinfo is None`, asumir UTC
+**explícitamente** (`dt.replace(tzinfo=timezone.utc)`) y emitir un WARNING de
+frontera — espejando el patrón asumir-UTC-y-loguear de CAIE
+`TCV_TIMESTAMP_NAIVE_ASSUMED_UTC` ya usado en el camino del veredicto. Los
+inputs aware (Z u offset explícito) quedan sin cambios (basados en instante).
+Sin interpretación silenciosa en la zona local del host.
+
+**Rojos primero.** `tests/test_b150_naive_timestamp_utc.py`: bajo
+`TZ=America/New_York` el parseo naive divergía del parseo UTC pre-fix (ROJO,
+delta 14400s) y ahora es igual (VERDE); un test de regresión en host UTC y un
+test de offset explícito fijan los caminos sin cambios. Suite completa 1635
+passed, 0 failed. No hizo falta gate de corpus — el fix solo cambia inputs
+naive, que el corpus no contiene, y en un host UTC naive==UTC antes y después
+de todos modos.
+
+---
+
+## B-151 — Downgrades del scorer: (a) clamp silencioso de score de artefacto único [RESUELTO, código muerto]; (b) entrada de cadena contradiction_detector mandatada no cableada en Modo-1 [ABIERTO — decisión de arquitectura]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | (a) RESUELTO (2026-07-19) — clamp hecho auditable; además se encontró inalcanzable. (b) ABIERTO — decisión de arquitectura, deliberadamente NO empaquetada con (a). |
+| **Severidad** | (a) P3 (divulgación de un clamp de código muerto). (b) P2 (brecha doctrina-vs-implementación). |
+| **Archivo** | (a) `vigia_scorer.py` clamp ~1216 + marcador ~1620; (b) `vigia_scorer.py` (sin `ToolExecutionLogChain` en el camino de decisión). |
+
+**(a) Clamp silencioso de score de artefacto único — RESUELTO, con un giro
+honesto.** `if n_artifacts < 2 and final_score > 0.65: final_score = 0.65`
+reescribía en silencio el score sellado (una reducción de fuerza probatoria
+sin razón/marcador, a diferencia de todo otro downgrade de la cascada). Fix:
+capturar el score pre-cap y surfacear un marcador
+`single_artifact_score_cap` + nota de razón en `base_result`, espejando el
+patrón de divulgación `normalization_failures` / `temporal_pairs_skipped`.
+Neutro al veredicto (el cap ya aplicaba; la divulgación es aditiva).
+
+**Giro encontrado al verificar: el clamp es actualmente código muerto
+INALCANZABLE.** Un artefacto de señal único se suprime a un score máximo de
+~0.038 (`cryptographic_hash`, raw 0.99, todos los boosters) — muy por debajo
+del cap 0.65 — así que el "downgrade silencioso" que este ítem nombró no es un
+riesgo vivo; el clamp es defensivo y el marcador es divulgación prospectiva.
+Fijado por `tests/test_b151a_single_artifact_cap.py`: si un artefacto único
+alguna vez alcanza un score >= 0.65 el test falla, señalando que el camino del
+marcador se volvió vivo. `_dround` devuelve float, así que `final_score` acá
+es float por el diseño de redondeo determinista del scorer (no un camino puro
+de Fraction) — la asignación `= 0.65` es consistente en tipos, sin inyección
+nueva de float.
+
+**(b) Entrada de cadena contradiction_detector no cableada en Modo-1 —
+ABIERTO.** El "Self-Correction Event Schema" de CLAUDE.md manda que cada
+downgrade dirigido por gate agregue una entrada `contradiction_detector` vía
+`ToolExecutionLogChain`. Verificado: `vigia_scorer.py`, `bundle_builder.py`,
+`pipeline.py`, `sift_orchestrator.py` contienen **cero** referencias a
+`ToolExecutionLogChain` / `contradiction_detector` — el appender se instancia
+solo en tests y en un script de red team. Es decir, el camino determinista de
+Modo-1 no emite los eventos de auto-corrección a prueba de manipulación
+mandatados (la cascada SÍ setea strings `reason` legibles por humanos para 7/8
+downgrades — la brecha es el evento *encadenado*, no la razón). Es una
+decisión de arquitectura — cablearlo en Modo-1, o enmendar la doctrina para
+declarar que el evento de auto-corrección encadenado es una construcción de
+Modo-2 (Claude Code) por diseño. Deliberadamente NO corregido como one-liner.
+Aún sin decidir.
+
+---
+
+## B-152 — Dos caminos de sellado de bundle distintos con superficies de integridad diferentes (hallazgo de arquitectura); capa de reasoning trace cableada junto al bundle de agente [DOCUMENTADO + Fase 1.5 aterrizada]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | Hallazgo de arquitectura DOCUMENTADO; reasoning trace Cronos-en-VIGÍA cableado en Modo-1 (Fase 1.5). |
+| **Severidad** | P3 (documentación / consistencia arquitectónica). Sin defecto — una propiedad real de doble camino que los mantenedores futuros deben conocer. |
+| **Archivo** | `vigia/core/bundle_builder.py` (camino EBS), `vigia_agent.py:_seal_bundle` (camino de agente), `vigia/core/reasoning_trace.py` (nuevo). |
+
+**Hallazgo de arquitectura (Anna, 2026-07-19): VIGÍA tiene DOS caminos de
+sellado con superficies de integridad diferentes.** Aflorado al diseñar dónde
+adjuntar el reasoning trace. No son intercambiables:
+
+- **Camino EBS** (`bundle_builder.seal`): `bundle_hash = _sha256_dict(bundle_payload)`
+  sobre un conjunto de claves FIJO; el bundle serializado es
+  `bundle_payload + integrity`, y el verificador re-deriva sobre
+  `{k:v for k in bundle if k != "integrity"}` (`verify_ebs_v1.py:294`).
+  Superficie de integridad = "todo excepto una lista de exclusión nombrada".
+  Un campo nuevo queda dentro del hash salvo exclusión explícita.
+- **Camino de agente** (`vigia_agent._seal_bundle`, el sello primario de
+  Modo-1): `bundle_digest = sha256(json.dumps(entire bundle dict))`. SIN
+  mecanismo de exclusión — el archivo `.json` en disco ES el contenido
+  hasheado (`sha256sum -c`). `bundle_sha256` ni siquiera está embebido (sin
+  auto-referencia). Cualquier campo agregado al dict cambia el digest.
+
+Consecuencia: "adjuntar un hermano narrativo FUERA del hash del veredicto" es
+una operación distinta según el camino — una clave excluida para EBS, un
+**archivo separado** para el bundle de agente. Asumir el mecanismo EBS para el
+camino de agente habría cambiado en silencio cada `bundle_digest` de agente.
+Registrado para que esta propiedad de doble camino no se redescubra por las
+malas.
+
+**Cableado de Fase 1.5 (reasoning trace junto al bundle de agente).**
+`vigia/core/reasoning_trace.py` (adaptado de Cronos, determinista, solo
+Fraction, doctrina B-148 aplicada en la API) es escrito por `vigia_agent` como
+archivo hermano `<stem>_reasoning_trace.json`, FUERA de `bundle_digest`, con
+su propia integridad `ToolExecutionLogChain`.
+`verify_reasoning_trace(bundle, trace)` liga a los dos: FALLA ante
+manipulación de la cadena, mismatch de `case_id`, o — la guarda
+proceso-no-resultado — `trace.verdict != bundle.agent_verdict` (testeado rojo
+primero). El trace se deriva de datos que el bundle ya selló: la hipótesis
+abductiva, evidencia NOT_ANALYZED para artefactos no analizados (B-148), y
+auto-correcciones como entradas `contradiction_detector` encadenadas — que es
+el mecanismo de Modo-1 que B-151(b) decía faltante (ahora disponible; si cada
+gate del scorer emite una sigue siendo la decisión pendiente bajo B-151b).
+
+**Gate (las tres pruebas de Anna).** (a/b) `tests/test_reasoning_trace_bundle_gate.py`
+prueba contra 15 bundles reales de `results/agent_batch/*` que construir el
+trace deja `bundle_digest` byte-idéntico (el dict nunca se muta; el trace es
+un archivo separado) y que el trace verifica contra cada uno. (c)
+`test_reasoning_trace.py::test_verify_trace_FAILS_on_verdict_divergence` es el
+rojo primero: un trace que registra un veredicto distinto del bundle sellado
+hace que el verificador FALLE explícitamente. End-to-end: `vigia_agent.py`
+sobre un caso real escribe el hermano, el `sha256sum -c` propio del bundle
+sigue verificando (digest intacto), y el trace verifica contra él. Suite
+completa 1674 passed. Fail-soft: un error de escritura del trace nunca
+descarta el bundle sellado (§5.3).
+
+**Alcance (honesto).** El trace se deriva actualmente de datos resumidos del
+bundle sellado (hipótesis + no analizados + auto-correcciones), así que para
+casos sin nada de lo último queda delgado (calidad MINIMAL). La
+instrumentación paso a paso más rica del loop de ejecución vivo, y la
+exposición MCP del trace, son fases posteriores.
 
 ---
 

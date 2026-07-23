@@ -57,7 +57,7 @@ Desglose de los 27 MALICE degradados por causa raíz:
 |---|---|---|---|
 | **C1 — metadata degenerada** | `ABSTAIN_INSUFFICIENT_TOOLS` (16) | serie VIGIA-REAL-*/SRL-* y demos | TODOS los artefactos de estos casos tienen `evidence_type` ausente (cae a `default`) y `source_tool=unknown` — la cadena de fallback del gate colapsa a 1 "tool" único. Es calidad de conversión del corpus, NO doctrina del gate. Ya diagnosticado así en la entrada original de B-116. |
 | **C2 — señales débiles bajo baseline agrupada** | `ABSTAIN_WEAK_SIGNALS` (5) | SRL-MAIL/RD01/RD03/RD06/WKSTN04 | raw_scores < ~0.20 → z < 2.0 contra la baseline agrupada. Puede ser debilidad real o desalineación del bucket `default`; indistinguible hasta resolver C1 (con evidence_type reales, estos casos usarían baselines propias). |
-| **C3 — estructura mono-canal** | `ABSTAIN_DEPENDENT_SIGNALS` (4) + `ABSTAIN_LOW_Z_VARIANCE` (2) | FF-GENUINE-001, HMG-99999-11, CAN-009/018/046, case_003 | Casos de 3-4 señales dominadas por un canal. Tensión doctrinal real: el corpus espera MALICE donde la doctrina de diversidad (cf. techo D3-only L-051/§9.4) apunta a cap. No es un bug — es una decisión de metodología. |
+| **C3 — estructura mono-canal** | `ABSTAIN_DEPENDENT_SIGNALS` (4) + `ABSTAIN_LOW_Z_VARIANCE` (2) | FF-GENUINE-001, HMG-99999-11, CAN-009/018/046, case_003 | Casos de 3-4 señales dominadas por un canal. Tensión doctrinal real: el corpus espera MALICE donde la doctrina de diversidad (cf. techo D3-only L-067/§9.4) apunta a cap. No es un bug — es una decisión de metodología. |
 
 **Conclusión de la medición:** la condición 4 NO se cumple hoy (27 ≠ 0), pero
 por primera vez el residuo tiene causas separables y accionables, y ninguna es
@@ -97,7 +97,7 @@ Los 7 restantes, verificados campo por campo, son TODOS clase C3
 |---|---|---|
 | FF-GENUINE-001, case_003_false_flag | DEPENDENT | 2 de 3 señales de `list_processes` (66% > 60%) |
 | VIGIA-HMG-99999-11 | DEPENDENT | 3 de 4 de `search_pattern` (75%) |
-| VIGIA-REAL-M57-PAT-Dec11 | INSUFFICIENT | 3 de 3 de `vol3_windows_pslist` — mono-plugin genuino (caso L-051 de libro) |
+| VIGIA-REAL-M57-PAT-Dec11 | INSUFFICIENT | 3 de 3 de `vol3_windows_pslist` — mono-plugin genuino (caso L-067 de libro) |
 | VIGIA-CAN-009, CAN-018 | LOW_Z_VARIANCE | 4 tools distintas pero raws casi idénticos (0.90-0.95) — el gate lee uniformidad como "poca información"; la doctrina B-171 la lee como señal de fabricación. Tensión doctrinal genuina. |
 | VIGIA-CAN-046 | DEPENDENT | 3 de 4 de `sift_file_audit` (75%) |
 

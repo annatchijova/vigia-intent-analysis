@@ -99,7 +99,7 @@ que ya se cerró desde entonces. La Fase 0 (sorpresas protegidas) y la Fase 1
 En orden de dependencia:
 
 1. ~~**A2 / B-052-P2** — granularidad mobile/macOS~~ — **CERRADO 2026-07-10,
-   NOT ADOPTED** por decisión sellada §9.4-LIM (L-051): SUSPICION es el techo
+   NOT ADOPTED** por decisión sellada §9.4-LIM (L-067, ex-L-051): SUSPICION es el techo
    doctrinal para casos mobile/macOS D3-only; la migración `to_signals()` no
    se adopta. Los pins de Grupo C (§1.3) quedan como arnés de regresión.
 2. ~~**A5 / B-041b** — CAIE retroalimenta el veredicto~~ — **CERRADO**:

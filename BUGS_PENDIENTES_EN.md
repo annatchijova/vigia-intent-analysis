@@ -2250,6 +2250,31 @@ any future reviewer who asks the same question.
 
 ## Session 2026-06-29 Bugs — Windows Disk Evidence & RAW Mode
 
+### B-031 [FIXED] — Mistyped `provenance_chain` (string/dict) produced a semantically wrong `len()` in the EPC factor [retrospective entry 2026-07-23]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — the shield lives in `vigia_scorer.py` and is covered by `tests/test_r4_boundaries.py` |
+| **File** | `vigia_scorer.py` (`effective_trusts` block, `# B-031` comment) |
+| **Detected** | 2026-06-29 band (evolution cited in `docs/PROPUESTA_TANDA_B.md` and `docs/REDTEAM_ROUND4_BOUNDARIES.md`) |
+
+**Provenance note:** entry RECONSTRUCTED on 2026-07-23 by the referential
+integrity contract (`tests/test_registry_integrity.py`): the ID was cited
+across five surfaces (production code, two dossiers, both registries) but
+never had an entry of its own. Sources for this reconstruction: the code
+comment, the REDTEAM_ROUND4 table ("`provenance_chain` = 'str' → NOISE, no
+crash — B-031 retypes non-list chain → []") and the R4 test that exercises
+it. Nothing unsupported by those sources was reconstructed (exact fix date,
+commit).
+
+**Description:** a `provenance_chain` arriving as a string or dict (instead
+of a list) produced a semantically wrong `len()` in the EPC factor —
+`len("abc")==3` counted characters as if they were custody links. Fix:
+`isinstance(list)` coercion; a non-list falls to `[]`, which lands in the
+`chain_status BROKEN` path (EPC 1/10, conservative).
+
+---
+
 ### B-032 [FIXED] — vigia_agent.py mapped *.evtx to event_stream kwarg instead of event_logs
 
 | Field | Value |
@@ -3244,7 +3269,7 @@ Clamp the argument to `±LOG_LR_EXP_CAP = 700.0` before `math.exp`:
 
 | Field | Value |
 |-------|-------|
-| **Status** | P1 (honest narrative) FIXED — 2026-07-03; **P2 CLOSED 2026-07-10 — NOT ADOPTED per sealed decision §9.4 (pure option (ii), collective + Anna's signature)**: the logical-domain split manufactures corroboration — all macOS domains are D3, the same physical channel. SUSPICION is the doctrinal ceiling for D3-only cases (**L-051 / §9.4-LIM**). The split implementation remains as historical record on branch `claude/b052-p2-domain-signals-xk5ecq` (`c5c8d38`+`a74d360`, **DO NOT MERGE**); `densidad_causal_D3` discarded by pre-registered experiment (r=0.9185, fail-closed grey zone). Implemented mitigation: `suspicion_class` (GENERIC \| D3_RICH_NO_TRIANGULATION) in narrative + pipeline_meta, text only (`docs/B052_P2_DESIGN.md` §10; 12 tests). |
+| **Status** | P1 (honest narrative) FIXED — 2026-07-03; **P2 CLOSED 2026-07-10 — NOT ADOPTED per sealed decision §9.4 (pure option (ii), collective + Anna's signature)**: the logical-domain split manufactures corroboration — all macOS domains are D3, the same physical channel. SUSPICION is the doctrinal ceiling for D3-only cases (**L-067 / §9.4-LIM**, ex-L-051). The split implementation remains as historical record on branch `claude/b052-p2-domain-signals-xk5ecq` (`c5c8d38`+`a74d360`, **DO NOT MERGE**); `densidad_causal_D3` discarded by pre-registered experiment (r=0.9185, fail-closed grey zone). Implemented mitigation: `suspicion_class` (GENERIC \| D3_RICH_NO_TRIANGULATION) in narrative + pipeline_meta, text only (`docs/B052_P2_DESIGN.md` §10; 12 tests). |
 | **Severity** | MEDIUM — the v2 engine's Peircean narrative is unreachable for mobile evidence by design |
 | **Files** | `sift_orchestrator.py` (shim, mobile-only route); P2: `vigia/sift/{macos,ios,android,google_takeout}_forensics.py` |
 | **Detected** | `AUDITORIA_MACOS_NARRATIVA.md` (2026-07-03) |
