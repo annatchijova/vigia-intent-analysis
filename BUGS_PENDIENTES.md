@@ -5824,8 +5824,8 @@ and docstring guard citing this bug.
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | POSPUESTO — bloqueado por desajuste de interfaz y calidad de datos |
-| **Severidad** | P2 (gate-level architectural gap — safety mechanism exists but does not fire) |
+| **Estado** | CABLEADO COMO SOMBRA (WARN) — 2026-07-22, decisión de Anna. El gate evalúa y anexa `signal_quality_shadow` al resultado del scorer con CERO autoridad de veredicto (corrida comparativa: 0 flips en 202 casos). Condición 4 reducida a decisión doctrinal ya tomada. Ver los updates cronológicos abajo y `docs/B116_CONDITION4_DESIGN.md` §5-bis. (Estado previo: POSPUESTO — bloqueado por desajuste de interfaz y calidad de datos.) |
+| **Severidad** | P2 (gate-level architectural gap — el mecanismo ahora observa en sombra; promoción a autoridad requiere nueva corrida 0-flips + firma) |
 | **Archivo** | `vigia/signal_quality_gate.py` AND `vigia/core/signal_quality_gate.py` (identical duplicates) |
 | **Detectado en** | Post-hackathon session 2026-07-14, dry-run script `scripts/dryrun_signal_quality_gate.py` |
 
