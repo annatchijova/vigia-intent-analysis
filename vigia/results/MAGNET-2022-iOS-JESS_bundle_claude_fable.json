@@ -1,0 +1,160 @@
+{
+  "abduction_trace": {
+    "abort_reason": null,
+    "abort_triggered": false,
+    "anomalies_found": [],
+    "cluster_name": null,
+    "clustering_method": "heuristic_default",
+    "correlation_penalties_applied": false,
+    "dominant_signal": null,
+    "dominant_z_score": 0.0,
+    "execution_plan_rationale": [],
+    "inference_mode": "FALLBACK",
+    "peirce_firstness": "0 senal(es) procesadas via FALLBACK. 6 cluster(s) de inferencia. Se\u00f1al dominante: ninguna (z=0.00)",
+    "peirce_secondness": "Sin anomalias significativas (z < 2.0)",
+    "peirce_thirdness": "Patron ambiguo \u2014 posible fabricacion parcial. P(fabricacion)=0.926. Evidencia insuficiente para certeza. Decision: ABSTAIN.",
+    "tools_available": [
+      "ACP",
+      "ACP",
+      "ACP",
+      "ACP",
+      "SDA",
+      "ACP"
+    ],
+    "tools_executed": [],
+    "tools_skipped": [
+      "ACP",
+      "ACP",
+      "ACP",
+      "ACP",
+      "SDA",
+      "ACP"
+    ]
+  },
+  "actions": [],
+  "bundle_id": "fa76ecf2-ea40-4c91-824c-48ac4b00da04",
+  "bundle_version": "1.0",
+  "caie_analysis": {
+    "composite_score": "0.0357",
+    "fractures": [],
+    "fractures_detected": 0,
+    "golden_rules_triggered": 0,
+    "key_fractures": [],
+    "structural_verdict": "NOISE",
+    "verdict": "NOISE"
+  },
+  "config_attestation": {
+    "caie_enabled": true,
+    "caie_verdict": "NOISE",
+    "canonical_version": "1.0.0",
+    "config_hash": "97904d138f3ec6fea5396ed8bc9bcbd6bfa1de6a3e998ca11845a8c0f2fcd50a",
+    "deviation_from_canonical": false,
+    "modified_params": [],
+    "vigia_version": "1.0"
+  },
+  "decision_trace": {
+    "abstain_reason": "Zona de incertidumbre honesta (r=0.9256, \u03b5_accept=0.0500, \u03b5_reject=0.0500). Evidencia insuficiente para decisi\u00f3n unilateral.",
+    "components_used": 6,
+    "consistency_score": 1.0,
+    "decision": "ABSTAIN",
+    "drift_score": 0.0,
+    "epsilon_used": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability": 1.0,
+    "lambda_drift": 2.0,
+    "log_lr": 2.520661,
+    "lr": 12.436814681727949,
+    "omega_intention": 1.0,
+    "posterior": 0.925578,
+    "reason_code": "ABSTAIN_ZONE",
+    "risk": 0.925578,
+    "signal_contributions": []
+  },
+  "evidence_graph": {
+    "bootstrap_rounds": 500,
+    "edges": [],
+    "generated_at": "2026-07-23T02:26:45.951867+00:00",
+    "graph_hash": "94147b51c639cd0c5f361fc885bdd59a257ffaf3f770203ff7b7a3a787b57f53",
+    "nodes": [],
+    "stability_threshold": 0.85
+  },
+  "integrity": {
+    "analysis_fingerprint": "53a43baab8b677564d7ffbfd3c1e05da5d2f6111a2efeeab3f97be8ebe143e5c",
+    "bundle_hash": "fbb6c5a6ed5243e23eadce6895173d40163b859bedcd2fe49453c21449b56b7d",
+    "decision_hash": "aa91ab1e6fef84d91366d439228b9468ca753aeeab3d978ccbbb7c972ad323a5",
+    "ecl_hash": "",
+    "engine_attestation_hash": "10b2ac4e032febedde3d9c71b0890218e486aab134076823dd696f9ddb7302c8",
+    "graph_hash": "94147b51c639cd0c5f361fc885bdd59a257ffaf3f770203ff7b7a3a787b57f53",
+    "policy_hash": "0ab1014d64e939c55cbd9c171bde5a36f13146453f602e9a44ae0b093a49cb69",
+    "sealed_at": "2026-07-23T02:26:45.952276+00:00"
+  },
+  "policy_spec": {
+    "created_at": "2026-07-23T02:26:45.916982+00:00",
+    "description": "VIGIA default policy \u2014 SANS FIND EVIL 2026",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability_init": 2.0,
+    "lambda_drift_init": 2.0,
+    "rules": [
+      {
+        "allowed_roles": [
+          "system",
+          "analyst"
+        ],
+        "description": "Maximum allowed change in posterior probability",
+        "max_delta": 0.1,
+        "requires_approval": false,
+        "variable": "posterior"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Maximum allowed drift correction",
+        "max_delta": 0.15,
+        "requires_approval": false,
+        "variable": "drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Graph stability changes require explicit approval",
+        "max_delta": 0.05,
+        "requires_approval": true,
+        "variable": "graph_stability"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Adaptive drift sensitivity adjustment",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "lambda_drift"
+      },
+      {
+        "allowed_roles": [
+          "system"
+        ],
+        "description": "Adaptive structural sensitivity adjustment",
+        "max_delta": 1.0,
+        "requires_approval": false,
+        "variable": "gamma_stability"
+      }
+    ],
+    "version": "1.0"
+  },
+  "system_state": {
+    "calibration_model_hash": "",
+    "drift_score": 0.0,
+    "engine_version": "vigia-ebs-v1.0",
+    "epsilon_accept": 0.05,
+    "epsilon_reject": 0.05,
+    "gamma_stability": 2.0,
+    "graph_stability_global": 1.0,
+    "lambda_drift": 2.0,
+    "timestamp": "2026-07-23T02:26:45.951856+00:00"
+  },
+  "timestamp": "2026-07-23T02:26:45.951923+00:00"
+}
