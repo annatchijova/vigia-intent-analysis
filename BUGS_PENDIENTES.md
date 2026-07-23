@@ -5791,12 +5791,12 @@ and docstring guard citing this bug.
 > production callers): no verdict moved. Tests:
 > `tests/test_b116_placeholder_tools.py` (9, red-first).
 
-> **Update 2026-07-22 (clase B-206 purgada del gate; condición 4
+> **Update 2026-07-22 (clase B-211 purgada del gate; condición 4
 > re-medida sin cambios):** `_get_z_score()` devolvía `abs(z)` sin coerción
 > pese a declarar `-> float`; con z_scores `Fraction` (el transporte normal
 > del pipeline VIGÍA) los seis `f"{...:.2f}"` del módulo crashean en
 > Python < 3.12 (el pinneado por la CI) — reproducido. El crash era latente
-> por la misma razón que B-206: cero callers de producción. Fix:
+> por la misma razón que B-211: cero callers de producción. Fix:
 > `float(abs(...))` — contractual con la firma declarada; el gate opera en
 > espacio float por diseño (umbrales 2.0/0.5) y no está en el path sellado.
 > Tests: `tests/test_b116_gate_fraction_z.py` (4, rojo-primero; incluye
@@ -10342,7 +10342,11 @@ válido por firma pero basura interna) siguen parseando. Suite completa
 (`tests/` + `vigia/tests/`, sin integration): **1865 passed** (+9 sobre
 B-207), 0 failed. `tests/test_prefetch_real.py` (21 tests preexistentes)
 sigue en verde sin modificaciones.
-## B-206 — el material del signal_id formateaba Fraction con `.8f` — el bridge entero moría en Python 3.11 [RESUELTO — Claude 2026-07-22]
+## B-211 — el material del signal_id formateaba Fraction con `.8f` — el bridge entero moría en Python 3.11 [RESUELTO — Claude 2026-07-22]
+
+> Renumerado 2026-07-22 desde B-206 (colisión con el batch de Anna del
+> 2026-07-21, commit 4ce432445, que ya había asignado B-206/207/208 a
+> SMS-OWL/extractor/prefetch-MAM). Precedente de renumerado: L-067.
 
 | Campo | Valor |
 |-------|-------|
@@ -10373,13 +10377,16 @@ comportamiento histórico de `f"{v:.8f}"`.
 
 **Validación:** roja primero (`test_b184_keeps_a_valid_bundle_output_external`
 en 3.11), verde con el fix. Tests nuevos:
-`tests/test_b206_fraction_format_signal_id.py` (6 — valores exactos, ties
+`tests/test_b211_fraction_format_signal_id.py` (6 — valores exactos, ties
 half-even, passthrough float, paridad con `format()` nativo en ≥3.12,
 conversión e2e del adaptador, determinismo del ID). Suite completa verde.
 
 ---
 
-## B-207 — el workflow pytest.yml no instalaba fastapi: 4 módulos de tests de API sin colectar (deriva S-1, cuarta ocurrencia) [RESUELTO — Claude 2026-07-22]
+## B-212 — el workflow pytest.yml no instalaba fastapi: 4 módulos de tests de API sin colectar (deriva S-1, cuarta ocurrencia) [RESUELTO — Claude 2026-07-22]
+
+> Renumerado 2026-07-22 desde B-207 (colisión con el batch de Anna del
+> 2026-07-21, commit 4ce432445). Precedente de renumerado: L-067.
 
 | Campo | Valor |
 |-------|-------|
@@ -10414,11 +10421,14 @@ workflow es la próxima corrida CI de este push.
 
 ---
 
-## B-208 — `vigia_planner.py` muerto en import: `urllib` sin importar + sanitizador huérfano de la unificación P2-001 [RESUELTO — Claude 2026-07-22]
+## B-213 — `vigia_planner.py` muerto en import: `urllib` sin importar + sanitizador huérfano de la unificación P2-001 [RESUELTO — Claude 2026-07-22]
+
+> Renumerado 2026-07-22 desde B-208 (colisión con el batch de Anna del
+> 2026-07-21, commit 4ce432445). Precedente de renumerado: L-067.
 
 | Campo | Valor |
 |-------|-------|
-| **Severidad** | P2 (módulo entero inimportable — `NameError: urllib` al definir `_NoRedirect` a nivel de módulo; cero callers de producción, así que nadie lo notó — misma clase que B-115/B-206) |
+| **Severidad** | P2 (módulo entero inimportable — `NameError: urllib` al definir `_NoRedirect` a nivel de módulo; cero callers de producción, así que nadie lo notó — misma clase que B-115/B-211) |
 | **Archivo** | `vigia/tools/vigia_planner.py` |
 | **Detectado por** | Barrido `ruff --select F821` sobre el repo (sesión 2026-07-22), import reproducido: `import vigia.tools.vigia_planner` → `NameError`. |
 
@@ -10438,7 +10448,7 @@ control chars + padding guard sin truncado ciego);
 case-block, conservador contra padding).
 
 **Validación:** import OK, sanitizador canónico verificado, sentinel de
-padding activo a 500. Tests: `tests/test_b208_b209_dead_on_call_modules.py`.
+padding activo a 500. Tests: `tests/test_b213_b209_dead_on_call_modules.py`.
 
 ---
 
@@ -10446,9 +10456,9 @@ padding activo a 500. Tests: `tests/test_b208_b209_dead_on_call_modules.py`.
 
 | Campo | Valor |
 |-------|-------|
-| **Severidad** | P2/P3 (funciones muertas-al-llamar en módulos sin callers de producción — la clase B-115/B-206/B-208) |
+| **Severidad** | P2/P3 (funciones muertas-al-llamar en módulos sin callers de producción — la clase B-115/B-211/B-213) |
 | **Archivos** | `vigia/tools/visible_variables.py`, `vigia/forensics/temporal_forensics_redteam.py`, `vigia/tools/sanitize_judicial.py` |
-| **Detectado por** | Mismo barrido `ruff --select F821` de B-208; cada hallazgo reproducido antes de tocar (disciplina audit-before-patch). |
+| **Detectado por** | Mismo barrido `ruff --select F821` de B-213; cada hallazgo reproducido antes de tocar (disciplina audit-before-patch). |
 
 **Corregidos:**
 1. `visible_variables.analyze_focus()`: usaba `visible_artifacts` en el
@@ -10485,7 +10495,7 @@ Suite completa 1862 passed, 0 failed.
 |-------|-------|
 | **Severidad** | P3 (sin efecto en runtime HOY — pero el duplicado de ebs.py era una trampa activa para la próxima "limpieza") |
 | **Archivos** | `vigia/models/ebs.py`, `vigia/security/__init__.py` |
-| **Detectado por** | Mismo barrido ruff de B-208/B-209, señal F811 (redefiniciones). |
+| **Detectado por** | Mismo barrido ruff de B-213/B-209, señal F811 (redefiniciones). |
 
 **ebs.py:** las tres clases stub (`AbductionTrace`,
 `PolicyStabilityController`, `SelfAdaptiveRiskPolicy`) estaban definidas

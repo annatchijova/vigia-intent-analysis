@@ -39,7 +39,7 @@ import os
 import re
 import sys
 import unicodedata
-# B-208: urllib se usaba a nivel de módulo (_NoRedirect, webhook SSRF guard)
+# B-213: urllib se usaba a nivel de módulo (_NoRedirect, webhook SSRF guard)
 # sin importarse — el módulo entero moría en import con NameError.
 import urllib.error
 import urllib.request
@@ -64,7 +64,7 @@ from vigia.security import (
     rate_limit,
 )
 
-# B-208: tope de sanitización para el campo `interpretation` de cada señal
+# B-213: tope de sanitización para el campo `interpretation` de cada señal
 # en message_history (case "infer_intent"). La constante se referenciaba pero
 # nunca existió (la unificación P2-001 movió el sanitizador a security.py y
 # esta quedó atrás). 500 = el mismo tope que usa el fallback de ese mismo
@@ -1292,7 +1292,7 @@ SIGNAL_TO_ATTACK: dict[str, str] = {
     "SIGNIFICANT_SILENCE": "T1564",
 }
 
-# B-208: la copia local de _sanitize_llm_input se eliminó. La unificación
+# B-213: la copia local de _sanitize_llm_input se eliminó. La unificación
 # P2-001 (Kimi 2026-05-02) movió la versión canónica —idéntica: NFKC + tag
 # strip + control chars + padding guard sin truncado ciego— a
 # vigia/security/security.py, pero esta copia quedó atrás referenciando

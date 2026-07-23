@@ -1,10 +1,10 @@
-"""B-208/B-209 — modules that were dead on import or dead on call (F821 sweep).
+"""B-213/B-209 — modules that were dead on import or dead on call (F821 sweep).
 
-Same silent-breakage class as B-115/B-206: code paths with zero production
+Same silent-breakage class as B-115/B-211: code paths with zero production
 callers accumulate NameError/UnboundLocalError defects that no test feeds.
 Found by `ruff --select F821` sweep, each reproduced before fixing:
 
-- B-208 vigia_planner: module-level `urllib` never imported (NameError on
+- B-213 vigia_planner: module-level `urllib` never imported (NameError on
   import — the whole module was unimportable); duplicate _sanitize_llm_input
   referenced _LLM_DANGEROUS_TAGS/_CONTROL_CHARS moved to security.py by the
   P2-001 unification; _MAX_INTERPRETATION_LEN never existed.

@@ -1,4 +1,4 @@
-"""B-206 — signal_id material must format Fraction scores on Python < 3.12.
+"""B-211 — signal_id material must format Fraction scores on Python < 3.12.
 
 `f"{Fraction:.8f}"` requires Python >= 3.12 (Fraction.__format__ with float
 presentation types). On the CI-pinned 3.11 every artifact conversion in

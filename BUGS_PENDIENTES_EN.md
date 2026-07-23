@@ -9266,7 +9266,194 @@ integration) green before the merge.
 
 ---
 
-## B-206 — signal_id material formatted Fraction with `.8f` — the entire bridge died on Python 3.11 [RESOLVED — Claude 2026-07-22]
+## B-206 — the L-041 coordination SMS was never in the OWL-NEXUS5 case JSON [MITIGATED — Claude 2026-07-22]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 evidence-completeness: the message the scenario itself was designed to test (`L-041`, discovered 2026-06-30) never reached `data/cases/OWL-NEXUS5-CASE.json` — no semantic-extractor or normalization fix can see it if the artifact is not in the file Mode 1 reads. |
+| **Files** | `data/cases/OWL-NEXUS5-CASE.json`, `vigia/pipeline/vigia_integration_bridge.py` (`_LEGACY_TYPE_TO_EVIDENCE`), `tests/test_b206_owl_sms_artifact_present.py`. |
+| **Mode** | Affects only the reading of this specific case JSON via `_analyze_ebs_json`. |
+| **Detected by** | Continuation of the B-160/B-163/L-041 investigation (OWL-NEXUS5 bundle NOISE → ABSTAIN), 2026-07-22 session. |
+
+**Reproduced observation:** the three historical OWL-NEXUS5 bundles (ChatGPT,
+fallback agent, and the engine re-run today after B-163/B-205) agree that none
+saw the SMS "Sarah, the delivery is today 7 tonight the confirmation will come
+later through pidgin" (+13045184333, `sms._id=6`) nor its reply "Thank you!"
+(`sms._id=5`). Verified with `sqlite3` against
+`evidence/owl-2019-nexus5-quick/Agent Data/mmssms.db` (SHA-256
+`0bc8bfcb4fbebe9cccc9fd3d37ffad5de7e33b09f3d524c648787dde2bf5fce6`,
+`android_metadata`/`sms` tables intact, both messages readable). `grep -i
+"pidgin\|13045184333"` against the case JSON found no matches: the message was
+simply never incorporated into the file, even though the raw evidence
+containing it has been present and accessible in the repo all along.
+
+**Side note:** Codex's earlier attempt to read that database with a `for db in
+$(find ... -iname '*mmssms*')` without quotes failed with "unable to open
+database file" — not a forensic problem, but because the space in `Agent Data/`
+split the path into two words via bash word-splitting. The database was never
+damaged.
+
+**Applied correction:** `ART-021`/`ART-022` (legacy `sms` type) were added to
+the case JSON with the verified content from `mmssms.db`, and `"sms": "sms"`
+was added to `_LEGACY_TYPE_TO_EVIDENCE` — previously absent, so a `type: "sms"`
+artifact would have fallen to the `"default"` fallback instead of the dedicated
+CAIE profile (`sms`: spoofability 0.40, already present in `vigia/tools/caie.py`,
+distinct from `chat_message`'s). The legacy `id` (`ART-021`/`ART-022`) is
+preserved as `artifact_id` by the existing B-162 mechanism — no need to touch
+that logic.
+
+**Semantic-extractor scope (measured, not attacked this session):** running
+`normalize_case_schema` against the 265 JSON in `data/cases/**`, a single case
+(this one) has legacy artifacts without a semantic extractor
+(`structured_content_without_semantic_extractor`) — the original 20, and now
+also the 2 new SMS (still contributing no real score beyond the
+`raw_score=0.05` floor; the engine stays at honest `ABSTAIN`, see B-160).
+Generalizing that extractor (widened L-041 scope) remains pending, deliberately
+not attacked here — low calibration risk given the measured scope, but it
+requires the full dry-run + adversarial protocol before wiring it to the scorer.
+
+**Unattacked side finding:** `PrefetchAnalyzer._parse_pf()`
+(`vigia/sift/prefetch_analyzer.py`) recognizes the `MAM\x04` signature (Win10+
+compressed) but never decompresses it — returns a fixed `last_execution_time`
+of `"unknown"` and a fixed `run_count=1` for *every* modern prefetch, not just
+Pidgin. Confirmed with `xxd` over the three Pidgin `.pf` in
+`evidence/owl-2019-hd1-windows/prefetch/`. This blocks any temporal correlation
+between Pidgin execution and the confirmation SMS in this case, and probably
+affects the whole corpus with Win10+ Prefetch evidence. It has no bug number of
+its own yet — it requires XPRESS Huffman decompression + parsing the real
+Prefetch binary format; a larger implementation effort, deliberately out of
+scope for this session. (Later addressed as B-208.)
+
+**Validation:** `tests/test_b206_owl_sms_artifact_present.py` — 3 tests: legacy
+mapping `sms`→`sms` (does not collapse to `chat_message`/`default`), presence of
+the two SMS artifacts with their exact content, and survival of the
+`artifact_id` after `normalize_case_schema`. Full suite (`tests/` +
+`vigia/tests/`, without integration): **1848 passed** (+3 over the post-merge
+state of the codex branch), 0 failed.
+
+---
+
+## B-207 — transaction/coordination semantic extractor: candidate designed, NOT wired [MEASURED, NOT APPLIED — Claude 2026-07-22]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3 — the gap (B-160/B-206) still produces `ABSTAIN` in the single affected case. Not P1 because the engine no longer lies (NOISE); ABSTAIN is honest. |
+| **Files** | `vigia/tools/coordination_language.py` (new, not wired), `scripts/dryrun_coordination_language.py` (new), `tests/test_b207_coordination_language_detector.py` (new). **`vigia_scorer.py` and `vigia_integration_bridge.py` were NOT touched.** |
+| **Mode** | None — the detector participates in no scoring pipeline. |
+| **Detected by** | Direct continuation of B-206/L-041, 2026-07-22 session. |
+
+**Why it was NOT wired:** this repo's explicit precedent for calibrating any new
+scorer parameter or rule is L-033 (event-log gamma, `docs/A3_EXPERIMENT_DESIGN.md`):
+it requires **≥20 signals, ≥3 cases per polarity, both polarities represented**,
+with 5 gates (signal-level, corpus A/B, invariants, LOCO stability, diagnostic).
+L-033 itself remains `NOT APPLIED` for not reaching that minimum with 7 signals
+of a single polarity. Measured for this candidate: **1/265 cases** of the corpus
+(`data/cases/**`) has legacy artifacts with rich `content` without a semantic
+extractor (B-160), and **zero** are known-negative cases for this content class.
+Wiring a keyword/regex rule to the scorer with a single positive case and zero
+real negatives would be exactly the error L-033 already blocked — and L-041
+itself warns against a generic price/time/location set for the same
+false-positive risk.
+
+**Candidate design:** deliberately narrow rule, not the generic set L-041
+discourages. It flags a text ONLY if it mentions a secondary confirmation
+channel ("confirmation will come through X", "message me on X to confirm")
+**AND** makes a concrete delivery/time commitment ("today"/"tonight"/explicit
+hour + delivery verb) **in the same message**. Requiring both conditions at
+once — following the same multiple-corroboration principle already used by other
+gates in this repo (Daubert Corroboration Gate, B-172 hard temporal pair) — is
+what prevents ordinary coordination from firing the detector. Structure copied
+from `ENCRYPTED_APPS` in `android_forensics.py::_analyze_sms()` (dict of patterns
++ `Fraction` severity, no floats).
+
+**Measurement (`scripts/dryrun_coordination_language.py`, exit 0, alters
+nothing):** over 201 cases / 1035 real artifacts, it matches exactly the
+expected artifact (`OWL-NEXUS5-CASE/ART-021`, the B-206 SMS) and no other. Over
+a synthetic set of 10 ordinary-coordination messages (appointments, greetings,
+logistics without transaction) — hand-built because the corpus has no real
+negatives for this content class — **0 false positives**.
+
+**What would unblock wiring:** a corpus with more content-rich legacy-schema
+cases, with enough real (not synthetic) positives and negatives to pass L-033's
+G1–G5 protocol. Until then, this module stays a measured, reproducible
+candidate, not part of the decision path.
+
+**Validation:** `tests/test_b207_coordination_language_detector.py` — 8 tests:
+true positive (real OWL SMS), the "Thank you!" reply alone does not match, 10
+synthetic negatives, channel-only-without-time does not match,
+time-only-without-channel does not match, and degenerate input (`None`, empty
+string, non-string) does not crash. Full suite: **1856 passed** (+8 over B-206),
+0 failed. `git diff --stat` confirms `vigia_scorer.py`/`vigia_integration_bridge.py`
+did not change.
+
+---
+
+## B-208 — PrefetchAnalyzer never decompressed the MAM container (Win10+); last_execution_time/run_count were fixed placeholders [RESOLVED — Claude 2026-07-22]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 forensic coverage: it blocked any temporal correlation over modern prefetch (all Win10+ in the corpus, not just OWL). It did not alter verdicts — `to_signal()` uses a fixed severity per finding type, never `run_count`/`last_execution_time`. |
+| **Files** | `vigia/sift/prefetch_analyzer.py`, `pyproject.toml` (`[project.optional-dependencies].prefetch`), `tests/test_b208_prefetch_pyscca_enrichment.py`. |
+| **Mode** | Anything that uses `PrefetchAnalyzer.analyze_directory()`/`_parse_pf()` over real Win10+ prefetch. |
+| **Detected by** | Continuation of the B-160/B-206 investigation (Pidgin↔SMS correlation in OWL-NEXUS5), 2026-07-22 session. |
+
+**Reproduced observation:** `_parse_pf()` recognizes the `MAM\x04`/`MAM\x03`
+signature (Win10+ compressed prefetch) but never decompressed the container —
+it returned fixed `last_execution_time="unknown"` and `run_count=1` for *every*
+modern prefetch, without exception. Confirmed with `xxd` over the three Pidgin
+`.pf` in `evidence/owl-2019-hd1-windows/prefetch/` (real `MAM\x04` signature).
+
+**Architecture decision (consulted with Anna):** implementing XPRESS Huffman
+decompression + SCCA binary parsing by hand would have duplicated, with no
+independent way to validate it, a binary-format parser already solved by a
+reference library. `libscca-python` (pyscca, libyal project — the one real
+forensic tools use) is already installed in this environment and works
+correctly. It is a compiled extension (not pure-pip, requires the system C
+library `libscca`) — it was integrated as an **optional enrichment with honest
+degradation**: if `pyscca` is unavailable, `_parse_pf()` falls back to the
+previous placeholders (`"unknown"`/`1`) without breaking anything; Mode 1 stays
+offline/zero-dependency without this extra. New extra in `pyproject.toml`:
+`pip install vigia[prefetch]`.
+
+**Applied correction:** `_enrich_via_pyscca()` opens the `.pf` with pyscca,
+takes the maximum of the up-to-8 `last_run_time` slots (FILETIME, 100ns since
+1601-01-01) and converts it to ISO 8601 with exact integer arithmetic
+(`ticks // 10` → microseconds, no float). If pyscca is not installed, or raises
+on content it cannot parse (e.g. the synthetic fixtures in
+`tests/test_prefetch_real.py`, which write only the signature + zeros),
+`_parse_pf()` still returns a valid `PrefetchRecord` with the placeholders —
+the signature check (which decides `unparsed_files`) is independent and did not
+change.
+
+**Verified on real evidence** (not versioned in git, local):
+`PIDGIN.EXE-86E18E41.pf` now reports `run_count=7`,
+`last_execution_time="2017-02-02T21:25:05.097Z"` (before: `1`/`"unknown"`).
+Cross-checked against the B-206 SMS (received 2017-02-01T00:41:15Z, "confirmation
+will come later through pidgin"): the other two Pidgin variants
+(`PIDGIN-2.11.0(.EXE/ (1).EXE`) show a single execution each on the same day,
+2017-02-01 ~17:00-17:06 UTC — **~16 hours after** the SMS, consistent with
+"later" as the message says. This is genuine temporal corroboration, not noise;
+it was not wired to any verdict in this session (out of scope — the same
+conservative criterion as B-207).
+
+**Validation:** `tests/test_b208_prefetch_pyscca_enrichment.py` — 9 tests:
+FILETIME conversion against the publicly known constant `116444736000000000`
+(Unix epoch, verifiable without trusting this code), selection of the most
+recent slot among several, degradation without pyscca, degradation when pyscca
+raises, all slots at zero, full integration in `_parse_pf` (with and without
+pyscca), and an explicit regression that the synthetic fixtures of
+`test_prefetch_real.py` (SCCA valid by signature but garbage inside) still parse.
+Full suite (`tests/` + `vigia/tests/`, without integration): **1865 passed**
+(+9 over B-207), 0 failed. `tests/test_prefetch_real.py` (21 pre-existing tests)
+stays green without modifications.
+
+---
+
+## B-211 — signal_id material formatted Fraction with `.8f` — the entire bridge died on Python 3.11 [RESOLVED — Claude 2026-07-22]
+
+> Renumbered 2026-07-22 from B-206 (collision with Anna's 2026-07-21 batch,
+> commit 4ce432445, which had already assigned B-206/207/208 to
+> SMS-OWL/extractor/prefetch-MAM). Renumber precedent: L-067.
 
 | Field | Value |
 |-------|-------|
@@ -9297,13 +9484,16 @@ historical `f"{v:.8f}"` behavior.
 
 **Validation:** red first (`test_b184_keeps_a_valid_bundle_output_external`
 on 3.11), green with the fix. New tests:
-`tests/test_b206_fraction_format_signal_id.py` (6 — exact values, half-even
+`tests/test_b211_fraction_format_signal_id.py` (6 — exact values, half-even
 ties, float passthrough, parity with native `format()` on >=3.12, e2e
 adapter conversion, ID determinism). Full suite green.
 
 ---
 
-## B-207 — the pytest.yml workflow did not install fastapi: 4 API test modules not collected (S-1 drift, fourth occurrence) [RESOLVED — Claude 2026-07-22]
+## B-212 — the pytest.yml workflow did not install fastapi: 4 API test modules not collected (S-1 drift, fourth occurrence) [RESOLVED — Claude 2026-07-22]
+
+> Renumbered 2026-07-22 from B-207 (collision with Anna's 2026-07-21 batch,
+> commit 4ce432445). Renumber precedent: L-067.
 
 | Field | Value |
 |-------|-------|
@@ -9339,11 +9529,14 @@ workflow is the next CI run of this push.
 
 ---
 
-## B-208 — `vigia_planner.py` dead on import: `urllib` not imported + sanitizer orphaned by the P2-001 unification [RESOLVED — Claude 2026-07-22]
+## B-213 — `vigia_planner.py` dead on import: `urllib` not imported + sanitizer orphaned by the P2-001 unification [RESOLVED — Claude 2026-07-22]
+
+> Renumbered 2026-07-22 from B-208 (collision with Anna's 2026-07-21 batch,
+> commit 4ce432445). Renumber precedent: L-067.
 
 | Field | Value |
 |-------|-------|
-| **Severity** | P2 (entire module unimportable — `NameError: urllib` while defining `_NoRedirect` at module level; zero production callers, so nobody noticed — same class as B-115/B-206) |
+| **Severity** | P2 (entire module unimportable — `NameError: urllib` while defining `_NoRedirect` at module level; zero production callers, so nobody noticed — same class as B-115/B-211) |
 | **File** | `vigia/tools/vigia_planner.py` |
 | **Detected by** | `ruff --select F821` sweep over the repo (2026-07-22 session), import reproduced: `import vigia.tools.vigia_planner` → `NameError`. |
 
@@ -9363,7 +9556,7 @@ imported from `vigia.security` (identical: NFKC + tag strip + control chars
 case-block, conservative against padding).
 
 **Validation:** import OK, canonical sanitizer verified, padding sentinel
-active at 500. Tests: `tests/test_b208_b209_dead_on_call_modules.py`.
+active at 500. Tests: `tests/test_b213_b209_dead_on_call_modules.py`.
 
 ---
 
@@ -9371,9 +9564,9 @@ active at 500. Tests: `tests/test_b208_b209_dead_on_call_modules.py`.
 
 | Field | Value |
 |-------|-------|
-| **Severity** | P2/P3 (dead-on-call functions in modules with no production callers — the B-115/B-206/B-208 class) |
+| **Severity** | P2/P3 (dead-on-call functions in modules with no production callers — the B-115/B-211/B-213 class) |
 | **Files** | `vigia/tools/visible_variables.py`, `vigia/forensics/temporal_forensics_redteam.py`, `vigia/tools/sanitize_judicial.py` |
-| **Detected by** | Same `ruff --select F821` sweep as B-208; each finding reproduced before touching anything (audit-before-patch discipline). |
+| **Detected by** | Same `ruff --select F821` sweep as B-213; each finding reproduced before touching anything (audit-before-patch discipline). |
 
 **Fixed:**
 1. `visible_variables.analyze_focus()`: used `visible_artifacts` in the
@@ -9411,7 +9604,7 @@ Full suite 1862 passed, 0 failed.
 |-------|-------|
 | **Severity** | P3 (no runtime effect TODAY — but the ebs.py duplicate was an active trap for the next "cleanup") |
 | **Files** | `vigia/models/ebs.py`, `vigia/security/__init__.py` |
-| **Detected by** | Same ruff sweep as B-208/B-209, F811 signal (redefinitions). |
+| **Detected by** | Same ruff sweep as B-213/B-209, F811 signal (redefinitions). |
 
 **ebs.py:** the three stub classes (`AbductionTrace`,
 `PolicyStabilityController`, `SelfAdaptiveRiskPolicy`) were defined

@@ -652,7 +652,7 @@ def _decimal_8f(value: Any) -> str:
     """
     Representación '.8f' de un score para el material del signal_id.
 
-    B-206: `f"{x:.8f}"` sobre Fraction requiere Python >= 3.12
+    B-211: `f"{x:.8f}"` sobre Fraction requiere Python >= 3.12
     (Fraction.__format__ con presentation types no existe en 3.11 — la CI
     pinnea 3.11 y CADA artefacto fallaba la conversión, dejando el bridge
     entero inoperante vía CaseSchemaError). Esta réplica usa aritmética
@@ -771,7 +771,7 @@ class CaseAdapter:
                 # en máquinas distintas o con relojes desincronizados producen el
                 # mismo signal_id. El ID incluye: tool, case_id, artifact_id,
                 # raw_score y z_score — cualquier cambio en el dato cambia el ID.
-                # B-206: _decimal_8f en vez de f"{...:.8f}" — Fraction no
+                # B-211: _decimal_8f en vez de f"{...:.8f}" — Fraction no
                 # soporta ese format spec en Python < 3.12.
                 import hashlib as _hl
                 _id_material = (

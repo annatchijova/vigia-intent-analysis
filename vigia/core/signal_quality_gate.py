@@ -153,7 +153,7 @@ class SignalQualityGate:
         return "unknown"
 
     def _get_z_score(self, signal) -> float:
-        # B-116/B-206: coerción explícita a float — el pipeline VIGÍA
+        # B-116/B-211: coerción explícita a float — el pipeline VIGÍA
         # transporta z_scores como Fraction, y abs(Fraction) devuelto tal
         # cual crashea los f"{...:.2f}" de este módulo en Python < 3.12
         # (Fraction.__format__ sin presentation types). El gate opera en

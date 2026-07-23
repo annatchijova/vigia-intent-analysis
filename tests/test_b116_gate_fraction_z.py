@@ -1,6 +1,6 @@
 """B-116 — the pending SignalQualityGate must accept Fraction z_scores.
 
-Same latent class as B-206: the gate's reason_detail strings use
+Same latent class as B-211: the gate's reason_detail strings use
 f"{...:.2f}" / f"{...:.3f}", which Fraction does not support on
 Python < 3.12. The VIGIA pipeline transports z_scores as Fraction, so the
 moment the gate is wired it would have crashed on the CI-pinned 3.11.
