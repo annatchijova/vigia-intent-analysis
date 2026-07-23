@@ -6296,6 +6296,26 @@ The gate can be wired when ALL of the following are met:
 2. The corpus includes cases with real CCS dimension values (not all defaults).
 3. A meaningful dry-run (with real data) shows acceptable impact on the corpus.
 
+### Update 2026-07-23 — excavación completa + H-04 resuelto + productores caracterizados
+
+Excavación triple contra código vivo (`docs/B123_EXCAVATION_20260723.md`):
+el acoplamiento productores→CCS es SOLO documental (docstrings, cero
+imports); `vigia_artifact_graph` (float no-determinista declarado) y
+`vigia_counter_fact` (int) quedan descalificados como fuentes CCS;
+materia prima real: timestamps en 82% del corpus (0% en VIGIA-REAL-*,
+esquema CONTENT), `cost` abductivo entero vivo, CAR sin campo semántico
+real (constantes de plantilla descartadas por `to_signal()`).
+
+Intervenciones de riesgo cero aplicadas: **H-04 RESUELTO** (el gate
+pasaba a MALICE_HIGH con cero información; ahora 2+ dimensiones ausentes
+→ `insufficient_coverage` → ABSTAIN pre-umbral; los 2 xfail de
+`test_audit_gates.py` promovidos a guardas + 2 tests de frontera) y
+**caracterización de ASD/HLT** (tenían cero tests;
+`tests/test_b123_producer_characterization.py`, 9 tests con valores
+Fraction exactos sondeados). El cableo del CCS sigue POSPUESTO: las 4
+dimensiones requieren decisiones de método D1-D4 (§5 del informe) antes
+de cualquier sombra.
+
 ---
 
 ## B-124 — Verdict/governance cluster: 6 modules designed, tested, NOT wired — same pattern as B-123

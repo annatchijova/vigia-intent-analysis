@@ -57,6 +57,10 @@ class CausalClosureResult:
     verdict_cap:           str        # "MALICE_HIGH" | "ABSTAIN"
     audit_hash:            str
     explanation:           str
+    # H-04 (2026-07-23): cobertura de dimensiones. Un gate que habilita
+    # MALICE_HIGH sin información no es un gate — ver test_audit_gates.py.
+    dimensions_provided:   int = 4
+    insufficient_coverage: bool = False
 
     def display_pct(self) -> int:
         """Porcentaje entero — int() truncado, nunca round()."""
@@ -86,6 +90,21 @@ def compute_causal_closure(
     Returns:
         CausalClosureResult con score y gate decision
     """
+    # H-04 (2026-07-23): cobertura ANTES de sustituir. Con los pesos sumando
+    # 1 y el default 1/2, all-None produce CCS = 1/2 = umbral y el gate
+    # "pasaba" hacia MALICE_HIGH con CERO información — exactamente el
+    # comportamiento que los tests xfail de test_audit_gates.py declaraban
+    # indefendible. Regla: con 2+ dimensiones ausentes (n_provided <= 2) el
+    # veredicto máximo es ABSTAIN sin evaluar el umbral. El score se computa
+    # igual (con defaults) para trazabilidad — el guard test fija que
+    # all-None siga dando exactamente 1/2.
+    n_provided = sum(
+        1 for _dim in (temporal_coherence, semantic_resonance,
+                       abductive_parsimony, adversarial_silence)
+        if _dim is not None
+    )
+    insufficient_coverage = n_provided <= 2
+
     # Sustituir None por incertidumbre máxima
     tc = temporal_coherence  if temporal_coherence  is not None else Fraction(1, 2)
     sr = semantic_resonance  if semantic_resonance  is not None else Fraction(1, 2)
@@ -111,11 +130,18 @@ def compute_causal_closure(
         + as_score * _WEIGHTS["adversarial_silence"]
     )
 
-    gate_passed = ccs >= gate_threshold
-    verdict_cap = "MALICE_HIGH" if gate_passed else "ABSTAIN"
+    if insufficient_coverage:
+        gate_passed = False
+        verdict_cap = "ABSTAIN"
+    else:
+        gate_passed = ccs >= gate_threshold
+        verdict_cap = "MALICE_HIGH" if gate_passed else "ABSTAIN"
 
-    explanation = _build_explanation(tc, sr, ap, as_score, ccs, gate_passed, gate_threshold)
-    audit_hash  = _compute_hash(tc, sr, ap, as_score, ccs)
+    explanation = _build_explanation(
+        tc, sr, ap, as_score, ccs, gate_passed, gate_threshold,
+        n_provided, insufficient_coverage,
+    )
+    audit_hash  = _compute_hash(tc, sr, ap, as_score, ccs, n_provided)
 
     return CausalClosureResult(
         temporal_coherence=tc,
@@ -127,6 +153,8 @@ def compute_causal_closure(
         verdict_cap=verdict_cap,
         audit_hash=audit_hash,
         explanation=explanation,
+        dimensions_provided=n_provided,
+        insufficient_coverage=insufficient_coverage,
     )
 
 
@@ -158,6 +186,7 @@ def _clamp_fraction(v: Fraction) -> Fraction:
 def _build_explanation(
     tc: Fraction, sr: Fraction, ap: Fraction, as_score: Fraction,
     ccs: Fraction, gate_passed: bool, threshold: Fraction,
+    n_provided: int = 4, insufficient_coverage: bool = False,
 ) -> str:
     parts = [
         f"CausalClosureScore={int(ccs * 100)}%",
@@ -166,6 +195,13 @@ def _build_explanation(
         f"  abductive_parsimony={int(ap * 100)}% (w={_WEIGHTS['abductive_parsimony']})",
         f"  adversarial_silence={int(as_score * 100)}% (w={_WEIGHTS['adversarial_silence']})",
     ]
+    if insufficient_coverage:
+        parts.append(
+            f"INSUFFICIENT COVERAGE ({n_provided}/4 dimensions provided) — "
+            f"verdict capped at ABSTAIN before gate evaluation (H-04). "
+            f"A causal-closure gate cannot enable MALICE_HIGH on defaults."
+        )
+        return "\n".join(parts)
     if gate_passed:
         parts.append(f"GATE PASSED (>= {int(threshold * 100)}%) — MALICE_HIGH reachable")
     else:
@@ -179,13 +215,18 @@ def _build_explanation(
 
 def _compute_hash(
     tc: Fraction, sr: Fraction, ap: Fraction,
-    as_score: Fraction, ccs: Fraction,
+    as_score: Fraction, ccs: Fraction, n_provided: int = 4,
 ) -> str:
+    # H-04: n_provided entra al material del hash — determina verdict_cap,
+    # así que debe estar sellado. El módulo no tiene callers de producción
+    # ni hashes históricos sellados, por lo que el cambio de material no
+    # rompe verificación alguna (verificado 2026-07-23).
     content = json.dumps({
         "tc":  str(tc),
         "sr":  str(sr),
         "ap":  str(ap),
         "as":  str(as_score),
         "ccs": str(ccs),
+        "n_provided": n_provided,
     }, sort_keys=True)
     return hashlib.sha256(content.encode()).hexdigest()

@@ -43,33 +43,69 @@ def test_ccs_all_none_sits_exactly_on_threshold():
     )
 
 
-@pytest.mark.xfail(
-    reason="H-04: with zero information (all dimensions None) the gate passes "
-           "because 1/2 >= 1/2 and enables MALICE_HIGH. The defensible behavior is ABSTAIN. "
-           "Transitions to XPASS when total absence forces ABSTAIN.",
-    strict=False,
-)
 def test_ccs_no_information_forces_abstain():
+    """
+    H-04 FIXED (2026-07-23): formerly xfail. With zero information the gate
+    must not enable MALICE_HIGH — insufficient_coverage forces ABSTAIN
+    before the threshold is evaluated. Now a permanent regression guard.
+    """
     result = compute_causal_closure()
     assert result.verdict_cap == "ABSTAIN", (
         "With zero causal coherence information, the maximum verdict should be "
         f"ABSTAIN. Got verdict_cap={result.verdict_cap!r}, "
         f"gate_passed={result.gate_passed}."
     )
+    assert result.gate_passed is False
+    assert result.insufficient_coverage is True
+    assert result.dimensions_provided == 0
+    assert "INSUFFICIENT COVERAGE" in result.explanation
 
 
-@pytest.mark.xfail(
-    reason="H-04: insufficient coverage (2+ dimensions None) should abstain "
-           "before evaluating the gate.",
-    strict=False,
-)
 def test_ccs_insufficient_coverage_abstains():
-    # Only one dimension present (temporal), the rest unknown.
+    """
+    H-04 FIXED (2026-07-23): formerly xfail. 2+ dimensions None (here 3)
+    is insufficient coverage — ABSTAIN before gate evaluation.
+    """
     result = compute_causal_closure(temporal_coherence=Fraction(9, 10))
     assert result.verdict_cap == "ABSTAIN", (
         "With 3 of 4 dimensions unknown there is insufficient causal closure; "
         f"should ABSTAIN. Got: {result.verdict_cap!r}."
     )
+    assert result.dimensions_provided == 1
+    assert result.insufficient_coverage is True
+
+
+def test_ccs_two_provided_still_insufficient():
+    """Boundary: exactly 2 None (2 provided) is still insufficient (H-04)."""
+    result = compute_causal_closure(
+        temporal_coherence=Fraction(9, 10),
+        semantic_resonance=Fraction(9, 10),
+    )
+    assert result.verdict_cap == "ABSTAIN"
+    assert result.insufficient_coverage is True
+    assert result.dimensions_provided == 2
+
+
+def test_ccs_three_provided_evaluates_gate_normally():
+    """Boundary: 3 of 4 provided → coverage sufficient, threshold applies."""
+    high = compute_causal_closure(
+        temporal_coherence=Fraction(9, 10),
+        abductive_parsimony=Fraction(9, 10),
+        adversarial_silence=Fraction(9, 10),
+    )
+    assert high.insufficient_coverage is False
+    assert high.dimensions_provided == 3
+    assert high.gate_passed is True
+    assert high.verdict_cap == "MALICE_HIGH"
+
+    low = compute_causal_closure(
+        temporal_coherence=Fraction(1, 10),
+        abductive_parsimony=Fraction(1, 10),
+        adversarial_silence=Fraction(1, 10),
+    )
+    assert low.insufficient_coverage is False
+    assert low.gate_passed is False
+    assert low.verdict_cap == "ABSTAIN"
 
 
 # ===========================================================================
