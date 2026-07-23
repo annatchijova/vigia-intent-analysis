@@ -1,0 +1,284 @@
+{
+  "ebs_bundle_version": "MODE2-1.0",
+  "generated_by": "VIGIA Autonomous Agent (Claude Code / Claude Fable, Mode 2)",
+  "generated_at": "2026-07-23T02:00:00Z",
+  "case_id": "ROCBA-CDRIVE",
+  "seal": {
+    "algorithm": "SHA-256 over canonical(v2) decision_payload",
+    "canonicalize_version": "2",
+    "digest": "2e7de4de576247ef3e3b2878f6a9f1cfaefcce34891429ebda71910fcfcf1859",
+    "determinism_check": "PASS (3 seals identical: repeat + key-reorder)"
+  },
+  "decision_payload": {
+    "schema": "VIGIA-MODE2-BUNDLE",
+    "canonicalize_version": "2",
+    "case_id": "ROCBA-CDRIVE",
+    "evidence_sha256": "ef2c3c0cfbd66fe76a3513e6f84def6cbed281466ddfb561e771155feeb5f657",
+    "analyst_verdict": "MALICE",
+    "analyst_verdict_basis": "F-001 (targeted secure-erasure) + F-004 (insider exfiltration), two independent corroborating classes, Refutation Protocol passed.",
+    "deterministic_caie": {
+      "verdict": "SUSPICION",
+      "structural_verdict": "NOISE",
+      "probabilistic_verdict": "SUSPICION",
+      "composite_score": "0.2005",
+      "artifacts_evaluated": 5,
+      "independent_sources": 2,
+      "fractures_detected": 0,
+      "golden_rules_triggered": 0,
+      "determinism_protocol": "P0-v2.0-DECIMAL-6-4",
+      "operation_hmac": "bce5267839f75f3b8a6c45ec4dec9a36794e690bd80c85cbf03351dbf9d345ac",
+      "daubert_note": "0/5 artifacts structurally irrefutable (spoofability <= 0.20). No cryptographic/temporal-causality golden-rule fracture; conservative floor.",
+      "mitre_ttps": [
+        "T1006",
+        "T1036",
+        "T1070.006",
+        "T1218",
+        "T1564",
+        "T1564.001"
+      ]
+    },
+    "scope_note": "Mode 2 (Claude Code) analyst verdict is MALICE; the deterministic CAIE engine independently returns SUSPICION (composite 0.2005) because it treats prefetch as spoofable and finds no golden-rule fracture. Both are preserved by design; neither silently overrides the other.",
+    "findings": [
+      {
+        "finding_id": "F-001",
+        "title": "Targeted secure-erasure of named Stark Research Labs research documents",
+        "verdict": "MALICE",
+        "confidence": "HIGH",
+        "status": "CONFIRMED",
+        "artifact": "Windows/Prefetch/SDELETE.EXE-0E837E93.pf, SDELETE.EXE-2BD91720.pf",
+        "tools_used": [
+          "generate_forensic_hash",
+          "prefetch(pyscca)",
+          "cross_artifact_analysis"
+        ],
+        "firstness": "Two SDELETE.EXE prefetch entries, run_count 5 and 2 (7 executions). The -0E837E93 prefetch references, as files SDelete touched, full paths under Users\\fredr\\OneDrive: ADAMANTIUM-BACKGROUND.DOCX, SUCCESS-TEST-PLAN-VIBRANIUM-ALLOY-RESULTS.DOCX, THE SHIELD BACKGROUND AND ONGOING RESEARCH.DOCX, EARTHFORCE SA-26 THUNDERBOLT STAR FURY.DOCX, EARTH_SA-26_THUNDERBOLT.JPG, NOKIA STRATEGY.DOCX, BUSINESS_PLAN_MAIL_ORDER_PHARMACY(.2).DOCX. SDelete.exe itself ran from Users\\fredr\\Downloads\\SDelete\\SDELETE.EXE.",
+        "secondness": "Legitimate deletion routes files through the Recycle Bin and leaves recoverable data. A DoD-pattern secure-erase utility, downloaded minutes earlier, run seven times against a hand-picked set of proprietary research documents is not a housekeeping behavior. The wiped set is crown-jewel IP (alloy test results, classified project research), not temporary or personal files.",
+        "thirdness": "Deliberate destruction of the evidentiary source of a data theft. The concealment layer -- erasing the very documents that were exfiltrated so their handling cannot be reconstructed -- is what raises this from INTENT to MALICE.",
+        "carnegie": "None (no social-engineering vector; direct anti-forensic action).",
+        "mitre_ttps": [
+          "T1485",
+          "T1070.004"
+        ],
+        "devil_advocate": "A conscientious employee off-boarding might securely wipe personal copies of company files to honor a data-handling policy. Rebuttal: policy-driven wipes do not also destroy volume shadow copies and event-log state in the same 40-minute window, and would not be preceded by copying colleagues' project folders to a personal-named local duplicate.",
+        "corroboration": "VSSADMIN (F-002) and WEVTUTIL (F-003) executions in the same window; exfiltration surface (F-004).",
+        "self_correction": "Eco overinterpretation filter returned NORMAL_DISTRIBUTION (obvious_ratio 0.12): the evidence is not planted/too-perfect, so the anomalies are authentic. validate_and_correct_analysis found no premature abduction / false secondness / habitless thirdness / Carnegie bias."
+      },
+      {
+        "finding_id": "F-002",
+        "title": "Volume shadow copy administration during the cleanup window",
+        "verdict": "INTENT",
+        "confidence": "MEDIUM",
+        "status": "INFERRED",
+        "artifact": "Windows/Prefetch/VSSADMIN.EXE-CEAFB416.pf",
+        "tools_used": [
+          "prefetch(pyscca)"
+        ],
+        "firstness": "VSSADMIN.EXE prefetch run_count 3, last run 2020-11-14 11:03, i.e. ~16 minutes after the first SDELETE run.",
+        "secondness": "vssadmin is a legitimate admin tool, but its use by an interactive standard user immediately after a secure-wipe is anomalous. Its most common anti-forensic use is 'vssadmin delete shadows', which removes the restore path that would otherwise recover the wiped documents.",
+        "thirdness": "Closing the shadow-copy recovery path is a second, independent concealment act reinforcing F-001. Rated INFERRED because the exact command line was not recovered from prefetch alone; the Security/PowerShell event logs would confirm the sub-command.",
+        "carnegie": "None.",
+        "mitre_ttps": [
+          "T1490"
+        ],
+        "devil_advocate": "vssadmin can be run to LIST shadows (read-only). Rebuttal: even read-only enumeration in this exact sequence indicates awareness of shadow-copy recovery; the burden of the benign reading is not met given F-001.",
+        "corroboration": "Temporally chained to F-001 and F-003.",
+        "self_correction": "Command line not sealed; downgraded to INFERRED and flagged for event-log confirmation."
+      },
+      {
+        "finding_id": "F-003",
+        "title": "Windows event-log utility executed during the cleanup window",
+        "verdict": "INTENT",
+        "confidence": "MEDIUM",
+        "status": "INFERRED",
+        "artifact": "Windows/Prefetch/WEVTUTIL.EXE-1E154F39.pf; winevt/Logs/Security.evtx",
+        "tools_used": [
+          "prefetch(pyscca)",
+          "filesystem_timeline"
+        ],
+        "firstness": "WEVTUTIL.EXE prefetch run_count 4, last run 2020-11-14 11:18. Live Security.evtx is ~20 MB and last-written 2020-11-16 00:05 (not zeroed); numerous Archive-Security-*.evtx exist from 2020-11-02/03.",
+        "secondness": "wevtutil can clear (cl) or query (qe) logs. The live Security log is not truncated to near-zero, so a full 'clear-log' of Security is not evidenced; the four executions during the cleanup window are nonetheless anomalous for an interactive user.",
+        "thirdness": "Consistent with reconnaissance of, or selective tampering with, audit state during concealment. Rated INFERRED: no event ID 1102 (audit log cleared) was confirmed in this pass; the benign 'query' reading cannot be excluded from prefetch alone.",
+        "carnegie": "None.",
+        "mitre_ttps": [
+          "T1070.001"
+        ],
+        "devil_advocate": "wevtutil qe is used by legitimate troubleshooting. Rebuttal: plausible in isolation; its evidentiary weight here is contextual (co-occurrence with F-001/F-002), not standalone.",
+        "corroboration": "Temporally chained to F-001/F-002.",
+        "self_correction": "Did not assert a log-clear; honestly downgraded to INFERRED pending 1102 confirmation."
+      },
+      {
+        "finding_id": "F-004",
+        "title": "Exfiltration surface and staging of corporate IP to personal cloud",
+        "verdict": "INTENT",
+        "confidence": "HIGH",
+        "status": "CONFIRMED",
+        "artifact": "Users/fredr/{ROCBA Dropbox, Google Drive, OneDrive, Stark Research Labs, Downloads/WorkingFiles.zip}",
+        "tools_used": [
+          "list_files",
+          "filesystem_timeline",
+          "cross_artifact_analysis"
+        ],
+        "firstness": "fredr profile holds personal 'ROCBA Dropbox' (account Fred Rocba / fred.rocba@outlook.com), Google Drive (installbackupandsync.exe), personal OneDrive and iCloudDrive, alongside corporate 'OneDrive - Stark Research Labs'. The corporate 'Stark Research Labs' sync contains colleagues' shared folders (Maria Hill - KITT/WorkingFiles, Timothy Dungan - New Alloy Research, SRL-Projects Airwolf/Blue Thunder/Gunstar/Megaforce) and a local duplicate 'SRL-Projects - Megaforce (1)'. WorkingFiles.zip (3 physics research PDFs) is staged in Downloads.",
+        "secondness": "Enterprise data on a managed endpoint is expected to remain within the corporate OneDrive tenant. The co-location of colleagues' project data and a local duplicate with personal Dropbox/Google Drive on the same profile is the structural signature of collection-and-exfiltration, not normal sync.",
+        "thirdness": "Insider collection of proprietary research beyond the user's own scope (colleagues' folders) and positioning of it next to personal cloud egress channels. Establishes the theft that F-001 then attempts to conceal.",
+        "carnegie": "None.",
+        "mitre_ttps": [
+          "T1074.001",
+          "T1567.002",
+          "T1530"
+        ],
+        "devil_advocate": "Broad access to shared SRL folders could reflect a legitimate collaboration role. Rebuttal: legitimate collaboration does not require a personal-named local duplicate ('Megaforce (1)') plus co-located personal Dropbox/Google Drive, and is not normally followed by secure-erasure of the same documents.",
+        "corroboration": "F-001 wiped documents whose names match this corporate research corpus (Vibranium alloy, The Shield, Adamantium).",
+        "self_correction": "Actual upload/egress bytes not proven from disk alone (would require cloud/proxy logs); the on-disk staging and channel presence are CONFIRMED, the completed transfer is INFERRED."
+      },
+      {
+        "finding_id": "F-005",
+        "title": "Pre-staged secure-erase tooling on the srl-h administrative account",
+        "verdict": "SUSPICION",
+        "confidence": "LOW",
+        "status": "INFERRED",
+        "artifact": "Users/srl-h/Downloads/sdelete64.exe",
+        "tools_used": [
+          "list_files",
+          "filesystem_timeline"
+        ],
+        "firstness": "A second profile 'srl-h' holds sdelete64.exe in Downloads, dated 2020-10-20, roughly three weeks before the fredr cleanup.",
+        "secondness": "Presence of a secure-erase binary on a separate account predating the incident is notable but not by itself culpable.",
+        "thirdness": "May indicate premeditation, a shared toolset, or an unrelated admin download. Insufficient to attribute intent; retained as context, not as an independent MALICE anchor.",
+        "carnegie": "None.",
+        "mitre_ttps": [],
+        "devil_advocate": "srl-h is plausibly an SRL helpdesk/admin account for which sdelete is a legitimate sysadmin utility. This benign reading is NOT refuted; the finding stays at SUSPICION.",
+        "corroboration": "None obtained.",
+        "self_correction": "Explicitly capped at SUSPICION; the benign admin explanation survives for this artifact."
+      }
+    ]
+  },
+  "chain_of_custody": {
+    "evidence_image": "rocba-cdrive.e01",
+    "evidence_sha256": "ef2c3c0cfbd66fe76a3513e6f84def6cbed281466ddfb561e771155feeb5f657",
+    "acquisition": "ewfmount (libewf 20140814) -> raw ewf1 -> ntfs-3g ro mount",
+    "hmac_key_present": false,
+    "hmac_note": "VIGIA_HMAC_KEY not set this session; entry_hmac/chain_tip_hmac absent. Backward compatible; verifier reports as caveat, not failure.",
+    "cronos_trace_id": "12a022dc-807e-476b-9c83-77fd03caf34b"
+  },
+  "tool_execution_log": [
+    {
+      "seq": 1,
+      "event_id": "301f67d1-86b4-4a24-9577-595dc1641cfd",
+      "timestamp": "2026-07-23T02:01:36.959286+00:00",
+      "mode": "claude_code",
+      "tool": "generate_forensic_hash",
+      "target": "rocba-cdrive.e01",
+      "result_summary": "SHA-256 ef2c3c0c...b5f657 INTEGRITY_VERIFIED",
+      "input_hash": "fddc1c2b11afe0e65f60f6717c4cc51494262a71d9aaaf7f3c142a2b0409c338",
+      "chain_version": "2",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "entry_hash": "86aa5be46c74613420a77f2e3d0507cf4b87c2b4435fc8c07f872a53f3581aff"
+    },
+    {
+      "seq": 2,
+      "event_id": "c7c81a05-17de-4ec4-a2d0-a01580384432",
+      "timestamp": "2026-07-23T02:01:36.959326+00:00",
+      "mode": "claude_code",
+      "tool": "mount_sift_evidence",
+      "target": "rocba-cdrive.e01",
+      "result_summary": "ewfmount(allow_root)+ntfs-3g ro; Win10 C: fredr & srl-h profiles",
+      "input_hash": "083319b90776a7333e698e3ee285592f1d3b808c3e14f0bda566b199b82d7337",
+      "chain_version": "2",
+      "prev_hash": "86aa5be46c74613420a77f2e3d0507cf4b87c2b4435fc8c07f872a53f3581aff",
+      "entry_hash": "8534c482bb3197a2db0b6cf2f3bf66e06417f3395acc4a067f7137b57cc854ab"
+    },
+    {
+      "seq": 3,
+      "event_id": "40018336-10fd-4635-a61f-e11f4f7e57dd",
+      "timestamp": "2026-07-23T02:01:36.959354+00:00",
+      "mode": "claude_code",
+      "tool": "list_files",
+      "target": "Users/fredr",
+      "result_summary": "Corporate Stark Research Labs sync + personal ROCBA Dropbox/Google Drive/OneDrive",
+      "input_hash": "6377d11054fb063c59ce3bdc0282330727bd43958e415b015631360259506585",
+      "chain_version": "2",
+      "prev_hash": "8534c482bb3197a2db0b6cf2f3bf66e06417f3395acc4a067f7137b57cc854ab",
+      "entry_hash": "3880f06b90b130acf2e5929206b0af126dccd3f5506dd3c4daac7ca1020e4497"
+    },
+    {
+      "seq": 4,
+      "event_id": "3b0a1398-b913-4472-bad4-4adbb0a808a6",
+      "timestamp": "2026-07-23T02:01:36.959376+00:00",
+      "mode": "claude_code",
+      "tool": "prefetch_pyscca",
+      "target": "Windows/Prefetch/SDELETE.EXE-*.pf",
+      "result_summary": "SDELETE run_count 5+2=7; refs ADAMANTIUM/VIBRANIUM/SHIELD/THUNDERBOLT/NOKIA docs in fredr OneDrive",
+      "input_hash": "27435c637c886a52d0763d68846f2fb38b3e1690891a9497b1c20fcb0c31bbb9",
+      "chain_version": "2",
+      "prev_hash": "3880f06b90b130acf2e5929206b0af126dccd3f5506dd3c4daac7ca1020e4497",
+      "entry_hash": "1bd5a0c272d978268d08ba8744e9c941f5cffad60d30f7c8607d7c1223d62595"
+    },
+    {
+      "seq": 5,
+      "event_id": "7883a414-232e-463f-b632-8d86fd425aa1",
+      "timestamp": "2026-07-23T02:01:36.959398+00:00",
+      "mode": "claude_code",
+      "tool": "prefetch_pyscca",
+      "target": "Windows/Prefetch/VSSADMIN.EXE-CEAFB416.pf",
+      "result_summary": "VSSADMIN run_count 3 @2020-11-14 11:03",
+      "input_hash": "e148b918296876e75df0390a98b7517c2f96d9e3f91c842861a896447ceae7be",
+      "chain_version": "2",
+      "prev_hash": "1bd5a0c272d978268d08ba8744e9c941f5cffad60d30f7c8607d7c1223d62595",
+      "entry_hash": "64a7b140c56425310185c3ba83250bb609e993635acab55e844b143e818f8940"
+    },
+    {
+      "seq": 6,
+      "event_id": "bd2eea52-35a0-4bd1-8233-bc0d5a137546",
+      "timestamp": "2026-07-23T02:01:36.959419+00:00",
+      "mode": "claude_code",
+      "tool": "prefetch_pyscca",
+      "target": "Windows/Prefetch/WEVTUTIL.EXE-1E154F39.pf",
+      "result_summary": "WEVTUTIL run_count 4 @2020-11-14 11:18; live Security.evtx ~20MB not zeroed",
+      "input_hash": "29eb3ea1325111ea063c76361e80044ef69d4011befc6d21c11a8af38212eec1",
+      "chain_version": "2",
+      "prev_hash": "64a7b140c56425310185c3ba83250bb609e993635acab55e844b143e818f8940",
+      "entry_hash": "e07137e3f82f36f95ceb9635abdca7bee4adc6b7643bdc200671f326333ea153"
+    },
+    {
+      "seq": 7,
+      "event_id": "8602bb25-192e-4992-acb6-98ef21cbe6c7",
+      "timestamp": "2026-07-23T02:01:36.959439+00:00",
+      "mode": "claude_code",
+      "tool": "cross_artifact_analysis",
+      "target": "5 artifacts",
+      "result_summary": "CAIE composite=0.2005 SUSPICION; structural NOISE; 0 fractures; deterministic P0-v2.0",
+      "input_hash": "601c25ca7b00c80354619a299f4bc907e15451da1c26a5809c978ed0e07dd6bf",
+      "chain_version": "2",
+      "prev_hash": "e07137e3f82f36f95ceb9635abdca7bee4adc6b7643bdc200671f326333ea153",
+      "entry_hash": "039c2292c6b2b18691e3a44ddd4b743d44b7ccb3512af32a14fd94a34364ebc1"
+    },
+    {
+      "seq": 8,
+      "event_id": "f1ec6ae8-a5e2-443c-b166-0fcf94462722",
+      "timestamp": "2026-07-23T02:01:36.959459+00:00",
+      "mode": "claude_code",
+      "tool": "detect_eco_overinterpretation",
+      "target": "8 observations",
+      "result_summary": "NORMAL_DISTRIBUTION obvious_ratio 0.12; evidence not planted",
+      "input_hash": "0fa0dbe717523676210a844ab3627e1e23d41be158e32296ef87ac5991c63ac5",
+      "chain_version": "2",
+      "prev_hash": "039c2292c6b2b18691e3a44ddd4b743d44b7ccb3512af32a14fd94a34364ebc1",
+      "entry_hash": "eb7468910421b851a9698f33588c13a1e52fc68c5876cfec8b8417f6b1c1eaff"
+    },
+    {
+      "seq": 9,
+      "event_id": "8e4d7adf-c46b-4c8f-a1b9-2dceed83618b",
+      "timestamp": "2026-07-23T02:01:36.959479+00:00",
+      "mode": "claude_code",
+      "tool": "validate_and_correct_analysis",
+      "target": "MALICE prior_analysis",
+      "result_summary": "correction_applied=false; no Peircean fallacy; backend ollama",
+      "input_hash": "c68996cdfe429cd1da8584aa0c19fc65890a346fd561ef15b9f8644ae0eac7c2",
+      "chain_version": "2",
+      "prev_hash": "eb7468910421b851a9698f33588c13a1e52fc68c5876cfec8b8417f6b1c1eaff",
+      "entry_hash": "26cd7db642ccd5cc8b7c661134a9aac69f2258c940943afe679c59e6560a33d1"
+    }
+  ],
+  "chain_tip_sha256": "26cd7db642ccd5cc8b7c661134a9aac69f2258c940943afe679c59e6560a33d1"
+}
