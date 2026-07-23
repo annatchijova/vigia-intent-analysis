@@ -71,6 +71,22 @@ here.
 
 ---
 
+## Maintainer correction (Anna, 2026-07-23)
+
+The raw-FLARE-On **ABSTAIN is the correct verdict, not an extraction weakness.**
+VIGÍA detects *semiotic fractures* — intent signatures that live in operational
+context (a host, a timeline, a user, deleted logs, incongruence). A pile of loose
+malware binaries with **no host, no deployment, no victim** genuinely has **no
+fracture to detect**, so ABSTAIN is the right answer. The 16.7% "coverage" is not a
+coverage failure to be fixed; it reflects that the raw input lacks the contextual
+evidence that produces a fracture. The engine resolves 200+ cases correctly; the
+ones it abstains on are frequently the ones that (correctly) have no fracture — this
+was a predicted case. So Lesson 1 below should be read narrowly: the JSON run
+reaches MALICE because the curated artifacts *supply* the contextual signal; the raw
+run correctly finds none. Do **not** read this as "extraction is the ceiling of the
+tool." (VIGÍA is also not ML — the corpus is not training data; each case is
+independent and the engine does not learn from cases.)
+
 ## Lessons (the gold)
 
 1. **A verdict is only as good as the evidence the engine actually ingested.** On the

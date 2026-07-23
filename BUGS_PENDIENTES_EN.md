@@ -9629,3 +9629,81 @@ importable names does not change (verified).
 
 **Validation:** ruff F811/F821 clean in both files; `lambda_t`/`gamma_t`
 aliases verified; full suite 1862 passed, 0 failed.
+
+## B-214 — `VigiaPipeline.run_full` bypasses the normalization-integrity gate that `vigia_agent.py` applies: two entry points, two verdicts [DOCUMENTED — Claude 2026-07-23]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (architectural footgun, not an incorrectness): the same case yields different verdicts by entry point. `run_full` scores raw; `vigia_agent.py` applies the honest-degradation gate. A caller using `run_full` gets an ungated score and may seal it as if it were the authoritative verdict. |
+| **Files** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full`), `vigia_agent.py` (full Mode-1 agent). |
+| **Mode** | Any code that calls `run_full` directly to seal (e.g. `scripts/run_vigia_full.py` and this session's `_claude_fable` bundles) instead of going through the agent. |
+| **Detected by** | Mode-1 vs Mode-2 cross-check (session 2026-07-23, `vigia/results/MODE1-vs-MODE2_crosscheck_claude_fable.md`). |
+
+**Reproduced observation:** on `data/cases/OWL-NEXUS5-CASE.json` and
+`VIGIA-OWL-2019-COMPLETE.json`, `VigiaPipeline.run_full` returns
+`decision=REJECT, posterior=1.0`; `vigia_agent.py` on the same JSON returns
+**ABSTAIN** with reason `NORMALIZATION INTEGRITY LOSS` — it detects that an
+artifact's metadata (the `significance` field carrying `..` on the coordination
+SMS) was coerced at intake, which can silently drop a scoring-relevant assertion.
+`run_full` does not run that check.
+
+**Note (Thirdness):** neither side is "wrong" — there are two paths with different
+guarantees and nothing flags it at the call site. The integrity gate (P1 metadata
+normalization) is correct; the problem is that `run_full` is a low-level API that
+bypasses it. Related to the B-160/B-206 semantic-extractor gap that leaves
+OWL-NEXUS5 in honest ABSTAIN.
+
+**Proposed fix (NOT applied):** either (a) `run_full` runs the same gate and
+degrades to ABSTAIN on metadata coercion, or (b) `run_full` is renamed/documented
+explicitly as "raw ungated score" and authoritative sealing always routes through
+the agent. Needs an architecture decision + corpus dry-run before touching, since
+it changes the sealed verdict of any case with `normalization_failures`.
+
+## B-215 — `evidence_graph` not populated in `run_full` bundles: `graph_hash` identical across all cases (integrity anchor is meaningless) [DOCUMENTED — Claude 2026-07-23]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (Daubert integrity): `graph_hash` should bind the bundle to the case-specific evidence graph; if constant, it anchors nothing. `decision_hash` IS case-specific and stable, so verdict reproducibility is not compromised — but a verifier relying on `graph_hash` as proof of graph integrity is trusting an empty value. |
+| **Files** | `vigia/core/bundle_builder.py` (`graph_hash = _sha256_dict(evidence_graph.to_dict())`), `vigia/pipeline/pipeline.py` (`ForensicBundle` construction in `run_full`). |
+| **Mode** | Bundles sealed via `run_full`. |
+| **Detected by** | Empirical check of 4 `_claude_fable` bundles (session 2026-07-23). |
+
+**Reproduced observation:** OWL-NEXUS5 (22 artifacts), MAGNET-2022-iOS-JESS (6),
+OWL-COMPLETE (30) and FLAREON-2017 (14) — totally different content and size —
+produce the **same** `graph_hash` `94147b51c639cd0c...`. The `decision_hash`, by
+contrast, differs across all four.
+
+**Root cause (Secondness):** `graph_hash` = SHA-256 of `evidence_graph.to_dict()`
+minus `graph_hash`/`generated_at`. Its being constant implies the
+`ForensicBundle.evidence_graph` built by `run_full` is empty or a constant default
+— it is not populated with nodes/edges derived from the case signals. The evidence
+graph (a causal-chain artifact relevant to Daubert) is absent from the bundle.
+
+**Proposed fix (NOT applied):** populate `evidence_graph` in `run_full` with signal
+nodes and their relations before computing `graph_hash`; add a test asserting
+distinct `graph_hash` for two cases with distinct artifacts (red-first against the
+current state). Requires reviewing downstream consumers of `evidence_graph` so
+`verify_ebs_v1.py` does not break.
+
+**Related findings (NOT bugs, recorded to avoid re-discovery):** (1) `bundle_hash`
+embeds `bundle_id` (random UUID) + timestamp and varies per seal — this is
+**intentional** and documented at `bundle_builder.py:171`; the determinism anchor
+is `decision_hash`, not `bundle_hash`. (2) `ecl_hash` is never populated in
+`run_full` bundles, so `verify_ebs_v1.py` reports `R5_ECL_BINDING` WARN and caps at
+Level 2 — Level 3 requires wiring the Evidence Chain Ledger (`VIGIA_CHAIN_DB_PATH`),
+pending integration; not a failure, a Level-3 feature not connected to this entry
+point.
+
+## B-216 — `tests/run_vigia_case.py` crashes formatting a `caie_fracture`'s None `severity` with `:.2f` [DOCUMENTED — Claude 2026-07-23]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3 (display/demo runner, not the sealed path): `TypeError: unsupported format string passed to NoneType.__format__` when printing the CAIE fractures of any case whose `caie_fractures` lack a `severity` field (they carry `type`/`description`). Does not affect the verdict or the bundle. |
+| **File** | `tests/run_vigia_case.py` (line ~162: `f"    [{f.get('fracture_type')}] severity={f.get('severity'):.2f}"`). |
+| **Mode** | Only the display runner `tests/run_vigia_case.py` (used by `scripts/run_vigia_full.py` as its first stage). |
+| **Detected by** | Running `run_vigia_full.py` on `VIGIA-OWL-2019-COMPLETE.json`; also reproduced on the original `OWL-NEXUS5-CASE.json` (pre-existing bug, not case-specific). |
+
+**Proposed fix (NOT applied):** `f.get('severity') or 0` (or an `if 'severity' in
+f` guard) and `f.get('fracture_type', f.get('type', '?'))` to tolerate the
+`type`/`description` fracture schema real cases use. Trivial, but a dry-run of the
+cases that DO carry `severity` is warranted so their render is not broken.

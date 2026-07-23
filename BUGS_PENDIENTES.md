@@ -10520,3 +10520,86 @@ de nombres importables no cambia (verificado).
 
 **Validación:** ruff F811/F821 limpio en ambos archivos; aliases
 `lambda_t`/`gamma_t` verificados; suite completa 1862 passed, 0 failed.
+
+## B-214 — `VigiaPipeline.run_full` saltea el gate de integridad de normalización que `vigia_agent.py` sí aplica: dos entry points, dos veredictos [DOCUMENTADO — Claude 2026-07-23]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 (footgun de arquitectura, no incorrección): el mismo caso produce veredictos distintos según el entry point. `run_full` puntúa crudo; `vigia_agent.py` aplica el gate de degradación honesta. Un caller que use `run_full` obtiene un score sin gate y puede sellarlo como si fuera el veredicto autoritativo. |
+| **Archivos** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full`), `vigia_agent.py` (agente Mode 1 completo). |
+| **Modo** | Cualquier código que llame `run_full` directo para sellar (p.ej. `scripts/run_vigia_full.py` y los bundles `_claude_fable` de esta sesión) en vez de pasar por el agente. |
+| **Detectado por** | Cross-check Mode-1 vs Mode-2 (sesión 2026-07-23, `vigia/results/MODE1-vs-MODE2_crosscheck_claude_fable.md`). |
+
+**Observación reproducida:** sobre `data/cases/OWL-NEXUS5-CASE.json` y
+`VIGIA-OWL-2019-COMPLETE.json`, `VigiaPipeline.run_full` devuelve
+`decision=REJECT, posterior=1.0`; el agente `vigia_agent.py` sobre el mismo JSON
+devuelve **ABSTAIN** con razón `NORMALIZATION INTEGRITY LOSS` — detecta que el
+metadata de un artefacto (el campo `significance` con `..` del SMS de
+coordinación) fue coercionado en el intake, lo que puede dropear silenciosamente
+una aserción que participa del scoring. `run_full` no corre ese chequeo.
+
+**Nota (Thirdness):** no es que un lado esté "mal" — es que hay dos caminos con
+garantías distintas y nada lo señala en el punto de llamada. El gate de
+integridad (P1 metadata normalization, `tests/test_p1_metadata_normalization_integrity.py`)
+es correcto; el problema es que `run_full` es un API de bajo nivel que lo
+puentea. Relacionado con el gap B-160/B-206 (extractor semántico) que deja
+OWL-NEXUS5 en ABSTAIN honesto.
+
+**Fix propuesto (NO aplicado):** o (a) `run_full` corre el mismo gate y degrada a
+ABSTAIN cuando hay coerción de metadata, o (b) `run_full` se renombra/documenta
+explícitamente como "score crudo sin gates" y el sellado autoritativo se rutea
+siempre por el agente. Requiere decisión de arquitectura + dry-run del corpus
+antes de tocar, porque cambia el veredicto sellado de cualquier caso con
+`normalization_failures`.
+
+## B-215 — `evidence_graph` no se puebla en bundles de `run_full`: `graph_hash` idéntico en todos los casos (ancla de integridad vacía de significado) [DOCUMENTADO — Claude 2026-07-23]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 (integridad Daubert): `graph_hash` debería ligar el bundle al grafo de evidencia específico del caso; si es constante, no ancla nada. `decision_hash` sí es case-specific y estable, así que la reproducibilidad del veredicto no está comprometida — pero un verificador que confíe en `graph_hash` como prueba de integridad del grafo está confiando en un valor vacío. |
+| **Archivos** | `vigia/core/bundle_builder.py` (`graph_hash = _sha256_dict(evidence_graph.to_dict())`), `vigia/pipeline/pipeline.py` (construcción del `ForensicBundle` en `run_full`). |
+| **Modo** | Bundles sellados vía `run_full`. |
+| **Detectado por** | Verificación empírica de 4 bundles `_claude_fable` (sesión 2026-07-23). |
+
+**Observación reproducida:** OWL-NEXUS5 (22 artefactos), MAGNET-2022-iOS-JESS (6),
+OWL-COMPLETE (30) y FLAREON-2017 (14) — contenido y tamaño totalmente distintos —
+producen el **mismo** `graph_hash` `94147b51c639cd0c...`. El `decision_hash`, en
+cambio, difiere en los cuatro (`1fc52828` / `aa91ab1e` / `617cd69c` / `3e08cb52`).
+
+**Causa raíz (Secondness):** `graph_hash` = SHA-256 de `evidence_graph.to_dict()`
+menos `graph_hash`/`generated_at`. Que sea constante implica que el
+`evidence_graph` del `ForensicBundle` construido por `run_full` está vacío o en un
+default constante — no se lo puebla con los nodos/edges derivados de las señales
+del caso. El grafo de evidencia (artefacto de cadena causal relevante para
+Daubert) no está en el bundle.
+
+**Fix propuesto (NO aplicado):** poblar `evidence_graph` en `run_full` con los
+nodos de señal y sus relaciones antes de computar `graph_hash`; agregar un test
+que asserte `graph_hash` distinto entre dos casos con artefactos distintos
+(rojo-primero contra el estado actual). Requiere revisar qué consume
+`evidence_graph` aguas abajo para no romper `verify_ebs_v1.py`.
+
+**Hallazgos relacionados (NO bugs, registrados para no re-descubrirlos):**
+(1) `bundle_hash` embebe `bundle_id` (UUID aleatorio) + timestamp y varía por
+sello — es **intencional** y documentado en `bundle_builder.py:171` ("bundle_hash
+is intentionally an identity for a specific custody event"); el ancla de
+determinismo es `decision_hash`, no `bundle_hash`. (2) `ecl_hash` nunca se puebla
+en bundles de `run_full`, así que `verify_ebs_v1.py` reporta `R5_ECL_BINDING`
+WARN y topa en Level 2 — Level 3 requiere cablear el Evidence Chain Ledger
+(`VIGIA_CHAIN_DB_PATH`), pendiente de integración; no es un fallo, es una feature
+de Level 3 no conectada a este entry point.
+
+## B-216 — `tests/run_vigia_case.py` crashea al formatear `severity` None de un `caie_fracture` con `:.2f` [DOCUMENTADO — Claude 2026-07-23]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 (runner de display/demo, no el path sellado): `TypeError: unsupported format string passed to NoneType.__format__` al imprimir las fracturas CAIE de cualquier caso cuyas `caie_fractures` no traigan el campo `severity` (traen `type`/`description`). No afecta el veredicto ni el bundle. |
+| **Archivo** | `tests/run_vigia_case.py` (línea ~162: `f"    [{f.get('fracture_type')}] severity={f.get('severity'):.2f}"`). |
+| **Modo** | Solo el runner de display `tests/run_vigia_case.py` (usado por `scripts/run_vigia_full.py` como primera etapa). |
+| **Detectado por** | Corrida de `run_vigia_full.py` sobre `VIGIA-OWL-2019-COMPLETE.json`; reproducido también sobre el `OWL-NEXUS5-CASE.json` original (bug preexistente, no del caso). |
+
+**Fix propuesto (NO aplicado):** `f.get('severity') or 0` (o guard `if
+'severity' in f`) y `f.get('fracture_type', f.get('type', '?'))` para tolerar el
+schema `type`/`description` de las fracturas que usan los casos reales. Trivial,
+pero conviene un dry-run de los casos que sí traen `severity` para no romper su
+render.
