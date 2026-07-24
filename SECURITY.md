@@ -22,21 +22,7 @@
 | `_sanitize_text_list()` | OOM via count + byte-volume limits |
 | `@rate_limit()` | Per-function sliding-window rate limiting with exponential backoff |
 
-### MCP Transport Security
-
-VIGIA uses MCP-over-stdio by default, where security is enforced by the OS:
-only the parent process (Claude Code, Ollama) can read/write the stdin/stdout pipes.
-
-Startup protections (V-002 mitigation):
-- **Session token**: generated at startup, printed to stderr for operator verification
-- **Stdin pipe check**: warns if stdin is not a pipe (unexpected command source)
-- **HTTP/SSE detection**: logs CRITICAL alert if HTTP transport is detected in args, since it exposes 21+ forensic tools to any local process on the network port
-- **Parent process logging**: records PPID and parent executable path to audit trail
-
-For HTTP/SSE deployments (NOT recommended without additional auth):
-- Use Unix socket with 0o600 permissions instead of TCP port
-- Implement token-based authentication at the application layer
-- Restrict network binding to localhost only
+See "MCP Transport Security" below for stdio-vs-HTTP/SSE details.
 
 ### Rate Limiting (All MCP Tools)
 
@@ -45,8 +31,8 @@ Every MCP tool is protected by `@rate_limit()` with sliding window + exponential
 | Category | Tools | Limit |
 |----------|-------|-------|
 | LLM (cost + latency) | `reason_with_llm`, `validate_and_correct_analysis` | 5/min |
-| Sensitive (root, mount, honey) | `mount_sift_evidence`, `activate_honey_token`, `reload_phonetic_dict`, `audit_network` | 5/min |
-| CPU heavy (entropy, CLIP, OCR) | `calculate_shannon_entropy`, `audit_image_metadata`, `analyze_stylometry`, `calculate_human_entropy` | 10/min |
+| Sensitive (root, mount, honey) | `mount_sift_evidence`, `activate_honey_token`, `deactivate_honey_token`, `reload_phonetic_dict` | 5/min |
+| CPU heavy (entropy, CLIP, OCR) | `calculate_shannon_entropy`, `audit_image_metadata`, `analyze_stylometry`, `calculate_human_entropy`, `audit_network` | 10/min |
 | Medium I/O (grep, analysis) | `search_pattern`, `infer_intent`, `detect_habit_incongruence`, `detect_human_jitter`, `audit_grice_maxims`, `detect_eco_overinterpretation`, `list_processes` | 30/min |
 | Light I/O (read, list, hash) | `list_files`, `read_evidence`, `generate_forensic_hash`, `get_phonetic_dict_stats` | 100/min |
 
