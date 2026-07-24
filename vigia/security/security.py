@@ -126,6 +126,18 @@ _HMAC_KEY_ENV: Final[str] = "VIGIA_HMAC_KEY"
 _HMAC_KEY_FILE_ENV: Final[str] = "VIGIA_HMAC_KEY_FILE"
 _HMAC_ALGORITHM: Final[str] = "sha256"
 
+# Same fail-open-by-default / fail-closed-on-request pattern as
+# VIGIA_ENFORCE_POSIX_SANDBOX (sandbox.py) and VIGIA_ENFORCE_STDIO /
+# VIGIA_ENFORCE_PARENT / VIGIA_ENFORCE_KASSANDRA_SALT (vigia_sift_bridge.py).
+# Without a persistent key, the entire security_audit.log HMAC chain resets
+# on every process restart with a fresh, never-recorded key: a tampered or
+# truncated log and a legitimate restart become indistinguishable, because
+# there is nothing durable to verify the new chain against. Default is
+# unchanged (warn + continue); set this to fail closed in production.
+_ENFORCE_HMAC_KEY: Final[bool] = (
+    os.getenv("VIGIA_ENFORCE_HMAC_KEY", "false").lower() == "true"
+)
+
 
 # ---------------------------------------------------------------------------
 # TrustExponentialDecay
@@ -349,11 +361,23 @@ class SecurityAudit:
                 )
 
         # 3. Ephemeral key (development only)
+        msg = (
+            f"No persistent HMAC key configured — set {_HMAC_KEY_ENV} or "
+            f"{_HMAC_KEY_FILE_ENV} for production. Without one, the "
+            "security_audit.log HMAC chain resets to a fresh, never-recorded "
+            "key on every restart, so a tampered/truncated log cannot be "
+            "told apart from a legitimate restart."
+        )
+        if _ENFORCE_HMAC_KEY:
+            print(
+                f"[VIGIA][SecurityAudit][CRITICAL] {msg} "
+                "VIGIA_ENFORCE_HMAC_KEY=true — aborting.",
+                file=sys.stderr, flush=True,
+            )
+            sys.exit(1)
         ephemeral = secrets.token_bytes(32)
         print(
-            "[VIGIA][SecurityAudit] WARNING: Using ephemeral HMAC key. "
-            "Log chain will NOT be verifiable after restart. "
-            f"Set {_HMAC_KEY_ENV} or {_HMAC_KEY_FILE_ENV} for production.",
+            f"[VIGIA][SecurityAudit] WARNING: Using ephemeral HMAC key. {msg}",
             file=sys.stderr, flush=True,
         )
         return ephemeral
