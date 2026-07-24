@@ -3248,7 +3248,25 @@ async def validate_and_correct_analysis(
     4. CARNEGIE BIAS: analyst saw manipulation where there was operational error
     """
     evidence       = _sanitize_text(evidence, max_length=5_000)
-    analysis_str   = json.dumps(prior_analysis)[:5_000]
+    analysis_str   = json.dumps(prior_analysis, default=str)[:5_000]
+
+    # CONFUSED DEPUTY FIX: `prior_analysis` is the raw output of upstream
+    # MCP tools (infer_intent, audit_grice_maxims, detect_eco_overinterpretation,
+    # cross_artifact_analysis, ...) which may echo attacker-controlled evidence
+    # content verbatim (e.g. in "interpretation"/"observation"/"vigia_verdict"
+    # fields). Those tools do not scan their inputs for prompt injection —
+    # only the LLM-facing boundary does. Without this scan, a hostile artifact
+    # could ride an upstream tool's output straight into this LLM prompt
+    # unfiltered, exactly like it would if it reached reason_with_llm directly.
+    try:
+        evidence     = llm_shield.scan(evidence,     "validate_and_correct_analysis.evidence")
+        analysis_str = llm_shield.scan(analysis_str, "validate_and_correct_analysis.prior_analysis")
+    except ValueError as exc:
+        return {
+            "error": str(exc),
+            "security_block": True,
+            "self_correction_timestamp": _utcnow(),
+        }
 
     prompt = f"""
 Review this forensic analysis for these specific errors:
@@ -3650,6 +3668,57 @@ def _verify_transport_security() -> None:
             tool="vigia_sift_bridge",
             message=f"MCP server starting. PID={os.getpid()}, session={session_token[:8]}...",
         )
+
+    # 5. Verify KASSANDRA_SALT (Semantic Tripwire seed) is set.
+    # Without it, _derive_session_nonce() / _generate_active_tripwire() fall
+    # back to a hardcoded, publicly-known salt ("VIGIA_FALLBACK_SALT_NO_PRODUCTION").
+    # An attacker who plants the evidence artifact knows its content — and
+    # therefore its SHA-256 — in advance, so with the fallback salt they can
+    # precompute the exact session nonce and ghost_protocol id offline from
+    # public source alone. That breaks the tripwire's evidentiary claim (that
+    # triggering it requires session-specific insider knowledge) and lets an
+    # attacker stage a decoy KASSANDRA_TRIPWIRE_TRIGGERED event to draw
+    # attention away from a separate, non-referencing injection elsewhere.
+    # Fails open by default (matching the existing warning in
+    # _derive_session_nonce); set VIGIA_ENFORCE_KASSANDRA_SALT=true to fail
+    # closed in production.
+    kassandra_salt = os.environ.get("KASSANDRA_SALT", "").strip()
+    if not kassandra_salt:
+        msg = (
+            "KASSANDRA_SALT is not set. The Semantic Tripwire (session nonce "
+            "and ghost_protocol) falls back to a hardcoded, publicly-known "
+            "salt — an attacker who controls evidence content can precompute "
+            "the tripwire id offline and forge or evade "
+            "KASSANDRA_TRIPWIRE_TRIGGERED events. Set KASSANDRA_SALT for a "
+            "cryptographically unpredictable tripwire."
+        )
+        enforce_kassandra_salt = (
+            os.getenv("VIGIA_ENFORCE_KASSANDRA_SALT", "false").lower() == "true"
+        )
+        if enforce_kassandra_salt:
+            print(
+                f"[VIGIA][CRITICAL] {msg} VIGIA_ENFORCE_KASSANDRA_SALT=true — aborting.",
+                file=sys.stderr, flush=True,
+            )
+            audit_logger.log_block(
+                event_type="KASSANDRA_SALT_MISSING_BLOCKED",
+                tool="vigia_sift_bridge.__main__",
+                input_preview="KASSANDRA_SALT unset",
+                reason=msg,
+            )
+            sys.exit(1)
+        else:
+            print(
+                f"[VIGIA][CRITICAL] {msg} Continuing, but this is NOT recommended "
+                "for production.",
+                file=sys.stderr, flush=True,
+            )
+            audit_logger.log_block(
+                event_type="KASSANDRA_SALT_MISSING",
+                tool="vigia_sift_bridge.__main__",
+                input_preview="KASSANDRA_SALT unset",
+                reason=msg,
+            )
 
 
 if __name__ == "__main__":
