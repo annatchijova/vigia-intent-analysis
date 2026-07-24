@@ -79,10 +79,9 @@ Honey tokens use **secure temp files** (never `os.environ`):
 
 ### Mount Security
 
-- Magic-byte validation before mounting (`EVF`/`LVF` for E01, script detection for raw)
+- Magic-byte validation before mounting (`EVF`/`LVF` for E01, script/executable detection for raw) -- the extension check alone (`.e01`/`.dd`/`.img`/`.raw`) was previously trivially spoofable by renaming any file; `_verify_image_magic_bytes()` now reads the header before invoking `ewfmount`/`mount`
 - `noexec,nosuid,nodev,ro` mount flags (hardened in 2026-04 audit)
-- Mount point restricted to `/mnt/analysis/` subtree
-- Empty-directory check before mounting
+- Mount point confined to a private leaf under the operational work root (`WORK_BASE_DIR/mounted`, not the evidence tree), never an arbitrary or request-controlled path
 - All mount operations via `sandboxed_execute()` with resource limits
 
 ### CLIP Model Integrity

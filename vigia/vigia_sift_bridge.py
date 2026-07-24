@@ -1430,6 +1430,61 @@ async def audit_network() -> dict | str:
         return {"error": f"Network audit failed: {str(e)}"}
 
 
+# SECURITY.md has claimed "Magic-byte validation before mounting (EVF/LVF
+# for E01, script detection for raw)" since before this fix, but no such
+# check ever existed anywhere in this codebase -- mount_sift_evidence only
+# checked the file EXTENSION, which is trivially spoofable (rename anything
+# to .e01/.dd/.img/.raw). Mounting is a root-privileged, rate-limited-as-
+# "sensitive" operation; a documented-but-nonfunctional content check is the
+# same claim/mechanism mismatch class as the removed HTTP/SSE auth theater.
+# EWF-E01 signature: b"EVF\t\r\n\xff\x00" (45 56 46 09 0D 0A FF 00).
+# EWF2 (Ex01/Lx01) signature: b"LVF\t\r\n\xff\x00" (4C 56 46 09 0D 0A FF 00).
+_EWF_E01_SIGNATURE = b"EVF\x09\x0d\x0a\xff\x00"
+_EWF2_SIGNATURE = b"LVF\x09\x0d\x0a\xff\x00"
+# Raw/dd/img images have no universal magic bytes (first bytes are whatever
+# partition table or filesystem superblock the image starts with), so the
+# check there is negative: reject unambiguous script/executable signatures
+# rather than trying to allow-list every possible filesystem.
+_SCRIPT_OR_EXECUTABLE_SIGNATURES = (
+    b"#!",        # shebang
+    b"\x7fELF",   # ELF binary
+    b"MZ",        # DOS/PE executable
+)
+
+
+def _verify_image_magic_bytes(image_path: str, ext: str) -> str | None:
+    """
+    Return None if *image_path*'s content is consistent with *ext*, or an
+    error string if it looks spoofed. Reads at most 8 bytes -- cheap enough
+    to run unconditionally before every mount.
+    """
+    try:
+        with open(image_path, "rb") as fh:
+            header = fh.read(8)
+    except OSError as exc:
+        return f"Cannot read image header: {exc}"
+
+    if ext in (".e01", ".ewf"):
+        if header not in (_EWF_E01_SIGNATURE, _EWF2_SIGNATURE):
+            return (
+                f"File has .{ext.lstrip('.')} extension but its header does not "
+                "match the EWF-E01 or EWF2 (Ex01/Lx01) signature. "
+                "Extension does not guarantee content — refusing to mount."
+            )
+        return None
+
+    # .dd / .img / .raw: no positive signature to check, only reject the
+    # unambiguous "this is not a disk image" cases.
+    for sig in _SCRIPT_OR_EXECUTABLE_SIGNATURES:
+        if header.startswith(sig):
+            return (
+                f"File has .{ext.lstrip('.')} extension but its header matches "
+                f"a script/executable signature ({sig!r}), not a disk image. "
+                "Refusing to mount."
+            )
+    return None
+
+
 @_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def mount_sift_evidence(
@@ -1458,6 +1513,16 @@ async def mount_sift_evidence(
     ext = os.path.splitext(image_path)[1].lower()
     if ext not in (".e01", ".ewf", ".dd", ".img", ".raw"):
         return {"error": f"Unsupported image format: {ext}. Use .E01 or .dd/.img/.raw"}
+
+    magic_error = _verify_image_magic_bytes(image_path, ext)
+    if magic_error:
+        audit_logger.log_block(
+            event_type="MOUNT_MAGIC_BYTE_MISMATCH",
+            tool="mount_sift_evidence",
+            input_preview=image_path,
+            reason=magic_error,
+        )
+        return {"error": magic_error, "security_block": True, "timestamp": _utcnow()}
 
     try:
         mount_point = _sanitize_mount_point(mount_point)
