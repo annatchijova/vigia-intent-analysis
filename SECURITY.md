@@ -247,7 +247,7 @@ The Cross-Artifact Incongruence Engine enforces:
 
 | Variable | Purpose | Default |
 |----------|---------|---------|
-| `VIGIA_STRICT_MODEL_CHECK` | Refuse CLIP load without hash | `false` |
+| `VIGIA_STRICT_MODEL_CHECK` | Refuse CLIP load without hash | `true` |
 | `VIGIA_CLIP_HASH_FILE` | JSON with model SHA-256 hashes | none |
 | `VIGIA_WEBHOOK_SECRET` | HMAC secret for webhook signatures | none |
 | `VIGIA_DROP_PRIVS_UID` | UID to drop to when running as root | none |
