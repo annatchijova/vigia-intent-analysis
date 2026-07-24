@@ -1,0 +1,201 @@
+{
+  "case_id": "ZONE38-REDTEAM-2026-07-23",
+  "name": "zone38 authorized red-team audit (secret scanner / AI-code detector)",
+  "description": "Authorized red-team audit of github.com/semanticRig/zone38 @ 60f42e2 (110 commits, full unshallowed history), an offline JS/TS secret scanner and AI-generated-code detector. Method: abductive engineering (abduction -> deduction -> induction) against the real CLI, read-only throughout. Question under test: can a real secret pass the CI gate without zone38 blocking it, and does zone38 deliver on its headline claim of detecting AI-generated code by mathematical structure (Shannon entropy / Index of Coincidence / Normalized Compression Distance)? Six of eleven investigated findings (INV-1..INV-11) were retained as forensically significant; the rest were CODE FACT/low-severity or open PLAUSIBLE hypotheses not executed. Reconstructed from audits/zone38/zone38_redteam_findings_2026-07-23.txt after the original case file referenced by the sealed bundle was never committed alongside it.",
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "poc-minified-bypass.js",
+      "timestamp": "2026-07-23T20:30:00Z",
+      "raw_score": 0.90,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "sha256:zone38_redteam_ART-001"
+      ],
+      "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+      "acquisition_hash": "sha256:zone38_redteam_ART-001",
+      "acquisition_timestamp": "2026-07-23T20:30:00Z",
+      "description": "INV-9 (HIGH) — 'Minified-skip' is a total detection bypass. runner.js:81-88: if record.surface.minified is true, the entire L05-L08 candidate pipeline is skipped (record.findings=[], record.review=[]); only URL analysis (L09) and regex rules (L10) run. Induction (poc-minified-bypass.js): NORMAL 29-line file with 25 regex-blind base64 secrets -> minified=false, 25 secrets reported, axis B=45, exit 1. Same content concatenated to one line (avgLineLen 1478) -> minified=true, 0 secrets reported, axis B=0, exit 0.",
+      "metadata": {
+        "original_type": "source_code_finding",
+        "peirce_layer": "SECONDNESS",
+        "level": "CONFIRMED BY INDUCTION",
+        "forensic_anomalies": [
+          "Entropy pipeline is fully disabled by a one-line-length heuristic (minified=true)",
+          "Composed with regex-blind naming (d0..d24), this is a total secret-detection bypass, not a false-positive suppression edge case",
+          "On a minified file, zone38's secret detection collapses to regex-only -- the exact 'regex-based scanner' failure mode its own README criticizes"
+        ],
+        "content_preview": "runner.js:81-88 skips L05-L08 when surface.minified; poc-minified-bypass.js: 25 secrets/exit 1 (normal) vs 0 secrets/exit 0 (minified)",
+        "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+        "acquisition_hash": "sha256:zone38_redteam_ART-001",
+        "acquisition_timestamp": "2026-07-23T20:30:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "zone38_redteam_reconstruction"
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "git log / history analysis",
+      "timestamp": "2026-07-23T20:30:00Z",
+      "raw_score": 0.84,
+      "prior_trust": 0.84,
+      "provenance_chain": [
+        "sha256:zone38_redteam_ART-002"
+      ],
+      "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+      "acquisition_hash": "sha256:zone38_redteam_ART-002",
+      "acquisition_timestamp": "2026-07-23T20:30:00Z",
+      "description": "INV-10 (Medium, CONFIRMED BY EVIDENCE) — the AI-slop detector is itself AI-agent-built; its thesis refutes itself. Objective git evidence: originally 'slopguard', 110 commits over 5 weeks, single author, feature/phase-N branches. History contains CLAUDE.md (Claude Code project instructions) and planner.instructions.md (phase-gated agent planner with explicit user-approval gating). .gitignore scrubs CLAUDE.md, PHASES.md, planner.instructions.md, solution/, solutionV2/ from the published tree. Scanning zone38 with itself yields axis A=9.2 'Minimal' (clears itself) while reporting 98 'secrets' at exit 0.",
+      "metadata": {
+        "original_type": "git_history_evidence",
+        "peirce_layer": "THIRDNESS",
+        "level": "CONFIRMED BY EVIDENCE",
+        "forensic_anomalies": [
+          "AI coding agents were used in a human-directed, phase-gated workflow -- the 'written 100% by AI in one shot' framing is falsified by the 110-commit cadence",
+          "The decisive evidence of AI authorship lives in git history and gitignored planning files, outside the .js files the tool actually scans",
+          "zone38's core thesis (detect AI origin from code texture) is refuted by its own case: the ground truth here is procedural/historical, not textural"
+        ],
+        "content_preview": "110 commits/5 weeks, CLAUDE.md + planner.instructions.md gitignored from published tree; self-scan axis A=9.2 'Minimal'",
+        "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+        "acquisition_hash": "sha256:zone38_redteam_ART-002",
+        "acquisition_timestamp": "2026-07-23T20:30:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "zone38_redteam_reconstruction"
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "poc-inv4.js / poc-inv4-e2e.js / poc-inv8-sweep.js",
+      "timestamp": "2026-07-23T20:30:00Z",
+      "raw_score": 0.61,
+      "prior_trust": 0.61,
+      "provenance_chain": [
+        "sha256:zone38_redteam_ART-003"
+      ],
+      "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+      "acquisition_hash": "sha256:zone38_redteam_ART-003",
+      "acquisition_timestamp": "2026-07-23T20:30:00Z",
+      "description": "INV-4 (Medium, CONFIRMED BY INDUCTION) — a purely representational change (hex vs base64/base32 encoding of the identical 32-byte secret) flips the CI decision inside a density window. icSignal is deterministically 0 for hex (IC ~0.064, above the 0.045 gate) and 1 for base64/base32. In the window N in [15,24] regex-blind secrets per file: base64 -> axis B>25 -> exit 1, hex -> exit 0, for the same underlying secret bytes. Existence result, not a universal bypass -- scoped to the density window.",
+      "metadata": {
+        "original_type": "source_code_finding",
+        "peirce_layer": "SECONDNESS",
+        "level": "CONFIRMED BY INDUCTION",
+        "forensic_anomalies": [
+          "Same secret bytes, different textual representation, opposite CI decision inside N in [15,24]",
+          "NCD anti-correlates with the verdict: hex has the highest NCD (0.899, 'most alien') yet the weakest verdict, and NCD is not counted by the confirmation gate at all"
+        ],
+        "content_preview": "hex icSignal=0 (IC~0.064 > 0.045 gate) vs base64 icSignal=1; N in [15,24] flips exit 1 <-> exit 0 for identical secret bytes",
+        "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+        "acquisition_hash": "sha256:zone38_redteam_ART-003",
+        "acquisition_timestamp": "2026-07-23T20:30:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "zone38_redteam_reconstruction"
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "static reading of L08.arbitrate",
+      "timestamp": "2026-07-23T20:30:00Z",
+      "raw_score": 0.52,
+      "prior_trust": 0.52,
+      "provenance_chain": [
+        "sha256:zone38_redteam_ART-004"
+      ],
+      "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+      "acquisition_hash": "sha256:zone38_redteam_ART-004",
+      "acquisition_timestamp": "2026-07-23T20:30:00Z",
+      "description": "INV-2 (Medium, documentation integrity) — the real confirmation gate does not match the README's model. README claims all three signals (Shannon, IC, NCD) must agree before a secret is confirmed. CODE FACT: the real gate is L08.arbitrate -- HIGH requires effectivePipeline >= 0.65 AND >= 2 of {icSignal, ctfSignal, egsSpike, uniformity}; MEDIUM requires >= 0.50 AND >= 2. NCD is not among the four counted signals at all. Induction: secret#2 in hex is confirmed MEDIUM with icSignal=0 -- a secret confirmed without the IC signal, refuting 'all three must agree'.",
+      "metadata": {
+        "original_type": "documentation_vs_code_mismatch",
+        "peirce_layer": "SECONDNESS",
+        "level": "CONFIRMED BY INDUCTION",
+        "forensic_anomalies": [
+          "The user's mental model of the detector, built entirely from the README, does not match the actual implementation",
+          "NCD is described as one of three required signals but is not part of the real 4-signal counted gate at all"
+        ],
+        "content_preview": "L08.arbitrate: HIGH >=0.65 & >=2-of-4 signals, MEDIUM >=0.50 & >=2-of-4; NCD absent from the counted set despite README claim",
+        "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+        "acquisition_hash": "sha256:zone38_redteam_ART-004",
+        "acquisition_timestamp": "2026-07-23T20:30:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "zone38_redteam_reconstruction"
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "induction over 5 Python-only repos",
+      "timestamp": "2026-07-23T20:30:00Z",
+      "raw_score": 0.46,
+      "prior_trust": 0.46,
+      "provenance_chain": [
+        "sha256:zone38_redteam_ART-005"
+      ],
+      "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+      "acquisition_hash": "sha256:zone38_redteam_ART-005",
+      "acquisition_timestamp": "2026-07-23T20:30:00Z",
+      "description": "INV-11 (Medium, broken honest-degradation) — a 'Clean' verdict is emitted over 0 analyzed files. L13._aggregateProject returns {A:0,B:0,C:0} when perFile.length===0. zone38 only analyzes JS/TS; a repo with none yields 0 files -> axes all 0 -> verdict 'Clean'. There is no third not-analyzed/ABSTAIN state. Induction: five Python-only repos all produced analyzed=0, A=0 'Clean', exit 0 -- a CI running zone38 on a non-JS project gets an empty green that certifies nothing.",
+      "metadata": {
+        "original_type": "source_code_finding",
+        "peirce_layer": "SECONDNESS",
+        "level": "CONFIRMED BY INDUCTION",
+        "forensic_anomalies": [
+          "Absence of analysis is reported identically to a genuinely clean result -- absence of a check surfaces as absence of a problem",
+          "No ABSTAIN/not-analyzed state exists in the verdict model, even though the tool's own conclusion elsewhere argues ABSTAIN is the epistemically honest posture for what it cannot actually measure"
+        ],
+        "content_preview": "perFile.length===0 -> {A:0,B:0,C:0} -> 'Clean'; reproduced on 5 Python-only repos, exit 0 every time",
+        "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+        "acquisition_hash": "sha256:zone38_redteam_ART-005",
+        "acquisition_timestamp": "2026-07-23T20:30:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "zone38_redteam_reconstruction"
+      }
+    },
+    {
+      "artifact_id": "ART-006",
+      "evidence_type": "filesystem_artifact",
+      "source_tool": "static reading of L13 axis B formula",
+      "timestamp": "2026-07-23T20:30:00Z",
+      "raw_score": 0.42,
+      "prior_trust": 0.42,
+      "provenance_chain": [
+        "sha256:zone38_redteam_ART-006"
+      ],
+      "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+      "acquisition_hash": "sha256:zone38_redteam_ART-006",
+      "acquisition_timestamp": "2026-07-23T20:30:00Z",
+      "description": "INV-8 (Medium) — detection is not blocking; axis B saturates low. L13 axis B = 0.45*findings + 0.25*patterns + 0.20*urls + 0.10*compression, each sub-score capped at 100; DEFAULT_THRESHOLDS.B=25. Induction: a single detected hardcoded secret yields axis B ~10.6 -- reported (secrets=1) but exit 0. The gate is only crossed at ~15 base64 / ~25 hex secrets in one file; axis B saturates at ~45 even with 100 secrets (findings capped). Detection != blocking: the default gate tolerates a detected secret.",
+      "metadata": {
+        "original_type": "source_code_finding",
+        "peirce_layer": "SECONDNESS",
+        "level": "CONFIRMED BY INDUCTION",
+        "forensic_anomalies": [
+          "A confirmed, reported secret finding does not by itself fail the CI gate at default thresholds",
+          "Axis B saturates well below 100 regardless of how many secrets are present, capping the maximum penalty a real leak can incur"
+        ],
+        "content_preview": "axis B = 0.45*findings+0.25*patterns+0.20*urls+0.10*compression; 1 secret -> B~10.6, exit 0; threshold B=25 crossed only at ~15-25 secrets/file",
+        "acquisition_tool": "zone38_redteam_manual_audit_reconstruction",
+        "acquisition_hash": "sha256:zone38_redteam_ART-006",
+        "acquisition_timestamp": "2026-07-23T20:30:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "zone38_redteam_reconstruction"
+      }
+    }
+  ],
+  "temporal_violations": [],
+  "expected_verdict": "ABSTAIN",
+  "expected_confidence": null,
+  "expected_mitre_ttps": [],
+  "metadata": {
+    "target": "github.com/semanticRig/zone38 @ 60f42e2",
+    "authorization": "Authorized red-team audit against a public third-party tool, run from this repository as a VIGIA stress test.",
+    "reconstructed_from": "audits/zone38/zone38_redteam_findings_2026-07-23.txt",
+    "reconstruction_note": "This case file was referenced by ZONE38-REDTEAM-2026-07-23_bundle.json but never committed alongside it (2026-07-23, commit 0422884). Reconstructed 2026-07-24 from the full red-team findings .txt before that source file was removed. Field values (raw_score/prior_trust) are drawn from the 6 kept findings' documented severities; per-artifact acquisition_hash values are placeholders (no original per-artifact hashing was performed during the manual audit) and this file will NOT reproduce the original Evidence SHA-256 referenced in vigia_analysis_ZONE38_2026-07-23.md.",
+    "expected_verdict_rationale": "Both prior verdicts on this case disagreed: the sealed VIGIA deterministic bundle recorded agent_verdict=NOISE at MINIMAL quality tier (confidence capped 3/5, submitted 1/1); a separate Claude/Cronos reasoning trace recorded INTENT at 75% confidence. Per CLAUDE.md's own verdict scale and Refutation Protocol, a MINIMAL-quality deterministic NOISE and an unrefuted single-source LLM narrative INTENT are not sufficient corroboration for a confirmed verdict either way. The findings' own conclusion states this explicitly: 'the honest posture toward such input is ABSTAIN, not a confident verdict.' expected_verdict is set to ABSTAIN accordingly, and cronos_audit_zone38_2026-07-23.md was annotated (not deleted) to record this as a stress-test case: an LLM narrative reasoning trace reached INTENT at 75% confidence without corroboration and without the Mandatory Refutation Protocol being applied -- illustrating how much an unfounded verdict is 'punished' by the Daubert-grade standard this project holds itself to.",
+    "carnegie_pattern": null
+  }
+}

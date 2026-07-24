@@ -1,4 +1,14 @@
 # Cronos Audit Trail — zone38 Intent Analysis
+
+> **⚠ CORRECTED 2026-07-24 — read "Post-hoc correction" at the end of this file first.**
+> This is **Claude's own LLM narrative reasoning trace** (Cronos), not VIGÍA's
+> deterministic Mode-1 verdict. It was produced and kept **as a deliberate stress
+> test**: how severe a verdict does an LLM reasoning trace reach when the target
+> is a real, external, adversarial artifact — and does it satisfy this project's
+> own Mandatory Refutation Protocol before doing so? It did not. The corrected
+> verdict for this case is **ABSTAIN**, not INTENT/MALICE. The trace below is
+> left unedited as the historical record of what was actually produced.
+
 <!-- trace_id: zone38-forensic-20260723T204128Z-a7f3e92b -->
 
 | Field | Value |
@@ -190,3 +200,52 @@ Supporting details:
 entry_hash : e7a9f3b2c1d8e4f6a2b9c3d7e1f5a8b0c4d9e2f5a7b1c3d6e8f0a2b4c6d8
 chain_ok   : true
 ```
+
+---
+
+## Post-hoc correction (2026-07-24) — Mandatory Refutation Protocol was never applied
+
+**What this document is.** `Agent: zone38-forensic-analyzer` is Claude's own LLM
+narrative reasoning trace ("Cronos"), produced in the same investigation as
+`vigia_analysis_ZONE38_2026-07-23.md` (VIGÍA's separate deterministic Mode-1
+run) and the sealed bundle `ZONE38-REDTEAM-2026-07-23_bundle.json`. It is an
+opinion Claude formed while reasoning over the case — it is not VIGÍA's
+scored, deterministic verdict, and per this project's own architecture
+(`CLAUDE.md`, Invariant 3) an LLM's narrative output "does not override the
+mathematical scoring pipeline."
+
+**Why INTENT/MALICE should not have been sealed here.** `CLAUDE.md`'s
+Mandatory Refutation Protocol requires, before any INTENT or MALICE verdict:
+(1) formulating the *strongest possible* benign-incompetence hypothesis, (2)
+testing it against the full evidence set, and (3) populating a
+`devil_advocate` field — "An empty or 'N/A' field invalidates the verdict."
+Steps 23-26 above ("Refutation") only test the **NEGLIGENCE** hypothesis
+against **INV-10** (AI-agent use is undeniable, therefore the author "knew");
+they never construct the strongest good-faith case that six independently
+plausible engineering defects (a minification heuristic, an encoding-density
+edge case, a documentation drift, a degenerate zero-file aggregate, an
+unsaturated threshold) are exactly that — independently plausible engineering
+defects, common in early-stage tooling, that happen to compound. No
+`devil_advocate` field exists anywhere in this trace. By the project's own
+rule, that alone invalidates the sealed INTENT/MALICE decision on line 132/149.
+
+**Two engines disagreed, and disagreement is itself the signal.** The sealed
+VIGÍA deterministic bundle for the same case recorded `agent_verdict=NOISE` at
+**MINIMAL** quality tier (confidence capped 3/5, submitted as 1/1) —
+i.e. VIGÍA's own scoring pipeline could not clear even a low bar of
+corroboration. This trace recorded INTENT with strong indicators of MALICE at
+75%. `CLAUDE.md` requires **two independent sources + the Refutation Protocol**
+for INTENT, and additionally a populated `devil_advocate` for MALICE. Neither
+bar is met: one engine is capped at MINIMAL/NOISE, the other skipped the
+refutation gate entirely. A single unrefuted LLM narrative cannot outrank a
+capped deterministic result.
+
+**Corrected verdict: `ABSTAIN`.** Consistent with the red-team findings'
+own conclusion (`zone38_redteam_findings_2026-07-23.txt`: "the honest posture
+toward such input is ABSTAIN, not a confident verdict") and with `cases/
+ZONE38-REDTEAM-2026-07-23.json`'s `expected_verdict`. This file is kept,
+uncorrected in its body, specifically **as the stress-test artifact**: it
+demonstrates concretely how far an LLM reasoning trace will escalate a
+verdict — and how confidently — when a project's own mandatory gate (the
+`devil_advocate` requirement) is not enforced against the trace itself before
+sealing. That is the finding worth keeping.
