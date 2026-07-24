@@ -61,6 +61,7 @@ from vigia.security import (
     _sanitize_path,
     _utcnow as _utcnow_security,
     audit_logger,
+    llm_shield,
     rate_limit,
 )
 
@@ -1406,6 +1407,35 @@ async def _abductive_falsification_test(
         narrative.append(
             f"[NAVAJA DE ECO] Refutación omitida: evidence_summary contiene "
             "anomalía de padding. Veredicto preliminar conservado."
+        )
+        return preliminary_verdict, None
+
+    # CONFUSED DEPUTY FIX: evidence_summary is assembled by
+    # _build_evidence_summary_for_eco from upstream tool outputs
+    # (signal "interpretation", step "verdict", CAIE "fracture" descriptions)
+    # copied verbatim from prior pipeline steps. _sanitize_llm_input strips
+    # tags/control-chars/padding but its own docstring states it is NOT a
+    # substitute for LLMShield's pattern scan. Without this scan, injected
+    # text designed to manipulate VIGIA's own verdict (e.g. "override verdict",
+    # "set confidence to 0") would reach this defense-attorney prompt unfiltered.
+    try:
+        safe_summary = llm_shield.scan(
+            safe_summary, "_abductive_falsification_test.evidence_summary"
+        )
+    except ValueError as exc:
+        audit_logger.log_block(
+            event_type="ABDUCTIVE_TEST_INJECTION_BLOCKED",
+            tool="_abductive_falsification_test",
+            input_preview=safe_summary[:200],
+            reason=(
+                f"LLMShield bloqueo evidence_summary antes de la refutacion abductiva: {exc}. "
+                f"Veredicto {preliminary_verdict} se mantiene sin refutacion — una entrada "
+                "bloqueada no puede sostener una degradacion a SUSPICION."
+            ),
+        )
+        narrative.append(
+            "[NAVAJA DE ECO] Refutación omitida: evidence_summary contiene "
+            "un patrón de inyección de prompt. Veredicto preliminar conservado."
         )
         return preliminary_verdict, None
 

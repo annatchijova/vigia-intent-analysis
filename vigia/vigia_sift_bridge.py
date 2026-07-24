@@ -3248,7 +3248,25 @@ async def validate_and_correct_analysis(
     4. CARNEGIE BIAS: analyst saw manipulation where there was operational error
     """
     evidence       = _sanitize_text(evidence, max_length=5_000)
-    analysis_str   = json.dumps(prior_analysis)[:5_000]
+    analysis_str   = json.dumps(prior_analysis, default=str)[:5_000]
+
+    # CONFUSED DEPUTY FIX: `prior_analysis` is the raw output of upstream
+    # MCP tools (infer_intent, audit_grice_maxims, detect_eco_overinterpretation,
+    # cross_artifact_analysis, ...) which may echo attacker-controlled evidence
+    # content verbatim (e.g. in "interpretation"/"observation"/"vigia_verdict"
+    # fields). Those tools do not scan their inputs for prompt injection —
+    # only the LLM-facing boundary does. Without this scan, a hostile artifact
+    # could ride an upstream tool's output straight into this LLM prompt
+    # unfiltered, exactly like it would if it reached reason_with_llm directly.
+    try:
+        evidence     = llm_shield.scan(evidence,     "validate_and_correct_analysis.evidence")
+        analysis_str = llm_shield.scan(analysis_str, "validate_and_correct_analysis.prior_analysis")
+    except ValueError as exc:
+        return {
+            "error": str(exc),
+            "security_block": True,
+            "self_correction_timestamp": _utcnow(),
+        }
 
     prompt = f"""
 Review this forensic analysis for these specific errors:
