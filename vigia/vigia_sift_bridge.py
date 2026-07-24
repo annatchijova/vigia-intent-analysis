@@ -3537,6 +3537,19 @@ _PLANNER_TOOL_WHITELIST: frozenset = frozenset({
 # ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _parse_requested_transport(argv: list[str]) -> str:
+    """
+    Parse ``--transport=X`` / ``--transport X`` from CLI args. Defaults to
+    "stdio", matching mcp.run()'s own default, when not specified.
+    """
+    for i, arg in enumerate(argv):
+        if arg.startswith("--transport="):
+            return arg.split("=", 1)[1].strip().lower()
+        if arg == "--transport" and i + 1 < len(argv):
+            return argv[i + 1].strip().lower()
+    return "stdio"
+
+
 def _verify_transport_security() -> None:
     """
     V-002 mitigation (2025-04 audit): verify that the MCP server is running
@@ -3547,8 +3560,25 @@ def _verify_transport_security() -> None:
     * Only the parent can read/write these file descriptors
     * This is enforced by the OS — no additional auth needed for stdio
 
+    CONFUSED-DEPUTY-ADJACENT FIX: this function's docstring and SECURITY.md
+    used to describe VIGIA_MCP_AUTH_TOKEN as an active control that gates
+    HTTP/SSE transport ("Required for HTTP/SSE transport"). It never was:
+    `mcp.run()` at the bottom of __main__ is called with NO transport
+    argument, so it ALWAYS serves over stdio regardless of --transport, and
+    nowhere in this codebase is VIGIA_MCP_AUTH_TOKEN's value ever compared
+    against an incoming request — it was checked only for presence at
+    startup. A documented-but-nonfunctional auth control is worse than no
+    control: it invites an operator to expose this server (21+ forensic
+    tools, several root-level) believing a token gates access when nothing
+    does. Rather than implement untested bearer-auth middleware for a
+    transport this entrypoint has never actually served, an explicit
+    --transport request for anything other than stdio now hard-aborts
+    unconditionally (previously: warn, or opt-in abort via
+    VIGIA_ENFORCE_STDIO) — see step 3 below.
+
     Risks mitigated:
-    * Accidental HTTP exposure: BLOCK if --transport=sse without VIGIA_MCP_AUTH_TOKEN
+    * Non-stdio transport requested via --transport: ALWAYS abort (no real
+      HTTP/SSE authentication exists in this codebase to make it safe)
     * Stdin redirection: warn if stdin is not a pipe
     * Parent process verification: log and optionally enforce allowed parents
     * Session token: generate and print to stderr for operator verification
@@ -3578,40 +3608,31 @@ def _verify_transport_security() -> None:
     except OSError:
         pass  # Can't stat stdin — might be on Windows
 
-    # 3. Check command-line args for HTTP transport
-    is_http_transport = any(
-        "sse" in arg.lower() or "http" in arg.lower()
-        for arg in sys.argv[1:]
-    )
-    if is_http_transport:
-        auth_token = os.getenv("VIGIA_MCP_AUTH_TOKEN", "").strip()
-        if not auth_token:
-            msg = (
-                "HTTP/SSE transport detected but VIGIA_MCP_AUTH_TOKEN is not set. "
-                "VIGIA exposes 21+ forensic tools including root-level operations. "
-                "HTTP transport without authentication exposes these to any local "
-                "process. Set VIGIA_MCP_AUTH_TOKEN or use stdio transport (default)."
-            )
-            enforce_stdio = os.getenv("VIGIA_ENFORCE_STDIO", "false").lower() == "true"
-            if enforce_stdio:
-                print(f"[VIGIA][CRITICAL] {msg} VIGIA_ENFORCE_STDIO=true — aborting.",
-                      file=sys.stderr, flush=True)
-                audit_logger.log_block(
-                    event_type="INSECURE_TRANSPORT_BLOCKED",
-                    tool="vigia_sift_bridge.__main__",
-                    input_preview=" ".join(sys.argv),
-                    reason=msg,
-                )
-                sys.exit(1)
-            else:
-                print(f"[VIGIA][CRITICAL] {msg} Continuing, but this is NOT recommended.",
-                      file=sys.stderr, flush=True)
-                audit_logger.log_block(
-                    event_type="INSECURE_TRANSPORT",
-                    tool="vigia_sift_bridge.__main__",
-                    input_preview=" ".join(sys.argv),
-                    reason=msg,
-                )
+    # 3. Check command-line args for a non-stdio transport request.
+    requested_transport = _parse_requested_transport(sys.argv[1:])
+    if requested_transport != "stdio":
+        msg = (
+            f"--transport={requested_transport} was requested, but this "
+            "entrypoint's mcp.run() call takes no transport argument and "
+            "therefore ALWAYS serves over stdio regardless of this flag — "
+            "continuing would silently ignore the requested transport. "
+            "Separately, and more importantly: this codebase implements no "
+            "request-level authentication for HTTP/SSE transport at all. "
+            "VIGIA_MCP_AUTH_TOKEN is not validated against incoming requests "
+            "anywhere — it was only ever checked for presence at startup. "
+            "VIGIA exposes 21+ forensic tools including root-level "
+            "operations; there is no safe way to serve them over HTTP/SSE "
+            "with this build. Use stdio transport (the default — omit "
+            "--transport)."
+        )
+        print(f"[VIGIA][CRITICAL] {msg} Aborting.", file=sys.stderr, flush=True)
+        audit_logger.log_block(
+            event_type="UNSUPPORTED_TRANSPORT_REQUESTED",
+            tool="vigia_sift_bridge.__main__",
+            input_preview=" ".join(sys.argv),
+            reason=msg,
+        )
+        sys.exit(1)
 
     # 4. Verify parent process
     _ALLOWED_PARENT_NAMES = frozenset({
