@@ -6429,6 +6429,105 @@ vigia/patterns/). The full unblocking roadmap is:
 3. Wire governance modules in order: ockham -> dissent -> config_sentinel
 4. Wire narrative_auditor as C3 validation step before bundle sealing
 
+### Update 2026-07-25 — confirmado con ejecución: el hueco de `adversarial_penalty`
+no es solo "no cableado", cambia el estado emitido
+
+Continuación de la auditoría "Ronda 2" (ver B-217/B-221): investigando por qué
+`vigia_scorer.py:1931` (`_apply_quadripartite`) pasa `dissent_info={}` (F1,
+B-217), noté que la misma llamada también hardcodea `pivot_signals=[]`,
+`investigation_roadmap=[]` y `adversarial_penalty=False` — los tres son
+literales en `_apply_quadripartite` (línea ~503), no vienen de ningún cálculo
+en `vigia_scorer.py`. `pivot_signals`/`investigation_roadmap` son datos de
+display puro (alimentan el reporte del analista vía
+`QuadripartiteClassifier._build_verdict` → `render_for_report`) — su ausencia
+degrada el reporte a "see roadmap" pero no cambia ningún veredicto.
+
+`adversarial_penalty`, en cambio, **sí gatea una rama activa** (Check 6,
+`quadripartite.py` línea ~375): con `adversarial_penalty=True`, un veredicto
+BENIGN recibe +5% de confianza efectiva (el bono existe precisamente porque
+el sistema evaluó y descartó la hipótesis-demasiado-simple, según el
+principio de `ockham_adversarial.py`). Confirmado por ejecución directa
+contra `QuadripartiteClassifier.classify()`:
+
+```
+BENIGN, confidence=78%, stability=100%
+  adversarial_penalty=False (estado real hoy) -> BENIGN_MEDIUM, confidence=78%
+  adversarial_penalty=True  (si ockham estuviera cableado) -> BENIGN_HIGH,  confidence=83%
+```
+
+El +5% cruza el umbral HIGH/MEDIUM (80%) en este ejemplo — no es un ajuste
+cosmético, cambia el `VerdictState` emitido. Como `ockham_adversarial.py`
+tiene cero *callers* en todo el repo (confirmado por grep exhaustivo,
+incluyendo tests — ni siquiera hay un test unitario de este módulo), la rama
+`adversarial_penalty=True` de `_build_verdict`/Check 6 es alcanzable en el
+código pero **inalcanzable en la práctica**: nada en el pipeline vivo puede
+producir ese `True` hoy. Mismo patrón que F1 (B-217): una rama de decisión
+correctamente implementada y con su propio test de branch, pero con el único
+insumo que la activaría hardcodeado a un valor fijo en el único *caller* de
+producción.
+
+No se abre como bug nuevo — es la misma causa raíz ya documentada en este
+B-124 (cadena de productores huérfanos en `vigia/abduction/`), solo que ahora
+con la consecuencia concreta verificada por ejecución en vez de deducida.
+Queda como evidencia adicional para priorizar el paso 3 del roadmap de
+desbloqueo ("Wire governance modules in order: ockham -> dissent ->
+config_sentinel") si se decide continuar esa vía.
+
+### Update 2026-07-25 (bis) — `config_sentinel.py`: si se cableara hoy tal
+cual está, mentiría sobre los dos módulos críticos que ya sabemos rotos
+
+Continuando la excavación del cluster B-124, leí `ConfigAuditMonitor`
+completo. Su propósito declarado es exactamente detectar esto: "Módulos
+críticos desactivados al inicio" y sellar un `analyst_warning` en el bundle
+si `CAIE`, `TrustFusion`, `OckhamAdversarial` o `SignalRouter` (su propio
+`CRITICAL_MODULES`) están inactivos. Pero su `_MODULE_ENV_MAP` mapea cada
+módulo a una variable de entorno que el monitor mismo lee — y de las 9
+variables mapeadas, **7 no se leen en ningún otro lugar del repositorio**
+(confirmado por grep exhaustivo, excluyendo tests y el propio
+`config_sentinel.py`): `VIGIA_OCKHAM_ADVERSARIAL`,
+`VIGIA_SIGNALROUTER_ENABLED`, `VIGIA_PDF_ENABLED`, `VIGIA_NETWORK_ENABLED`,
+`VIGIA_REGISTRY_ENABLED`, `VIGIA_EMAIL_ENABLED`, `VIGIA_TEMPORAL_ENABLED`.
+Solo `VIGIA_CAIE_ENABLED` y `VIGIA_TRUST_FUSION_ENABLED` gatean algo real.
+
+`_getenv_bool` por diseño devuelve `True` (activo) cuando la variable no
+está seteada — `NOT_SET` se interpreta como "activo por default", lo cual
+tiene sentido SI la variable realmente controlara el módulo. Pero como
+`VIGIA_OCKHAM_ADVERSARIAL` y `VIGIA_SIGNALROUTER_ENABLED` no controlan nada
+(ya sabemos por este mismo B-124 que `ockham_adversarial.py` tiene cero
+*callers* y que `advanced_signal_router.py` está "conceptualmente
+superseded"), el monitor reportaría "activo" para exactamente los dos
+módulos críticos que están completamente desconectados del pipeline vivo.
+
+Ejecutado directamente contra `ConfigAuditMonitor` con el entorno limpio
+(sin ninguna de las 9 variables seteada — el caso normal, porque nadie las
+documenta):
+
+```
+integrity_level: FULL_INTEGRITY
+analyst_warning: None
+
+OckhamAdversarial    active=True  env_var=VIGIA_OCKHAM_ADVERSARIAL  env_value=NOT_SET
+SignalRouter         active=True  env_var=VIGIA_SIGNALROUTER_ENABLED  env_value=NOT_SET
+```
+
+Un "guardián de configuración" que reporta `FULL_INTEGRITY` y "activo" para
+los dos módulos que su propio archivo hermano (este B-124) documenta como
+completamente huérfanos no es solo "no cableado" — si se cableara sin
+corregir primero el `_MODULE_ENV_MAP`, daría falsa tranquilidad exactamente
+donde el sistema está más roto. Mismo patrón epistemológico que "ataques
+contra el auditor" (ver B-219): un mecanismo que, lejos de fallar
+ruidosamente, produciría un reporte sellado que dice "todo bien" sobre un
+módulo ausente.
+
+No se abre como bug nuevo — sigue siendo parte de la causa raíz de B-124
+(cadena de dependencias huérfanas), pero el fix correcto para
+`config_sentinel.py` ya no es solo "cablearlo": `_MODULE_ENV_MAP` tiene que
+reflejar cómo cada módulo se activa realmente (para `OckhamAdversarial` y
+`SignalRouter`, hoy eso sería "nunca, porque no tienen *caller*", no una
+variable de entorno que nadie lee) antes de que el monitor pueda ser
+confiable. Verificado con test permanente:
+`tests/test_config_sentinel_orphaned_module_env_map.py`.
+
 ---
 
 ## B-125 — `vigia/forensics/document_integrity.py` dead duplicate deleted (unpatched ancestor of tools/ version)
@@ -10603,3 +10702,380 @@ de Level 3 no conectada a este entry point.
 schema `type`/`description` de las fracturas que usan los casos reales. Trivial,
 pero conviene un dry-run de los casos que sí traen `severity` para no romper su
 render.
+
+## B-217 — `_compute_majority` pesaba los votos con la escala de alarma: BENIGN nunca podía ganar una mayoría, y la cadena dissent→ESCALATE estaba muerta de punta a punta [RESUELTO — Claude 2026-07-25]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 (garantía documentada del sistema, inexistente en el pipeline vivo). Origen: auditoría "Ronda 2" (metodología A-D-I, ver nota de proceso al final de este bloque), hallazgo F1. |
+| **Archivo** | `vigia/core/dissent_report.py` (`_compute_majority`, línea ~132). |
+| **Función** | `_compute_majority(opinions)`. |
+| **Líneas originales** | `weight = op.confidence * _SEVERITY_WEIGHT[op.verdict]` dentro del loop de acumulación de `vote_counts`. |
+| **Commit fix** | `e7efacb` (rama `claude/mcp-security-followup-30502`). |
+| **Detectado en** | Auditoría "Ronda 2" (invariantes epistemológicos), re-verificada contra el archivo vivo antes de aplicar el fix. |
+
+### Descripción
+
+`_SEVERITY_WEIGHT` es una escala de ALARMA (`MALICIOUS=1.0, SUSPICIOUS=0.5,
+BENIGN=0.0, ABSTAIN=0.0`), correctamente usada en otra parte de este mismo
+módulo (línea ~244) para puntuar cuán alarmante es una opinión que
+**disiente** de la mayoría. `_compute_majority` reutilizaba esa misma tabla
+para pesar el voto de cada módulo hacia la mayoría — no solo para puntuar
+alarma. Con `_SEVERITY_WEIGHT[BENIGN] = 0`, el voto de cualquier módulo que
+opinara BENIGN pesaba matemáticamente cero, sin importar cuántos módulos
+opinaran así ni con qué confianza.
+
+Cadena causal completa, verificada eslabón por eslabón contra el código vivo:
+
+1. `_SEVERITY_WEIGHT[BENIGN] = 0` → los votos BENIGN pesan cero →
+   `vote_counts[BENIGN]` se queda en 0 sin importar cuántos módulos votaron
+   así. Si **todos** los módulos opinan BENIGN, `total = sum(vote_counts.values())`
+   colapsa a 0, y `_compute_majority` cae en el fallback de "no hay votos" y
+   devuelve `(ABSTAIN, 0)`.
+2. Ejecutado (inducción): 10 módulos opinando BENIGN unánimemente al 90% de
+   confianza produjeron `majority_verdict=ABSTAIN`, `consensus=0%`, y los 10
+   fueron reportados individualmente como "disidentes" de una mayoría que
+   nunca se calculó de verdad.
+3. `_is_suspicious_consensus` exige `majority == BENIGN` para activarse — con
+   el bug, esa rama era código muerto por construcción: BENIGN jamás podía
+   llegar a ser la mayoría calculada.
+4. Dos hechos adicionales, confirmados por separado, no arreglados por este
+   fix (verdaderos antes y después): `generate_dissent_report()` tiene cero
+   *callers* en todo el repositorio (grep exhaustivo, no solo tests), y su
+   consumidor nominal — el chequeo "Check 2: Specialist dissent → ESCALATE"
+   de `QuadripartiteClassifier` en `vigia/verdict/quadripartite.py` — tiene un
+   único *caller* de producción (`vigia_scorer.py`, línea ~499) que pasa
+   `dissent_info={}` **hardcodeado**, así que `escalation_required` nunca
+   puede llegar a ese chequeo aunque este fix esté aplicado.
+
+### Impacto
+
+La garantía estrella documentada en el docstring del módulo — *"9 módulos
+dicen BENIGN + 1 módulo behavioral dice MALICE = escalación requerida"* — no
+existía en el pipeline vivo. Existía en tests (los que se agregaron recién,
+ver abajo) y en la documentación, pero no en ningún camino de ejecución real,
+porque además el módulo no tiene *callers*. Ante un perito o un juez, un
+sistema que promete una propiedad que su código de producción no ejecuta es
+peor que uno que no la promete: la brecha entre lo documentado y lo real es,
+en sí misma, un defecto de admisibilidad Daubert.
+
+### Fix aplicado
+
+Cambiar el peso de cada voto de `op.confidence * _SEVERITY_WEIGHT[op.verdict]`
+a `op.confidence` solo. La pregunta que responde `_compute_majority` es "¿qué
+votó cada módulo, ponderado por su propia confianza en ese voto?" — una
+pregunta ortogonal a cuán alarmante es ese veredicto. El otro uso de
+`_SEVERITY_WEIGHT` (puntuar la alarma de una opinión que sí disiente, línea
+~244) queda intacto porque ahí la semántica de "escala de alarma" es
+correcta.
+
+Verificado empíricamente antes de escribir el fix, con tres escenarios
+(unánime BENIGN, el escenario insignia de 9 BENIGN + 1 especialista
+MALICIOUS, y una mayoría MALICIOUS genuina como control de que los caminos
+no afectados no cambiaran), y fijado como test permanente en
+`tests/test_dissent_report_majority.py` (el módulo no tenía ningún test
+antes de este fix). Suite completa corrida antes y después: 1969 passed, 191
+skipped, 29 xfailed — cero regresiones.
+
+**Decisión pendiente (NO tomada en este fix):** este fix restaura la
+corrección interna del módulo, pero no lo cablea al pipeline vivo. Falta
+decidir entre (a) cablear `generate_dissent_report()` al pipeline real
+(reemplazando el `dissent_info={}` hardcodeado en `vigia_scorer.py:499` por
+un llamado real, alimentado con `ModuleOpinion`s de los módulos
+especialistas), o (b) declarar el módulo experimental/dormido y ajustar
+cualquier promesa del README en consecuencia. Ninguna de las dos opciones se
+implementó todavía.
+
+## B-218 — El bundle sella `epsilon_used = epsilon_accept` incluso cuando el veredicto fue REJECT por `epsilon_reject`: el ε que queda registrado no es el que decidió [DOCUMENTADO — Claude 2026-07-25]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2, con precondición dormida hoy (ver más abajo). Origen: auditoría "Ronda 2", hallazgo F2. |
+| **Archivos** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`, línea ~578: `epsilon_used=self._eps_accept`); `vigia/pipeline/pipeline.py` (líneas 730-731: `epsilon_accept=decision_trace.epsilon_used` y `epsilon_reject=decision_trace.epsilon_used`). |
+| **Función** | `RiskBoundedDecisionLayer.decide()`; `VigiaPipeline` (construcción del `SystemState` sellado). |
+| **Líneas originales** | `epsilon_used=self._eps_accept` (siempre, sin importar el veredicto). |
+| **Commit fix** | Ninguno — documentado, no aplicado. |
+| **Detectado en** | Auditoría "Ronda 2", inducción ejecutada y re-verificada contra el archivo vivo en esta sesión. |
+
+### Descripción
+
+`decide()` construye la `DecisionTrace` con `epsilon_used=self._eps_accept`
+sin condicionar por el veredicto. Cuando el veredicto es REJECT, el umbral
+que efectivamente decidió fue `epsilon_reject` (la regla es
+`REJECT si r >= 1 - epsilon_reject`), no `epsilon_accept` — pero el campo
+sellado en el *trace* (y de ahí en el bundle, vía `pipeline.py:730-731`, que
+copia ese mismo valor a **ambos** `epsilon_accept` y `epsilon_reject` del
+`SystemState`) siempre reporta `epsilon_accept`.
+
+Verificado empíricamente en esta sesión (no solo deducido):
+
+```
+RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
+decide(posterior=0.70) → decision=REJECT, risk=0.7
+  epsilon_used (sellado) = 0.05        # epsilon_accept
+  eps_reject real usado en el umbral   = 0.40
+```
+
+El veredicto (`REJECT`) es correcto — el bug es puramente de auditoría: el
+campo que un perito leería para saber "¿qué umbral se usó para rechazar este
+caso?" no dice la verdad.
+
+**Precondición honesta (por qué esto es P2 y no P1):**
+`SelfAdaptiveRiskPolicy.update_from_window` fuerza
+`epsilon_accept = epsilon_reject` en cada actualización (`risk_bounded_layer.py`,
+líneas ~290-291: `self.epsilon_accept = epsilon_stable; self.epsilon_reject = epsilon_stable`).
+En la configuración adaptativa por defecto (la que usa el pipeline en la
+práctica), ambos valores son siempre iguales, así que el bug es inofensivo:
+da igual cuál de los dos se selle porque son el mismo número. El mecanismo
+está roto, pero el disparador está dormido hoy. Muerde solo si un
+`PolicySpec` define `epsilon_accept != epsilon_reject` explícitamente — camino
+que `RiskBoundedDecisionLayer.from_policy_spec()` soporta sin restricción.
+
+### Impacto
+
+Si algún `PolicySpec` futuro (o alguien construyendo `RiskBoundedDecisionLayer`
+directamente, fuera de la política adaptativa) define umbrales asimétricos, el
+bundle sellado mentiría sobre qué ε se usó en cualquier caso rechazado —
+exactamente el tipo de discrepancia entre "lo que el sistema hizo" y "lo que
+el sistema dice que hizo" que compromete la cadena de custodia auditable
+(invariante de VIGÍA: determinismo del audit trail, no solo del veredicto).
+
+### Fix propuesto (NO aplicado)
+
+En `decide()`, sellar `epsilon_used = self._eps_reject if verdict == "REJECT" else self._eps_accept`
+(o, más explícito para el perito, sellar ambos valores por separado en el
+*trace* — `epsilon_accept_used` y `epsilon_reject_used` — en vez de un único
+campo `epsilon_used` que asume que uno de los dos siempre es irrelevante).
+Requiere además revisar `pipeline.py:730-731`, que hoy asume que un solo
+`epsilon_used` basta para poblar ambos campos del `SystemState` sellado.
+
+## B-219 — El *reason* del override CRITICAL por `ECO_SEMIOTIC_COLLISION` nunca nombraba la colisión, solo el MI (que podía estar en 0.000) [RESUELTO — Claude 2026-07-25]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 (ataque contra el auditor, no contra el detector — el veredicto era correcto, la explicación no). Origen: auditoría "Ronda 2", hallazgo F3. |
+| **Archivo** | `vigia/core/decision_layer.py` (`RiskBoundedDecisionLayer._generate_reason`, línea ~98). |
+| **Función** | `_generate_reason(self, mi, level, fsv)`, llamada desde `decide()`. |
+| **Líneas originales** | `_generate_reason` recibía `mi` y `level` pero nunca `has_collision`; para `level == "CRITICAL"` siempre devolvía el texto `"MI crítico ({mi_str})..."`, sin importar si el CRITICAL vino de `mi >= self.high` o del override `has_collision`. |
+| **Commit fix** | `056977e` (rama `claude/mcp-security-followup-30502`). |
+| **Detectado en** | Auditoría "Ronda 2", confirmado como CODE FACT (el string `"ECO_SEMIOTIC_COLLISION"` no aparecía en ninguna rama de `_generate_reason`) además de por inducción ejecutada. |
+
+### Descripción
+
+`decide()` calcula `has_collision = "ECO_SEMIOTIC_COLLISION" in critical_patterns`
+y decide `level = "CRITICAL"` si `has_collision or mi >= self.high` — el
+override es independiente de la magnitud de `mi`. Pero `_generate_reason(mi,
+level, fsv)` nunca recibía `has_collision`, así que para cualquier
+`level == "CRITICAL"` siempre atribuía el veredicto a que "MI crítico
+({mi_str})", incluso cuando `mi` estaba en 0.000 y el verdadero disparador
+fue la colisión semántica.
+
+Ejecutado: `MI = 1/100 (0.010)` + `critical_patterns=["ECO_SEMIOTIC_COLLISION"]`
+→ `alert_level = "CRITICAL"` (correcto) con
+`reason = "MI crítico (0.010). ... Escalamiento inmediato requerido."` — un
+perito leyendo solo el *reason* (no el metadata crudo) concluiría que el MI
+fue el disparador. No lo fue; fue la colisión.
+
+### Impacto
+
+El veredicto (`CRITICAL`) siempre fue correcto — este no es un bug de
+detección, es un bug de narrativa: la misma clase de "ataques contra el
+auditor" identificada antes en esta rama (ver el fix de orden de
+presentación narrativa en CAIE, commit `a0ebd5c`). Un perito o juez que
+audite el caso por su explicación textual, sin cruzar el metadata crudo,
+llegaría a una conclusión técnica incorrecta sobre qué produjo el
+CRITICAL — exactamente el escenario que el marco de "ataques contra el
+auditor" de esta sesión fue diseñado para cazar.
+
+### Fix aplicado
+
+Recomputar el mismo chequeo `has_collision` dentro de `_generate_reason`, a
+partir de datos ya disponibles en su parámetro `fsv`
+(`meta.get("critical_patterns", [])`) — sin necesidad de agregar un
+parámetro nuevo, porque `_generate_reason` ya recibe el mismo `fsv` del que
+`decide()` deriva `has_collision`. Para `level == "CRITICAL" and has_collision`,
+el mensaje ahora nombra explícitamente `ECO_SEMIOTIC_COLLISION` como override
+independiente del MI; para `level == "CRITICAL"` sin colisión, el mensaje
+original ("MI crítico...") queda sin cambios.
+
+Test agregado: `test_critical_override_reason_names_the_collision_not_just_mi`
+en `tests/test_evidence_aggregator.py`, hermano del test preexistente
+`test_critical_override_eco_semiotic_collision` (que solo verificaba
+`alert_level`, nunca el texto del *reason*). Suite del área (38 tests:
+`test_evidence_aggregator.py` + `test_red_team.py` + `test_h27_internal_drift.py`)
+verde antes y después.
+
+## B-220 — La caché de `bayesian_update` está indexada solo por `artifact_id`: ignora `custom_window`, aunque el parámetro es parte de la firma pública [DOCUMENTADO — Claude 2026-07-25]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3, latente (no hay ningún *caller* que use el parámetro afectado hoy). Origen: auditoría "Ronda 2", hallazgo F4. |
+| **Archivo** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`, línea ~260). |
+| **Función** | `bayesian_update(self, artifact_id, custom_window=None)`. |
+| **Líneas originales** | `if artifact_id in self._bayesian_cache: return self._bayesian_cache[artifact_id]` — la clave de caché es solo `artifact_id`, `custom_window` no participa. |
+| **Commit fix** | Ninguno — documentado, no aplicado. |
+| **Detectado en** | Auditoría "Ronda 2", ejecutado contra el archivo vivo. |
+
+### Descripción
+
+`bayesian_update(artifact_id, custom_window=None)` acepta `custom_window`
+como parámetro documentado y lo usa correctamente para calcular la vecindad
+temporal (`get_neighborhood(artifact_id, custom_window)`) — pero **antes**
+de llegar a ese cálculo, revisa `self._bayesian_cache` usando únicamente
+`artifact_id` como clave. Ejecutado: `bayesian_update('a3')` y
+`bayesian_update('a3', custom_window=timedelta(seconds=30))` devuelven el
+**mismo objeto** — el segundo llamado nunca recalcula con la ventana
+distinta, simplemente devuelve lo que había en caché del primer llamado
+(cualquiera que haya sido).
+
+Confirmado por grep exhaustivo: ningún *caller* de `bayesian_update` en todo
+el repositorio (ni interno, ni expuesto vía MCP) pasa `custom_window` hoy —
+todos los llamados de producción (`vigia/core/trust_fusion.py`, líneas 319,
+345, 395, 541) usan el default `None`. El bug es puramente latente: no tiene
+ningún camino de ejecución real que lo alcance en el estado actual del
+código.
+
+### Impacto
+
+Si en el futuro algún *caller* (interno o vía MCP) empieza a usar
+`custom_window` — el parámetro está documentado y expuesto, así que es un uso
+previsible, no exótico — obtendría resultados de la ventana temporal
+equivocada dependiendo únicamente del orden de llamadas: la primera llamada
+"gana" y queda cacheada para cualquier `custom_window` posterior sobre el
+mismo `artifact_id`. Es un bug de caché-key incompleta clásico, con el mismo
+patrón de otros bugs ya documentados en este repositorio (buscar
+"cache key" en `BUGS_PENDIENTES.md`).
+
+### Fix propuesto (NO aplicado)
+
+Incluir `custom_window` en la clave de caché (p. ej.
+`cache_key = (artifact_id, custom_window)`, con `custom_window=None` como
+parte válida de la tupla), o — más simple, dado que hoy nadie lo usa —
+excluir explícitamente del cacheo cualquier llamado con `custom_window` no
+default, documentando que solo la ventana por defecto se cachea. Cualquiera
+de las dos opciones requiere un test de regresión que hoy no existe (no hay
+ningún test de `bayesian_update` con `custom_window` distinto de `None`).
+
+## B-221 — Auditoría "Ronda 2" (invariantes epistemológicos): vectores investigados y descartados — registrados para no re-descubrirlos [DOCUMENTADO — Claude 2026-07-25]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | N/A — no son bugs. Documentado como referencia de auditoría, no como defecto. |
+| **Archivos** | `vigia/core/risk_bounded_layer.py` (`PolicyStabilityController`), `vigia/core/dissent_report.py` (`_compute_majority`, tie-break), `vigia/core/trust_fusion.py` (`NeighborhoodContext.mean_neighbor_trust`, `TrustFusionEngine.calculate_likelihood`, `add_artifact`). |
+| **Método** | A-D-I (Abductivo-Deductivo-Inductivo): cada vector se ejecutó contra el código vivo antes de aceptarlo o descartarlo, no solo se dedujo. |
+| **Detectado en** | Auditoría "Ronda 2", sesión 2026-07-25, re-verificado independientemente en esta sesión (no se aceptó ningún resultado del reporte pegado sin re-ejecutarlo). |
+
+### Descripción
+
+Cinco vectores se investigaron durante la auditoría "Ronda 2" y no se
+convirtieron en bugs. Se documentan aquí explícitamente para que una
+auditoría futura no vuelva a gastar tiempo re-descubriéndolos:
+
+**1. F5 — `PolicyStabilityController`: ¿diverge el resultado entre la rama
+numpy (`np.linalg.norm` + `np.array`) y el fallback stdlib (`math.sqrt` +
+listas)?** FALSIFICADO. Hipótesis original (deducida, no ejecutada): el
+veredicto podría depender silenciosamente de si `numpy` está instalado.
+Re-ejecutado en esta sesión, forzando ambas ramas sobre la misma secuencia de
+`stabilize()`: los tres parámetros resultantes (`lambda, gamma, epsilon`) son
+**bit-idénticos** entre ambas rutas (`0x1.b851eb851eb85p+1` en ambos casos,
+verificado con `.hex()` de float). Las dos ramas son aritméticamente
+equivalentes para esta operación; la divergencia BLAS que motivó la
+hipótesis es teórica para este caso, no demostrada. Se retira como hallazgo.
+
+**2. Tie-break de `_compute_majority` favorece MALICIOUS ante empate.** NO
+ES BUG. El desempate hacia el veredicto más severo ante un empate exacto de
+votos es determinista y *fail-safe* — es la política correcta para un
+sistema forense: ante incertidumbre genuina entre dos veredictos igual de
+votados, escalar es más defendible que promediar hacia abajo.
+
+**3. `NeighborhoodContext.mean_neighbor_trust` devuelve `1.0` cuando no hay
+vecinos — ¿es "ausencia de evidencia tratada como confianza perfecta"?**
+FALSIFICADO como riesgo de score. Verificado contra el código vivo:
+`TrustFusionEngine.calculate_likelihood` hace *short-circuit* a `return 0.5`
+cuando `neighborhood.neighbor_count == 0`, **antes** de leer
+`mean_neighbor_trust` — el valor `1.0` nunca llega a participar del cálculo
+de `likelihood`/`posterior`. El `1.0` sí aparece en el texto de la razón
+narrativa (`BOOST: trust vecindad={neighborhood.mean_neighbor_trust:.3f}`)
+en casos donde sí hay vecinos, así que no hay ninguna ruta donde el default
+de "sin vecinos" se cuele en un score. Riesgo real: ninguno confirmado.
+
+**4. `add_artifact` deduplica silenciosamente IDs duplicados.** Higiene, no
+bug de severidad. `add_artifact` devuelve `False` sin excepción ni registro
+cuando `artifact.artifact_id` ya existe (`trust_fusion.py`, línea ~207) — dos
+artefactos con el mismo ID colapsan a uno sin aparecer en ningún
+`rejected_details` o estructura equivalente. El comportamiento en sí es
+deseable (protege contra doble conteo), pero es invisible: nada en el output
+de `TrustFusionEngine` le dice a un perito que un artefacto fue descartado
+por duplicado. Ticket menor, no bloqueante — no se abre como bug numerado
+independiente porque no afecta ningún veredicto, se deja registrado aquí.
+
+### Nota de proceso
+
+Esta auditoría se hizo con disciplina A-D-I explícita después de una primera
+pasada (B-217 a B-220 más este bloque) que había *deducido* algunos hallazgos
+sin ejecutarlos. La re-verificación con inducción cambió el resultado: F1 se
+agravó (se demostró que la cadena completa está muerta, no solo que el
+módulo estaba huérfano), F2 y F4 bajaron de severidad al descubrirse sus
+precondiciones dormidas, y F5 se retiró por completo al ejecutarlo y
+encontrar resultados bit-idénticos. Se documenta el proceso, no solo el
+resultado, porque el proceso es replicable: cualquier hallazgo futuro de este
+tipo debe pasar por la misma re-verificación contra el código vivo antes de
+aceptarse como confirmado.
+
+## B-222 — `.env.example`: nombre de variable de override de hash CLIP incompleto y default de `VIGIA_STRICT_MODEL_CHECK` invertido respecto al código [RESUELTO — Claude 2026-07-25]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P4 (deriva documentación/código, cero impacto en veredictos sellados — pero silenciaba un override de seguridad y bajaba un default seguro). |
+| **Archivos** | `.env.example` (reescrito completo, traducido al inglés en el mismo commit); `vigia/forensics/vision_audit.py` (comentarios en líneas ~78 y ~94). |
+| **Función** | `_load_clip_model_hashes()` (deriva el nombre de la variable de override por modelo); `_STRICT_MODEL_CHECK` (lectura del default). |
+| **Líneas originales** | Comentario `VIGIA_CLIP_HASH_VIT_B_32` (sin `_PT`); `.env.example` con `VIGIA_STRICT_MODEL_CHECK=false`. |
+| **Commit fix** | (rama `claude/mcp-security-followup-30502`, mismo commit que la actualización de `.env.example`). |
+| **Detectado en** | Continuación de la auditoría "Ronda 2" — encontrado incidentalmente mientras se relevaban todas las variables `VIGIA_*` leídas en vivo para actualizar `.env.example`, verificado por ejecución antes de documentarlo. |
+
+### Descripción
+
+Dos discrepancias independientes entre lo documentado y el comportamiento real:
+
+1. **Nombre de variable incompleto.** `_load_clip_model_hashes()` deriva el
+   nombre de la variable de override por modelo como
+   `"VIGIA_CLIP_HASH_" + filename.replace("-","_").replace(".","_").upper()`.
+   Para `"ViT-B-32.pt"` eso da `VIGIA_CLIP_HASH_VIT_B_32_PT` — confirmado por
+   ejecución directa. El comentario del propio módulo (línea ~78) y el
+   `.env.example` anterior documentaban `VIGIA_CLIP_HASH_VIT_B_32`, sin el
+   `_PT` de la extensión. Un operador que siguiera esa documentación seteaba
+   una variable que `_load_clip_model_hashes()` nunca lee — el override no
+   hacía nada, silenciosamente, sin ningún error que apuntara al typo.
+
+2. **Default invertido.** `VIGIA_STRICT_MODEL_CHECK` tiene default `"true"`
+   en el código (`os.getenv("VIGIA_STRICT_MODEL_CHECK", "true")`, comentado
+   como "P1-7: default seguro"). El `.env.example` anterior lo seteaba
+   explícitamente en `false` — al copiar el archivo a `.env`, esto bajaba la
+   verificación de integridad del modelo CLIP de "segura por defecto" a
+   permisiva, contradiciendo el propio encabezado de esa sección
+   ("STRICT MODE — activar todos antes de cualquier uso forense en un
+   entorno real").
+
+### Impacto
+
+Ninguno sobre veredictos ya sellados — ambas son variables de configuración
+de entorno, no lógica de scoring. El impacto es operacional: un operador
+que configurara el hash de CLIP vía el nombre documentado (sin `_PT`)
+creería tener supply-chain integrity activa sobre el modelo de visión
+cuando en realidad seguía usando el hash hardcodeado (vacío) o de archivo;
+y cualquiera que copiara `.env.example` tal cual heredaba un
+`VIGIA_STRICT_MODEL_CHECK=false` explícito, más permisivo que no setear la
+variable en absoluto.
+
+### Fix aplicado
+
+Corregido el comentario en `vision_audit.py` (nombre completo con `_PT` +
+nota de que fue confirmado por ejecución) y el `.env.example` reescrito
+(variable renombrada a `VIGIA_CLIP_HASH_VIT_B_32_PT`;
+`VIGIA_STRICT_MODEL_CHECK` cambiado a `true` con comentario explicando por
+qué). Test permanente agregado:
+`tests/test_clip_hash_env_var_naming.py` (4 tests: deriva el nombre
+correcto, el override con `_PT` funciona, el nombre sin `_PT` se ignora
+silenciosamente — documentando el modo de falla que causó esto — y el
+default de `VIGIA_STRICT_MODEL_CHECK` es `true` cuando la variable no está
+seteada).

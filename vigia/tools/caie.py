@@ -90,12 +90,16 @@ from pathlib import Path
 from typing import Any, Final
 
 from vigia.security import (
-    _sanitize_path, 
-    _utcnow, 
+    _sanitize_path,
+    _utcnow,
     audit_logger,
     trust_decay,
     _sanitize_llm_input,
 )
+# Reused for artifact-signature timestamp canonicalization (see
+# _canonical_timestamp): same tolerant ISO-8601 parser already used by the
+# tool_execution_log hash chain, instead of a second ad-hoc implementation.
+from vigia.core.hash_chain import _parse_iso_ts
 
 # Import MITRE mapping for centralized TTP knowledge
 from vigia.tools.mitre_mapping import (
@@ -537,6 +541,46 @@ _MAX_ARTIFACTS: Final[int] = 1000
 # Minimum independent sources for full confidence (P1: normalization)
 _MIN_INDEPENDENT_SOURCES: Final[int] = 3
 _LOW_SOURCE_PENALTY: Final[float] = 0.20  # Reduce score by 20% if < 3 sources
+
+# COGNITIVE/SCORING FLOOD FIX: independent_sources originally counted every
+# distinct (source_tool, evidence_type) GROUP, regardless of how much that
+# group actually contributed to the fused score -- a group's own raw_score
+# and spoofability never entered the count, only its existence as a label.
+# This is gameable in a way that is NOT just a narrative/display problem:
+# padding a case with cheap, distinct-labeled, near-worthless artifacts (a
+# tool that emits low-confidence findings, or an attacker manufacturing
+# junk categories) can push independent_sources across the
+# _MIN_INDEPENDENT_SOURCES=3 line and WAIVE the 20% confidence_penalty
+# entirely, even though nothing was genuinely corroborated. Confirmed
+# empirically: 2 solid artifacts alone score 0.3083 with the penalty
+# correctly applied (INCONCLUSIVE); adding 3 trivial-but-distinct-group
+# artifacts (raw_score=0.02 each, high-spoofability evidence_type) escapes
+# the penalty entirely and raises the score to 0.3879 (+26%) and the
+# verdict to SUSPICION -- from evidence that, standing alone, would barely
+# register.
+#
+# _SOURCE_MATERIALITY_FLOOR: a group only counts toward independent_sources
+# if SOME member artifact's own RAW_SCORE (pre-spoofability) reaches this
+# floor -- deliberately RAW, not the spoofability-adjusted group_score.
+# First attempt used group_score and immediately broke a legitimate case:
+# a real log_entry finding at raw_score=0.55 (a genuine, moderate-confidence
+# assertion) adjusts down to 0.0404 given log_entry's spoofability=0.85 --
+# BELOW a 0.05 floor on the adjusted score, so a real corroborating source
+# would have been wrongly excluded for being an inherently-spoofable
+# evidence TYPE, which is a different thing from being unsubstantiated
+# padding. raw_score isolates "did the tool/analyst assert at least minimal
+# analytical confidence" from "how much do we discount this evidence type",
+# which is exactly what spoofability weighting already does correctly
+# downstream in adjusted_score / composite_score -- materiality should not
+# re-apply that discount a second time. The padding reproduction above used
+# raw_score=0.02, deliberately near zero; 0.05 sits well below any
+# genuine finding in this codebase's own test corpus while still excluding
+# that padding. This does NOT remove low-scoring groups from the composite
+# Noisy-OR fusion itself (their small, honest contribution to
+# composite_score is correct and stays); it only stops manufactured
+# near-zero-confidence artifacts from also buying an exemption from the
+# low-corroboration penalty.
+_SOURCE_MATERIALITY_FLOOR: Final[str] = "0.05"
 
 # ---------------------------------------------------------------------------
 # NIST SP 800-86 / RFC 3227 — Acquisition metadata validation
@@ -1113,6 +1157,86 @@ def _extract_assertions(artifact: "Artifact") -> frozenset:
     return frozenset(assertions)
 
 
+def _canonical_timestamp(ts: str) -> str:
+    """
+    UTC-normalized ISO-8601 form of *ts*, so two artifacts describing the
+    exact same instant hash identically regardless of which UTC offset the
+    producing tool happened to print (e.g. "2025-01-01T12:00:00Z" and
+    "2025-01-01T09:00:00-03:00" are the same instant). Falls back to the raw
+    string if unparseable -- never raise on a malformed timestamp, just
+    don't canonicalize it (same tolerant contract as _parse_iso_ts itself).
+
+    This is deliberately a pure canonicalization (one instant -> one
+    string), not similarity/fuzzy matching: signature equality built on top
+    of it stays an exact-equality relation (reflexive, symmetric,
+    transitive) rather than a "close enough" comparison, which would not be
+    transitive in general (A~B and B~C does not imply A~C for a distance
+    threshold).
+    """
+    dt = _parse_iso_ts(ts)
+    return dt.astimezone(timezone.utc).isoformat() if dt is not None else ts
+
+
+def _artifact_content_signature(artifact: Artifact) -> str:
+    """
+    SHA-256 over every identity-relevant field of *artifact* (post
+    __post_init__ normalization): source_tool, evidence_type, raw_score,
+    description, metadata, provenance_chain, timestamp (UTC-canonicalized).
+    Two artifacts with an identical signature are the exact same submitted
+    fact, not two independently-corroborating observations.
+
+    This is a forensic-identity signature, not a byte-identity hash: "same
+    fact" is intentionally slightly broader than "same JSON bytes" — right
+    now that means timestamp UTC-normalization (see _canonical_timestamp).
+    It deliberately does NOT fold case or coerce types across all of
+    metadata (e.g. host="SERVER01" vs "server01", pid="123" vs 123):
+    hostnames are case-insensitive but a Linux path is not, and blanket
+    normalization would trade a false-negative (missed duplicate) for a
+    false-positive (two genuinely different facts conflated) in fields
+    whose semantics this function cannot know. See
+    CrossArtifactIncongruenceEngine.add_artifact's superset-based
+    REFINEMENT handling for the complementary case: an artifact that adds
+    strictly more metadata to an existing one (not a different
+    representation of the same fields) supersedes it instead of being
+    treated as independent corroboration.
+    """
+    payload = {
+        "source_tool": artifact.source_tool,
+        "evidence_type": artifact.evidence_type,
+        "raw_score": str(artifact.raw_score),
+        "description": artifact.description,
+        "metadata": artifact.metadata,
+        "provenance_chain": artifact.provenance_chain,
+        "timestamp": _canonical_timestamp(artifact.timestamp),
+    }
+    canonical = json.dumps(payload, sort_keys=True, ensure_ascii=True, default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _metadata_is_subset(smaller: dict, larger: dict) -> bool:
+    """
+    True if every key in *smaller* has an identical value in *larger*
+    (recursing into nested dicts); *larger* may have additional keys
+    *smaller* lacks. List/scalar values must match exactly — no partial
+    credit for lists, since "subset of a list" is order/membership-
+    ambiguous and not worth the complexity here. Used to detect when one
+    artifact is a strict REFINEMENT of another (same fact, more detail),
+    as opposed to a conflicting or genuinely independent observation (e.g.
+    pid=100 vs pid=200 is neither a subset nor a superset — two different
+    processes, correctly kept as two artifacts).
+    """
+    for k, v in smaller.items():
+        if k not in larger:
+            return False
+        lv = larger[k]
+        if isinstance(v, dict) and isinstance(lv, dict):
+            if not _metadata_is_subset(v, lv):
+                return False
+        elif v != lv:
+            return False
+    return True
+
+
 class CrossArtifactIncongruenceEngine:
     """
     Kimi's Cross-Artifact Incongruence Engine — EXPANDED v2.0 [DETERMINISTIC].
@@ -1147,16 +1271,45 @@ class CrossArtifactIncongruenceEngine:
         # the omission is surfaced in the (signed) result and can drive an
         # honest disposition, instead of only living in the HMAC audit log.
         self._temporal_pairs_skipped: list[dict] = []
+        # Duplicate-artifact epistemology fix (see add_artifact): content
+        # signatures of every artifact accepted so far, to reject exact
+        # resubmissions before they inflate Noisy-OR fusion.
+        self._seen_content_signatures: set[str] = set()
 
     def add_artifact(self, artifact: Artifact) -> bool:
         """
         Add an artifact from a VIGIA tool result.
 
-        Returns True if added, False if rejected (limit or invalid type).
+        Returns True if added or if it refined/replaced an existing
+        artifact in place (see REFINEMENT below); False if rejected (limit,
+        invalid type, exact duplicate, or redundant refinement).
 
         Kimi P0 enforcement:
         - Rejects if _MAX_ARTIFACTS exceeded (DoS protection)
         - Rejects if evidence_type is not in the whitelist
+
+        Duplicate-content rejection (epistemology fix): evaluate() fuses
+        artifacts within a (source_tool, evidence_type) group via Noisy-OR
+        (1 - prod(1 - s)), which compounds every additional score as if it
+        were independent corroboration. Submitting the exact same artifact
+        N times (a duplicate log entry, a tool re-run whose output gets
+        ingested twice, or deliberate padding) is not N independent
+        observations -- it is one fact reported N times -- yet each
+        resubmission still raised composite_score, and
+        _MIN_INDEPENDENT_SOURCES only counts distinct (source_tool,
+        evidence_type) pairs, not distinct underlying facts within a pair.
+        Empirically: 3 genuinely distinct weak artifacts (one per
+        source/type, raw_score=0.55 each) scored SUSPICION (composite
+        ~0.24); duplicating each one 3x (9 total artifacts, still only 3
+        source/type pairs, zero new facts) reached MALICE (composite
+        ~0.56) with structural_verdict staying NOISE throughout -- the
+        entire escalation was duplicate-driven, not evidence-driven.
+        _artifact_content_signature() rejects only byte-identical
+        resubmissions (same source_tool, evidence_type, raw_score,
+        description, metadata, provenance_chain, timestamp); a genuinely
+        distinct second occurrence (different PID, different
+        acquisition_hash, different timestamp, ...) still gets a different
+        signature and is accepted as new evidence.
         """
         if len(self._artifacts) >= _MAX_ARTIFACTS:
             audit_logger.log_block(
@@ -1184,15 +1337,131 @@ class CrossArtifactIncongruenceEngine:
             return False
 
         _artifact_copy = copy.deepcopy(artifact)
+
+        _sig = _artifact_content_signature(_artifact_copy)
+        if _sig in self._seen_content_signatures:
+            audit_logger.log_block(
+                event_type="CAIE_DUPLICATE_ARTIFACT",
+                tool="CAIE.add_artifact",
+                input_preview=f"source={artifact.source_tool} type={artifact.evidence_type}",
+                reason=(
+                    "Artifact is byte-identical to one already added in this "
+                    "evaluation (same source_tool, evidence_type, raw_score, "
+                    "description, metadata, provenance_chain, timestamp). "
+                    "Duplicate submissions are not independent corroboration -- "
+                    "Noisy-OR fusion would double-count the same fact. Rejected."
+                ),
+            )
+            return False
+
+        # REFINEMENT / SUBSUMPTION (I-0XX generalization): a new artifact
+        # that adds strictly more metadata to an already-accepted artifact
+        # describing the exact same EVENT is not a second independent
+        # observation either — a tool re-parsing the same evidence with more
+        # detail ("Suspicious process" -> "Suspicious process" + pid +
+        # sha256) is one fact reported twice at different resolutions, and
+        # would otherwise inflate Noisy-OR fusion exactly like the
+        # exact-duplicate case. Symmetrically: if the NEW artifact carries
+        # strictly LESS metadata than one already stored for the same event,
+        # it is redundant and rejected outright (the stored one already
+        # dominates it). Neither branch fires when metadata is incomparable
+        # (e.g. pid=100 vs pid=200) or the description differs — those are
+        # kept as genuinely independent artifacts, unchanged from prior
+        # behavior.
+        #
+        # "Same event" REQUIRES matching timestamp and provenance_chain, not
+        # just source_tool/evidence_type/description: two artifacts that
+        # both happen to carry empty/no metadata (e.g. two MFT records both
+        # missing mft_entry_number) share source_tool+evidence_type+
+        # description and are trivially "metadata subsets" of each other,
+        # but a different timestamp or provenance_chain means a genuinely
+        # different occurrence — collapsing them would silently destroy a
+        # real, distinct MFT_ENTRY_ANOMALY-eligible artifact
+        # (test_caie_mft_entry_guard.py caught exactly this while adding
+        # this fix). Timestamp is compared canonicalized (same instant,
+        # different UTC offset, still counts as the same event).
+        for _i, _existing in enumerate(self._artifacts):
+            if not (
+                _existing.source_tool == _artifact_copy.source_tool
+                and _existing.evidence_type == _artifact_copy.evidence_type
+                and _existing.description == _artifact_copy.description
+                and _existing.provenance_chain == _artifact_copy.provenance_chain
+                and _canonical_timestamp(_existing.timestamp)
+                == _canonical_timestamp(_artifact_copy.timestamp)
+            ):
+                continue
+            if _metadata_is_subset(_existing.metadata, _artifact_copy.metadata):
+                # New artifact refines/supersedes the stored one. Retain the
+                # higher raw_score -- a refinement must never look LESS
+                # confident than the vaguer report it replaces.
+                if _existing.raw_score > _artifact_copy.raw_score:
+                    _artifact_copy.raw_score = _existing.raw_score
+                self._seen_content_signatures.discard(
+                    _artifact_content_signature(_existing)
+                )
+                self._remove_from_indices(_existing)
+                self._artifacts[_i] = _artifact_copy
+                self._seen_content_signatures.add(
+                    _artifact_content_signature(_artifact_copy)
+                )
+                self._add_to_indices(_artifact_copy)
+                audit_logger.log_info(
+                    event_type="CAIE_ARTIFACT_REFINED",
+                    tool="CAIE.add_artifact",
+                    message=(
+                        f"source={artifact.source_tool} type={artifact.evidence_type}: "
+                        "new artifact carries a superset of an existing artifact's "
+                        "metadata for the same event -- replaced in place instead of "
+                        "counted as independent corroboration."
+                    ),
+                )
+                return True
+            if _metadata_is_subset(_artifact_copy.metadata, _existing.metadata):
+                # New artifact carries no information the stored one lacks.
+                audit_logger.log_block(
+                    event_type="CAIE_REDUNDANT_REFINEMENT",
+                    tool="CAIE.add_artifact",
+                    input_preview=f"source={artifact.source_tool} type={artifact.evidence_type}",
+                    reason=(
+                        "Artifact's metadata is a subset of an already-accepted "
+                        "artifact describing the same event (same source_tool, "
+                        "evidence_type, description). It carries no new information "
+                        "-- rejected rather than double-counted."
+                    ),
+                )
+                return False
+
+        self._seen_content_signatures.add(_sig)
         self._artifacts.append(_artifact_copy)
-
-        # Index for temporal and network analysis
-        if _artifact_copy.timestamp:
-            self._temporal_index.setdefault(_artifact_copy.timestamp, []).append(_artifact_copy)
-        if "network" in _artifact_copy.evidence_type or "ip" in _artifact_copy.evidence_type:
-            self._network_index.setdefault(_artifact_copy.source_tool, []).append(_artifact_copy)
-
+        self._add_to_indices(_artifact_copy)
         return True
+
+    def _add_to_indices(self, artifact: "Artifact") -> None:
+        """Index a stored artifact for temporal (TCV) and network correlation."""
+        if artifact.timestamp:
+            self._temporal_index.setdefault(artifact.timestamp, []).append(artifact)
+        if "network" in artifact.evidence_type or "ip" in artifact.evidence_type:
+            self._network_index.setdefault(artifact.source_tool, []).append(artifact)
+
+    def _remove_from_indices(self, artifact: "Artifact") -> None:
+        """
+        Remove *artifact* (by identity, not equality) from the temporal and
+        network indices. Required when a REFINEMENT replaces an artifact
+        in-place: without this, the superseded object stays reachable from
+        _temporal_index / _network_index (used by TCV and NETWORK_VS_HOST
+        fracture rules) even though it is no longer in self._artifacts --
+        a stale reference to evidence the engine has otherwise forgotten.
+        """
+        bucket = self._temporal_index.get(artifact.timestamp)
+        if bucket is not None:
+            bucket[:] = [a for a in bucket if a is not artifact]
+            if not bucket:
+                del self._temporal_index[artifact.timestamp]
+        net_bucket = self._network_index.get(artifact.source_tool)
+        if net_bucket is not None:
+            net_bucket[:] = [a for a in net_bucket if a is not artifact]
+            if not net_bucket:
+                del self._network_index[artifact.source_tool]
 
     def add_from_tool_result(
         self,
@@ -2436,7 +2705,7 @@ class CrossArtifactIncongruenceEngine:
         grouped = defaultdict(list)
         for a in self._artifacts:
             key = (a.source_tool.strip().casefold(), a.evidence_type.strip().casefold())
-            grouped[key].append(a.adjusted_score)
+            grouped[key].append((a.adjusted_score, a.raw_score))
 
         # Within-group fusion (dependent evidence): 1 - ∏(1 - s)
         # NIGHTFALL P1: multiplicaciones acumulativas con decimal.Decimal.
@@ -2444,16 +2713,28 @@ class CrossArtifactIncongruenceEngine:
         # antes del redondeo, y ese producto intermedio puede diferir en el
         # bit 52 de la mantisa entre x86 y ARM. Con Decimal(str(x)) la
         # multiplicacion es puramente software, determinista en toda arquitectura.
+        #
+        # group_is_material tracks, per group, the MAX raw_score (pre-
+        # spoofability) any member artifact asserted -- see
+        # _SOURCE_MATERIALITY_FLOOR below for why this must be raw_score and
+        # not the fused/adjusted group_score.
         group_scores = []
-        for scores in grouped.values():
+        group_is_material = []
+        _materiality_floor = decimal.Decimal(_SOURCE_MATERIALITY_FLOOR)
+        for members in grouped.values():
             prod_d = _D_ONE
-            for s in scores:
+            max_raw_d = _D_ZERO
+            for adjusted, raw in members:
                 # Decimal(str(x)): conversion via string evita imprecision
                 # de la conversion directa float->Decimal
-                s_d = decimal.Decimal(str(_dround(s, _DETERMINISTIC_INTERNAL_PREC)))
+                s_d = decimal.Decimal(str(_dround(adjusted, _DETERMINISTIC_INTERNAL_PREC)))
                 prod_d = prod_d * (_D_ONE - s_d)
+                raw_d = decimal.Decimal(str(_dround(raw, _DETERMINISTIC_INTERNAL_PREC)))
+                if raw_d > max_raw_d:
+                    max_raw_d = raw_d
             group_score = _dround(_D_ONE - prod_d, _DETERMINISTIC_INTERNAL_PREC)
             group_scores.append(group_score)
+            group_is_material.append(max_raw_d >= _materiality_floor)
 
         # Across-group fusion (independent sources): 1 - ∏(1 - g)
         # NIGHTFALL P1: mismo patron Decimal para las multiplicaciones de grupos
@@ -2469,7 +2750,19 @@ class CrossArtifactIncongruenceEngine:
         composite = _dround(min(composite, decimal.Decimal("0.99")), _DETERMINISTIC_INTERNAL_PREC)
 
         # P1: Confidence normalization - penalize if < 3 independent sources
-        independent_sources = len(group_scores)
+        #
+        # source_groups_total: raw count of distinct (source_tool,
+        # evidence_type) groups -- purely mechanical, says nothing about how
+        # much each group actually contributed.
+        # independent_sources: only groups where SOME member artifact's own
+        # raw_score cleared _SOURCE_MATERIALITY_FLOOR (group_is_material,
+        # computed above). This is what gates confidence_penalty (see the
+        # constant's docstring for why the raw count was gameable) and it is
+        # the number exposed under the "independent_sources" key -- callers
+        # relying on that name for the corroboration count get the fixed
+        # semantics automatically.
+        source_groups_total = len(group_scores)
+        independent_sources = sum(1 for m in group_is_material if m)
         confidence_penalty = 0.0
         if independent_sources < _MIN_INDEPENDENT_SOURCES:
             confidence_penalty = _LOW_SOURCE_PENALTY
@@ -2514,6 +2807,44 @@ class CrossArtifactIncongruenceEngine:
 
         has_golden_rule = any(f.fracture_type in _GOLDEN_RULE_TYPES for f in filtered_fractures)
         has_structural_malice = any(f.fracture_type in _STRUCTURAL_MALICE_TYPES for f in filtered_fractures)
+
+        # HUMAN-FACING PRESENTATION ORDER (attack-against-the-auditor fix):
+        # filtered_fractures previously stayed in raw rule-execution order
+        # (Rule 1, Rule 2, ... Rule 8) — an artifact of which detect_fractures()
+        # check happens to run first, not of forensic importance. The verdict
+        # itself was always computed correctly (has_golden_rule/
+        # has_structural_malice scan the WHOLE list), but the narrative below
+        # picked filtered_fractures[0] as "the Key finding" and golden_rules[0]
+        # as "the Golden Rule" -- whichever fired first, not whichever mattered
+        # most. Confirmed empirically: a VERDICT_CONFLICT (severity 0.5, "requires
+        # deeper analysis... to resolve") that happens to fire before a
+        # TEMPORAL_CAUSALITY_VIOLATION (severity 1.0 -- MAXIMUM, "proving the
+        # evidence was planted retroactively") produced a Thirdness narrative
+        # that LEADS with the uncertain-sounding low-severity finding and tacks
+        # the maximum-severity structural proof on as an afterthought clause at
+        # the end -- primacy bias against the human reader, on a case the
+        # machine verdict (correctly) already called MALICE.
+        #
+        # Priority is Golden Rule > structural malice > everything else (the
+        # code's own stated epistemology just above: a causal impossibility is
+        # "a different epistemic category entirely", not just a high number),
+        # severity descending within each tier. Pure severity-sort alone is not
+        # equivalent: CRYPTOGRAPHIC_INCONSISTENCY (Golden Rule) can be severity
+        # 0.9, below a LOG_VS_MEMORY structural-malice fracture at 0.95, so a
+        # plain sort would still rank the Golden Rule second — hence the
+        # explicit tier first, severity only as the tiebreak within a tier.
+        # Stable sort (Python's sorted()) keeps this deterministic: ties within
+        # a tier+severity fall back to original detection order, never random.
+        def _fracture_narrative_priority(f: "Fracture") -> tuple[int, float]:
+            if f.fracture_type in _GOLDEN_RULE_TYPES:
+                tier = 0
+            elif f.fracture_type in _STRUCTURAL_MALICE_TYPES:
+                tier = 1
+            else:
+                tier = 2
+            return (tier, -float(f.severity))
+
+        fractures_by_priority = sorted(filtered_fractures, key=_fracture_narrative_priority)
 
         # Fracture bonus: only applied to NON-golden-rule fractures.
         # Rationale: Golden Rules already force MALICE via structural_verdict.
@@ -2591,12 +2922,59 @@ class CrossArtifactIncongruenceEngine:
             cdl = CollapseDecisionLayer()
 
             # Calcular coverage_ratio aproximado basado en capas observadas
+            #
+            # KNOWN GAP (investigated, only partially fixed here -- see
+            # docs/CDL_COVERAGE_RATIO_GAP.md for the full writeup): this is
+            # the same "count distinct labels, not weight/membership" defect
+            # class as the independent_sources bug fixed earlier in this
+            # branch, in a sibling mechanism. Two confirmed problems:
+            #
+            # 1. UNBOUNDED RATIO (fixed below): observed_layers counts every
+            #    DISTINCT label seen, with no bound and no membership check
+            #    against total_expected_layers. len(observed_layers) can
+            #    exceed 6, so coverage_ratio could exceed 1.0 (verified:
+            #    10 distinct evidence_type values -> coverage_ratio=1.667,
+            #    167% -- nonsensical for a value CollapseDecisionLayer.explain()
+            #    formats as a percentage). Capped at 1.0 below.
+            #
+            # 2. NOT ACTUALLY MEMBERSHIP-TESTED (NOT fixed here -- needs a
+            #    real evidence_type -> layer taxonomy, which is a separate,
+            #    larger task requiring domain judgment this fix should not
+            #    rush): `a.metadata.get("layer", a.evidence_type)` is meant
+            #    to let a producer explicitly declare one of the 6 canonical
+            #    layers via metadata["layer"], falling back to evidence_type.
+            #    Verified: metadata["layer"] is never set anywhere in this
+            #    codebase (grep found zero producers), and NONE of the 70+
+            #    _VALID_EVIDENCE_TYPES strings are members of
+            #    total_expected_layers (zero-element intersection). So in
+            #    100% of current real usage, coverage_ratio measures "how
+            #    many distinct evidence_type labels were used, capped at
+            #    6/6" -- not genuine memory/process/auth/filesystem/network/
+            #    kernel domain coverage. The CollapseVerdict.INCONCLUSIVE
+            #    gate at coverage_ratio < 0.3 (collapse_decision.py) is
+            #    trivially cleared by just 2 distinct evidence_type labels
+            #    (2/6 = 0.333), regardless of whether they represent
+            #    genuinely diverse forensic domains -- e.g. memory_process +
+            #    kernel_structure are both memory/kernel-adjacent yet count
+            #    as 2 full "layers". A real fix requires an explicit,
+            #    reviewed evidence_type -> {memory, process, auth,
+            #    filesystem, network, kernel, other} mapping (most of the 70+
+            #    types, e.g. chat_message/social_media/osint/document_visual,
+            #    do not fit this 6-layer host-forensics taxonomy at all) and
+            #    must be validated against the full canonical case corpus
+            #    before landing, the same way the independent_sources fix
+            #    above was -- a naive mapping risks silently downgrading real
+            #    verdicts to INCONCLUSIVE for the wrong reason, which is a
+            #    worse failure than the current (over-lenient) gate.
             total_expected_layers = ["memory", "process", "auth", "filesystem", "network", "kernel"]
             observed_layers = set()
             for a in self._artifacts:
                 layer = a.metadata.get("layer", a.evidence_type)
                 observed_layers.add(layer)
-            coverage_ratio = len(observed_layers) / len(total_expected_layers) if total_expected_layers else 0.5
+            coverage_ratio = (
+                min(len(observed_layers), len(total_expected_layers)) / len(total_expected_layers)
+                if total_expected_layers else 0.5
+            )
 
             ctx = CollapseContext(
                 broken_assumptions=broken_assumptions,
@@ -2637,20 +3015,35 @@ class CrossArtifactIncongruenceEngine:
             reverse=True
         )
 
-        # Golden Rules summary for Peirce Thirdness
-        # Uses _GOLDEN_RULE_TYPES (defined above in verdict block).
-        golden_rules = [f for f in filtered_fractures
+        # Golden Rules summary for Peirce Thirdness. Sourced from
+        # fractures_by_priority (not filtered_fractures): golden_rules[0] must
+        # be the highest-priority Golden Rule, not merely the first one the
+        # rule engine happened to detect.
+        golden_rules = [f for f in fractures_by_priority
                         if f.fracture_type in _GOLDEN_RULE_TYPES]
 
         peirce_chain = {
+            # COGNITIVE FLOOD FIX: the raw artifact/tool count alone invites a
+            # "broad corroboration" impression that does not distinguish 3
+            # solid findings from 3 solid findings plus 30 near-worthless
+            # ones -- Noisy-OR fusion barely reacts to the padding
+            # (spoofability weighting keeps its score contribution small),
+            # but "N artifacts from M tools" reads the same either way to a
+            # human skimming it. Naming how many of those tools materially
+            # cleared _SOURCE_MATERIALITY_FLOOR alongside the raw count lets
+            # the reader tell "broad AND substantive" apart from "wide but
+            # thin" at a glance, without hiding the raw number.
             "firstness": (
                 f"{len(self._artifacts)} artifacts from "
-                f"{len(set(a.source_tool for a in self._artifacts))} tools. "
+                f"{len(set(a.source_tool for a in self._artifacts))} tools "
+                f"({independent_sources} materially independent of "
+                f"{source_groups_total} distinct source/type groups). "
                 f"Raw scores range: {_dround(min(a.raw_score for a in self._artifacts), 2):.2f} "
                 f"to {_dround(max(a.raw_score for a in self._artifacts), 2):.2f}."
             ),
             "secondness": (
-                f"Noisy-OR fusion: {len(group_scores)} independent groups, "
+                f"Noisy-OR fusion: {source_groups_total} group(s) fused "
+                f"({independent_sources} materially independent), "
                 f"composite={_dround(composite, 4):.4f}. "
                 f"Most reliable: {top_adjusted[0]['tool']} "
                 f"({top_adjusted[0]['type']}, adj={top_adjusted[0]['adjusted']}). "
@@ -2660,8 +3053,10 @@ class CrossArtifactIncongruenceEngine:
             "thirdness": (
                 f"Inferred habit: {'fabrication/staging' if verdict != 'NOISE' else 'normal operation'}. "
                 + (
-                    f"Key: {filtered_fractures[0].fracture_type} — {filtered_fractures[0].interpretation[:200]}"
-                    if filtered_fractures else "No structural discrepancies."
+                    f"Key: {fractures_by_priority[0].fracture_type} "
+                    f"(severity={_dround(fractures_by_priority[0].severity, 2)}) — "
+                    f"{fractures_by_priority[0].interpretation[:200]}"
+                    if fractures_by_priority else "No structural discrepancies."
                 )
                 + (f" Golden Rule triggered: {golden_rules[0].fracture_type}." if golden_rules else "")
             ),
@@ -2730,6 +3125,7 @@ class CrossArtifactIncongruenceEngine:
             "fracture_bonus_applied": str(_dround(fracture_bonus, _DETERMINISTIC_OUTPUT_PREC)),
             "artifacts_evaluated": len(self._artifacts),
             "independent_sources": independent_sources,
+            "source_groups_total": source_groups_total,
             "confidence_penalty_applied": confidence_penalty > 0,
             "fractures_detected": len(filtered_fractures),
             "fractures_unique": len(filtered_fractures),
@@ -2747,7 +3143,12 @@ class CrossArtifactIncongruenceEngine:
                     "is_golden_rule": f.fracture_type in _GOLDEN_RULE_TYPES,
                     "is_structural": f.fracture_type in _STRUCTURAL_MALICE_TYPES,
                 }
-                for f in filtered_fractures
+                # Golden Rule > structural malice > everything else, severity
+                # descending within a tier (see fractures_by_priority above) --
+                # a human or downstream tool reading this list top-to-bottom
+                # sees the most forensically significant finding first, not
+                # whichever rule the engine happened to check first.
+                for f in fractures_by_priority
             ],
             "mitre_ttps": sorted(mitre_ttps),
             "ttp_confidences": {k: str(_dround(v, _DETERMINISTIC_OUTPUT_PREC)) for k, v in ttp_confidences.items()},
@@ -2822,6 +3223,7 @@ class CrossArtifactIncongruenceEngine:
         self._fractures = []
         self._temporal_index = {}
         self._network_index = {}
+        self._seen_content_signatures = set()
 
 
 # ---------------------------------------------------------------------------

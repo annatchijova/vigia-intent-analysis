@@ -125,13 +125,42 @@ class DissentReport:
 def _compute_majority(
     opinions: list[ModuleOpinion],
 ) -> tuple[ModuleVerdict, Fraction]:
+    """
+    F1 fix (Ronda 2 audit): this used to weight votes by
+    `op.confidence * _SEVERITY_WEIGHT[op.verdict]`. _SEVERITY_WEIGHT is an
+    ALARM/severity scale (MALICIOUS=1, SUSPICIOUS=0.5, BENIGN=0) meant for
+    scoring how alarming a DISSENTING opinion is (correctly still used that
+    way below, in the per-opinion dissent_weight computation) -- it is not a
+    voting weight, and reusing it here as one made BENIGN mathematically
+    unable to ever win a majority: with weight forced to exactly 0 for every
+    BENIGN vote, vote_counts[BENIGN] stays 0 regardless of how many modules
+    voted BENIGN or how confidently, `total` collapses to 0 whenever ALL
+    votes are BENIGN, and _compute_majority silently returns
+    (ABSTAIN, 0) instead of (BENIGN, ~1.0).
+
+    Consequence, confirmed by induction: 10 modules unanimously voting
+    BENIGN at 90% confidence produced majority=ABSTAIN with 0% consensus,
+    and all 10 were then treated as "dissenting" from a majority that was
+    never actually computed. Worse, this silently disabled the module's own
+    documented headline property (module docstring, line ~7): "9 modules
+    say BENIGN + 1 behavioral module says MALICE = escalation required" --
+    the escalation check a few lines below this function already correctly
+    tests `majority == ModuleVerdict.BENIGN`, but majority could never
+    legitimately BE BENIGN, so that branch was unreachable from any
+    real BENIGN-majority scenario.
+
+    Majority determination must answer "what did modules actually vote for,
+    weighted by their own confidence in that vote" -- a question orthogonal
+    to how alarming that verdict is. Weighting by confidence alone (not
+    severity) fixes this without touching _SEVERITY_WEIGHT's correct,
+    separate use for alarm/dissent scoring elsewhere in this module.
+    """
     vote_counts: dict[ModuleVerdict, Fraction] = {v: Fraction(0) for v in ModuleVerdict}
 
     for op in opinions:
         if op.verdict == ModuleVerdict.ABSTAIN:
             continue
-        weight = op.confidence * _SEVERITY_WEIGHT[op.verdict]
-        vote_counts[op.verdict] += weight
+        vote_counts[op.verdict] += op.confidence
 
     total = sum(vote_counts.values())
     if total == Fraction(0):

@@ -1430,6 +1430,61 @@ async def audit_network() -> dict | str:
         return {"error": f"Network audit failed: {str(e)}"}
 
 
+# SECURITY.md has claimed "Magic-byte validation before mounting (EVF/LVF
+# for E01, script detection for raw)" since before this fix, but no such
+# check ever existed anywhere in this codebase -- mount_sift_evidence only
+# checked the file EXTENSION, which is trivially spoofable (rename anything
+# to .e01/.dd/.img/.raw). Mounting is a root-privileged, rate-limited-as-
+# "sensitive" operation; a documented-but-nonfunctional content check is the
+# same claim/mechanism mismatch class as the removed HTTP/SSE auth theater.
+# EWF-E01 signature: b"EVF\t\r\n\xff\x00" (45 56 46 09 0D 0A FF 00).
+# EWF2 (Ex01/Lx01) signature: b"LVF\t\r\n\xff\x00" (4C 56 46 09 0D 0A FF 00).
+_EWF_E01_SIGNATURE = b"EVF\x09\x0d\x0a\xff\x00"
+_EWF2_SIGNATURE = b"LVF\x09\x0d\x0a\xff\x00"
+# Raw/dd/img images have no universal magic bytes (first bytes are whatever
+# partition table or filesystem superblock the image starts with), so the
+# check there is negative: reject unambiguous script/executable signatures
+# rather than trying to allow-list every possible filesystem.
+_SCRIPT_OR_EXECUTABLE_SIGNATURES = (
+    b"#!",        # shebang
+    b"\x7fELF",   # ELF binary
+    b"MZ",        # DOS/PE executable
+)
+
+
+def _verify_image_magic_bytes(image_path: str, ext: str) -> str | None:
+    """
+    Return None if *image_path*'s content is consistent with *ext*, or an
+    error string if it looks spoofed. Reads at most 8 bytes -- cheap enough
+    to run unconditionally before every mount.
+    """
+    try:
+        with open(image_path, "rb") as fh:
+            header = fh.read(8)
+    except OSError as exc:
+        return f"Cannot read image header: {exc}"
+
+    if ext in (".e01", ".ewf"):
+        if header not in (_EWF_E01_SIGNATURE, _EWF2_SIGNATURE):
+            return (
+                f"File has .{ext.lstrip('.')} extension but its header does not "
+                "match the EWF-E01 or EWF2 (Ex01/Lx01) signature. "
+                "Extension does not guarantee content — refusing to mount."
+            )
+        return None
+
+    # .dd / .img / .raw: no positive signature to check, only reject the
+    # unambiguous "this is not a disk image" cases.
+    for sig in _SCRIPT_OR_EXECUTABLE_SIGNATURES:
+        if header.startswith(sig):
+            return (
+                f"File has .{ext.lstrip('.')} extension but its header matches "
+                f"a script/executable signature ({sig!r}), not a disk image. "
+                "Refusing to mount."
+            )
+    return None
+
+
 @_register_mcp_tool
 @rate_limit(max_calls=5, window_seconds=60, raise_on_limit=False)
 async def mount_sift_evidence(
@@ -1458,6 +1513,16 @@ async def mount_sift_evidence(
     ext = os.path.splitext(image_path)[1].lower()
     if ext not in (".e01", ".ewf", ".dd", ".img", ".raw"):
         return {"error": f"Unsupported image format: {ext}. Use .E01 or .dd/.img/.raw"}
+
+    magic_error = _verify_image_magic_bytes(image_path, ext)
+    if magic_error:
+        audit_logger.log_block(
+            event_type="MOUNT_MAGIC_BYTE_MISMATCH",
+            tool="mount_sift_evidence",
+            input_preview=image_path,
+            reason=magic_error,
+        )
+        return {"error": magic_error, "security_block": True, "timestamp": _utcnow()}
 
     try:
         mount_point = _sanitize_mount_point(mount_point)
@@ -3537,6 +3602,19 @@ _PLANNER_TOOL_WHITELIST: frozenset = frozenset({
 # ENTRY POINT
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _parse_requested_transport(argv: list[str]) -> str:
+    """
+    Parse ``--transport=X`` / ``--transport X`` from CLI args. Defaults to
+    "stdio", matching mcp.run()'s own default, when not specified.
+    """
+    for i, arg in enumerate(argv):
+        if arg.startswith("--transport="):
+            return arg.split("=", 1)[1].strip().lower()
+        if arg == "--transport" and i + 1 < len(argv):
+            return argv[i + 1].strip().lower()
+    return "stdio"
+
+
 def _verify_transport_security() -> None:
     """
     V-002 mitigation (2025-04 audit): verify that the MCP server is running
@@ -3547,8 +3625,25 @@ def _verify_transport_security() -> None:
     * Only the parent can read/write these file descriptors
     * This is enforced by the OS — no additional auth needed for stdio
 
+    CONFUSED-DEPUTY-ADJACENT FIX: this function's docstring and SECURITY.md
+    used to describe VIGIA_MCP_AUTH_TOKEN as an active control that gates
+    HTTP/SSE transport ("Required for HTTP/SSE transport"). It never was:
+    `mcp.run()` at the bottom of __main__ is called with NO transport
+    argument, so it ALWAYS serves over stdio regardless of --transport, and
+    nowhere in this codebase is VIGIA_MCP_AUTH_TOKEN's value ever compared
+    against an incoming request — it was checked only for presence at
+    startup. A documented-but-nonfunctional auth control is worse than no
+    control: it invites an operator to expose this server (21+ forensic
+    tools, several root-level) believing a token gates access when nothing
+    does. Rather than implement untested bearer-auth middleware for a
+    transport this entrypoint has never actually served, an explicit
+    --transport request for anything other than stdio now hard-aborts
+    unconditionally (previously: warn, or opt-in abort via
+    VIGIA_ENFORCE_STDIO) — see step 3 below.
+
     Risks mitigated:
-    * Accidental HTTP exposure: BLOCK if --transport=sse without VIGIA_MCP_AUTH_TOKEN
+    * Non-stdio transport requested via --transport: ALWAYS abort (no real
+      HTTP/SSE authentication exists in this codebase to make it safe)
     * Stdin redirection: warn if stdin is not a pipe
     * Parent process verification: log and optionally enforce allowed parents
     * Session token: generate and print to stderr for operator verification
@@ -3578,40 +3673,31 @@ def _verify_transport_security() -> None:
     except OSError:
         pass  # Can't stat stdin — might be on Windows
 
-    # 3. Check command-line args for HTTP transport
-    is_http_transport = any(
-        "sse" in arg.lower() or "http" in arg.lower()
-        for arg in sys.argv[1:]
-    )
-    if is_http_transport:
-        auth_token = os.getenv("VIGIA_MCP_AUTH_TOKEN", "").strip()
-        if not auth_token:
-            msg = (
-                "HTTP/SSE transport detected but VIGIA_MCP_AUTH_TOKEN is not set. "
-                "VIGIA exposes 21+ forensic tools including root-level operations. "
-                "HTTP transport without authentication exposes these to any local "
-                "process. Set VIGIA_MCP_AUTH_TOKEN or use stdio transport (default)."
-            )
-            enforce_stdio = os.getenv("VIGIA_ENFORCE_STDIO", "false").lower() == "true"
-            if enforce_stdio:
-                print(f"[VIGIA][CRITICAL] {msg} VIGIA_ENFORCE_STDIO=true — aborting.",
-                      file=sys.stderr, flush=True)
-                audit_logger.log_block(
-                    event_type="INSECURE_TRANSPORT_BLOCKED",
-                    tool="vigia_sift_bridge.__main__",
-                    input_preview=" ".join(sys.argv),
-                    reason=msg,
-                )
-                sys.exit(1)
-            else:
-                print(f"[VIGIA][CRITICAL] {msg} Continuing, but this is NOT recommended.",
-                      file=sys.stderr, flush=True)
-                audit_logger.log_block(
-                    event_type="INSECURE_TRANSPORT",
-                    tool="vigia_sift_bridge.__main__",
-                    input_preview=" ".join(sys.argv),
-                    reason=msg,
-                )
+    # 3. Check command-line args for a non-stdio transport request.
+    requested_transport = _parse_requested_transport(sys.argv[1:])
+    if requested_transport != "stdio":
+        msg = (
+            f"--transport={requested_transport} was requested, but this "
+            "entrypoint's mcp.run() call takes no transport argument and "
+            "therefore ALWAYS serves over stdio regardless of this flag — "
+            "continuing would silently ignore the requested transport. "
+            "Separately, and more importantly: this codebase implements no "
+            "request-level authentication for HTTP/SSE transport at all. "
+            "VIGIA_MCP_AUTH_TOKEN is not validated against incoming requests "
+            "anywhere — it was only ever checked for presence at startup. "
+            "VIGIA exposes 21+ forensic tools including root-level "
+            "operations; there is no safe way to serve them over HTTP/SSE "
+            "with this build. Use stdio transport (the default — omit "
+            "--transport)."
+        )
+        print(f"[VIGIA][CRITICAL] {msg} Aborting.", file=sys.stderr, flush=True)
+        audit_logger.log_block(
+            event_type="UNSUPPORTED_TRANSPORT_REQUESTED",
+            tool="vigia_sift_bridge.__main__",
+            input_preview=" ".join(sys.argv),
+            reason=msg,
+        )
+        sys.exit(1)
 
     # 4. Verify parent process
     _ALLOWED_PARENT_NAMES = frozenset({

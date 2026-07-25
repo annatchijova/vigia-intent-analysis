@@ -22,21 +22,7 @@
 | `_sanitize_text_list()` | OOM via count + byte-volume limits |
 | `@rate_limit()` | Per-function sliding-window rate limiting with exponential backoff |
 
-### MCP Transport Security
-
-VIGIA uses MCP-over-stdio by default, where security is enforced by the OS:
-only the parent process (Claude Code, Ollama) can read/write the stdin/stdout pipes.
-
-Startup protections (V-002 mitigation):
-- **Session token**: generated at startup, printed to stderr for operator verification
-- **Stdin pipe check**: warns if stdin is not a pipe (unexpected command source)
-- **HTTP/SSE detection**: logs CRITICAL alert if HTTP transport is detected in args, since it exposes 21+ forensic tools to any local process on the network port
-- **Parent process logging**: records PPID and parent executable path to audit trail
-
-For HTTP/SSE deployments (NOT recommended without additional auth):
-- Use Unix socket with 0o600 permissions instead of TCP port
-- Implement token-based authentication at the application layer
-- Restrict network binding to localhost only
+See "MCP Transport Security" below for stdio-vs-HTTP/SSE details.
 
 ### Rate Limiting (All MCP Tools)
 
@@ -45,8 +31,8 @@ Every MCP tool is protected by `@rate_limit()` with sliding window + exponential
 | Category | Tools | Limit |
 |----------|-------|-------|
 | LLM (cost + latency) | `reason_with_llm`, `validate_and_correct_analysis` | 5/min |
-| Sensitive (root, mount, honey) | `mount_sift_evidence`, `activate_honey_token`, `reload_phonetic_dict`, `audit_network` | 5/min |
-| CPU heavy (entropy, CLIP, OCR) | `calculate_shannon_entropy`, `audit_image_metadata`, `analyze_stylometry`, `calculate_human_entropy` | 10/min |
+| Sensitive (root, mount, honey) | `mount_sift_evidence`, `activate_honey_token`, `deactivate_honey_token`, `reload_phonetic_dict` | 5/min |
+| CPU heavy (entropy, CLIP, OCR) | `calculate_shannon_entropy`, `audit_image_metadata`, `analyze_stylometry`, `calculate_human_entropy`, `audit_network` | 10/min |
 | Medium I/O (grep, analysis) | `search_pattern`, `infer_intent`, `detect_habit_incongruence`, `detect_human_jitter`, `audit_grice_maxims`, `detect_eco_overinterpretation`, `list_processes` | 30/min |
 | Light I/O (read, list, hash) | `list_files`, `read_evidence`, `generate_forensic_hash`, `get_phonetic_dict_stats` | 100/min |
 
@@ -93,10 +79,9 @@ Honey tokens use **secure temp files** (never `os.environ`):
 
 ### Mount Security
 
-- Magic-byte validation before mounting (`EVF`/`LVF` for E01, script detection for raw)
+- Magic-byte validation before mounting (`EVF`/`LVF` for E01, script/executable detection for raw) -- the extension check alone (`.e01`/`.dd`/`.img`/`.raw`) was previously trivially spoofable by renaming any file; `_verify_image_magic_bytes()` now reads the header before invoking `ewfmount`/`mount`
 - `noexec,nosuid,nodev,ro` mount flags (hardened in 2026-04 audit)
-- Mount point restricted to `/mnt/analysis/` subtree
-- Empty-directory check before mounting
+- Mount point confined to a private leaf under the operational work root (`WORK_BASE_DIR/mounted`, not the evidence tree), never an arbitrary or request-controlled path
 - All mount operations via `sandboxed_execute()` with resource limits
 
 ### CLIP Model Integrity
@@ -108,21 +93,36 @@ Honey tokens use **secure temp files** (never `os.environ`):
 
 ### MCP Transport Security
 
-VIGIA uses stdio transport by default, which inherits OS-level process isolation:
+VIGIA uses stdio transport only, which inherits OS-level process isolation:
 only the parent process (Claude Code, Ollama) can read/write the server's stdin/stdout.
+`__main__` calls `mcp.run()` with no transport argument, so the server always
+serves over stdio no matter what `--transport` is passed on the command line —
+and, separately, **this codebase implements no request-level authentication for
+HTTP/SSE transport at all**. An earlier revision of this document (and of
+`_verify_transport_security()`) described `VIGIA_MCP_AUTH_TOKEN` as gating
+HTTP/SSE access; it never did — the token was only ever checked for *presence*
+at startup, never validated against an incoming request, because no HTTP/SSE
+serving code path or auth middleware exists in this repository. A
+documented-but-nonfunctional control is worse than none, so this has been
+corrected: requesting anything other than stdio transport now hard-aborts
+startup unconditionally, rather than warning or gating behind an opt-in flag.
 
 Startup verification (`_verify_transport_security()`):
 
 1. **Session token**: Random 128-bit token printed to stderr for operator verification.
 2. **Stdin check**: Warns if stdin is not a pipe (unexpected command source).
-3. **HTTP/SSE blocking**: If SSE transport is detected AND `VIGIA_MCP_AUTH_TOKEN` is not set, logs CRITICAL alert. With `VIGIA_ENFORCE_STDIO=true`, aborts startup entirely.
+3. **Non-stdio transport request**: If `--transport` requests anything other than `stdio`, aborts startup unconditionally — there is no safe way to serve HTTP/SSE with this build.
 4. **Parent process verification**: Reads `/proc/{ppid}/exe` and compares against allowed executables (claude, node, python3, ollama, etc.). With `VIGIA_ENFORCE_PARENT=true`, aborts if parent is unknown.
 5. **Forensic logging**: Parent PID, executable, and trust status logged to the HMAC-chained audit trail.
 
 Environment variables:
-- `VIGIA_MCP_AUTH_TOKEN`: Required for HTTP/SSE transport (not needed for stdio)
-- `VIGIA_ENFORCE_STDIO=true`: Block startup if HTTP/SSE transport detected without auth
 - `VIGIA_ENFORCE_PARENT=true`: Block startup if parent process is not in the allowed list
+
+`VIGIA_MCP_AUTH_TOKEN` and `VIGIA_ENFORCE_STDIO` are no longer read anywhere —
+they implied a working HTTP/SSE auth path that never existed. If HTTP/SSE
+transport is ever added, it must ship together with real request-level
+authentication (e.g. bearer-token middleware on the ASGI app), not a
+startup-only presence check.
 
 ### Webhook Security
 
@@ -247,13 +247,13 @@ The Cross-Artifact Incongruence Engine enforces:
 
 | Variable | Purpose | Default |
 |----------|---------|---------|
-| `VIGIA_STRICT_MODEL_CHECK` | Refuse CLIP load without hash | `false` |
+| `VIGIA_STRICT_MODEL_CHECK` | Refuse CLIP load without hash | `true` |
 | `VIGIA_CLIP_HASH_FILE` | JSON with model SHA-256 hashes | none |
 | `VIGIA_WEBHOOK_SECRET` | HMAC secret for webhook signatures | none |
 | `VIGIA_DROP_PRIVS_UID` | UID to drop to when running as root | none |
-| `VIGIA_ENFORCE_STDIO` | Block HTTP/SSE transport without auth | `false` |
 | `VIGIA_ENFORCE_PARENT` | Block startup from unknown parent processes | `false` |
-| `VIGIA_MCP_AUTH_TOKEN` | Auth token required for HTTP/SSE transport | none |
+| `VIGIA_ENFORCE_KASSANDRA_SALT` | Abort startup if `KASSANDRA_SALT` is unset (else falls back to a publicly-known salt, making the semantic tripwire precomputable) | `false` |
+| `VIGIA_ENFORCE_HMAC_KEY` | Abort startup if no persistent `VIGIA_HMAC_KEY`/`VIGIA_HMAC_KEY_FILE` is set (else the audit log HMAC chain resets to a fresh, unrecorded key every restart) | `false` |
 
 ### Optional
 
