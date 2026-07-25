@@ -2744,6 +2744,44 @@ class CrossArtifactIncongruenceEngine:
         has_golden_rule = any(f.fracture_type in _GOLDEN_RULE_TYPES for f in filtered_fractures)
         has_structural_malice = any(f.fracture_type in _STRUCTURAL_MALICE_TYPES for f in filtered_fractures)
 
+        # HUMAN-FACING PRESENTATION ORDER (attack-against-the-auditor fix):
+        # filtered_fractures previously stayed in raw rule-execution order
+        # (Rule 1, Rule 2, ... Rule 8) — an artifact of which detect_fractures()
+        # check happens to run first, not of forensic importance. The verdict
+        # itself was always computed correctly (has_golden_rule/
+        # has_structural_malice scan the WHOLE list), but the narrative below
+        # picked filtered_fractures[0] as "the Key finding" and golden_rules[0]
+        # as "the Golden Rule" -- whichever fired first, not whichever mattered
+        # most. Confirmed empirically: a VERDICT_CONFLICT (severity 0.5, "requires
+        # deeper analysis... to resolve") that happens to fire before a
+        # TEMPORAL_CAUSALITY_VIOLATION (severity 1.0 -- MAXIMUM, "proving the
+        # evidence was planted retroactively") produced a Thirdness narrative
+        # that LEADS with the uncertain-sounding low-severity finding and tacks
+        # the maximum-severity structural proof on as an afterthought clause at
+        # the end -- primacy bias against the human reader, on a case the
+        # machine verdict (correctly) already called MALICE.
+        #
+        # Priority is Golden Rule > structural malice > everything else (the
+        # code's own stated epistemology just above: a causal impossibility is
+        # "a different epistemic category entirely", not just a high number),
+        # severity descending within each tier. Pure severity-sort alone is not
+        # equivalent: CRYPTOGRAPHIC_INCONSISTENCY (Golden Rule) can be severity
+        # 0.9, below a LOG_VS_MEMORY structural-malice fracture at 0.95, so a
+        # plain sort would still rank the Golden Rule second — hence the
+        # explicit tier first, severity only as the tiebreak within a tier.
+        # Stable sort (Python's sorted()) keeps this deterministic: ties within
+        # a tier+severity fall back to original detection order, never random.
+        def _fracture_narrative_priority(f: "Fracture") -> tuple[int, float]:
+            if f.fracture_type in _GOLDEN_RULE_TYPES:
+                tier = 0
+            elif f.fracture_type in _STRUCTURAL_MALICE_TYPES:
+                tier = 1
+            else:
+                tier = 2
+            return (tier, -float(f.severity))
+
+        fractures_by_priority = sorted(filtered_fractures, key=_fracture_narrative_priority)
+
         # Fracture bonus: only applied to NON-golden-rule fractures.
         # Rationale: Golden Rules already force MALICE via structural_verdict.
         # Adding a bonus on top of a forced verdict would double-weight the same
@@ -2866,9 +2904,11 @@ class CrossArtifactIncongruenceEngine:
             reverse=True
         )
 
-        # Golden Rules summary for Peirce Thirdness
-        # Uses _GOLDEN_RULE_TYPES (defined above in verdict block).
-        golden_rules = [f for f in filtered_fractures
+        # Golden Rules summary for Peirce Thirdness. Sourced from
+        # fractures_by_priority (not filtered_fractures): golden_rules[0] must
+        # be the highest-priority Golden Rule, not merely the first one the
+        # rule engine happened to detect.
+        golden_rules = [f for f in fractures_by_priority
                         if f.fracture_type in _GOLDEN_RULE_TYPES]
 
         peirce_chain = {
@@ -2889,8 +2929,10 @@ class CrossArtifactIncongruenceEngine:
             "thirdness": (
                 f"Inferred habit: {'fabrication/staging' if verdict != 'NOISE' else 'normal operation'}. "
                 + (
-                    f"Key: {filtered_fractures[0].fracture_type} — {filtered_fractures[0].interpretation[:200]}"
-                    if filtered_fractures else "No structural discrepancies."
+                    f"Key: {fractures_by_priority[0].fracture_type} "
+                    f"(severity={_dround(fractures_by_priority[0].severity, 2)}) — "
+                    f"{fractures_by_priority[0].interpretation[:200]}"
+                    if fractures_by_priority else "No structural discrepancies."
                 )
                 + (f" Golden Rule triggered: {golden_rules[0].fracture_type}." if golden_rules else "")
             ),
@@ -2976,7 +3018,12 @@ class CrossArtifactIncongruenceEngine:
                     "is_golden_rule": f.fracture_type in _GOLDEN_RULE_TYPES,
                     "is_structural": f.fracture_type in _STRUCTURAL_MALICE_TYPES,
                 }
-                for f in filtered_fractures
+                # Golden Rule > structural malice > everything else, severity
+                # descending within a tier (see fractures_by_priority above) --
+                # a human or downstream tool reading this list top-to-bottom
+                # sees the most forensically significant finding first, not
+                # whichever rule the engine happened to check first.
+                for f in fractures_by_priority
             ],
             "mitre_ttps": sorted(mitre_ttps),
             "ttp_confidences": {k: str(_dround(v, _DETERMINISTIC_OUTPUT_PREC)) for k, v in ttp_confidences.items()},
