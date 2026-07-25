@@ -243,6 +243,32 @@ class TestPipelineIntegration(unittest.TestCase):
         self.assertEqual(decision["alert_level"], "CRITICAL",
                          "ECO_SEMIOTIC_COLLISION debe forzar CRITICAL")
 
+    def test_critical_override_reason_names_the_collision_not_just_mi(self):
+        """F3 (Ronda 2 audit): _generate_reason() ignored has_collision and
+        always attributed CRITICAL to MI's magnitude. At MI=1/100 (0.010,
+        nowhere near the CRITICAL threshold) with ECO_SEMIOTIC_COLLISION
+        forcing the override, the reason used to read "MI crítico (0.010).
+        ... Escalamiento inmediato requerido." -- an auditor reading only the
+        reason string, not the raw metadata, would conclude MI itself was
+        the trigger. The reason must name the actual cause."""
+        try:
+            from vigia.core.decision_layer import decide
+        except ImportError:
+            self.skipTest("decision_layer no disponible")
+
+        det = _make_detector_output(
+            1, 100,  # MI muy bajo -- el trigger real es el collision, no MI
+            critical_patterns=["ECO_SEMIOTIC_COLLISION"]
+        )
+        from vigia.core.evidence_aggregator import aggregate_evidence
+        agg = aggregate_evidence(det)
+        decision = decide(det, agg)
+
+        self.assertEqual(decision["alert_level"], "CRITICAL")
+        self.assertIn("ECO_SEMIOTIC_COLLISION", decision["reason"],
+                       "El reason de un override por colisión debe nombrar la colisión, "
+                       "no atribuir el CRITICAL solo a MI")
+
     def test_low_mi_gives_low_alert(self):
         """MI muy bajo sin críticos → LOW."""
         try:

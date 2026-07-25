@@ -103,6 +103,24 @@ class RiskBoundedDecisionLayer:
         dominant = meta.get("dominant_category", "N/A")
         mi_str = f"{float(mi):.3f}"
 
+        # F3 fix: recompute the SAME has_collision check decide() used to
+        # pick CRITICAL, so the narrative names the actual trigger instead
+        # of always blaming MI. Before this fix, an ECO_SEMIOTIC_COLLISION
+        # override at MI=0.000 produced "MI crítico (0.000). ... Escalamiento
+        # inmediato requerido." -- CRITICAL with a reason that names the one
+        # value (MI) that was nowhere near critical, and never mentions the
+        # collision that actually forced the override. Recomputed here
+        # (rather than threaded as a new parameter) because _generate_reason
+        # already receives the same fsv decide() derived has_collision from.
+        has_collision = "ECO_SEMIOTIC_COLLISION" in meta.get("critical_patterns", [])
+
+        if level == "CRITICAL" and has_collision:
+            return (
+                f"ECO_SEMIOTIC_COLLISION detectado — override crítico independiente de MI "
+                f"(MI={mi_str}). {patterns} patrones, {synergies} sinergias, "
+                f"{sequences} secuencias. Categoría dominante: {dominant}. "
+                f"Escalamiento inmediato requerido."
+            )
         if level == "CRITICAL":
             return (
                 f"MI crítico ({mi_str}). {patterns} patrones, {synergies} sinergias, "
