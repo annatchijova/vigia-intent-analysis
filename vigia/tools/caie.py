@@ -1113,6 +1113,33 @@ def _extract_assertions(artifact: "Artifact") -> frozenset:
     return frozenset(assertions)
 
 
+def _artifact_content_signature(artifact: Artifact) -> str:
+    """
+    SHA-256 over every identity-relevant field of *artifact* (post
+    __post_init__ normalization): source_tool, evidence_type, raw_score,
+    description, metadata, provenance_chain, timestamp. Two artifacts with
+    an identical signature are the exact same submitted fact, not two
+    independently-corroborating observations.
+
+    Deliberately excludes nothing that would let a real second occurrence of
+    a similar-looking event collide: a distinct acquisition_hash, PID, or
+    timestamp in metadata already changes the signature, so genuinely
+    different (if structurally similar) artifacts are never conflated —
+    only byte-identical resubmissions are.
+    """
+    payload = {
+        "source_tool": artifact.source_tool,
+        "evidence_type": artifact.evidence_type,
+        "raw_score": str(artifact.raw_score),
+        "description": artifact.description,
+        "metadata": artifact.metadata,
+        "provenance_chain": artifact.provenance_chain,
+        "timestamp": artifact.timestamp,
+    }
+    canonical = json.dumps(payload, sort_keys=True, ensure_ascii=True, default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 class CrossArtifactIncongruenceEngine:
     """
     Kimi's Cross-Artifact Incongruence Engine — EXPANDED v2.0 [DETERMINISTIC].
@@ -1147,16 +1174,44 @@ class CrossArtifactIncongruenceEngine:
         # the omission is surfaced in the (signed) result and can drive an
         # honest disposition, instead of only living in the HMAC audit log.
         self._temporal_pairs_skipped: list[dict] = []
+        # Duplicate-artifact epistemology fix (see add_artifact): content
+        # signatures of every artifact accepted so far, to reject exact
+        # resubmissions before they inflate Noisy-OR fusion.
+        self._seen_content_signatures: set[str] = set()
 
     def add_artifact(self, artifact: Artifact) -> bool:
         """
         Add an artifact from a VIGIA tool result.
 
-        Returns True if added, False if rejected (limit or invalid type).
+        Returns True if added, False if rejected (limit, invalid type, or
+        exact duplicate).
 
         Kimi P0 enforcement:
         - Rejects if _MAX_ARTIFACTS exceeded (DoS protection)
         - Rejects if evidence_type is not in the whitelist
+
+        Duplicate-content rejection (epistemology fix): evaluate() fuses
+        artifacts within a (source_tool, evidence_type) group via Noisy-OR
+        (1 - prod(1 - s)), which compounds every additional score as if it
+        were independent corroboration. Submitting the exact same artifact
+        N times (a duplicate log entry, a tool re-run whose output gets
+        ingested twice, or deliberate padding) is not N independent
+        observations -- it is one fact reported N times -- yet each
+        resubmission still raised composite_score, and
+        _MIN_INDEPENDENT_SOURCES only counts distinct (source_tool,
+        evidence_type) pairs, not distinct underlying facts within a pair.
+        Empirically: 3 genuinely distinct weak artifacts (one per
+        source/type, raw_score=0.55 each) scored SUSPICION (composite
+        ~0.24); duplicating each one 3x (9 total artifacts, still only 3
+        source/type pairs, zero new facts) reached MALICE (composite
+        ~0.56) with structural_verdict staying NOISE throughout -- the
+        entire escalation was duplicate-driven, not evidence-driven.
+        _artifact_content_signature() rejects only byte-identical
+        resubmissions (same source_tool, evidence_type, raw_score,
+        description, metadata, provenance_chain, timestamp); a genuinely
+        distinct second occurrence (different PID, different
+        acquisition_hash, different timestamp, ...) still gets a different
+        signature and is accepted as new evidence.
         """
         if len(self._artifacts) >= _MAX_ARTIFACTS:
             audit_logger.log_block(
@@ -1184,6 +1239,24 @@ class CrossArtifactIncongruenceEngine:
             return False
 
         _artifact_copy = copy.deepcopy(artifact)
+
+        _sig = _artifact_content_signature(_artifact_copy)
+        if _sig in self._seen_content_signatures:
+            audit_logger.log_block(
+                event_type="CAIE_DUPLICATE_ARTIFACT",
+                tool="CAIE.add_artifact",
+                input_preview=f"source={artifact.source_tool} type={artifact.evidence_type}",
+                reason=(
+                    "Artifact is byte-identical to one already added in this "
+                    "evaluation (same source_tool, evidence_type, raw_score, "
+                    "description, metadata, provenance_chain, timestamp). "
+                    "Duplicate submissions are not independent corroboration -- "
+                    "Noisy-OR fusion would double-count the same fact. Rejected."
+                ),
+            )
+            return False
+        self._seen_content_signatures.add(_sig)
+
         self._artifacts.append(_artifact_copy)
 
         # Index for temporal and network analysis
@@ -2822,6 +2895,7 @@ class CrossArtifactIncongruenceEngine:
         self._fractures = []
         self._temporal_index = {}
         self._network_index = {}
+        self._seen_content_signatures = set()
 
 
 # ---------------------------------------------------------------------------
