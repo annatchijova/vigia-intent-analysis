@@ -6181,6 +6181,49 @@ All 6: zero production callers, all depend on orphaned producer chain
 (vigia/abduction/, vigia/temporal/, vigia/patterns/). Dry-run inviable.
 Preserved as pending-to-wire capability, NOT deletion candidates.
 
+### Update 2026-07-25 — confirmed by execution: the `adversarial_penalty` gap
+is not just "not wired," it changes the emitted state
+
+Continuation of the "Round 2" audit (see B-217/B-221): while investigating
+why `vigia_scorer.py:1931` (`_apply_quadripartite`) passes `dissent_info={}`
+(F1, B-217), I noticed the same call also hardcodes `pivot_signals=[]`,
+`investigation_roadmap=[]`, and `adversarial_penalty=False` — all three are
+literals inside `_apply_quadripartite` (line ~503), not derived from any
+computation in `vigia_scorer.py`. `pivot_signals`/`investigation_roadmap` are
+pure display data (they feed the analyst report via
+`QuadripartiteClassifier._build_verdict` → `render_for_report`) — their
+absence degrades the report to "see roadmap" but changes no verdict.
+
+`adversarial_penalty`, by contrast, **does gate a live branch** (Check 6,
+`quadripartite.py` line ~375): with `adversarial_penalty=True`, a BENIGN
+verdict gets a +5% effective-confidence bonus (the bonus exists precisely
+because the system evaluated and discarded the too-simple hypothesis, per
+`ockham_adversarial.py`'s principle). Confirmed by direct execution against
+`QuadripartiteClassifier.classify()`:
+
+```
+BENIGN, confidence=78%, stability=100%
+  adversarial_penalty=False (today's real state) -> BENIGN_MEDIUM, confidence=78%
+  adversarial_penalty=True  (if ockham were wired)-> BENIGN_HIGH,  confidence=83%
+```
+
+The +5% crosses the HIGH/MEDIUM threshold (80%) in this example — not a
+cosmetic adjustment, it changes the emitted `VerdictState`. Since
+`ockham_adversarial.py` has zero callers anywhere in the repository
+(confirmed by exhaustive grep, including tests — there isn't even a unit
+test for this module), the `adversarial_penalty=True` branch of
+`_build_verdict`/Check 6 is reachable in the code but **unreachable in
+practice**: nothing in the live pipeline can produce that `True` today. Same
+pattern as F1 (B-217): a correctly implemented decision branch with its own
+branch logic, but with the one input that would activate it hardcoded to a
+fixed value at the sole production call site.
+
+Not opened as a new bug — same root cause already documented in this B-124
+entry (orphaned producer chain in `vigia/abduction/`), just now with the
+concrete consequence verified by execution instead of deduced. Left as
+additional evidence to prioritize roadmap step 3 ("Wire governance modules
+in order: ockham -> dissent -> config_sentinel") if that path is pursued.
+
 ---
 
 ## B-126 — Grice v3.2 phenomenon-based detector + scorer testimony gate

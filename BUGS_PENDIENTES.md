@@ -6429,6 +6429,50 @@ vigia/patterns/). The full unblocking roadmap is:
 3. Wire governance modules in order: ockham -> dissent -> config_sentinel
 4. Wire narrative_auditor as C3 validation step before bundle sealing
 
+### Update 2026-07-25 — confirmado con ejecución: el hueco de `adversarial_penalty`
+no es solo "no cableado", cambia el estado emitido
+
+Continuación de la auditoría "Ronda 2" (ver B-217/B-221): investigando por qué
+`vigia_scorer.py:1931` (`_apply_quadripartite`) pasa `dissent_info={}` (F1,
+B-217), noté que la misma llamada también hardcodea `pivot_signals=[]`,
+`investigation_roadmap=[]` y `adversarial_penalty=False` — los tres son
+literales en `_apply_quadripartite` (línea ~503), no vienen de ningún cálculo
+en `vigia_scorer.py`. `pivot_signals`/`investigation_roadmap` son datos de
+display puro (alimentan el reporte del analista vía
+`QuadripartiteClassifier._build_verdict` → `render_for_report`) — su ausencia
+degrada el reporte a "see roadmap" pero no cambia ningún veredicto.
+
+`adversarial_penalty`, en cambio, **sí gatea una rama activa** (Check 6,
+`quadripartite.py` línea ~375): con `adversarial_penalty=True`, un veredicto
+BENIGN recibe +5% de confianza efectiva (el bono existe precisamente porque
+el sistema evaluó y descartó la hipótesis-demasiado-simple, según el
+principio de `ockham_adversarial.py`). Confirmado por ejecución directa
+contra `QuadripartiteClassifier.classify()`:
+
+```
+BENIGN, confidence=78%, stability=100%
+  adversarial_penalty=False (estado real hoy) -> BENIGN_MEDIUM, confidence=78%
+  adversarial_penalty=True  (si ockham estuviera cableado) -> BENIGN_HIGH,  confidence=83%
+```
+
+El +5% cruza el umbral HIGH/MEDIUM (80%) en este ejemplo — no es un ajuste
+cosmético, cambia el `VerdictState` emitido. Como `ockham_adversarial.py`
+tiene cero *callers* en todo el repo (confirmado por grep exhaustivo,
+incluyendo tests — ni siquiera hay un test unitario de este módulo), la rama
+`adversarial_penalty=True` de `_build_verdict`/Check 6 es alcanzable en el
+código pero **inalcanzable en la práctica**: nada en el pipeline vivo puede
+producir ese `True` hoy. Mismo patrón que F1 (B-217): una rama de decisión
+correctamente implementada y con su propio test de branch, pero con el único
+insumo que la activaría hardcodeado a un valor fijo en el único *caller* de
+producción.
+
+No se abre como bug nuevo — es la misma causa raíz ya documentada en este
+B-124 (cadena de productores huérfanos en `vigia/abduction/`), solo que ahora
+con la consecuencia concreta verificada por ejecución en vez de deducida.
+Queda como evidencia adicional para priorizar el paso 3 del roadmap de
+desbloqueo ("Wire governance modules in order: ockham -> dissent ->
+config_sentinel") si se decide continuar esa vía.
+
 ---
 
 ## B-125 — `vigia/forensics/document_integrity.py` dead duplicate deleted (unpatched ancestor of tools/ version)
