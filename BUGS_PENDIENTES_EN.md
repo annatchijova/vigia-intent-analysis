@@ -9707,3 +9707,323 @@ point.
 f` guard) and `f.get('fracture_type', f.get('type', '?'))` to tolerate the
 `type`/`description` fracture schema real cases use. Trivial, but a dry-run of the
 cases that DO carry `severity` is warranted so their render is not broken.
+
+## B-217 — `_compute_majority` weighted votes with the alarm scale: BENIGN could never win a majority, and the dissent→ESCALATE chain was dead end to end [RESOLVED — Claude 2026-07-25]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 (a documented system guarantee that did not exist in the live pipeline). Origin: "Round 2" audit (A-D-I methodology, see process note at the end of this block), finding F1. |
+| **File** | `vigia/core/dissent_report.py` (`_compute_majority`, line ~132). |
+| **Function** | `_compute_majority(opinions)`. |
+| **Original lines** | `weight = op.confidence * _SEVERITY_WEIGHT[op.verdict]` inside the `vote_counts` accumulation loop. |
+| **Fix commit** | `e7efacb` (branch `claude/mcp-security-followup-30502`). |
+| **Detected in** | "Round 2" audit (epistemological invariants), re-verified against the live file before applying the fix. |
+
+### Description
+
+`_SEVERITY_WEIGHT` is an ALARM scale (`MALICIOUS=1.0, SUSPICIOUS=0.5,
+BENIGN=0.0, ABSTAIN=0.0`), correctly used elsewhere in this same module
+(line ~244) to score how alarming an opinion that **dissents** from the
+majority is. `_compute_majority` reused that same table to weight each
+module's vote toward the majority itself — not just to score alarm. With
+`_SEVERITY_WEIGHT[BENIGN] = 0`, any module's BENIGN vote carried
+mathematically zero weight, regardless of how many modules voted that way or
+how confidently.
+
+Full causal chain, verified link by link against the live code:
+
+1. `_SEVERITY_WEIGHT[BENIGN] = 0` → BENIGN votes weigh zero →
+   `vote_counts[BENIGN]` stays at 0 no matter how many modules voted that
+   way. If **every** module opines BENIGN, `total = sum(vote_counts.values())`
+   collapses to 0, and `_compute_majority` falls into the "no votes at all"
+   fallback and returns `(ABSTAIN, 0)`.
+2. Executed (induction): 10 modules unanimously voting BENIGN at 90%
+   confidence produced `majority_verdict=ABSTAIN`, `consensus=0%`, with all
+   10 individually reported as "dissenting" from a majority that was never
+   actually computed.
+3. `_is_suspicious_consensus` requires `majority == BENIGN` to fire — under
+   the bug, that branch was dead code by construction: BENIGN could never
+   actually become the computed majority.
+4. Two additional facts, confirmed separately, NOT fixed by this change
+   (true before and after it): `generate_dissent_report()` has zero callers
+   anywhere in the repository (exhaustive grep, not just tests), and its
+   nominal consumer — `QuadripartiteClassifier`'s "Check 2: Specialist
+   dissent → ESCALATE" in `vigia/verdict/quadripartite.py` — has exactly one
+   production caller (`vigia_scorer.py`, line ~499) which passes
+   `dissent_info={}` **hardcoded**, so `escalation_required` can never reach
+   that check even with this fix applied.
+
+### Impact
+
+The system's headline guarantee, documented in the module's own docstring —
+*"9 modules say BENIGN + 1 behavioral module says MALICE = escalation
+required"* — did not exist in the live pipeline. It existed in tests (the
+ones just added, see below) and in documentation, but not on any real
+execution path, because the module additionally has no callers. To an
+expert witness or a judge, a system that promises a property its production
+code does not execute is worse than one that makes no such promise: the gap
+between documented and actual behavior is itself a Daubert admissibility
+defect.
+
+### Fix applied
+
+Change each vote's weight from `op.confidence * _SEVERITY_WEIGHT[op.verdict]`
+to `op.confidence` alone. The question `_compute_majority` answers is "what
+did each module vote, weighted by its own confidence in that vote" — a
+question orthogonal to how alarming that verdict is. The other use of
+`_SEVERITY_WEIGHT` (scoring the alarm level of a genuinely dissenting
+opinion, line ~244) is untouched, since the "alarm scale" semantics are
+correct there.
+
+Verified empirically before writing the fix, across three scenarios
+(unanimous BENIGN, the flagship 9-BENIGN+1-specialist-MALICIOUS escalation
+case, and a genuine MALICIOUS majority as a sanity check that unaffected
+paths didn't change), then locked in as a permanent test in
+`tests/test_dissent_report_majority.py` (the module had zero test coverage
+before this fix). Full suite run before and after: 1969 passed, 191 skipped,
+29 xfailed — zero regressions.
+
+**Pending decision (NOT made as part of this fix):** this fix restores the
+module's internal correctness but does not wire it into the live pipeline.
+Still to decide: either (a) wire `generate_dissent_report()` into the real
+pipeline (replacing the hardcoded `dissent_info={}` in
+`vigia_scorer.py:499` with a real call, fed with `ModuleOpinion`s from the
+specialist modules), or (b) declare the module experimental/dormant and
+adjust any README promise accordingly. Neither option has been implemented
+yet.
+
+## B-218 — The bundle seals `epsilon_used = epsilon_accept` even when the verdict was REJECT via `epsilon_reject`: the recorded ε is not the one that actually decided [DOCUMENTED — Claude 2026-07-25]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2, with a precondition currently dormant (see below). Origin: "Round 2" audit, finding F2. |
+| **Files** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`, line ~578: `epsilon_used=self._eps_accept`); `vigia/pipeline/pipeline.py` (lines 730-731: `epsilon_accept=decision_trace.epsilon_used` and `epsilon_reject=decision_trace.epsilon_used`). |
+| **Function** | `RiskBoundedDecisionLayer.decide()`; `VigiaPipeline` (sealed `SystemState` construction). |
+| **Original lines** | `epsilon_used=self._eps_accept` (always, regardless of the verdict). |
+| **Fix commit** | None — documented, not applied. |
+| **Detected in** | "Round 2" audit, induction executed and re-verified against the live file in this session. |
+
+### Description
+
+`decide()` builds the `DecisionTrace` with `epsilon_used=self._eps_accept`
+unconditionally on the verdict. When the verdict is REJECT, the threshold
+that actually decided was `epsilon_reject` (the rule is `REJECT if
+r >= 1 - epsilon_reject`), not `epsilon_accept` — but the field sealed in
+the trace (and from there in the bundle, via `pipeline.py:730-731`, which
+copies that same value into **both** `epsilon_accept` and `epsilon_reject`
+of the `SystemState`) always reports `epsilon_accept`.
+
+Verified empirically in this session (not just deduced):
+
+```
+RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
+decide(posterior=0.70) → decision=REJECT, risk=0.7
+  epsilon_used (sealed)              = 0.05    # epsilon_accept
+  actual eps_reject used at threshold = 0.40
+```
+
+The verdict (`REJECT`) is correct — this is purely an auditability bug: the
+field an expert witness would read to answer "what threshold was used to
+reject this case?" does not tell the truth.
+
+**Honest precondition (why this is P2, not P1):**
+`SelfAdaptiveRiskPolicy.update_from_window` forces
+`epsilon_accept = epsilon_reject` on every update (`risk_bounded_layer.py`,
+lines ~290-291: `self.epsilon_accept = epsilon_stable; self.epsilon_reject = epsilon_stable`).
+Under the default adaptive configuration (the one the pipeline uses in
+practice), both values are always equal, so the bug is harmless there —
+it doesn't matter which of the two gets sealed since they're the same
+number. The mechanism is broken, but the trigger is dormant today. It only
+bites if some `PolicySpec` explicitly sets `epsilon_accept != epsilon_reject`
+— a path `RiskBoundedDecisionLayer.from_policy_spec()` supports without
+restriction.
+
+### Impact
+
+If a future `PolicySpec` (or someone constructing `RiskBoundedDecisionLayer`
+directly, outside the adaptive policy) sets asymmetric thresholds, the
+sealed bundle would misrepresent which ε was used for any rejected case —
+exactly the kind of discrepancy between "what the system did" and "what the
+system says it did" that undermines the auditable chain of custody (VIGÍA
+invariant: audit-trail determinism, not just verdict determinism).
+
+### Proposed fix (NOT applied)
+
+In `decide()`, seal `epsilon_used = self._eps_reject if verdict == "REJECT" else self._eps_accept`
+(or, more explicit for an expert witness, seal both values separately in the
+trace — `epsilon_accept_used` and `epsilon_reject_used` — instead of a
+single `epsilon_used` field that assumes one of the two is always
+irrelevant). Also requires revisiting `pipeline.py:730-731`, which currently
+assumes a single `epsilon_used` is enough to populate both fields of the
+sealed `SystemState`.
+
+## B-219 — The CRITICAL override's `ECO_SEMIOTIC_COLLISION` reason never named the collision, only the MI (which could sit at 0.000) [RESOLVED — Claude 2026-07-25]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (an attack against the auditor, not the detector — the verdict was correct, the explanation wasn't). Origin: "Round 2" audit, finding F3. |
+| **File** | `vigia/core/decision_layer.py` (`RiskBoundedDecisionLayer._generate_reason`, line ~98). |
+| **Function** | `_generate_reason(self, mi, level, fsv)`, called from `decide()`. |
+| **Original lines** | `_generate_reason` received `mi` and `level` but never `has_collision`; for `level == "CRITICAL"` it always returned `"MI crítico ({mi_str})..."`, regardless of whether CRITICAL came from `mi >= self.high` or from the `has_collision` override. |
+| **Fix commit** | `056977e` (branch `claude/mcp-security-followup-30502`). |
+| **Detected in** | "Round 2" audit, confirmed as a CODE FACT (the string `"ECO_SEMIOTIC_COLLISION"` did not appear in any branch of `_generate_reason`) in addition to executed induction. |
+
+### Description
+
+`decide()` computes `has_collision = "ECO_SEMIOTIC_COLLISION" in critical_patterns`
+and sets `level = "CRITICAL"` if `has_collision or mi >= self.high` — the
+override is independent of `mi`'s magnitude. But `_generate_reason(mi,
+level, fsv)` never received `has_collision`, so for any `level == "CRITICAL"`
+it always attributed the verdict to "MI crítico ({mi_str})", even when `mi`
+sat at 0.000 and the real trigger was the semantic collision.
+
+Executed: `MI = 1/100 (0.010)` + `critical_patterns=["ECO_SEMIOTIC_COLLISION"]`
+→ `alert_level = "CRITICAL"` (correct) with
+`reason = "MI crítico (0.010). ... Escalamiento inmediato requerido."` — an
+auditor reading only the reason string (not the raw metadata) would conclude
+MI was the trigger. It wasn't; the collision was.
+
+### Impact
+
+The verdict (`CRITICAL`) was always correct — this isn't a detection bug,
+it's a narrative bug: the same "attacks against the auditor" class
+identified earlier on this branch (see the CAIE narrative-presentation-order
+fix, commit `a0ebd5c`). An expert witness or judge auditing the case through
+its text explanation, without cross-checking raw metadata, would reach an
+incorrect technical conclusion about what produced the CRITICAL level —
+exactly the scenario this session's "attacks against the auditor" framework
+was designed to catch.
+
+### Fix applied
+
+Recompute the same `has_collision` check inside `_generate_reason`, from
+data already available in its `fsv` parameter
+(`meta.get("critical_patterns", [])`) — no new parameter needed, since
+`_generate_reason` already receives the same `fsv` that `decide()` derives
+`has_collision` from. For `level == "CRITICAL" and has_collision`, the
+message now explicitly names `ECO_SEMIOTIC_COLLISION` as an override
+independent of MI; for `level == "CRITICAL"` without a collision, the
+original ("MI crítico...") message is unchanged.
+
+Test added: `test_critical_override_reason_names_the_collision_not_just_mi`
+in `tests/test_evidence_aggregator.py`, sibling to the pre-existing
+`test_critical_override_eco_semiotic_collision` (which only checked
+`alert_level`, never the reason text). The area's suite (38 tests:
+`test_evidence_aggregator.py` + `test_red_team.py` + `test_h27_internal_drift.py`)
+was green before and after.
+
+## B-220 — The `bayesian_update` cache is keyed only by `artifact_id`: it ignores `custom_window`, even though the parameter is part of the public signature [DOCUMENTED — Claude 2026-07-25]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3, latent (no caller uses the affected parameter today). Origin: "Round 2" audit, finding F4. |
+| **File** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`, line ~260). |
+| **Function** | `bayesian_update(self, artifact_id, custom_window=None)`. |
+| **Original lines** | `if artifact_id in self._bayesian_cache: return self._bayesian_cache[artifact_id]` — the cache key is `artifact_id` alone; `custom_window` plays no part. |
+| **Fix commit** | None — documented, not applied. |
+| **Detected in** | "Round 2" audit, executed against the live file. |
+
+### Description
+
+`bayesian_update(artifact_id, custom_window=None)` accepts `custom_window`
+as a documented parameter and correctly uses it to compute the temporal
+neighborhood (`get_neighborhood(artifact_id, custom_window)`) — but
+**before** reaching that computation, it checks `self._bayesian_cache` keyed
+only by `artifact_id`. Executed: `bayesian_update('a3')` and
+`bayesian_update('a3', custom_window=timedelta(seconds=30))` return the
+**same object** — the second call never recomputes with the different
+window, it simply returns whatever was cached from the first call
+(whichever that was).
+
+Confirmed by exhaustive grep: no caller of `bayesian_update` anywhere in the
+repository (neither internal nor MCP-exposed) passes `custom_window` today —
+every production call site (`vigia/core/trust_fusion.py`, lines 319, 345,
+395, 541) uses the `None` default. The bug is purely latent: no real
+execution path reaches it in the code's current state.
+
+### Impact
+
+If some future caller (internal or via MCP) starts using `custom_window` —
+the parameter is documented and exposed, so this is a foreseeable use, not
+an exotic one — it would get results from the wrong temporal window
+depending solely on call order: the first call "wins" and stays cached for
+any subsequent `custom_window` on the same `artifact_id`. This is a classic
+incomplete-cache-key bug, matching the pattern of other cache-key bugs
+already documented in this repository (search "cache key" in
+`BUGS_PENDIENTES_EN.md`).
+
+### Proposed fix (NOT applied)
+
+Include `custom_window` in the cache key (e.g.
+`cache_key = (artifact_id, custom_window)`, with `custom_window=None` a
+valid tuple member), or — simpler, given nobody uses it today — explicitly
+exclude from caching any call with a non-default `custom_window`,
+documenting that only the default window gets cached. Either option needs a
+regression test that doesn't exist today (no test of `bayesian_update`
+exercises a non-`None` `custom_window`).
+
+## B-221 — "Round 2" audit (epistemological invariants): investigated and discarded vectors — recorded to avoid re-discovering them [DOCUMENTED — Claude 2026-07-25]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | N/A — not bugs. Documented as audit reference, not as a defect. |
+| **Files** | `vigia/core/risk_bounded_layer.py` (`PolicyStabilityController`), `vigia/core/dissent_report.py` (`_compute_majority`, tie-break), `vigia/core/trust_fusion.py` (`NeighborhoodContext.mean_neighbor_trust`, `TrustFusionEngine.calculate_likelihood`, `add_artifact`). |
+| **Method** | A-D-I (Abductive-Deductive-Inductive): every vector was executed against the live code before being accepted or discarded, not just deduced. |
+| **Detected in** | "Round 2" audit, session 2026-07-25, independently re-verified in this session (no result from the pasted report was accepted without re-running it). |
+
+### Description
+
+Five vectors were investigated during the "Round 2" audit and did not turn
+into bugs. They're documented here explicitly so a future audit doesn't
+spend time re-discovering them:
+
+**1. F5 — `PolicyStabilityController`: does the result diverge between the
+numpy branch (`np.linalg.norm` + `np.array`) and the stdlib fallback
+(`math.sqrt` + lists)?** FALSIFIED. Original hypothesis (deduced, not
+executed): the verdict might silently depend on whether `numpy` is
+installed. Re-executed in this session, forcing both branches over the same
+`stabilize()` sequence: the three resulting parameters (`lambda, gamma,
+epsilon`) are **bit-identical** across both paths (`0x1.b851eb851eb85p+1` in
+both cases, verified via float `.hex()`). The two branches are
+arithmetically equivalent for this operation; the BLAS divergence that
+motivated the hypothesis is theoretical for this case, not demonstrated.
+Retracted as a finding.
+
+**2. `_compute_majority`'s tie-break favors MALICIOUS on a tie.** NOT A BUG.
+Breaking ties toward the more severe verdict on an exact vote tie is
+deterministic and fail-safe — it's the correct policy for a forensic system:
+under genuine uncertainty between two equally-voted verdicts, escalating is
+more defensible than averaging down.
+
+**3. `NeighborhoodContext.mean_neighbor_trust` returns `1.0` when there are
+no neighbors — is that "absence of evidence treated as perfect trust"?**
+FALSIFIED as a scoring risk. Verified against the live code:
+`TrustFusionEngine.calculate_likelihood` short-circuits to `return 0.5` when
+`neighborhood.neighbor_count == 0`, **before** ever reading
+`mean_neighbor_trust` — the `1.0` value never participates in the
+`likelihood`/`posterior` computation. The `1.0` does appear in the narrative
+reason text (`BOOST: trust vecindad={neighborhood.mean_neighbor_trust:.3f}`)
+in cases where neighbors DO exist, so there's no path where the "no
+neighbors" default leaks into a score. Confirmed real risk: none.
+
+**4. `add_artifact` silently deduplicates duplicate IDs.** Hygiene, not a
+severity bug. `add_artifact` returns `False` with no exception and no
+record when `artifact.artifact_id` already exists (`trust_fusion.py`, line
+~207) — two artifacts sharing an ID collapse into one without appearing in
+any `rejected_details` or equivalent structure. The behavior itself is
+desirable (guards against double-counting), but it's invisible: nothing in
+`TrustFusionEngine`'s output tells an expert witness that an artifact was
+dropped as a duplicate. Minor, non-blocking ticket — not opened as its own
+numbered bug since it affects no verdict; recorded here instead.
+
+### Process note
+
+This audit was done with explicit A-D-I discipline after an earlier pass
+(B-217 through B-220 plus this block) had *deduced* some findings without
+executing them. Re-verification with induction changed the outcome: F1 got
+worse (the full chain was shown to be dead, not just that the module was
+orphaned), F2 and F4 dropped in severity once their dormant preconditions
+were discovered, and F5 was fully retracted once executed and found
+bit-identical. The process is documented, not just the outcome, because the
+process is repeatable: any future finding of this kind should go through the
+same re-verification against live code before being accepted as confirmed.
