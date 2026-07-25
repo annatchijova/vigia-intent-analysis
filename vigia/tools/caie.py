@@ -542,6 +542,46 @@ _MAX_ARTIFACTS: Final[int] = 1000
 _MIN_INDEPENDENT_SOURCES: Final[int] = 3
 _LOW_SOURCE_PENALTY: Final[float] = 0.20  # Reduce score by 20% if < 3 sources
 
+# COGNITIVE/SCORING FLOOD FIX: independent_sources originally counted every
+# distinct (source_tool, evidence_type) GROUP, regardless of how much that
+# group actually contributed to the fused score -- a group's own raw_score
+# and spoofability never entered the count, only its existence as a label.
+# This is gameable in a way that is NOT just a narrative/display problem:
+# padding a case with cheap, distinct-labeled, near-worthless artifacts (a
+# tool that emits low-confidence findings, or an attacker manufacturing
+# junk categories) can push independent_sources across the
+# _MIN_INDEPENDENT_SOURCES=3 line and WAIVE the 20% confidence_penalty
+# entirely, even though nothing was genuinely corroborated. Confirmed
+# empirically: 2 solid artifacts alone score 0.3083 with the penalty
+# correctly applied (INCONCLUSIVE); adding 3 trivial-but-distinct-group
+# artifacts (raw_score=0.02 each, high-spoofability evidence_type) escapes
+# the penalty entirely and raises the score to 0.3879 (+26%) and the
+# verdict to SUSPICION -- from evidence that, standing alone, would barely
+# register.
+#
+# _SOURCE_MATERIALITY_FLOOR: a group only counts toward independent_sources
+# if SOME member artifact's own RAW_SCORE (pre-spoofability) reaches this
+# floor -- deliberately RAW, not the spoofability-adjusted group_score.
+# First attempt used group_score and immediately broke a legitimate case:
+# a real log_entry finding at raw_score=0.55 (a genuine, moderate-confidence
+# assertion) adjusts down to 0.0404 given log_entry's spoofability=0.85 --
+# BELOW a 0.05 floor on the adjusted score, so a real corroborating source
+# would have been wrongly excluded for being an inherently-spoofable
+# evidence TYPE, which is a different thing from being unsubstantiated
+# padding. raw_score isolates "did the tool/analyst assert at least minimal
+# analytical confidence" from "how much do we discount this evidence type",
+# which is exactly what spoofability weighting already does correctly
+# downstream in adjusted_score / composite_score -- materiality should not
+# re-apply that discount a second time. The padding reproduction above used
+# raw_score=0.02, deliberately near zero; 0.05 sits well below any
+# genuine finding in this codebase's own test corpus while still excluding
+# that padding. This does NOT remove low-scoring groups from the composite
+# Noisy-OR fusion itself (their small, honest contribution to
+# composite_score is correct and stays); it only stops manufactured
+# near-zero-confidence artifacts from also buying an exemption from the
+# low-corroboration penalty.
+_SOURCE_MATERIALITY_FLOOR: Final[str] = "0.05"
+
 # ---------------------------------------------------------------------------
 # NIST SP 800-86 / RFC 3227 — Acquisition metadata validation
 #
@@ -2665,7 +2705,7 @@ class CrossArtifactIncongruenceEngine:
         grouped = defaultdict(list)
         for a in self._artifacts:
             key = (a.source_tool.strip().casefold(), a.evidence_type.strip().casefold())
-            grouped[key].append(a.adjusted_score)
+            grouped[key].append((a.adjusted_score, a.raw_score))
 
         # Within-group fusion (dependent evidence): 1 - ∏(1 - s)
         # NIGHTFALL P1: multiplicaciones acumulativas con decimal.Decimal.
@@ -2673,16 +2713,28 @@ class CrossArtifactIncongruenceEngine:
         # antes del redondeo, y ese producto intermedio puede diferir en el
         # bit 52 de la mantisa entre x86 y ARM. Con Decimal(str(x)) la
         # multiplicacion es puramente software, determinista en toda arquitectura.
+        #
+        # group_is_material tracks, per group, the MAX raw_score (pre-
+        # spoofability) any member artifact asserted -- see
+        # _SOURCE_MATERIALITY_FLOOR below for why this must be raw_score and
+        # not the fused/adjusted group_score.
         group_scores = []
-        for scores in grouped.values():
+        group_is_material = []
+        _materiality_floor = decimal.Decimal(_SOURCE_MATERIALITY_FLOOR)
+        for members in grouped.values():
             prod_d = _D_ONE
-            for s in scores:
+            max_raw_d = _D_ZERO
+            for adjusted, raw in members:
                 # Decimal(str(x)): conversion via string evita imprecision
                 # de la conversion directa float->Decimal
-                s_d = decimal.Decimal(str(_dround(s, _DETERMINISTIC_INTERNAL_PREC)))
+                s_d = decimal.Decimal(str(_dround(adjusted, _DETERMINISTIC_INTERNAL_PREC)))
                 prod_d = prod_d * (_D_ONE - s_d)
+                raw_d = decimal.Decimal(str(_dround(raw, _DETERMINISTIC_INTERNAL_PREC)))
+                if raw_d > max_raw_d:
+                    max_raw_d = raw_d
             group_score = _dround(_D_ONE - prod_d, _DETERMINISTIC_INTERNAL_PREC)
             group_scores.append(group_score)
+            group_is_material.append(max_raw_d >= _materiality_floor)
 
         # Across-group fusion (independent sources): 1 - ∏(1 - g)
         # NIGHTFALL P1: mismo patron Decimal para las multiplicaciones de grupos
@@ -2698,7 +2750,19 @@ class CrossArtifactIncongruenceEngine:
         composite = _dround(min(composite, decimal.Decimal("0.99")), _DETERMINISTIC_INTERNAL_PREC)
 
         # P1: Confidence normalization - penalize if < 3 independent sources
-        independent_sources = len(group_scores)
+        #
+        # source_groups_total: raw count of distinct (source_tool,
+        # evidence_type) groups -- purely mechanical, says nothing about how
+        # much each group actually contributed.
+        # independent_sources: only groups where SOME member artifact's own
+        # raw_score cleared _SOURCE_MATERIALITY_FLOOR (group_is_material,
+        # computed above). This is what gates confidence_penalty (see the
+        # constant's docstring for why the raw count was gameable) and it is
+        # the number exposed under the "independent_sources" key -- callers
+        # relying on that name for the corroboration count get the fixed
+        # semantics automatically.
+        source_groups_total = len(group_scores)
+        independent_sources = sum(1 for m in group_is_material if m)
         confidence_penalty = 0.0
         if independent_sources < _MIN_INDEPENDENT_SOURCES:
             confidence_penalty = _LOW_SOURCE_PENALTY
@@ -2912,14 +2976,27 @@ class CrossArtifactIncongruenceEngine:
                         if f.fracture_type in _GOLDEN_RULE_TYPES]
 
         peirce_chain = {
+            # COGNITIVE FLOOD FIX: the raw artifact/tool count alone invites a
+            # "broad corroboration" impression that does not distinguish 3
+            # solid findings from 3 solid findings plus 30 near-worthless
+            # ones -- Noisy-OR fusion barely reacts to the padding
+            # (spoofability weighting keeps its score contribution small),
+            # but "N artifacts from M tools" reads the same either way to a
+            # human skimming it. Naming how many of those tools materially
+            # cleared _SOURCE_MATERIALITY_FLOOR alongside the raw count lets
+            # the reader tell "broad AND substantive" apart from "wide but
+            # thin" at a glance, without hiding the raw number.
             "firstness": (
                 f"{len(self._artifacts)} artifacts from "
-                f"{len(set(a.source_tool for a in self._artifacts))} tools. "
+                f"{len(set(a.source_tool for a in self._artifacts))} tools "
+                f"({independent_sources} materially independent of "
+                f"{source_groups_total} distinct source/type groups). "
                 f"Raw scores range: {_dround(min(a.raw_score for a in self._artifacts), 2):.2f} "
                 f"to {_dround(max(a.raw_score for a in self._artifacts), 2):.2f}."
             ),
             "secondness": (
-                f"Noisy-OR fusion: {len(group_scores)} independent groups, "
+                f"Noisy-OR fusion: {source_groups_total} group(s) fused "
+                f"({independent_sources} materially independent), "
                 f"composite={_dround(composite, 4):.4f}. "
                 f"Most reliable: {top_adjusted[0]['tool']} "
                 f"({top_adjusted[0]['type']}, adj={top_adjusted[0]['adjusted']}). "
@@ -3001,6 +3078,7 @@ class CrossArtifactIncongruenceEngine:
             "fracture_bonus_applied": str(_dround(fracture_bonus, _DETERMINISTIC_OUTPUT_PREC)),
             "artifacts_evaluated": len(self._artifacts),
             "independent_sources": independent_sources,
+            "source_groups_total": source_groups_total,
             "confidence_penalty_applied": confidence_penalty > 0,
             "fractures_detected": len(filtered_fractures),
             "fractures_unique": len(filtered_fractures),
