@@ -5,9 +5,10 @@ without a fix applied, or awaiting an architecture decision. Format: one
 block per bug, keeping the same number it always had — never renumbered.
 
 Bugs that are already resolved, closed, applied, or discarded live in
-`BUGS_HISTORICO_EN.md` — split out on 2026-07-25 so this file stays
-navigable. Numbering is shared between both files: a given B-XXX never
-appears in both at once.
+[`BUGS_HISTORICO_EN.md`](./BUGS_HISTORICO_EN.md) — split out on 2026-07-25
+so this file stays navigable. Useful if you're red-teaming VIGÍA: it holds
+everything that's already been found and fixed. Numbering is shared
+between both files: a given B-XXX never appears in both at once.
 
 ---
 

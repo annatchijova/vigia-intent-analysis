@@ -5,9 +5,11 @@ aplicado, o con una decisión de arquitectura sin tomar. Formato: un bloque
 por bug, con el mismo número que tuvo siempre — nunca se renumera.
 
 Los bugs ya resueltos, cerrados, aplicados o descartados viven en
-`BUGS_HISTORICO.md` — separados el 2026-07-25 para que este archivo quede
-navegable. La numeración es compartida entre ambos archivos: un mismo
-B-XXX nunca aparece en los dos a la vez.
+[`BUGS_HISTORICO.md`](./BUGS_HISTORICO.md) — separados el 2026-07-25 para
+que este archivo quede navegable. Útil para quien quiera hacer red team
+sobre VIGÍA: ahí está todo lo que ya se encontró y se corrigió. La
+numeración es compartida entre ambos archivos: un mismo B-XXX nunca
+aparece en los dos a la vez.
 
 ---
 

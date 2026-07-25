@@ -106,6 +106,8 @@ VIGÍA. The truth is in the fracture.
 | Command reference | [`vigia_commands_en.html`](./vigia_commands_en.html) — [hosted](https://annatchijova.github.io/vigia/vigia_commands_en.html) |
 | Known limitations | [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) |
 | Security policy | [`SECURITY.md`](./SECURITY.md) |
+| **Bug registry — open items** | [`BUGS_PENDIENTES.md`](./BUGS_PENDIENTES.md) (ES) · [`BUGS_PENDIENTES_EN.md`](./BUGS_PENDIENTES_EN.md) (EN) |
+| **Bug registry — resolved / historical** | [`BUGS_HISTORICO.md`](./BUGS_HISTORICO.md) (ES) · [`BUGS_HISTORICO_EN.md`](./BUGS_HISTORICO_EN.md) (EN) — full audit trail of every fix, useful if you're red-teaming VIGÍA and want to see exactly what's already been found and patched before you go looking for the next thing |
 | Authors | [`AUTHORS.md`](./AUTHORS.md) |
 | **Origin story** | **[`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) · [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES)** |
 | Full compliance index | [`SUBMISSION_COMPLIANCE.md`](./SUBMISSION_COMPLIANCE.md) |
@@ -1314,6 +1316,8 @@ vigia-intent-analysis/
 ├── LICENSE                              ← Apache 2.0
 ├── README.md                            ← This file
 ├── KNOWN_LIMITATIONS.md                 ← L-001 to L-066 (Daubert transparency)
+├── BUGS_PENDIENTES.md / _EN.md          ← Bug registry: still open
+├── BUGS_HISTORICO.md / _EN.md           ← Bug registry: resolved (red-team reading)
 ├── SUBMISSION_COMPLIANCE.md             ← Full compliance index for judges
 ├── INSTALL.md                           ← Extended installation guide (EN)
 ├── INSTALL_ES.md                        ← Installation guide (ES)

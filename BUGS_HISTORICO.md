@@ -1,10 +1,12 @@
 # BUGS_HISTORICO.md — VIGÍA Bug Registry (Histórico / Resueltos)
 
 Registro histórico de bugs **ya resueltos, cerrados, aplicados o
-descartados** — separado de `BUGS_PENDIENTES.md` el 2026-07-25 para que el
-archivo de pendientes reales quedara navegable. Se conserva completo como
-audit trail (los bugs resueltos no se eliminan, solo se archivan) — cada
-entrada mantiene el número que tenía en el registro original.
+descartados** — separado de [`BUGS_PENDIENTES.md`](./BUGS_PENDIENTES.md) el
+2026-07-25 para que el archivo de pendientes reales quedara navegable. Se
+conserva completo como audit trail (los bugs resueltos no se eliminan,
+solo se archivan) — cada entrada mantiene el número que tenía en el
+registro original. Lectura recomendada para quien quiera hacer red team
+sobre VIGÍA: acá está todo lo que ya se encontró y se corrigió.
 
 Formato: un bloque por bug, con su impacto forense y el fix aplicado.
 

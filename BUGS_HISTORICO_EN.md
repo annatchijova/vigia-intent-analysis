@@ -1,10 +1,12 @@
 # BUGS_HISTORICO_EN.md — VIGÍA Bug Registry (Historical / Resolved)
 
 Historical registry of bugs that are **already resolved, closed, applied,
-or discarded** — split out of `BUGS_PENDIENTES_EN.md` on 2026-07-25 so the
-file of genuinely pending bugs stays navigable. Kept complete as an audit
-trail (resolved bugs are never deleted, only archived) — each entry keeps
-the number it had in the original registry.
+or discarded** — split out of [`BUGS_PENDIENTES_EN.md`](./BUGS_PENDIENTES_EN.md)
+on 2026-07-25 so the file of genuinely pending bugs stays navigable. Kept
+complete as an audit trail (resolved bugs are never deleted, only
+archived) — each entry keeps the number it had in the original registry.
+Recommended reading if you're red-teaming VIGÍA: everything already found
+and fixed lives here.
 
 Format: one block per bug, with its forensic impact and the fix applied.
 
