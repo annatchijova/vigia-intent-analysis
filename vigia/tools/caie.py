@@ -2922,12 +2922,59 @@ class CrossArtifactIncongruenceEngine:
             cdl = CollapseDecisionLayer()
 
             # Calcular coverage_ratio aproximado basado en capas observadas
+            #
+            # KNOWN GAP (investigated, only partially fixed here -- see
+            # docs/CDL_COVERAGE_RATIO_GAP.md for the full writeup): this is
+            # the same "count distinct labels, not weight/membership" defect
+            # class as the independent_sources bug fixed earlier in this
+            # branch, in a sibling mechanism. Two confirmed problems:
+            #
+            # 1. UNBOUNDED RATIO (fixed below): observed_layers counts every
+            #    DISTINCT label seen, with no bound and no membership check
+            #    against total_expected_layers. len(observed_layers) can
+            #    exceed 6, so coverage_ratio could exceed 1.0 (verified:
+            #    10 distinct evidence_type values -> coverage_ratio=1.667,
+            #    167% -- nonsensical for a value CollapseDecisionLayer.explain()
+            #    formats as a percentage). Capped at 1.0 below.
+            #
+            # 2. NOT ACTUALLY MEMBERSHIP-TESTED (NOT fixed here -- needs a
+            #    real evidence_type -> layer taxonomy, which is a separate,
+            #    larger task requiring domain judgment this fix should not
+            #    rush): `a.metadata.get("layer", a.evidence_type)` is meant
+            #    to let a producer explicitly declare one of the 6 canonical
+            #    layers via metadata["layer"], falling back to evidence_type.
+            #    Verified: metadata["layer"] is never set anywhere in this
+            #    codebase (grep found zero producers), and NONE of the 70+
+            #    _VALID_EVIDENCE_TYPES strings are members of
+            #    total_expected_layers (zero-element intersection). So in
+            #    100% of current real usage, coverage_ratio measures "how
+            #    many distinct evidence_type labels were used, capped at
+            #    6/6" -- not genuine memory/process/auth/filesystem/network/
+            #    kernel domain coverage. The CollapseVerdict.INCONCLUSIVE
+            #    gate at coverage_ratio < 0.3 (collapse_decision.py) is
+            #    trivially cleared by just 2 distinct evidence_type labels
+            #    (2/6 = 0.333), regardless of whether they represent
+            #    genuinely diverse forensic domains -- e.g. memory_process +
+            #    kernel_structure are both memory/kernel-adjacent yet count
+            #    as 2 full "layers". A real fix requires an explicit,
+            #    reviewed evidence_type -> {memory, process, auth,
+            #    filesystem, network, kernel, other} mapping (most of the 70+
+            #    types, e.g. chat_message/social_media/osint/document_visual,
+            #    do not fit this 6-layer host-forensics taxonomy at all) and
+            #    must be validated against the full canonical case corpus
+            #    before landing, the same way the independent_sources fix
+            #    above was -- a naive mapping risks silently downgrading real
+            #    verdicts to INCONCLUSIVE for the wrong reason, which is a
+            #    worse failure than the current (over-lenient) gate.
             total_expected_layers = ["memory", "process", "auth", "filesystem", "network", "kernel"]
             observed_layers = set()
             for a in self._artifacts:
                 layer = a.metadata.get("layer", a.evidence_type)
                 observed_layers.add(layer)
-            coverage_ratio = len(observed_layers) / len(total_expected_layers) if total_expected_layers else 0.5
+            coverage_ratio = (
+                min(len(observed_layers), len(total_expected_layers)) / len(total_expected_layers)
+                if total_expected_layers else 0.5
+            )
 
             ctx = CollapseContext(
                 broken_assumptions=broken_assumptions,
