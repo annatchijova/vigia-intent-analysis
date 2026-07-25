@@ -15,10 +15,11 @@ Dos garantías:
 
 Universo de definición (tres niveles, reflejo de la práctica real del repo):
   a. Headings h2-h4 de KNOWN_LIMITATIONS.md, BUGS_PENDIENTES.md,
-     BUGS_PENDIENTES_EN.md y docs/*.md — tolera los formatos históricos
-     `### [RESOLVED] L-019 — ...`, `### B-032 [FIXED] — ...` y los dossiers
-     de auditoría que son registro canónico de bandas enteras (B-057..B-061
-     viven en docs/AUDITORIA_INVARIANTES_ASIMETRIAS_20260703.md).
+     BUGS_PENDIENTES_EN.md, BUGS_HISTORICO.md, BUGS_HISTORICO_EN.md y
+     docs/*.md — tolera los formatos históricos `### [RESOLVED] L-019 — ...`,
+     `### B-032 [FIXED] — ...` y los dossiers de auditoría que son registro
+     canónico de bandas enteras (B-057..B-061 viven en
+     docs/AUDITORIA_INVARIANTES_ASIMETRIAS_20260703.md).
   b. Filas de índice "entry retired" (L-013 es un hueco documentado).
   c. Sub-IDs con letra (B-041a, L-037a): definidos si su padre tiene
      heading — la práctica del repo los define dentro del cuerpo del padre.
@@ -39,6 +40,8 @@ REGISTRY_FILES = (
     "KNOWN_LIMITATIONS.md",
     "BUGS_PENDIENTES.md",
     "BUGS_PENDIENTES_EN.md",
+    "BUGS_HISTORICO.md",
+    "BUGS_HISTORICO_EN.md",
 )
 
 _ID_RE = re.compile(r"\b([LB]-\d{3}[a-z]?)\b")
@@ -138,7 +141,7 @@ def _b_heading_ids(fname: str) -> set[str]:
 
 
 def test_es_en_registry_parity() -> None:
-    """Ambos registros documentan el MISMO conjunto de bugs B-*.
+    """Ambos registros de PENDIENTES documentan el MISMO conjunto de bugs B-*.
 
     Sentinela promovida a guarda dura el 2026-07-23 (patrón B-097): el
     empalme EN de B-111..B-115 + REVIEW-001 aterrizó en esta sesión.
@@ -147,16 +150,54 @@ def test_es_en_registry_parity() -> None:
     2026-07-23: EN sin B-111..B-115 y ES sin B-145..B-152). Un registro
     espejo que diverge en contenido deja de ser espejo: el lector de un
     idioma cree tener el cuadro completo y no lo tiene.
+
+    2026-07-25: BUGS_PENDIENTES.md/_EN.md se separaron de
+    BUGS_HISTORICO.md/_EN.md (los ~186 bugs ya resueltos se archivaron para
+    que el registro de pendientes reales quedara navegable). Esta guarda
+    ahora cubre solo el par PENDIENTES; ver test_es_en_historico_parity
+    para el par HISTORICO — juntos siguen cubriendo el universo B-* completo
+    en ambos idiomas.
     """
     es = _b_heading_ids("BUGS_PENDIENTES.md")
     en = _b_heading_ids("BUGS_PENDIENTES_EN.md")
     only_es = sorted(es - en)
     only_en = sorted(en - es)
     assert not only_es and not only_en, (
-        f"Registros desincronizados — solo en ES: {only_es}; "
+        f"Registros PENDIENTES desincronizados — solo en ES: {only_es}; "
         f"solo en EN: {only_en}. Traducir las entradas faltantes "
         "(no borrar las presentes)."
     )
+
+
+def test_es_en_historico_parity() -> None:
+    """Ambos registros HISTORICO documentan el MISMO conjunto de bugs B-*.
+
+    Mismo contrato que test_es_en_registry_parity, aplicado al archivo
+    archivado (BUGS_HISTORICO.md/_EN.md) creado en el split del 2026-07-25.
+    """
+    es = _b_heading_ids("BUGS_HISTORICO.md")
+    en = _b_heading_ids("BUGS_HISTORICO_EN.md")
+    only_es = sorted(es - en)
+    only_en = sorted(en - es)
+    assert not only_es and not only_en, (
+        f"Registros HISTORICO desincronizados — solo en ES: {only_es}; "
+        f"solo en EN: {only_en}. Traducir las entradas faltantes "
+        "(no borrar las presentes)."
+    )
+
+
+def test_pendientes_and_historico_partition_the_full_registry() -> None:
+    """PENDIENTES e HISTORICO no se solapan y juntos cubren todo el universo
+    B-* de cada idioma — el split del 2026-07-25 no debe perder ni duplicar
+    ningún bug al mover entradas resueltas al archivo histórico."""
+    for lang_suffix in ("", "_EN"):
+        pending = _b_heading_ids(f"BUGS_PENDIENTES{lang_suffix}.md")
+        historico = _b_heading_ids(f"BUGS_HISTORICO{lang_suffix}.md")
+        overlap = pending & historico
+        assert not overlap, (
+            f"BUGS_PENDIENTES{lang_suffix}.md y BUGS_HISTORICO{lang_suffix}.md "
+            f"comparten IDs (deberían ser una partición): {sorted(overlap)}"
+        )
 
 
 def test_allowlist_entries_carry_justification() -> None:

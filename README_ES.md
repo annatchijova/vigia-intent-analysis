@@ -105,6 +105,8 @@ VIGÍA. The truth is in the fracture.
 | Referencia de comandos | [`vigia_commands_en.html`](./vigia_commands_en.html) — [alojado](https://annatchijova.github.io/vigia/vigia_commands_en.html) |
 | Limitaciones conocidas | [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) |
 | Política de seguridad | [`SECURITY.md`](./SECURITY.md) |
+| **Registro de bugs — pendientes** | [`BUGS_PENDIENTES.md`](./BUGS_PENDIENTES.md) (ES) · [`BUGS_PENDIENTES_EN.md`](./BUGS_PENDIENTES_EN.md) (EN) |
+| **Registro de bugs — resueltos / histórico** | [`BUGS_HISTORICO.md`](./BUGS_HISTORICO.md) (ES) · [`BUGS_HISTORICO_EN.md`](./BUGS_HISTORICO_EN.md) (EN) — audit trail completo de cada fix; útil si estás haciendo red team sobre VIGÍA y querés ver qué ya se encontró y se corrigió antes de buscar lo siguiente |
 | Autores | [`AUTHORS.md`](./AUTHORS.md) |
 | **Historia de origen** | **[`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) · [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES)** |
 | Índice de cumplimiento completo | [`SUBMISSION_COMPLIANCE.md`](./SUBMISSION_COMPLIANCE.md) |
@@ -1266,6 +1268,8 @@ vigia-intent-analysis/
 ├── README.md                            ← Versión en inglés
 ├── README_ES.md                         ← Este archivo (versión en español)
 ├── KNOWN_LIMITATIONS.md                 ← L-001 a L-066 (transparencia Daubert)
+├── BUGS_PENDIENTES.md / _EN.md          ← Registro de bugs: pendientes
+├── BUGS_HISTORICO.md / _EN.md           ← Registro de bugs: resueltos (lectura para red team)
 ├── SUBMISSION_COMPLIANCE.md             ← Índice completo de cumplimiento para jueces
 ├── INSTALL.md                           ← Guía de instalación extendida (EN)
 ├── INSTALL_ES.md                        ← Guía de instalación (ES)

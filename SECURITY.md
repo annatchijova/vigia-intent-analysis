@@ -337,16 +337,22 @@ Daubert admissibility assessment included in every CAIE result.
 ## Bug Registry and Audit Documentation
 
 Every security-relevant bug, fix, and architectural decision is tracked with
-full audit trail in two registries (identical content, maintained in parallel):
+full audit trail, split across two tiers (2026-07-25) so the list of
+genuinely open items stays navigable as the registry grows. Each tier is
+maintained in parallel in Spanish and English (identical content):
 
-- **[BUGS_PENDIENTES.md](BUGS_PENDIENTES.md)** (Spanish) -- B-001 through B-126+
-- **[BUGS_PENDIENTES_EN.md](BUGS_PENDIENTES_EN.md)** (English) -- same entries
+- **[BUGS_PENDIENTES.md](BUGS_PENDIENTES.md)** / **[BUGS_PENDIENTES_EN.md](BUGS_PENDIENTES_EN.md)**
+  -- bugs still open, documented without a fix applied, or awaiting an
+  architecture decision (e.g. B-116, B-123, B-124).
+- **[BUGS_HISTORICO.md](BUGS_HISTORICO.md)** / **[BUGS_HISTORICO_EN.md](BUGS_HISTORICO_EN.md)**
+  -- bugs already resolved, closed, applied, or discarded (e.g. verdict
+  inversions like B-117, fail-open stubs like B-119). Archived, not deleted.
 
 Each entry documents: severity, affected file, root cause, fix applied,
 impact assessment, and verification steps. Entries are never deleted --
-resolved bugs remain as permanent audit trail. The registries include
-confirmed production incidents (BUG-EML-001), verdict inversions (B-117),
-fail-open stubs (B-119), and architectural gaps (B-116, B-123, B-124).
+resolved bugs move from the pending file to the historical one, keeping
+the same B-XXX number, and remain as permanent audit trail. Confirmed
+production incidents (BUG-EML-001) are tracked the same way.
 
 Additional red-team audits, adversarial robustness reports, and architectural
 dossiers are available under `docs/` -- including multi-model adversarial
