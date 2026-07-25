@@ -6473,6 +6473,61 @@ Queda como evidencia adicional para priorizar el paso 3 del roadmap de
 desbloqueo ("Wire governance modules in order: ockham -> dissent ->
 config_sentinel") si se decide continuar esa vía.
 
+### Update 2026-07-25 (bis) — `config_sentinel.py`: si se cableara hoy tal
+cual está, mentiría sobre los dos módulos críticos que ya sabemos rotos
+
+Continuando la excavación del cluster B-124, leí `ConfigAuditMonitor`
+completo. Su propósito declarado es exactamente detectar esto: "Módulos
+críticos desactivados al inicio" y sellar un `analyst_warning` en el bundle
+si `CAIE`, `TrustFusion`, `OckhamAdversarial` o `SignalRouter` (su propio
+`CRITICAL_MODULES`) están inactivos. Pero su `_MODULE_ENV_MAP` mapea cada
+módulo a una variable de entorno que el monitor mismo lee — y de las 9
+variables mapeadas, **7 no se leen en ningún otro lugar del repositorio**
+(confirmado por grep exhaustivo, excluyendo tests y el propio
+`config_sentinel.py`): `VIGIA_OCKHAM_ADVERSARIAL`,
+`VIGIA_SIGNALROUTER_ENABLED`, `VIGIA_PDF_ENABLED`, `VIGIA_NETWORK_ENABLED`,
+`VIGIA_REGISTRY_ENABLED`, `VIGIA_EMAIL_ENABLED`, `VIGIA_TEMPORAL_ENABLED`.
+Solo `VIGIA_CAIE_ENABLED` y `VIGIA_TRUST_FUSION_ENABLED` gatean algo real.
+
+`_getenv_bool` por diseño devuelve `True` (activo) cuando la variable no
+está seteada — `NOT_SET` se interpreta como "activo por default", lo cual
+tiene sentido SI la variable realmente controlara el módulo. Pero como
+`VIGIA_OCKHAM_ADVERSARIAL` y `VIGIA_SIGNALROUTER_ENABLED` no controlan nada
+(ya sabemos por este mismo B-124 que `ockham_adversarial.py` tiene cero
+*callers* y que `advanced_signal_router.py` está "conceptualmente
+superseded"), el monitor reportaría "activo" para exactamente los dos
+módulos críticos que están completamente desconectados del pipeline vivo.
+
+Ejecutado directamente contra `ConfigAuditMonitor` con el entorno limpio
+(sin ninguna de las 9 variables seteada — el caso normal, porque nadie las
+documenta):
+
+```
+integrity_level: FULL_INTEGRITY
+analyst_warning: None
+
+OckhamAdversarial    active=True  env_var=VIGIA_OCKHAM_ADVERSARIAL  env_value=NOT_SET
+SignalRouter         active=True  env_var=VIGIA_SIGNALROUTER_ENABLED  env_value=NOT_SET
+```
+
+Un "guardián de configuración" que reporta `FULL_INTEGRITY` y "activo" para
+los dos módulos que su propio archivo hermano (este B-124) documenta como
+completamente huérfanos no es solo "no cableado" — si se cableara sin
+corregir primero el `_MODULE_ENV_MAP`, daría falsa tranquilidad exactamente
+donde el sistema está más roto. Mismo patrón epistemológico que "ataques
+contra el auditor" (ver B-219): un mecanismo que, lejos de fallar
+ruidosamente, produciría un reporte sellado que dice "todo bien" sobre un
+módulo ausente.
+
+No se abre como bug nuevo — sigue siendo parte de la causa raíz de B-124
+(cadena de dependencias huérfanas), pero el fix correcto para
+`config_sentinel.py` ya no es solo "cablearlo": `_MODULE_ENV_MAP` tiene que
+reflejar cómo cada módulo se activa realmente (para `OckhamAdversarial` y
+`SignalRouter`, hoy eso sería "nunca, porque no tienen *caller*", no una
+variable de entorno que nadie lee) antes de que el monitor pueda ser
+confiable. Verificado con test permanente:
+`tests/test_config_sentinel_orphaned_module_env_map.py`.
+
 ---
 
 ## B-125 — `vigia/forensics/document_integrity.py` dead duplicate deleted (unpatched ancestor of tools/ version)

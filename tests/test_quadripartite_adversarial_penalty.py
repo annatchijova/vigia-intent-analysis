@@ -73,20 +73,30 @@ class TestProductionCallSiteHardcodesPenaltyFalse:
         )
 
     def test_ockham_adversarial_has_no_callers_outside_its_own_module(self):
+        """Checks actual import/usage, not bare substring matches -- test
+        docstrings elsewhere in this suite legitimately discuss
+        ockham_adversarial.py by name (e.g.
+        test_config_sentinel_orphaned_module_env_map.py's B-124 addendum
+        prose) without importing or calling it. Only a real import or
+        attribute-style reference outside tests/ would mean it got wired."""
         import subprocess
 
         result = subprocess.run(
-            ["grep", "-rl", "ockham_adversarial", "--include=*.py", "."],
+            [
+                "grep", "-rlE",
+                r"import ockham_adversarial|ockham_adversarial\.",
+                "--include=*.py", ".",
+            ],
             cwd=__file__.rsplit("/tests/", 1)[0],
             capture_output=True, text=True,
         )
         callers = [
             line for line in result.stdout.splitlines()
             if not line.endswith("vigia/core/ockham_adversarial.py")
-            and "test_quadripartite_adversarial_penalty.py" not in line
+            and "/tests/" not in line
         ]
         assert callers == [], (
-            f"ockham_adversarial now has callers outside its own module: "
-            f"{callers} -- the 'zero callers' premise of this diagnosis no "
-            f"longer holds, update the B-124 addendum."
+            f"ockham_adversarial now has callers outside its own module and "
+            f"outside tests/: {callers} -- the 'zero callers' premise of "
+            f"this diagnosis no longer holds, update the B-124 addendum."
         )
