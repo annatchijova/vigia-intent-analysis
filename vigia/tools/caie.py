@@ -90,12 +90,16 @@ from pathlib import Path
 from typing import Any, Final
 
 from vigia.security import (
-    _sanitize_path, 
-    _utcnow, 
+    _sanitize_path,
+    _utcnow,
     audit_logger,
     trust_decay,
     _sanitize_llm_input,
 )
+# Reused for artifact-signature timestamp canonicalization (see
+# _canonical_timestamp): same tolerant ISO-8601 parser already used by the
+# tool_execution_log hash chain, instead of a second ad-hoc implementation.
+from vigia.core.hash_chain import _parse_iso_ts
 
 # Import MITRE mapping for centralized TTP knowledge
 from vigia.tools.mitre_mapping import (
@@ -1113,19 +1117,48 @@ def _extract_assertions(artifact: "Artifact") -> frozenset:
     return frozenset(assertions)
 
 
+def _canonical_timestamp(ts: str) -> str:
+    """
+    UTC-normalized ISO-8601 form of *ts*, so two artifacts describing the
+    exact same instant hash identically regardless of which UTC offset the
+    producing tool happened to print (e.g. "2025-01-01T12:00:00Z" and
+    "2025-01-01T09:00:00-03:00" are the same instant). Falls back to the raw
+    string if unparseable -- never raise on a malformed timestamp, just
+    don't canonicalize it (same tolerant contract as _parse_iso_ts itself).
+
+    This is deliberately a pure canonicalization (one instant -> one
+    string), not similarity/fuzzy matching: signature equality built on top
+    of it stays an exact-equality relation (reflexive, symmetric,
+    transitive) rather than a "close enough" comparison, which would not be
+    transitive in general (A~B and B~C does not imply A~C for a distance
+    threshold).
+    """
+    dt = _parse_iso_ts(ts)
+    return dt.astimezone(timezone.utc).isoformat() if dt is not None else ts
+
+
 def _artifact_content_signature(artifact: Artifact) -> str:
     """
     SHA-256 over every identity-relevant field of *artifact* (post
     __post_init__ normalization): source_tool, evidence_type, raw_score,
-    description, metadata, provenance_chain, timestamp. Two artifacts with
-    an identical signature are the exact same submitted fact, not two
-    independently-corroborating observations.
+    description, metadata, provenance_chain, timestamp (UTC-canonicalized).
+    Two artifacts with an identical signature are the exact same submitted
+    fact, not two independently-corroborating observations.
 
-    Deliberately excludes nothing that would let a real second occurrence of
-    a similar-looking event collide: a distinct acquisition_hash, PID, or
-    timestamp in metadata already changes the signature, so genuinely
-    different (if structurally similar) artifacts are never conflated —
-    only byte-identical resubmissions are.
+    This is a forensic-identity signature, not a byte-identity hash: "same
+    fact" is intentionally slightly broader than "same JSON bytes" — right
+    now that means timestamp UTC-normalization (see _canonical_timestamp).
+    It deliberately does NOT fold case or coerce types across all of
+    metadata (e.g. host="SERVER01" vs "server01", pid="123" vs 123):
+    hostnames are case-insensitive but a Linux path is not, and blanket
+    normalization would trade a false-negative (missed duplicate) for a
+    false-positive (two genuinely different facts conflated) in fields
+    whose semantics this function cannot know. See
+    CrossArtifactIncongruenceEngine.add_artifact's superset-based
+    REFINEMENT handling for the complementary case: an artifact that adds
+    strictly more metadata to an existing one (not a different
+    representation of the same fields) supersedes it instead of being
+    treated as independent corroboration.
     """
     payload = {
         "source_tool": artifact.source_tool,
@@ -1134,10 +1167,34 @@ def _artifact_content_signature(artifact: Artifact) -> str:
         "description": artifact.description,
         "metadata": artifact.metadata,
         "provenance_chain": artifact.provenance_chain,
-        "timestamp": artifact.timestamp,
+        "timestamp": _canonical_timestamp(artifact.timestamp),
     }
     canonical = json.dumps(payload, sort_keys=True, ensure_ascii=True, default=str)
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _metadata_is_subset(smaller: dict, larger: dict) -> bool:
+    """
+    True if every key in *smaller* has an identical value in *larger*
+    (recursing into nested dicts); *larger* may have additional keys
+    *smaller* lacks. List/scalar values must match exactly — no partial
+    credit for lists, since "subset of a list" is order/membership-
+    ambiguous and not worth the complexity here. Used to detect when one
+    artifact is a strict REFINEMENT of another (same fact, more detail),
+    as opposed to a conflicting or genuinely independent observation (e.g.
+    pid=100 vs pid=200 is neither a subset nor a superset — two different
+    processes, correctly kept as two artifacts).
+    """
+    for k, v in smaller.items():
+        if k not in larger:
+            return False
+        lv = larger[k]
+        if isinstance(v, dict) and isinstance(lv, dict):
+            if not _metadata_is_subset(v, lv):
+                return False
+        elif v != lv:
+            return False
+    return True
 
 
 class CrossArtifactIncongruenceEngine:
@@ -1183,8 +1240,9 @@ class CrossArtifactIncongruenceEngine:
         """
         Add an artifact from a VIGIA tool result.
 
-        Returns True if added, False if rejected (limit, invalid type, or
-        exact duplicate).
+        Returns True if added or if it refined/replaced an existing
+        artifact in place (see REFINEMENT below); False if rejected (limit,
+        invalid type, exact duplicate, or redundant refinement).
 
         Kimi P0 enforcement:
         - Rejects if _MAX_ARTIFACTS exceeded (DoS protection)
@@ -1255,17 +1313,115 @@ class CrossArtifactIncongruenceEngine:
                 ),
             )
             return False
+
+        # REFINEMENT / SUBSUMPTION (I-0XX generalization): a new artifact
+        # that adds strictly more metadata to an already-accepted artifact
+        # describing the exact same EVENT is not a second independent
+        # observation either — a tool re-parsing the same evidence with more
+        # detail ("Suspicious process" -> "Suspicious process" + pid +
+        # sha256) is one fact reported twice at different resolutions, and
+        # would otherwise inflate Noisy-OR fusion exactly like the
+        # exact-duplicate case. Symmetrically: if the NEW artifact carries
+        # strictly LESS metadata than one already stored for the same event,
+        # it is redundant and rejected outright (the stored one already
+        # dominates it). Neither branch fires when metadata is incomparable
+        # (e.g. pid=100 vs pid=200) or the description differs — those are
+        # kept as genuinely independent artifacts, unchanged from prior
+        # behavior.
+        #
+        # "Same event" REQUIRES matching timestamp and provenance_chain, not
+        # just source_tool/evidence_type/description: two artifacts that
+        # both happen to carry empty/no metadata (e.g. two MFT records both
+        # missing mft_entry_number) share source_tool+evidence_type+
+        # description and are trivially "metadata subsets" of each other,
+        # but a different timestamp or provenance_chain means a genuinely
+        # different occurrence — collapsing them would silently destroy a
+        # real, distinct MFT_ENTRY_ANOMALY-eligible artifact
+        # (test_caie_mft_entry_guard.py caught exactly this while adding
+        # this fix). Timestamp is compared canonicalized (same instant,
+        # different UTC offset, still counts as the same event).
+        for _i, _existing in enumerate(self._artifacts):
+            if not (
+                _existing.source_tool == _artifact_copy.source_tool
+                and _existing.evidence_type == _artifact_copy.evidence_type
+                and _existing.description == _artifact_copy.description
+                and _existing.provenance_chain == _artifact_copy.provenance_chain
+                and _canonical_timestamp(_existing.timestamp)
+                == _canonical_timestamp(_artifact_copy.timestamp)
+            ):
+                continue
+            if _metadata_is_subset(_existing.metadata, _artifact_copy.metadata):
+                # New artifact refines/supersedes the stored one. Retain the
+                # higher raw_score -- a refinement must never look LESS
+                # confident than the vaguer report it replaces.
+                if _existing.raw_score > _artifact_copy.raw_score:
+                    _artifact_copy.raw_score = _existing.raw_score
+                self._seen_content_signatures.discard(
+                    _artifact_content_signature(_existing)
+                )
+                self._remove_from_indices(_existing)
+                self._artifacts[_i] = _artifact_copy
+                self._seen_content_signatures.add(
+                    _artifact_content_signature(_artifact_copy)
+                )
+                self._add_to_indices(_artifact_copy)
+                audit_logger.log_info(
+                    event_type="CAIE_ARTIFACT_REFINED",
+                    tool="CAIE.add_artifact",
+                    message=(
+                        f"source={artifact.source_tool} type={artifact.evidence_type}: "
+                        "new artifact carries a superset of an existing artifact's "
+                        "metadata for the same event -- replaced in place instead of "
+                        "counted as independent corroboration."
+                    ),
+                )
+                return True
+            if _metadata_is_subset(_artifact_copy.metadata, _existing.metadata):
+                # New artifact carries no information the stored one lacks.
+                audit_logger.log_block(
+                    event_type="CAIE_REDUNDANT_REFINEMENT",
+                    tool="CAIE.add_artifact",
+                    input_preview=f"source={artifact.source_tool} type={artifact.evidence_type}",
+                    reason=(
+                        "Artifact's metadata is a subset of an already-accepted "
+                        "artifact describing the same event (same source_tool, "
+                        "evidence_type, description). It carries no new information "
+                        "-- rejected rather than double-counted."
+                    ),
+                )
+                return False
+
         self._seen_content_signatures.add(_sig)
-
         self._artifacts.append(_artifact_copy)
-
-        # Index for temporal and network analysis
-        if _artifact_copy.timestamp:
-            self._temporal_index.setdefault(_artifact_copy.timestamp, []).append(_artifact_copy)
-        if "network" in _artifact_copy.evidence_type or "ip" in _artifact_copy.evidence_type:
-            self._network_index.setdefault(_artifact_copy.source_tool, []).append(_artifact_copy)
-
+        self._add_to_indices(_artifact_copy)
         return True
+
+    def _add_to_indices(self, artifact: "Artifact") -> None:
+        """Index a stored artifact for temporal (TCV) and network correlation."""
+        if artifact.timestamp:
+            self._temporal_index.setdefault(artifact.timestamp, []).append(artifact)
+        if "network" in artifact.evidence_type or "ip" in artifact.evidence_type:
+            self._network_index.setdefault(artifact.source_tool, []).append(artifact)
+
+    def _remove_from_indices(self, artifact: "Artifact") -> None:
+        """
+        Remove *artifact* (by identity, not equality) from the temporal and
+        network indices. Required when a REFINEMENT replaces an artifact
+        in-place: without this, the superseded object stays reachable from
+        _temporal_index / _network_index (used by TCV and NETWORK_VS_HOST
+        fracture rules) even though it is no longer in self._artifacts --
+        a stale reference to evidence the engine has otherwise forgotten.
+        """
+        bucket = self._temporal_index.get(artifact.timestamp)
+        if bucket is not None:
+            bucket[:] = [a for a in bucket if a is not artifact]
+            if not bucket:
+                del self._temporal_index[artifact.timestamp]
+        net_bucket = self._network_index.get(artifact.source_tool)
+        if net_bucket is not None:
+            net_bucket[:] = [a for a in net_bucket if a is not artifact]
+            if not net_bucket:
+                del self._network_index[artifact.source_tool]
 
     def add_from_tool_result(
         self,
