@@ -10966,3 +10966,61 @@ encontrar resultados bit-idénticos. Se documenta el proceso, no solo el
 resultado, porque el proceso es replicable: cualquier hallazgo futuro de este
 tipo debe pasar por la misma re-verificación contra el código vivo antes de
 aceptarse como confirmado.
+
+## B-222 — `.env.example`: nombre de variable de override de hash CLIP incompleto y default de `VIGIA_STRICT_MODEL_CHECK` invertido respecto al código [RESUELTO — Claude 2026-07-25]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P4 (deriva documentación/código, cero impacto en veredictos sellados — pero silenciaba un override de seguridad y bajaba un default seguro). |
+| **Archivos** | `.env.example` (reescrito completo, traducido al inglés en el mismo commit); `vigia/forensics/vision_audit.py` (comentarios en líneas ~78 y ~94). |
+| **Función** | `_load_clip_model_hashes()` (deriva el nombre de la variable de override por modelo); `_STRICT_MODEL_CHECK` (lectura del default). |
+| **Líneas originales** | Comentario `VIGIA_CLIP_HASH_VIT_B_32` (sin `_PT`); `.env.example` con `VIGIA_STRICT_MODEL_CHECK=false`. |
+| **Commit fix** | (rama `claude/mcp-security-followup-30502`, mismo commit que la actualización de `.env.example`). |
+| **Detectado en** | Continuación de la auditoría "Ronda 2" — encontrado incidentalmente mientras se relevaban todas las variables `VIGIA_*` leídas en vivo para actualizar `.env.example`, verificado por ejecución antes de documentarlo. |
+
+### Descripción
+
+Dos discrepancias independientes entre lo documentado y el comportamiento real:
+
+1. **Nombre de variable incompleto.** `_load_clip_model_hashes()` deriva el
+   nombre de la variable de override por modelo como
+   `"VIGIA_CLIP_HASH_" + filename.replace("-","_").replace(".","_").upper()`.
+   Para `"ViT-B-32.pt"` eso da `VIGIA_CLIP_HASH_VIT_B_32_PT` — confirmado por
+   ejecución directa. El comentario del propio módulo (línea ~78) y el
+   `.env.example` anterior documentaban `VIGIA_CLIP_HASH_VIT_B_32`, sin el
+   `_PT` de la extensión. Un operador que siguiera esa documentación seteaba
+   una variable que `_load_clip_model_hashes()` nunca lee — el override no
+   hacía nada, silenciosamente, sin ningún error que apuntara al typo.
+
+2. **Default invertido.** `VIGIA_STRICT_MODEL_CHECK` tiene default `"true"`
+   en el código (`os.getenv("VIGIA_STRICT_MODEL_CHECK", "true")`, comentado
+   como "P1-7: default seguro"). El `.env.example` anterior lo seteaba
+   explícitamente en `false` — al copiar el archivo a `.env`, esto bajaba la
+   verificación de integridad del modelo CLIP de "segura por defecto" a
+   permisiva, contradiciendo el propio encabezado de esa sección
+   ("STRICT MODE — activar todos antes de cualquier uso forense en un
+   entorno real").
+
+### Impacto
+
+Ninguno sobre veredictos ya sellados — ambas son variables de configuración
+de entorno, no lógica de scoring. El impacto es operacional: un operador
+que configurara el hash de CLIP vía el nombre documentado (sin `_PT`)
+creería tener supply-chain integrity activa sobre el modelo de visión
+cuando en realidad seguía usando el hash hardcodeado (vacío) o de archivo;
+y cualquiera que copiara `.env.example` tal cual heredaba un
+`VIGIA_STRICT_MODEL_CHECK=false` explícito, más permisivo que no setear la
+variable en absoluto.
+
+### Fix aplicado
+
+Corregido el comentario en `vision_audit.py` (nombre completo con `_PT` +
+nota de que fue confirmado por ejecución) y el `.env.example` reescrito
+(variable renombrada a `VIGIA_CLIP_HASH_VIT_B_32_PT`;
+`VIGIA_STRICT_MODEL_CHECK` cambiado a `true` con comentario explicando por
+qué). Test permanente agregado:
+`tests/test_clip_hash_env_var_naming.py` (4 tests: deriva el nombre
+correcto, el override con `_PT` funciona, el nombre sin `_PT` se ignora
+silenciosamente — documentando el modo de falla que causó esto — y el
+default de `VIGIA_STRICT_MODEL_CHECK` es `true` cuando la variable no está
+seteada).

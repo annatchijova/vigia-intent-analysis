@@ -75,10 +75,16 @@ CHROMA_SUBSAMPLING_ANOMALY_THRESHOLD: Final[float] = 0.3      # Chroma channel v
 # Hash resolution (priority order):
 #   1. VIGIA_CLIP_HASH_FILE env var → JSON file mapping filename → sha256
 #      Example: {"ViT-B-32.pt": "abcdef1234..."}
-#   2. VIGIA_CLIP_HASH_VIT_B_32 env var → direct hash for ViT-B/32
+#   2. VIGIA_CLIP_HASH_<FILENAME> env var → direct hash for one model,
+#      filename uppercased with "-" and "." replaced by "_"
+#      (ViT-B-32.pt → VIGIA_CLIP_HASH_VIT_B_32_PT — confirmed by execution
+#      2026-07-25; a prior version of this comment and of .env.example said
+#      VIGIA_CLIP_HASH_VIT_B_32, missing the "_PT" from the extension, which
+#      silently no-ops as an override since _load_clip_model_hashes() below
+#      never reads that name)
 #   3. Hardcoded dict below (populate before production use)
 #
-# Strict mode (VIGIA_STRICT_MODEL_CHECK=true):
+# Strict mode (VIGIA_STRICT_MODEL_CHECK, default true):
 #   If enabled and NO hash is configured for a model, CLIPVisualAuditor
 #   will REFUSE to load. This prevents silent skip of integrity checks
 #   in production/court environments.
@@ -91,7 +97,7 @@ _STRICT_MODEL_CHECK: Final[bool] = (
 
 # Hardcoded fallback — override via env vars above
 _CLIP_MODEL_HASHES_BUILTIN: Final[dict[str, str]] = {
-    "ViT-B-32.pt": "",   # Configurar via VIGIA_CLIP_HASH_FILE o VIGIA_CLIP_HASH_VIT_B_32 (ver QUICK_START.md)
+    "ViT-B-32.pt": "",   # Configure via VIGIA_CLIP_HASH_FILE or VIGIA_CLIP_HASH_VIT_B_32_PT
 }
 
 
