@@ -10047,3 +10047,65 @@ xfailed — cero regresiones (la única falla observada en
 `tests/integration/test_ebs_v1_integration.py`, sobre calibración
 KDE/Ledoit-Wolf, es preexistente — confirmada idéntica con y sin este fix
 vía `git stash`).
+
+## B-220 — La caché de `bayesian_update` está indexada solo por `artifact_id`: ignora `custom_window`, aunque el parámetro es parte de la firma pública [RESUELTO — Claude 2026-07-26]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3, era latente (ningún *caller* usaba el parámetro afectado). Origen: auditoría "Ronda 2", hallazgo F4. |
+| **Archivo** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`). |
+| **Función** | `bayesian_update(self, artifact_id, custom_window=None)`. |
+| **Líneas originales** | `if artifact_id in self._bayesian_cache: return self._bayesian_cache[artifact_id]` — clave de caché era solo `artifact_id`. |
+| **Commit fix** | rama `claude/bugs-pendientes-advance`. |
+
+### Descripción (verificada de nuevo antes de tocar código)
+
+`bayesian_update(artifact_id, custom_window=None)` usaba correctamente
+`custom_window` para calcular la vecindad temporal, pero revisaba
+`self._bayesian_cache` usando únicamente `artifact_id` como clave. Confirmado
+por `git stash` (comparación antes/después con el mismo repro): con
+`a1`(prior 0.9) en t=0, `a3`(prior 0.5) en t=10s y `a5`(prior 0.1,
+contaminado) en t=200s — dentro de la ventana default de 300s pero fuera de
+una ventana custom de 30s —, `bayesian_update('a3')` seguido de
+`bayesian_update('a3', custom_window=30s)` devolvía el **mismo objeto** los
+dos veces (posterior 0.15 filtrado a la llamada de 30s, que debería haber
+visto solo a `a1` y calculado 0.9).
+
+### Fix aplicado
+
+`cache_key = (artifact_id, custom_window)` en vez de `artifact_id` solo.
+`custom_window` es `None` o un `timedelta` — ambos hasheables, la tupla
+funciona directamente como clave de dict sin conversión adicional. Los dos
+lugares donde se escribe/lee la caché (`bayesian_update`) y los dos donde se
+limpia (`add_artifact`, otro método) no necesitaron más cambios — `.clear()`
+no depende de la forma de la clave.
+
+### Verificación
+
+Ejecutado antes y después (`git stash`):
+
+```
+ANTES: bayesian_update('a3') -> posterior=0.15
+       bayesian_update('a3', custom_window=30s) -> posterior=0.15 (mismo objeto, INCORRECTO)
+
+DESPUÉS: bayesian_update('a3') -> posterior=0.15
+         bayesian_update('a3', custom_window=30s) -> posterior=0.9 (objeto distinto, CORRECTO)
+```
+
+Confirmado también que el orden de llamadas no importa (custom primero,
+default después, da los mismos resultados correctos e independientes), que
+llamadas idénticas siguen cacheando (no se desactivó el cacheo, solo se
+corrigió la clave), y que `add_artifact` sigue invalidando la caché
+correctamente con la clave nueva.
+
+Re-confirmado por grep (el mismo chequeo que originalmente marcó esto como
+latente): ningún *caller* de producción pasa `custom_window` hoy — el fix no
+tiene efecto de comportamiento en ningún camino real, solo corrige qué pasa
+si/cuando alguien empiece a usar el parámetro documentado.
+
+Test permanente: `tests/test_b220_bayesian_cache_key.py` (6 tests: ventanas
+distintas dan resultados distintos en ambos órdenes de llamada, llamadas
+idénticas siguen cacheando, `add_artifact` sigue invalidando la caché, y un
+guard que se auto-marca para revisión si algún *caller* de producción
+empieza a usar `custom_window`). Suite completa antes y después: 1998
+passed, 191 skipped, 29 xfailed — cero regresiones.

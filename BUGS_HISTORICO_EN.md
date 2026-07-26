@@ -9482,3 +9482,64 @@ regressions (the one failure observed in
 `tests/integration/test_ebs_v1_integration.py`, about KDE/Ledoit-Wolf
 calibration, is pre-existing -- confirmed identical with and without this
 fix via `git stash`).
+
+## B-220 — The `bayesian_update` cache is keyed only by `artifact_id`: it ignores `custom_window`, even though the parameter is part of the public signature [RESOLVED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3, was latent (no caller used the affected parameter). Origin: "Round 2" audit, finding F4. |
+| **File** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`). |
+| **Function** | `bayesian_update(self, artifact_id, custom_window=None)`. |
+| **Original lines** | `if artifact_id in self._bayesian_cache: return self._bayesian_cache[artifact_id]` — cache key was `artifact_id` alone. |
+| **Fix commit** | branch `claude/bugs-pendientes-advance`. |
+
+### Description (re-verified before touching code)
+
+`bayesian_update(artifact_id, custom_window=None)` correctly used
+`custom_window` to compute the temporal neighborhood, but checked
+`self._bayesian_cache` keyed only by `artifact_id`. Confirmed via `git
+stash` (before/after comparison with the same repro): with `a1`(prior 0.9)
+at t=0, `a3`(prior 0.5) at t=10s, and `a5`(prior 0.1, contaminated) at
+t=200s — inside the default 300s window but outside a 30s custom window --
+`bayesian_update('a3')` followed by `bayesian_update('a3',
+custom_window=30s)` returned the **same object** both times (posterior 0.15
+leaked into the 30s-window call, which should have seen only `a1` and
+computed 0.9).
+
+### Fix applied
+
+`cache_key = (artifact_id, custom_window)` instead of `artifact_id` alone.
+`custom_window` is `None` or a `timedelta` -- both hashable, the tuple works
+directly as a dict key with no extra conversion. The two places that write/
+read the cache (`bayesian_update`) and the ones that clear it
+(`add_artifact`, another method) needed no further changes -- `.clear()`
+doesn't depend on the key's shape.
+
+### Verification
+
+Executed before and after (`git stash`):
+
+```
+BEFORE: bayesian_update('a3') -> posterior=0.15
+        bayesian_update('a3', custom_window=30s) -> posterior=0.15 (same object, WRONG)
+
+AFTER: bayesian_update('a3') -> posterior=0.15
+       bayesian_update('a3', custom_window=30s) -> posterior=0.9 (distinct object, CORRECT)
+```
+
+Also confirmed call order doesn't matter (custom first, default second
+gives the same correct, independent results), that identical calls still
+hit the cache (caching wasn't disabled, only the key was fixed), and that
+`add_artifact` still invalidates the cache correctly with the new key.
+
+Re-confirmed by grep (the same check that originally flagged this as
+latent): no production caller passes `custom_window` today -- the fix has
+no behavioral effect on any real path, it only fixes what happens if/when
+someone starts using the documented parameter.
+
+Permanent test: `tests/test_b220_bayesian_cache_key.py` (6 tests: distinct
+windows give distinct results in both call orders, identical calls still
+cache, `add_artifact` still invalidates the cache, and a guard that flags
+itself for review if any production caller starts using `custom_window`).
+Full suite before and after: 1998 passed, 191 skipped, 29 xfailed -- zero
+regressions.

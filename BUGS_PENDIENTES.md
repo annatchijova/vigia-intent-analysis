@@ -980,57 +980,6 @@ WARN y topa en Level 2 — Level 3 requiere cablear el Evidence Chain Ledger
 (`VIGIA_CHAIN_DB_PATH`), pendiente de integración; no es un fallo, es una feature
 de Level 3 no conectada a este entry point.
 
-## B-220 — La caché de `bayesian_update` está indexada solo por `artifact_id`: ignora `custom_window`, aunque el parámetro es parte de la firma pública [DOCUMENTADO — Claude 2026-07-25]
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | P3, latente (no hay ningún *caller* que use el parámetro afectado hoy). Origen: auditoría "Ronda 2", hallazgo F4. |
-| **Archivo** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`, línea ~260). |
-| **Función** | `bayesian_update(self, artifact_id, custom_window=None)`. |
-| **Líneas originales** | `if artifact_id in self._bayesian_cache: return self._bayesian_cache[artifact_id]` — la clave de caché es solo `artifact_id`, `custom_window` no participa. |
-| **Commit fix** | Ninguno — documentado, no aplicado. |
-| **Detectado en** | Auditoría "Ronda 2", ejecutado contra el archivo vivo. |
-
-### Descripción
-
-`bayesian_update(artifact_id, custom_window=None)` acepta `custom_window`
-como parámetro documentado y lo usa correctamente para calcular la vecindad
-temporal (`get_neighborhood(artifact_id, custom_window)`) — pero **antes**
-de llegar a ese cálculo, revisa `self._bayesian_cache` usando únicamente
-`artifact_id` como clave. Ejecutado: `bayesian_update('a3')` y
-`bayesian_update('a3', custom_window=timedelta(seconds=30))` devuelven el
-**mismo objeto** — el segundo llamado nunca recalcula con la ventana
-distinta, simplemente devuelve lo que había en caché del primer llamado
-(cualquiera que haya sido).
-
-Confirmado por grep exhaustivo: ningún *caller* de `bayesian_update` en todo
-el repositorio (ni interno, ni expuesto vía MCP) pasa `custom_window` hoy —
-todos los llamados de producción (`vigia/core/trust_fusion.py`, líneas 319,
-345, 395, 541) usan el default `None`. El bug es puramente latente: no tiene
-ningún camino de ejecución real que lo alcance en el estado actual del
-código.
-
-### Impacto
-
-Si en el futuro algún *caller* (interno o vía MCP) empieza a usar
-`custom_window` — el parámetro está documentado y expuesto, así que es un uso
-previsible, no exótico — obtendría resultados de la ventana temporal
-equivocada dependiendo únicamente del orden de llamadas: la primera llamada
-"gana" y queda cacheada para cualquier `custom_window` posterior sobre el
-mismo `artifact_id`. Es un bug de caché-key incompleta clásico, con el mismo
-patrón de otros bugs ya documentados en este repositorio (buscar
-"cache key" en `BUGS_PENDIENTES.md`).
-
-### Fix propuesto (NO aplicado)
-
-Incluir `custom_window` en la clave de caché (p. ej.
-`cache_key = (artifact_id, custom_window)`, con `custom_window=None` como
-parte válida de la tupla), o — más simple, dado que hoy nadie lo usa —
-excluir explícitamente del cacheo cualquier llamado con `custom_window` no
-default, documentando que solo la ventana por defecto se cachea. Cualquiera
-de las dos opciones requiere un test de regresión que hoy no existe (no hay
-ningún test de `bayesian_update` con `custom_window` distinto de `None`).
-
 ## B-221 — Auditoría "Ronda 2" (invariantes epistemológicos): vectores investigados y descartados — registrados para no re-descubrirlos [DOCUMENTADO — Claude 2026-07-25]
 
 | Campo | Valor |
