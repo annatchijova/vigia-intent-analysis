@@ -547,35 +547,6 @@ materializes the facts it proposes to score.
 
 ---
 
-## B-214 — `VigiaPipeline.run_full` bypasses the normalization-integrity gate that `vigia_agent.py` applies: two entry points, two verdicts [DOCUMENTED — Claude 2026-07-23]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P2 (architectural footgun, not an incorrectness): the same case yields different verdicts by entry point. `run_full` scores raw; `vigia_agent.py` applies the honest-degradation gate. A caller using `run_full` gets an ungated score and may seal it as if it were the authoritative verdict. |
-| **Files** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full`), `vigia_agent.py` (full Mode-1 agent). |
-| **Mode** | Any code that calls `run_full` directly to seal (e.g. `scripts/run_vigia_full.py` and this session's `_claude_fable` bundles) instead of going through the agent. |
-| **Detected by** | Mode-1 vs Mode-2 cross-check (session 2026-07-23, `vigia/results/MODE1-vs-MODE2_crosscheck_claude_fable.md`). |
-
-**Reproduced observation:** on `data/cases/OWL-NEXUS5-CASE.json` and
-`VIGIA-OWL-2019-COMPLETE.json`, `VigiaPipeline.run_full` returns
-`decision=REJECT, posterior=1.0`; `vigia_agent.py` on the same JSON returns
-**ABSTAIN** with reason `NORMALIZATION INTEGRITY LOSS` — it detects that an
-artifact's metadata (the `significance` field carrying `..` on the coordination
-SMS) was coerced at intake, which can silently drop a scoring-relevant assertion.
-`run_full` does not run that check.
-
-**Note (Thirdness):** neither side is "wrong" — there are two paths with different
-guarantees and nothing flags it at the call site. The integrity gate (P1 metadata
-normalization) is correct; the problem is that `run_full` is a low-level API that
-bypasses it. Related to the B-160/B-206 semantic-extractor gap that leaves
-OWL-NEXUS5 in honest ABSTAIN.
-
-**Proposed fix (NOT applied):** either (a) `run_full` runs the same gate and
-degrades to ABSTAIN on metadata coercion, or (b) `run_full` is renamed/documented
-explicitly as "raw ungated score" and authoritative sealing always routes through
-the agent. Needs an architecture decision + corpus dry-run before touching, since
-it changes the sealed verdict of any case with `normalization_failures`.
-
 ## B-215 — `evidence_graph` not populated in `run_full` bundles: `graph_hash` identical across all cases (integrity anchor is meaningless) [DOCUMENTED — Claude 2026-07-23]
 
 | Field | Value |

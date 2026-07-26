@@ -10181,3 +10181,62 @@ saltear el wrapper de auditoría —, `_register_mcp_tool` envuelve con
 `TOOL_INVOKED` en ejecución real, y `check_syscall_latency` confirmado sin
 decorador y sin callers). Suite completa: 1998 passed (antes de sumar este
 archivo), 191 skipped, 29 xfailed.
+
+## B-214 — `VigiaPipeline.run_full` saltea el gate de integridad de normalización que `vigia_agent.py` sí aplica: dos entry points, dos veredictos [RESUELTO — Claude 2026-07-26]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 (footgun de arquitectura, no incorrección). |
+| **Archivos** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full`), `vigia_agent.py` (agente Mode 1 completo). |
+| **Modo** | Cualquier código que llame `run_full` directo para sellar en vez de pasar por el agente. |
+| **Detectado por** | Cross-check Mode-1 vs Mode-2 (sesión 2026-07-23). |
+| **Commit fix** | rama `claude/bugs-pendientes-advance`. |
+
+### Descripción (heredada, sin cambios de sustancia)
+
+`run_full` no corre el gate de integridad de normalización que sí aplica
+`vigia_agent.py` (Mode 1) antes de sellar. Reproducido con dos casos reales
+(`OWL-NEXUS5-CASE.json`, `VIGIA-OWL-2019-COMPLETE.json`): `run_full` sella
+`decision=REJECT, posterior=1.0`; `vigia_agent.py` sobre el mismo JSON sella
+`ABSTAIN` con razón `NORMALIZATION_INTEGRITY_LOSS`. Investigación adicional
+en esta sesión confirmó que `run_full` (motor `LikelihoodEngine` +
+`RiskBoundedDecisionLayer`, el path "EBS v1") y `vigia_agent.py` (que usa
+`vigia_scorer.py` + `vigia_integration_bridge.py` para su scoring
+determinístico) son en efecto **dos motores de scoring distintos**, no una
+función con un flag opcional — cablear el gate de normalización en
+`run_full` requeriría integrar dos sistemas de scoring separados, no solo
+agregar un chequeo.
+
+### Decisión tomada: opción (b), no (a)
+
+La entrada original proponía dos caminos: (a) `run_full` corre el mismo
+gate y degrada a ABSTAIN — cambia el veredicto sellado de cualquier caso
+con `normalization_failures`, requiere decisión de arquitectura + dry-run
+del corpus; o (b) documentar `run_full` explícitamente como "score crudo
+sin gates" y señalar que el sellado autoritativo debe pasar por el agente.
+Se aplicó (b): es la opción que la propia entrada ya sancionaba como segura
+sin necesitar el dry-run que (a) exige, y no toca ningún veredicto sellado.
+
+### Fix aplicado
+
+Docstring de `run_full()` ampliada con una advertencia explícita: nombra
+B-214, describe el gap exacto, cita los dos casos reales reproducidos, y
+indica textualmente "no llames a `run_full` directamente" para sellado
+autoritativo — usar `vigia_agent.py` en su lugar. Cero cambio de
+comportamiento: la lógica de scoring de `run_full` no se tocó.
+
+**Hallazgo adyacente corregido de paso:** la misma docstring, en el paso
+`[Gobernanza]`, documentaba la fórmula pre-B-117 invertida
+(`r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))`) — el bug que B-117 corrigió en
+2026-07-14 invirtiendo el sentido de los veredictos. La implementación viva
+(`risk_bounded_layer.py`) usa `r = P·(...)` desde ese fix; la docstring
+nunca se actualizó. Corregida a la fórmula real, con referencia a B-117.
+
+### Verificación
+
+Test permanente: `tests/test_b214_run_full_docstring_warning.py` (3 tests:
+la docstring nombra B-214 y el gap, apunta explícitamente al agente para
+sellado, y la fórmula ya no es la forma pre-B-117 invertida). Sintaxis
+verificada con `ast.parse()` tras el edit. Suite completa antes y después:
+2004 passed, 191 skipped, 29 xfailed — cero regresiones (cambio
+documentación-only, sin lógica tocada).

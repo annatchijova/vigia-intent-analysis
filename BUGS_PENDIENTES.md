@@ -847,37 +847,6 @@ source-specific y hash-bound materialice los hechos que pretende puntuar.
 
 ---
 
-## B-214 — `VigiaPipeline.run_full` saltea el gate de integridad de normalización que `vigia_agent.py` sí aplica: dos entry points, dos veredictos [DOCUMENTADO — Claude 2026-07-23]
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | P2 (footgun de arquitectura, no incorrección): el mismo caso produce veredictos distintos según el entry point. `run_full` puntúa crudo; `vigia_agent.py` aplica el gate de degradación honesta. Un caller que use `run_full` obtiene un score sin gate y puede sellarlo como si fuera el veredicto autoritativo. |
-| **Archivos** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full`), `vigia_agent.py` (agente Mode 1 completo). |
-| **Modo** | Cualquier código que llame `run_full` directo para sellar (p.ej. `scripts/run_vigia_full.py` y los bundles `_claude_fable` de esta sesión) en vez de pasar por el agente. |
-| **Detectado por** | Cross-check Mode-1 vs Mode-2 (sesión 2026-07-23, `vigia/results/MODE1-vs-MODE2_crosscheck_claude_fable.md`). |
-
-**Observación reproducida:** sobre `data/cases/OWL-NEXUS5-CASE.json` y
-`VIGIA-OWL-2019-COMPLETE.json`, `VigiaPipeline.run_full` devuelve
-`decision=REJECT, posterior=1.0`; el agente `vigia_agent.py` sobre el mismo JSON
-devuelve **ABSTAIN** con razón `NORMALIZATION INTEGRITY LOSS` — detecta que el
-metadata de un artefacto (el campo `significance` con `..` del SMS de
-coordinación) fue coercionado en el intake, lo que puede dropear silenciosamente
-una aserción que participa del scoring. `run_full` no corre ese chequeo.
-
-**Nota (Thirdness):** no es que un lado esté "mal" — es que hay dos caminos con
-garantías distintas y nada lo señala en el punto de llamada. El gate de
-integridad (P1 metadata normalization, `tests/test_p1_metadata_normalization_integrity.py`)
-es correcto; el problema es que `run_full` es un API de bajo nivel que lo
-puentea. Relacionado con el gap B-160/B-206 (extractor semántico) que deja
-OWL-NEXUS5 en ABSTAIN honesto.
-
-**Fix propuesto (NO aplicado):** o (a) `run_full` corre el mismo gate y degrada a
-ABSTAIN cuando hay coerción de metadata, o (b) `run_full` se renombra/documenta
-explícitamente como "score crudo sin gates" y el sellado autoritativo se rutea
-siempre por el agente. Requiere decisión de arquitectura + dry-run del corpus
-antes de tocar, porque cambia el veredicto sellado de cualquier caso con
-`normalization_failures`.
-
 ## B-215 — `evidence_graph` no se puebla en bundles de `run_full`: `graph_hash` idéntico en todos los casos (ancla de integridad vacía de significado) [DOCUMENTADO — Claude 2026-07-23]
 
 | Campo | Valor |

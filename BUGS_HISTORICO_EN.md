@@ -9614,3 +9614,62 @@ wrapper ever appears --, `_register_mcp_tool` wraps with
 real execution, and `check_syscall_latency` confirmed to have no decorator
 and no callers). Full suite: 1998 passed (before adding this file), 191
 skipped, 29 xfailed.
+
+## B-214 — `VigiaPipeline.run_full` bypasses the normalization-integrity gate that `vigia_agent.py` applies: two entry points, two verdicts [RESOLVED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (architectural footgun, not an incorrectness). |
+| **Files** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full`), `vigia_agent.py` (full Mode-1 agent). |
+| **Mode** | Any code that calls `run_full` directly to seal instead of going through the agent. |
+| **Detected by** | Mode-1 vs Mode-2 cross-check (session 2026-07-23). |
+| **Fix commit** | branch `claude/bugs-pendientes-advance`. |
+
+### Description (inherited, unchanged in substance)
+
+`run_full` does not run the normalization-integrity gate that `vigia_agent.py`
+(Mode 1) applies before sealing. Reproduced with two real cases
+(`OWL-NEXUS5-CASE.json`, `VIGIA-OWL-2019-COMPLETE.json`): `run_full` seals
+`decision=REJECT, posterior=1.0`; `vigia_agent.py` on the same JSON seals
+`ABSTAIN` with reason `NORMALIZATION_INTEGRITY_LOSS`. Further investigation
+this session confirmed `run_full` (the `LikelihoodEngine` +
+`RiskBoundedDecisionLayer` "EBS v1" engine) and `vigia_agent.py` (which uses
+`vigia_scorer.py` + `vigia_integration_bridge.py` for its deterministic
+scoring) are in fact **two distinct scoring engines**, not one function with
+an optional flag -- wiring the normalization gate into `run_full` would mean
+integrating two separate scoring systems, not just adding a check.
+
+### Decision made: option (b), not (a)
+
+The original entry proposed two paths: (a) `run_full` runs the same gate and
+degrades to ABSTAIN -- changes the sealed verdict of any case with
+`normalization_failures`, needs an architecture decision + corpus dry-run;
+or (b) document `run_full` explicitly as "raw ungated score" and note that
+authoritative sealing must route through the agent. Option (b) was applied:
+it's the path the entry itself already sanctioned as safe without the
+dry-run (a) requires, and it touches no sealed verdict.
+
+### Fix applied
+
+`run_full()`'s docstring expanded with an explicit warning: names B-214,
+describes the exact gap, cites the two reproduced real cases, and states
+outright not to call `run_full` directly for authoritative sealing -- use
+`vigia_agent.py` instead. Zero behavioral change: `run_full`'s scoring logic
+was not touched.
+
+**Adjacent finding fixed in passing:** the same docstring, in its
+`[Gobernanza]` step, documented the pre-B-117 inverted formula
+(`r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))`) -- the bug B-117 fixed on
+2026-07-14, which inverted verdicts. The live implementation
+(`risk_bounded_layer.py`) has used `r = P·(...)` since that fix; the
+docstring was never updated. Corrected to the real formula, with a
+reference to B-117.
+
+### Verification
+
+Permanent test: `tests/test_b214_run_full_docstring_warning.py` (3 tests:
+the docstring names B-214 and the gap, explicitly points callers at the
+agent for sealing, and the formula is no longer the pre-B-117 inverted
+form). Syntax verified with `ast.parse()` after the edit. Full suite before
+and after: 2004 passed, 191 skipped, 29 xfailed -- zero regressions
+(documentation-only change, no logic touched).
