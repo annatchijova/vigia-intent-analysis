@@ -9543,3 +9543,74 @@ cache, `add_artifact` still invalidates the cache, and a guard that flags
 itself for review if any production caller starts using `custom_window`).
 Full suite before and after: 1998 passed, 191 skipped, 29 xfailed -- zero
 regressions.
+
+## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging [RESOLVED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — universal coverage already existed, resolved by a different mechanism than the entry proposed. |
+| **Severity** | Was P2 (Daubert chain-of-custody gap). |
+| **File** | `vigia/vigia_sift_bridge.py`. |
+| **Detected in** | Module archaeology audit 2026-07-14; re-investigated 2026-07-26 while fixing an unrelated "21 tools" count discrepancy across the docs. |
+| **Fix commit** | None on this branch -- already resolved in the live code by the time it was re-investigated; only the registry needed correcting. |
+
+### What the original entry said
+
+CLAUDE.md requires every tool call to be logged to `audit_trail`. Of the
+tools exposed by `Vigia_Sift_Bridge`, only 3 (`generate_forensic_hash`,
+`read_evidence`, `list_files`) had their own `audit_logger.log_info(
+event_type="TOOL_INVOKED", ...)` call inside the function body; 20 more
+were listed as "NOT covered", with the fix deferred to a dedicated session
+because instrumenting all 20 by hand would add ~20 more synchronous
+`fsync()` calls per investigation.
+
+### What the live code shows today
+
+`_register_mcp_tool()` (line ~206) is the **only** MCP tool registration
+path in the entire file -- confirmed by `grep -c "mcp.tool()"` returning
+exactly 1 occurrence in the whole file, inside that function. It wraps
+EVERY tool, both decorator-style (`@_register_mcp_tool`) and call-style
+(`_register_mcp_tool(func)`, the optional/gated ones), with
+`_audit_mcp_entry()`, which emits `audit_logger.log_info(event_type=
+"TOOL_INVOKED", ...)` **before** the wrapped function runs -- i.e. before
+any path sanitization or internal logic, matching or exceeding the
+guarantee the 3 original tools individually provided.
+
+Verified by direct execution (not just static reading): calling
+`deactivate_honey_token` and `get_phonetic_dict_stats` -- two of the tools
+the original entry listed as "NOT covered" -- each produces a
+`TOOL_INVOKED` event, with zero per-tool code changes. Further confirmed by
+AST walk that all 22 base tools and the 5 always-loaded optional tools all
+resolve to `_register_mcp_tool`.
+
+### Correcting a detail in the original list
+
+`check_syscall_latency` appeared in the "NOT covered (20)" list as if it
+were an uninstrumented MCP tool. It is not: it has no `@_register_mcp_tool`
+decorator, no `_register_mcp_tool(check_syscall_latency)` call, and **zero
+callers anywhere in the file** -- it was never an MCP tool, appears to be
+dead code (rootkit detection via syscall latency, never wired to anything).
+It was never part of either the covered or uncovered count.
+
+### Why this counts as resolved, not a new finding
+
+B-122's underlying concern (does every MCP tool leave a contemporaneous
+invocation record, not one reconstructed afterward?) is satisfied -- better
+than the entry proposed: instead of 3 manually-instrumented sites plus 20
+pending, there is a single structural enforcement point that cannot be
+forgotten when adding a new tool (any tool that doesn't go through
+`_register_mcp_tool` simply never gets registered with the MCP server at
+all). The "known technical debt" concern about `fsync()` cost across 20
+additional tools is moot: that cost was already being paid on every tool
+call before this check, not a new performance regression to evaluate.
+
+### Verification
+
+Permanent test: `tests/test_b122_universal_tool_invoked_audit.py` (6 tests:
+`mcp.tool()` is called exactly once in the whole module -- a guard that
+flags itself if a second registration path that could bypass the audit
+wrapper ever appears --, `_register_mcp_tool` wraps with
+`_audit_mcp_entry`, two previously-"uncovered" tools emit `TOOL_INVOKED` on
+real execution, and `check_syscall_latency` confirmed to have no decorator
+and no callers). Full suite: 1998 passed (before adding this file), 191
+skipped, 29 xfailed.

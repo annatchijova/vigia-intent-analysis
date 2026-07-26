@@ -10109,3 +10109,75 @@ idénticas siguen cacheando, `add_artifact` sigue invalidando la caché, y un
 guard que se auto-marca para revisión si algún *caller* de producción
 empieza a usar `custom_window`). Suite completa antes y después: 1998
 passed, 191 skipped, 29 xfailed — cero regresiones.
+
+## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging [RESUELTO — Claude 2026-07-26]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — cobertura universal ya existía, resuelto por un mecanismo distinto al que la entrada proponía. |
+| **Severidad** | Era P2 (Daubert chain-of-custody gap). |
+| **Archivo** | `vigia/vigia_sift_bridge.py`. |
+| **Detectado en** | Module archaeology audit 2026-07-14; re-investigado 2026-07-26 mientras se corregía una discrepancia no relacionada del conteo "21 tools" en la documentación. |
+| **Commit fix** | Ninguno de esta rama — ya estaba resuelto en el código vivo cuando se re-investigó; solo se corrige el registro. |
+
+### Qué decía la entrada original
+
+CLAUDE.md exige loguear cada llamada a `audit_trail`. De los tools expuestos
+por `Vigia_Sift_Bridge`, solo 3 (`generate_forensic_hash`, `read_evidence`,
+`list_files`) tenían su propio `audit_logger.log_info(event_type="TOOL_INVOKED",
+...)` dentro del cuerpo de la función; 20 más estaban listados como
+"NOT covered", con el fix pospuesto a una sesión dedicada porque instrumentar
+los 20 manualmente sumaría ~20 `fsync()` síncronos más por investigación.
+
+### Qué muestra el código vivo hoy
+
+`_register_mcp_tool()` (línea ~206) es el **único** camino de registro de
+tools MCP en todo el archivo — confirmado por `grep -c "mcp.tool()"` dando
+exactamente 1 ocurrencia en todo el archivo, dentro de esa función. Envuelve
+CADA tool, tanto los registrados por decorador (`@_register_mcp_tool`) como
+los de estilo llamada (`_register_mcp_tool(func)`, los opcionales/gateados),
+con `_audit_mcp_entry()`, que emite `audit_logger.log_info(event_type=
+"TOOL_INVOKED", ...)` **antes** de ejecutar la función envuelta — es decir,
+antes de cualquier sanitización de paths o lógica interna, igual o mejor que
+la garantía que los 3 tools originales cumplían individualmente.
+
+Verificado por ejecución directa (no solo lectura estática): llamar a
+`deactivate_honey_token` y `get_phonetic_dict_stats` — dos de los tools que
+la entrada original listaba como "NOT covered" — produce un evento
+`TOOL_INVOKED` cada uno, sin ningún cambio de código por tool. Confirmado
+además por AST walk que los 22 tools base y los 5 tools opcionales
+siempre-cargados resuelven todos a `_register_mcp_tool`.
+
+### Corrección de un detalle de la lista original
+
+`check_syscall_latency` aparecía en la lista de "NOT covered (20)" como si
+fuera un tool MCP sin instrumentar. No lo es: no tiene el decorador
+`@_register_mcp_tool` ni ningún `_register_mcp_tool(check_syscall_latency)`,
+y no tiene **ningún caller** en todo el archivo — nunca fue un tool MCP,
+parece código muerto (detección de rootkits vía latencia de syscalls,
+nunca cableado a nada). No participaba del conteo real de tools cubiertos ni
+sin cubrir.
+
+### Por qué esto cuenta como resuelto, no como "hallazgo nuevo"
+
+La preocupación de fondo de B-122 (¿todo tool MCP deja un registro de
+invocación contemporáneo, no reconstruido después?) está satisfecha —
+mejor de lo que la entrada proponía: en vez de 3 sitios de instrumentación
+manual + 20 pendientes, hay UN solo punto de aplicación estructural que no
+puede olvidarse al agregar un tool nuevo (cualquier tool que no pase por
+`_register_mcp_tool` simplemente no se registra en el servidor MCP en
+absoluto). La preocupación de "known technical debt" sobre el costo de
+`fsync()` × 20 tools adicionales quedó sin objeto: el costo ya se estaba
+pagando en cada llamada a cualquier tool desde antes de esta verificación,
+no es una regresión de performance nueva a evaluar.
+
+### Verificación
+
+Test permanente: `tests/test_b122_universal_tool_invoked_audit.py` (6 tests:
+`mcp.tool()` se llama exactamente una vez en todo el módulo — un guard que
+se auto-marca si algún día aparece un segundo camino de registro que podría
+saltear el wrapper de auditoría —, `_register_mcp_tool` envuelve con
+`_audit_mcp_entry`, dos tools previamente "sin cobertura" emiten
+`TOOL_INVOKED` en ejecución real, y `check_syscall_latency` confirmado sin
+decorador y sin callers). Suite completa: 1998 passed (antes de sumar este
+archivo), 191 skipped, 29 xfailed.

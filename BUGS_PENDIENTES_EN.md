@@ -214,38 +214,6 @@ checks unique to `SignalQualityGate`.
 
 ---
 
-## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging
-
-| Field | Value |
-|-------|-------|
-| **Status** | PARTIALLY RESOLVED — 3 priority tools covered, 20 pending |
-| **Severity** | P2 (Daubert chain-of-custody gap) |
-| **File** | `vigia/vigia_sift_bridge.py` |
-| **Detected in** | Module archaeology audit 2026-07-14 |
-
-### Description
-
-Of 23 MCP tools, only 3 have `audit_logger.log_info(event_type="TOOL_INVOKED")`
-before path sanitization: `generate_forensic_hash`, `read_evidence`, `list_files`.
-These 3 are the evidence-touching tools (chain-of-custody anchor). The remaining
-20 Phase 2-4 analysis tools are not instrumented. A calling agent can reconstruct
-a v2 HMAC `tool_execution_log` after a session, but that is not equivalent to
-tool-side instrumentation or contemporaneous capture.
-
-**OWL v2 confirmation (2026-07-21):** external bundle
-`results/OWL-NEXUS5-CASE_bundle_claude_v2.json` preserves 37 entries and the
-stdlib verifier confirms its hash chain. Its own report documents that entries
-were written by the agent in batches after MCP calls and that HMAC cannot be
-keyedly verified without the access-restricted key. The chain therefore proves
-subsequent relative integrity, not wall-clock timing, call order, or literal
-MCP response text. This is not a verifier defect; it is concrete evidence that
-B-122 remains partially open.
-
-Deferred: broader rollout needs to address `audit_logger` synchronous fsync
-performance before adding to all 20 tools.
-
----
-
 ## B-123 — Causal Closure Score gate designed and tested, NOT wired — dry-run inviable (0/258 cases have data)
 
 | Field | Value |
