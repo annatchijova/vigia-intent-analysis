@@ -5753,6 +5753,54 @@ as emitted by LikelihoodEngine. Inline comment and docstring guard cite this bug
 - `vigia/governance/risk_bounded_layer_v2.py` deleted (commit `c46991c4`)
 - `scripts/pre_release_check.py` BANNED_FILENAMES corrected
 
+### Update 2026-07-26 -- the stale `(1-P)·(...)` formula had survived in 8
+places besides the code, including two that generate real output
+
+While resolving B-214, the code fix (v1, above) was found never to have
+propagated to the comments, docstrings, and narrative generators that quote
+the same formula. A full sweep (grep across the whole repo, excluding the
+generated academic corpus) found the pre-B-117 inverted formula alive in 8
+places:
+
+`vigia/pipeline/pipeline.py` (two separate docstrings: the module header and
+`run_full()`), `vigia/models/ebs.py`, `VIGIA_ESTADO_TECNICO_ES.md` and its
+`docs/` mirror, `docs/VIGIA_TECHNICAL_STATE_EN.md`,
+`docs/vigia_paper_methodology.md` (the layer diagram AND the prose
+explanation, which additionally had the formula's *meaning* backwards:
+"r = 0 when P = 1, certain fabrication" is exactly the inverted-decision bug
+B-117 fixed, described there as if it were the intended design),
+`docs/vigia-real-006_execution_summary.md` (a worked example whose own
+shown arithmetic, `r=0.1734`, already contradicted its own displayed
+threshold check -- "REJECT > 0.35? No" -- AND its stated final decision --
+"REJECT" --; fixed by recomputing with the real formula, which also
+resolves that internal contradiction), and
+`forensics/evidence_narrative_gen.py` (a narrative label shown next to the
+REAL, correctly-computed risk score -- an expert witness reading the
+generated narrative and trying to reproduce the number by hand from the
+stated formula would get the wrong answer).
+
+**One case was found and deliberately NOT fixed:**
+`vigia/scripts/generate_execution_log.py:227` passes this same formula
+(plus fabricated placeholder D/S/I values: hardcoded `"D": 0.1`, `S`/`I`
+derived by ad-hoc formulas matching no real computation) into a
+`RISK_CALCULATION` log entry -- but the script actually calls
+`vigia.core.decision_layer.decide()` (line 142), an entirely different,
+MI-threshold-based decision engine that computes no D, S, or I at all. This
+isn't a wrong sign: it's a log format designed for one subsystem
+(`risk_bounded_layer.py`) reused to describe an entirely different one
+(`decision_layer.py`), with fabricated data in the fields that don't apply
+-- a deeper audit-trail integrity problem (the script generates "Agent
+Execution Logs... for SANS deliverables" per its own docstring), not a
+simple stale string. This script does process real cases (not a synthetic/
+demo generator). Documented in detail, unfixed, in
+`tests/test_b117_stale_formula_sweep.py`, pending its own investigation.
+
+Permanent test: `tests/test_b117_stale_formula_sweep.py` -- sweeps the whole
+repo for the inverted formula and fails if it reappears anywhere not
+covered by an explicitly justified exception. Full suite: 2008 passed, 191
+skipped, 29 xfailed -- zero regressions (all changes are comments/
+docstrings/prose, no logic touched).
+
 ---
 
 ## B-118 — `vigia/core/signal_contract.py` name collision caused BUG-EML-001 — file deleted

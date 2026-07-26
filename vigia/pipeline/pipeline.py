@@ -11,7 +11,7 @@ ARQUITECTURA COMPLETA — CAPAS ESTANCAS (Zero-Trust):
         └─ likelihood_engine.py      — KDE + Ledoit-Wolf
         └─ graph_stability.py        — Bootstrap stability selection
     CAPA 3: governance/              — Gobernanza y riesgo
-        └─ risk_bounded_layer.py     — r=(1-P)·(1+λD)·(1+γ(1-S))
+        └─ risk_bounded_layer.py     — r=P·(1+λD)·(1+γ(1-S))
     CAPA 4: audit/ + action/         — Auditoría y acción controlada
         └─ audit_action.py           — Diff / Optimizer / PolicyEngine / Executor
     CAPA 5: forensics/               — Verificación independiente

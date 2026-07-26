@@ -5645,6 +5645,56 @@ and docstring guard citing this bug.
 - `scripts/pre_release_check.py` BANNED_FILENAMES corrected (v1 is canonical,
   not deprecated).
 
+### Update 2026-07-26 — la fórmula vieja `(1-P)·(...)` había sobrevivido en 8
+lugares además del código, incluyendo dos que generan output real
+
+Mientras se resolvía B-214, se encontró que el fix del código (v1, arriba)
+nunca se propagó a los comentarios, docstrings y generadores de narrativa
+que citan la misma fórmula. Barrido completo (`grep` en todo el repo,
+excluyendo el corpus académico generado) encontró la fórmula pre-B-117
+invertida en 8 lugares vivos:
+
+`vigia/pipeline/pipeline.py` (dos docstrings distintos: el header del
+módulo y `run_full()`), `vigia/models/ebs.py`, `VIGIA_ESTADO_TECNICO_ES.md`
+y su espejo en `docs/`, `docs/VIGIA_TECHNICAL_STATE_EN.md`,
+`docs/vigia_paper_methodology.md` (el diagrama de capas Y la explicación en
+prosa, que además tenía el *significado* invertido: "r = 0 cuando P = 1,
+fabricación cierta" es exactamente el bug de decisión invertida que B-117
+corrigió, descripto ahí como si fuera el diseño intencional),
+`docs/vigia-real-006_execution_summary.md` (un walkthrough cuya propia
+aritmética mostrada, `r=0.1734`, ya contradecía su propio chequeo de umbral
+mostrado — "REJECT > 0.35? No" — Y la decisión final declarada — "REJECT" —;
+corregido recalculando con la fórmula real, lo que además resuelve esa
+contradicción interna), y `forensics/evidence_narrative_gen.py` (una
+etiqueta de narrativa mostrada junto al risk score REAL, correctamente
+calculado — un perito leyendo la narrativa generada e intentando reproducir
+el número a mano usando la fórmula indicada habría obtenido el resultado
+equivocado).
+
+**Un caso NO se corrigió, deliberadamente:**
+`vigia/scripts/generate_execution_log.py:227` pasa esta misma fórmula
+(más valores placeholder D/S/I fabricados: `"D": 0.1` hardcodeado, `S`/`I`
+derivados con fórmulas ad-hoc que no corresponden a ningún cálculo real)
+a una entrada de log `RISK_CALCULATION` — pero el script en realidad llama a
+`vigia.core.decision_layer.decide()` (línea 142), un motor de decisión
+completamente distinto, basado en umbrales de MI, que no calcula D, S, ni I
+en absoluto. No es un signo invertido: es un formato de log diseñado para un
+subsistema (`risk_bounded_layer.py`) reutilizado para describir otro
+completamente distinto (`decision_layer.py`), con datos fabricados en los
+campos que no aplican — un problema más profundo de integridad de audit
+trail (el script genera "Agent Execution Logs... para los entregables
+SANS" según su propio docstring), no un simple string desactualizado. Este
+script SÍ procesa casos reales (no es un generador sintético/demo). Queda
+documentado en detalle, sin fix, en `tests/test_b117_stale_formula_sweep.py`
+y pendiente de investigación propia.
+
+Test permanente: `tests/test_b117_stale_formula_sweep.py` — barre todo el
+repo buscando la fórmula invertida y falla si reaparece en cualquier lugar
+no cubierto por una excepción documentada y justificada explícitamente.
+Suite completa: 2008 passed, 191 skipped, 29 xfailed — cero regresiones
+(todos los cambios son comentarios/docstrings/prosa, ninguna lógica
+tocada).
+
 ---
 
 ## B-118 — `vigia/core/signal_contract.py` name collision caused BUG-EML-001 — file deleted

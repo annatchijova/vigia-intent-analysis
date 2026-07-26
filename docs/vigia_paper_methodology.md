@@ -129,7 +129,7 @@ Layer 2: engine/                — Multivariate inference (no LLM)
             likelihood_engine.py   KDE + Ledoit-Wolf
             graph_stability.py     Bootstrap stability selection (π ≥ 0.85)
 Layer 3: governance/            — Risk and policy
-            risk_bounded_layer_v2.py  r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))
+            risk_bounded_layer.py  r = P·(1+λD)·(1+γ(1-S))·(1+ω(1-I))
 Layer 4: audit/ + action/       — Forensic actions
 Layer 5: forensics/             — Independent verification
             verify_ebs_v1.py   (stdlib only, zero runtime imports)
@@ -137,7 +137,7 @@ Layer 5: forensics/             — Independent verification
 
 The architectural rule is strict monotonicity: layer *k* may import from layers 0 through *k*-1 but not from layers *k* through 5. This is enforced by `pre_release_check.py` via AST analysis at commit time. Circular imports are structurally impossible under this constraint. The LLM (PeircePlanner, backed by Claude or Ollama) operates entirely post-hoc: it receives a sealed ForensicBundle and generates human-readable narrative, but it has no write access to any field that enters the `bundle_hash` computation. The mathematical decision is closed before the LLM is invoked.
 
-The governance formula r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I)) deserves explication. *P* is the posterior probability of fabrication from the LikelihoodEngine. *D* is the drift score (anomaly in the system's own calibration baseline). *S* is the global stability of the evidence graph (computed by bootstrapped stability selection over graph edges). *I* is the consistency score from the AbductiveIntentEngine (how well the abductive hypothesis aligns with the posterior). *λ*, *γ*, and *ω* are policy parameters that modulate the sensitivity to each risk component. The formula is designed so that *r* = 0 when P = 1 (certain fabrication, no residual uncertainty) and *r* > ε_reject triggers a REJECT decision. This is a *governance formula*, not a probability—it is a policy-controlled risk score that a forensic administrator can tune to the operational context.
+The governance formula r = P·(1+λD)·(1+γ(1-S))·(1+ω(1-I)) deserves explication. *P* is the posterior probability of fabrication from the LikelihoodEngine. *D* is the drift score (anomaly in the system's own calibration baseline). *S* is the global stability of the evidence graph (computed by bootstrapped stability selection over graph edges). *I* is the consistency score from the AbductiveIntentEngine (how well the abductive hypothesis aligns with the posterior). *λ*, *γ*, and *ω* are policy parameters that modulate the sensitivity to each risk component. The formula is designed so that *r* = 0 when P = 0 (certain authenticity, no residual uncertainty) and *r* grows with P, so that *r* > 1 - ε_reject triggers a REJECT decision as fabrication becomes more likely. (An earlier revision of this formula used (1-P) in place of P, which inverted the decision — a fabricated case scored *low* risk and a genuine one scored *high* risk; fixed 2026-07-14, tracked as B-117.) This is a *governance formula*, not a probability—it is a policy-controlled risk score that a forensic administrator can tune to the operational context.
 
 ### 3.7 Adversarial Robustness and Significant Silence
 

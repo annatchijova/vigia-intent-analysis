@@ -145,7 +145,7 @@ Ockham's Razor guides selection between competing hypotheses of equal explanator
 │  LAYER 0: ebs_v1.py       — Data contracts (immutable)         │
 │  LAYER 1: external signals — SDA/CLI/GCI/SIFT tools            │
 │  LAYER 2: likelihood_engine + graph_stability — inference       │
-│  LAYER 3: risk_bounded_layer — governance r=(1-P)·(1+λD)·(1+γ) │
+│  LAYER 3: risk_bounded_layer — governance r=P·(1+λD)·(1+γ)     │
 │  LAYER 4: audit_action    — Diff/Optimizer/PolicyEngine         │
 │  LAYER 5: verify_ebs_v1.py — verification, stdlib only         │
 │                                                                 │
