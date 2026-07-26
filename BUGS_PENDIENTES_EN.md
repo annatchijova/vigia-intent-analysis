@@ -478,6 +478,34 @@ event, not the reason). This is an architecture decision — wire it into Mode-1
 amend the doctrine to state the chained self-correction event is a Mode-2 (Claude
 Code) construct by design. Deliberately NOT fixed as a one-liner. Not yet decided.
 
+**Update 2026-07-26 — the attribution above is now STALE (see B-224).** Two
+factual corrections, both verified live:
+
+1. *The wiring exists.* `vigia/core/reasoning_trace.py` implements the mandated
+   mechanism, cites B-151b by name in its docstring, and is wired into
+   `vigia_agent.py`'s sealing path (~2180): `build_from_agent_bundle` chains
+   `pipeline_results["self_corrections"]` as `contradiction_detector` entries
+   via `ToolExecutionLogChain`. Confirmed with a real Mode-1 run, which writes a
+   chained, tail-anchored `<stem>_reasoning_trace.json`. The claim "the appender
+   is instantiated only in tests and a red-team script" is no longer true.
+2. *What is missing is the input, not the wiring.* B-224 documents that
+   `ContradictionDetector` can never fire in Mode-1: 3 of its 4 rules read
+   fields with no producer (`signal["tool"]`, `technical_result`) or a spelling
+   the real vocabulary never uses (`"BENIGN"` vs `NO_*_ANOMALY_DETECTED`), and
+   `CONTRADICTION_THRESHOLD = 2` makes the single live rule insufficient
+   (maximum achievable = 1). So the trace's self-correction branch is **always**
+   empty, by construction — not only on cases without contradictions.
+
+**What remains open here (independent of B-224):** whether each scorer gate
+should emit its own chained event. A structural note for whoever takes it on:
+the gates live in `vigia_scorer.py`, which `vigia_agent.py` does **not** import
+(zero references, verified) — they are two disjoint subsystems, and no gate
+marker (`normalization_failures`, `temporal_pairs_skipped`,
+`pre_unverified_*_verdict`, `single_artifact_score_cap`) ever reaches the agent
+bundle. So the fix is not "read the markers in `build_from_agent_bundle`":
+there are no markers to read on that path. The architecture decision stays
+pending.
+
 ---
 
 ## B-162 — The legacy adapter silently erased an unmodeled structured-evidence schema [PARTIALLY REMEDIATED — Codex 2026-07-21]
@@ -737,3 +765,164 @@ whether this script should be calling
 `decision_layer.decide()` for cases where the full P/D/S/I model is
 needed. Requires first understanding who consumes these JSONL logs and
 with what schema expectation.
+
+---
+
+## B-224 — Mode-1's self-correction loop is structurally inert: 3 of 4 `ContradictionDetector` rules read fields no producer writes, and the threshold makes the one live rule insufficient [DOCUMENTED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 (doctrine-vs-implementation + compliance flag). Self-correction is presented as a core differentiator: `vigia_agent.py --help` says "Self-correction: automatic — no flags needed" and "Max iterations: 3", and `CLAUDE.md` states that "VIGÍA's self-correction occurs pre-emission". In Mode-1 it never occurs. |
+| **Files** | `vigia_agent.py` — `ContradictionDetector.detect()` (lines 451-528), `CONTRADICTION_THRESHOLD = 2` (line 55), `_apply_self_correction` (guard at ~813), `sans_compliance.self_correction` flag (~1398). |
+| **Detected in** | Investigation of B-151(b)'s open remainder (2026-07-26). Measured across the 21 corpus cases plus direct per-rule reachability testing. |
+
+### Description
+
+`ContradictionDetector.detect()` implements 4 rules. Three cannot match any
+input, because they read fields no production path writes:
+
+**Rule 1 — ENTROPY_VS_BEHAVIORAL.** Filters on `signal["tool"] in
+("memory_forensics", "disk_forensics")` and `signal["tool"] ==
+"behavioral_fingerprint"`. Mode-1 signals have no `tool` key: they carry
+`evidence_type` and `source`. Measured: **196 of 196 signals** across the 21
+corpus cases have `tool=None`. Verified that the rule's own logic is fine —
+the same scenario with `tool` instead of `source` fires correctly (control
+test included).
+
+**Rule 2 — SEMIOTIC_VS_TECHNICAL.** Reads
+`module_results["technical_result"]["alert_level"]` and requires `HIGH`/
+`CRITICAL`. `technical_result` and `semiotic_result` are **read** at
+`vigia_agent.py:464-465` and **written nowhere in the repository** —
+confirmed by exhaustive grep over every `*.py`, including `tests/`. The
+`.get(..., "LOW")` default always wins, and `"LOW"` is not in
+`("HIGH", "CRITICAL")`.
+
+**Rule 4 — VERDICT_FLIP.** Requires `"BENIGN" in
+best_hypothesis.upper()`. The producer's complete vocabulary
+(`vigia/inference/abductive_reasoner.py` + `vigia_agent.py`) is:
+`UNDETERMINED`, `REASONER_ERROR`, `ABSTAIN_V2`, `MALICIOUS_INTENT_DETECTED`,
+`INTENT_DETECTED`, `SUSPICION_DETECTED`, `NO_ANOMALY_DETECTED`,
+`NO_SEMIOTIC_ANOMALY_DETECTED`, `PIPELINE_ERROR`. **None contains "BENIGN"** —
+Mode-1 spells "benign" as `NO_*_ANOMALY_DETECTED`. `vigia_agent.py:164` itself
+documents that both spellings exist ("`NO_*_ANOMALY_DETECTED`, `BENIGN`"), but
+the rule only checks one. Verified the logic works: with the literal
+`"BENIGN"` it fires.
+
+That leaves **Rule 3 (CONFIDENCE_COLLAPSE)** as the only reachable rule, and
+it appends at most **one** contradiction. `CONTRADICTION_THRESHOLD = 2` gates
+correction on `len(contradictions) >= 2`:
+
+```python
+if len(contradictions) < CONTRADICTION_THRESHOLD:
+    ...
+    return False, results          # no correction
+```
+
+Maximum achievable = 1 < 2. Therefore `_apply_self_correction` returns
+`(False, results)` **for every possible input** — not "none on this corpus",
+but none ever.
+
+### Impact
+
+Structural, not case-dependent:
+
+- `self_corrections_applied` is always `0` and `iterations_executed` always
+  `1` — the self-correction loop documented as "max 3 iterations" never
+  iterates. Measured: 21/21 cases.
+- `sans_compliance.self_correction` (`= self.iteration > 0 or
+  len(self.corrections_applied) > 0`) can only ever be `False`. Measured:
+  21/21 `False`. This is particularly sensitive because that flag was
+  introduced explicitly as "FIX P1-5: real verifications instead of hardcoded
+  True flags" — it is a real verification correctly reporting that something
+  did not happen; the problem is that it cannot happen.
+- `contradictions_found = 0` on 21/21 corpus cases, read from the
+  `audit_trail` of real runs (not a simulation): it does not merely fall short
+  of the threshold, it is absolute zero.
+- The chained `contradiction_detector` event mandated by `CLAUDE.md`'s
+  "Self-Correction Event Schema" can never be emitted by Mode-1.
+
+### Relationship to B-151(b) — its attribution is now stale
+
+B-151(b) attributes the absence of that event to missing wiring
+("`vigia_scorer.py`, `bundle_builder.py`, `pipeline.py`,
+`sift_orchestrator.py` contain **zero** references to `ToolExecutionLogChain`
+/ `contradiction_detector` — the appender is instantiated only in tests and a
+red team script"). **That attribution is stale.**
+`vigia/core/reasoning_trace.py` implements the mechanism, cites B-151b by name
+in its docstring, and is wired into `vigia_agent.py`'s sealing path (~2180):
+`build_from_agent_bundle` chains `pipeline_results["self_corrections"]` as
+`contradiction_detector` entries. Verified live: a real Mode-1 run writes a
+chained, tail-anchored `<stem>_reasoning_trace.json`.
+
+That is: **the wiring exists and works; what does not exist is the input.**
+The real cause is upstream of where B-151(b) locates it. Note also that
+`BUGS_HISTORICO.md` (the reasoning-trace Phase 1.5 entry) describes the trace
+as "thin (MINIMAL quality)" for "cases without any of the latter" — treating
+it as case-dependent. With this finding, the trace's self-correction branch is
+**always** empty, by construction.
+
+B-151(b)'s legitimately open remainder (should each scorer gate emit a chained
+event?) stays open and is independent of this: the gates live in
+`vigia_scorer.py`, which `vigia_agent.py` does **not** import (zero
+references, verified) — they are two disjoint subsystems, and no gate marker
+ever reaches the agent bundle.
+
+### Verification done before documenting
+
+Induction against the live system, not deduction:
+
+1. Real `vigia_agent.py` runs over all 21 `cases/input/` cases:
+   `self_corrections_applied=0`, `iterations_executed=1`,
+   `sans_compliance.self_correction=False`, and `contradictions_found=0` read
+   from each `audit_trail`.
+2. Signal-key inventory across the 21 sealed runs: 196 signals, `tool=None` in
+   all of them; real keys
+   `{artifact_id, confidence, description, evidence_type, source, z_score}`.
+3. Exhaustive grep: `technical_result` / `semiotic_result` have no producer in
+   any `*.py` in the repo.
+4. Enumeration of the `best_hypothesis` vocabulary in the producer's own source
+   (not just in the corpus) — no literal containing "BENIGN".
+5. Direct per-rule reachability testing, feeding `detect()` scenarios built to
+   trigger each rule using the **real** data shapes: rules 1, 2 and 4 return
+   `[]`; rule 3 returns 1; the maximum with everything stacked at once is 1,
+   against threshold 2.
+6. Positive control tests proving rules 1 and 4 do work logically and that only
+   the field name / spelling is misaligned — so "unreachable rule" is not
+   confused with "incorrect rule".
+
+Locked by `tests/test_b224_contradiction_detector_dormancy.py` (10 tests). All
+of its assertions document the **current broken state**, not the desired one:
+they will FAIL when someone wires a producer or aligns the vocabulary, which is
+exactly the point.
+
+### Proposed fix (NOT applied)
+
+Not applied because **every possible option affects verdicts** and requires
+corpus re-validation plus Anna's sign-off. A live correction rewrites
+`abduction["best_hypothesis"]` (see `_apply_self_correction`, actions
+`OVERRIDE_ABDUCTIVE_CONCLUSION` / `ESCALATE_TO_CRITICAL`), so reviving any rule
+can move sealed verdicts on real corpus cases.
+
+There is also an interaction that makes partial fixes useless: reviving a
+**single** rule leaves the maximum at 1, still < 2, and changes nothing. A real
+fix requires deciding jointly:
+
+- (a) Align rule 1 with the real keys (`evidence_type` / `source`) — requires
+  defining which `evidence_type` values count as memory/disk and what the real
+  equivalent of `behavioral_fingerprint` is.
+- (b) Align rule 4 with the real vocabulary (`NO_*_ANOMALY_DETECTED` in
+  addition to `BENIGN`).
+- (c) Decide whether rule 2 should have a producer (`technical_result`) or be
+  removed as a dead concept.
+- (d) Revisit `CONTRADICTION_THRESHOLD = 2` in light of how many rules are
+  actually live: with 4 nominal rules a threshold of 2 was plausible; with 1
+  live rule it is an impossible condition.
+- (e) The honest alternative if scoring must not be touched: document the
+  inertness in `KNOWN_LIMITATIONS.md` and adjust `--help` / `CLAUDE.md` so
+  Mode-1 self-correction is not presented as active. Under the honest-degradation
+  doctrine (§5.3 of `docs/ENGINEERING_DISCIPLINE.md`), declaring an inert
+  capability is worse than declaring an absent one.
+
+Worth noting too: `ContradictionDetector`'s docstring enumerates 5 contradiction
+types but only implements 4 — `TEMPORAL_VS_CONTENT` (listed as #1) does not
+exist in the code.
