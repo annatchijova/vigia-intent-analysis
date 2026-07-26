@@ -550,7 +550,7 @@ python3 vigia_agent.py \
 
 ### Modo 2 — Claude Code + MCP (investigación interactiva)
 
-VIGÍA expone 21 herramientas forenses como funciones MCP. Cuando ejecutas `claude` en
+VIGÍA expone 22 herramientas forenses como funciones MCP. Cuando ejecutas `claude` en
 la raíz del repositorio, el agente lee `CLAUDE.md` y conduce una investigación
 peirciana completa de forma interactiva.
 
@@ -586,7 +586,7 @@ Genera un ForensicBundle sellado y una narrativa Amicus Curiae.
 
 > **No se necesita API key de Anthropic.** El Modo 2 funciona con una
 > suscripcion Claude Code Pro o Max — no hace falta un `ANTHROPIC_API_KEY`
-> separado. Claude Code lee `CLAUDE.md`, llama a las 21 herramientas MCP
+> separado. Claude Code lee `CLAUDE.md`, llama a las 22 herramientas MCP
 > directamente y conduce la investigacion peirciana completa de forma
 > interactiva. El motor deterministico de scoring corre localmente (Modo 1
 > internamente); Claude aporta la capa narrativa, la generacion de audit
@@ -1209,7 +1209,7 @@ un system prompt.
 |----------|---------------------|
 | **Ejecución Autónoma** | `vigia_agent.py` — bucle auto-correctivo, `MAX_ITERATIONS=3`, detección determinista de contradicciones |
 | **Precisión IR** | Veredictos probabilísticos (0.0–0.99); confirmado vs. inferido siempre distinguidos |
-| **Amplitud y Profundidad** | 21 herramientas; `AbductiveHuntingStrategy` prioriza via `value / (cost × spoofability)` |
+| **Amplitud y Profundidad** | 22 herramientas; `AbductiveHuntingStrategy` prioriza via `value / (cost × spoofability)` |
 | **Implementación de Restricciones** | `_sanitize_path`, `@_rate_limit`, validación de magic-byte, Protocolo Kassandra |
 | **Pista de Auditoría** | `chain_of_custody_hash` (SHA-256), cadena de auditoría firmada con HMAC, AmicusCuriae completo |
 | **Usabilidad** | 5 modos: fallback (0 tokens), Claude Code + MCP, Ollama (local), agente batch, OpenWebUI |
@@ -1293,7 +1293,7 @@ vigia-intent-analysis/
 ├── vigia-es.html / vigia-ru.html        ← Versiones ES / RU
 │
 ├── vigia/                               ← Paquete principal
-│   ├── vigia_sift_bridge_final.py       ← Servidor MCP (21 herramientas, entrada principal)
+│   ├── vigia_sift_bridge_final.py       ← Servidor MCP (22 herramientas, entrada principal)
 │   ├── core/
 │   │   ├── ebs_v1.py                    ← Evidence Bundle Synthesizer
 │   │   ├── caie.py                      ← CrossArtifactIncongruenceEngine

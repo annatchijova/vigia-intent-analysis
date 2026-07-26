@@ -149,7 +149,7 @@ Ockham's Razor guides selection between competing hypotheses of equal explanator
 │  LAYER 4: audit_action    — Diff/Optimizer/PolicyEngine         │
 │  LAYER 5: verify_ebs_v1.py — verification, stdlib only         │
 │                                                                 │
-│  SIFT BRIDGE: vigia_sift_bridge_final.py (21+ MCP tools)       │
+│  SIFT BRIDGE: vigia_sift_bridge_final.py (22+ MCP tools)       │
 └────────────────────────┬────────────────────────────────────────┘
                          │  Sealed ForensicBundle
                          ▼

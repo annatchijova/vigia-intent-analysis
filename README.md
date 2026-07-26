@@ -598,7 +598,7 @@ Generate a sealed ForensicBundle and Amicus Curiae narrative.
 
 > **No Anthropic API key required.** Mode 2 works with a Claude Code Pro or Max
 > subscription — no separate `ANTHROPIC_API_KEY` needed. Claude Code reads
-> `CLAUDE.md`, calls the 21 MCP tools directly, and conducts the full Peircean
+> `CLAUDE.md`, calls the 22 MCP tools directly, and conducts the full Peircean
 > investigation interactively. The deterministic tools remain local, while
 > Mode 2 assembles a separately scoped investigation, audit trail, and Amicus
 > Curiae report. It does not mutate a sealed Mode 1 bundle. It can, however,
@@ -1258,7 +1258,7 @@ assumption.
 |-----------|---------------------|
 | **Autonomous Execution** | `vigia_agent.py` — self-correcting loop, `MAX_ITERATIONS=3`, deterministic contradiction detection |
 | **IR Accuracy** | Probabilistic verdicts (0.0–0.99); confirmed vs. inferred always distinguished |
-| **Breadth & Depth** | 21 tools; `AbductiveHuntingStrategy` prioritizes via `value / (cost × spoofability)` |
+| **Breadth & Depth** | 22 tools; `AbductiveHuntingStrategy` prioritizes via `value / (cost × spoofability)` |
 | **Constraint Implementation** | `_sanitize_path`, `@_rate_limit`, magic-byte validation, Kassandra Protocol |
 | **Audit Trail** | `chain_of_custody_hash` (SHA-256), HMAC-signed audit chain, full AmicusCuriae |
 | **Usability** | 5 modes: fallback (0 tokens), Claude Code + MCP, Ollama (local), batch agent, OpenWebUI |
@@ -1341,7 +1341,7 @@ vigia-intent-analysis/
 ├── vigia-es.html / vigia-ru.html        ← ES / RU versions
 │
 ├── vigia/                               ← Main package
-│   ├── vigia_sift_bridge_final.py       ← MCP server (21 tools, primary entry)
+│   ├── vigia_sift_bridge_final.py       ← MCP server (22 tools, primary entry)
 │   ├── core/
 │   │   ├── ebs_v1.py                    ← Evidence Bundle Synthesizer
 │   │   ├── caie.py                      ← CrossArtifactIncongruenceEngine

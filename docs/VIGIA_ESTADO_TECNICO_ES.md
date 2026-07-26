@@ -151,7 +151,7 @@ La Navaja de Ockham guía la selección entre hipótesis competidoras de igual p
 │  CAPA 4: audit_action     — Diff/Optimizer/PolicyEngine         │
 │  CAPA 5: verify_ebs_v1.py — verificación stdlib puro           │
 │                                                                 │
-│  SIFT BRIDGE: vigia_sift_bridge_final.py (21+ tools MCP)       │
+│  SIFT BRIDGE: vigia_sift_bridge_final.py (22+ tools MCP)       │
 └────────────────────────┬────────────────────────────────────────┘
                          │  ForensicBundle sellado
                          ▼
@@ -530,7 +530,7 @@ Implementadas en `vigia_sift_bridge.py` con comentario explícito en el código:
 3. Detección de HTTP/SSE: sin `VIGIA_MCP_AUTH_TOKEN` → CRITICAL alert
 4. Con `VIGIA_ENFORCE_STDIO=true`: abort en startup si transporte inseguro
 
-VIGÍA expone 21+ herramientas forenses incluyendo operaciones de nivel root. HTTP sin autenticación es una superficie de ataque inaceptable.
+VIGÍA expone 22+ herramientas forenses incluyendo operaciones de nivel root. HTTP sin autenticación es una superficie de ataque inaceptable.
 
 ### 9.8 Integridad del Modelo CLIP
 

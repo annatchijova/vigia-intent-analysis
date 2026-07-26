@@ -143,12 +143,12 @@ eliminate the **semiotic fractures** produced by deliberate fabrication. VIGÍA 
 
 ### Key Technical Features
 
-**21 MCP forensic tools** organized in two phases:
+**22 MCP forensic tools** organized in two phases:
 
 *Phase 1 — Chain of Custody (9 tools):* forensic image mounting, SHA-256 hash chain,
 single-pass evidence I/O, filesystem perimeter, entropy calculation, image metadata audit.
 
-*Phase 2 — Intentionality Analysis (12 tools):* stylometry, human entropy / jitter,
+*Phase 2 — Intentionality Analysis (13 tools):* stylometry, human entropy / jitter,
 habit incongruence (memory vs. logs), intent inference, Grice maxim auditing,
 Eco overinterpretation detection, honey token activation, LLM abductive reasoning,
 self-correction via Peircean fallacy check.
@@ -237,7 +237,7 @@ screenshots/selfcorection.png               ← Self-correction sequence
 │                                                                 │
 │  CAIE: CrossArtifactIncongruenceEngine                          │
 │  EBS v1: Evidence Bundle Synthesizer                            │
-│  SIFT BRIDGE: 21 MCP tools (Phase 1: CoC + Phase 2: IoI)        │
+│  SIFT BRIDGE: 22 MCP tools (Phase 1: CoC + Phase 2: IoI)        │
 └────────────────────────┬────────────────────────────────────────┘
                          │  Sealed ForensicBundle (JSON + SHA-256)
                          ▼

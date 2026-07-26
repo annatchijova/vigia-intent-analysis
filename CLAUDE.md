@@ -114,7 +114,7 @@ export VIGIA_ENTANGLEMENT_ENABLED=true     # analyze_document_entanglement
 
 ## MCP Tool Reference
 
-All 21 tools are exposed by `Vigia_Sift_Bridge`. Tool names use underscores.
+All 22 tools are exposed by `Vigia_Sift_Bridge`. Tool names use underscores.
 
 ### Phase 1 — Evidence Preservation
 
@@ -159,6 +159,7 @@ All 21 tools are exposed by `Vigia_Sift_Bridge`. Tool names use underscores.
 | Tool | Purpose |
 |------|---------|
 | `activate_honey_token` | Plant a tripwire variable. If a suspicious process reads the monitored file, the tripwire fires. |
+| `deactivate_honey_token` | Retire a planted honey-token with audit trail. Also sweeps any expired tokens (lazy expiry). |
 
 ### Utility
 
@@ -169,7 +170,7 @@ All 21 tools are exposed by `Vigia_Sift_Bridge`. Tool names use underscores.
 
 ### Optional — Dynamically-Registered Tools
 
-The 21 tools above are the **base set**, always exposed. Beyond them, `Vigia_Sift_Bridge`
+The 22 tools above are the **base set**, always exposed. Beyond them, `Vigia_Sift_Bridge`
 registers additional enrichment tools at startup if their module loads (and, for the
 gated ones, if their `VIGIA_*_ENABLED` flag is true). Treat these as enrichment, not as
 part of the deterministic core.
@@ -183,6 +184,7 @@ part of the deterministic core.
 | `vision_intent_audit` | `vigia.tools.vision_audit` | always (if module present) — **B-114:** now runs real CLIP inference; requires GPU + CLIP model loaded. Was silently broken before B-114. |
 | `cross_artifact_analysis` | `vigia.tools.caie` | `VIGIA_CAIE_ENABLED` |
 | `trust_fusion_analysis` | `vigia.core.trust_fusion` | `VIGIA_TRUST_FUSION_ENABLED` |
+| `compare_paired_bundles` | `vigia.tools.paired_review` | `VIGIA_PAIRED_REVIEW_ENABLED` (default true) — L-029 F2/FW-009 deterministic cross-bundle sub-metrics; zero verdict authority. |
 | `analyze_document_register` | `vigia.tools.adversarial_nlp` | `VIGIA_NLP_ENABLED` |
 | `analyze_document_entanglement` | `vigia.tools.entanglement` | `VIGIA_ENTANGLEMENT_ENABLED` |
 

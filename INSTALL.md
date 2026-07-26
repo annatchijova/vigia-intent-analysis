@@ -367,7 +367,7 @@ claude
 ```
 
 Claude Code reads `CLAUDE.md` and the VIGÍA MCP server connects automatically.
-All 21 tools (`generate_forensic_hash`, `infer_intent`, `validate_and_correct_analysis`,
+All 22 tools (`generate_forensic_hash`, `infer_intent`, `validate_and_correct_analysis`,
 etc.) are available as MCP functions for the full Peircean investigation workflow.
 
 ### Alternative: REST API quick start
