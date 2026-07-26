@@ -980,69 +980,6 @@ WARN y topa en Level 2 — Level 3 requiere cablear el Evidence Chain Ledger
 (`VIGIA_CHAIN_DB_PATH`), pendiente de integración; no es un fallo, es una feature
 de Level 3 no conectada a este entry point.
 
-## B-218 — El bundle sella `epsilon_used = epsilon_accept` incluso cuando el veredicto fue REJECT por `epsilon_reject`: el ε que queda registrado no es el que decidió [DOCUMENTADO — Claude 2026-07-25]
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | P2, con precondición dormida hoy (ver más abajo). Origen: auditoría "Ronda 2", hallazgo F2. |
-| **Archivos** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`, línea ~578: `epsilon_used=self._eps_accept`); `vigia/pipeline/pipeline.py` (líneas 730-731: `epsilon_accept=decision_trace.epsilon_used` y `epsilon_reject=decision_trace.epsilon_used`). |
-| **Función** | `RiskBoundedDecisionLayer.decide()`; `VigiaPipeline` (construcción del `SystemState` sellado). |
-| **Líneas originales** | `epsilon_used=self._eps_accept` (siempre, sin importar el veredicto). |
-| **Commit fix** | Ninguno — documentado, no aplicado. |
-| **Detectado en** | Auditoría "Ronda 2", inducción ejecutada y re-verificada contra el archivo vivo en esta sesión. |
-
-### Descripción
-
-`decide()` construye la `DecisionTrace` con `epsilon_used=self._eps_accept`
-sin condicionar por el veredicto. Cuando el veredicto es REJECT, el umbral
-que efectivamente decidió fue `epsilon_reject` (la regla es
-`REJECT si r >= 1 - epsilon_reject`), no `epsilon_accept` — pero el campo
-sellado en el *trace* (y de ahí en el bundle, vía `pipeline.py:730-731`, que
-copia ese mismo valor a **ambos** `epsilon_accept` y `epsilon_reject` del
-`SystemState`) siempre reporta `epsilon_accept`.
-
-Verificado empíricamente en esta sesión (no solo deducido):
-
-```
-RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
-decide(posterior=0.70) → decision=REJECT, risk=0.7
-  epsilon_used (sellado) = 0.05        # epsilon_accept
-  eps_reject real usado en el umbral   = 0.40
-```
-
-El veredicto (`REJECT`) es correcto — el bug es puramente de auditoría: el
-campo que un perito leería para saber "¿qué umbral se usó para rechazar este
-caso?" no dice la verdad.
-
-**Precondición honesta (por qué esto es P2 y no P1):**
-`SelfAdaptiveRiskPolicy.update_from_window` fuerza
-`epsilon_accept = epsilon_reject` en cada actualización (`risk_bounded_layer.py`,
-líneas ~290-291: `self.epsilon_accept = epsilon_stable; self.epsilon_reject = epsilon_stable`).
-En la configuración adaptativa por defecto (la que usa el pipeline en la
-práctica), ambos valores son siempre iguales, así que el bug es inofensivo:
-da igual cuál de los dos se selle porque son el mismo número. El mecanismo
-está roto, pero el disparador está dormido hoy. Muerde solo si un
-`PolicySpec` define `epsilon_accept != epsilon_reject` explícitamente — camino
-que `RiskBoundedDecisionLayer.from_policy_spec()` soporta sin restricción.
-
-### Impacto
-
-Si algún `PolicySpec` futuro (o alguien construyendo `RiskBoundedDecisionLayer`
-directamente, fuera de la política adaptativa) define umbrales asimétricos, el
-bundle sellado mentiría sobre qué ε se usó en cualquier caso rechazado —
-exactamente el tipo de discrepancia entre "lo que el sistema hizo" y "lo que
-el sistema dice que hizo" que compromete la cadena de custodia auditable
-(invariante de VIGÍA: determinismo del audit trail, no solo del veredicto).
-
-### Fix propuesto (NO aplicado)
-
-En `decide()`, sellar `epsilon_used = self._eps_reject if verdict == "REJECT" else self._eps_accept`
-(o, más explícito para el perito, sellar ambos valores por separado en el
-*trace* — `epsilon_accept_used` y `epsilon_reject_used` — en vez de un único
-campo `epsilon_used` que asume que uno de los dos siempre es irrelevante).
-Requiere además revisar `pipeline.py:730-731`, que hoy asume que un solo
-`epsilon_used` basta para poblar ambos campos del `SystemState` sellado.
-
 ## B-220 — La caché de `bayesian_update` está indexada solo por `artifact_id`: ignora `custom_window`, aunque el parámetro es parte de la firma pública [DOCUMENTADO — Claude 2026-07-25]
 
 | Campo | Valor |

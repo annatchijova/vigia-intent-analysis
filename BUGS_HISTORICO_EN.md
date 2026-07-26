@@ -9404,3 +9404,81 @@ that fracture carries no measured severity.
   value correctly, and the `type` fallback works).
 - Full suite before and after: 1982 passed, 191 skipped, 29 xfailed — zero
   regressions.
+
+## B-218 — The bundle seals `epsilon_used = epsilon_accept` even when the verdict was REJECT via `epsilon_reject`: the recorded ε is not the one that actually decided [RESOLVED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2, with a precondition dormant on the default path (see below). Origin: "Round 2" audit, finding F2. |
+| **Files** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`); `vigia/pipeline/pipeline.py` (`SystemState` construction in `run_full`). |
+| **Function** | `RiskBoundedDecisionLayer.decide()`; `VigiaPipeline.run_full()`. |
+| **Original lines** | `epsilon_used=self._eps_accept` (always, regardless of the verdict); `epsilon_accept=decision_trace.epsilon_used, epsilon_reject=decision_trace.epsilon_used` in `pipeline.py`. |
+| **Fix commit** | branch `claude/bugs-pendientes-advance`. |
+
+### Description (inherited from the original documentation, re-verified before touching code)
+
+`decide()` built the `DecisionTrace` with `epsilon_used=self._eps_accept`
+unconditionally on the verdict. When the verdict was REJECT, the threshold
+that actually decided was `epsilon_reject`, not `epsilon_accept` — but the
+sealed field always reported `epsilon_accept`. Separately, and more
+severely: `pipeline.py` copied that same `epsilon_used` into **both**
+`SystemState.epsilon_accept` and `SystemState.epsilon_reject`, collapsing
+two potentially distinct policy thresholds into the sealed bundle.
+
+**Precondition confirmed by execution (why this was P2, not P1):**
+`VigiaPipeline(adaptive_policy=True)` -- the default -- constructs a
+`SelfAdaptiveRiskPolicy(epsilon_init=policy_spec.epsilon_accept)`, which
+sets `self.epsilon_accept = self.epsilon_reject = epsilon_init` right in
+the constructor, BEFORE `update_from_window()` ever runs. So the default
+adaptive path collapses both thresholds to a single value by design,
+independent of this bug. The bug only bit if a `PolicySpec` explicitly set
+`epsilon_accept != epsilon_reject` AND the pipeline was constructed with
+`adaptive_policy=False` -- confirmed by executing both cases before
+deciding on the fix.
+
+### Fix applied
+
+Two parts:
+
+1. **`decide()`** now seals `epsilon_used = self._eps_reject` for a
+   `REJECT` verdict, `self._eps_accept` otherwise (`ABSTAIN` keeps
+   `eps_accept` as a reference value -- no threshold "decided" an ABSTAIN,
+   and `abstain_reason` already surfaces both real values in its text).
+2. **`pipeline.py`** no longer derives `SystemState.epsilon_accept`/
+   `epsilon_reject` from `decision_trace.epsilon_used` -- it now seals
+   `self._adaptive_policy.epsilon_accept`/`.epsilon_reject` directly (when
+   an adaptive policy exists) or `self._risk_layer._eps_accept`/
+   `._eps_reject` (when it doesn't), the same pattern already used for
+   `lambda_drift`/`gamma_stability` two lines above. This is the real fix
+   for the bundle's auditability problem: it no longer collapses two
+   potentially-distinct thresholds into one value.
+
+### Verification
+
+Executed before and after the fix (not just deduced):
+
+```
+RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
+decide(posterior=0.70) → REJECT, epsilon_used=0.40 (before: 0.05, wrong)
+decide(posterior=0.01) → ACCEPT, epsilon_used=0.05 (unchanged)
+decide(posterior=0.30) → ABSTAIN, epsilon_used=0.05 (unchanged, reference value)
+
+VigiaPipeline(policy=PolicySpec(epsilon_accept=0.05, epsilon_reject=0.40),
+              adaptive_policy=False).run_full(...) → REJECT
+  SystemState.epsilon_accept = 0.05  (before: 0.05, coincidentally correct on ACCEPT)
+  SystemState.epsilon_reject = 0.40  (before: 0.05, WRONG)
+
+VigiaPipeline() [default, adaptive_policy=True] .run_full(...)
+  SystemState.epsilon_accept = SystemState.epsilon_reject = 0.05  (unchanged,
+  confirms the default path -- the one the pipeline actually uses in
+  practice -- was not affected by the fix)
+```
+
+Permanent test: `tests/test_b218_epsilon_sealing.py` (6 tests: correct
+threshold sealed per verdict in `decide()`, symmetric case unaffected, and
+the with/without-adaptive-policy pair end-to-end through `run_full()`).
+Full suite before and after: 1992 passed, 191 skipped, 29 xfailed -- zero
+regressions (the one failure observed in
+`tests/integration/test_ebs_v1_integration.py`, about KDE/Ledoit-Wolf
+calibration, is pre-existing -- confirmed identical with and without this
+fix via `git stash`).

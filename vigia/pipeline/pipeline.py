@@ -727,8 +727,21 @@ class VigiaPipeline:
                 self._adaptive_policy.gamma_t
                 if self._adaptive_policy else self._risk_layer._gamma
             ),
-            epsilon_accept=decision_trace.epsilon_used,
-            epsilon_reject=decision_trace.epsilon_used,
+            # B-218 fix: seal the layer's/policy's actual epsilon_accept and
+            # epsilon_reject directly (same pattern as lambda_drift/
+            # gamma_stability above), instead of deriving both from the
+            # single decision_trace.epsilon_used -- that collapsed two
+            # possibly-distinct thresholds into whichever one the verdict
+            # happened to use, misrepresenting the other in the sealed
+            # SystemState whenever a PolicySpec sets them asymmetrically.
+            epsilon_accept=(
+                self._adaptive_policy.epsilon_accept
+                if self._adaptive_policy else self._risk_layer._eps_accept
+            ),
+            epsilon_reject=(
+                self._adaptive_policy.epsilon_reject
+                if self._adaptive_policy else self._risk_layer._eps_reject
+            ),
             drift_score=drift_score,
             graph_stability_global=graph_stability,
             engine_version="vigia-ebs-v1.0",

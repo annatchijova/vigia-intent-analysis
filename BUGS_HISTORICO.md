@@ -9969,3 +9969,81 @@ esa fractura no trae severidad medida.
   renderiza el valor correcto, y el fallback a `type` funciona).
 - Suite completa antes y después: 1982 passed, 191 skipped, 29 xfailed —
   cero regresiones.
+
+## B-218 — El bundle sella `epsilon_used = epsilon_accept` incluso cuando el veredicto fue REJECT por `epsilon_reject`: el ε que queda registrado no es el que decidió [RESUELTO — Claude 2026-07-26]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2, con precondición dormida en el path por defecto (ver abajo). Origen: auditoría "Ronda 2", hallazgo F2. |
+| **Archivos** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`); `vigia/pipeline/pipeline.py` (construcción del `SystemState` en `run_full`). |
+| **Función** | `RiskBoundedDecisionLayer.decide()`; `VigiaPipeline.run_full()`. |
+| **Líneas originales** | `epsilon_used=self._eps_accept` (siempre, sin importar el veredicto); `epsilon_accept=decision_trace.epsilon_used, epsilon_reject=decision_trace.epsilon_used` en `pipeline.py`. |
+| **Commit fix** | rama `claude/bugs-pendientes-advance`. |
+
+### Descripción (heredada de la documentación original, verificada de nuevo antes de tocar código)
+
+`decide()` construía la `DecisionTrace` con `epsilon_used=self._eps_accept`
+sin condicionar por el veredicto. Cuando el veredicto era REJECT, el umbral
+que efectivamente decidió era `epsilon_reject`, no `epsilon_accept` — pero
+el campo sellado siempre reportaba `epsilon_accept`. Separadamente, y más
+grave: `pipeline.py` copiaba ese mismo `epsilon_used` a **ambos**
+`SystemState.epsilon_accept` y `SystemState.epsilon_reject`, colapsando dos
+umbrales de política potencialmente distintos en el bundle sellado.
+
+**Precondición confirmada por ejecución (por qué esto era P2, no P1):**
+`VigiaPipeline(adaptive_policy=True)` — el default — construye
+`SelfAdaptiveRiskPolicy(epsilon_init=policy_spec.epsilon_accept)`, que fija
+`self.epsilon_accept = self.epsilon_reject = epsilon_init` ya en el
+constructor, ANTES de que `update_from_window()` corra siquiera. Es decir,
+el path adaptativo por defecto colapsa los dos umbrales a un solo valor por
+diseño, independientemente de este bug. El bug solo mordía si un
+`PolicySpec` definía `epsilon_accept != epsilon_reject` explícitamente Y se
+construía el pipeline con `adaptive_policy=False` — confirmado ejecutando
+ambos casos antes de decidir el fix.
+
+### Fix aplicado
+
+Dos partes:
+
+1. **`decide()`** ahora sella `epsilon_used = self._eps_reject` si el
+   veredicto es `REJECT`, `self._eps_accept` en cualquier otro caso
+   (`ABSTAIN` conserva `eps_accept` como valor de referencia — ningún umbral
+   "decidió" un ABSTAIN, y `abstain_reason` ya expone ambos valores reales
+   en su texto).
+2. **`pipeline.py`** ya NO deriva `SystemState.epsilon_accept`/`epsilon_reject`
+   de `decision_trace.epsilon_used` — ahora sella directamente
+   `self._adaptive_policy.epsilon_accept`/`.epsilon_reject` (si hay política
+   adaptativa) o `self._risk_layer._eps_accept`/`._eps_reject` (si no la
+   hay), el mismo patrón que ya usaban `lambda_drift`/`gamma_stability` dos
+   líneas arriba. Este es el fix real del problema de auditoría del bundle:
+   ya no colapsa dos umbrales potencialmente distintos en un solo valor.
+
+### Verificación
+
+Ejecutado antes y después del fix (no solo deducido):
+
+```
+RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
+decide(posterior=0.70) → REJECT, epsilon_used=0.40 (antes: 0.05, incorrecto)
+decide(posterior=0.01) → ACCEPT, epsilon_used=0.05 (sin cambio)
+decide(posterior=0.30) → ABSTAIN, epsilon_used=0.05 (sin cambio, valor de referencia)
+
+VigiaPipeline(policy=PolicySpec(epsilon_accept=0.05, epsilon_reject=0.40),
+              adaptive_policy=False).run_full(...) → REJECT
+  SystemState.epsilon_accept = 0.05  (antes: 0.05, por casualidad correcto en ACCEPT)
+  SystemState.epsilon_reject = 0.40  (antes: 0.05, INCORRECTO)
+
+VigiaPipeline() [default, adaptive_policy=True] .run_full(...)
+  SystemState.epsilon_accept = SystemState.epsilon_reject = 0.05  (sin cambio,
+  confirma que el path por defecto —el que usa el pipeline en la práctica—
+  no se vio afectado por el fix)
+```
+
+Test permanente: `tests/test_b218_epsilon_sealing.py` (6 tests: umbral
+correcto sellado por veredicto en `decide()`, caso simétrico sin cambios, y
+el par de casos end-to-end con/sin política adaptativa a través de
+`run_full()`). Suite completa antes y después: 1992 passed, 191 skipped, 29
+xfailed — cero regresiones (la única falla observada en
+`tests/integration/test_ebs_v1_integration.py`, sobre calibración
+KDE/Ledoit-Wolf, es preexistente — confirmada idéntica con y sin este fix
+vía `git stash`).
