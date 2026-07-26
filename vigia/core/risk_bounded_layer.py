@@ -564,6 +564,21 @@ class RiskBoundedDecisionLayer:
             lr = inference_result.get("lr", 1.0)
             components_used = inference_result.get("components_used", 0)
 
+        # B-218 fix: epsilon_used must name the threshold that actually
+        # decided the verdict -- ACCEPT is gated by eps_accept, REJECT by
+        # eps_reject. Before this fix, epsilon_used was always eps_accept
+        # regardless of verdict, so a REJECT decided by eps_reject sealed
+        # the wrong threshold on the trace (and, downstream, on the bundle
+        # -- see pipeline.py's SystemState construction, fixed separately).
+        # ABSTAIN has no single deciding threshold (the case fell strictly
+        # between both); eps_accept is kept as the reference value there,
+        # unchanged from prior behavior -- abstain_reason already surfaces
+        # both real values in its text for that case.
+        if verdict == "REJECT":
+            epsilon_used = self._eps_reject
+        else:
+            epsilon_used = self._eps_accept
+
         omega = getattr(self, "_omega", 1.0)
         trace = DecisionTrace(
             decision=verdict,
@@ -575,7 +590,7 @@ class RiskBoundedDecisionLayer:
             graph_stability=graph_stability,
             lambda_drift=self._lambda,
             gamma_stability=self._gamma,
-            epsilon_used=self._eps_accept,
+            epsilon_used=epsilon_used,
             components_used=components_used,
             signal_contributions=signal_contributions,
             reason_code=reason_code,

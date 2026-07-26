@@ -214,38 +214,6 @@ checks unique to `SignalQualityGate`.
 
 ---
 
-## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging
-
-| Field | Value |
-|-------|-------|
-| **Status** | PARTIALLY RESOLVED — 3 priority tools covered, 20 pending |
-| **Severity** | P2 (Daubert chain-of-custody gap) |
-| **File** | `vigia/vigia_sift_bridge.py` |
-| **Detected in** | Module archaeology audit 2026-07-14 |
-
-### Description
-
-Of 23 MCP tools, only 3 have `audit_logger.log_info(event_type="TOOL_INVOKED")`
-before path sanitization: `generate_forensic_hash`, `read_evidence`, `list_files`.
-These 3 are the evidence-touching tools (chain-of-custody anchor). The remaining
-20 Phase 2-4 analysis tools are not instrumented. A calling agent can reconstruct
-a v2 HMAC `tool_execution_log` after a session, but that is not equivalent to
-tool-side instrumentation or contemporaneous capture.
-
-**OWL v2 confirmation (2026-07-21):** external bundle
-`results/OWL-NEXUS5-CASE_bundle_claude_v2.json` preserves 37 entries and the
-stdlib verifier confirms its hash chain. Its own report documents that entries
-were written by the agent in batches after MCP calls and that HMAC cannot be
-keyedly verified without the access-restricted key. The chain therefore proves
-subsequent relative integrity, not wall-clock timing, call order, or literal
-MCP response text. This is not a verifier defect; it is concrete evidence that
-B-122 remains partially open.
-
-Deferred: broader rollout needs to address `audit_logger` synchronous fsync
-performance before adding to all 20 tools.
-
----
-
 ## B-123 — Causal Closure Score gate designed and tested, NOT wired — dry-run inviable (0/258 cases have data)
 
 | Field | Value |
@@ -510,6 +478,34 @@ event, not the reason). This is an architecture decision — wire it into Mode-1
 amend the doctrine to state the chained self-correction event is a Mode-2 (Claude
 Code) construct by design. Deliberately NOT fixed as a one-liner. Not yet decided.
 
+**Update 2026-07-26 — the attribution above is now STALE (see B-224).** Two
+factual corrections, both verified live:
+
+1. *The wiring exists.* `vigia/core/reasoning_trace.py` implements the mandated
+   mechanism, cites B-151b by name in its docstring, and is wired into
+   `vigia_agent.py`'s sealing path (~2180): `build_from_agent_bundle` chains
+   `pipeline_results["self_corrections"]` as `contradiction_detector` entries
+   via `ToolExecutionLogChain`. Confirmed with a real Mode-1 run, which writes a
+   chained, tail-anchored `<stem>_reasoning_trace.json`. The claim "the appender
+   is instantiated only in tests and a red-team script" is no longer true.
+2. *What is missing is the input, not the wiring.* B-224 documents that
+   `ContradictionDetector` can never fire in Mode-1: 3 of its 4 rules read
+   fields with no producer (`signal["tool"]`, `technical_result`) or a spelling
+   the real vocabulary never uses (`"BENIGN"` vs `NO_*_ANOMALY_DETECTED`), and
+   `CONTRADICTION_THRESHOLD = 2` makes the single live rule insufficient
+   (maximum achievable = 1). So the trace's self-correction branch is **always**
+   empty, by construction — not only on cases without contradictions.
+
+**What remains open here (independent of B-224):** whether each scorer gate
+should emit its own chained event. A structural note for whoever takes it on:
+the gates live in `vigia_scorer.py`, which `vigia_agent.py` does **not** import
+(zero references, verified) — they are two disjoint subsystems, and no gate
+marker (`normalization_failures`, `temporal_pairs_skipped`,
+`pre_unverified_*_verdict`, `single_artifact_score_cap`) ever reaches the agent
+bundle. So the fix is not "read the markers in `build_from_agent_bundle`":
+there are no markers to read on that path. The architecture decision stays
+pending.
+
 ---
 
 ## B-162 — The legacy adapter silently erased an unmodeled structured-evidence schema [PARTIALLY REMEDIATED — Codex 2026-07-21]
@@ -579,35 +575,6 @@ materializes the facts it proposes to score.
 
 ---
 
-## B-214 — `VigiaPipeline.run_full` bypasses the normalization-integrity gate that `vigia_agent.py` applies: two entry points, two verdicts [DOCUMENTED — Claude 2026-07-23]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P2 (architectural footgun, not an incorrectness): the same case yields different verdicts by entry point. `run_full` scores raw; `vigia_agent.py` applies the honest-degradation gate. A caller using `run_full` gets an ungated score and may seal it as if it were the authoritative verdict. |
-| **Files** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full`), `vigia_agent.py` (full Mode-1 agent). |
-| **Mode** | Any code that calls `run_full` directly to seal (e.g. `scripts/run_vigia_full.py` and this session's `_claude_fable` bundles) instead of going through the agent. |
-| **Detected by** | Mode-1 vs Mode-2 cross-check (session 2026-07-23, `vigia/results/MODE1-vs-MODE2_crosscheck_claude_fable.md`). |
-
-**Reproduced observation:** on `data/cases/OWL-NEXUS5-CASE.json` and
-`VIGIA-OWL-2019-COMPLETE.json`, `VigiaPipeline.run_full` returns
-`decision=REJECT, posterior=1.0`; `vigia_agent.py` on the same JSON returns
-**ABSTAIN** with reason `NORMALIZATION INTEGRITY LOSS` — it detects that an
-artifact's metadata (the `significance` field carrying `..` on the coordination
-SMS) was coerced at intake, which can silently drop a scoring-relevant assertion.
-`run_full` does not run that check.
-
-**Note (Thirdness):** neither side is "wrong" — there are two paths with different
-guarantees and nothing flags it at the call site. The integrity gate (P1 metadata
-normalization) is correct; the problem is that `run_full` is a low-level API that
-bypasses it. Related to the B-160/B-206 semantic-extractor gap that leaves
-OWL-NEXUS5 in honest ABSTAIN.
-
-**Proposed fix (NOT applied):** either (a) `run_full` runs the same gate and
-degrades to ABSTAIN on metadata coercion, or (b) `run_full` is renamed/documented
-explicitly as "raw ungated score" and authoritative sealing always routes through
-the agent. Needs an architecture decision + corpus dry-run before touching, since
-it changes the sealed verdict of any case with `normalization_failures`.
-
 ## B-215 — `evidence_graph` not populated in `run_full` bundles: `graph_hash` identical across all cases (integrity anchor is meaningless) [DOCUMENTED — Claude 2026-07-23]
 
 | Field | Value |
@@ -642,135 +609,6 @@ is `decision_hash`, not `bundle_hash`. (2) `ecl_hash` is never populated in
 Level 2 — Level 3 requires wiring the Evidence Chain Ledger (`VIGIA_CHAIN_DB_PATH`),
 pending integration; not a failure, a Level-3 feature not connected to this entry
 point.
-
-## B-216 — `tests/run_vigia_case.py` crashes formatting a `caie_fracture`'s None `severity` with `:.2f` [DOCUMENTED — Claude 2026-07-23]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P3 (display/demo runner, not the sealed path): `TypeError: unsupported format string passed to NoneType.__format__` when printing the CAIE fractures of any case whose `caie_fractures` lack a `severity` field (they carry `type`/`description`). Does not affect the verdict or the bundle. |
-| **File** | `tests/run_vigia_case.py` (line ~162: `f"    [{f.get('fracture_type')}] severity={f.get('severity'):.2f}"`). |
-| **Mode** | Only the display runner `tests/run_vigia_case.py` (used by `scripts/run_vigia_full.py` as its first stage). |
-| **Detected by** | Running `run_vigia_full.py` on `VIGIA-OWL-2019-COMPLETE.json`; also reproduced on the original `OWL-NEXUS5-CASE.json` (pre-existing bug, not case-specific). |
-
-**Proposed fix (NOT applied):** `f.get('severity') or 0` (or an `if 'severity' in
-f` guard) and `f.get('fracture_type', f.get('type', '?'))` to tolerate the
-`type`/`description` fracture schema real cases use. Trivial, but a dry-run of the
-cases that DO carry `severity` is warranted so their render is not broken.
-
-## B-218 — The bundle seals `epsilon_used = epsilon_accept` even when the verdict was REJECT via `epsilon_reject`: the recorded ε is not the one that actually decided [DOCUMENTED — Claude 2026-07-25]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P2, with a precondition currently dormant (see below). Origin: "Round 2" audit, finding F2. |
-| **Files** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`, line ~578: `epsilon_used=self._eps_accept`); `vigia/pipeline/pipeline.py` (lines 730-731: `epsilon_accept=decision_trace.epsilon_used` and `epsilon_reject=decision_trace.epsilon_used`). |
-| **Function** | `RiskBoundedDecisionLayer.decide()`; `VigiaPipeline` (sealed `SystemState` construction). |
-| **Original lines** | `epsilon_used=self._eps_accept` (always, regardless of the verdict). |
-| **Fix commit** | None — documented, not applied. |
-| **Detected in** | "Round 2" audit, induction executed and re-verified against the live file in this session. |
-
-### Description
-
-`decide()` builds the `DecisionTrace` with `epsilon_used=self._eps_accept`
-unconditionally on the verdict. When the verdict is REJECT, the threshold
-that actually decided was `epsilon_reject` (the rule is `REJECT if
-r >= 1 - epsilon_reject`), not `epsilon_accept` — but the field sealed in
-the trace (and from there in the bundle, via `pipeline.py:730-731`, which
-copies that same value into **both** `epsilon_accept` and `epsilon_reject`
-of the `SystemState`) always reports `epsilon_accept`.
-
-Verified empirically in this session (not just deduced):
-
-```
-RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
-decide(posterior=0.70) → decision=REJECT, risk=0.7
-  epsilon_used (sealed)              = 0.05    # epsilon_accept
-  actual eps_reject used at threshold = 0.40
-```
-
-The verdict (`REJECT`) is correct — this is purely an auditability bug: the
-field an expert witness would read to answer "what threshold was used to
-reject this case?" does not tell the truth.
-
-**Honest precondition (why this is P2, not P1):**
-`SelfAdaptiveRiskPolicy.update_from_window` forces
-`epsilon_accept = epsilon_reject` on every update (`risk_bounded_layer.py`,
-lines ~290-291: `self.epsilon_accept = epsilon_stable; self.epsilon_reject = epsilon_stable`).
-Under the default adaptive configuration (the one the pipeline uses in
-practice), both values are always equal, so the bug is harmless there —
-it doesn't matter which of the two gets sealed since they're the same
-number. The mechanism is broken, but the trigger is dormant today. It only
-bites if some `PolicySpec` explicitly sets `epsilon_accept != epsilon_reject`
-— a path `RiskBoundedDecisionLayer.from_policy_spec()` supports without
-restriction.
-
-### Impact
-
-If a future `PolicySpec` (or someone constructing `RiskBoundedDecisionLayer`
-directly, outside the adaptive policy) sets asymmetric thresholds, the
-sealed bundle would misrepresent which ε was used for any rejected case —
-exactly the kind of discrepancy between "what the system did" and "what the
-system says it did" that undermines the auditable chain of custody (VIGÍA
-invariant: audit-trail determinism, not just verdict determinism).
-
-### Proposed fix (NOT applied)
-
-In `decide()`, seal `epsilon_used = self._eps_reject if verdict == "REJECT" else self._eps_accept`
-(or, more explicit for an expert witness, seal both values separately in the
-trace — `epsilon_accept_used` and `epsilon_reject_used` — instead of a
-single `epsilon_used` field that assumes one of the two is always
-irrelevant). Also requires revisiting `pipeline.py:730-731`, which currently
-assumes a single `epsilon_used` is enough to populate both fields of the
-sealed `SystemState`.
-
-## B-220 — The `bayesian_update` cache is keyed only by `artifact_id`: it ignores `custom_window`, even though the parameter is part of the public signature [DOCUMENTED — Claude 2026-07-25]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P3, latent (no caller uses the affected parameter today). Origin: "Round 2" audit, finding F4. |
-| **File** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`, line ~260). |
-| **Function** | `bayesian_update(self, artifact_id, custom_window=None)`. |
-| **Original lines** | `if artifact_id in self._bayesian_cache: return self._bayesian_cache[artifact_id]` — the cache key is `artifact_id` alone; `custom_window` plays no part. |
-| **Fix commit** | None — documented, not applied. |
-| **Detected in** | "Round 2" audit, executed against the live file. |
-
-### Description
-
-`bayesian_update(artifact_id, custom_window=None)` accepts `custom_window`
-as a documented parameter and correctly uses it to compute the temporal
-neighborhood (`get_neighborhood(artifact_id, custom_window)`) — but
-**before** reaching that computation, it checks `self._bayesian_cache` keyed
-only by `artifact_id`. Executed: `bayesian_update('a3')` and
-`bayesian_update('a3', custom_window=timedelta(seconds=30))` return the
-**same object** — the second call never recomputes with the different
-window, it simply returns whatever was cached from the first call
-(whichever that was).
-
-Confirmed by exhaustive grep: no caller of `bayesian_update` anywhere in the
-repository (neither internal nor MCP-exposed) passes `custom_window` today —
-every production call site (`vigia/core/trust_fusion.py`, lines 319, 345,
-395, 541) uses the `None` default. The bug is purely latent: no real
-execution path reaches it in the code's current state.
-
-### Impact
-
-If some future caller (internal or via MCP) starts using `custom_window` —
-the parameter is documented and exposed, so this is a foreseeable use, not
-an exotic one — it would get results from the wrong temporal window
-depending solely on call order: the first call "wins" and stays cached for
-any subsequent `custom_window` on the same `artifact_id`. This is a classic
-incomplete-cache-key bug, matching the pattern of other cache-key bugs
-already documented in this repository (search "cache key" in
-`BUGS_PENDIENTES_EN.md`).
-
-### Proposed fix (NOT applied)
-
-Include `custom_window` in the cache key (e.g.
-`cache_key = (artifact_id, custom_window)`, with `custom_window=None` a
-valid tuple member), or — simpler, given nobody uses it today — explicitly
-exclude from caching any call with a non-default `custom_window`,
-documenting that only the default window gets cached. Either option needs a
-regression test that doesn't exist today (no test of `bayesian_update`
-exercises a non-`None` `custom_window`).
 
 ## B-221 — "Round 2" audit (epistemological invariants): investigated and discarded vectors — recorded to avoid re-discovering them [DOCUMENTED — Claude 2026-07-25]
 
@@ -838,3 +676,253 @@ bit-identical. The process is documented, not just the outcome, because the
 process is repeatable: any future finding of this kind should go through the
 same re-verification against live code before being accepted as confirmed.
 
+
+## B-223 — `generate_execution_log.py` seals a `RISK_CALCULATION` entry with the formula and variables of a different decision engine than the one it actually uses, with fabricated D/S/I [DOCUMENTED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (audit-trail integrity — the script generates "Agent Execution Logs... for the SANS deliverables" per its own docstring; it is not a synthetic/demo generator). |
+| **File** | `vigia/scripts/generate_execution_log.py` (`process_case` function, lines ~142, ~218-230). |
+| **Detected in** | Sweep for the pre-B-117 inverted formula (2026-07-26, see the B-117 addendum in `BUGS_HISTORICO.md`) — this was the only one of 9 locations found that was NOT fixed as a simple stale string, because the problem runs deeper. |
+
+### Description
+
+`process_case()` calls `dec = decide(det, agg)` (line 142), where `decide`
+is `vigia.core.decision_layer.decide()` — the MI-threshold-based decision
+engine (`mi >= self.low/medium/high` → LOW/MEDIUM/HIGH/CRITICAL) that was
+worked on in this same session for B-219. This function **does not
+compute** `D` (drift), `S` (graph stability), or `I` (consistency) — those
+concepts don't exist in its model.
+
+However, the `RISK_CALCULATION` log this script emits per case (lines
+218-230) is formatted for the OTHER decision engine
+(`risk_bounded_layer.RiskBoundedDecisionLayer`, the one used by
+`run_full`/EBS v1), with:
+
+```python
+formula="r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))",
+variables={
+    "P": round(mi_float, 8),
+    "D": 0.1,                                  # hardcoded
+    "S": round(1.0 - mi_float * 0.2, 8),       # ad-hoc formula, not from the real engine
+    "I": round(min(0.95, mi_float + 0.05), 8), # ad-hoc formula, not from the real engine
+},
+```
+
+`P` is actually `mi_float` (the manipulation index from the other system,
+not a fabrication posterior). `D=0.1` is a hardcoded constant unrelated to
+any measured drift. `S` and `I` are derived with formulas invented for the
+occasion (`1.0 - mi_float*0.2`, `min(0.95, mi_float + 0.05)`) that
+correspond to no real `graph_stability` or `consistency_score`
+computation — they don't exist in the decision path this script actually
+executes.
+
+### Impact
+
+An examiner reading an Agent Execution Log JSONL generated by this script
+would see a `RISK_CALCULATION` entry with a formula and four variables
+(P/D/S/I) that give the impression of being the real risk calculation that
+decided the verdict — but three of the four variables (D, S, I) are
+synthetic, invented to fill a log schema that does not correspond to the
+decision engine actually used. This is more serious than an inverted sign
+in a formula (which is "the same model, mislabeled"): here it's "a
+different model, with fabricated data, presented as if it were the real
+one" — exactly the kind of discrepancy between "what the system did" and
+"what the system says it did" that VIGÍA's audit-trail doctrine
+(`docs/ENGINEERING_DISCIPLINE.md`, `CLAUDE.md`) exists to prevent.
+
+### Why this wasn't fixed on the spot
+
+Fixing only the formula's sign (`(1-P)` → `P`) would be cosmetic and would
+give false confidence — the underlying problem (the log describes a model
+the script doesn't use) would remain intact. A real fix requires deciding
+what `RISK_CALCULATION` should log for a case resolved via
+`decision_layer.decide()` — for example, a distinct log schema for the
+MI-based engine (without fabricated D/S/I), or explicitly mapping MI to a
+real P/D/S/I if the script should be using `risk_bounded_layer` instead.
+Neither option is a one-liner; both are design decisions that shouldn't be
+made without more context on which downstream consumer reads these logs
+and what guarantees it expects from them.
+
+### Verification done before documenting
+
+Confirmed by reading the actual import and call (`decide(det, agg)` in
+`vigia.core.decision_layer`, not `RiskBoundedDecisionLayer`), and by a full
+read of `decision_layer.py` (already thoroughly audited in this session for
+B-219): it has no parameter or computation for D, S, or I. Permanent test
+(documenting the state, not a fix):
+`tests/test_b117_stale_formula_sweep.py` has this path in its allowlist
+with the full justification, and fails if anyone tries to "fix" it with a
+simple sign change without updating the test — forcing any future fix to
+go through this same investigation.
+
+### Proposed fix (NOT applied)
+
+Pending architecture decision: (a) design a dedicated `RISK_CALCULATION`
+schema for the MI-based engine that doesn't invent D/S/I, or (b) audit
+whether this script should be calling
+`risk_bounded_layer.RiskBoundedDecisionLayer` instead of
+`decision_layer.decide()` for cases where the full P/D/S/I model is
+needed. Requires first understanding who consumes these JSONL logs and
+with what schema expectation.
+
+---
+
+## B-224 — Mode-1's self-correction loop is structurally inert: 3 of 4 `ContradictionDetector` rules read fields no producer writes, and the threshold makes the one live rule insufficient [DOCUMENTED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P1 (doctrine-vs-implementation + compliance flag). Self-correction is presented as a core differentiator: `vigia_agent.py --help` says "Self-correction: automatic — no flags needed" and "Max iterations: 3", and `CLAUDE.md` states that "VIGÍA's self-correction occurs pre-emission". In Mode-1 it never occurs. |
+| **Files** | `vigia_agent.py` — `ContradictionDetector.detect()` (lines 451-528), `CONTRADICTION_THRESHOLD = 2` (line 55), `_apply_self_correction` (guard at ~813), `sans_compliance.self_correction` flag (~1398). |
+| **Detected in** | Investigation of B-151(b)'s open remainder (2026-07-26). Measured across the 21 corpus cases plus direct per-rule reachability testing. |
+
+### Description
+
+`ContradictionDetector.detect()` implements 4 rules. Three cannot match any
+input, because they read fields no production path writes:
+
+**Rule 1 — ENTROPY_VS_BEHAVIORAL.** Filters on `signal["tool"] in
+("memory_forensics", "disk_forensics")` and `signal["tool"] ==
+"behavioral_fingerprint"`. Mode-1 signals have no `tool` key: they carry
+`evidence_type` and `source`. Measured: **196 of 196 signals** across the 21
+corpus cases have `tool=None`. Verified that the rule's own logic is fine —
+the same scenario with `tool` instead of `source` fires correctly (control
+test included).
+
+**Rule 2 — SEMIOTIC_VS_TECHNICAL.** Reads
+`module_results["technical_result"]["alert_level"]` and requires `HIGH`/
+`CRITICAL`. `technical_result` and `semiotic_result` are **read** at
+`vigia_agent.py:464-465` and **written nowhere in the repository** —
+confirmed by exhaustive grep over every `*.py`, including `tests/`. The
+`.get(..., "LOW")` default always wins, and `"LOW"` is not in
+`("HIGH", "CRITICAL")`.
+
+**Rule 4 — VERDICT_FLIP.** Requires `"BENIGN" in
+best_hypothesis.upper()`. The producer's complete vocabulary
+(`vigia/inference/abductive_reasoner.py` + `vigia_agent.py`) is:
+`UNDETERMINED`, `REASONER_ERROR`, `ABSTAIN_V2`, `MALICIOUS_INTENT_DETECTED`,
+`INTENT_DETECTED`, `SUSPICION_DETECTED`, `NO_ANOMALY_DETECTED`,
+`NO_SEMIOTIC_ANOMALY_DETECTED`, `PIPELINE_ERROR`. **None contains "BENIGN"** —
+Mode-1 spells "benign" as `NO_*_ANOMALY_DETECTED`. `vigia_agent.py:164` itself
+documents that both spellings exist ("`NO_*_ANOMALY_DETECTED`, `BENIGN`"), but
+the rule only checks one. Verified the logic works: with the literal
+`"BENIGN"` it fires.
+
+That leaves **Rule 3 (CONFIDENCE_COLLAPSE)** as the only reachable rule, and
+it appends at most **one** contradiction. `CONTRADICTION_THRESHOLD = 2` gates
+correction on `len(contradictions) >= 2`:
+
+```python
+if len(contradictions) < CONTRADICTION_THRESHOLD:
+    ...
+    return False, results          # no correction
+```
+
+Maximum achievable = 1 < 2. Therefore `_apply_self_correction` returns
+`(False, results)` **for every possible input** — not "none on this corpus",
+but none ever.
+
+### Impact
+
+Structural, not case-dependent:
+
+- `self_corrections_applied` is always `0` and `iterations_executed` always
+  `1` — the self-correction loop documented as "max 3 iterations" never
+  iterates. Measured: 21/21 cases.
+- `sans_compliance.self_correction` (`= self.iteration > 0 or
+  len(self.corrections_applied) > 0`) can only ever be `False`. Measured:
+  21/21 `False`. This is particularly sensitive because that flag was
+  introduced explicitly as "FIX P1-5: real verifications instead of hardcoded
+  True flags" — it is a real verification correctly reporting that something
+  did not happen; the problem is that it cannot happen.
+- `contradictions_found = 0` on 21/21 corpus cases, read from the
+  `audit_trail` of real runs (not a simulation): it does not merely fall short
+  of the threshold, it is absolute zero.
+- The chained `contradiction_detector` event mandated by `CLAUDE.md`'s
+  "Self-Correction Event Schema" can never be emitted by Mode-1.
+
+### Relationship to B-151(b) — its attribution is now stale
+
+B-151(b) attributes the absence of that event to missing wiring
+("`vigia_scorer.py`, `bundle_builder.py`, `pipeline.py`,
+`sift_orchestrator.py` contain **zero** references to `ToolExecutionLogChain`
+/ `contradiction_detector` — the appender is instantiated only in tests and a
+red team script"). **That attribution is stale.**
+`vigia/core/reasoning_trace.py` implements the mechanism, cites B-151b by name
+in its docstring, and is wired into `vigia_agent.py`'s sealing path (~2180):
+`build_from_agent_bundle` chains `pipeline_results["self_corrections"]` as
+`contradiction_detector` entries. Verified live: a real Mode-1 run writes a
+chained, tail-anchored `<stem>_reasoning_trace.json`.
+
+That is: **the wiring exists and works; what does not exist is the input.**
+The real cause is upstream of where B-151(b) locates it. Note also that
+`BUGS_HISTORICO.md` (the reasoning-trace Phase 1.5 entry) describes the trace
+as "thin (MINIMAL quality)" for "cases without any of the latter" — treating
+it as case-dependent. With this finding, the trace's self-correction branch is
+**always** empty, by construction.
+
+B-151(b)'s legitimately open remainder (should each scorer gate emit a chained
+event?) stays open and is independent of this: the gates live in
+`vigia_scorer.py`, which `vigia_agent.py` does **not** import (zero
+references, verified) — they are two disjoint subsystems, and no gate marker
+ever reaches the agent bundle.
+
+### Verification done before documenting
+
+Induction against the live system, not deduction:
+
+1. Real `vigia_agent.py` runs over all 21 `cases/input/` cases:
+   `self_corrections_applied=0`, `iterations_executed=1`,
+   `sans_compliance.self_correction=False`, and `contradictions_found=0` read
+   from each `audit_trail`.
+2. Signal-key inventory across the 21 sealed runs: 196 signals, `tool=None` in
+   all of them; real keys
+   `{artifact_id, confidence, description, evidence_type, source, z_score}`.
+3. Exhaustive grep: `technical_result` / `semiotic_result` have no producer in
+   any `*.py` in the repo.
+4. Enumeration of the `best_hypothesis` vocabulary in the producer's own source
+   (not just in the corpus) — no literal containing "BENIGN".
+5. Direct per-rule reachability testing, feeding `detect()` scenarios built to
+   trigger each rule using the **real** data shapes: rules 1, 2 and 4 return
+   `[]`; rule 3 returns 1; the maximum with everything stacked at once is 1,
+   against threshold 2.
+6. Positive control tests proving rules 1 and 4 do work logically and that only
+   the field name / spelling is misaligned — so "unreachable rule" is not
+   confused with "incorrect rule".
+
+Locked by `tests/test_b224_contradiction_detector_dormancy.py` (10 tests). All
+of its assertions document the **current broken state**, not the desired one:
+they will FAIL when someone wires a producer or aligns the vocabulary, which is
+exactly the point.
+
+### Proposed fix (NOT applied)
+
+Not applied because **every possible option affects verdicts** and requires
+corpus re-validation plus Anna's sign-off. A live correction rewrites
+`abduction["best_hypothesis"]` (see `_apply_self_correction`, actions
+`OVERRIDE_ABDUCTIVE_CONCLUSION` / `ESCALATE_TO_CRITICAL`), so reviving any rule
+can move sealed verdicts on real corpus cases.
+
+There is also an interaction that makes partial fixes useless: reviving a
+**single** rule leaves the maximum at 1, still < 2, and changes nothing. A real
+fix requires deciding jointly:
+
+- (a) Align rule 1 with the real keys (`evidence_type` / `source`) — requires
+  defining which `evidence_type` values count as memory/disk and what the real
+  equivalent of `behavioral_fingerprint` is.
+- (b) Align rule 4 with the real vocabulary (`NO_*_ANOMALY_DETECTED` in
+  addition to `BENIGN`).
+- (c) Decide whether rule 2 should have a producer (`technical_result`) or be
+  removed as a dead concept.
+- (d) Revisit `CONTRADICTION_THRESHOLD = 2` in light of how many rules are
+  actually live: with 4 nominal rules a threshold of 2 was plausible; with 1
+  live rule it is an impossible condition.
+- (e) The honest alternative if scoring must not be touched: document the
+  inertness in `KNOWN_LIMITATIONS.md` and adjust `--help` / `CLAUDE.md` so
+  Mode-1 self-correction is not presented as active. Under the honest-degradation
+  doctrine (§5.3 of `docs/ENGINEERING_DISCIPLINE.md`), declaring an inert
+  capability is worse than declaring an absent one.
+
+Worth noting too: `ContradictionDetector`'s docstring enumerates 5 contradiction
+types but only implements 4 — `TEMPORAL_VS_CONTENT` (listed as #1) does not
+exist in the code.

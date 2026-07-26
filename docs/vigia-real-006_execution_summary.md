@@ -55,7 +55,7 @@ Esto es la **prueba indexical** del ataque. No hay explicación benigna para que
 
 ### 7. Cálculo de Riesgo
 ```
-r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))·(1+σ·adjustment)
+r = P·(1+λD)·(1+γ(1-S))·(1+ω(1-I))·(1+σ·adjustment)
 
 P = 0.88    (posterior)
 D = 0.15    (drift bajo — evidencia consistente)
@@ -63,15 +63,22 @@ S = 0.92    (graph stability alto)
 I = 0.85    (consistency alto)
 adjustment = 0.297  (del patrón semiótico)
 
-r = 0.12 · 1.075 · 1.024 · 1.06 · 1.238
-r = 0.1734
+r = 0.88 · 1.075 · 1.024 · 1.06 · 1.238
+r = 1.2712
 
-Threshold: REJECT > 0.35? No.
+Threshold: REJECT > 0.35? Sí.
            ACCEPT < 0.15? No.
            → ABSTAIN? No, porque no hay disonancia semántica.
 
 Decisión: REJECT por posterior MALICE con alta consistencia.
 ```
+
+(Nota 2026-07-26: este walkthrough usaba la fórmula pre-B-117 invertida
+— `r = (1-P)·(...)`, evaluada con `1-P = 0.12` — cuyo resultado, `r=0.1734`,
+contradecía el propio chequeo de umbral mostrado abajo (`REJECT > 0.35? No`)
+Y la decisión final declarada (`REJECT`). Recalculado con la fórmula real,
+`r=P·(...)`, el resultado `r=1.2712` sí cruza el umbral de REJECT y es
+consistente con la decisión declarada.)
 
 ### 8. Golden Rule — Check Epistémico
 **Check**: ¿`posterior=FABRICATED` pero `consistency_score<0.5`?  

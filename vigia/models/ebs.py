@@ -432,8 +432,10 @@ if _USE_PYDANTIC:
                    incertidumbre donde forzar decisión sería indefendible.
 
         posterior: P(fabricación | evidencia) ∈ [0, 1]
-        risk     : r_total = (1-P)·(1+λD)·(1+γ(1-S)) ∈ [0, ∞)
+        risk     : r_total = P·(1+λD)·(1+γ(1-S)) ∈ [0, ∞)
                    clipeado a [0, 1] para la regla de decisión.
+                   (B-117, 2026-07-14: la fórmula usaba (1-P), lo que
+                   invertía los veredictos — ver risk_bounded_layer.py)
         """
         decision: DecisionVerdict
         posterior: float = Field(ge=0.0, le=1.0)
