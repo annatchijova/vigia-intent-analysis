@@ -1,4 +1,10 @@
-# NOTE: Three bridge versions exist. Active MCP bridge: vigia/vigia_sift_bridge_final.py (launched by launch_vigia_mcp.sh). This file is the import path used by vigia/__init__.py and internal modules.
+# NOTE (corrected 2026-07-26): this IS the active MCP bridge -- launch_vigia_mcp.sh
+# execs this exact file (vigia/vigia_sift_bridge.py). An earlier version of this
+# comment claimed a separate vigia/vigia_sift_bridge_final.py was the active bridge
+# and this file was import-path-only; that file does not exist anywhere in the
+# repository (confirmed by exhaustive search) and never has, going back through the
+# available git history. This file is also the import path used by vigia/__init__.py
+# and internal modules -- there is only one bridge file, not three.
 
 """
 VIGÍA — Intentionality Analysis Bridge for SIFT Workstation

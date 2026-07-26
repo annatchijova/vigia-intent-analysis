@@ -321,7 +321,7 @@ curl http://127.0.0.1:8000/health
 ## 12. Claude Code integration (MCP Server Setup)
 
 Claude Code connects to VIGÍA via the MCP bridge (`vigia_sift_bridge.py`).
-This is the primary interactive investigation mode — 21 forensic tools exposed
+This is the primary interactive investigation mode — 22 forensic tools exposed
 as MCP functions, driven by the Peircean investigation playbook in `CLAUDE.md`.
 
 ### Step 1 — Create `.mcp.json` in the repo root

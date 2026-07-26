@@ -561,7 +561,7 @@ peirciana completa de forma interactiva.
   "mcpServers": {
     "vigia_sift": {
       "command": "python3",
-      "args": ["/ruta/a/vigia-intent-analysis/vigia/vigia_sift_bridge_final.py"]
+      "args": ["/ruta/a/vigia-intent-analysis/vigia/vigia_sift_bridge.py"]
     }
   }
 }
@@ -1293,7 +1293,7 @@ vigia-intent-analysis/
 ├── vigia-es.html / vigia-ru.html        ← Versiones ES / RU
 │
 ├── vigia/                               ← Paquete principal
-│   ├── vigia_sift_bridge_final.py       ← Servidor MCP (22 herramientas, entrada principal)
+│   ├── vigia_sift_bridge.py             ← Servidor MCP (22 herramientas, entrada principal)
 │   ├── core/
 │   │   ├── ebs_v1.py                    ← Evidence Bundle Synthesizer
 │   │   ├── caie.py                      ← CrossArtifactIncongruenceEngine

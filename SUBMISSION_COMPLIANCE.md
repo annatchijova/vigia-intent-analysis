@@ -98,12 +98,12 @@ export VIGIA_EVIDENCE_DIR="/path/to/evidence"
 #   "mcpServers": {
 #     "vigia_sift": {
 #       "command": "python3",
-#       "args": ["/path/to/vigia-intent-analysis/vigia_sift_bridge_final.py"]
+#       "args": ["/path/to/vigia-intent-analysis/vigia/vigia_sift_bridge.py"]
 #     }
 #   }
 # }
 
-python3 vigia_sift_bridge_final.py   # Terminal 1
+python3 vigia/vigia_sift_bridge.py   # Terminal 1
 claude                                 # Terminal 2
 ```
 
@@ -111,7 +111,9 @@ claude                                 # Terminal 2
 
 ```bash
 ollama pull llama3.1
-python3 vigia_sift_bridge_final.py --backend ollama --model llama3.1
+export VIGIA_LLM_BACKEND=ollama
+export VIGIA_OLLAMA_MODEL=llama3.1
+python3 vigia/vigia_sift_bridge.py
 ```
 
 ### Option D: CLI (no LLM required — deterministic core only)
@@ -225,7 +227,7 @@ screenshots/selfcorection.png               ← Self-correction sequence
                          ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    VIGÍA MCP SERVER                             │
-│              (vigia_sift_bridge_final.py)                       │
+│              (vigia_sift_bridge.py)                             │
 │                                                                 │
 │  LAYER 0: ebs_v1.py         — Data contracts (immutable)        │
 │  LAYER 1: SIFT tool outputs — Memory/Registry/Network/Disk      │

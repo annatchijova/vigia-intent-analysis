@@ -562,7 +562,7 @@ python3 vigia_agent.py \
 
 ### Mode 2 — Claude Code + MCP (interactive investigation)
 
-VIGÍA exposes 21 forensic tools as MCP functions. When you run `claude` in the
+VIGÍA exposes 22 forensic tools as MCP functions. When you run `claude` in the
 repository root, the agent reads `CLAUDE.md` and conducts a full Peircean
 investigation interactively.
 
@@ -573,7 +573,7 @@ investigation interactively.
   "mcpServers": {
     "vigia_sift": {
       "command": "python3",
-      "args": ["/path/to/vigia-intent-analysis/vigia/vigia_sift_bridge_final.py"]
+      "args": ["/path/to/vigia-intent-analysis/vigia/vigia_sift_bridge.py"]
     }
   }
 }
@@ -1341,7 +1341,7 @@ vigia-intent-analysis/
 ├── vigia-es.html / vigia-ru.html        ← ES / RU versions
 │
 ├── vigia/                               ← Main package
-│   ├── vigia_sift_bridge_final.py       ← MCP server (22 tools, primary entry)
+│   ├── vigia_sift_bridge.py             ← MCP server (22 tools, primary entry)
 │   ├── core/
 │   │   ├── ebs_v1.py                    ← Evidence Bundle Synthesizer
 │   │   ├── caie.py                      ← CrossArtifactIncongruenceEngine
