@@ -159,7 +159,10 @@ def run_case(case_path: str) -> None:
     if case.get("caie_fractures"):
         print(f"\n  {YEL}CAIE FRACTURES:{RST}")
         for f in case["caie_fractures"]:
-            print(f"    [{f.get('fracture_type')}] severity={f.get('severity'):.2f}")
+            fracture_type = f.get('fracture_type', f.get('type', '?'))
+            severity = f.get('severity')
+            severity_str = f"{severity:.2f}" if severity is not None else "N/A"
+            print(f"    [{fracture_type}] severity={severity_str}")
             print(f"    → {f.get('interpretation', '')[:80]}")
 
     if result["peirce_chain"]:

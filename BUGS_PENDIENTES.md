@@ -980,21 +980,6 @@ WARN y topa en Level 2 — Level 3 requiere cablear el Evidence Chain Ledger
 (`VIGIA_CHAIN_DB_PATH`), pendiente de integración; no es un fallo, es una feature
 de Level 3 no conectada a este entry point.
 
-## B-216 — `tests/run_vigia_case.py` crashea al formatear `severity` None de un `caie_fracture` con `:.2f` [DOCUMENTADO — Claude 2026-07-23]
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | P3 (runner de display/demo, no el path sellado): `TypeError: unsupported format string passed to NoneType.__format__` al imprimir las fracturas CAIE de cualquier caso cuyas `caie_fractures` no traigan el campo `severity` (traen `type`/`description`). No afecta el veredicto ni el bundle. |
-| **Archivo** | `tests/run_vigia_case.py` (línea ~162: `f"    [{f.get('fracture_type')}] severity={f.get('severity'):.2f}"`). |
-| **Modo** | Solo el runner de display `tests/run_vigia_case.py` (usado por `scripts/run_vigia_full.py` como primera etapa). |
-| **Detectado por** | Corrida de `run_vigia_full.py` sobre `VIGIA-OWL-2019-COMPLETE.json`; reproducido también sobre el `OWL-NEXUS5-CASE.json` original (bug preexistente, no del caso). |
-
-**Fix propuesto (NO aplicado):** `f.get('severity') or 0` (o guard `if
-'severity' in f`) y `f.get('fracture_type', f.get('type', '?'))` para tolerar el
-schema `type`/`description` de las fracturas que usan los casos reales. Trivial,
-pero conviene un dry-run de los casos que sí traen `severity` para no romper su
-render.
-
 ## B-218 — El bundle sella `epsilon_used = epsilon_accept` incluso cuando el veredicto fue REJECT por `epsilon_reject`: el ε que queda registrado no es el que decidió [DOCUMENTADO — Claude 2026-07-25]
 
 | Campo | Valor |

@@ -9358,3 +9358,49 @@ to `true` with a comment explaining why). Permanent test added:
 name, the `_PT`-suffixed override actually works, the un-suffixed name is
 silently ignored — documenting the failure mode this caused — and
 `VIGIA_STRICT_MODEL_CHECK`'s default is `true` when the variable is unset).
+
+## B-216 — `tests/run_vigia_case.py` crashes formatting a `caie_fracture`'s None `severity` with `:.2f` [RESOLVED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3 (display/demo runner, not the sealed path): `TypeError: unsupported format string passed to NoneType.__format__` when printing the CAIE fractures of any case whose `caie_fractures` lack a `severity` field (they carry `type`/`description`). Does not affect the verdict or the bundle. |
+| **File** | `tests/run_vigia_case.py` (line ~162: `f"    [{f.get('fracture_type')}] severity={f.get('severity'):.2f}"`). |
+| **Mode** | Only the display runner `tests/run_vigia_case.py` (used by `scripts/run_vigia_full.py` as its first stage). |
+| **Detected by** | Running `run_vigia_full.py` on `VIGIA-OWL-2019-COMPLETE.json`; also reproduced on the original `OWL-NEXUS5-CASE.json` (pre-existing bug, not case-specific). |
+| **Fix commit** | branch `claude/bugs-pendientes-advance`. |
+
+### Verification before the fix (Firstness/Secondness)
+
+Before touching code, the full corpus was surveyed (`data/cases/**/*.json` +
+`cases/**/*.json`, 293 files scanned): 101 `caie_fractures` total, 95 with a
+numeric `severity` and 6 (the two OWL cases) with only `type`/`description`.
+Reproduced live: `python3 tests/run_vigia_case.py
+data/cases/VIGIA-OWL-2019-COMPLETE.json` ends in the exact documented
+`TypeError`, after printing the verdict — confirms the bug is real and
+exactly where reported, not a stale finding.
+
+### Fix applied
+
+`fracture_type = f.get('fracture_type', f.get('type', '?'))` (fallback to
+the legacy schema) and `severity_str = f"{severity:.2f}" if severity is not
+None else "N/A"`. `"N/A"` was chosen over the originally proposed
+`f.get('severity') or 0`: a fabricated 0.00 would look like real data and
+violate this repo's own honest-degradation doctrine
+(`docs/ENGINEERING_DISCIPLINE.md` §5.3 — "never emit a result that looks
+correct when correctness cannot be guaranteed"); `N/A` makes explicit that
+that fracture carries no measured severity.
+
+### Verification after the fix
+
+- Re-run against all 101 fractures in the full corpus (a verification
+  script, not just the two OWL cases): 0 crashes.
+- `python3 tests/run_vigia_case.py data/cases/VIGIA-OWL-2019-COMPLETE.json`
+  and `.../OWL-NEXUS5-CASE.json`: run to completion, `severity=N/A` on the
+  6 severity-less fractures, verdict prints normally.
+- `cases/input/VIGIA-BREAK-012.json` (a case with real `severity`): still
+  shows `severity=0.90`, unchanged behavior.
+- Permanent test: `tests/test_b216_run_vigia_case_severity_format.py` (4
+  tests: both OWL cases don't crash, a case with real severity renders the
+  value correctly, and the `type` fallback works).
+- Full suite before and after: 1982 passed, 191 skipped, 29 xfailed — zero
+  regressions.
