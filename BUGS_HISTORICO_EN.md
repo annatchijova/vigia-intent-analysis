@@ -9496,3 +9496,59 @@ tests, red-first — the two recompute tests fail without the fix because the
 second call returns the cached object; the shared-cache and
 invalidation-on-add tests pass in both states, documenting that the fix does
 not break legitimate caching).
+
+---
+
+## B-215 — `evidence_graph` not populated in `run_full` bundles: `graph_hash` identical across all cases (integrity anchor is meaningless) [RESOLVED — Claude 2026-07-31]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (Daubert integrity): `graph_hash` should bind the bundle to the case-specific evidence graph; being constant, it anchored nothing. `decision_hash` WAS case-specific, so verdict reproducibility was not compromised. |
+| **Files** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full` / new helper `_signal_anchor_graph`). |
+| **Detected by** | Empirical check of 4 `_claude_fable` bundles (2026-07-23): OWL-NEXUS5 (22), MAGNET-iOS (6), OWL-COMPLETE (30), FLAREON-2017 (14) — all with `graph_hash` `94147b51...`. |
+
+### Finding that refuted the "obvious" fix (Anna's architecture decision)
+
+The report's literal fix ("populate `evidence_graph` with the signal nodes") is
+**dangerous** and was refuted by induction before applying it:
+`EvidenceGraph.global_stability()` returns `1.0` for `n==0` nodes (the current
+empty-graph default) but `0.0` for `n>=2` nodes with no bootstrap-stable edges.
+That `S` feeds the score in `pipeline.py` (`r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))`);
+with `γ=2`, `S` going 1.0→0.0 **triples** that factor. Demonstrated: a benign
+case with posterior 0.04 moves from ACCEPT (risk 0.04) to ABSTAIN (risk 0.12).
+Naively populating the graph would **change the sealed verdict of the whole
+corpus** running through `run_full` without a fitted graph. Anna chose the
+**anchor-only** approach: case-specific `graph_hash` for integrity, scoring
+untouched.
+
+### Fix applied
+
+New helper `VigiaPipeline._signal_anchor_graph(signals)`: when `run_full` gets
+no fitted graph, it seals a deterministic descriptor with one node per signal,
+labelled with a canonical content fingerprint
+(`_sha256_dict({tool_name, value, z_score})[:16]`, the same encoder that seals
+the bundle → same determinism guarantee). Labels are sorted (order-independent
+anchor). `bootstrap_rounds=0` marks the descriptor as UNFITTED; `edges=[]` (no
+dependency structure claimed). An explicitly-provided fitted graph is sealed
+unchanged (that branch is untouched).
+
+**Scoring untouched:** `graph_stability` is computed at `pipeline.py:561` from
+the `evidence_graph` *parameter* (None → 1.0), NOT from the descriptor, which is
+built afterwards only for sealing. Verified: no consumer recomputes
+`global_stability()` from the sealed graph (`verify_ebs_v1.py` only recomputes
+the SHA-256; `evidence_narrative_gen.py` reads `global_stability` as a dict key
+that `to_dict()` never emits).
+
+Verified empirically: two cases with different signals get different
+`graph_hash` (`5fceae93...` vs `77cc006b...`); the same case across fresh
+pipelines reproduces the hash (determinism); sealed `graph_stability` stays 1.0
+and the verdict does not change from the descriptor. Independent verifier
+`forensics/verify_ebs_v1.py` on a real sealed bundle: PASS, Level 2, 10/11
+checks OK (the one non-OK is the `R5_ECL_BINDING` WARN, a Level-3 feature
+unrelated to this bug). Full suite (`tests/ vigia/tests/ tests/integration`):
+1993 passed, 0 failed. Permanent test:
+`tests/test_b215_graph_hash_case_specific.py` (5 tests, red-first —
+`test_different_cases_get_different_graph_hash` and
+`test_descriptor_marked_unfitted` fail against the unfixed code; the
+determinism, order-independence and `graph_stability=1.0` tests pass in both
+states, documenting that the fix preserves those invariants).
