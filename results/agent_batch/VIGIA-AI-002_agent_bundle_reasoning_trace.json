@@ -1,0 +1,84 @@
+{
+  "case_id": "VIGIA-AI-002",
+  "chain_tip_sha256": "c68935df49d4e0fc91fcba1a274e66da091e1ac307fc34acfe62418f2bd29bca",
+  "confidence_stored": "3/5",
+  "confidence_submitted": "1/1",
+  "confidence_warnings": [
+    "Confidence 1 capped at 3/5 (diversity ceiling: 1/3 observation groups)"
+  ],
+  "contradictions": [],
+  "diversity": "1/3",
+  "quality": "MINIMAL",
+  "sealed_at": "2026-07-31T22:01:33.868686+00:00",
+  "steps": [
+    {
+      "kind": "objective",
+      "payload": {
+        "case_id": "VIGIA-AI-002",
+        "objective": "Forensic intent analysis of /home/labestiadevigia/vigia-repo/data/cases/VIGIA-AI-002.json",
+        "trace_version": "1.0"
+      },
+      "seq": 0
+    },
+    {
+      "kind": "hypothesis",
+      "payload": {
+        "description": "MALICIOUS_INTENT_DETECTED",
+        "label": "primary"
+      },
+      "seq": 1
+    },
+    {
+      "kind": "decision",
+      "payload": {
+        "confidence": "1/1",
+        "verdict": "MALICE"
+      },
+      "seq": 2
+    }
+  ],
+  "tool_execution_log": [
+    {
+      "chain_version": "2",
+      "entry_hash": "4af07ed5ec6889364be07cf7a1a100e56a2c3999b97256de4136fc88b709c31a",
+      "event_id": "rt-VIGIA-AI-002:0",
+      "input_hash": "4804388b757656a8b39d6549bc320fa00a0192edc3f3d068029d584762c01f5d",
+      "mode": "python_fallback",
+      "prev_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+      "result_summary": "Forensic intent analysis of /home/labestiadevigia/vigia-repo/data/cases/VIGIA-AI-002.json",
+      "seq": 1,
+      "target": "VIGIA-AI-002",
+      "timestamp": "2026-07-31T22:01:33.868686+00:00",
+      "tool": "reasoning:objective"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "c5be1bc0d1a558fb69073165b750300679f97f9a3469113d68e20df1684bd79d",
+      "event_id": "rt-VIGIA-AI-002:1",
+      "input_hash": "2f2f9b461752b6f92991533a5ac729c8e0cbb89a886c79b680043f9153b21e71",
+      "mode": "python_fallback",
+      "prev_hash": "4af07ed5ec6889364be07cf7a1a100e56a2c3999b97256de4136fc88b709c31a",
+      "result_summary": "primary: MALICIOUS_INTENT_DETECTED",
+      "seq": 2,
+      "target": "VIGIA-AI-002",
+      "timestamp": "2026-07-31T22:01:33.868686+00:00",
+      "tool": "reasoning:hypothesis"
+    },
+    {
+      "chain_version": "2",
+      "entry_hash": "c68935df49d4e0fc91fcba1a274e66da091e1ac307fc34acfe62418f2bd29bca",
+      "event_id": "rt-VIGIA-AI-002:2",
+      "input_hash": "fb5c03b9e683233d6677ed9d1fedafc4d39c07ae3a863a1e8b19a99ffa1b7d19",
+      "mode": "python_fallback",
+      "prev_hash": "c5be1bc0d1a558fb69073165b750300679f97f9a3469113d68e20df1684bd79d",
+      "result_summary": "{'verdict': 'MALICE', 'confidence': '1/1'}",
+      "seq": 3,
+      "target": "VIGIA-AI-002",
+      "timestamp": "2026-07-31T22:01:33.868686+00:00",
+      "tool": "reasoning:decision"
+    }
+  ],
+  "trace_id": "rt-VIGIA-AI-002",
+  "trace_version": "1.0",
+  "verdict": "MALICE"
+}
