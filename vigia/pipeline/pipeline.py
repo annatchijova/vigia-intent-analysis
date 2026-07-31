@@ -321,6 +321,43 @@ class VigiaPipeline:
         result = self.run_full(signals, drift_score, evidence_graph, metadata)
         return result["bundle"]  # bundle con .integrity asignado por BundleBuilder
 
+    @staticmethod
+    def _signal_anchor_graph(signals: List[SignalOutput]) -> EvidenceGraph:
+        """B-215: deterministic, case-specific integrity anchor for graph_hash
+        when no stability graph was fitted.
+
+        run_full does not bootstrap-fit an EvidenceGraph, so graph_stability
+        honestly defaults to 1.0 (no penalty) and is sealed as such in the
+        decision_trace. But the sealed evidence_graph was a constant empty
+        graph (nodes=[], edges=[]), so graph_hash was identical across every
+        case — an integrity anchor that anchored nothing (verified: OWL-NEXUS5
+        with 22 signals, MAGNET-iOS with 6, OWL-COMPLETE with 30 all shared
+        graph_hash 94147b51...). This builds one node per signal whose label is
+        a canonical content fingerprint (same encoder that seals the bundle),
+        so graph_hash varies by case and is stable across runs of the same
+        case. Labels are sorted, making the anchor order-independent.
+
+        bootstrap_rounds=0 marks this as an UNFITTED descriptor, NOT a fitted
+        stability graph: its global_stability() is not meaningful and is never
+        read (scoring reads graph_stability from the sealed decision_trace,
+        fixed at 1.0 via the no-graph branch; no consumer recomputes stability
+        from the sealed graph — verified against verify_ebs_v1.py and
+        evidence_narrative_gen.py). Edges stay empty; no dependency structure
+        is claimed. This changes no sealed verdict — only graph_hash.
+        """
+        from vigia.core.bundle_builder import _sha256_dict
+        labels: List[str] = []
+        for s in signals:
+            tool_name = getattr(s, "tool_name", "") or ""
+            content = {
+                "tool_name": tool_name,
+                "value": float(getattr(s, "value", 0.0)),
+                "z_score": float(getattr(s, "z_score", 0.0)),
+            }
+            labels.append(f"{tool_name}:{_sha256_dict(content)[:16]}")
+        labels.sort()
+        return EvidenceGraph(nodes=labels, edges=[], bootstrap_rounds=0)
+
     def run_full(
         self,
         signals: List[SignalOutput],
@@ -768,7 +805,14 @@ class VigiaPipeline:
             engine_version="vigia-ebs-v1.0",
         )
 
-        graph_for_bundle = evidence_graph or EvidenceGraph(nodes=[], edges=[])
+        # B-215: a fitted graph (if provided) is sealed unchanged; otherwise
+        # seal a deterministic per-signal anchor so graph_hash is case-specific.
+        # Scoring is untouched — graph_stability was computed above from the
+        # `evidence_graph` parameter (None → 1.0), NOT from this descriptor.
+        if evidence_graph is not None:
+            graph_for_bundle = evidence_graph
+        else:
+            graph_for_bundle = self._signal_anchor_graph(all_signals)
 
         # AbductionTrace enriquecida con resultado del motor de abducción
         abduction = self._build_abduction_trace(

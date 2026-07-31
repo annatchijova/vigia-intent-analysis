@@ -381,6 +381,35 @@ would be "never, because they have no caller," not an environment variable
 nobody reads) before the monitor can be trusted. Verified with a permanent
 test: `tests/test_config_sentinel_orphaned_module_env_map.py`.
 
+### Update 2026-07-31 — `config_sentinel.py` no longer lies (sub-issue RESOLVED; cluster still open)
+
+Applied the honest `_MODULE_ENV_MAP` hardening the previous addendum flagged as
+a prerequisite. `config_sentinel.py` now declares
+`_UNWIRED_MODULES = {OckhamAdversarial, SignalRouter}` — the two criticals with
+zero production callers whose env var gates nothing — and `_module_active()`
+reports them `active=False` (env_value `NOT_WIRED`, not `NOT_SET`) instead of
+"active by default". `initialize()`/`finalize()` seal `DEGRADED_MODE` with an
+`analyst_warning` naming the absent modules, and `to_report_dict` surfaces
+`critical_modules_inactive_at_init`. `CAIE` and `TrustFusion` (real gates, 5 and
+4 readers) stay `active=True`; runtime-deactivation detection (e.g.
+`VIGIA_CAIE_ENABLED=false`) still works. Also fixed the `finalize()` bug that
+reset to `FULL` whenever there were no runtime events (it would have undone the
+honest init DEGRADED).
+
+Chosen as the cluster's first step by discipline: it is the only member that is
+a correctness improvement TODAY (a sealed integrity report claiming "all good"
+about broken modules is a Daubert liability worse than its absence, §5.3) and it
+is the instrument that will guide future unblocking — when Ockham/SignalRouter
+are genuinely wired, their name is removed from `_UNWIRED_MODULES` in the same
+commit and the monitor returns to `FULL` on its own. The characterization test
+`tests/test_config_sentinel_orphaned_module_env_map.py` (which locked in the lie
+as a tripwire) became a guard of the honest behavior (5 tests). `config_sentinel`
+has zero callers → zero sealed verdicts change. Full suite: 2000 passed. **The
+B-124 cluster stays OPEN**: the other 5 modules (`ockham_adversarial`,
+`dissent_report`, `narrative_auditor`, `peirceplanner_bounded`,
+`advanced_signal_router`) remain unwired, blocked by the same orphaned-producer
+chain.
+
 ---
 
 ## B-129 — PeircePlanner bounded: Phase 1 observation adapter [PHASE 2 PENDING]
@@ -574,41 +603,6 @@ disagreement is preserved and reinforces that VIGÍA must keep emitting
 materializes the facts it proposes to score.
 
 ---
-
-## B-215 — `evidence_graph` not populated in `run_full` bundles: `graph_hash` identical across all cases (integrity anchor is meaningless) [DOCUMENTED — Claude 2026-07-23]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P2 (Daubert integrity): `graph_hash` should bind the bundle to the case-specific evidence graph; if constant, it anchors nothing. `decision_hash` IS case-specific and stable, so verdict reproducibility is not compromised — but a verifier relying on `graph_hash` as proof of graph integrity is trusting an empty value. |
-| **Files** | `vigia/core/bundle_builder.py` (`graph_hash = _sha256_dict(evidence_graph.to_dict())`), `vigia/pipeline/pipeline.py` (`ForensicBundle` construction in `run_full`). |
-| **Mode** | Bundles sealed via `run_full`. |
-| **Detected by** | Empirical check of 4 `_claude_fable` bundles (session 2026-07-23). |
-
-**Reproduced observation:** OWL-NEXUS5 (22 artifacts), MAGNET-2022-iOS-JESS (6),
-OWL-COMPLETE (30) and FLAREON-2017 (14) — totally different content and size —
-produce the **same** `graph_hash` `94147b51c639cd0c...`. The `decision_hash`, by
-contrast, differs across all four.
-
-**Root cause (Secondness):** `graph_hash` = SHA-256 of `evidence_graph.to_dict()`
-minus `graph_hash`/`generated_at`. Its being constant implies the
-`ForensicBundle.evidence_graph` built by `run_full` is empty or a constant default
-— it is not populated with nodes/edges derived from the case signals. The evidence
-graph (a causal-chain artifact relevant to Daubert) is absent from the bundle.
-
-**Proposed fix (NOT applied):** populate `evidence_graph` in `run_full` with signal
-nodes and their relations before computing `graph_hash`; add a test asserting
-distinct `graph_hash` for two cases with distinct artifacts (red-first against the
-current state). Requires reviewing downstream consumers of `evidence_graph` so
-`verify_ebs_v1.py` does not break.
-
-**Related findings (NOT bugs, recorded to avoid re-discovery):** (1) `bundle_hash`
-embeds `bundle_id` (random UUID) + timestamp and varies per seal — this is
-**intentional** and documented at `bundle_builder.py:171`; the determinism anchor
-is `decision_hash`, not `bundle_hash`. (2) `ecl_hash` is never populated in
-`run_full` bundles, so `verify_ebs_v1.py` reports `R5_ECL_BINDING` WARN and caps at
-Level 2 — Level 3 requires wiring the Evidence Chain Ledger (`VIGIA_CHAIN_DB_PATH`),
-pending integration; not a failure, a Level-3 feature not connected to this entry
-point.
 
 ## B-221 — "Round 2" audit (epistemological invariants): investigated and discarded vectors — recorded to avoid re-discovering them [DOCUMENTED — Claude 2026-07-25]
 
