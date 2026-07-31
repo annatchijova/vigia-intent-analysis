@@ -10113,3 +10113,67 @@ passed, 0 failed. Test permanente: `tests/test_b215_graph_hash_case_specific.py`
 `test_descriptor_marked_unfitted` fallan contra el código sin fix; los de
 determinismo, orden-independencia y `graph_stability=1.0` pasan en ambos
 estados, documentando que el fix preserva esos invariantes).
+
+---
+
+## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging [RESUELTO por wiring previo — verificado Claude 2026-07-31]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 (Daubert chain-of-custody gap). |
+| **Archivo** | `vigia/vigia_sift_bridge.py`. |
+| **Detectado en** | Module archaeology audit 2026-07-14 (hallazgo hoy OBSOLETO). |
+
+### Hallazgo obsoleto — auditado contra el archivo vivo (§4.1)
+
+El registro (2026-07-14) reportaba que solo 3 de 23 tools MCP emitían
+`TOOL_INVOKED`, con 20 sin instrumentar, y difería el rollout por la deuda de
+fsync. Auditado contra el código vivo hoy: el hallazgo ya NO es cierto. Una
+sesión posterior introdujo un boundary de registro uniforme:
+
+- `_register_mcp_tool(func)` (línea 206) es el ÚNICO camino de registro — el
+  único `mcp.tool()` del archivo vive dentro de él (línea 208). Cero
+  `@mcp.tool()` directos en todo el archivo.
+- `_register_mcp_tool` envuelve cada tool en `_audit_mcp_entry`, que llama
+  `audit_logger.log_info(event_type="TOOL_INVOKED", tool=func.__name__,
+  message=...)` ANTES de ejecutar la función, para toda tool.
+- Las 33 registraciones (23 base + enriquecimiento) pasan por ese boundary.
+  Verificado tool por tool: las 20 antes "no cubiertas" (`search_pattern`,
+  `infer_intent`, `audit_network`, `reason_with_llm`, `mount_sift_evidence`,
+  etc.) tienen hoy el stack `@_register_mcp_tool` → `@rate_limit` → `def`.
+- El resumen de argumentos (`_audit_argument_summary`/`_audit_argument_value`)
+  es acotado y NO-plaintext: un string se registra como
+  `str(bytes=N, sha256_prefix=...)` sobre a lo sumo 4096 bytes, nunca el
+  payload entero — resuelve la preocupación de copiar evidencia sensible al
+  trail.
+
+Verificado por ejecución (inducción, no solo lectura de decoradores):
+envolviendo una tool antes no cubierta con `_audit_mcp_entry` e invocándola
+con un payload sensible, el único evento emitido es `TOOL_INVOKED` y el
+plaintext no aparece (queda como sha256-prefix). Aplicar el fix del registro
+(agregar `log_info` por-tool) DUPLICARÍA el logging del boundary — por §4.1,
+el finding se rechaza como obsoleto en vez de parchearse.
+
+### Nota residual honesta (§5.3) — la deuda de fsync ahora está realizada
+
+El registro difería el rollout porque `audit_logger.log_info()` hace
+`fh.flush()` + `os.fsync()` síncrono por llamada (`security.py:488-489`,
+confirmado). Como el boundary ahora loguea en cada invocación de tool, ese
+fsync-por-llamada está en efecto hoy: una investigación con N llamadas MCP
+hace N fsync bloqueantes. Es un trade-off consciente (correctness > perf, ya
+anotado en el registro original) y no un problema de correctitud — el gap de
+cadena de custodia, que era la preocupación P2, está cerrado. Si en el futuro
+la performance importa, el fix es batch/async del sink de auditoría, no
+re-abrir la instrumentación.
+
+### Nota lateral
+
+`check_syscall_latency` figuraba en la lista de "no cubiertas", pero en el
+código vivo está definido (`vigia_sift_bridge.py:3928`) y NUNCA registrado —
+no es una tool MCP expuesta (cero `_register_mcp_tool`, cero *callers*). No
+tiene gap de auditoría porque no es alcanzable como tool; es una función
+muerta/interna, registrada aquí para que un auditor futuro no la persiga como
+si fuera una tool sin instrumentar.
+
+Sin cambios de código — resolución por verificación de que el wiring previo
+ya cierra el gap.

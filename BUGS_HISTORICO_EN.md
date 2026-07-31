@@ -9552,3 +9552,66 @@ unrelated to this bug). Full suite (`tests/ vigia/tests/ tests/integration`):
 `test_descriptor_marked_unfitted` fail against the unfixed code; the
 determinism, order-independence and `graph_stability=1.0` tests pass in both
 states, documenting that the fix preserves those invariants).
+
+---
+
+## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging [RESOLVED by prior wiring — verified Claude 2026-07-31]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (Daubert chain-of-custody gap). |
+| **File** | `vigia/vigia_sift_bridge.py`. |
+| **Detected in** | Module archaeology audit 2026-07-14 (finding now STALE). |
+
+### Stale finding — audited against the live file (§4.1)
+
+The registry (2026-07-14) reported that only 3 of 23 MCP tools emitted
+`TOOL_INVOKED`, 20 uninstrumented, and deferred the rollout over the fsync
+debt. Audited against the live code today: the finding is no longer true. A
+later session introduced a uniform registration boundary:
+
+- `_register_mcp_tool(func)` (line 206) is the ONLY registration path — the
+  file's only `mcp.tool()` lives inside it (line 208). Zero direct
+  `@mcp.tool()` anywhere in the file.
+- `_register_mcp_tool` wraps every tool in `_audit_mcp_entry`, which calls
+  `audit_logger.log_info(event_type="TOOL_INVOKED", tool=func.__name__,
+  message=...)` BEFORE executing the function, for every tool.
+- All 33 registrations (23 base + enrichment) go through that boundary.
+  Verified tool by tool: the 20 formerly "uncovered" (`search_pattern`,
+  `infer_intent`, `audit_network`, `reason_with_llm`, `mount_sift_evidence`,
+  etc.) now carry the stack `@_register_mcp_tool` → `@rate_limit` → `def`.
+- The argument summary (`_audit_argument_summary`/`_audit_argument_value`) is
+  bounded and non-plaintext: a string is recorded as
+  `str(bytes=N, sha256_prefix=...)` over at most 4096 bytes, never the whole
+  payload — addressing the concern of copying sensitive evidence into the
+  trail.
+
+Verified by execution (induction, not just reading decorators): wrapping a
+formerly-uncovered tool with `_audit_mcp_entry` and invoking it with a
+sensitive payload, the only emitted event is `TOOL_INVOKED` and the plaintext
+does not appear (kept as a sha256 prefix). Applying the registry's fix
+(per-tool `log_info`) would DUPLICATE the boundary's logging — per §4.1 the
+finding is rejected as stale rather than patched.
+
+### Honest residual note (§5.3) — the fsync debt is now realized
+
+The registry deferred the rollout because `audit_logger.log_info()` does a
+synchronous `fh.flush()` + `os.fsync()` per call (`security.py:488-489`,
+confirmed). Since the boundary now logs on every tool invocation, that
+per-call fsync is in effect today: an investigation with N MCP calls does N
+blocking fsyncs. This is a deliberate trade-off (correctness > perf, already
+noted in the original registry entry) and not a correctness problem — the
+chain-of-custody gap, which was the P2 concern, is closed. If performance
+matters later, the fix is to batch/async the audit sink, not to reopen the
+instrumentation.
+
+### Side note
+
+`check_syscall_latency` was in the "uncovered" list, but in the live code it
+is defined (`vigia_sift_bridge.py:3928`) and NEVER registered — it is not an
+exposed MCP tool (zero `_register_mcp_tool`, zero callers). It has no audit gap
+because it is unreachable as a tool; it is a dead/internal function, recorded
+here so a future auditor does not chase it as an uninstrumented tool.
+
+No code changes — resolved by verifying that the prior wiring already closes
+the gap.
