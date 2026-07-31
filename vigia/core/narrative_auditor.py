@@ -67,8 +67,27 @@ _INJECTION_PATTERNS: List[Tuple[str, str, str]] = [
     (r"(?i)(?:i\s+am|this\s+is)\s+(?:the\s+)?(?:developer|creator|owner)\s+of\s+(?:this\s+)?(?:system|vigia)",
      "AUTHORITY_SPOOFING", "CRITICAL"),
 
-    # False familiarity (Carnegie paradox — Gemini case)
-    (r"(?i)(?:as\s+)?(?:you\s+)?(?:know|should\s+know|obviously|naturally|of\s+course)",
+    # Role override — attacker assigns themselves examiner/judge authority
+    (r"(?i)\b(?:you\s+are|act\s+as|become|serve\s+as|assume\s+(?:the\s+)?role\s+of)\s+(?:now\s+)?(?:the\s+)?(?:lead\s+|chief\s+|senior\s+|principal\s+)?(?:examiner|investigator|judge|auditor|forensic\s+analyst|reviewer|authority)\b",
+     "ROLE_OVERRIDE", "CRITICAL"),
+    (r"(?i)\b(?:overrule|override|supersede|bypass|disregard)\s+(?:the\s+)?(?:scorer|score|verdict|judge|audit|assessment)\b",
+     "ROLE_OVERRIDE", "CRITICAL"),
+    (r"(?i)\b(?:as\s+(?:the\s+)?)(?:lead\s+|chief\s+|senior\s+|principal\s+)?(?:examiner|investigator|judge|auditor|forensic\s+analyst|reviewer|authority)\s*,\s*(?:i\s+|you\s+(?:must|should)|override|overrule|order)\b",
+     "ROLE_OVERRIDE", "CRITICAL"),
+
+    # Verdict coercion — attacker forces a specific seal regardless of evidence
+    (r"(?i)\b(?:must|should|need\s+to|has\s+to|is\s+to)\s+(?:be\s+)?(?:reported|returned|rendered|delivered|sealed|report|return|render|deliver|seal)\s+(?:it\s+)?(?:as\s+)?(?:MALICE|INTENT|NOISE|BENIGN|ABSTAIN|UNKNOWN)\b",
+     "VERDICT_COERCION", "CRITICAL"),
+    (r"(?i)\b(?:report|return|render|deliver|seal)\s+(?:it\s+)?(?:as\s+)?(?:MALICE|INTENT|NOISE|BENIGN|ABSTAIN|UNKNOWN)\s+(?:regardless|irrespective|no\s+matter)\b",
+     "VERDICT_COERCION", "CRITICAL"),
+    (r"(?i)\b(?:regardless\s+of\s+(?:the\s+)?evidence|ignore\s+(?:the\s+)?evidence|set\s+aside\s+(?:the\s+)?(?:earlier\s+)?guidance)\b",
+     "VERDICT_COERCION", "CRITICAL"),
+
+    # False familiarity (Carnegie paradox — Gemini case).
+    # Requiere límite de palabra y, para "know", contexto de segunda persona;
+    # sin eso la subcadena "know" dispara dentro de "unknown",
+    # direcciones como whoknowsme@..., y prosa común de citas.
+    (r"(?i)\b(?:(?:as\s+)?you\s+(?:know|should\s+know)|obviously|naturally|of\s+course)\b",
      "FALSE_FAMILIARITY", "MEDIUM"),
 
     # Delimiter breaks
