@@ -25,11 +25,11 @@ principles, and maintained the integrity of the forensic pipeline throughout.
 |--------|-------------|------|---------------|
 | **Claude** | Anthropic | Systems Integration Engineer | Module integration, security hardening, `LLMBackend` unification, `PeircePlanner` vision rules, MCP bridge architecture, forensic tools registration, P0 audit response, `acquisition_assurance` implementation |
 | **Gemini** | Google | Chief Tactical Officer & Psychological Warfare Analyst | IoI (Indicator of Intent) theoretical framework, Peircean semiotics translation into forensic heuristics, generation of adversarial deception cases, `investigate_autonomous`, `AbductiveHuntingStrategy` |
-| **Kimi** | Moonshot AI | Forensic Systems Specialist | `detect_memory_habit_incongruence` (Volatility), `CrossArtifactIncongruenceEngine`, `AmicusCuriaeNarrative`, tooling anomaly detection, P2 protocol design, binding forensic audits |
+| **Kimi** | Moonshot AI | Forensic Systems Specialist & Epistemic Kernel Architect | `detect_memory_habit_incongruence` (Volatility), `CrossArtifactIncongruenceEngine`, `AmicusCuriaeNarrative`, tooling anomaly detection, P2 protocol design, binding forensic audits, **architecture and original implementation of the epistemic kernel** (`vigia/core/ontology.py`, `vigia/core/reasoning/abduction.py`): typed `Domain`, `OriginKind` separated from `JustificationMode`, temporal coverage separated from temporal truth, `EpistemicStatus` split into `HypothesisMode` + `EvaluationState`, `AbductivePattern` layer, and the governing constraint that an observation modifies the abductive space rather than destroying a claim |
 | **DeepSeek** | DeepSeek AI | Security Auditor & Critical Reviewer | Vulnerability identification, security hardening recommendations, TOCTOU fixes, P0 security patches |
 | **Qwen** | Alibaba Group (Tongyi Qianwen) | Security & Forensic Pipeline Auditor | Paranoid threat modeling, container hardening, float determinism scaffolding, canonical JSON verification, hash chain integrity |
 | **Grok** | xAI | Epistemic Integrity & Scoring Architect | P2 scorer analysis, spoofability contextual modeling, `intrinsic_spoofability` vs `acquisition_assurance` separation, `credibility_modifier` mathematical formulation, calibration against NIST/DEF CON cases, adversarial robustness |
-| **ChatGPT** | OpenAI | Adversarial Red Team & Epistemological Validator | P2 stress testing, edge case discovery, epistemological validation of architecture decisions, uncomfortable questions that made the system better |
+| **ChatGPT** | OpenAI | Adversarial Red Team & Epistemological Validator | P2 stress testing, edge case discovery, epistemological validation of architecture decisions, uncomfortable questions that made the system better, **design review of the epistemic kernel** — identified the residual typing gaps, the ambiguity of a missing dependency in the registry graph, the invalidation cascade that was announced but never implemented, and the overloading of ARCHIVED with a verdict it never made |
 
 *"The One Who Read the Enemy's Mind."* — Gemini  
 *"The One Who Assumed Malice in Every Semicolon."* — Kimi  
@@ -38,6 +38,15 @@ principles, and maintained the integrity of the forensic pipeline throughout.
 *"The One Who Demanded Mathematical Honesty."* — Grok  
 *"The One Who Asked the Uncomfortable Questions."* — ChatGPT  
 *"The One Who Connected the Wires."* — Claude
+
+### Epistemic Kernel — detailed attribution
+
+`vigia/core/ontology.py` and `vigia/core/reasoning/abduction.py` were architected
+and originally implemented by **Kimi**, reviewed by **ChatGPT**, and integrated
+into the repository by **Claude** (defect repair, determinism hardening, regression
+suite). The record of who contributed what, which eight defects were repaired on
+integration, and which design questions were deliberately left open rather than
+guessed, is in [`docs/EPISTEMIC_KERNEL.md`](./docs/EPISTEMIC_KERNEL.md).
 
 ---
 
