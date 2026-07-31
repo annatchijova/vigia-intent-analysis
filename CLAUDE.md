@@ -462,6 +462,7 @@ rather than duplicating their content here:
 | `KNOWN_LIMITATIONS.md` | Documented limitations L-001..L-058 — required reading for Daubert scope. |
 | `SUBMISSION_COMPLIANCE.md` | SANS submission compliance checklist. |
 | `SECURITY.md` | Security policy and hardening notes. |
+| `docs/EPISTEMIC_KERNEL.md` | The epistemic kernel (`vigia/core/ontology.py`, `vigia/core/reasoning/abduction.py`) — attribution, repaired defects, and open design questions. **Not part of the verdict path:** it generates hypotheses and emits no verdict, score, or sealed output. Nothing in the scoring pipeline imports it, and a regression test enforces that. Irrelevant to running an investigation; required reading before refactoring those two modules. |
 | `docs/ENGINEERING_DISCIPLINE.md` | Development-discipline guide for any agent working *on* this code (abductive method, git hygiene, surgical patching, determinism invariants). Distinct from this runtime manual — that file governs the engineer, this one governs VIGÍA's investigative behavior. Do not conflate them. |
 
 ---

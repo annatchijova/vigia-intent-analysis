@@ -3022,3 +3022,35 @@ own merits (a scorer-level IoC floor), not via a fracture coupled to absent
 memory — is tracked as B-149 and pinned until designed deliberately.
 
 ---
+
+## L-068 — The epistemic kernel is integrated but not wired into the verdict path [DOCUMENTED]
+
+`vigia/core/ontology.py` (epistemic constitution) and
+`vigia/core/reasoning/abduction.py` (abductive tribunal) are present, tested
+(`tests/test_epistemic_kernel.py`), and **deliberately inert with respect to
+scoring**. They generate hypotheses; they emit no verdict, score, or sealed
+output. No module in the deterministic pipeline imports them, and
+`test_kernel_is_not_imported_by_the_scoring_pipeline` fails if that changes.
+
+**Forensic implication:** no sealed verdict, bundle hash, or corpus figure
+reported elsewhere in this repository is affected by, or benefits from, this
+layer. A reader must not treat the presence of an abductive tribunal in the
+tree as evidence that VIGÍA's verdicts pass through it. They do not.
+
+**Why it is not wired in:** connecting a hypothesis generator to the decision
+path changes what the scoring pipeline is, and would require deliberate design
+plus full corpus re-validation. That is a maintainer decision taken on purpose,
+not a side effect of an integration commit.
+
+**Open design questions inside the layer** — residual free-string typing in
+`ClaimContext.prerequisites`, prose-primary `Hypothesis.statement` where a
+causal structure belongs, and the absence of an `AssessmentMatrix` builder —
+are recorded in `docs/EPISTEMIC_KERNEL.md` rather than answered by guesswork.
+Each involves inventing taxonomy that belongs to the human maintainer.
+
+**Attribution:** architecture by Kimi (Moonshot AI), design review by ChatGPT
+(OpenAI), integration and defect repair by Claude (Anthropic). Eight defects
+were repaired on integration (D-1..D-8), two of which prevented the modules from
+importing or running at all; see `docs/EPISTEMIC_KERNEL.md`.
+
+---
