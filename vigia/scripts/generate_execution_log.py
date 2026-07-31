@@ -6,7 +6,7 @@ Genera Agent Execution Logs en formato JSONL para los entregables SANS.
 
 Recorre un caso (o dataset) JSON, ejecuta el pipeline completo y loguea
 cada fase: SESSION_START → VISIBLE_VARIABLES → MCP_TOOL_CALL → FORENSIC_FINDING
-→ ABDUCTIVE_HYPOTHESIS → EPISTEMIC_CHECK → RISK_CALCULATION → FINAL_VERDICT.
+→ ABDUCTIVE_HYPOTHESIS → EPISTEMIC_CHECK → MI_DECISION → FINAL_VERDICT.
 
 Uso (caso individual):
     python3 -m vigia.cli.generate_execution_log \\
@@ -32,7 +32,7 @@ from typing import Any, Dict, List, Optional
 try:
     from vigia.core.semiotic_detector_v2 import SemioticDetectorV2
     from vigia.core.evidence_aggregator import aggregate_evidence
-    from vigia.core.decision_layer import decide
+    from vigia.core.decision_layer import decide, DEFAULT_LOW, DEFAULT_MEDIUM, DEFAULT_HIGH
     from vigia.core.execution_logger import VigiaExecutionLogger
 except ImportError as e:
     print(f"[FATAL] Importación fallida: {e}", file=sys.stderr)
@@ -215,18 +215,22 @@ def process_case(
         consistency_threshold=0.5,
     )
 
-    # RISK_CALCULATION
-    logger.log_risk_calculation(
-        r_value=round(mi_float, 8),
-        variables={
-            "P": round(mi_float, 8),
-            "D": 0.1,
-            "S": round(1.0 - mi_float * 0.2, 8),
-            "I": round(min(0.95, mi_float + 0.05), 8),
+    # MI_DECISION — este script corre decision_layer.decide() (motor MI-threshold),
+    # no risk_bounded_layer (motor P/D/S/I). B-223: antes esto llamaba a
+    # log_risk_calculation() con D/S/I fabricados para encajar en un schema
+    # de un motor que este script no ejecuta. log_mi_decision() registra
+    # únicamente lo que decision_layer efectivamente calcula.
+    logger.log_mi_decision(
+        mi=round(mi_float, 8),
+        alert_level=alert,
+        thresholds={
+            "low": float(DEFAULT_LOW),
+            "medium": float(DEFAULT_MEDIUM),
+            "high": float(DEFAULT_HIGH),
         },
-        formula="r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))",
         decision=verdict,
-        reason_code=f"{'REJECT' if mi_float >= 0.15 else 'ACCEPT'}_POSTERIOR_{verdict}",
+        reason_code=f"{'REJECT' if mi_float >= float(DEFAULT_LOW) else 'ACCEPT'}_MI_{verdict}",
+        reason=dec.get("reason", ""),
     )
 
     # FINAL_VERDICT

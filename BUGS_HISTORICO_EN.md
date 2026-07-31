@@ -9777,3 +9777,78 @@ agent for sealing, and the formula is no longer the pre-B-117 inverted
 form). Syntax verified with `ast.parse()` after the edit. Full suite before
 and after: 2004 passed, 191 skipped, 29 xfailed -- zero regressions
 (documentation-only change, no logic touched).
+
+---
+
+## B-223 — `generate_execution_log.py` seals a `RISK_CALCULATION` entry with the formula and variables of a different decision engine than the one it actually uses, with fabricated D/S/I [RESOLVED — Claude 2026-07-31]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (audit-trail integrity — the script generates "Agent Execution Logs... for the SANS deliverables" per its own docstring; it is not a synthetic/demo generator). |
+| **Files** | `vigia/scripts/generate_execution_log.py` (`process_case`), `vigia/core/execution_logger.py` (`VigiaExecutionLogger`). |
+| **Detected in** | Sweep for the pre-B-117 inverted formula (2026-07-26). |
+
+### Description
+
+`process_case()` calls `decision_layer.decide()` (MI-threshold engine, no
+D/S/I) but sealed a `RISK_CALCULATION` entry with the formula and P/D/S/I
+variables of `risk_bounded_layer.RiskBoundedDecisionLayer` — a different
+engine this script never runs. `D=0.1` hardcoded; `S` and `I` derived
+with ad-hoc formulas of `mi_float` unrelated to any real
+`graph_stability` or `consistency_score` computation.
+
+### Pre-fix investigation (audit-before-patch)
+
+Before choosing between the two options the registry itself left open —
+(a) design an honest schema for the MI-based engine, or (b) migrate the
+script to `risk_bounded_layer` — checked who consumes these logs:
+exhaustive grep showed **nobody** calls `log_risk_calculation()` in
+production except this script itself (`pipeline.py`, the real
+`risk_bounded_layer` consumer, never calls it — it uses
+`log_event`/`log_abstain`/`log_verdict`). The P/D/S/I schema was never
+used for its real purpose; its only emitter was the fabricated-data
+script. That rules out option (b) — no signal the script should migrate
+engines — and confirms (a) is the right fix: the script runs
+`decision_layer.decide()`, so it must honestly log what that engine
+computes.
+
+### Fix applied
+
+New `VigiaExecutionLogger.log_mi_decision()` method in
+`execution_logger.py`: emits `event_type: "MI_DECISION"` with `engine`
+(the real engine's full name), `mi`, `alert_level`, `thresholds` (the
+real `DEFAULT_LOW/MEDIUM/HIGH` from `decision_layer`), `decision`,
+`reason_code`, and `reason` (the engine's own generated reason) — no
+`variables`, no `formula`, no D/S/I. `log_risk_calculation()` (the
+P/D/S/I method for `risk_bounded_layer`) is untouched, available for its
+real consumer if it's ever wired.
+
+`generate_execution_log.py` replaces the call site: uses
+`DEFAULT_LOW/MEDIUM/HIGH` imported from `decision_layer` (not new
+hardcoded thresholds) and `dec.get("reason", "")` (the engine's real
+reason, not an invented `reason_code` borrowing another system's
+vocabulary). Module docstring updated (`RISK_CALCULATION` ->
+`MI_DECISION` in the phase diagram).
+
+**Self-correction during the fix:** the first draft of
+`log_mi_decision()`'s docstring quoted the formula
+`r=(1-P)·(1+λD)·...` — the **pre-B-117 inverted** form — while explaining
+how it differed from the other method. `tests/test_b117_stale_formula_sweep.py`
+itself caught it (failed against the new file). Fixed to the real form
+(`r=P·(1+λD)·...`, verified against `risk_bounded_layer.py:426`) before
+committing — the test did exactly the job B-117 designed it for.
+
+### Verified
+
+Real end-to-end run (`process_case()` with a case that has `text`, not
+mocked): the resulting JSONL has an `MI_DECISION` event, zero
+`RISK_CALCULATION` events, `engine` names the real engine, `thresholds`
+are the real `decision_layer` values, no `variables`/`formula`/D/S/I in
+the payload. Permanent test:
+`tests/test_b223_mi_decision_no_fabricated_dsi.py` (4 tests, red-first —
+3 of 4 fail against the unfixed code, including a `StopIteration` because
+the `MI_DECISION` event didn't even exist). `test_b117_stale_formula_sweep.py`'s
+allowlist updated: removed the `generate_execution_log.py` exception (no
+longer contains the stale formula) and added the new test's exception
+(quotes the old formula as historical evidence of the bug, not a live
+claim). Full suite: 2128 passed, 0 failed.

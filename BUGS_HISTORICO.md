@@ -10342,3 +10342,79 @@ sellado, y la fórmula ya no es la forma pre-B-117 invertida). Sintaxis
 verificada con `ast.parse()` tras el edit. Suite completa antes y después:
 2004 passed, 191 skipped, 29 xfailed — cero regresiones (cambio
 documentación-only, sin lógica tocada).
+
+---
+
+## B-223 — `generate_execution_log.py` sella una entrada `RISK_CALCULATION` con la fórmula y variables de un motor de decisión distinto al que realmente usa, con D/S/I fabricados [RESUELTO — Claude 2026-07-31]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 (integridad de audit trail — el script genera "Agent Execution Logs... para los entregables SANS" según su propio docstring; no es un generador sintético/demo). |
+| **Archivos** | `vigia/scripts/generate_execution_log.py` (`process_case`), `vigia/core/execution_logger.py` (`VigiaExecutionLogger`). |
+| **Detectado en** | Barrido de la fórmula pre-B-117 invertida (2026-07-26). |
+
+### Descripción
+
+`process_case()` llama a `decision_layer.decide()` (motor MI-threshold,
+sin D/S/I) pero sellaba una entrada `RISK_CALCULATION` con la fórmula y
+variables P/D/S/I de `risk_bounded_layer.RiskBoundedDecisionLayer` — un
+motor distinto que este script nunca ejecuta. `D=0.1` hardcodeado; `S` e
+`I` derivados con fórmulas ad-hoc de `mi_float` sin relación con ningún
+cálculo real de `graph_stability` ni `consistency_score`.
+
+### Investigación previa al fix (audit-before-patch)
+
+Antes de decidir entre las dos opciones que el propio registro dejaba
+abiertas — (a) diseñar un schema honesto para el motor MI-based, o (b)
+migrar el script a `risk_bounded_layer` — se investigó quién consume
+estos logs: `grep` exhaustivo mostró que **nadie** llama a
+`log_risk_calculation()` en producción excepto este mismo script
+(`pipeline.py`, el consumidor real de `risk_bounded_layer`, nunca lo
+llama — usa `log_event`/`log_abstain`/`log_verdict`). Es decir, el schema
+P/D/S/I nunca se usó para su propósito real; su único emisor era el
+fabricante de datos falsos. Eso descarta la opción (b) — no hay ninguna
+señal de que el script debiera migrar de motor — y confirma que (a) es
+la corrección correcta: el script corre `decision_layer.decide()`, así
+que debe loguear honestamente lo que ese motor calcula.
+
+### Fix aplicado
+
+Nuevo método `VigiaExecutionLogger.log_mi_decision()` en
+`execution_logger.py`: emite `event_type: "MI_DECISION"` con `engine`
+(nombre completo del motor real), `mi`, `alert_level`, `thresholds` (los
+`DEFAULT_LOW/MEDIUM/HIGH` reales de `decision_layer`), `decision`,
+`reason_code`, y `reason` (la razón que el propio motor genera) — sin
+`variables`, sin `formula`, sin D/S/I. `log_risk_calculation()` (el
+método P/D/S/I para `risk_bounded_layer`) queda intacto para su
+consumidor real si algún día se cablea.
+
+`generate_execution_log.py` reemplaza el call site: usa
+`DEFAULT_LOW/MEDIUM/HIGH` importados de `decision_layer` (no thresholds
+hardcodeados nuevos) y `dec.get("reason", "")` (la razón real del motor,
+no un `reason_code` inventado con vocabulario de otro sistema). Docstring
+del módulo actualizado (`RISK_CALCULATION` → `MI_DECISION` en el diagrama
+de fases).
+
+**Auto-corrección durante el fix:** el primer borrador del docstring de
+`log_mi_decision()` citó la fórmula `r=(1-P)·(1+λD)·...` — la forma
+**invertida pre-B-117** — al explicar en qué se diferenciaba del otro
+método. El propio `tests/test_b117_stale_formula_sweep.py` lo detectó
+(falló contra el archivo nuevo). Corregido a la forma real
+(`r=P·(1+λD)·...`, verificada contra `risk_bounded_layer.py:426`) antes
+de commitear — el test cumplió exactamente la función para la que B-117
+lo diseñó.
+
+### Verificado
+
+Ejecución real end-to-end (`process_case()` con un caso con `text`, no
+mockeado): el JSONL resultante tiene evento `MI_DECISION`, cero eventos
+`RISK_CALCULATION`, `engine` nombra el motor real, `thresholds` son los
+reales del `decision_layer`, sin `variables`/`formula`/D/S/I en el
+payload. Test permanente:
+`tests/test_b223_mi_decision_no_fabricated_dsi.py` (4 tests, rojo-primero
+— 3 de 4 fallan contra el código sin el fix, incluyendo un
+`StopIteration` porque el evento `MI_DECISION` ni existía). `allowlist`
+de `test_b117_stale_formula_sweep.py` actualizado: se retiró la excepción
+de `generate_execution_log.py` (ya no contiene la fórmula obsoleta) y se
+agregó la del nuevo test (cita la fórmula vieja como evidencia histórica
+del bug, no como claim vivo). Suite completa: 2128 passed, 0 failed.

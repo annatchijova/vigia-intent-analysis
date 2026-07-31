@@ -310,6 +310,35 @@ class VigiaExecutionLogger:
             "threshold_reject": threshold_reject,
         })
 
+    def log_mi_decision(
+        self,
+        mi: float,
+        alert_level: str,
+        thresholds: Dict[str, float],
+        decision: str,
+        reason_code: str,
+        reason: str,
+        phase: str = "DECISION",
+    ) -> None:
+        """Registra la decisión del motor MI-threshold (decision_layer.decide()).
+
+        Distinto de log_risk_calculation (motor risk_bounded_layer, con
+        variables P/D/S/I y fórmula r=P·(1+λD)·(1+γ(1-S))·(1+ω(1-I))):
+        decision_layer no calcula drift, graph_stability, ni consistency_score
+        — no rellenar esos campos con valores fabricados aquí (B-223).
+        """
+        self._write({
+            "event_type": "MI_DECISION",
+            "phase": phase,
+            "engine": "vigia.core.decision_layer.RiskBoundedDecisionLayer",
+            "mi": mi,
+            "alert_level": alert_level,
+            "thresholds": thresholds,
+            "decision": decision,
+            "reason_code": reason_code,
+            "reason": reason,
+        })
+
     def log_abstain(self, reason_code: str, explanation: str) -> None:
         """Registra una abstención epistémica — válida en Daubert."""
         self._write({

@@ -23,13 +23,20 @@ locations across both code and docs:
   reproduce the number by hand from the stated formula would get the wrong
   answer).
 
-One occurrence was found and NOT fixed here: vigia/scripts/
-generate_execution_log.py:227 passes this formula string (plus fabricated
-placeholder D/S/I values) to a RISK_CALCULATION log entry, but the script
-actually calls vigia.core.decision_layer.decide() -- an entirely different,
+One occurrence needed its own investigation before touching (B-223,
+2026-07-26): vigia/scripts/generate_execution_log.py:227 passed this
+formula string (plus fabricated placeholder D/S/I values) to a
+RISK_CALCULATION log entry, but the script actually calls
+vigia.core.decision_layer.decide() -- an entirely different,
 MI-threshold-based decision engine that has no P/D/S/I risk formula at
-all. That is a deeper "wrong subsystem describing itself" problem, not a
-simple stale-string fix, and needs its own investigation before touching.
+all. That was a deeper "wrong subsystem describing itself" problem, not a
+simple stale-string fix. Resolved 2026-07-31: the script now logs via
+VigiaExecutionLogger.log_mi_decision() (event_type MI_DECISION), which
+records only what decision_layer.decide() actually computes -- mi,
+alert_level, the real DEFAULT_LOW/MEDIUM/HIGH thresholds, and the engine's
+own reason string -- with no D/S/I fabrication and no risk_bounded_layer
+formula string. log_risk_calculation() (the P/D/S/I, risk_bounded_layer-
+shaped method) is untouched and still available for its real caller.
 
 This test sweeps the whole repo (excluding generated/vendored corpora) for
 the exact inverted substring and fails if it reappears anywhere outside the
@@ -48,14 +55,6 @@ STALE_FORMULA = "(1-P)·(1+λD)"  # "(1-P)·(1+λD)"
 
 # Paths that are allowed to contain the stale string, with the reason why.
 ALLOWED = {
-    "vigia/scripts/generate_execution_log.py": (
-        "B-117 stale formula, not yet fixed -- see this test's module "
-        "docstring: the deeper problem is generate_execution_log.py "
-        "describing an entirely different decision engine (decision_layer."
-        "decide(), MI-threshold based) with a risk_bounded_layer-shaped "
-        "RISK_CALCULATION log entry and fabricated D/S/I placeholders, not "
-        "just a wrong sign."
-    ),
     "tests/test_b117_stale_formula_sweep.py": "this test's own docstring names the exact string it looks for",
     "tests/test_b214_run_full_docstring_warning.py": (
         "asserts the string is ABSENT (`assert ... not in doc`) -- the "
@@ -66,6 +65,7 @@ ALLOWED = {
     "BUGS_HISTORICO_EN.md": "documents the historical bug and this sweep's fix -- quotes the stale formula as what was wrong, not a live claim",
     "BUGS_PENDIENTES.md": "B-223 entry quotes generate_execution_log.py's own stale formula string as evidence of the bug being described, not a live claim",
     "BUGS_PENDIENTES_EN.md": "B-223 entry quotes generate_execution_log.py's own stale formula string as evidence of the bug being described, not a live claim",
+    "tests/test_b223_mi_decision_no_fabricated_dsi.py": "module docstring quotes the pre-fix stale formula string as historical evidence of the fixed defect, not a live claim",
 }
 
 
