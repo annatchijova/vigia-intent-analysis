@@ -112,24 +112,37 @@ def test_rule2_technical_result_and_semiotic_result_have_no_producer():
             ["grep", "-rn", key, "--include=*.py", "."],
             cwd=REPO, capture_output=True, text=True,
         ).stdout.splitlines()
-        # The only permitted occurrences are the two reads in the detector and
-        # this test file's own docstring/source naming the keys. Matched on the
-        # exact line, not a prefix -- a `:46` prefix would also swallow line 46
-        # and anything in the 4600s.
-        allowed_reads = {"./vigia_agent.py:464", "./vigia_agent.py:465"}
-        offenders = [
-            h for h in hits
-            if "tests/test_b224_contradiction_detector_dormancy.py" not in h
-            and h.rsplit(":", 1)[0] not in allowed_reads
-            and ":".join(h.split(":", 2)[:2]) not in allowed_reads
-        ]
+        # Two classes of permitted occurrence, matched by content rather than
+        # a hardcoded line number (which drifts under any surgical edit above
+        # the detector, e.g. the B-224 docstring warnings added to
+        # vigia_agent.py's module/class/ContradictionDetector docstrings):
+        #   1. the actual read -- `module_results.get("<key>"...)` or
+        #      `module_results["<key>"]` -- in vigia_agent.py itself.
+        #   2. a documentation citation naming the key as unreachable/no
+        #      producer (this file's docstrings, and vigia_agent.py's own
+        #      B-224 warning prose) -- these describe the defect, they are
+        #      not a second call site.
+        def _is_permitted(line: str) -> bool:
+            if "tests/test_b224_contradiction_detector_dormancy.py" in line:
+                return True
+            if line.startswith("./vigia_agent.py:") and (
+                f'module_results.get("{key}"' in line
+                or f'module_results["{key}"]' in line
+            ):
+                return True
+            if line.startswith("./vigia_agent.py:") and "no producer" in line:
+                return True  # the B-224 warning line citing the key by name
+            return False
+
+        offenders = [h for h in hits if not _is_permitted(h)]
         assert not offenders, (
-            f"{key!r} now has occurrences beyond the two reads at "
-            f"vigia_agent.py:464-465: {offenders}. If a PRODUCER was added, "
-            f"Rule 2 (SEMIOTIC_VS_TECHNICAL) may have become reachable -- see "
-            f"this module's docstring: reviving one rule alone still leaves "
-            f"max=1 < CONTRADICTION_THRESHOLD=2, and making corrections live "
-            f"changes sealed verdicts, so re-validate the corpus."
+            f"{key!r} now has occurrences beyond the read and documentation "
+            f"citation in vigia_agent.py: {offenders}. If a PRODUCER was "
+            f"added, Rule 2 (SEMIOTIC_VS_TECHNICAL) may have become reachable "
+            f"-- see this module's docstring: reviving one rule alone still "
+            f"leaves max=1 < CONTRADICTION_THRESHOLD=2, and making "
+            f"corrections live changes sealed verdicts, so re-validate the "
+            f"corpus."
         )
 
 

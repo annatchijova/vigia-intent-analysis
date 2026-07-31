@@ -6,11 +6,18 @@
 #
 # VIGÍA Autonomous Forensic Agent
 # ================================
-# Self-correcting agentic loop for SANS FIND EVIL Hackathon 2026.
+# Agentic loop for SANS FIND EVIL Hackathon 2026.
 #
 # Architecture: Custom MCP Server pattern (architectural guardrails, not prompt-based).
-# Self-correction: deterministic contradiction detection between modules,
-#                  automatic re-analysis with adjusted parameters, full audit trail.
+# Self-correction (designed, structurally inert — B-224, L-069, see
+# KNOWN_LIMITATIONS.md): ContradictionDetector.detect() implements 4 rules;
+# 3 of 4 read fields no producer in this Mode-1 path ever writes, so they
+# never fire, and the one reachable rule caps at 1 contradiction against a
+# threshold of 2 — CorrectionEngine is architecturally unreachable, not
+# merely quiet on this corpus. Distinct from vigia_scorer.py's Daubert
+# Corroboration Gate (Mode 2/API path, imported by vigia_api.py /
+# sift_orchestrator.py), which IS live and does gate pre-emission — that
+# gate is unrelated to this loop and unaffected by this note.
 #
 # Complies with SANS requirements:
 #   - Self-correction without human intervention
@@ -440,12 +447,24 @@ class ContradictionDetector:
     """
     Detects semantic contradictions between pipeline modules.
 
-    Detected contradiction types:
-    1. TEMPORAL_VS_CONTENT: timestamp inconsistent with artifact content
-    2. ENTROPY_VS_BEHAVIORAL: high entropy + normal behavior (false negative)
-    3. SEMIOTIC_VS_TECHNICAL: no linguistic patterns + high technical anomaly
-    4. CONFIDENCE_COLLAPSE: high MCP but all individual modules low
-    5. VERDICT_FLIP: opposing verdicts between equal-confidence engines
+    Implemented rules (B-224, KNOWN_LIMITATIONS.md L-069 — 3 of the 4 are
+    structurally unreachable in Mode 1, they read fields no producer here
+    writes; see the limitation entry before reviving one, since it moves
+    sealed verdicts and needs a corpus dry-run first):
+    1. ENTROPY_VS_BEHAVIORAL: high entropy + normal behavior (false negative)
+       — unreachable: filters on signal["tool"], Mode-1 signals carry
+       evidence_type/source instead.
+    2. SEMIOTIC_VS_TECHNICAL: no linguistic patterns + high technical anomaly
+       — unreachable: reads module_results["technical_result"], which no
+       Mode-1 producer ever writes.
+    3. CONFIDENCE_COLLAPSE: high MCP but all individual modules low — the
+       only reachable rule; contributes at most 1 contradiction.
+    4. VERDICT_FLIP: opposing verdicts between equal-confidence engines —
+       unreachable: checks for the literal "BENIGN" in best_hypothesis,
+       Mode-1 emits NO_*_ANOMALY_DETECTED instead.
+
+    TEMPORAL_VS_CONTENT (timestamp inconsistent with artifact content) was
+    never implemented; it does not appear anywhere in detect().
     """
 
     def detect(
@@ -616,10 +635,16 @@ class VIGIAAgent:
     6. Generate investigative narrative
     7. Export sealed bundle with SHA-256
 
-    Self-correction is architectural:
-    - ContradictionDetector operates on rational scores, not on text
-    - CorrectionEngine applies documented deterministic adjustments
-    - Each iteration is recorded in the audit trail with timestamp
+    Self-correction is architectural, but step 5's loop never actually
+    repeats (B-224, KNOWN_LIMITATIONS.md L-069): ContradictionDetector
+    operates on rational scores, not text, and CorrectionEngine applies
+    documented deterministic adjustments -- but 3 of the detector's 4 rules
+    read fields no Mode-1 producer writes, so the maximum reachable
+    contradiction count is 1, below CONTRADICTION_THRESHOLD (2). Step 5's
+    condition is therefore never satisfied; iteration is always recorded
+    as 1 of 1. Honest, not a failure -- see the limitation entry before
+    changing the threshold or reviving a rule, since either moves sealed
+    verdicts and needs a corpus dry-run first.
     """
 
     def __init__(self, case_id: str, evidence_path: str,
@@ -2020,9 +2045,11 @@ Examples:
   python3 vigia_agent.py --evidence /cases/xp-tdungan.raw --case-id XP-001
   python3 vigia_agent.py --evidence /cases/evidence.json --case-id TEST-001 --output report.json
 
-Self-correction: automatic — no flags needed.
+Self-correction: designed, no flags needed — but structurally does not
+  trigger in this mode today (max reachable contradictions=1 < threshold=2,
+  see KNOWN_LIMITATIONS.md L-069). Every run completes in 1 iteration.
 Narrative: 100% deterministic — no LLMs in core analysis.
-Max iterations: 3 (hard cap, prevents infinite loops).
+Max iterations: 3 (hard cap on the loop; not reached in practice — see above).
 
 Exit codes:
   0  NO EVIL     — analyzed, no anomaly (NOISE / benign)

@@ -1497,3 +1497,47 @@ nada. Un fix real requiere decidir en conjunto:
 También conviene notar que el docstring de `ContradictionDetector` enumera 5
 tipos de contradicción pero sólo implementa 4 — `TEMPORAL_VS_CONTENT`
 (listado como #1) no existe en el código.
+
+### Update 2026-07-31 — opción (e) aplicada: documentación honesta; el resto sigue abierto
+
+Aplicada la opción (e) del fix propuesto: cero riesgo de veredicto, ningún
+cambio de scoring. Antes de tocar nada se re-auditó la propia cita que
+sostenía la severidad P1: la frase de `CLAUDE.md` "VIGÍA's self-correction
+occurs pre-emission" **no** describe este loop — describe el Daubert
+Corroboration Gate de `vigia_scorer.py` (importado en producción por
+`vigia_api.py`/`sift_orchestrator.py`, el camino Modo 2/API), que está vivo
+y funciona de verdad. `vigia_agent.py` nunca importa `vigia_scorer.py`
+(verificado, cero referencias) — son subsistemas disjuntos, tal como el
+propio B-224 ya notaba en la sección "Relación con B-151(b)". La cita de
+`CLAUDE.md` en la justificación de severidad original conflacionaba ambos
+mecanismos; **no se tocó `CLAUDE.md`** porque esa frase es honesta sobre el
+sistema que describe.
+
+Lo que sí era autorreferencialmente falso — `vigia_agent.py` describiendo
+su **propio** loop como si iterara — se corrigió en el archivo vivo:
+docstring de módulo, docstring de `VIGIAAgent`, docstring de
+`ContradictionDetector` (removido `TEMPORAL_VS_CONTENT` de la lista de
+tipos implementados, anotado aparte como nunca implementado), y el epílogo
+de `--help` ("Self-correction: automatic" → estado real + puntero a
+`KNOWN_LIMITATIONS.md` L-069). Nueva entrada `L-069` documenta el hallazgo
+completo, incluyendo la aclaración Daubert-gate-vs-ContradictionDetector
+para que no se vuelva a conflacionar.
+
+Verificado: `vigia_agent.py --help` real ya no dice la frase falsa;
+`ast.parse()` limpio; corrida real de Modo 1 sobre los 3 casos AI (3/3
+PASS, mismos veredictos MALICE/SUSPICION/SUSPICION — el `agent_sha256`
+cambia porque el propio código fuente cambió, lo cual es esperado y no se
+propagó al resto del corpus committeado). Suite completa: 2137 passed.
+Tests permanentes: `tests/test_b224_self_correction_docs_are_honest.py`
+(9 tests, rojo-primero — los 9 fallan contra el código sin el fix) +
+`tests/test_b224_contradiction_detector_dormancy.py` (10 tests, ya
+existente, actualizado con anclaje robusto a números de línea en vez de
+hardcodeados, porque mis propios edits movieron las líneas que el test
+citaba).
+
+**Lo que sigue abierto, sin cambios:** las opciones (a)-(d) — alinear
+reglas al vocabulario real, decidir el destino de `SEMIOTIC_VS_TECHNICAL`,
+y revisar `CONTRADICTION_THRESHOLD` — siguen pendientes de decisión de
+arquitectura + dry-run de corpus, exactamente como estaban. Este bug
+permanece en `BUGS_PENDIENTES.md`, no se mueve a histórico: el mecanismo
+sigue inerte, solo dejó de mentir al respecto.

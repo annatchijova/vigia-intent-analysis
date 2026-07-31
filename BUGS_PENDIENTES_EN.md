@@ -1188,3 +1188,46 @@ fix requires deciding jointly:
 Worth noting too: `ContradictionDetector`'s docstring enumerates 5 contradiction
 types but only implements 4 — `TEMPORAL_VS_CONTENT` (listed as #1) does not
 exist in the code.
+
+### Update 2026-07-31 — option (e) applied: honest documentation; the rest stays open
+
+Applied proposed-fix option (e): zero verdict risk, no scoring changed.
+Before touching anything, re-audited the very citation that drove the P1
+severity: `CLAUDE.md`'s "VIGÍA's self-correction occurs pre-emission"
+phrase does **not** describe this loop — it describes the Daubert
+Corroboration Gate in `vigia_scorer.py` (imported in production by
+`vigia_api.py`/`sift_orchestrator.py`, the Mode 2/API path), which is live
+and genuinely works. `vigia_agent.py` never imports `vigia_scorer.py`
+(verified, zero references) — they are disjoint subsystems, exactly as
+B-224 itself already noted in its "Relation to B-151(b)" section. The
+`CLAUDE.md` citation in the original severity justification conflated the
+two mechanisms; **`CLAUDE.md` was NOT touched** because that sentence is
+honest about the system it describes.
+
+What WAS self-referentially false -- `vigia_agent.py` describing its OWN
+loop as if it iterated -- was corrected in the live file: module
+docstring, `VIGIAAgent` docstring, `ContradictionDetector` docstring
+(removed `TEMPORAL_VS_CONTENT` from the implemented-types list, noted
+separately as never implemented), and the `--help` epilog
+("Self-correction: automatic" -> real status + pointer to
+`KNOWN_LIMITATIONS.md` L-069). New entry `L-069` documents the full
+finding, including the Daubert-gate-vs-ContradictionDetector distinction
+so it doesn't get conflated again.
+
+Verified: real `vigia_agent.py --help` output no longer says the false
+sentence; clean `ast.parse()`; a real Mode-1 run over the 3 AI cases (3/3
+PASS, same MALICE/SUSPICION/SUSPICION verdicts -- `agent_sha256` changes
+because the source itself changed, expected, not propagated to the rest
+of the committed corpus). Full suite: 2137 passed. Permanent tests:
+`tests/test_b224_self_correction_docs_are_honest.py` (9 tests, red-first --
+all 9 fail against the unfixed code) plus
+`tests/test_b224_contradiction_detector_dormancy.py` (10 tests, pre-existing,
+updated with a content-based anchor instead of hardcoded line numbers,
+since my own edits shifted the lines that test was citing).
+
+**What remains open, unchanged:** options (a)-(d) -- aligning rules to the
+real vocabulary, deciding `SEMIOTIC_VS_TECHNICAL`'s fate, and revisiting
+`CONTRADICTION_THRESHOLD` -- are still pending an architecture decision
+plus a corpus dry-run, exactly as before. This bug stays in
+`BUGS_PENDIENTES_EN.md`, not archived: the mechanism is still inert, it
+just stopped lying about it.

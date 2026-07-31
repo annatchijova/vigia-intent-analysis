@@ -3054,3 +3054,63 @@ were repaired on integration (D-1..D-8), two of which prevented the modules from
 importing or running at all; see `docs/EPISTEMIC_KERNEL.md`.
 
 ---
+
+## L-069 — Mode-1's self-correction loop never actually iterates (B-224) [DOCUMENTED]
+
+`vigia_agent.py`'s `ContradictionDetector.detect()` implements 4 rules. 3 of
+them read fields no Mode-1 producer ever writes: `ENTROPY_VS_BEHAVIORAL` and
+`VERDICT_FLIP` filter on a `signal["tool"]` key Mode-1 signals never carry
+(they carry `evidence_type`/`source`), `SEMIOTIC_VS_TECHNICAL` reads
+`module_results["technical_result"]`, which no producer in this repository
+writes, and `VERDICT_FLIP` additionally checks for the literal string
+`"BENIGN"` where Mode-1 emits `NO_*_ANOMALY_DETECTED`. Only
+`CONFIDENCE_COLLAPSE` is reachable, and it contributes at most 1
+contradiction. `CONTRADICTION_THRESHOLD = 2` gates `_apply_self_correction`
+on `len(contradictions) >= 2`, so the maximum reachable count (1) never
+meets it — the correction branch cannot fire for any possible input, not
+merely none observed in the current corpus. Measured on the 21 cases under
+`cases/input/`: `self_corrections_applied=0`, `iterations_executed=1`,
+`sans_compliance.self_correction=False`, `contradictions_found=0` in every
+case's `audit_trail`.
+
+**Forensic implication:** no sealed verdict in this repository has ever
+passed through a live self-correction iteration in Mode 1. The mechanism is
+architecturally present (correct logic per rule, verified with control
+tests that trigger each rule using the *wrong* field names to prove the
+logic itself is not broken) but unreachable end-to-end, by construction.
+
+**Distinct from the Daubert Corroboration Gate** (`vigia_scorer.py`,
+imported by `vigia_api.py` / `sift_orchestrator.py` — the Mode 2/API path).
+That gate is live, gates pre-emission, and is unrelated: `vigia_agent.py`
+never imports `vigia_scorer.py` (verified, zero references). CLAUDE.md's
+"VIGÍA's self-correction occurs pre-emission" passage describes that gate,
+not this loop — the two must not be conflated when reading either document.
+
+**Why not fixed:** every possible fix touches sealed verdicts. A live
+correction rewrites `abduction["best_hypothesis"]`
+(`OVERRIDE_ABDUCTIVE_CONCLUSION` / `ESCALATE_TO_CRITICAL`), so reviving any
+one rule, or lowering `CONTRADICTION_THRESHOLD`, can change verdicts on real
+corpus cases. Reviving a single rule alone would not even help: the reachable
+maximum stays at 1, still below threshold 2, unless the threshold is also
+revisited. A real fix requires deciding, together and with a corpus
+dry-run: which rules to align to Mode-1's real field names/vocabulary,
+whether `SEMIOTIC_VS_TECHNICAL` needs a producer or should be retired as a
+dead concept, and whether `CONTRADICTION_THRESHOLD` should drop given how
+many rules are actually live. None of that has been decided.
+
+**Applied now (this entry, B-224):** honest-degradation documentation only,
+zero verdict risk. `vigia_agent.py`'s module docstring, class docstring,
+`ContradictionDetector`'s own docstring, and `--help` output all named the
+mechanism as functioning ("automatic", "Max iterations: 3" implying
+iteration happens); all four now state the true reachability status and
+point here. `TEMPORAL_VS_CONTENT`, listed in the old docstring as a 5th
+contradiction type, was never implemented at all — removed from the type
+list, noted separately.
+
+Permanent test: `tests/test_b224_contradiction_detector_dormancy.py` (10
+tests, pinning the current broken state — they will FAIL the moment someone
+wires a producer or aligns a rule's vocabulary, which is the point) and
+`tests/test_b224_self_correction_docs_are_honest.py` (locks in the corrected
+docstrings/`--help` text against silent drift back to the false claim).
+
+---
