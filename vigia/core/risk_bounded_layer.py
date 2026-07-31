@@ -575,7 +575,9 @@ class RiskBoundedDecisionLayer:
             graph_stability=graph_stability,
             lambda_drift=self._lambda,
             gamma_stability=self._gamma,
-            epsilon_used=self._eps_accept,
+            epsilon_used=(
+                self._eps_reject if verdict == "REJECT" else self._eps_accept
+            ),
             components_used=components_used,
             signal_contributions=signal_contributions,
             reason_code=reason_code,

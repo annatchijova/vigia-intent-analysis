@@ -727,8 +727,14 @@ class VigiaPipeline:
                 self._adaptive_policy.gamma_t
                 if self._adaptive_policy else self._risk_layer._gamma
             ),
-            epsilon_accept=decision_trace.epsilon_used,
-            epsilon_reject=decision_trace.epsilon_used,
+            epsilon_accept=(
+                self._adaptive_policy.epsilon_accept
+                if self._adaptive_policy else self._risk_layer._eps_accept
+            ),
+            epsilon_reject=(
+                self._adaptive_policy.epsilon_reject
+                if self._adaptive_policy else self._risk_layer._eps_reject
+            ),
             drift_score=drift_score,
             graph_stability_global=graph_stability,
             engine_version="vigia-ebs-v1.0",

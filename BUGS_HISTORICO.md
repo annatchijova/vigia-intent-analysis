@@ -9954,3 +9954,64 @@ Verificado con dry-run sobre ambos casos:
 
 Sin test unitario dedicado — es un runner de demo/display fuera del path
 sellado; el dry-run sobre los dos casos reales cubre ambas ramas del fix.
+
+---
+
+## B-218 — El bundle sella `epsilon_used = epsilon_accept` incluso cuando el veredicto fue REJECT por `epsilon_reject`: el ε que queda registrado no es el que decidió [RESUELTO — Claude 2026-07-31]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2, con precondición dormida (ver más abajo). Origen: auditoría "Ronda 2", hallazgo F2. |
+| **Archivos** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`, línea 578); `vigia/pipeline/pipeline.py` (líneas 730-731, bloque "SELLADO CONJUNTO"). |
+| **Detectado en** | Auditoría "Ronda 2", inducción ejecutada y re-verificada contra el archivo vivo en la sesión que lo documentó (2026-07-25). |
+
+### Descripción
+
+`decide()` construía la `DecisionTrace` con `epsilon_used=self._eps_accept`
+sin condicionar por el veredicto. Cuando el veredicto era REJECT, el umbral
+que efectivamente decidió fue `epsilon_reject` (la regla es
+`REJECT si r >= 1 - epsilon_reject`), no `epsilon_accept` — pero el campo
+sellado en el *trace* (y de ahí en el bundle, vía `pipeline.py:730-731`, que
+copiaba ese mismo valor a **ambos** `epsilon_accept` y `epsilon_reject` del
+`SystemState`) siempre reportaba `epsilon_accept`.
+
+**Precondición honesta (por qué era P2 y no P1):**
+`SelfAdaptiveRiskPolicy.update_from_window` fuerza
+`epsilon_accept = epsilon_reject` en cada actualización — la configuración
+adaptativa que usa el pipeline por defecto. El bug solo mordía si un
+`PolicySpec` definía `epsilon_accept != epsilon_reject` explícitamente (camino
+que `RiskBoundedDecisionLayer.from_policy_spec()` soporta sin restricción, por
+ejemplo con `adaptive_policy=False`).
+
+### Fix aplicado
+
+Confirmado en el archivo vivo antes de tocarlo (ambos anclajes citados en el
+reporte original, idénticos). Dos cambios:
+
+1. `risk_bounded_layer.py:578` — `epsilon_used` ahora se sella condicionado
+   por el veredicto: `self._eps_reject if verdict == "REJECT" else
+   self._eps_accept` (el fix propuesto originalmente en BUGS_PENDIENTES.md,
+   aplicado tal cual).
+2. `pipeline.py:730-731` — en vez de copiar el único `decision_trace.epsilon_used`
+   a ambos campos de `SystemState`, cada campo se llena de forma independiente
+   desde la fuente real (`self._adaptive_policy.epsilon_accept/epsilon_reject`
+   si hay política adaptativa, si no `self._risk_layer._eps_accept/_eps_reject`)
+   — mismo patrón ya usado dos líneas arriba para `lambda_drift`/`gamma_stability`.
+   Esto resuelve el bug de raíz para ambos campos simultáneamente, en vez de
+   depender de un único valor ambiguo del trace.
+
+Verificado empíricamente reproduciendo el escenario exacto del reporte original:
+
+```
+RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
+decide(posterior=0.70) → decision=REJECT, risk=0.7
+  epsilon_used (sellado) = 0.40   # antes: 0.05 (epsilon_accept, incorrecto)
+```
+
+Suite completa (`tests/ vigia/tests/ --ignore=tests/integration`): 1989
+passed, 0 failed (188 skipped, 29 xfailed — preexistentes, no relacionados).
+Test permanente agregado: `tests/test_b218_epsilon_used_verdict.py` (4 tests,
+rojo-primero contra el código sin el fix — `test_reject_seals_epsilon_reject`
+falla con `0.05 == 0.4` en el código original y pasa tras el fix; cubre
+ACCEPT, REJECT, ABSTAIN, y el sellado independiente de ambos umbrales en
+`VigiaPipeline` con `PolicySpec` asimétrico).
