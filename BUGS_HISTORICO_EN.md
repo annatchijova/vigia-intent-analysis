@@ -9453,3 +9453,46 @@ the unfixed code — `test_reject_seals_epsilon_reject` fails with
 `0.05 == 0.4` on the original code and passes after the fix; covers ACCEPT,
 REJECT, ABSTAIN, and the independent sealing of both thresholds in
 `VigiaPipeline` with an asymmetric `PolicySpec`).
+
+---
+
+## B-220 — The `bayesian_update` cache is keyed only by `artifact_id`: it ignores `custom_window`, even though the parameter is part of the public signature [RESOLVED — Claude 2026-07-31]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3, latent (no caller used the affected parameter). Origin: "Round 2" audit, finding F4. |
+| **File** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`). |
+| **Detected in** | "Round 2" audit (2026-07-25), re-executed against the live file in this session. |
+
+### Description
+
+`bayesian_update(artifact_id, custom_window=None)` used `custom_window` to
+compute the temporal neighborhood (`get_neighborhood`), but the
+`self._bayesian_cache` was keyed on `artifact_id` alone. A second call with a
+different window returned the first call's cached object without recomputing —
+the result depended on call order, not on the window requested. Latent today
+(no production caller passes `custom_window`, all use the `None` default), but
+the parameter is documented and MCP-exposed.
+
+### Fix applied
+
+Confirmed against the live file before touching it (cache keyed on
+`artifact_id` alone, as the report stated). Adopted the first proposed option:
+cache key `(artifact_id, custom_window)`. `custom_window` is a `timedelta` or
+`None`, both hashable, so the tuple is a valid key. Three surgical changes: the
+dict type annotation (`dict[tuple, ...]`), and the cache read and write using
+`cache_key`. `add_artifact` still invalidates the whole cache with `.clear()`
+(unchanged), so coherence after adding artifacts is preserved.
+
+Verified empirically by reproducing the bug scenario (center `a3`, neighbour
+`a2` 40s away): `bayesian_update('a3')` (300s window, includes a2, posterior
+0.01) and `bayesian_update('a3', custom_window=timedelta(seconds=10))`
+(excludes a2, posterior 0.5) now return distinct objects; identical repeated
+calls still share the cache.
+
+Full suite (`tests/ vigia/tests/ --ignore=tests/integration`): 1993 passed, 0
+failed. Permanent test: `tests/test_b220_bayesian_cache_window_key.py` (4
+tests, red-first — the two recompute tests fail without the fix because the
+second call returns the cached object; the shared-cache and
+invalidation-on-add tests pass in both states, documenting that the fix does
+not break legitimate caching).

@@ -201,7 +201,10 @@ class TrustFusionEngine:
         self._artifacts: dict[str, TemporalArtifact] = {}
         self._temporal_index: list = []
         self._timestamps: list = []
-        self._bayesian_cache: dict[str, BayesianTrustUpdate] = {}
+        # B-220: la clave incluye custom_window — dos llamados al mismo
+        # artifact_id con ventanas temporales distintas producen vecindades
+        # distintas y no deben compartir entrada de caché.
+        self._bayesian_cache: dict[tuple, BayesianTrustUpdate] = {}
 
     def add_artifact(self, artifact: TemporalArtifact) -> bool:
         if artifact.artifact_id in self._artifacts:
@@ -258,8 +261,9 @@ class TrustFusionEngine:
         return max(0.001, marginal)
 
     def bayesian_update(self, artifact_id: str, custom_window=None) -> BayesianTrustUpdate:
-        if artifact_id in self._bayesian_cache:
-            return self._bayesian_cache[artifact_id]
+        cache_key = (artifact_id, custom_window)
+        if cache_key in self._bayesian_cache:
+            return self._bayesian_cache[cache_key]
         if artifact_id not in self._artifacts:
             raise ValueError(f"Artifact {artifact_id!r} not found")
         artifact = self._artifacts[artifact_id]
@@ -278,7 +282,7 @@ class TrustFusionEngine:
         else:
             reason = f"NEUTRAL: prior={prior:.3f} posterior={posterior:.3f}"
         result = BayesianTrustUpdate(artifact_id, prior, posterior, likelihood, marginal, influence, reason)
-        self._bayesian_cache[artifact_id] = result
+        self._bayesian_cache[cache_key] = result
         if result.was_degraded:
             audit_logger.log_info("TRUST_BAYESIAN_DEGRADATION", "TrustFusionEngine", reason)
         return result

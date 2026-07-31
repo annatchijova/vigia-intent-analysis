@@ -644,56 +644,6 @@ pending integration; not a failure, a Level-3 feature not connected to this entr
 point.
 
 
-## B-220 — The `bayesian_update` cache is keyed only by `artifact_id`: it ignores `custom_window`, even though the parameter is part of the public signature [DOCUMENTED — Claude 2026-07-25]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P3, latent (no caller uses the affected parameter today). Origin: "Round 2" audit, finding F4. |
-| **File** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`, line ~260). |
-| **Function** | `bayesian_update(self, artifact_id, custom_window=None)`. |
-| **Original lines** | `if artifact_id in self._bayesian_cache: return self._bayesian_cache[artifact_id]` — the cache key is `artifact_id` alone; `custom_window` plays no part. |
-| **Fix commit** | None — documented, not applied. |
-| **Detected in** | "Round 2" audit, executed against the live file. |
-
-### Description
-
-`bayesian_update(artifact_id, custom_window=None)` accepts `custom_window`
-as a documented parameter and correctly uses it to compute the temporal
-neighborhood (`get_neighborhood(artifact_id, custom_window)`) — but
-**before** reaching that computation, it checks `self._bayesian_cache` keyed
-only by `artifact_id`. Executed: `bayesian_update('a3')` and
-`bayesian_update('a3', custom_window=timedelta(seconds=30))` return the
-**same object** — the second call never recomputes with the different
-window, it simply returns whatever was cached from the first call
-(whichever that was).
-
-Confirmed by exhaustive grep: no caller of `bayesian_update` anywhere in the
-repository (neither internal nor MCP-exposed) passes `custom_window` today —
-every production call site (`vigia/core/trust_fusion.py`, lines 319, 345,
-395, 541) uses the `None` default. The bug is purely latent: no real
-execution path reaches it in the code's current state.
-
-### Impact
-
-If some future caller (internal or via MCP) starts using `custom_window` —
-the parameter is documented and exposed, so this is a foreseeable use, not
-an exotic one — it would get results from the wrong temporal window
-depending solely on call order: the first call "wins" and stays cached for
-any subsequent `custom_window` on the same `artifact_id`. This is a classic
-incomplete-cache-key bug, matching the pattern of other cache-key bugs
-already documented in this repository (search "cache key" in
-`BUGS_PENDIENTES_EN.md`).
-
-### Proposed fix (NOT applied)
-
-Include `custom_window` in the cache key (e.g.
-`cache_key = (artifact_id, custom_window)`, with `custom_window=None` a
-valid tuple member), or — simpler, given nobody uses it today — explicitly
-exclude from caching any call with a non-default `custom_window`,
-documenting that only the default window gets cached. Either option needs a
-regression test that doesn't exist today (no test of `bayesian_update`
-exercises a non-`None` `custom_window`).
-
 ## B-221 — "Round 2" audit (epistemological invariants): investigated and discarded vectors — recorded to avoid re-discovering them [DOCUMENTED — Claude 2026-07-25]
 
 | Field | Value |

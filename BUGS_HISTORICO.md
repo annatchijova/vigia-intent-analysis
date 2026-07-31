@@ -10015,3 +10015,47 @@ rojo-primero contra el código sin el fix — `test_reject_seals_epsilon_reject`
 falla con `0.05 == 0.4` en el código original y pasa tras el fix; cubre
 ACCEPT, REJECT, ABSTAIN, y el sellado independiente de ambos umbrales en
 `VigiaPipeline` con `PolicySpec` asimétrico).
+
+---
+
+## B-220 — La caché de `bayesian_update` está indexada solo por `artifact_id`: ignora `custom_window`, aunque el parámetro es parte de la firma pública [RESUELTO — Claude 2026-07-31]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3, latente (no había ningún *caller* usando el parámetro afectado). Origen: auditoría "Ronda 2", hallazgo F4. |
+| **Archivo** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`). |
+| **Detectado en** | Auditoría "Ronda 2" (2026-07-25), re-ejecutado contra el archivo vivo en esta sesión. |
+
+### Descripción
+
+`bayesian_update(artifact_id, custom_window=None)` usaba `custom_window` para
+calcular la vecindad temporal (`get_neighborhood`), pero la caché
+`self._bayesian_cache` estaba indexada solo por `artifact_id`. Un segundo
+llamado con ventana distinta devolvía el objeto cacheado del primer llamado
+sin recalcular — el resultado dependía del orden de llamadas, no de la ventana
+pedida. Latente hoy (ningún caller de producción pasa `custom_window`, todos
+usan el default `None`), pero el parámetro está documentado y expuesto vía MCP.
+
+### Fix aplicado
+
+Confirmado en el archivo vivo antes de tocarlo (clave de caché `artifact_id`
+sola, como citaba el reporte). Se adoptó la primera opción propuesta: clave de
+caché `(artifact_id, custom_window)`. `custom_window` es `timedelta` o `None`,
+ambos hashables, así que la tupla es una clave válida. Tres cambios surgicales:
+declaración de tipo del dict (`dict[tuple, ...]`), lectura y escritura de la
+caché con `cache_key`. `add_artifact` sigue invalidando toda la caché con
+`.clear()` (sin cambios), así que la coherencia tras agregar artefactos se
+mantiene.
+
+Verificado empíricamente reproduciendo el escenario del bug (centro `a3`,
+vecino `a2` a 40s): `bayesian_update('a3')` (ventana 300s, incluye a2,
+posterior 0.01) y `bayesian_update('a3', custom_window=timedelta(seconds=10))`
+(excluye a2, posterior 0.5) ahora devuelven objetos distintos; llamados
+idénticos repetidos siguen compartiendo caché.
+
+Suite completa (`tests/ vigia/tests/ --ignore=tests/integration`): 1993
+passed, 0 failed. Test permanente: `tests/test_b220_bayesian_cache_window_key.py`
+(4 tests, rojo-primero — los dos de recompute fallan sin el fix porque el
+segundo llamado devuelve el objeto cacheado; los de caché-compartida e
+invalidación-por-add pasan en ambos estados, documentando que el fix no rompe
+el cacheo legítimo).
