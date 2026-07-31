@@ -9358,3 +9358,35 @@ to `true` with a comment explaining why). Permanent test added:
 name, the `_PT`-suffixed override actually works, the un-suffixed name is
 silently ignored — documenting the failure mode this caused — and
 `VIGIA_STRICT_MODEL_CHECK`'s default is `true` when the variable is unset).
+
+---
+
+## B-216 — `tests/run_vigia_case.py` crashes formatting a `caie_fracture`'s None `severity` with `:.2f` [RESOLVED — Claude 2026-07-31]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3 (display/demo runner, not the sealed path): `TypeError: unsupported format string passed to NoneType.__format__` when printing the CAIE fractures of any case whose `caie_fractures` lack a `severity` field (they carry `type`/`description`). Did not affect the verdict or the bundle. |
+| **File** | `tests/run_vigia_case.py` (line 162). |
+| **Mode** | Only the display runner `tests/run_vigia_case.py` (used by `scripts/run_vigia_full.py` as its first stage). |
+| **Detected by** | Running `run_vigia_full.py` on `VIGIA-OWL-2019-COMPLETE.json`; also reproduced on the original `OWL-NEXUS5-CASE.json` (pre-existing bug, not case-specific). |
+
+### Fix applied
+
+Confirmed against the live file before touching it (line 162 matched the
+original report exactly). Replaced the
+`f"...severity={f.get('severity'):.2f}"` line with an explicit guard:
+`severity_str = f"{severity:.2f}" if severity is not None else "n/a"`, and
+`fracture_type = f.get('fracture_type', f.get('type', '?'))` to tolerate the
+`type`/`description` schema real cases use (the fix originally proposed in
+BUGS_PENDIENTES.md, applied as-is).
+
+Verified with a dry-run on both cases:
+- `data/cases/OWL-NEXUS5-CASE.json` (fractures without `severity`,
+  `type`/`description` schema): no longer crashes, renders `severity=n/a`
+  and falls back to `type` for `fracture_type`. Bundle seals correctly
+  (H4 EBS verify PASS).
+- `data/cases/case_003_false_flag.json` (fracture with a numeric
+  `severity=0.85`): no regression, still shows `severity=0.85`.
+
+No dedicated unit test — this is a demo/display runner outside the sealed
+path; the dry-run over both real cases covers both branches of the fix.

@@ -9923,3 +9923,34 @@ correcto, el override con `_PT` funciona, el nombre sin `_PT` se ignora
 silenciosamente — documentando el modo de falla que causó esto — y el
 default de `VIGIA_STRICT_MODEL_CHECK` es `true` cuando la variable no está
 seteada).
+
+---
+
+## B-216 — `tests/run_vigia_case.py` crashea al formatear `severity` None de un `caie_fracture` con `:.2f` [RESUELTO — Claude 2026-07-31]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3 (runner de display/demo, no el path sellado): `TypeError: unsupported format string passed to NoneType.__format__` al imprimir las fracturas CAIE de cualquier caso cuyas `caie_fractures` no traigan el campo `severity` (traen `type`/`description`). No afectaba el veredicto ni el bundle. |
+| **Archivo** | `tests/run_vigia_case.py` (línea 162). |
+| **Modo** | Solo el runner de display `tests/run_vigia_case.py` (usado por `scripts/run_vigia_full.py` como primera etapa). |
+| **Detectado por** | Corrida de `run_vigia_full.py` sobre `VIGIA-OWL-2019-COMPLETE.json`; reproducido también sobre el `OWL-NEXUS5-CASE.json` original (bug preexistente, no del caso). |
+
+### Fix aplicado
+
+Confirmado en el archivo vivo antes de tocarlo (línea 162 idéntica a la citada
+en el reporte original). Reemplazado el `f"...severity={f.get('severity'):.2f}"`
+por un guard explícito: `severity_str = f"{severity:.2f}" if severity is not
+None else "n/a"`, y `fracture_type = f.get('fracture_type', f.get('type', '?'))`
+para tolerar el schema `type`/`description` que usan los casos reales (el fix
+propuesto originalmente en BUGS_PENDIENTES.md, aplicado tal cual).
+
+Verificado con dry-run sobre ambos casos:
+- `data/cases/OWL-NEXUS5-CASE.json` (fracturas sin `severity`, schema
+  `type`/`description`): ya no crashea, renderiza `severity=n/a` y usa
+  `type` como `fracture_type`. Bundle sella correctamente (H4 EBS verify
+  PASS).
+- `data/cases/case_003_false_flag.json` (fractura con `severity=0.85`
+  numérico): sin regresión, sigue mostrando `severity=0.85`.
+
+Sin test unitario dedicado — es un runner de demo/display fuera del path
+sellado; el dry-run sobre los dos casos reales cubre ambas ramas del fix.
