@@ -381,6 +381,35 @@ would be "never, because they have no caller," not an environment variable
 nobody reads) before the monitor can be trusted. Verified with a permanent
 test: `tests/test_config_sentinel_orphaned_module_env_map.py`.
 
+### Update 2026-07-31 — `config_sentinel.py` no longer lies (sub-issue RESOLVED; cluster still open)
+
+Applied the honest `_MODULE_ENV_MAP` hardening the previous addendum flagged as
+a prerequisite. `config_sentinel.py` now declares
+`_UNWIRED_MODULES = {OckhamAdversarial, SignalRouter}` — the two criticals with
+zero production callers whose env var gates nothing — and `_module_active()`
+reports them `active=False` (env_value `NOT_WIRED`, not `NOT_SET`) instead of
+"active by default". `initialize()`/`finalize()` seal `DEGRADED_MODE` with an
+`analyst_warning` naming the absent modules, and `to_report_dict` surfaces
+`critical_modules_inactive_at_init`. `CAIE` and `TrustFusion` (real gates, 5 and
+4 readers) stay `active=True`; runtime-deactivation detection (e.g.
+`VIGIA_CAIE_ENABLED=false`) still works. Also fixed the `finalize()` bug that
+reset to `FULL` whenever there were no runtime events (it would have undone the
+honest init DEGRADED).
+
+Chosen as the cluster's first step by discipline: it is the only member that is
+a correctness improvement TODAY (a sealed integrity report claiming "all good"
+about broken modules is a Daubert liability worse than its absence, §5.3) and it
+is the instrument that will guide future unblocking — when Ockham/SignalRouter
+are genuinely wired, their name is removed from `_UNWIRED_MODULES` in the same
+commit and the monitor returns to `FULL` on its own. The characterization test
+`tests/test_config_sentinel_orphaned_module_env_map.py` (which locked in the lie
+as a tripwire) became a guard of the honest behavior (5 tests). `config_sentinel`
+has zero callers → zero sealed verdicts change. Full suite: 2000 passed. **The
+B-124 cluster stays OPEN**: the other 5 modules (`ockham_adversarial`,
+`dissent_report`, `narrative_auditor`, `peirceplanner_bounded`,
+`advanced_signal_router`) remain unwired, blocked by the same orphaned-producer
+chain.
+
 ---
 
 ## B-129 — PeircePlanner bounded: Phase 1 observation adapter [PHASE 2 PENDING]

@@ -61,6 +61,20 @@ _MODULE_ENV_MAP: dict[str, str] = {
     "TemporalForensics": "VIGIA_TEMPORAL_ENABLED",
 }
 
+# B-124: módulos presentes en _MODULE_ENV_MAP cuya env_var no gatea NADA hoy y
+# cuya implementación no tiene ningún *caller* vivo (0 imports de producción,
+# confirmado por grep exhaustivo). Reportarlos "active" desde el default de una
+# env_var que nadie lee sería una falsa garantía de integridad: el monitor
+# diría FULL_INTEGRITY sobre exactamente los dos módulos críticos que ya se
+# sabe desconectados. Estado veraz: NOT WIRED. Quitar un nombre de este set en
+# el mismo commit que cablee su módulo (y así el monitor pasará a FULL solo).
+# `VIGIA_CAIE_ENABLED` y `VIGIA_TRUST_FUSION_ENABLED` sí se leen en el pipeline
+# (5 y 4 lectores) — CAIE y TrustFusion NO van acá.
+_UNWIRED_MODULES: frozenset[str] = frozenset({
+    "OckhamAdversarial",
+    "SignalRouter",
+})
+
 
 @dataclass
 class ModuleSnapshot:
@@ -98,19 +112,36 @@ class ConfigAuditTrail:
             e.module for e in self.degradation_events
             if e.is_critical and e.event_type == "MODULE_DEGRADED"
         ]
+        # B-124: críticos inactivos ya en el snapshot inicial (env-disabled o
+        # NOT_WIRED). Un crítico ausente desde el arranque también impide una
+        # garantía honesta de FULL_INTEGRITY — no solo las desactivaciones en
+        # runtime. Antes esto no se surfaceaba y el reporte podía decir
+        # "todo bien" sobre un módulo desconectado.
+        critical_inactive_at_init = sorted(
+            s.name for s in self.module_snapshots
+            if s.name in CRITICAL_MODULES and not s.active
+        )
+        warning = None
+        if critical_degraded or critical_inactive_at_init:
+            parts = []
+            if critical_degraded:
+                parts.append(f"deactivated during runtime {critical_degraded}")
+            if critical_inactive_at_init:
+                parts.append(f"inactive/not-wired at init {critical_inactive_at_init}")
+            warning = (
+                "ANALYSIS IN DEGRADED MODE: critical modules "
+                + "; ".join(parts)
+                + ". Verdict may be affected."
+            )
         return {
-            "integrity_level":             self.integrity_level.value,
-            "session_id":                  self.session_id,
-            "config_fingerprint":          self.config_fingerprint,
-            "init_seal":                   self.init_seal,
-            "degradation_events_count":    len(self.degradation_events),
-            "critical_modules_degraded":   critical_degraded,
-            "analyst_warning": (
-                f"ANALYSIS IN DEGRADED MODE: modules "
-                f"{critical_degraded} were deactivated during runtime. "
-                f"Verdict may be affected."
-                if critical_degraded else None
-            ),
+            "integrity_level":                self.integrity_level.value,
+            "session_id":                     self.session_id,
+            "config_fingerprint":             self.config_fingerprint,
+            "init_seal":                      self.init_seal,
+            "degradation_events_count":       len(self.degradation_events),
+            "critical_modules_degraded":      critical_degraded,
+            "critical_modules_inactive_at_init": critical_inactive_at_init,
+            "analyst_warning":                warning,
         }
 
 
@@ -143,9 +174,24 @@ class ConfigAuditMonitor:
         val = os.environ.get(key, str(default)).lower()
         return val in ("true", "1", "yes", "enabled", "on")
 
+    @staticmethod
+    def _module_active(module: str, env_var: str) -> bool:
+        """B-124: truthful active-state. A module with no live wiring is
+        inactive regardless of its env var — the env default must not
+        manufacture an "active" signal for a module nothing can reach."""
+        if module in _UNWIRED_MODULES:
+            return False
+        return ConfigAuditMonitor._getenv_bool(env_var, True)
+
     def _read_states(self) -> dict[str, str]:
+        # Unwired modules report NOT_WIRED (not NOT_SET): the env var is not
+        # merely unset, it gates nothing — the snapshot stays self-consistent
+        # with active=False rather than implying "unset ⇒ active by default".
         return {
-            module: os.environ.get(env_var, "NOT_SET")
+            module: (
+                "NOT_WIRED" if module in _UNWIRED_MODULES
+                else os.environ.get(env_var, "NOT_SET")
+            )
             for module, env_var in _MODULE_ENV_MAP.items()
         }
 
@@ -166,11 +212,15 @@ class ConfigAuditMonitor:
             if not env_var:
                 continue
             val = states.get(module, "NOT_SET")
-            # Default para módulos críticos es True — desactivar es degradar
-            if not self._getenv_bool(env_var, True):
-                reasons.append(
-                    f"{module} DISABLED — {env_var}={val}"
-                )
+            # Default para módulos críticos es True — desactivar es degradar.
+            # _module_active devuelve False para módulos NOT_WIRED (B-124),
+            # de modo que un crítico huérfano degrada la integridad en vez de
+            # reportarse "active" por el default de una env_var que nadie lee.
+            if not self._module_active(module, env_var):
+                if module in _UNWIRED_MODULES:
+                    reasons.append(f"{module} NOT WIRED — no live path (env {env_var} gates nothing)")
+                else:
+                    reasons.append(f"{module} DISABLED — {env_var}={val}")
         return len(reasons) > 0, reasons
 
     # ── API pública ───────────────────────────────────────────────────────────
@@ -193,7 +243,7 @@ class ConfigAuditMonitor:
         snapshots = [
             ModuleSnapshot(
                 name=module,
-                active=self._getenv_bool(_MODULE_ENV_MAP[module], True),
+                active=self._module_active(module, _MODULE_ENV_MAP[module]),
                 env_var=_MODULE_ENV_MAP[module],
                 env_value=val,
                 timestamp=now,
@@ -283,5 +333,16 @@ class ConfigAuditMonitor:
             raise RuntimeError("Monitor not initialized")
         self.checkpoint()
         if not self._trail.degradation_events:
-            self._trail.integrity_level = SystemIntegrityLevel.FULL
+            # B-124: no reponer FULL si un módulo crítico está inactivo ya en
+            # el snapshot inicial (NOT_WIRED o env-disabled). El reset a FULL
+            # solo aplica cuando el arranque estaba íntegro y no hubo eventos
+            # de runtime — de lo contrario borraría el DEGRADED honesto de init.
+            critical_inactive_at_init = [
+                s.name for s in self._trail.module_snapshots
+                if s.name in CRITICAL_MODULES and not s.active
+            ]
+            self._trail.integrity_level = (
+                SystemIntegrityLevel.DEGRADED if critical_inactive_at_init
+                else SystemIntegrityLevel.FULL
+            )
         return self._trail

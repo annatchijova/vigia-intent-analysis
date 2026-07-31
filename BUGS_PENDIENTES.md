@@ -648,6 +648,35 @@ variable de entorno que nadie lee) antes de que el monitor pueda ser
 confiable. Verificado con test permanente:
 `tests/test_config_sentinel_orphaned_module_env_map.py`.
 
+### Update 2026-07-31 — `config_sentinel.py` ya no miente (sub-issue RESUELTO; el cluster sigue abierto)
+
+Aplicado el hardening honesto del `_MODULE_ENV_MAP` que el addendum anterior
+señalaba como prerequisito. `config_sentinel.py` ahora declara
+`_UNWIRED_MODULES = {OckhamAdversarial, SignalRouter}` — los dos críticos con
+cero *callers* de producción cuya env_var no gatea nada — y `_module_active()`
+los reporta `active=False` (env_value `NOT_WIRED`, no `NOT_SET`) en vez de
+"active por default". `initialize()`/`finalize()` sellan `DEGRADED_MODE` con
+`analyst_warning` que nombra los módulos ausentes, y `to_report_dict` expone
+`critical_modules_inactive_at_init`. `CAIE` y `TrustFusion` (gates reales, 5 y
+4 lectores) siguen `active=True`; la detección de desactivación en runtime
+(p.ej. `VIGIA_CAIE_ENABLED=false`) sigue funcionando. Corregido además el bug
+de `finalize()` que reponía `FULL` cuando no había eventos de runtime (habría
+deshecho el DEGRADED honesto de init).
+
+Elegido como primer paso del cluster por disciplina: es el único miembro que
+es una mejora de correctitud HOY (un reporte de integridad sellado que dice
+"todo bien" sobre módulos rotos es un pasivo Daubert peor que su ausencia,
+§5.3) y es el instrumento que guiará el desbloqueo futuro — cuando se cablee
+Ockham/SignalRouter, se quita su nombre de `_UNWIRED_MODULES` en el mismo
+commit y el monitor vuelve a `FULL` solo. El test de caracterización
+`tests/test_config_sentinel_orphaned_module_env_map.py` (que fijaba la mentira
+como tripwire) se convirtió en guarda de la honestidad (5 tests). Cero callers
+de `config_sentinel` → cero veredictos sellados cambian. Suite completa: 2000
+passed. **El cluster B-124 sigue ABIERTO**: los otros 5 módulos
+(`ockham_adversarial`, `dissent_report`, `narrative_auditor`,
+`peirceplanner_bounded`, `advanced_signal_router`) permanecen sin cablear por
+la misma cadena de productores huérfanos.
+
 ---
 
 ## B-129 — PeircePlanner bounded: Fase 1 observation adapter [PENDIENTE Fase 2]
