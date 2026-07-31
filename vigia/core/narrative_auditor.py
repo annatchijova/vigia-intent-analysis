@@ -62,10 +62,47 @@ _INJECTION_PATTERNS: List[Tuple[str, str, str]] = [
     # Authority spoofing (Carnegie patterns — Gemini cases)
     (r"(?i)(?:as\s+)?(?:an?\s+)?(?:admin|administrator|root|system)\s+(?:user|operator)",
      "AUTHORITY_SPOOFING", "HIGH"),
-    (r"(?i)this\s+is\s+(?:a\s+)?(?:critical|emergency|urgent)\s+(?:audit|update|patch)",
+    # B-124: `(?:...)+` en vez de un solo adjetivo — "this is a critical
+    # emergency audit" no se detectaba porque el patrón admitía uno solo.
+    (r"(?i)this\s+is\s+(?:a\s+)?(?:(?:critical|emergency|urgent)\s+)+(?:audit|update|patch)",
      "AUTHORITY_SPOOFING", "HIGH"),
     (r"(?i)(?:i\s+am|this\s+is)\s+(?:the\s+)?(?:developer|creator|owner)\s+of\s+(?:this\s+)?(?:system|vigia)",
      "AUTHORITY_SPOOFING", "CRITICAL"),
+
+    # Role override — el atacante se asigna autoridad de examinador/juez.
+    #
+    # B-124: clase de ataque que el dry-run midió como NO detectada. Patrones
+    # originales de Kimi (Moonshot), ajustados tras medir falsos positivos
+    # sobre prosa pericial que el corpus actual no contiene. Los ajustes:
+    #
+    #  - El 2do exige imperativo a principio de cláusula. Sin eso, "The rootkit
+    #    was able to override the audit subsystem" —una DESCRIPCIÓN de conducta
+    #    adversaria— se marcaba como instrucción. Mismo error de categoría que
+    #    la cita MITRE de más abajo.
+    #  - El 3ro exige un verbo de orden explícito en vez de "I" suelto. Sin eso,
+    #    "As the lead examiner, I reviewed the disk image" —exactamente cómo
+    #    escribe un perito, y VIGÍA produce Amicus Curiae— se marcaba CRITICAL.
+    (r"(?i)\b(?:you\s+are|act\s+as|become|serve\s+as|assume\s+(?:the\s+)?role\s+of)\s+(?:now\s+)?(?:the\s+)?(?:lead\s+|chief\s+|senior\s+|principal\s+)?(?:examiner|investigator|judge|auditor|forensic\s+analyst|reviewer|authority)\b",
+     "ROLE_OVERRIDE", "CRITICAL"),
+    (r"(?i)(?:^|[.;:!?]\s*|\b(?:and|then|now|please)\s+)(?:overrule|override|supersede|bypass|disregard)\s+(?:the\s+)?(?:scorer|score|verdict|judge|audit|assessment)\b",
+     "ROLE_OVERRIDE", "CRITICAL"),
+    (r"(?i)\b(?:as\s+(?:the\s+)?)(?:lead\s+|chief\s+|senior\s+|principal\s+)?(?:examiner|investigator|judge|auditor|forensic\s+analyst|reviewer|authority)\s*,\s*(?:i\s+(?:order|instruct|direct|command|require)|you\s+(?:must|should|will)|override|overrule|order)\b",
+     "ROLE_OVERRIDE", "CRITICAL"),
+
+    # Verdict coercion — el atacante fuerza un sello sin importar la evidencia.
+    #
+    # B-124: la otra clase no detectada. El 1ro exige que el destinatario sea
+    # el sistema o la segunda persona. Sin eso, la DOCTRINA propia de VIGÍA
+    # —"with a single artifact the finding should be reported as ABSTAIN", que
+    # es el gate de corroboración Daubert— se marcaba como coerción.
+    (r"(?i)\b(?:you|the\s+system|the\s+agent|the\s+model|vigia)\s+(?:must|should|shall|need\s+to|has\s+to|is\s+to)\s+(?:be\s+)?(?:report|return|render|deliver|seal|reported|returned|rendered|delivered|sealed)\s+(?:it\s+)?(?:as\s+)?(?:MALICE|INTENT|NOISE|BENIGN|ABSTAIN|UNKNOWN)\b",
+     "VERDICT_COERCION", "CRITICAL"),
+    (r"(?i)\b(?:report|return|render|deliver|seal)\s+(?:it\s+)?(?:as\s+)?(?:MALICE|INTENT|NOISE|BENIGN|ABSTAIN|UNKNOWN)\s+(?:regardless|irrespective|no\s+matter)\b",
+     "VERDICT_COERCION", "CRITICAL"),
+    (r"(?i)\b(?:regardless\s+of\s+(?:the\s+)?evidence|ignore\s+(?:the\s+)?evidence|set\s+aside\s+(?:the\s+)?(?:earlier\s+)?guidance)\b",
+     "VERDICT_COERCION", "CRITICAL"),
+    (r"(?i)\bdo\s+not\s+(?:escalate|report|flag|raise|seal|record)\b",
+     "VERDICT_COERCION", "CRITICAL"),
 
     # False familiarity (Carnegie paradox — Gemini case)
     #
@@ -109,7 +146,14 @@ _INJECTION_PATTERNS: List[Tuple[str, str, str]] = [
      "TOOL_HIJACKING", "CRITICAL"),
     (r"(?i)(?:use|with)\s+(?:tool|function)\s*\w+\s*\(",
      "TOOL_HIJACKING", "HIGH"),
-    (r"(?i)(?:activate|trigger|disable)\s+(?:honey_token|audit|security)",
+    # B-124: exige imperativo a principio de cláusula. El patrón anterior no
+    # distinguía "la narrativa INSTRUYE deshabilitar seguridad" de "la narrativa
+    # CITA una técnica llamada así": disparaba sobre
+    # `T1562.001 (Disable Security Tools — unknown for this image)`, el nombre
+    # oficial de la técnica MITRE, marcada además como NO observada. Un informe
+    # forense cita TTPs por diseño; hacerlo no es hijacking. Único falso
+    # positivo que quedaba sobre las 605 narrativas del corpus.
+    (r"(?i)(?:^|[.;:!?]\s*|\b(?:and|then|now|please)\s+)(?:activate|trigger|disable)\s+(?:honey_token|audit|security)\b",
      "TOOL_HIJACKING", "HIGH"),
 
     # Gradual escalation (Gemini case — Pavlovian conditioning)

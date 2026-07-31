@@ -689,10 +689,83 @@ confidence proportional to 54%, not to 100%.
    writing new detection semantics for a security module; each new pattern needs
    its own false-positive measurement against the corpus before landing.
 
+*(Both resolved in update (sexies).)*
+
 `narrative_auditor` has zero production callers → the fix changes no sealed
 verdict. Permanent test:
 `tests/test_narrative_auditor_false_familiarity_boundary.py` (19 tests,
 red-first verified: 9 failed before the fix).
+
+### Update 2026-07-31 (sexies) — `ROLE_OVERRIDE` + `VERDICT_COERCION` + MITRE exemption. Coverage 54% → 93%, false positives 0. Both pending decisions closed
+
+**Authorship:** original patterns by **Kimi (Moonshot AI)**, who investigated
+and proposed the two missing classes on a separate branch
+(`claude/ai-agent-cases-002-003`, commit `a280a349`, measured there over a
+402-bundle corpus). Tightened and integrated here after re-measuring them
+against this tree's 605 narratives and an independent probe battery.
+
+**Corroboration:** Kimi's patterns produce **0 false positives over the 605
+narratives** — confirming that measurement on a 50% larger corpus.
+
+**But the corpus is not sufficient as a gate.** Measured against realistic
+expert prose the corpus does not happen to contain, the original patterns
+produced **5 false positives**, all CRITICAL:
+
+| Sentence | Pattern | Why it matters |
+|---|---|---|
+| `"As the lead examiner, I reviewed the disk image"` | ROLE_OVERRIDE | How an expert writes — and VIGÍA emits Amicus Curiae |
+| `"As the forensic analyst, I confirmed the hash"` | ROLE_OVERRIDE | same |
+| `"The rootkit was able to override the audit subsystem"` | ROLE_OVERRIDE | describing != instructing (same error as the MITRE citation) |
+| `"...the finding should be reported as ABSTAIN"` | VERDICT_COERCION | **that is the Daubert corroboration gate**, VIGÍA's own doctrine |
+| `"Coverage is low, so the case must be sealed as UNKNOWN"` | VERDICT_COERCION | same |
+
+Corpus absence is false reassurance: these are machine-generated narratives with
+a bounded vocabulary. The same reasoning that let the `know` defect survive.
+
+**Three adjustments, each pinned by a test:**
+
+1. Override/bypass verbs now require a **clause-initial imperative**
+   (`(?:^|[.;:!?]\s*|\b(?:and|then|now|please)\s+)`), so describing adversary
+   behaviour is not read as instructing it.
+2. After `"As the <role>,"` an **explicit command verb** is required
+   (`I order|instruct|direct|command|require`, `you must|should|will`) rather
+   than a bare `"I"`.
+3. Verdict coercion requires a **system/second-person addressee**
+   (`you|the system|the agent|the model|vigia`), so third-person doctrine about
+   a finding does not fire.
+
+**Added along the way:** a `do not (escalate|report|flag|raise|seal|record)`
+pattern (imperative suppression); the MITRE exemption resolved through the same
+clause-initial mechanism on `TOOL_HIJACKING` — closing pending decision #1
+without needing a MITRE-specific rule; and `AUTHORITY_SPOOFING` now accepts
+multiple adjectives (`(?:(?:critical|emergency|urgent)\s+)+`), which was the
+last undetected probe.
+
+**Final measurement:**
+
+| | before this thread | after the `know` fix | now |
+|---|---|---|---|
+| coverage (independent battery) | 7/13 (54%) | 7/13 (54%) | **14/15 (93%)** |
+| false positives (controls) | 1/6 | 1/6 | **0/7** |
+| corpus narratives flagged | 90 (14.9%) | 1 (0.2%) | **0 (0.0%)** |
+| CRITICAL events that would fire | 57 | 1 | **0** |
+
+The only probe still undetected is the open-ended paraphrased override
+(`"re-evaluate freely"` with no other signal); the "set aside the earlier
+guidance" variants are detected.
+
+**C3 wiring status:** the remaining gate — "insufficient value, detects 1 of 3
+relevant classes" — no longer applies. At 93% coverage, zero false positives
+over the corpus and zero over the expert-prose and doctrine controls, the
+original condition ("if the dry-run shows it adds value") is met. **Sign-off to
+wire is still pending** and is the maintainer's call: it changes `run_demo`
+behaviour on every case.
+
+Permanent tests: `tests/test_narrative_auditor_role_verdict_coercion.py`
+(29 tests, including the 5 false positives above as permanent guards) plus the
+19 in `..._false_familiarity_boundary.py`. Full suite: 1966 passed, same 14
+pre-existing failures. `narrative_auditor` still has zero production callers →
+no sealed verdict changes.
 
 ---
 

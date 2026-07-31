@@ -960,10 +960,84 @@ daría una tranquilidad proporcional al 54%, no al 100%.
    necesita su propia medición de falsos positivos contra el corpus antes de
    entrar.
 
+*(Ambas resueltas en el update (sexies).)*
+
 `narrative_auditor` tiene cero *callers* de producción → el fix no cambia ningún
 veredicto sellado. Test permanente:
 `tests/test_narrative_auditor_false_familiarity_boundary.py` (19 tests,
 rojo-primero verificado: 9 fallaban antes del fix).
+
+### Update 2026-07-31 (sexies) — `ROLE_OVERRIDE` + `VERDICT_COERCION` + exención MITRE. Cobertura 54% → 93%, falsos positivos 0. Cerradas las dos decisiones pendientes
+
+**Autoría:** patrones originales de **Kimi (Moonshot AI)**, que investigó y
+propuso las dos clases faltantes en una rama separada
+(`claude/ai-agent-cases-002-003`, commit `a280a349`, medidos allí sobre un
+corpus de 402 bundles). Ajustados e integrados acá tras re-medirlos contra las
+605 narrativas de este árbol y contra una batería independiente.
+
+**Corroboración:** los patrones de Kimi dan **0 falsos positivos sobre las 605
+narrativas** — confirma su medición, sobre un corpus 50% más grande.
+
+**Pero el corpus no alcanza como gate.** Medidos contra prosa pericial realista
+que este corpus no contiene, los patrones originales producían **5 falsos
+positivos**, todos CRITICAL:
+
+| Frase | Patrón | Por qué importa |
+|---|---|---|
+| `"As the lead examiner, I reviewed the disk image"` | ROLE_OVERRIDE | Así escribe un perito — y VIGÍA emite Amicus Curiae |
+| `"As the forensic analyst, I confirmed the hash"` | ROLE_OVERRIDE | ídem |
+| `"The rootkit was able to override the audit subsystem"` | ROLE_OVERRIDE | describir ≠ instruir (mismo error que la cita MITRE) |
+| `"...the finding should be reported as ABSTAIN"` | VERDICT_COERCION | **es el gate de corroboración Daubert**, doctrina propia de VIGÍA |
+| `"Coverage is low, so the case must be sealed as UNKNOWN"` | VERDICT_COERCION | ídem |
+
+La ausencia en el corpus es tranquilidad falsa: son narrativas generadas por
+máquina con vocabulario acotado. El mismo razonamiento que dejó pasar el
+defecto de `know`.
+
+**Tres ajustes, cada uno fijado por un test:**
+
+1. Los verbos de override/bypass exigen **imperativo a principio de cláusula**
+   (`(?:^|[.;:!?]\s*|\b(?:and|then|now|please)\s+)`), de modo que describir
+   conducta adversaria no se lee como instruirla.
+2. Tras `"As the <rol>,"` se exige un **verbo de orden explícito**
+   (`I order|instruct|direct|command|require`, `you must|should|will`) en vez
+   de `"I"` suelto.
+3. La coerción de veredicto exige **destinatario sistema/segunda persona**
+   (`you|the system|the agent|the model|vigia`), de modo que la doctrina en
+   tercera persona sobre un hallazgo no dispara.
+
+**Añadidos en el camino:** patrón `do not (escalate|report|flag|raise|seal|
+record)` (supresión imperativa); exención MITRE resuelta con el mismo mecanismo
+de imperativo a principio de cláusula sobre `TOOL_HIJACKING` — cierra la
+decisión pendiente nº1 sin necesidad de una regla ad-hoc para MITRE; y
+`AUTHORITY_SPOOFING` ahora admite varios adjetivos (`(?:(?:critical|emergency|
+urgent)\s+)+`), que era la última sonda no detectada.
+
+**Medición final:**
+
+| | antes del hilo | tras el fix de `know` | ahora |
+|---|---|---|---|
+| cobertura (batería independiente) | 7/13 (54%) | 7/13 (54%) | **14/15 (93%)** |
+| falsos positivos (controles) | 1/6 | 1/6 | **0/7** |
+| narrativas marcadas del corpus | 90 (14.9%) | 1 (0.2%) | **0 (0.0%)** |
+| eventos CRITICAL que se emitirían | 57 | 1 | **0** |
+
+La única sonda que sigue sin detectarse es el override parafraseado abierto
+(`"re-evaluate freely"` sin ninguna otra señal); las variantes con "set aside
+the earlier guidance" sí se detectan.
+
+**Estado del cableado de C3:** el gate que quedaba —"valor insuficiente,
+detecta 1 de 3 clases relevantes"— ya no aplica. Con 93% de cobertura, cero
+falsos positivos sobre el corpus y cero sobre los controles de prosa pericial y
+doctrina, la condición original ("si el dry-run demuestra que aporta valor")
+se cumple. **Queda pendiente el sign-off para cablear**, que es decisión del
+mantenedor: es un cambio de comportamiento de `run_demo` en todos los casos.
+
+Tests permanentes: `tests/test_narrative_auditor_role_verdict_coercion.py`
+(29 tests, incluidos los 5 falsos positivos de arriba como guardas permanentes)
++ los 19 de `..._false_familiarity_boundary.py`. Suite completa: 1966 passed,
+mismas 14 fallas preexistentes. `narrative_auditor` sigue con cero *callers* de
+producción → cero veredictos sellados cambian.
 
 ---
 
