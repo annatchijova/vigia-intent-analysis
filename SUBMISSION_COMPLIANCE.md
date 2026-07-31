@@ -98,12 +98,12 @@ export VIGIA_EVIDENCE_DIR="/path/to/evidence"
 #   "mcpServers": {
 #     "vigia_sift": {
 #       "command": "python3",
-#       "args": ["/path/to/vigia-intent-analysis/vigia_sift_bridge_final.py"]
+#       "args": ["/path/to/vigia-intent-analysis/vigia/vigia_sift_bridge.py"]
 #     }
 #   }
 # }
 
-python3 vigia_sift_bridge_final.py   # Terminal 1
+python3 vigia/vigia_sift_bridge.py   # Terminal 1
 claude                                 # Terminal 2
 ```
 
@@ -111,7 +111,9 @@ claude                                 # Terminal 2
 
 ```bash
 ollama pull llama3.1
-python3 vigia_sift_bridge_final.py --backend ollama --model llama3.1
+export VIGIA_LLM_BACKEND=ollama
+export VIGIA_OLLAMA_MODEL=llama3.1
+python3 vigia/vigia_sift_bridge.py
 ```
 
 ### Option D: CLI (no LLM required — deterministic core only)
@@ -143,12 +145,12 @@ eliminate the **semiotic fractures** produced by deliberate fabrication. VIGÍA 
 
 ### Key Technical Features
 
-**21 MCP forensic tools** organized in two phases:
+**22 MCP forensic tools** organized in two phases:
 
 *Phase 1 — Chain of Custody (9 tools):* forensic image mounting, SHA-256 hash chain,
 single-pass evidence I/O, filesystem perimeter, entropy calculation, image metadata audit.
 
-*Phase 2 — Intentionality Analysis (12 tools):* stylometry, human entropy / jitter,
+*Phase 2 — Intentionality Analysis (13 tools):* stylometry, human entropy / jitter,
 habit incongruence (memory vs. logs), intent inference, Grice maxim auditing,
 Eco overinterpretation detection, honey token activation, LLM abductive reasoning,
 self-correction via Peircean fallacy check.
@@ -225,7 +227,7 @@ screenshots/selfcorection.png               ← Self-correction sequence
                          ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    VIGÍA MCP SERVER                             │
-│              (vigia_sift_bridge_final.py)                       │
+│              (vigia_sift_bridge.py)                             │
 │                                                                 │
 │  LAYER 0: ebs_v1.py         — Data contracts (immutable)        │
 │  LAYER 1: SIFT tool outputs — Memory/Registry/Network/Disk      │
@@ -237,7 +239,7 @@ screenshots/selfcorection.png               ← Self-correction sequence
 │                                                                 │
 │  CAIE: CrossArtifactIncongruenceEngine                          │
 │  EBS v1: Evidence Bundle Synthesizer                            │
-│  SIFT BRIDGE: 21 MCP tools (Phase 1: CoC + Phase 2: IoI)        │
+│  SIFT BRIDGE: 22 MCP tools (Phase 1: CoC + Phase 2: IoI)        │
 └────────────────────────┬────────────────────────────────────────┘
                          │  Sealed ForensicBundle (JSON + SHA-256)
                          ▼

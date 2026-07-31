@@ -201,10 +201,11 @@ class TrustFusionEngine:
         self._artifacts: dict[str, TemporalArtifact] = {}
         self._temporal_index: list = []
         self._timestamps: list = []
-        # B-220: la clave incluye custom_window — dos llamados al mismo
-        # artifact_id con ventanas temporales distintas producen vecindades
-        # distintas y no deben compartir entrada de caché.
-        self._bayesian_cache: dict[tuple, BayesianTrustUpdate] = {}
+        # B-220 fix: keyed by (artifact_id, custom_window), not artifact_id
+        # alone -- a bare artifact_id key ignored custom_window entirely, so
+        # a second bayesian_update() call with a different window silently
+        # returned whatever was cached from the first call's window.
+        self._bayesian_cache: dict[tuple[str, timedelta | None], BayesianTrustUpdate] = {}
 
     def add_artifact(self, artifact: TemporalArtifact) -> bool:
         if artifact.artifact_id in self._artifacts:

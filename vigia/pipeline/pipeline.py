@@ -11,7 +11,7 @@ ARQUITECTURA COMPLETA — CAPAS ESTANCAS (Zero-Trust):
         └─ likelihood_engine.py      — KDE + Ledoit-Wolf
         └─ graph_stability.py        — Bootstrap stability selection
     CAPA 3: governance/              — Gobernanza y riesgo
-        └─ risk_bounded_layer.py     — r=(1-P)·(1+λD)·(1+γ(1-S))
+        └─ risk_bounded_layer.py     — r=P·(1+λD)·(1+γ(1-S))
     CAPA 4: audit/ + action/         — Auditoría y acción controlada
         └─ audit_action.py           — Diff / Optimizer / PolicyEngine / Executor
     CAPA 5: forensics/               — Verificación independiente
@@ -370,6 +370,24 @@ class VigiaPipeline:
         """
         Pipeline soberano — Integración Segundidad + Terceridad.
 
+        B-214 (footgun de arquitectura, no incorrección): este método NO corre
+        el gate de integridad de normalización que sí aplica `vigia_agent.py`
+        (Mode 1, el agente completo) antes de sellar. Un caso cuyos metadatos
+        fueron coercionados en el intake (p.ej. un campo `significance` con
+        caracteres perdidos) puede dropear silenciosamente una aserción que
+        participa del scoring — `vigia_agent.py` detecta esto y degrada a
+        ABSTAIN con razón NORMALIZATION_INTEGRITY_LOSS; `run_full` puntúa el
+        caso igual, sin advertencia. Confirmado con dos casos reales
+        (OWL-NEXUS5, VIGIA-OWL-2019-COMPLETE): `run_full` devuelve
+        `decision=REJECT, posterior=1.0`; `vigia_agent.py` sobre el mismo JSON
+        devuelve ABSTAIN.
+
+        Si estás sellando un veredicto autoritativo (no solo explorando o
+        prototipando), no llames a `run_full` directamente — usá
+        `vigia_agent.py`, que sí corre el gate. Este método es un API de
+        puntuación cruda de bajo nivel, sin las garantías de degradación
+        honesta del agente completo.
+
         FLUJO (Doctrina China/Israel):
             [Pre-filtro]  VisibleVariablesEngine filtra señales por fase detectada
                           → Lazy Abstraction: solo variables visibles para la fase
@@ -391,7 +409,10 @@ class VigiaPipeline:
                           → ABSTAIN por Disonancia Semántica (reason_code=ABSTAIN_INTENTION)
 
             [Gobernanza]  RiskBoundedDecisionLayer con factor ω(1-I)
-                          → r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))
+                          → r = P·(1+λD)·(1+γ(1-S))·(1+ω(1-I))
+                          (B-117, 2026-07-14: la fórmula usaba (1-P), lo que
+                          invertía los veredictos — ver risk_bounded_layer.py
+                          para la derivación completa del fix)
 
             [Sellado]     ForensicBundle con AbductiveResult + LikelihoodResult
                           bajo el mismo bundle_hash — admisibilidad Daubert
@@ -764,6 +785,13 @@ class VigiaPipeline:
                 self._adaptive_policy.gamma_t
                 if self._adaptive_policy else self._risk_layer._gamma
             ),
+            # B-218 fix: seal the layer's/policy's actual epsilon_accept and
+            # epsilon_reject directly (same pattern as lambda_drift/
+            # gamma_stability above), instead of deriving both from the
+            # single decision_trace.epsilon_used -- that collapsed two
+            # possibly-distinct thresholds into whichever one the verdict
+            # happened to use, misrepresenting the other in the sealed
+            # SystemState whenever a PolicySpec sets them asymmetrically.
             epsilon_accept=(
                 self._adaptive_policy.epsilon_accept
                 if self._adaptive_policy else self._risk_layer._eps_accept

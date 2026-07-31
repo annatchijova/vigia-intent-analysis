@@ -5645,6 +5645,56 @@ and docstring guard citing this bug.
 - `scripts/pre_release_check.py` BANNED_FILENAMES corrected (v1 is canonical,
   not deprecated).
 
+### Update 2026-07-26 — la fórmula vieja `(1-P)·(...)` había sobrevivido en 8
+lugares además del código, incluyendo dos que generan output real
+
+Mientras se resolvía B-214, se encontró que el fix del código (v1, arriba)
+nunca se propagó a los comentarios, docstrings y generadores de narrativa
+que citan la misma fórmula. Barrido completo (`grep` en todo el repo,
+excluyendo el corpus académico generado) encontró la fórmula pre-B-117
+invertida en 8 lugares vivos:
+
+`vigia/pipeline/pipeline.py` (dos docstrings distintos: el header del
+módulo y `run_full()`), `vigia/models/ebs.py`, `VIGIA_ESTADO_TECNICO_ES.md`
+y su espejo en `docs/`, `docs/VIGIA_TECHNICAL_STATE_EN.md`,
+`docs/vigia_paper_methodology.md` (el diagrama de capas Y la explicación en
+prosa, que además tenía el *significado* invertido: "r = 0 cuando P = 1,
+fabricación cierta" es exactamente el bug de decisión invertida que B-117
+corrigió, descripto ahí como si fuera el diseño intencional),
+`docs/vigia-real-006_execution_summary.md` (un walkthrough cuya propia
+aritmética mostrada, `r=0.1734`, ya contradecía su propio chequeo de umbral
+mostrado — "REJECT > 0.35? No" — Y la decisión final declarada — "REJECT" —;
+corregido recalculando con la fórmula real, lo que además resuelve esa
+contradicción interna), y `forensics/evidence_narrative_gen.py` (una
+etiqueta de narrativa mostrada junto al risk score REAL, correctamente
+calculado — un perito leyendo la narrativa generada e intentando reproducir
+el número a mano usando la fórmula indicada habría obtenido el resultado
+equivocado).
+
+**Un caso NO se corrigió, deliberadamente:**
+`vigia/scripts/generate_execution_log.py:227` pasa esta misma fórmula
+(más valores placeholder D/S/I fabricados: `"D": 0.1` hardcodeado, `S`/`I`
+derivados con fórmulas ad-hoc que no corresponden a ningún cálculo real)
+a una entrada de log `RISK_CALCULATION` — pero el script en realidad llama a
+`vigia.core.decision_layer.decide()` (línea 142), un motor de decisión
+completamente distinto, basado en umbrales de MI, que no calcula D, S, ni I
+en absoluto. No es un signo invertido: es un formato de log diseñado para un
+subsistema (`risk_bounded_layer.py`) reutilizado para describir otro
+completamente distinto (`decision_layer.py`), con datos fabricados en los
+campos que no aplican — un problema más profundo de integridad de audit
+trail (el script genera "Agent Execution Logs... para los entregables
+SANS" según su propio docstring), no un simple string desactualizado. Este
+script SÍ procesa casos reales (no es un generador sintético/demo). Queda
+documentado en detalle, sin fix, en `tests/test_b117_stale_formula_sweep.py`
+y pendiente de investigación propia.
+
+Test permanente: `tests/test_b117_stale_formula_sweep.py` — barre todo el
+repo buscando la fórmula invertida y falla si reaparece en cualquier lugar
+no cubierto por una excepción documentada y justificada explícitamente.
+Suite completa: 2008 passed, 191 skipped, 29 xfailed — cero regresiones
+(todos los cambios son comentarios/docstrings/prosa, ninguna lógica
+tocada).
+
 ---
 
 ## B-118 — `vigia/core/signal_contract.py` name collision caused BUG-EML-001 — file deleted
@@ -9924,144 +9974,6 @@ silenciosamente — documentando el modo de falla que causó esto — y el
 default de `VIGIA_STRICT_MODEL_CHECK` es `true` cuando la variable no está
 seteada).
 
----
-
-## B-216 — `tests/run_vigia_case.py` crashea al formatear `severity` None de un `caie_fracture` con `:.2f` [RESUELTO — Claude 2026-07-31]
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | P3 (runner de display/demo, no el path sellado): `TypeError: unsupported format string passed to NoneType.__format__` al imprimir las fracturas CAIE de cualquier caso cuyas `caie_fractures` no traigan el campo `severity` (traen `type`/`description`). No afectaba el veredicto ni el bundle. |
-| **Archivo** | `tests/run_vigia_case.py` (línea 162). |
-| **Modo** | Solo el runner de display `tests/run_vigia_case.py` (usado por `scripts/run_vigia_full.py` como primera etapa). |
-| **Detectado por** | Corrida de `run_vigia_full.py` sobre `VIGIA-OWL-2019-COMPLETE.json`; reproducido también sobre el `OWL-NEXUS5-CASE.json` original (bug preexistente, no del caso). |
-
-### Fix aplicado
-
-Confirmado en el archivo vivo antes de tocarlo (línea 162 idéntica a la citada
-en el reporte original). Reemplazado el `f"...severity={f.get('severity'):.2f}"`
-por un guard explícito: `severity_str = f"{severity:.2f}" if severity is not
-None else "n/a"`, y `fracture_type = f.get('fracture_type', f.get('type', '?'))`
-para tolerar el schema `type`/`description` que usan los casos reales (el fix
-propuesto originalmente en BUGS_PENDIENTES.md, aplicado tal cual).
-
-Verificado con dry-run sobre ambos casos:
-- `data/cases/OWL-NEXUS5-CASE.json` (fracturas sin `severity`, schema
-  `type`/`description`): ya no crashea, renderiza `severity=n/a` y usa
-  `type` como `fracture_type`. Bundle sella correctamente (H4 EBS verify
-  PASS).
-- `data/cases/case_003_false_flag.json` (fractura con `severity=0.85`
-  numérico): sin regresión, sigue mostrando `severity=0.85`.
-
-Sin test unitario dedicado — es un runner de demo/display fuera del path
-sellado; el dry-run sobre los dos casos reales cubre ambas ramas del fix.
-
----
-
-## B-218 — El bundle sella `epsilon_used = epsilon_accept` incluso cuando el veredicto fue REJECT por `epsilon_reject`: el ε que queda registrado no es el que decidió [RESUELTO — Claude 2026-07-31]
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | P2, con precondición dormida (ver más abajo). Origen: auditoría "Ronda 2", hallazgo F2. |
-| **Archivos** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`, línea 578); `vigia/pipeline/pipeline.py` (líneas 730-731, bloque "SELLADO CONJUNTO"). |
-| **Detectado en** | Auditoría "Ronda 2", inducción ejecutada y re-verificada contra el archivo vivo en la sesión que lo documentó (2026-07-25). |
-
-### Descripción
-
-`decide()` construía la `DecisionTrace` con `epsilon_used=self._eps_accept`
-sin condicionar por el veredicto. Cuando el veredicto era REJECT, el umbral
-que efectivamente decidió fue `epsilon_reject` (la regla es
-`REJECT si r >= 1 - epsilon_reject`), no `epsilon_accept` — pero el campo
-sellado en el *trace* (y de ahí en el bundle, vía `pipeline.py:730-731`, que
-copiaba ese mismo valor a **ambos** `epsilon_accept` y `epsilon_reject` del
-`SystemState`) siempre reportaba `epsilon_accept`.
-
-**Precondición honesta (por qué era P2 y no P1):**
-`SelfAdaptiveRiskPolicy.update_from_window` fuerza
-`epsilon_accept = epsilon_reject` en cada actualización — la configuración
-adaptativa que usa el pipeline por defecto. El bug solo mordía si un
-`PolicySpec` definía `epsilon_accept != epsilon_reject` explícitamente (camino
-que `RiskBoundedDecisionLayer.from_policy_spec()` soporta sin restricción, por
-ejemplo con `adaptive_policy=False`).
-
-### Fix aplicado
-
-Confirmado en el archivo vivo antes de tocarlo (ambos anclajes citados en el
-reporte original, idénticos). Dos cambios:
-
-1. `risk_bounded_layer.py:578` — `epsilon_used` ahora se sella condicionado
-   por el veredicto: `self._eps_reject if verdict == "REJECT" else
-   self._eps_accept` (el fix propuesto originalmente en BUGS_PENDIENTES.md,
-   aplicado tal cual).
-2. `pipeline.py:730-731` — en vez de copiar el único `decision_trace.epsilon_used`
-   a ambos campos de `SystemState`, cada campo se llena de forma independiente
-   desde la fuente real (`self._adaptive_policy.epsilon_accept/epsilon_reject`
-   si hay política adaptativa, si no `self._risk_layer._eps_accept/_eps_reject`)
-   — mismo patrón ya usado dos líneas arriba para `lambda_drift`/`gamma_stability`.
-   Esto resuelve el bug de raíz para ambos campos simultáneamente, en vez de
-   depender de un único valor ambiguo del trace.
-
-Verificado empíricamente reproduciendo el escenario exacto del reporte original:
-
-```
-RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
-decide(posterior=0.70) → decision=REJECT, risk=0.7
-  epsilon_used (sellado) = 0.40   # antes: 0.05 (epsilon_accept, incorrecto)
-```
-
-Suite completa (`tests/ vigia/tests/ --ignore=tests/integration`): 1989
-passed, 0 failed (188 skipped, 29 xfailed — preexistentes, no relacionados).
-Test permanente agregado: `tests/test_b218_epsilon_used_verdict.py` (4 tests,
-rojo-primero contra el código sin el fix — `test_reject_seals_epsilon_reject`
-falla con `0.05 == 0.4` en el código original y pasa tras el fix; cubre
-ACCEPT, REJECT, ABSTAIN, y el sellado independiente de ambos umbrales en
-`VigiaPipeline` con `PolicySpec` asimétrico).
-
----
-
-## B-220 — La caché de `bayesian_update` está indexada solo por `artifact_id`: ignora `custom_window`, aunque el parámetro es parte de la firma pública [RESUELTO — Claude 2026-07-31]
-
-| Campo | Valor |
-|-------|-------|
-| **Severidad** | P3, latente (no había ningún *caller* usando el parámetro afectado). Origen: auditoría "Ronda 2", hallazgo F4. |
-| **Archivo** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`). |
-| **Detectado en** | Auditoría "Ronda 2" (2026-07-25), re-ejecutado contra el archivo vivo en esta sesión. |
-
-### Descripción
-
-`bayesian_update(artifact_id, custom_window=None)` usaba `custom_window` para
-calcular la vecindad temporal (`get_neighborhood`), pero la caché
-`self._bayesian_cache` estaba indexada solo por `artifact_id`. Un segundo
-llamado con ventana distinta devolvía el objeto cacheado del primer llamado
-sin recalcular — el resultado dependía del orden de llamadas, no de la ventana
-pedida. Latente hoy (ningún caller de producción pasa `custom_window`, todos
-usan el default `None`), pero el parámetro está documentado y expuesto vía MCP.
-
-### Fix aplicado
-
-Confirmado en el archivo vivo antes de tocarlo (clave de caché `artifact_id`
-sola, como citaba el reporte). Se adoptó la primera opción propuesta: clave de
-caché `(artifact_id, custom_window)`. `custom_window` es `timedelta` o `None`,
-ambos hashables, así que la tupla es una clave válida. Tres cambios surgicales:
-declaración de tipo del dict (`dict[tuple, ...]`), lectura y escritura de la
-caché con `cache_key`. `add_artifact` sigue invalidando toda la caché con
-`.clear()` (sin cambios), así que la coherencia tras agregar artefactos se
-mantiene.
-
-Verificado empíricamente reproduciendo el escenario del bug (centro `a3`,
-vecino `a2` a 40s): `bayesian_update('a3')` (ventana 300s, incluye a2,
-posterior 0.01) y `bayesian_update('a3', custom_window=timedelta(seconds=10))`
-(excluye a2, posterior 0.5) ahora devuelven objetos distintos; llamados
-idénticos repetidos siguen compartiendo caché.
-
-Suite completa (`tests/ vigia/tests/ --ignore=tests/integration`): 1993
-passed, 0 failed. Test permanente: `tests/test_b220_bayesian_cache_window_key.py`
-(4 tests, rojo-primero — los dos de recompute fallan sin el fix porque el
-segundo llamado devuelve el objeto cacheado; los de caché-compartida e
-invalidación-por-add pasan en ambos estados, documentando que el fix no rompe
-el cacheo legítimo).
-
----
-
 ## B-215 — `evidence_graph` no se puebla en bundles de `run_full`: `graph_hash` idéntico en todos los casos (ancla de integridad vacía de significado) [RESUELTO — Claude 2026-07-31]
 
 | Campo | Valor |
@@ -10114,66 +10026,319 @@ passed, 0 failed. Test permanente: `tests/test_b215_graph_hash_case_specific.py`
 determinismo, orden-independencia y `graph_stability=1.0` pasan en ambos
 estados, documentando que el fix preserva esos invariantes).
 
----
-
-## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging [RESUELTO por wiring previo — verificado Claude 2026-07-31]
+## B-216 — `tests/run_vigia_case.py` crashea al formatear `severity` None de un `caie_fracture` con `:.2f` [RESUELTO — Claude 2026-07-26]
 
 | Campo | Valor |
 |-------|-------|
-| **Severidad** | P2 (Daubert chain-of-custody gap). |
+| **Severidad** | P3 (runner de display/demo, no el path sellado): `TypeError: unsupported format string passed to NoneType.__format__` al imprimir las fracturas CAIE de cualquier caso cuyas `caie_fractures` no traigan el campo `severity` (traen `type`/`description`). No afecta el veredicto ni el bundle. |
+| **Archivo** | `tests/run_vigia_case.py` (línea ~162: `f"    [{f.get('fracture_type')}] severity={f.get('severity'):.2f}"`). |
+| **Modo** | Solo el runner de display `tests/run_vigia_case.py` (usado por `scripts/run_vigia_full.py` como primera etapa). |
+| **Detectado por** | Corrida de `run_vigia_full.py` sobre `VIGIA-OWL-2019-COMPLETE.json`; reproducido también sobre el `OWL-NEXUS5-CASE.json` original (bug preexistente, no del caso). |
+| **Commit fix** | rama `claude/bugs-pendientes-advance`. |
+
+### Verificación previa al fix (Firstness/Secondness)
+
+Antes de tocar código, se relevó el corpus completo (`data/cases/**/*.json` +
+`cases/**/*.json`, 293 archivos escaneados): 101 `caie_fractures` en total,
+95 con `severity` numérico y 6 (los dos casos OWL) con solo `type`/
+`description`. Reproducido en vivo: `python3 tests/run_vigia_case.py
+data/cases/VIGIA-OWL-2019-COMPLETE.json` termina en el `TypeError` exacto
+documentado, después de imprimir el veredicto — confirma que el bug es real
+y está exactamente donde se lo señaló, no una anticipación stale.
+
+### Fix aplicado
+
+`fracture_type = f.get('fracture_type', f.get('type', '?'))` (fallback al
+schema legacy) y `severity_str = f"{severity:.2f}" if severity is not None
+else "N/A"`. Se prefirió `"N/A"` sobre el `f.get('severity') or 0` que
+proponía la entrada original: un 0.00 fabricado se vería como un dato real
+y violaría la doctrina de degradación honesta del propio repo
+(`docs/ENGINEERING_DISCIPLINE.md` §5.3 — "never emit a result that looks
+correct when correctness cannot be guaranteed"); `N/A` deja explícito que
+esa fractura no trae severidad medida.
+
+### Verificación posterior al fix
+
+- Re-ejecutado contra las 101 fracturas del corpus completo (script de
+  verificación, no solo los dos casos OWL): 0 crashes.
+- `python3 tests/run_vigia_case.py data/cases/VIGIA-OWL-2019-COMPLETE.json`
+  y `.../OWL-NEXUS5-CASE.json`: corren completos, `severity=N/A` en las 6
+  fracturas sin severidad, veredicto se imprime normalmente.
+- `cases/input/VIGIA-BREAK-012.json` (caso con `severity` real): sigue
+  mostrando `severity=0.90`, sin cambio de comportamiento.
+- Test permanente: `tests/test_b216_run_vigia_case_severity_format.py` (4
+  tests: los dos casos OWL no crashean, un caso con severidad real
+  renderiza el valor correcto, y el fallback a `type` funciona).
+- Suite completa antes y después: 1982 passed, 191 skipped, 29 xfailed —
+  cero regresiones.
+
+## B-218 — El bundle sella `epsilon_used = epsilon_accept` incluso cuando el veredicto fue REJECT por `epsilon_reject`: el ε que queda registrado no es el que decidió [RESUELTO — Claude 2026-07-26]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2, con precondición dormida en el path por defecto (ver abajo). Origen: auditoría "Ronda 2", hallazgo F2. |
+| **Archivos** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`); `vigia/pipeline/pipeline.py` (construcción del `SystemState` en `run_full`). |
+| **Función** | `RiskBoundedDecisionLayer.decide()`; `VigiaPipeline.run_full()`. |
+| **Líneas originales** | `epsilon_used=self._eps_accept` (siempre, sin importar el veredicto); `epsilon_accept=decision_trace.epsilon_used, epsilon_reject=decision_trace.epsilon_used` en `pipeline.py`. |
+| **Commit fix** | rama `claude/bugs-pendientes-advance`. |
+
+### Descripción (heredada de la documentación original, verificada de nuevo antes de tocar código)
+
+`decide()` construía la `DecisionTrace` con `epsilon_used=self._eps_accept`
+sin condicionar por el veredicto. Cuando el veredicto era REJECT, el umbral
+que efectivamente decidió era `epsilon_reject`, no `epsilon_accept` — pero
+el campo sellado siempre reportaba `epsilon_accept`. Separadamente, y más
+grave: `pipeline.py` copiaba ese mismo `epsilon_used` a **ambos**
+`SystemState.epsilon_accept` y `SystemState.epsilon_reject`, colapsando dos
+umbrales de política potencialmente distintos en el bundle sellado.
+
+**Precondición confirmada por ejecución (por qué esto era P2, no P1):**
+`VigiaPipeline(adaptive_policy=True)` — el default — construye
+`SelfAdaptiveRiskPolicy(epsilon_init=policy_spec.epsilon_accept)`, que fija
+`self.epsilon_accept = self.epsilon_reject = epsilon_init` ya en el
+constructor, ANTES de que `update_from_window()` corra siquiera. Es decir,
+el path adaptativo por defecto colapsa los dos umbrales a un solo valor por
+diseño, independientemente de este bug. El bug solo mordía si un
+`PolicySpec` definía `epsilon_accept != epsilon_reject` explícitamente Y se
+construía el pipeline con `adaptive_policy=False` — confirmado ejecutando
+ambos casos antes de decidir el fix.
+
+### Fix aplicado
+
+Dos partes:
+
+1. **`decide()`** ahora sella `epsilon_used = self._eps_reject` si el
+   veredicto es `REJECT`, `self._eps_accept` en cualquier otro caso
+   (`ABSTAIN` conserva `eps_accept` como valor de referencia — ningún umbral
+   "decidió" un ABSTAIN, y `abstain_reason` ya expone ambos valores reales
+   en su texto).
+2. **`pipeline.py`** ya NO deriva `SystemState.epsilon_accept`/`epsilon_reject`
+   de `decision_trace.epsilon_used` — ahora sella directamente
+   `self._adaptive_policy.epsilon_accept`/`.epsilon_reject` (si hay política
+   adaptativa) o `self._risk_layer._eps_accept`/`._eps_reject` (si no la
+   hay), el mismo patrón que ya usaban `lambda_drift`/`gamma_stability` dos
+   líneas arriba. Este es el fix real del problema de auditoría del bundle:
+   ya no colapsa dos umbrales potencialmente distintos en un solo valor.
+
+### Verificación
+
+Ejecutado antes y después del fix (no solo deducido):
+
+```
+RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
+decide(posterior=0.70) → REJECT, epsilon_used=0.40 (antes: 0.05, incorrecto)
+decide(posterior=0.01) → ACCEPT, epsilon_used=0.05 (sin cambio)
+decide(posterior=0.30) → ABSTAIN, epsilon_used=0.05 (sin cambio, valor de referencia)
+
+VigiaPipeline(policy=PolicySpec(epsilon_accept=0.05, epsilon_reject=0.40),
+              adaptive_policy=False).run_full(...) → REJECT
+  SystemState.epsilon_accept = 0.05  (antes: 0.05, por casualidad correcto en ACCEPT)
+  SystemState.epsilon_reject = 0.40  (antes: 0.05, INCORRECTO)
+
+VigiaPipeline() [default, adaptive_policy=True] .run_full(...)
+  SystemState.epsilon_accept = SystemState.epsilon_reject = 0.05  (sin cambio,
+  confirma que el path por defecto —el que usa el pipeline en la práctica—
+  no se vio afectado por el fix)
+```
+
+Test permanente: `tests/test_b218_epsilon_sealing.py` (6 tests: umbral
+correcto sellado por veredicto en `decide()`, caso simétrico sin cambios, y
+el par de casos end-to-end con/sin política adaptativa a través de
+`run_full()`). Suite completa antes y después: 1992 passed, 191 skipped, 29
+xfailed — cero regresiones (la única falla observada en
+`tests/integration/test_ebs_v1_integration.py`, sobre calibración
+KDE/Ledoit-Wolf, es preexistente — confirmada idéntica con y sin este fix
+vía `git stash`).
+
+## B-220 — La caché de `bayesian_update` está indexada solo por `artifact_id`: ignora `custom_window`, aunque el parámetro es parte de la firma pública [RESUELTO — Claude 2026-07-26]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P3, era latente (ningún *caller* usaba el parámetro afectado). Origen: auditoría "Ronda 2", hallazgo F4. |
+| **Archivo** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`). |
+| **Función** | `bayesian_update(self, artifact_id, custom_window=None)`. |
+| **Líneas originales** | `if artifact_id in self._bayesian_cache: return self._bayesian_cache[artifact_id]` — clave de caché era solo `artifact_id`. |
+| **Commit fix** | rama `claude/bugs-pendientes-advance`. |
+
+### Descripción (verificada de nuevo antes de tocar código)
+
+`bayesian_update(artifact_id, custom_window=None)` usaba correctamente
+`custom_window` para calcular la vecindad temporal, pero revisaba
+`self._bayesian_cache` usando únicamente `artifact_id` como clave. Confirmado
+por `git stash` (comparación antes/después con el mismo repro): con
+`a1`(prior 0.9) en t=0, `a3`(prior 0.5) en t=10s y `a5`(prior 0.1,
+contaminado) en t=200s — dentro de la ventana default de 300s pero fuera de
+una ventana custom de 30s —, `bayesian_update('a3')` seguido de
+`bayesian_update('a3', custom_window=30s)` devolvía el **mismo objeto** los
+dos veces (posterior 0.15 filtrado a la llamada de 30s, que debería haber
+visto solo a `a1` y calculado 0.9).
+
+### Fix aplicado
+
+`cache_key = (artifact_id, custom_window)` en vez de `artifact_id` solo.
+`custom_window` es `None` o un `timedelta` — ambos hasheables, la tupla
+funciona directamente como clave de dict sin conversión adicional. Los dos
+lugares donde se escribe/lee la caché (`bayesian_update`) y los dos donde se
+limpia (`add_artifact`, otro método) no necesitaron más cambios — `.clear()`
+no depende de la forma de la clave.
+
+### Verificación
+
+Ejecutado antes y después (`git stash`):
+
+```
+ANTES: bayesian_update('a3') -> posterior=0.15
+       bayesian_update('a3', custom_window=30s) -> posterior=0.15 (mismo objeto, INCORRECTO)
+
+DESPUÉS: bayesian_update('a3') -> posterior=0.15
+         bayesian_update('a3', custom_window=30s) -> posterior=0.9 (objeto distinto, CORRECTO)
+```
+
+Confirmado también que el orden de llamadas no importa (custom primero,
+default después, da los mismos resultados correctos e independientes), que
+llamadas idénticas siguen cacheando (no se desactivó el cacheo, solo se
+corrigió la clave), y que `add_artifact` sigue invalidando la caché
+correctamente con la clave nueva.
+
+Re-confirmado por grep (el mismo chequeo que originalmente marcó esto como
+latente): ningún *caller* de producción pasa `custom_window` hoy — el fix no
+tiene efecto de comportamiento en ningún camino real, solo corrige qué pasa
+si/cuando alguien empiece a usar el parámetro documentado.
+
+Test permanente: `tests/test_b220_bayesian_cache_key.py` (6 tests: ventanas
+distintas dan resultados distintos en ambos órdenes de llamada, llamadas
+idénticas siguen cacheando, `add_artifact` sigue invalidando la caché, y un
+guard que se auto-marca para revisión si algún *caller* de producción
+empieza a usar `custom_window`). Suite completa antes y después: 1998
+passed, 191 skipped, 29 xfailed — cero regresiones.
+
+## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging [RESUELTO — Claude 2026-07-26]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO — cobertura universal ya existía, resuelto por un mecanismo distinto al que la entrada proponía. |
+| **Severidad** | Era P2 (Daubert chain-of-custody gap). |
 | **Archivo** | `vigia/vigia_sift_bridge.py`. |
-| **Detectado en** | Module archaeology audit 2026-07-14 (hallazgo hoy OBSOLETO). |
+| **Detectado en** | Module archaeology audit 2026-07-14; re-investigado 2026-07-26 mientras se corregía una discrepancia no relacionada del conteo "21 tools" en la documentación. |
+| **Commit fix** | Ninguno de esta rama — ya estaba resuelto en el código vivo cuando se re-investigó; solo se corrige el registro. |
 
-### Hallazgo obsoleto — auditado contra el archivo vivo (§4.1)
+### Qué decía la entrada original
 
-El registro (2026-07-14) reportaba que solo 3 de 23 tools MCP emitían
-`TOOL_INVOKED`, con 20 sin instrumentar, y difería el rollout por la deuda de
-fsync. Auditado contra el código vivo hoy: el hallazgo ya NO es cierto. Una
-sesión posterior introdujo un boundary de registro uniforme:
+CLAUDE.md exige loguear cada llamada a `audit_trail`. De los tools expuestos
+por `Vigia_Sift_Bridge`, solo 3 (`generate_forensic_hash`, `read_evidence`,
+`list_files`) tenían su propio `audit_logger.log_info(event_type="TOOL_INVOKED",
+...)` dentro del cuerpo de la función; 20 más estaban listados como
+"NOT covered", con el fix pospuesto a una sesión dedicada porque instrumentar
+los 20 manualmente sumaría ~20 `fsync()` síncronos más por investigación.
 
-- `_register_mcp_tool(func)` (línea 206) es el ÚNICO camino de registro — el
-  único `mcp.tool()` del archivo vive dentro de él (línea 208). Cero
-  `@mcp.tool()` directos en todo el archivo.
-- `_register_mcp_tool` envuelve cada tool en `_audit_mcp_entry`, que llama
-  `audit_logger.log_info(event_type="TOOL_INVOKED", tool=func.__name__,
-  message=...)` ANTES de ejecutar la función, para toda tool.
-- Las 33 registraciones (23 base + enriquecimiento) pasan por ese boundary.
-  Verificado tool por tool: las 20 antes "no cubiertas" (`search_pattern`,
-  `infer_intent`, `audit_network`, `reason_with_llm`, `mount_sift_evidence`,
-  etc.) tienen hoy el stack `@_register_mcp_tool` → `@rate_limit` → `def`.
-- El resumen de argumentos (`_audit_argument_summary`/`_audit_argument_value`)
-  es acotado y NO-plaintext: un string se registra como
-  `str(bytes=N, sha256_prefix=...)` sobre a lo sumo 4096 bytes, nunca el
-  payload entero — resuelve la preocupación de copiar evidencia sensible al
-  trail.
+### Qué muestra el código vivo hoy
 
-Verificado por ejecución (inducción, no solo lectura de decoradores):
-envolviendo una tool antes no cubierta con `_audit_mcp_entry` e invocándola
-con un payload sensible, el único evento emitido es `TOOL_INVOKED` y el
-plaintext no aparece (queda como sha256-prefix). Aplicar el fix del registro
-(agregar `log_info` por-tool) DUPLICARÍA el logging del boundary — por §4.1,
-el finding se rechaza como obsoleto en vez de parchearse.
+`_register_mcp_tool()` (línea ~206) es el **único** camino de registro de
+tools MCP en todo el archivo — confirmado por `grep -c "mcp.tool()"` dando
+exactamente 1 ocurrencia en todo el archivo, dentro de esa función. Envuelve
+CADA tool, tanto los registrados por decorador (`@_register_mcp_tool`) como
+los de estilo llamada (`_register_mcp_tool(func)`, los opcionales/gateados),
+con `_audit_mcp_entry()`, que emite `audit_logger.log_info(event_type=
+"TOOL_INVOKED", ...)` **antes** de ejecutar la función envuelta — es decir,
+antes de cualquier sanitización de paths o lógica interna, igual o mejor que
+la garantía que los 3 tools originales cumplían individualmente.
 
-### Nota residual honesta (§5.3) — la deuda de fsync ahora está realizada
+Verificado por ejecución directa (no solo lectura estática): llamar a
+`deactivate_honey_token` y `get_phonetic_dict_stats` — dos de los tools que
+la entrada original listaba como "NOT covered" — produce un evento
+`TOOL_INVOKED` cada uno, sin ningún cambio de código por tool. Confirmado
+además por AST walk que los 22 tools base y los 5 tools opcionales
+siempre-cargados resuelven todos a `_register_mcp_tool`.
 
-El registro difería el rollout porque `audit_logger.log_info()` hace
-`fh.flush()` + `os.fsync()` síncrono por llamada (`security.py:488-489`,
-confirmado). Como el boundary ahora loguea en cada invocación de tool, ese
-fsync-por-llamada está en efecto hoy: una investigación con N llamadas MCP
-hace N fsync bloqueantes. Es un trade-off consciente (correctness > perf, ya
-anotado en el registro original) y no un problema de correctitud — el gap de
-cadena de custodia, que era la preocupación P2, está cerrado. Si en el futuro
-la performance importa, el fix es batch/async del sink de auditoría, no
-re-abrir la instrumentación.
+### Corrección de un detalle de la lista original
 
-### Nota lateral
+`check_syscall_latency` aparecía en la lista de "NOT covered (20)" como si
+fuera un tool MCP sin instrumentar. No lo es: no tiene el decorador
+`@_register_mcp_tool` ni ningún `_register_mcp_tool(check_syscall_latency)`,
+y no tiene **ningún caller** en todo el archivo — nunca fue un tool MCP,
+parece código muerto (detección de rootkits vía latencia de syscalls,
+nunca cableado a nada). No participaba del conteo real de tools cubiertos ni
+sin cubrir.
 
-`check_syscall_latency` figuraba en la lista de "no cubiertas", pero en el
-código vivo está definido (`vigia_sift_bridge.py:3928`) y NUNCA registrado —
-no es una tool MCP expuesta (cero `_register_mcp_tool`, cero *callers*). No
-tiene gap de auditoría porque no es alcanzable como tool; es una función
-muerta/interna, registrada aquí para que un auditor futuro no la persiga como
-si fuera una tool sin instrumentar.
+### Por qué esto cuenta como resuelto, no como "hallazgo nuevo"
 
-Sin cambios de código — resolución por verificación de que el wiring previo
-ya cierra el gap.
+La preocupación de fondo de B-122 (¿todo tool MCP deja un registro de
+invocación contemporáneo, no reconstruido después?) está satisfecha —
+mejor de lo que la entrada proponía: en vez de 3 sitios de instrumentación
+manual + 20 pendientes, hay UN solo punto de aplicación estructural que no
+puede olvidarse al agregar un tool nuevo (cualquier tool que no pase por
+`_register_mcp_tool` simplemente no se registra en el servidor MCP en
+absoluto). La preocupación de "known technical debt" sobre el costo de
+`fsync()` × 20 tools adicionales quedó sin objeto: el costo ya se estaba
+pagando en cada llamada a cualquier tool desde antes de esta verificación,
+no es una regresión de performance nueva a evaluar.
+
+### Verificación
+
+Test permanente: `tests/test_b122_universal_tool_invoked_audit.py` (6 tests:
+`mcp.tool()` se llama exactamente una vez en todo el módulo — un guard que
+se auto-marca si algún día aparece un segundo camino de registro que podría
+saltear el wrapper de auditoría —, `_register_mcp_tool` envuelve con
+`_audit_mcp_entry`, dos tools previamente "sin cobertura" emiten
+`TOOL_INVOKED` en ejecución real, y `check_syscall_latency` confirmado sin
+decorador y sin callers). Suite completa: 1998 passed (antes de sumar este
+archivo), 191 skipped, 29 xfailed.
+
+## B-214 — `VigiaPipeline.run_full` saltea el gate de integridad de normalización que `vigia_agent.py` sí aplica: dos entry points, dos veredictos [RESUELTO — Claude 2026-07-26]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P2 (footgun de arquitectura, no incorrección). |
+| **Archivos** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full`), `vigia_agent.py` (agente Mode 1 completo). |
+| **Modo** | Cualquier código que llame `run_full` directo para sellar en vez de pasar por el agente. |
+| **Detectado por** | Cross-check Mode-1 vs Mode-2 (sesión 2026-07-23). |
+| **Commit fix** | rama `claude/bugs-pendientes-advance`. |
+
+### Descripción (heredada, sin cambios de sustancia)
+
+`run_full` no corre el gate de integridad de normalización que sí aplica
+`vigia_agent.py` (Mode 1) antes de sellar. Reproducido con dos casos reales
+(`OWL-NEXUS5-CASE.json`, `VIGIA-OWL-2019-COMPLETE.json`): `run_full` sella
+`decision=REJECT, posterior=1.0`; `vigia_agent.py` sobre el mismo JSON sella
+`ABSTAIN` con razón `NORMALIZATION_INTEGRITY_LOSS`. Investigación adicional
+en esta sesión confirmó que `run_full` (motor `LikelihoodEngine` +
+`RiskBoundedDecisionLayer`, el path "EBS v1") y `vigia_agent.py` (que usa
+`vigia_scorer.py` + `vigia_integration_bridge.py` para su scoring
+determinístico) son en efecto **dos motores de scoring distintos**, no una
+función con un flag opcional — cablear el gate de normalización en
+`run_full` requeriría integrar dos sistemas de scoring separados, no solo
+agregar un chequeo.
+
+### Decisión tomada: opción (b), no (a)
+
+La entrada original proponía dos caminos: (a) `run_full` corre el mismo
+gate y degrada a ABSTAIN — cambia el veredicto sellado de cualquier caso
+con `normalization_failures`, requiere decisión de arquitectura + dry-run
+del corpus; o (b) documentar `run_full` explícitamente como "score crudo
+sin gates" y señalar que el sellado autoritativo debe pasar por el agente.
+Se aplicó (b): es la opción que la propia entrada ya sancionaba como segura
+sin necesitar el dry-run que (a) exige, y no toca ningún veredicto sellado.
+
+### Fix aplicado
+
+Docstring de `run_full()` ampliada con una advertencia explícita: nombra
+B-214, describe el gap exacto, cita los dos casos reales reproducidos, y
+indica textualmente "no llames a `run_full` directamente" para sellado
+autoritativo — usar `vigia_agent.py` en su lugar. Cero cambio de
+comportamiento: la lógica de scoring de `run_full` no se tocó.
+
+**Hallazgo adyacente corregido de paso:** la misma docstring, en el paso
+`[Gobernanza]`, documentaba la fórmula pre-B-117 invertida
+(`r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))`) — el bug que B-117 corrigió en
+2026-07-14 invirtiendo el sentido de los veredictos. La implementación viva
+(`risk_bounded_layer.py`) usa `r = P·(...)` desde ese fix; la docstring
+nunca se actualizó. Corregida a la fórmula real, con referencia a B-117.
+
+### Verificación
+
+Test permanente: `tests/test_b214_run_full_docstring_warning.py` (3 tests:
+la docstring nombra B-214 y el gap, apunta explícitamente al agente para
+sellado, y la fórmula ya no es la forma pre-B-117 invertida). Sintaxis
+verificada con `ast.parse()` tras el edit. Suite completa antes y después:
+2004 passed, 191 skipped, 29 xfailed — cero regresiones (cambio
+documentación-only, sin lógica tocada).

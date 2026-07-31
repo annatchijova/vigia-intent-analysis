@@ -147,11 +147,11 @@ La Navaja de Ockham guía la selección entre hipótesis competidoras de igual p
 │  CAPA 0: ebs_v1.py        — Contratos de datos (inmutable)     │
 │  CAPA 1: señales externas — SDA/CLI/GCI/herramientas SIFT      │
 │  CAPA 2: likelihood_engine + graph_stability — inferencia       │
-│  CAPA 3: risk_bounded_layer — gobernanza r=(1-P)·(1+λD)·(1+γ)  │
+│  CAPA 3: risk_bounded_layer — gobernanza r=P·(1+λD)·(1+γ)      │
 │  CAPA 4: audit_action     — Diff/Optimizer/PolicyEngine         │
 │  CAPA 5: verify_ebs_v1.py — verificación stdlib puro           │
 │                                                                 │
-│  SIFT BRIDGE: vigia_sift_bridge_final.py (21+ tools MCP)       │
+│  SIFT BRIDGE: vigia_sift_bridge.py (22+ tools MCP)             │
 └────────────────────────┬────────────────────────────────────────┘
                          │  ForensicBundle sellado
                          ▼
@@ -530,7 +530,7 @@ Implementadas en `vigia_sift_bridge.py` con comentario explícito en el código:
 3. Detección de HTTP/SSE: sin `VIGIA_MCP_AUTH_TOKEN` → CRITICAL alert
 4. Con `VIGIA_ENFORCE_STDIO=true`: abort en startup si transporte inseguro
 
-VIGÍA expone 21+ herramientas forenses incluyendo operaciones de nivel root. HTTP sin autenticación es una superficie de ataque inaceptable.
+VIGÍA expone 22+ herramientas forenses incluyendo operaciones de nivel root. HTTP sin autenticación es una superficie de ataque inaceptable.
 
 ### 9.8 Integridad del Modelo CLIP
 
@@ -658,7 +658,7 @@ Configuración en `~/.claude/claude.json`:
   "mcpServers": {
     "vigia_sift": {
       "command": "python3",
-      "args": ["/path/to/vigia-sift/vigia_sift_bridge_final.py"]
+      "args": ["/path/to/vigia-sift/vigia/vigia_sift_bridge.py"]
     }
   }
 }
@@ -795,8 +795,13 @@ El proyecto cuenta con 151 módulos Python. Clasificación por función:
 ### 15.4 Herramientas SIFT (12 módulos)
 `sift_orchestrator.py`, `mft_timeline_analyzer.py`, `registry_timeline_reconstructor.py`, `prefetch_analyzer.py`, `memory_forensics.py`, `shellbag_analyzer.py`, `usb_device_tracker.py`, `browser_forensics.py`, `event_log_correlator.py`, `disk_forensics.py`, `amcache_shimcache.py`, `network_forensics.py`
 
-### 15.5 Bridge y API (7 módulos)
-`vigia_sift_bridge.py`, `vigia_sift_bridge_final.py`, `BRIDGE_PATCH_FINAL.py`, `vigia_api.py`, `vigia_server.py`, `vigia_namespace_shim.py`, `cli.py`
+### 15.5 Bridge y API (3 módulos)
+`vigia_sift_bridge.py`, `vigia_api.py`, `cli.py`
+
+(`vigia_sift_bridge_final.py`, `BRIDGE_PATCH_FINAL.py`, `vigia_server.py` y
+`vigia_namespace_shim.py` no existen en el repositorio — confirmado por
+búsqueda exhaustiva 2026-07-26; removidos de este inventario, que hasta
+entonces los listaba como si existieran.)
 
 ### 15.6 Seguridad (6 módulos)
 `security.py`, `sandbox.py`, `shadow_mode.py`, `path_guard.py`, `config_sentinel.py`, `normalization_layer.py`

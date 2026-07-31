@@ -5753,6 +5753,54 @@ as emitted by LikelihoodEngine. Inline comment and docstring guard cite this bug
 - `vigia/governance/risk_bounded_layer_v2.py` deleted (commit `c46991c4`)
 - `scripts/pre_release_check.py` BANNED_FILENAMES corrected
 
+### Update 2026-07-26 -- the stale `(1-P)·(...)` formula had survived in 8
+places besides the code, including two that generate real output
+
+While resolving B-214, the code fix (v1, above) was found never to have
+propagated to the comments, docstrings, and narrative generators that quote
+the same formula. A full sweep (grep across the whole repo, excluding the
+generated academic corpus) found the pre-B-117 inverted formula alive in 8
+places:
+
+`vigia/pipeline/pipeline.py` (two separate docstrings: the module header and
+`run_full()`), `vigia/models/ebs.py`, `VIGIA_ESTADO_TECNICO_ES.md` and its
+`docs/` mirror, `docs/VIGIA_TECHNICAL_STATE_EN.md`,
+`docs/vigia_paper_methodology.md` (the layer diagram AND the prose
+explanation, which additionally had the formula's *meaning* backwards:
+"r = 0 when P = 1, certain fabrication" is exactly the inverted-decision bug
+B-117 fixed, described there as if it were the intended design),
+`docs/vigia-real-006_execution_summary.md` (a worked example whose own
+shown arithmetic, `r=0.1734`, already contradicted its own displayed
+threshold check -- "REJECT > 0.35? No" -- AND its stated final decision --
+"REJECT" --; fixed by recomputing with the real formula, which also
+resolves that internal contradiction), and
+`forensics/evidence_narrative_gen.py` (a narrative label shown next to the
+REAL, correctly-computed risk score -- an expert witness reading the
+generated narrative and trying to reproduce the number by hand from the
+stated formula would get the wrong answer).
+
+**One case was found and deliberately NOT fixed:**
+`vigia/scripts/generate_execution_log.py:227` passes this same formula
+(plus fabricated placeholder D/S/I values: hardcoded `"D": 0.1`, `S`/`I`
+derived by ad-hoc formulas matching no real computation) into a
+`RISK_CALCULATION` log entry -- but the script actually calls
+`vigia.core.decision_layer.decide()` (line 142), an entirely different,
+MI-threshold-based decision engine that computes no D, S, or I at all. This
+isn't a wrong sign: it's a log format designed for one subsystem
+(`risk_bounded_layer.py`) reused to describe an entirely different one
+(`decision_layer.py`), with fabricated data in the fields that don't apply
+-- a deeper audit-trail integrity problem (the script generates "Agent
+Execution Logs... for SANS deliverables" per its own docstring), not a
+simple stale string. This script does process real cases (not a synthetic/
+demo generator). Documented in detail, unfixed, in
+`tests/test_b117_stale_formula_sweep.py`, pending its own investigation.
+
+Permanent test: `tests/test_b117_stale_formula_sweep.py` -- sweeps the whole
+repo for the inverted formula and fails if it reappears anywhere not
+covered by an explicitly justified exception. Full suite: 2008 passed, 191
+skipped, 29 xfailed -- zero regressions (all changes are comments/
+docstrings/prose, no logic touched).
+
 ---
 
 ## B-118 — `vigia/core/signal_contract.py` name collision caused BUG-EML-001 — file deleted
@@ -9359,146 +9407,6 @@ name, the `_PT`-suffixed override actually works, the un-suffixed name is
 silently ignored — documenting the failure mode this caused — and
 `VIGIA_STRICT_MODEL_CHECK`'s default is `true` when the variable is unset).
 
----
-
-## B-216 — `tests/run_vigia_case.py` crashes formatting a `caie_fracture`'s None `severity` with `:.2f` [RESOLVED — Claude 2026-07-31]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P3 (display/demo runner, not the sealed path): `TypeError: unsupported format string passed to NoneType.__format__` when printing the CAIE fractures of any case whose `caie_fractures` lack a `severity` field (they carry `type`/`description`). Did not affect the verdict or the bundle. |
-| **File** | `tests/run_vigia_case.py` (line 162). |
-| **Mode** | Only the display runner `tests/run_vigia_case.py` (used by `scripts/run_vigia_full.py` as its first stage). |
-| **Detected by** | Running `run_vigia_full.py` on `VIGIA-OWL-2019-COMPLETE.json`; also reproduced on the original `OWL-NEXUS5-CASE.json` (pre-existing bug, not case-specific). |
-
-### Fix applied
-
-Confirmed against the live file before touching it (line 162 matched the
-original report exactly). Replaced the
-`f"...severity={f.get('severity'):.2f}"` line with an explicit guard:
-`severity_str = f"{severity:.2f}" if severity is not None else "n/a"`, and
-`fracture_type = f.get('fracture_type', f.get('type', '?'))` to tolerate the
-`type`/`description` schema real cases use (the fix originally proposed in
-BUGS_PENDIENTES.md, applied as-is).
-
-Verified with a dry-run on both cases:
-- `data/cases/OWL-NEXUS5-CASE.json` (fractures without `severity`,
-  `type`/`description` schema): no longer crashes, renders `severity=n/a`
-  and falls back to `type` for `fracture_type`. Bundle seals correctly
-  (H4 EBS verify PASS).
-- `data/cases/case_003_false_flag.json` (fracture with a numeric
-  `severity=0.85`): no regression, still shows `severity=0.85`.
-
-No dedicated unit test — this is a demo/display runner outside the sealed
-path; the dry-run over both real cases covers both branches of the fix.
-
----
-
-## B-218 — The bundle seals `epsilon_used = epsilon_accept` even when the verdict was REJECT via `epsilon_reject`: the recorded ε is not the one that actually decided [RESOLVED — Claude 2026-07-31]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P2, with a precondition previously dormant (see below). Origin: "Round 2" audit, finding F2. |
-| **Files** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`, line 578); `vigia/pipeline/pipeline.py` (lines 730-731, "SELLADO CONJUNTO" block). |
-| **Detected in** | "Round 2" audit, induction executed and re-verified against the live file in the session that documented it (2026-07-25). |
-
-### Description
-
-`decide()` built the `DecisionTrace` with `epsilon_used=self._eps_accept`
-unconditionally on the verdict. When the verdict was REJECT, the threshold
-that actually decided was `epsilon_reject` (the rule is `REJECT if
-r >= 1 - epsilon_reject`), not `epsilon_accept` — but the field sealed in
-the trace (and from there in the bundle, via `pipeline.py:730-731`, which
-copied that same value into **both** `epsilon_accept` and `epsilon_reject`
-of the `SystemState`) always reported `epsilon_accept`.
-
-**Honest precondition (why it was P2, not P1):**
-`SelfAdaptiveRiskPolicy.update_from_window` forces
-`epsilon_accept = epsilon_reject` on every update — the adaptive
-configuration the pipeline uses by default. The bug only bit if some
-`PolicySpec` explicitly set `epsilon_accept != epsilon_reject` (a path
-`RiskBoundedDecisionLayer.from_policy_spec()` supports without restriction,
-e.g. with `adaptive_policy=False`).
-
-### Fix applied
-
-Confirmed against the live file before touching it (both anchors cited in
-the original report matched exactly). Two changes:
-
-1. `risk_bounded_layer.py:578` — `epsilon_used` is now sealed conditioned on
-   the verdict: `self._eps_reject if verdict == "REJECT" else
-   self._eps_accept` (the fix originally proposed in BUGS_PENDIENTES.md,
-   applied as-is).
-2. `pipeline.py:730-731` — instead of copying the single
-   `decision_trace.epsilon_used` into both `SystemState` fields, each field
-   is now populated independently from the real source
-   (`self._adaptive_policy.epsilon_accept/epsilon_reject` when an adaptive
-   policy is active, else `self._risk_layer._eps_accept/_eps_reject`) — the
-   same pattern already used two lines above for `lambda_drift`/
-   `gamma_stability`. This fixes the root cause for both fields at once,
-   instead of relying on a single ambiguous trace value.
-
-Verified empirically by reproducing the exact scenario from the original
-report:
-
-```
-RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
-decide(posterior=0.70) → decision=REJECT, risk=0.7
-  epsilon_used (sealed) = 0.40   # before: 0.05 (epsilon_accept, wrong)
-```
-
-Full suite (`tests/ vigia/tests/ --ignore=tests/integration`): 1989 passed,
-0 failed (188 skipped, 29 xfailed — pre-existing, unrelated). Permanent test
-added: `tests/test_b218_epsilon_used_verdict.py` (4 tests, red-first against
-the unfixed code — `test_reject_seals_epsilon_reject` fails with
-`0.05 == 0.4` on the original code and passes after the fix; covers ACCEPT,
-REJECT, ABSTAIN, and the independent sealing of both thresholds in
-`VigiaPipeline` with an asymmetric `PolicySpec`).
-
----
-
-## B-220 — The `bayesian_update` cache is keyed only by `artifact_id`: it ignores `custom_window`, even though the parameter is part of the public signature [RESOLVED — Claude 2026-07-31]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P3, latent (no caller used the affected parameter). Origin: "Round 2" audit, finding F4. |
-| **File** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`). |
-| **Detected in** | "Round 2" audit (2026-07-25), re-executed against the live file in this session. |
-
-### Description
-
-`bayesian_update(artifact_id, custom_window=None)` used `custom_window` to
-compute the temporal neighborhood (`get_neighborhood`), but the
-`self._bayesian_cache` was keyed on `artifact_id` alone. A second call with a
-different window returned the first call's cached object without recomputing —
-the result depended on call order, not on the window requested. Latent today
-(no production caller passes `custom_window`, all use the `None` default), but
-the parameter is documented and MCP-exposed.
-
-### Fix applied
-
-Confirmed against the live file before touching it (cache keyed on
-`artifact_id` alone, as the report stated). Adopted the first proposed option:
-cache key `(artifact_id, custom_window)`. `custom_window` is a `timedelta` or
-`None`, both hashable, so the tuple is a valid key. Three surgical changes: the
-dict type annotation (`dict[tuple, ...]`), and the cache read and write using
-`cache_key`. `add_artifact` still invalidates the whole cache with `.clear()`
-(unchanged), so coherence after adding artifacts is preserved.
-
-Verified empirically by reproducing the bug scenario (center `a3`, neighbour
-`a2` 40s away): `bayesian_update('a3')` (300s window, includes a2, posterior
-0.01) and `bayesian_update('a3', custom_window=timedelta(seconds=10))`
-(excludes a2, posterior 0.5) now return distinct objects; identical repeated
-calls still share the cache.
-
-Full suite (`tests/ vigia/tests/ --ignore=tests/integration`): 1993 passed, 0
-failed. Permanent test: `tests/test_b220_bayesian_cache_window_key.py` (4
-tests, red-first — the two recompute tests fail without the fix because the
-second call returns the cached object; the shared-cache and
-invalidation-on-add tests pass in both states, documenting that the fix does
-not break legitimate caching).
-
----
-
 ## B-215 — `evidence_graph` not populated in `run_full` bundles: `graph_hash` identical across all cases (integrity anchor is meaningless) [RESOLVED — Claude 2026-07-31]
 
 | Field | Value |
@@ -9555,63 +9463,317 @@ states, documenting that the fix preserves those invariants).
 
 ---
 
-## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging [RESOLVED by prior wiring — verified Claude 2026-07-31]
+## B-216 — `tests/run_vigia_case.py` crashes formatting a `caie_fracture`'s None `severity` with `:.2f` [RESOLVED — Claude 2026-07-26]
 
 | Field | Value |
 |-------|-------|
-| **Severity** | P2 (Daubert chain-of-custody gap). |
+| **Severity** | P3 (display/demo runner, not the sealed path): `TypeError: unsupported format string passed to NoneType.__format__` when printing the CAIE fractures of any case whose `caie_fractures` lack a `severity` field (they carry `type`/`description`). Does not affect the verdict or the bundle. |
+| **File** | `tests/run_vigia_case.py` (line ~162: `f"    [{f.get('fracture_type')}] severity={f.get('severity'):.2f}"`). |
+| **Mode** | Only the display runner `tests/run_vigia_case.py` (used by `scripts/run_vigia_full.py` as its first stage). |
+| **Detected by** | Running `run_vigia_full.py` on `VIGIA-OWL-2019-COMPLETE.json`; also reproduced on the original `OWL-NEXUS5-CASE.json` (pre-existing bug, not case-specific). |
+| **Fix commit** | branch `claude/bugs-pendientes-advance`. |
+
+### Verification before the fix (Firstness/Secondness)
+
+Before touching code, the full corpus was surveyed (`data/cases/**/*.json` +
+`cases/**/*.json`, 293 files scanned): 101 `caie_fractures` total, 95 with a
+numeric `severity` and 6 (the two OWL cases) with only `type`/`description`.
+Reproduced live: `python3 tests/run_vigia_case.py
+data/cases/VIGIA-OWL-2019-COMPLETE.json` ends in the exact documented
+`TypeError`, after printing the verdict — confirms the bug is real and
+exactly where reported, not a stale finding.
+
+### Fix applied
+
+`fracture_type = f.get('fracture_type', f.get('type', '?'))` (fallback to
+the legacy schema) and `severity_str = f"{severity:.2f}" if severity is not
+None else "N/A"`. `"N/A"` was chosen over the originally proposed
+`f.get('severity') or 0`: a fabricated 0.00 would look like real data and
+violate this repo's own honest-degradation doctrine
+(`docs/ENGINEERING_DISCIPLINE.md` §5.3 — "never emit a result that looks
+correct when correctness cannot be guaranteed"); `N/A` makes explicit that
+that fracture carries no measured severity.
+
+### Verification after the fix
+
+- Re-run against all 101 fractures in the full corpus (a verification
+  script, not just the two OWL cases): 0 crashes.
+- `python3 tests/run_vigia_case.py data/cases/VIGIA-OWL-2019-COMPLETE.json`
+  and `.../OWL-NEXUS5-CASE.json`: run to completion, `severity=N/A` on the
+  6 severity-less fractures, verdict prints normally.
+- `cases/input/VIGIA-BREAK-012.json` (a case with real `severity`): still
+  shows `severity=0.90`, unchanged behavior.
+- Permanent test: `tests/test_b216_run_vigia_case_severity_format.py` (4
+  tests: both OWL cases don't crash, a case with real severity renders the
+  value correctly, and the `type` fallback works).
+- Full suite before and after: 1982 passed, 191 skipped, 29 xfailed — zero
+  regressions.
+
+## B-218 — The bundle seals `epsilon_used = epsilon_accept` even when the verdict was REJECT via `epsilon_reject`: the recorded ε is not the one that actually decided [RESOLVED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2, with a precondition dormant on the default path (see below). Origin: "Round 2" audit, finding F2. |
+| **Files** | `vigia/core/risk_bounded_layer.py` (`RiskBoundedDecisionLayer.decide`); `vigia/pipeline/pipeline.py` (`SystemState` construction in `run_full`). |
+| **Function** | `RiskBoundedDecisionLayer.decide()`; `VigiaPipeline.run_full()`. |
+| **Original lines** | `epsilon_used=self._eps_accept` (always, regardless of the verdict); `epsilon_accept=decision_trace.epsilon_used, epsilon_reject=decision_trace.epsilon_used` in `pipeline.py`. |
+| **Fix commit** | branch `claude/bugs-pendientes-advance`. |
+
+### Description (inherited from the original documentation, re-verified before touching code)
+
+`decide()` built the `DecisionTrace` with `epsilon_used=self._eps_accept`
+unconditionally on the verdict. When the verdict was REJECT, the threshold
+that actually decided was `epsilon_reject`, not `epsilon_accept` — but the
+sealed field always reported `epsilon_accept`. Separately, and more
+severely: `pipeline.py` copied that same `epsilon_used` into **both**
+`SystemState.epsilon_accept` and `SystemState.epsilon_reject`, collapsing
+two potentially distinct policy thresholds into the sealed bundle.
+
+**Precondition confirmed by execution (why this was P2, not P1):**
+`VigiaPipeline(adaptive_policy=True)` -- the default -- constructs a
+`SelfAdaptiveRiskPolicy(epsilon_init=policy_spec.epsilon_accept)`, which
+sets `self.epsilon_accept = self.epsilon_reject = epsilon_init` right in
+the constructor, BEFORE `update_from_window()` ever runs. So the default
+adaptive path collapses both thresholds to a single value by design,
+independent of this bug. The bug only bit if a `PolicySpec` explicitly set
+`epsilon_accept != epsilon_reject` AND the pipeline was constructed with
+`adaptive_policy=False` -- confirmed by executing both cases before
+deciding on the fix.
+
+### Fix applied
+
+Two parts:
+
+1. **`decide()`** now seals `epsilon_used = self._eps_reject` for a
+   `REJECT` verdict, `self._eps_accept` otherwise (`ABSTAIN` keeps
+   `eps_accept` as a reference value -- no threshold "decided" an ABSTAIN,
+   and `abstain_reason` already surfaces both real values in its text).
+2. **`pipeline.py`** no longer derives `SystemState.epsilon_accept`/
+   `epsilon_reject` from `decision_trace.epsilon_used` -- it now seals
+   `self._adaptive_policy.epsilon_accept`/`.epsilon_reject` directly (when
+   an adaptive policy exists) or `self._risk_layer._eps_accept`/
+   `._eps_reject` (when it doesn't), the same pattern already used for
+   `lambda_drift`/`gamma_stability` two lines above. This is the real fix
+   for the bundle's auditability problem: it no longer collapses two
+   potentially-distinct thresholds into one value.
+
+### Verification
+
+Executed before and after the fix (not just deduced):
+
+```
+RiskBoundedDecisionLayer(epsilon_accept=0.05, epsilon_reject=0.40)
+decide(posterior=0.70) → REJECT, epsilon_used=0.40 (before: 0.05, wrong)
+decide(posterior=0.01) → ACCEPT, epsilon_used=0.05 (unchanged)
+decide(posterior=0.30) → ABSTAIN, epsilon_used=0.05 (unchanged, reference value)
+
+VigiaPipeline(policy=PolicySpec(epsilon_accept=0.05, epsilon_reject=0.40),
+              adaptive_policy=False).run_full(...) → REJECT
+  SystemState.epsilon_accept = 0.05  (before: 0.05, coincidentally correct on ACCEPT)
+  SystemState.epsilon_reject = 0.40  (before: 0.05, WRONG)
+
+VigiaPipeline() [default, adaptive_policy=True] .run_full(...)
+  SystemState.epsilon_accept = SystemState.epsilon_reject = 0.05  (unchanged,
+  confirms the default path -- the one the pipeline actually uses in
+  practice -- was not affected by the fix)
+```
+
+Permanent test: `tests/test_b218_epsilon_sealing.py` (6 tests: correct
+threshold sealed per verdict in `decide()`, symmetric case unaffected, and
+the with/without-adaptive-policy pair end-to-end through `run_full()`).
+Full suite before and after: 1992 passed, 191 skipped, 29 xfailed -- zero
+regressions (the one failure observed in
+`tests/integration/test_ebs_v1_integration.py`, about KDE/Ledoit-Wolf
+calibration, is pre-existing -- confirmed identical with and without this
+fix via `git stash`).
+
+## B-220 — The `bayesian_update` cache is keyed only by `artifact_id`: it ignores `custom_window`, even though the parameter is part of the public signature [RESOLVED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P3, was latent (no caller used the affected parameter). Origin: "Round 2" audit, finding F4. |
+| **File** | `vigia/core/trust_fusion.py` (`TrustFusionEngine.bayesian_update`). |
+| **Function** | `bayesian_update(self, artifact_id, custom_window=None)`. |
+| **Original lines** | `if artifact_id in self._bayesian_cache: return self._bayesian_cache[artifact_id]` — cache key was `artifact_id` alone. |
+| **Fix commit** | branch `claude/bugs-pendientes-advance`. |
+
+### Description (re-verified before touching code)
+
+`bayesian_update(artifact_id, custom_window=None)` correctly used
+`custom_window` to compute the temporal neighborhood, but checked
+`self._bayesian_cache` keyed only by `artifact_id`. Confirmed via `git
+stash` (before/after comparison with the same repro): with `a1`(prior 0.9)
+at t=0, `a3`(prior 0.5) at t=10s, and `a5`(prior 0.1, contaminated) at
+t=200s — inside the default 300s window but outside a 30s custom window --
+`bayesian_update('a3')` followed by `bayesian_update('a3',
+custom_window=30s)` returned the **same object** both times (posterior 0.15
+leaked into the 30s-window call, which should have seen only `a1` and
+computed 0.9).
+
+### Fix applied
+
+`cache_key = (artifact_id, custom_window)` instead of `artifact_id` alone.
+`custom_window` is `None` or a `timedelta` -- both hashable, the tuple works
+directly as a dict key with no extra conversion. The two places that write/
+read the cache (`bayesian_update`) and the ones that clear it
+(`add_artifact`, another method) needed no further changes -- `.clear()`
+doesn't depend on the key's shape.
+
+### Verification
+
+Executed before and after (`git stash`):
+
+```
+BEFORE: bayesian_update('a3') -> posterior=0.15
+        bayesian_update('a3', custom_window=30s) -> posterior=0.15 (same object, WRONG)
+
+AFTER: bayesian_update('a3') -> posterior=0.15
+       bayesian_update('a3', custom_window=30s) -> posterior=0.9 (distinct object, CORRECT)
+```
+
+Also confirmed call order doesn't matter (custom first, default second
+gives the same correct, independent results), that identical calls still
+hit the cache (caching wasn't disabled, only the key was fixed), and that
+`add_artifact` still invalidates the cache correctly with the new key.
+
+Re-confirmed by grep (the same check that originally flagged this as
+latent): no production caller passes `custom_window` today -- the fix has
+no behavioral effect on any real path, it only fixes what happens if/when
+someone starts using the documented parameter.
+
+Permanent test: `tests/test_b220_bayesian_cache_key.py` (6 tests: distinct
+windows give distinct results in both call orders, identical calls still
+cache, `add_artifact` still invalidates the cache, and a guard that flags
+itself for review if any production caller starts using `custom_window`).
+Full suite before and after: 1998 passed, 191 skipped, 29 xfailed -- zero
+regressions.
+
+## B-122 — Audit trail gap: 20 of 23 MCP tools lack TOOL_INVOKED logging [RESOLVED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED — universal coverage already existed, resolved by a different mechanism than the entry proposed. |
+| **Severity** | Was P2 (Daubert chain-of-custody gap). |
 | **File** | `vigia/vigia_sift_bridge.py`. |
-| **Detected in** | Module archaeology audit 2026-07-14 (finding now STALE). |
+| **Detected in** | Module archaeology audit 2026-07-14; re-investigated 2026-07-26 while fixing an unrelated "21 tools" count discrepancy across the docs. |
+| **Fix commit** | None on this branch -- already resolved in the live code by the time it was re-investigated; only the registry needed correcting. |
 
-### Stale finding — audited against the live file (§4.1)
+### What the original entry said
 
-The registry (2026-07-14) reported that only 3 of 23 MCP tools emitted
-`TOOL_INVOKED`, 20 uninstrumented, and deferred the rollout over the fsync
-debt. Audited against the live code today: the finding is no longer true. A
-later session introduced a uniform registration boundary:
+CLAUDE.md requires every tool call to be logged to `audit_trail`. Of the
+tools exposed by `Vigia_Sift_Bridge`, only 3 (`generate_forensic_hash`,
+`read_evidence`, `list_files`) had their own `audit_logger.log_info(
+event_type="TOOL_INVOKED", ...)` call inside the function body; 20 more
+were listed as "NOT covered", with the fix deferred to a dedicated session
+because instrumenting all 20 by hand would add ~20 more synchronous
+`fsync()` calls per investigation.
 
-- `_register_mcp_tool(func)` (line 206) is the ONLY registration path — the
-  file's only `mcp.tool()` lives inside it (line 208). Zero direct
-  `@mcp.tool()` anywhere in the file.
-- `_register_mcp_tool` wraps every tool in `_audit_mcp_entry`, which calls
-  `audit_logger.log_info(event_type="TOOL_INVOKED", tool=func.__name__,
-  message=...)` BEFORE executing the function, for every tool.
-- All 33 registrations (23 base + enrichment) go through that boundary.
-  Verified tool by tool: the 20 formerly "uncovered" (`search_pattern`,
-  `infer_intent`, `audit_network`, `reason_with_llm`, `mount_sift_evidence`,
-  etc.) now carry the stack `@_register_mcp_tool` → `@rate_limit` → `def`.
-- The argument summary (`_audit_argument_summary`/`_audit_argument_value`) is
-  bounded and non-plaintext: a string is recorded as
-  `str(bytes=N, sha256_prefix=...)` over at most 4096 bytes, never the whole
-  payload — addressing the concern of copying sensitive evidence into the
-  trail.
+### What the live code shows today
 
-Verified by execution (induction, not just reading decorators): wrapping a
-formerly-uncovered tool with `_audit_mcp_entry` and invoking it with a
-sensitive payload, the only emitted event is `TOOL_INVOKED` and the plaintext
-does not appear (kept as a sha256 prefix). Applying the registry's fix
-(per-tool `log_info`) would DUPLICATE the boundary's logging — per §4.1 the
-finding is rejected as stale rather than patched.
+`_register_mcp_tool()` (line ~206) is the **only** MCP tool registration
+path in the entire file -- confirmed by `grep -c "mcp.tool()"` returning
+exactly 1 occurrence in the whole file, inside that function. It wraps
+EVERY tool, both decorator-style (`@_register_mcp_tool`) and call-style
+(`_register_mcp_tool(func)`, the optional/gated ones), with
+`_audit_mcp_entry()`, which emits `audit_logger.log_info(event_type=
+"TOOL_INVOKED", ...)` **before** the wrapped function runs -- i.e. before
+any path sanitization or internal logic, matching or exceeding the
+guarantee the 3 original tools individually provided.
 
-### Honest residual note (§5.3) — the fsync debt is now realized
+Verified by direct execution (not just static reading): calling
+`deactivate_honey_token` and `get_phonetic_dict_stats` -- two of the tools
+the original entry listed as "NOT covered" -- each produces a
+`TOOL_INVOKED` event, with zero per-tool code changes. Further confirmed by
+AST walk that all 22 base tools and the 5 always-loaded optional tools all
+resolve to `_register_mcp_tool`.
 
-The registry deferred the rollout because `audit_logger.log_info()` does a
-synchronous `fh.flush()` + `os.fsync()` per call (`security.py:488-489`,
-confirmed). Since the boundary now logs on every tool invocation, that
-per-call fsync is in effect today: an investigation with N MCP calls does N
-blocking fsyncs. This is a deliberate trade-off (correctness > perf, already
-noted in the original registry entry) and not a correctness problem — the
-chain-of-custody gap, which was the P2 concern, is closed. If performance
-matters later, the fix is to batch/async the audit sink, not to reopen the
-instrumentation.
+### Correcting a detail in the original list
 
-### Side note
+`check_syscall_latency` appeared in the "NOT covered (20)" list as if it
+were an uninstrumented MCP tool. It is not: it has no `@_register_mcp_tool`
+decorator, no `_register_mcp_tool(check_syscall_latency)` call, and **zero
+callers anywhere in the file** -- it was never an MCP tool, appears to be
+dead code (rootkit detection via syscall latency, never wired to anything).
+It was never part of either the covered or uncovered count.
 
-`check_syscall_latency` was in the "uncovered" list, but in the live code it
-is defined (`vigia_sift_bridge.py:3928`) and NEVER registered — it is not an
-exposed MCP tool (zero `_register_mcp_tool`, zero callers). It has no audit gap
-because it is unreachable as a tool; it is a dead/internal function, recorded
-here so a future auditor does not chase it as an uninstrumented tool.
+### Why this counts as resolved, not a new finding
 
-No code changes — resolved by verifying that the prior wiring already closes
-the gap.
+B-122's underlying concern (does every MCP tool leave a contemporaneous
+invocation record, not one reconstructed afterward?) is satisfied -- better
+than the entry proposed: instead of 3 manually-instrumented sites plus 20
+pending, there is a single structural enforcement point that cannot be
+forgotten when adding a new tool (any tool that doesn't go through
+`_register_mcp_tool` simply never gets registered with the MCP server at
+all). The "known technical debt" concern about `fsync()` cost across 20
+additional tools is moot: that cost was already being paid on every tool
+call before this check, not a new performance regression to evaluate.
+
+### Verification
+
+Permanent test: `tests/test_b122_universal_tool_invoked_audit.py` (6 tests:
+`mcp.tool()` is called exactly once in the whole module -- a guard that
+flags itself if a second registration path that could bypass the audit
+wrapper ever appears --, `_register_mcp_tool` wraps with
+`_audit_mcp_entry`, two previously-"uncovered" tools emit `TOOL_INVOKED` on
+real execution, and `check_syscall_latency` confirmed to have no decorator
+and no callers). Full suite: 1998 passed (before adding this file), 191
+skipped, 29 xfailed.
+
+## B-214 — `VigiaPipeline.run_full` bypasses the normalization-integrity gate that `vigia_agent.py` applies: two entry points, two verdicts [RESOLVED — Claude 2026-07-26]
+
+| Field | Value |
+|-------|-------|
+| **Severity** | P2 (architectural footgun, not an incorrectness). |
+| **Files** | `vigia/pipeline/pipeline.py` (`VigiaPipeline.run_full`), `vigia_agent.py` (full Mode-1 agent). |
+| **Mode** | Any code that calls `run_full` directly to seal instead of going through the agent. |
+| **Detected by** | Mode-1 vs Mode-2 cross-check (session 2026-07-23). |
+| **Fix commit** | branch `claude/bugs-pendientes-advance`. |
+
+### Description (inherited, unchanged in substance)
+
+`run_full` does not run the normalization-integrity gate that `vigia_agent.py`
+(Mode 1) applies before sealing. Reproduced with two real cases
+(`OWL-NEXUS5-CASE.json`, `VIGIA-OWL-2019-COMPLETE.json`): `run_full` seals
+`decision=REJECT, posterior=1.0`; `vigia_agent.py` on the same JSON seals
+`ABSTAIN` with reason `NORMALIZATION_INTEGRITY_LOSS`. Further investigation
+this session confirmed `run_full` (the `LikelihoodEngine` +
+`RiskBoundedDecisionLayer` "EBS v1" engine) and `vigia_agent.py` (which uses
+`vigia_scorer.py` + `vigia_integration_bridge.py` for its deterministic
+scoring) are in fact **two distinct scoring engines**, not one function with
+an optional flag -- wiring the normalization gate into `run_full` would mean
+integrating two separate scoring systems, not just adding a check.
+
+### Decision made: option (b), not (a)
+
+The original entry proposed two paths: (a) `run_full` runs the same gate and
+degrades to ABSTAIN -- changes the sealed verdict of any case with
+`normalization_failures`, needs an architecture decision + corpus dry-run;
+or (b) document `run_full` explicitly as "raw ungated score" and note that
+authoritative sealing must route through the agent. Option (b) was applied:
+it's the path the entry itself already sanctioned as safe without the
+dry-run (a) requires, and it touches no sealed verdict.
+
+### Fix applied
+
+`run_full()`'s docstring expanded with an explicit warning: names B-214,
+describes the exact gap, cites the two reproduced real cases, and states
+outright not to call `run_full` directly for authoritative sealing -- use
+`vigia_agent.py` instead. Zero behavioral change: `run_full`'s scoring logic
+was not touched.
+
+**Adjacent finding fixed in passing:** the same docstring, in its
+`[Gobernanza]` step, documented the pre-B-117 inverted formula
+(`r = (1-P)·(1+λD)·(1+γ(1-S))·(1+ω(1-I))`) -- the bug B-117 fixed on
+2026-07-14, which inverted verdicts. The live implementation
+(`risk_bounded_layer.py`) has used `r = P·(...)` since that fix; the
+docstring was never updated. Corrected to the real formula, with a
+reference to B-117.
+
+### Verification
+
+Permanent test: `tests/test_b214_run_full_docstring_warning.py` (3 tests:
+the docstring names B-214 and the gap, explicitly points callers at the
+agent for sealing, and the formula is no longer the pre-B-117 inverted
+form). Syntax verified with `ast.parse()` after the edit. Full suite before
+and after: 2004 passed, 191 skipped, 29 xfailed -- zero regressions
+(documentation-only change, no logic touched).

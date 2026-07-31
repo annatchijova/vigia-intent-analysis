@@ -787,7 +787,7 @@ class NarrativeGenerator:
                              f"{posterior*100:.1f}% probabilidad de intención maliciosa"),
             self._table_row("**Risk score** r",
                              f"`{self.b.risk:.6f}`",
-                             "Función de gobernanza: r=(1-P)·(1+λD)·(1+γ(1-S))"),
+                             "Función de gobernanza: r=P·(1+λD)·(1+γ(1-S))"),
             self._table_row("**Estabilidad grafo**",
                              f"`{self.b.global_stability:.4f}`",
                              "π≥0.85 por arista (bootstrap)"),
