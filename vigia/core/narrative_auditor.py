@@ -68,7 +68,29 @@ _INJECTION_PATTERNS: List[Tuple[str, str, str]] = [
      "AUTHORITY_SPOOFING", "CRITICAL"),
 
     # False familiarity (Carnegie paradox — Gemini case)
-    (r"(?i)(?:as\s+)?(?:you\s+)?(?:know|should\s+know|obviously|naturally|of\s+course)",
+    #
+    # B-124: el patrón anterior era
+    #   (?i)(?:as\s+)?(?:you\s+)?(?:know|should\s+know|obviously|naturally|of\s+course)
+    # Todos los grupos de contexto son OPCIONALES y no había límites de
+    # palabra, así que colapsaba a "las letras k-n-o-w en cualquier lado":
+    # disparaba dentro de `unknown` (el artifact_type/evidence_type por
+    # defecto de VIGÍA, el token más frecuente de sus propias narrativas),
+    # dentro de direcciones de correo presentes en la evidencia
+    # (`whoknowsme@sbcglobal.net`) y dentro de prosa forense común.
+    # Medido sobre las 605 narrativas reales de results/: 410 de 411 threats
+    # (99.8%) venían de acá, y como audit_narrative_before_seal escala a
+    # CRITICAL_NARRATIVE_INJECTION en veredictos MALICE/INTENT, habría
+    # fabricado 57 eventos CRITICAL en el log de auditoría sellado.
+    #
+    # El dispositivo que este patrón existe para detectar es el ENCUADRE
+    # retórico ("as you know", "obviously") que presupone terreno compartido
+    # para suprimir escrutinio — no el verbo "know". Reportar ignorancia
+    # ("we do not know the acquisition tool") no es manipulación.
+    # `know` exige ahora su encuadre de familiaridad; los adverbios quedan
+    # sueltos pero con límite de palabra.
+    (r"(?i)\b(?:as\s+)?(?:you|we)\s+(?:should\s+)?know\b",
+     "FALSE_FAMILIARITY", "MEDIUM"),
+    (r"(?i)\b(?:obviously|naturally|of\s+course)\b",
      "FALSE_FAMILIARITY", "MEDIUM"),
 
     # Delimiter breaks
