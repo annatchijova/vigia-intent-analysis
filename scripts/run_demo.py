@@ -150,6 +150,64 @@ def _print_sep(char: str = "─", w: int = 74) -> None:
 # C3: NarrativeAuditor — validación antes del cierre del bundle
 # ---------------------------------------------------------------------------
 
+# B-124: estados explícitos de C3. Un audit que no corrió NO es un audit
+# limpio. `is_clean` solo tiene significado cuando status == AUDITED; en
+# SKIPPED/ERROR vale None (desconocido), nunca True.
+C3_STATUS_AUDITED = "AUDITED"
+C3_STATUS_SKIPPED = "SKIPPED_MODULE_ABSENT"
+C3_STATUS_ERROR   = "ERROR"
+
+# Rutas donde se busca el auditor, relativas al script — run_demo bootstrapea
+# `sys.path` desde un layout `vigia_prod/` y corre tanto empaquetado como desde
+# el repo, así que la ausencia del módulo es legítima. Constante a nivel módulo
+# para que los tests puedan sustituirla sin escribir dentro del repo.
+#
+# `vigia/core/narrative_auditor.py` NO está acá a propósito: expone exactamente
+# `audit_narrative_before_seal(...)`, de modo que agregarlo haría que C3 corra
+# de verdad en todos los casos del demo. Eso es un cambio de comportamiento que
+# necesita dry-run de corpus + sign-off (disciplina del cluster B-124), no un
+# efecto colateral de este fix de honestidad.
+_C3_AUDITOR_CANDIDATES: List[str] = [
+    os.path.join(_SCRIPT_DIR, "narrative_auditor.py"),
+    os.path.join(_SCRIPT_DIR, "vigia_prod", "security", "narrative_auditor.py"),
+]
+
+
+def _c3_not_run(investigation_id: str, status: str, note: str) -> Dict[str, Any]:
+    """Resultado de un C3 que no produjo veredicto. Nunca `is_clean=True`."""
+    return {
+        "status": status,
+        "is_clean": None,
+        "threats_count": None,
+        "threats": [],
+        "audit_hash": "N/A",
+        "investigation_id": investigation_id,
+        "note": note,
+    }
+
+
+def _c3_display(c3: Dict[str, Any]) -> str:
+    """Cómo se muestra C3 a un humano. La ausencia se ve como ausencia."""
+    status = c3.get("status")
+    if status == C3_STATUS_AUDITED:
+        return "CLEAN" if c3.get("is_clean") else "THREATS DETECTED"
+    if status == C3_STATUS_SKIPPED:
+        return "NOT RUN (auditor ausente)"
+    return "NOT RUN (error)"
+
+
+def _c3_summary_fields(c3: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Campos de C3 para el resumen batch. `c3_clean` ya no tiene default True:
+    un lector del resumen debe poder distinguir "no auditado" de "auditado y
+    limpio".
+    """
+    return {
+        "c3_status": c3.get("status", C3_STATUS_ERROR),
+        "c3_clean":  c3.get("is_clean") if c3.get("status") == C3_STATUS_AUDITED else None,
+    }
+
+
 def _run_c3_audit(
     narrative: List[str],
     investigation_id: str,
@@ -158,42 +216,39 @@ def _run_c3_audit(
     """
     Invoca al NarrativeAuditor (C3) sobre la narrativa generada.
 
-    Si el auditor no está disponible, retorna resultado limpio con advertencia.
     C3 nunca bloquea el pipeline por ausencia del módulo — degrada gracefully.
+    Pero degradar no es aprobar: si el auditor no está o falla, el resultado se
+    marca NOT RUN (`is_clean=None`), no "limpio". Reportar `is_clean=True` para
+    un audit que nunca corrió sería un falso PASS sellado junto al bundle.
     """
     try:
         # Intentar importación desde rutas conocidas
         import importlib.util as _ilu
-        _auditor_candidates = [
-            os.path.join(_SCRIPT_DIR, "narrative_auditor.py"),
-            os.path.join(_SCRIPT_DIR, "vigia_prod", "security", "narrative_auditor.py"),
-        ]
-        _auditor_path = next((p for p in _auditor_candidates if os.path.isfile(p)), None)
+        _auditor_path = next(
+            (p for p in _C3_AUDITOR_CANDIDATES if os.path.isfile(p)), None
+        )
 
         if _auditor_path:
             spec = _ilu.spec_from_file_location("narrative_auditor", _auditor_path)
             mod  = _ilu.module_from_spec(spec)
             spec.loader.exec_module(mod)
             result = mod.audit_narrative_before_seal(narrative, investigation_id, verdict)
-            return result.to_dict()
+            audited = dict(result.to_dict())
+            audited["status"] = C3_STATUS_AUDITED
+            return audited
         else:
-            return {
-                "is_clean": True,
-                "threats_count": 0,
-                "threats": [],
-                "audit_hash": "N/A",
-                "investigation_id": investigation_id,
-                "note": "narrative_auditor.py no encontrado — C3 omitido",
-            }
+            return _c3_not_run(
+                investigation_id,
+                C3_STATUS_SKIPPED,
+                "narrative_auditor.py no encontrado — C3 NO EJECUTADO "
+                "(ausencia de audit, no un PASS)",
+            )
     except Exception as e:
-        return {
-            "is_clean": True,
-            "threats_count": 0,
-            "threats": [],
-            "audit_hash": "N/A",
-            "investigation_id": investigation_id,
-            "note": f"C3 error (no bloqueante): {e}",
-        }
+        return _c3_not_run(
+            investigation_id,
+            C3_STATUS_ERROR,
+            f"C3 error (no bloqueante) — NO EJECUTADO: {e}",
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -253,11 +308,16 @@ def run_case(
     result["c3_audit"] = c3_result
 
     # Advertir si C3 detectó amenazas
-    if not c3_result.get("is_clean", True):
+    # Solo un audit que efectivamente corrió puede alertar. Un C3 ausente no
+    # dispara alerta de amenazas (no vio ninguna) pero tampoco se reporta
+    # limpio: eso lo dice la línea C3 AUDIT abajo.
+    if c3_result.get("status") == C3_STATUS_AUDITED and not c3_result.get("is_clean"):
         print(
             f"  [C3 ALERTA] {c3_result['threats_count']} amenaza(s) en narrativa "
             f"— audit_hash: {c3_result['audit_hash']}"
         )
+    elif c3_result.get("status") != C3_STATUS_AUDITED:
+        print(f"  [WARN] C3 no ejecutado — {c3_result.get('note', 'sin detalle')}")
 
     # ── Output determinista (Protocolo P0) ────────────────────────────────
     _print_sep("═")
@@ -270,8 +330,9 @@ def run_case(
     if result.get("ecl_hash"):
         print(f"  ECL HASH:    {result['ecl_hash']} (Level 3)")
     print(f"  VERIFY:      {'OK' if result['verify']['passed'] else 'FAIL'} — {result['verify']['message']}")
-    print(f"  C3 AUDIT:    {'CLEAN' if c3_result.get('is_clean') else 'THREATS DETECTED'} "
-          f"({c3_result.get('threats_count', 0)} amenazas)")
+    _c3_count = c3_result.get("threats_count")
+    print(f"  C3 AUDIT:    {_c3_display(c3_result)}"
+          + (f" ({_c3_count} amenazas)" if _c3_count is not None else ""))
     if result.get("bundle_path"):
         print(f"  BUNDLE:      {result['bundle_path']}")
     if result.get("report_path"):
@@ -438,7 +499,7 @@ Ejemplos:
                     "posterior":  r.get("posterior"),
                     "bundle_hash": r.get("bundle_hash", ""),
                     "verify_ok":  r.get("verify", {}).get("passed", False),
-                    "c3_clean":   r.get("c3_audit", {}).get("is_clean", True),
+                    **_c3_summary_fields(r.get("c3_audit", {})),
                     "mode":       r.get("mode"),
                 }
                 for r in results
@@ -455,7 +516,7 @@ Ejemplos:
         bh = r.get("bundle_hash", "N/A")
         bp = r.get("bundle_path", "N/A")
         rp = r.get("report_path", "N/A")
-        c3 = "CLEAN" if r.get("c3_audit", {}).get("is_clean", True) else "THREATS"
+        c3 = _c3_display(r.get("c3_audit", {}))
         print(f"  [{r.get('case_id')}]")
         print(f"    bundle_hash : {bh}")
         print(f"    bundle      : {bp}")

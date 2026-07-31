@@ -449,12 +449,17 @@ def test_kernel_is_not_imported_by_the_scoring_pipeline():
     out = subprocess.run(
         ["git", "grep", "-l", "-E",
          r"core\.reasoning\.abduction|core import ontology|core\.ontology",
-         "--", "vigia/", "*.py"],
+         "--",
+         # Production code only. `*.py` as a git pathspec matches at any depth,
+         # so the test suite (which imports the kernel by design) has to be
+         # excluded explicitly, along with the kernel's own package.
+         "vigia/", "*.py",
+         ":(exclude)tests/", ":(exclude)vigia/tests/",
+         ":(exclude)vigia/core/ontology.py", ":(exclude)vigia/core/reasoning/"],
         capture_output=True, text=True,
     )
+    assert out.returncode in (0, 1), out.stderr
     importers = {line for line in out.stdout.splitlines() if line}
-    importers -= {"vigia/core/ontology.py", "vigia/core/reasoning/abduction.py",
-                  "vigia/core/reasoning/__init__.py"}
     assert importers == set(), (
         f"epistemic kernel reached the pipeline via: {sorted(importers)}"
     )
