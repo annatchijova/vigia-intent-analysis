@@ -1,0 +1,344 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-08-01T21:16:28.542641+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-COLONIAL-001",
+    "end_time": "2026-08-01T21:16:28.542645+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-COLONIAL-001",
+        "entry_sha256": "eea3ac310a956b8a02d4477f669912ef5f26837e67d14a15b84b647e72e6a75b",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-COLONIAL-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: aaf9d220f681ce27...; runtime fingerprint: f2d94e95391fc828...",
+        "outputs_summary": {
+          "agent_sha256": "aaf9d220f681ce2720749a524979a01363811def99b4f13c2454dc29bc00e80e",
+          "agent_version": "1.0.0-SANS-2026",
+          "runtime_fingerprint": "f2d94e95391fc8282ba48e8a82c13355545908dde7980bf63ebf3ef40a59871f"
+        },
+        "seq": 1,
+        "timestamp": "2026-08-01T21:16:28.194072+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-COLONIAL-001",
+        "entry_sha256": "df8f94abe5627d78c681c2e29b1f56c420d3b9280500661993a1bcff2a827cb8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/VIGIA-REAL-COLONIAL-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-08-01T21:16:28.194156+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-COLONIAL-001",
+        "entry_sha256": "d405ee518d886bb43be06561b382281f406231f662459107f3a79f4f3df164d8",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/VIGIA-REAL-COLONIAL-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: c117e61b9be168f4...",
+        "outputs_summary": {
+          "sha256": "c117e61b9be168f42ea704890a3fb812df10a5168669cf1ca7caa20d15b67abe"
+        },
+        "seq": 3,
+        "timestamp": "2026-08-01T21:16:28.194231+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-COLONIAL-001",
+        "entry_sha256": "02da1efe3c535efa535d701f7cbb2740e7598b47b426b44208e3fbf8271fd125",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/VIGIA-REAL-COLONIAL-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-08-01T21:16:28.194313+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-COLONIAL-001",
+        "entry_sha256": "180cd92d89eb5017dac328f4415659132e3e579156ecd365c79b0199c75c664b",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 6 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "61/100",
+            "confidence": "61/100",
+            "is_conclusive": "True",
+            "narrative": "[MOTOR] Label-blind selection: SUSPICION_DETECTED. Significant signal with structural support (score=0.3072)",
+            "narrative_provenance": "deterministic_motor_selection",
+            "scenario_context": "On May 7, 2021, Colonial Pipeline, operator of the largest refined oil products pipeline in the United States (5,500 miles, 100M+ gallons/day), suffered a ransomware attack by the DarkSide group. The ...",
+            "scenario_context_provenance": "case_description_unverified"
+          },
+          "case_id": "VIGIA-REAL-COLONIAL-001",
+          "pipeline_meta": {
+            "artifact_count": "6",
+            "avg_score": "6133/12000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.61",
+              "motor_reason": "Significant signal with structural support (score=0.3072)",
+              "motor_score": "0.3072",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "41/50",
+              "description": "DarkSide ransomware deployment on Colonial Pipeline IT systems. FIRSTNESS: ransomware encrypted critical business systems (accounting, billing) using AES-256 and RSA algorithms. SECONDNESS: the ransom",
+              "evidence_type": "malware_infrastructure",
+              "source": "public CISA / Mandiant analysis",
+              "z_score": "82/125"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "39/50",
+              "description": "Data exfiltration \u2014 ~100 GB stolen in ~2 hours before ransomware deployment. FIRSTNESS: large volume of data transferred outbound from Colonial's network. SECONDNESS: the exfiltration occurred BEFORE ",
+              "evidence_type": "network_communication_pattern",
+              "source": "public reporting on data exfiltration",
+              "z_score": "117/200"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "3/4",
+              "description": "Compromised VPN credentials \u2014 initial access vector. FIRSTNESS: a single set of stolen credentials granted access to Colonial's VPN. SECONDNESS: the VPN account lacked multi-factor authentication (MFA",
+              "evidence_type": "plaintext_credential",
+              "source": "public reporting on initial access",
+              "z_score": "39/80"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "22/25",
+              "description": "Critical infrastructure impact \u2014 the escalation artifact. FIRSTNESS: Colonial shut down 5,500 miles of pipeline, halting 45% of East Coast fuel supply. SECONDNESS: the shutdown triggered fuel shortage",
+              "evidence_type": "behavioral_context",
+              "source": "public reporting on societal impact",
+              "z_score": "187/250"
+            },
+            {
+              "artifact_id": "ART-005",
+              "confidence": "17/20",
+              "description": "Ransom payment and recovery \u2014 the criminal-economics anchor. FIRSTNESS: Colonial paid 75 Bitcoin (~$4.4M) within hours of the attack. SECONDNESS: the FBI recovered 64 Bitcoin (~$2.3M) one month later,",
+              "evidence_type": "outcome_signal",
+              "source": "public reporting on ransom payment",
+              "z_score": "51/100"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-08-01T21:16:28.542256+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-COLONIAL-001",
+        "entry_sha256": "8d7f8c8f4622d936409cdf36e659bc38fd551bf6aebc026e18b24b40d3420fe8",
+        "inputs_summary": {
+          "n_signals": "6"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-08-01T21:16:28.542386+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-COLONIAL-001",
+        "entry_sha256": "ac176af3beba3aeafb271ee82bd24162f76e232edebc984e87c9df38cd37d463",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-08-01T21:16:28.542593+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-08-01T21:16:28.173978+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-COLONIAL-001",
+  "evidence_path": "/home/labestiadevigia/Downloads/VIGIA-REAL-COLONIAL-001.json",
+  "evidence_sha256": "c117e61b9be168f42ea704890a3fb812df10a5168669cf1ca7caa20d15b67abe",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-COLONIAL-001 ===\nEvidence: /home/labestiadevigia/Downloads/VIGIA-REAL-COLONIAL-001.json\nEvidence SHA-256: c117e61b9be168f42ea704890a3fb812df10a5168669cf1ca7caa20d15b67abe\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 61/100\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['public CISA / Mandiant analysis', 'public reporting on DarkSide statements', 'public reporting on data exfiltration', 'public reporting on initial access', 'public reporting on ransom payment', 'public reporting on societal impact'], 0 derivada(s)/no-analizada(s). Top z: Critical infrastructure impact \u2014 the esc=0.75, DarkSide ransomware deployment on Coloni=0.66, Data exfiltration \u2014 ~100 GB stolen in ~2=0.58.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n[MOTOR] Label-blind selection: SUSPICION_DETECTED. Significant signal with structural support (score=0.3072)\n\n--- CASE CONTEXT (UNVERIFIED INPUT \u2014 NOT ANALYTICAL EVIDENCE) ---\nOn May 7, 2021, Colonial Pipeline, operator of the largest refined oil products pipeline in the United States (5,500 miles, 100M+ gallons/day), suffered a ransomware attack by the DarkSide group. The attack encrypted IT systems and exfiltrated ~100 GB of data. Colonial proactively shut down pipeline operations to prevent OT/ICS compromise, triggering fuel shortages across the U.S. East Coast, panic buying, and a national state of emergency declared by President Biden. Colonial paid 75 Bitcoin (~\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [Critical infrastructure impact \u2014 the escalation artifact. FIRSTNESS: C] z=0.748 conf=0.88 \u2014 \n  [DarkSide ransomware deployment on Colonial Pipeline IT systems. FIRSTN] z=0.656 conf=0.82 \u2014 \n  [Data exfiltration \u2014 ~100 GB stolen in ~2 hours before ransomware deplo] z=0.585 conf=0.78 \u2014 \n  [Ransom payment and recovery \u2014 the criminal-economics anchor. FIRSTNESS] z=0.510 conf=0.85 \u2014 \n  [Compromised VPN credentials \u2014 initial access vector. FIRSTNESS: a sing] z=0.487 conf=0.75 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "61/100",
+      "confidence": {
+        "__fraction__": true,
+        "den": 100,
+        "num": 61
+      },
+      "is_conclusive": true,
+      "narrative": "[MOTOR] Label-blind selection: SUSPICION_DETECTED. Significant signal with structural support (score=0.3072)",
+      "narrative_provenance": "deterministic_motor_selection",
+      "scenario_context": "On May 7, 2021, Colonial Pipeline, operator of the largest refined oil products pipeline in the United States (5,500 miles, 100M+ gallons/day), suffered a ransomware attack by the DarkSide group. The attack encrypted IT systems and exfiltrated ~100 GB of data. Colonial proactively shut down pipeline operations to prevent OT/ICS compromise, triggering fuel shortages across the U.S. East Coast, panic buying, and a national state of emergency declared by President Biden. Colonial paid 75 Bitcoin (~",
+      "scenario_context_provenance": "case_description_unverified"
+    },
+    "case_id": "VIGIA-REAL-COLONIAL-001",
+    "pipeline_meta": {
+      "artifact_count": 6,
+      "avg_score": "6133/12000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.61",
+        "motor_reason": "Significant signal with structural support (score=0.3072)",
+        "motor_score": "0.3072",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 41
+        },
+        "description": "DarkSide ransomware deployment on Colonial Pipeline IT systems. FIRSTNESS: ransomware encrypted critical business systems (accounting, billing) using AES-256 and RSA algorithms. SECONDNESS: the ransom",
+        "evidence_type": "malware_infrastructure",
+        "source": "public CISA / Mandiant analysis",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 82
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 39
+        },
+        "description": "Data exfiltration \u2014 ~100 GB stolen in ~2 hours before ransomware deployment. FIRSTNESS: large volume of data transferred outbound from Colonial's network. SECONDNESS: the exfiltration occurred BEFORE ",
+        "evidence_type": "network_communication_pattern",
+        "source": "public reporting on data exfiltration",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "Compromised VPN credentials \u2014 initial access vector. FIRSTNESS: a single set of stolen credentials granted access to Colonial's VPN. SECONDNESS: the VPN account lacked multi-factor authentication (MFA",
+        "evidence_type": "plaintext_credential",
+        "source": "public reporting on initial access",
+        "z_score": {
+          "__fraction__": true,
+          "den": 80,
+          "num": 39
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 22
+        },
+        "description": "Critical infrastructure impact \u2014 the escalation artifact. FIRSTNESS: Colonial shut down 5,500 miles of pipeline, halting 45% of East Coast fuel supply. SECONDNESS: the shutdown triggered fuel shortage",
+        "evidence_type": "behavioral_context",
+        "source": "public reporting on societal impact",
+        "z_score": {
+          "__fraction__": true,
+          "den": 250,
+          "num": 187
+        }
+      },
+      {
+        "artifact_id": "ART-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Ransom payment and recovery \u2014 the criminal-economics anchor. FIRSTNESS: Colonial paid 75 Bitcoin (~$4.4M) within hours of the attack. SECONDNESS: the FBI recovered 64 Bitcoin (~$2.3M) one month later,",
+        "evidence_type": "outcome_signal",
+        "source": "public reporting on ransom payment",
+        "z_score": {
+          "__fraction__": true,
+          "den": 100,
+          "num": 51
+        }
+      },
+      {
+        "artifact_id": "ART-006",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 2
+        },
+        "description": "DarkSide's 'apolitical' disclaimer \u2014 the refutation artifact. FIRSTNESS: after the attack gained global attention, DarkSide issued a statement claiming they were 'apolitical' and did not intend to cre",
+        "evidence_type": "acquisition_context",
+        "source": "public reporting on DarkSide statements",
+        "z_score": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 2
+        }
+      }
+    ]
+  },
+  "runtime_fingerprint": "f2d94e95391fc8282ba48e8a82c13355545908dde7980bf63ebf3ef40a59871f",
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 6,
+    "n_total_signals": 6,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

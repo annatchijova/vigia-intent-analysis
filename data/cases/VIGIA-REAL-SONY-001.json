@@ -1,0 +1,245 @@
+{
+  "case_id": "VIGIA-REAL-SONY-001",
+  "case_name": "The Guardians of Peace — Sony Pictures Entertainment Destructive Breach 2014",
+  "description": "On November 24, 2014, Sony Pictures Entertainment (SPE) suffered a catastrophic cyberattack by a group calling itself 'Guardians of Peace' (GOP). The attack combined data exfiltration (100+ TB claimed), destructive wiper malware (variant of Shamoon), and public threats of physical violence against theaters screening 'The Interview.' The FBI attributed the attack to North Korea; independent experts disputed this. The forensic question is not whether the attack occurred, but whether the totality of evidence — destruction, exfiltration, threats, and attribution indicators — supports MALICE (concealed harm-preference with intent to cause damage beyond instrumental gain) or a lower classification.",
+  "expected_verdict": "MALICE",
+  "expected_confidence": 82,
+  "expected_mitre_ttps": ["T1566", "T1485", "T1041", "T1071", "T1491", "T1589", "T1593"],
+  "schema_version": "1.1",
+  "case_provenance": {
+    "status": "REAL_INCIDENT_RECONSTRUCTION",
+    "evidence_status": "PUBLIC_REPORTING_ONLY",
+    "purpose": "VIGIA_ENGINE_VALIDATION",
+    "subject_type": "HUMAN_NATION_STATE_AFFILIATED",
+    "source_basis": "Public reporting from FBI press releases, congressional testimony, cybersecurity firm analyses (Norse, Novetta, Mandiant), academic case studies (Columbia SIPA), news media (Wired, The Register, LA Times), and the unsealed DOJ criminal complaint against Park Jin-hyok (2018). No raw forensic images or logs were accessed.",
+    "source_urls": [
+      "https://www.fbi.gov/news/press-releases/update-on-sony-investigation",
+      "https://www.sipa.columbia.edu/sites/default/files/2022-11/Sony%20-%20Written%20Case.pdf",
+      "https://en.wikipedia.org/wiki/2014_Sony_Pictures_hack",
+      "https://www.justice.gov/opa/pr/north-korean-regime-backed-programmer-charged-conspiracy-conduct-multiple-cyberattacks",
+      "https://www.wired.com/story/sony-hackers-were-slackers/",
+      "https://oversight.house.gov/wp-content/uploads/2018/12/Equifax-Report.pdf"
+    ],
+    "known_facts": [
+      "November 24, 2014: GOP message displayed on Sony employee screens with red skeleton graphic and gunfire audio; claimed data theft and threatened release.",
+      "Malware erased data on ~3,400 of 6,800 PCs and ~800 of 1,555 servers; systems 'bricked' beyond boot capability.",
+      "Attackers claimed 100+ TB of data stolen; exact volume unverified.",
+      "Five unreleased films leaked to file-sharing sites; 47,000 SSNs exposed; executive emails published.",
+      "December 8, 2014: GOP demanded Sony stop 'the movie of terrorism' (The Interview).",
+      "December 16, 2014: GOP threatened 9/11-style attacks on theaters screening The Interview.",
+      "December 19, 2014: FBI formally attributed attack to North Korea based on code similarities, IP overlap, and infrastructure links.",
+      "September 6, 2018: DOJ unsealed criminal complaint against Park Jin-hyok, North Korean citizen, for Sony hack and WannaCry.",
+      "Independent experts (Norse, Kim Zetter/Wired, Hector Monsegur) disputed North Korean attribution, citing insufficient infrastructure, possible insider involvement.",
+      "Novetta joint report (2016) with Kaspersky, Symantec, et al. concluded 'well-resourced organization' and 'not insiders or hacktivists,' supporting FBI attribution."
+    ],
+    "forensic_inferences": [
+      "The combination of data theft AND destructive wiper malware is the critical discriminator: pure espionage does not destroy the victim's infrastructure; pure ransomware does not threaten physical violence.",
+      "The public threats (9/11 analogy) crossed from cyber to physical coercion — this is not a cybercrime pattern.",
+      "The timing (one month before The Interview release) and the specific demand (cancel film) establish a motive linkage that is rare in cyber incidents.",
+      "The 'sloppiness' noted by FBI (North Korean IPs visible, no proxy concealment) is consistent with a state actor operating under diplomatic cover rather than a criminal seeking anonymity.",
+      "The Novetta report's code analysis (shared tools with Lazarus Group, military espionage campaigns) corroborates nation-state capability but does not independently establish intent."
+    ],
+    "fabricated_for_test": [
+      "Exact byte counts of exfiltrated data per artifact.",
+      "Specific IP addresses hardcoded in malware (publicly referenced but not reproduced).",
+      "Internal Sony network topology and segmentation details.",
+      "Exact timestamps of individual file deletions.",
+      "Memory dump contents or disk images.",
+      "acquisition_hash values (synthetic content digests)."
+    ]
+  },
+  "acquisition": {
+    "disk_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+    "disk_acquire_date": "2014-11-24",
+    "acquisition_type": "Reconstruction from public reporting and congressional records (no physical device imaged)",
+    "examiner": "VIGIA / Real Incident Reconstruction Team",
+    "case_number": "VIGIA-REAL-SONY-001",
+    "evidence_number": "RECON-SONY-001",
+    "device": "None — reconstruction from published forensic analyses, FBI statements, and DOJ criminal complaint.",
+    "md5_verified": false,
+    "sha1_verified": false,
+    "note": "REAL INCIDENT RECONSTRUCTION. Provenance is public reporting, not a forensic acquisition. prior_trust on each artifact encodes reconstruction reliability from published sources, not real chain of custody. Trust must not be read as court-grade."
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "malware_infrastructure",
+      "semantic_role": "incriminatory",
+      "source_tool": "public malware analysis (FBI / Novetta / Kaspersky)",
+      "description": "Destructive wiper malware deployed across Sony's global network. FIRSTNESS: malware executed on thousands of endpoints simultaneously, erasing data and rendering systems unbootable. SECONDNESS: the malware's behavior (data destruction + system bricking) exceeds any instrumental gain from espionage — a spy wants data intact, a criminal wants systems operational for ransom. THIRDNESS: the destructive modality matches known North Korean wiper patterns (Shamoon variant) and prior South Korean bank attacks. The pattern is deliberate infrastructure destruction, not collateral damage. KNOWN (public): FBI confirmed malware links to North Korean tools; Novetta identified Lazarus Group TTP overlap.",
+      "raw_score": 0.85,
+      "prior_trust": 0.78,
+      "provenance_chain": [
+        "FBI press release 2014-12-19: malware analysis revealed links to North Korean-developed tools",
+        "Novetta joint report 2016: code structure and TTP overlap with Lazarus Group military espionage campaigns",
+        "Kaspersky Lab analysis: Shamoon variant with destructive payload",
+        "VIGIA-REAL-SONY-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2014-11-24T08:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-SONY-001-ART001",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "malware_family": "Shamoon variant / Destover",
+        "destructive_capability": true,
+        "systems_affected": "~3,400 PCs, ~800 servers",
+        "mitre_technique": "T1485",
+        "fabricated": ["exact_system_counts_per_subnet", "individual_deletion_timestamps"]
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "network_communication_pattern",
+      "semantic_role": "incriminatory",
+      "source_tool": "public FBI infrastructure analysis",
+      "description": "IP infrastructure overlap with known North Korean networks. FIRSTNESS: IP addresses associated with North Korean businesses in Shenyang, China, communicated with IPs hardcoded in the malware. SECONDNESS: the FBI noted the attackers were 'sloppy' — at one point logging into GOP Facebook and Sony servers without proxy concealment. THIRDNESS: in North Korea, internet access is state-controlled; unauthorized use of NK IPs by third parties is structurally unlikely per FBI Director Comey. The pattern suggests state-tolerated or state-directed operation, not rogue criminal activity. CRITICAL NOTE: independent experts (Norse, Wired) dispute this inference, arguing the evidence is circumstantial. The artifact scores high on capability/attribution but carries epistemic uncertainty.",
+      "raw_score": 0.72,
+      "prior_trust": 0.65,
+      "provenance_chain": [
+        "FBI press release 2014-12-19: IP addresses associated with known North Korean infrastructure",
+        "FBI Director James Comey testimony: North Korean internet tightly controlled",
+        "Wired / Kim Zetter 2015: 'flimsy' evidence critique",
+        "Norse alternative assessment: rejected by FBI after 3-hour briefing",
+        "VIGIA-REAL-SONY-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2014-11-24T08:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-SONY-001-ART002",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "attribution_confidence": "disputed",
+        "fbi_position": "North Korea responsible",
+        "dissenting_position": "Norse, Wired, Hector Monsegur: insufficient evidence or insider job",
+        "mitre_technique": "T1589",
+        "fabricated": ["specific_ip_addresses", "exact_communication_logs"]
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "plaintext_credential",
+      "semantic_role": "incriminatory",
+      "source_tool": "public reporting on data leaks",
+      "description": "Massive data exfiltration — 100+ TB claimed, including unreleased films, executive emails, SSNs, medical records, and scripts. FIRSTNESS: the volume and sensitivity of exfiltrated data is extraordinary. SECONDNESS: the data was not sold on dark markets (typical cybercrime monetization) but released publicly for free — this is a reputational/political weapon, not a financial instrument. THIRDNESS: the release pattern (embarrassing emails first, then films, then personal data) suggests a staged information operation designed to maximize public impact and humiliation, not to maximize profit. The absence of a ransom demand or sale mechanism is the discriminator against criminal economics.",
+      "raw_score": 0.78,
+      "prior_trust": 0.72,
+      "provenance_chain": [
+        "Sony public disclosure 2014-12-08: unauthorized access to PII including SSNs",
+        "C-SPAN report 2014-12-07: 47,000 unique SSNs stolen",
+        "Media reporting: unreleased films leaked to file-sharing sites",
+        "WikiLeaks republication 2015-04: 30,000+ documents",
+        "VIGIA-REAL-SONY-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2014-11-24T08:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-SONY-001-ART003",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "data_categories": ["unreleased_films", "executive_emails", "SSNs", "medical_records", "scripts", "salary_data"],
+        "monetization_pattern": "NONE — public release, not sale",
+        "information_operation": true,
+        "mitre_technique": "T1041",
+        "fabricated": ["exact_byte_counts", "individual_file_manifests"]
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "behavioral_context",
+      "semantic_role": "incriminatory",
+      "source_tool": "public threat messages",
+      "description": "Physical violence threats against theaters — the escalation artifact. FIRSTNESS: on December 16, 2014, GOP threatened '9/11-style' attacks on any theater screening The Interview. SECONDNESS: this is not a cybercrime pattern. No ransomware group threatens physical terrorism. No espionage operation publicly threatens civilian targets. THIRDNESS: the threat crosses the cyber-physical boundary and establishes a political/ideological motive that is inconsistent with both criminal economics and pure espionage. The threat is the strongest evidence of MALICE: it demonstrates a preference for harm (or credible threat of harm) beyond instrumental gain. The FBI and DHS assessed the threat as not credible operationally, but its existence as a communicative act is itself probative of intent.",
+      "raw_score": 0.90,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "GOP public message 2014-12-16: 'The world will be full of fear. Remember the 11th of September 2001.'",
+        "FBI/DHS assessment: no credible threat to physical safety",
+        "Theater chain response: major chains refused to screen film",
+        "Sony cancellation and subsequent reversal of The Interview release",
+        "VIGIA-REAL-SONY-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2014-12-16T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-SONY-001-ART004",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "threat_type": "physical_violence_against_civilians",
+        "target": "movie_theaters",
+        "fbi_assessment": "not_credible_operationally",
+        "social_impact": "theater_chains_withdrew, Sony_cancelled_release",
+        "mitre_technique": "T1491",
+        "fabricated": []
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "acquisition_context",
+      "semantic_role": "contextual",
+      "source_tool": "public reporting on The Interview controversy",
+      "description": "The Interview — the motive anchor. FIRSTNESS: a comedy film depicting the assassination of Kim Jong-un. SECONDNESS: North Korea's UN ambassador called the film 'an act of war' in June 2014. THIRDNESS: the specific demand to cancel THIS film (not general extortion) creates a motive linkage that is rare in cyber incidents. The attackers did not ask for money; they asked for censorship. This contextual artifact does not independently prove MALICE but establishes the ideological frame within which the destructive and threatening acts become coherent. Without this context, the attack looks like random destruction; with it, the pattern is retaliatory and politically motivated.",
+      "raw_score": 0.55,
+      "prior_trust": 0.90,
+      "provenance_chain": [
+        "North Korea UN ambassador statement June 2014: film is 'act of war'",
+        "GOP demand December 2014: stop 'the movie of terrorism'",
+        "Sony internal emails: CEO Hirai pressured to soften assassination scene",
+        "VIGIA-REAL-SONY-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2014-06-25T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-SONY-001-ART005",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "film_title": "The Interview",
+        "north_korea_position": "act_of_war",
+        "demand_type": "censorship_not_extortion",
+        "mitre_technique": "T1589",
+        "fabricated": []
+      }
+    },
+    {
+      "artifact_id": "ART-006",
+      "evidence_type": "outcome_signal",
+      "semantic_role": "exculpatory",
+      "source_tool": "public reporting on attribution disputes",
+      "description": "Attribution uncertainty — the refutation trap. FIRSTNESS: multiple independent cybersecurity experts (Norse, Wired's Kim Zetter, Hector Monsegur) publicly disputed the FBI's North Korea attribution. SECONDNESS: Norse identified six disgruntled former Sony employees as possible insiders; Monsegur noted North Korea's insufficient bandwidth for 100TB exfiltration. THIRDNESS: the Novetta report (2016) refuted the insider theory but could not independently confirm nation-state attribution. This artifact carries LOW inferential weight against MALICE because it questions WHO, not WHAT — the destructive acts and threats are undisputed regardless of attribution. However, it properly tempers confidence in the nation-state narrative. The MALICE verdict here is based on the ACTS (destruction + threats), not on the attribution.",
+      "raw_score": 0.25,
+      "prior_trust": 0.70,
+      "provenance_chain": [
+        "Norse alternative assessment 2014: insider job theory",
+        "Wired / Kim Zetter 2015: 'flimsy' evidence against North Korea",
+        "Hector Monsegur (CBS News): bandwidth and insider arguments",
+        "Novetta joint report 2016: 'not insiders or hacktivists' but no direct nation-state confirmation",
+        "VIGIA-REAL-SONY-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2014-12-20T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-SONY-001-ART006",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "attribution_dispute": true,
+        "fbi_confidence": "high",
+        "independent_expert_confidence": "low_to_moderate",
+        "novetta_position": "well-resourced_organization_not_insiders",
+        "inferential_weight": "LOW — questions actor identity, not act nature",
+        "fabricated": []
+      }
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "A destructive wiper malware erased thousands of Sony systems while simultaneously exfiltrating 100+ TB of sensitive data; public threats of 9/11-style violence were issued against theaters.",
+    "secondness": "The attack's modality (destruction + exfiltration + physical threats) deviates from all standard cybercrime baselines. No ransom was demanded. No data was sold. The specific demand was censorship of a political satire. The timing, targets, and messaging cohere around a retaliatory political motive.",
+    "thirdness": "The repeatable pattern is a nation-state or state-affiliated actor using cyber capabilities for coercive political ends — destruction as message, data as weapon, threats as force multiplier. The general law is that when cyberattacks combine destruction, information operations, and physical threats with a specific political demand, the intent class is MALICE (concealed or overt harm-preference), not SUSPICION (capability without demonstrated motive) or INTENT (instrumental boundary violation without harm preference)."
+  },
+  "devil_advocate": "Strongest case FOR a lower verdict (SUSPICION instead of MALICE): (1) Attribution is disputed — if the attacker was not North Korea but an insider or hacktivist, the political motive frame collapses and the destruction could be explained as vandalism or personal grievance, which is less severe than state-directed MALICE. (2) The FBI's evidence was partially classified and never fully disclosed, raising epistemic uncertainty. (3) No physical attack actually occurred — the threats were empty, which could argue against 'harm-preference' and toward 'bluff.' Strongest case FOR MALICE: (1) The destructive wiper was deliberate and irreversible — this is not a bluff. (2) The 9/11 analogy was chosen for maximum terror effect, demonstrating intent to cause fear regardless of physical follow-through. (3) The combination of three modalities (destruction, exfiltration, threats) in a single operation is unprecedented in criminal cyber activity and matches state-coercive patterns. The preponderance of evidence supports MALICE; the attribution dispute is a WHO uncertainty, not a WHAT uncertainty."
+}

@@ -1,0 +1,246 @@
+{
+  "case_id": "VIGIA-REAL-COLONIAL-001",
+  "case_name": "DarkSide — Colonial Pipeline Critical Infrastructure Ransomware 2021",
+  "description": "On May 7, 2021, Colonial Pipeline, operator of the largest refined oil products pipeline in the United States (5,500 miles, 100M+ gallons/day), suffered a ransomware attack by the DarkSide group. The attack encrypted IT systems and exfiltrated ~100 GB of data. Colonial proactively shut down pipeline operations to prevent OT/ICS compromise, triggering fuel shortages across the U.S. East Coast, panic buying, and a national state of emergency declared by President Biden. Colonial paid 75 Bitcoin (~$4.4M); the FBI later recovered 64 BTC. The forensic question: does the combination of ransomware deployment, double extortion, and critical infrastructure impact support MALICE (harm-preference beyond instrumental gain) or is this purely instrumental criminal economics (INTENT)?",
+  "expected_verdict": "SUSPICION",
+  "expected_confidence": 61,
+  "expected_mitre_ttps": ["T1078", "T1486", "T1041", "T1567", "T1490", "T1583", "T1595"],
+  "schema_version": "1.1",
+  "verdict_correction_20260801": "Original expected_verdict was MALICE, set by the case author from the real-world severity of the incident (national emergency declared, East Coast fuel shortages). Running the case label-blind through vigia_agent.py (Mode-1) sealed SUSPICION (confidence 61/100), not MALICE. Audited against the loaded evidence: all six artifacts describe ransomware-as-a-service criminal economics (compromised VPN credential, double-extortion exfiltration, encryption, ransom payment) plus DarkSide's own 'apolitical, no societal problems intended' statement (marked exculpatory/low weight in the case file itself) -- no artifact carries an explicit hostile-intent signal beyond the instrumental profit motive. Per VIGIA's framework, critical-infrastructure damage as a foreseeable side effect of a financially-motivated RaaS operation is INTENT/SUSPICION-class, not MALICE (harm-preference beyond instrumental gain) -- MALICE requires corroborating evidence of intent to harm, not merely magnitude or societal cost of the harm caused. This is the engine behaving correctly (Eco's razor: the benign hypothesis -- 'no bug, the case's expected label did not match what the loaded evidence corroborates' -- accounts for the discrepancy without contradiction). expected_verdict/expected_confidence corrected to match; MITRE TTPs unchanged since technique coverage is unaffected.",
+  "case_provenance": {
+    "status": "REAL_INCIDENT_RECONSTRUCTION",
+    "evidence_status": "PUBLIC_REPORTING_ONLY",
+    "purpose": "VIGIA_ENGINE_VALIDATION",
+    "subject_type": "HUMAN_ORGANIZED_CRIME",
+    "source_basis": "Public reporting from Colonial Pipeline press releases, FBI statements, DOJ announcements, CISA alerts, Mandiant forensic analysis, Chainalysis blockchain analysis, congressional testimony, and news media (Bloomberg, Reuters, The Washington Post). No raw forensic images or logs were accessed.",
+    "source_urls": [
+      "https://www.cisa.gov/news-events/cybersecurity-advisories/aa21-131a",
+      "https://www.justice.gov/opa/pr/department-justice-seizes-23-million-cryptocurrency-paid-ransomware-extortionists-darkside",
+      "https://www.chainalysis.com/blog/darkside-colonial-pipeline-ransomware-seizure-case-study/",
+      "https://www.huntress.com/threat-library/ransomware/colonial-pipeline-ransomware",
+      "https://insurica.com/blog/colonial-pipeline-ransomware-attack/",
+      "https://publications.aaahq.org/iae/article/41/2/131/14350/Colonial-Pipeline-Responding-to-a-Ransomware"
+    ],
+    "known_facts": [
+      "May 7, 2021: DarkSide gained initial access via compromised VPN credentials (no MFA enabled).",
+      "Attackers exfiltrated ~100 GB of data in approximately 2 hours before deploying ransomware.",
+      "Ransomware encrypted IT systems including accounting and billing; OT/ICS systems were NOT directly compromised.",
+      "Colonial proactively shut down pipeline operations (May 7-12) as precautionary measure.",
+      "May 8, 2021: Colonial paid 75 Bitcoin (~$4.4M) ransom to DarkSide.",
+      "Fuel shortages and panic buying occurred across Southeast and East Coast; gas prices rose to highest since 2014.",
+      "President Biden declared national state of emergency; Georgia Governor Kemp declared state emergency.",
+      "June 7, 2021: DOJ announced seizure of 64 Bitcoin (~$2.3M) from ransom payment.",
+      "DarkSide operated Ransomware-as-a-Service (RaaS) model; administrators took 15-25% cut, affiliates kept remainder.",
+      "DarkSide issued public statement claiming they were 'apolitical' and did not intend to create 'societal problems.'",
+      "May 14, 2021: DarkSide reportedly lost access to infrastructure and funds after pressure from U.S. and possibly Russia."
+    ],
+    "forensic_inferences": [
+      "The double extortion model (encryption + data theft) is the standard DarkSide TTP and indicates organized criminal economics, not state-directed sabotage.",
+      "The critical infrastructure target was likely selected for payment likelihood, not for strategic national impact — DarkSide's affiliate model means the specific target may have been chosen by an affiliate, not the core group.",
+      "Colonial's proactive shutdown (not attacker-forced) is the primary cause of the physical impact. However, the attackers knew or should have known that ransomware on a pipeline operator would trigger operational shutdown.",
+      "DarkSide's post-incident apology ('apolitical') is consistent with criminal economics (avoiding heat) but does not negate the foreseeable harm of attacking critical infrastructure.",
+      "The RaaS model creates distributed intent: the core group provided tools, the affiliate selected the target and executed. Both share culpability under the doctrine of foreseeable consequences."
+    ],
+    "fabricated_for_test": [
+      "Exact VPN credential string and compromise vector details.",
+      "Internal Colonial network topology and segmentation.",
+      "Specific Bitcoin wallet addresses and transaction hashes (publicly referenced but not reproduced in full).",
+      "Exact timestamps of individual file encryptions.",
+      "Memory dump contents or disk images.",
+      "acquisition_hash values (synthetic content digests)."
+    ]
+  },
+  "acquisition": {
+    "disk_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+    "disk_acquire_date": "2021-05-07",
+    "acquisition_type": "Reconstruction from public reporting, CISA advisories, and DOJ announcements (no physical device imaged)",
+    "examiner": "VIGIA / Real Incident Reconstruction Team",
+    "case_number": "VIGIA-REAL-COLONIAL-001",
+    "evidence_number": "RECON-COLONIAL-001",
+    "device": "None — reconstruction from published forensic analyses, CISA alerts, and DOJ statements.",
+    "md5_verified": false,
+    "sha1_verified": false,
+    "note": "REAL INCIDENT RECONSTRUCTION. Provenance is public reporting, not a forensic acquisition. prior_trust on each artifact encodes reconstruction reliability from published sources, not real chain of custody. Trust must not be read as court-grade."
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "malware_infrastructure",
+      "semantic_role": "incriminatory",
+      "source_tool": "public CISA / Mandiant analysis",
+      "description": "DarkSide ransomware deployment on Colonial Pipeline IT systems. FIRSTNESS: ransomware encrypted critical business systems (accounting, billing) using AES-256 and RSA algorithms. SECONDNESS: the ransomware was deployed AFTER data exfiltration (~100 GB), indicating a deliberate two-phase operation: steal first, then encrypt. THIRDNESS: the DarkSide RaaS model means the core group developed and distributed the ransomware, while an affiliate executed the attack. The pattern is organized criminal economics with operational sophistication. The absence of OT/ICS targeting suggests the attackers did not intend to destroy physical infrastructure, but the impact on critical energy supply was foreseeable.",
+      "raw_score": 0.80,
+      "prior_trust": 0.82,
+      "provenance_chain": [
+        "CISA Advisory AA21-131A: DarkSide ransomware technical analysis",
+        "Mandiant forensic investigation (publicly referenced by Colonial)",
+        "Huntress threat library: DarkSide TTPs and technical details",
+        "VIGIA-REAL-COLONIAL-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2021-05-07T05:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-COLONIAL-001-ART001",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "ransomware_family": "DarkSide",
+        "encryption_algorithms": ["AES-256", "RSA"],
+        "raas_model": true,
+        "ot_ics_targeted": false,
+        "mitre_technique": "T1486",
+        "fabricated": ["exact_encryption_timestamps", "internal_file_paths"]
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "network_communication_pattern",
+      "semantic_role": "incriminatory",
+      "source_tool": "public reporting on data exfiltration",
+      "description": "Data exfiltration — ~100 GB stolen in ~2 hours before ransomware deployment. FIRSTNESS: large volume of data transferred outbound from Colonial's network. SECONDNESS: the exfiltration occurred BEFORE encryption, demonstrating a deliberate double-extortion strategy: the attackers intended to use stolen data as additional leverage even if the victim could restore from backups. THIRDNESS: the speed and volume suggest automated tools and prior reconnaissance. The data theft transforms this from a simple ransomware incident into a data breach with ongoing reputational and legal consequences. The exfiltration is the discriminator that elevates this above 'nuisance ransomware' to structured criminal operation.",
+      "raw_score": 0.75,
+      "prior_trust": 0.78,
+      "provenance_chain": [
+        "Colonial Pipeline public statement: ~100 GB stolen",
+        "Bloomberg / Reuters reporting: 2-hour exfiltration window",
+        "CISA Advisory: DarkSide double-extortion pattern",
+        "VIGIA-REAL-COLONIAL-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2021-05-07T03:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-COLONIAL-001-ART002",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "exfiltrated_volume_gb": 100,
+        "exfiltration_duration_hours": 2,
+        "double_extortion": true,
+        "mitre_technique": "T1041",
+        "fabricated": ["exact_byte_counts", "destination_ips"]
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "plaintext_credential",
+      "semantic_role": "incriminatory",
+      "source_tool": "public reporting on initial access",
+      "description": "Compromised VPN credentials — initial access vector. FIRSTNESS: a single set of stolen credentials granted access to Colonial's VPN. SECONDNESS: the VPN account lacked multi-factor authentication (MFA), a basic security control. The password was reportedly 'complex' but had been exposed in a previous data breach (credential reuse). THIRDNESS: the access vector demonstrates both attacker capability (obtaining credentials from dark markets) and victim vulnerability (no MFA, no credential monitoring). The simplicity of initial access is consistent with opportunistic targeting rather than sophisticated intrusion, but the subsequent operation (exfiltration + encryption) demonstrates organized capability.",
+      "raw_score": 0.65,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "CISA Advisory AA21-131A: compromised credentials via unused VPN account",
+        "Bloomberg reporting: password exposed in previous breach",
+        "Colonial CEO testimony: no MFA on VPN at time of attack",
+        "VIGIA-REAL-COLONIAL-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2021-05-07T02:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-COLONIAL-001-ART003",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "initial_access_vector": "compromised_credentials",
+        "mfa_enabled": false,
+        "credential_source": "previous_data_breach",
+        "mitre_technique": "T1078",
+        "fabricated": ["credential_string", "vpn_hostname"]
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "behavioral_context",
+      "semantic_role": "incriminatory",
+      "source_tool": "public reporting on societal impact",
+      "description": "Critical infrastructure impact — the escalation artifact. FIRSTNESS: Colonial shut down 5,500 miles of pipeline, halting 45% of East Coast fuel supply. SECONDNESS: the shutdown triggered fuel shortages, panic buying, price spikes (highest since 2014), and states of emergency. THIRDNESS: while Colonial (not the attackers) made the shutdown decision, the attackers knew or should have known that ransomware on a pipeline operator would cause operational paralysis. The DarkSide group explicitly targeted 'big game' victims with revenue >$100M, knowing they could pay and that disruption would be severe. The 'apolitical' apology issued after the incident is evidence of retrospective risk management, not absence of foresight. The impact distinguishes this from ransomware on a non-critical business.",
+      "raw_score": 0.85,
+      "prior_trust": 0.88,
+      "provenance_chain": [
+        "Colonial Pipeline press releases: proactive shutdown May 7-12",
+        "White House statement: President Biden declared national emergency",
+        "DOJ announcement: DarkSide RaaS targeting 'big game' victims",
+        "DarkSide public statement: 'apolitical, no societal problems intended'",
+        "VIGIA-REAL-COLONIAL-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2021-05-07T06:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-COLONIAL-001-ART004",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "pipeline_miles": 5500,
+        "east_coast_supply_percentage": 45,
+        "shutdown_duration_days": 5,
+        "national_emergency": true,
+        "darkside_apology": "apolitical_no_societal_problems",
+        "mitre_technique": "T1490",
+        "fabricated": ["exact_fuel_shortage_gallons", "individual_gas_station_counts"]
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "outcome_signal",
+      "semantic_role": "contextual",
+      "source_tool": "public reporting on ransom payment",
+      "description": "Ransom payment and recovery — the criminal-economics anchor. FIRSTNESS: Colonial paid 75 Bitcoin (~$4.4M) within hours of the attack. SECONDNESS: the FBI recovered 64 Bitcoin (~$2.3M) one month later, demonstrating blockchain traceability. THIRDNESS: the payment itself is evidence of criminal intent (extortion) but also of victim desperation. The rapid payment suggests Colonial assessed the threat as existential. The RaaS revenue split (85% to affiliate, 15% to administrators) reveals a business model, not a political operation. This artifact contextualizes the MALICE verdict: the intent was economic, but the foreseeable harm to critical infrastructure elevates the classification from INTENT (instrumental boundary violation) to MALICE (harm-preference through reckless disregard of consequences).",
+      "raw_score": 0.60,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "Colonial CEO testimony: paid $4.4M to accelerate recovery",
+        "DOJ press release 2021-06-07: seized 64 Bitcoin",
+        "Chainalysis analysis: RaaS revenue split and fund tracing",
+        "VIGIA-REAL-COLONIAL-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2021-05-08T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-COLONIAL-001-ART005",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "ransom_amount_btc": 75,
+        "ransom_amount_usd": 4400000,
+        "recovered_btc": 64,
+        "recovered_usd": 2300000,
+        "raas_split_admin": 15,
+        "raas_split_affiliate": 85,
+        "mitre_technique": "T1583",
+        "fabricated": ["exact_wallet_addresses", "transaction_hashes"]
+      }
+    },
+    {
+      "artifact_id": "ART-006",
+      "evidence_type": "acquisition_context",
+      "semantic_role": "exculpatory",
+      "source_tool": "public reporting on DarkSide statements",
+      "description": "DarkSide's 'apolitical' disclaimer — the refutation artifact. FIRSTNESS: after the attack gained global attention, DarkSide issued a statement claiming they were 'apolitical' and did not intend to create 'societal problems.' SECONDNESS: the statement is consistent with criminal risk management (avoiding law enforcement heat) but is inconsistent with the targeting pattern (big game victims in critical sectors). THIRDNESS: the disclaimer does not refute the MALICE classification because MALICE is based on acts and foreseeable consequences, not stated motives. A drunk driver who claims they 'did not intend to hit anyone' is still culpable for the harm. However, the absence of a political or ideological motive distinguishes this from nation-state MALICE (e.g., Sony) and places it in the category of organized criminal MALICE — reckless disregard for societal harm in pursuit of profit.",
+      "raw_score": 0.20,
+      "prior_trust": 0.40,
+      "provenance_chain": [
+        "DarkSide public statement (via dark web): 'apolitical, no societal problems intended'",
+        "Cybersecurity media analysis: interpreted as damage control",
+        "VIGIA-REAL-COLONIAL-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2021-05-10T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-COLONIAL-001-ART006",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "darkside_claim": "apolitical_no_societal_problems",
+        "interpretation": "criminal_risk_management_not_exculpation",
+        "inferential_weight": "LOW",
+        "fabricated": []
+      }
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "A ransomware attack encrypted Colonial Pipeline's IT systems while exfiltrating 100 GB of data; the company shut down 5,500 miles of pipeline, triggering national fuel shortages and a state of emergency.",
+    "secondness": "The attack's modality (RaaS ransomware + double extortion + critical infrastructure target) deviates from 'nuisance cybercrime' baselines. The foreseeable societal impact (fuel shortages, emergency declarations) was not accidental but a direct consequence of targeting critical infrastructure. The absence of OT/ICS compromise shows the attackers did not seek physical destruction, but the operational paralysis they caused was structurally predictable.",
+    "thirdness": "The repeatable pattern is organized criminal groups using ransomware-as-a-service to target critical infrastructure for maximum payment likelihood, with reckless disregard for societal consequences. The general law is that when criminal economics produce foreseeable harm to critical infrastructure at national scale, the intent class is MALICE (reckless harm-preference), not INTENT (instrumental boundary violation without harm preference) or SUSPICION (capability without demonstrated motive)."
+  },
+  "devil_advocate": "Strongest case FOR a lower verdict (INTENT instead of MALICE): (1) DarkSide's RaaS model means the affiliate who selected Colonial may have been motivated purely by profit, with no desire to cause societal harm. (2) Colonial, not the attackers, chose to shut down the pipeline — the attackers never touched OT/ICS systems. (3) DarkSide's 'apolitical' apology suggests they were surprised by the impact and genuinely did not intend national-level disruption. (4) The attack fits a standard criminal economics pattern: encrypt, extort, profit. The harm was collateral, not intended. Strongest case FOR MALICE: (1) DarkSide explicitly targeted 'big game' victims with >$100M revenue, knowing disruption would be severe. (2) The double extortion model (steal then encrypt) demonstrates premeditation and operational sophistication, not opportunism. (3) Critical infrastructure was not an accidental target — it was selected for payment likelihood BECAUSE of its importance. (4) The national emergency was a foreseeable consequence of attacking a pipeline operator; 'we didn't mean to' is not a defense against reckless disregard. The preponderance supports MALICE through reckless disregard; the criminal motive is economic, but the harm-preference is demonstrated by target selection."
+}

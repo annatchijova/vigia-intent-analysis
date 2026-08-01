@@ -1,0 +1,344 @@
+{
+  "agent_verdict": "SUSPICION",
+  "analysis_timestamp": "2026-08-01T21:16:28.067032+00:00",
+  "audit_trail": {
+    "agent_version": "1.0.0-SANS-2026",
+    "case_id": "VIGIA-REAL-TARGET-001",
+    "end_time": "2026-08-01T21:16:28.067037+00:00",
+    "entries": [
+      {
+        "action": "AGENT_INITIALIZED",
+        "case_id": "VIGIA-REAL-TARGET-001",
+        "entry_sha256": "13de35277c4844ef6f762ccfff06b85096f61ca36bec10c23a25467ed1438599",
+        "inputs_summary": {
+          "agent_file": "/home/labestiadevigia/vigia-repo/vigia_agent.py",
+          "case_id": "VIGIA-REAL-TARGET-001"
+        },
+        "iteration": 0,
+        "note": "Agent initialized \u2014 source SHA-256: aaf9d220f681ce27...; runtime fingerprint: f2d94e95391fc828...",
+        "outputs_summary": {
+          "agent_sha256": "aaf9d220f681ce2720749a524979a01363811def99b4f13c2454dc29bc00e80e",
+          "agent_version": "1.0.0-SANS-2026",
+          "runtime_fingerprint": "f2d94e95391fc8282ba48e8a82c13355545908dde7980bf63ebf3ef40a59871f"
+        },
+        "seq": 1,
+        "timestamp": "2026-08-01T21:16:27.716769+00:00",
+        "tool": "vigia_agent"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-TARGET-001",
+        "entry_sha256": "9e82e8c1dbcb3404e800512b37511ff36ac1f64bb4a2f3c826ce892f8ed5799c",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/VIGIA-REAL-TARGET-001.json"
+        },
+        "iteration": 0,
+        "note": "Computing SHA-256 of original evidence",
+        "outputs_summary": {},
+        "seq": 2,
+        "timestamp": "2026-08-01T21:16:27.716869+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "EVIDENCE_INTEGRITY_CHECK",
+        "case_id": "VIGIA-REAL-TARGET-001",
+        "entry_sha256": "6c75527338749034989afe6fc930e4f6048cdedefb821c599a2d953316e43a10",
+        "inputs_summary": {
+          "path": "/home/labestiadevigia/Downloads/VIGIA-REAL-TARGET-001.json"
+        },
+        "iteration": 0,
+        "note": "Evidence verified: 9729795f55babfb0...",
+        "outputs_summary": {
+          "sha256": "9729795f55babfb0d30cdba33a5b175dbb3f0a9a5705b00b3cc7482056f98d82"
+        },
+        "seq": 3,
+        "timestamp": "2026-08-01T21:16:27.716957+00:00",
+        "tool": "sha256_hasher"
+      },
+      {
+        "action": "PIPELINE_EXECUTE",
+        "case_id": "VIGIA-REAL-TARGET-001",
+        "entry_sha256": "d247fbb1109dc6a84b19da4ff4547ff6b344507a71597456c89e7a9e0b9502d5",
+        "inputs_summary": {
+          "evidence": "/home/labestiadevigia/Downloads/VIGIA-REAL-TARGET-001.json",
+          "iteration": "0",
+          "params": {}
+        },
+        "iteration": 0,
+        "note": "Executing pipeline \u2014 iteration 0",
+        "outputs_summary": {},
+        "seq": 4,
+        "timestamp": "2026-08-01T21:16:27.717040+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "PIPELINE_COMPLETE",
+        "case_id": "VIGIA-REAL-TARGET-001",
+        "entry_sha256": "f2612744127a1862c160b4c1530f491289a2c9d917cc6ba5827e142c56174576",
+        "inputs_summary": {
+          "iteration": "0"
+        },
+        "iteration": 0,
+        "note": "Pipeline completed \u2014 6 signals",
+        "outputs_summary": {
+          "abduction": {
+            "best_hypothesis": "SUSPICION_DETECTED",
+            "best_posterior": "13/20",
+            "confidence": "13/20",
+            "is_conclusive": "True",
+            "narrative": "[MOTOR] Label-blind selection: SUSPICION_DETECTED. Significant signal with structural support (score=0.3242)",
+            "narrative_provenance": "deterministic_motor_selection",
+            "scenario_context": "Between November 15 and December 15, 2013, Target Corporation suffered one of the largest retail data breaches in history. Attackers compromised credentials from a third-party HVAC vendor (Fazio Mecha...",
+            "scenario_context_provenance": "case_description_unverified"
+          },
+          "case_id": "VIGIA-REAL-TARGET-001",
+          "pipeline_meta": {
+            "artifact_count": "6",
+            "avg_score": "9979/20000",
+            "ebs_adapter_mode": "motor",
+            "expected_verdict": "MALICE",
+            "resolve": {
+              "motor_confidence": "0.65",
+              "motor_reason": "Significant signal with structural support (score=0.3242)",
+              "motor_score": "0.3242",
+              "motor_verdict": "SUSPICION",
+              "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+            },
+            "source": "ebs_v1_json_adapter"
+          },
+          "signals": [
+            {
+              "artifact_id": "ART-001",
+              "confidence": "4/5",
+              "description": "BlackPOS malware deployed on 1,800+ Target POS terminals. FIRSTNESS: malware scraped payment card track data from RAM of POS devices in real-time as customers swiped cards. SECONDNESS: the malware was",
+              "evidence_type": "malware_infrastructure",
+              "source": "public malware analysis (HP / McAfee / IntelCrawler)",
+              "z_score": "82/125"
+            },
+            {
+              "artifact_id": "ART-002",
+              "confidence": "3/4",
+              "description": "Multi-stage data exfiltration \u2014 11 GB aggregated in Russia. FIRSTNESS: stolen card data moved from POS terminals to internal FTP servers, then relayed to external drop sites. SECONDNESS: the exfiltrat",
+              "evidence_type": "network_communication_pattern",
+              "source": "public reporting on data exfiltration",
+              "z_score": "117/200"
+            },
+            {
+              "artifact_id": "ART-003",
+              "confidence": "39/50",
+              "description": "Fazio Mechanical Services compromise \u2014 supply chain vector. FIRSTNESS: attackers compromised an HVAC vendor with access to Target's Ariba vendor portal. SECONDNESS: the vendor credentials were stolen ",
+              "evidence_type": "plaintext_credential",
+              "source": "public reporting on supply chain compromise",
+              "z_score": "351/625"
+            },
+            {
+              "artifact_id": "ART-004",
+              "confidence": "41/50",
+              "description": "Black Friday timing and ignored FireEye alerts \u2014 the operational sophistication artifact. FIRSTNESS: malware was deployed on November 27, the day before Black Friday, the busiest shopping day of the y",
+              "evidence_type": "behavioral_context",
+              "source": "public reporting on timing and alerts",
+              "z_score": "287/500"
+            },
+            {
+              "artifact_id": "ART-005",
+              "confidence": "18/25",
+              "description": "Monetization \u2014 stolen cards sold on black market forums. FIRSTNESS: stolen payment card data appeared for sale on underground forums shortly after the breach. SECONDNESS: the cards were sold in batche",
+              "evidence_type": "outcome_signal",
+              "source": "public reporting on black market sales",
+              "z_score": "306/625"
+            }
+          ]
+        },
+        "seq": 5,
+        "timestamp": "2026-08-01T21:16:28.066638+00:00",
+        "tool": "vigia_pipeline"
+      },
+      {
+        "action": "CONTRADICTION_CHECK",
+        "case_id": "VIGIA-REAL-TARGET-001",
+        "entry_sha256": "fc5545da05a71a6b1502c0de867adc57fd2f32a834eb425e91c709049e173e33",
+        "inputs_summary": {
+          "n_signals": "6"
+        },
+        "iteration": 0,
+        "note": "0 contradiction(s) \u2014 below threshold 2, no correction",
+        "outputs_summary": {
+          "contradictions_found": "0",
+          "threshold": "2"
+        },
+        "seq": 6,
+        "timestamp": "2026-08-01T21:16:28.066766+00:00",
+        "tool": "contradiction_detector"
+      },
+      {
+        "action": "AGENT_EXIT",
+        "case_id": "VIGIA-REAL-TARGET-001",
+        "entry_sha256": "bc4ac6683e680422c006e141403e4ce9918bcdf7f943001a1dd1a62eb76b2acf",
+        "inputs_summary": {
+          "verdict": "SUSPICION_DETECTED"
+        },
+        "iteration": 0,
+        "note": "Exit code 5 (SUSPICION) \u2014 analysis complete.",
+        "outputs_summary": {
+          "agent_verdict": "SUSPICION",
+          "exit_code": "5"
+        },
+        "seq": 7,
+        "timestamp": "2026-08-01T21:16:28.066983+00:00",
+        "tool": "vigia_agent"
+      }
+    ],
+    "start_time": "2026-08-01T21:16:27.696103+00:00",
+    "total_entries": 7
+  },
+  "case_id": "VIGIA-REAL-TARGET-001",
+  "evidence_path": "/home/labestiadevigia/Downloads/VIGIA-REAL-TARGET-001.json",
+  "evidence_sha256": "9729795f55babfb0d30cdba33a5b175dbb3f0a9a5705b00b3cc7482056f98d82",
+  "iterations_executed": 1,
+  "narrative": "=== VIG\u00cdA FORENSIC AGENT \u2014 CASE VIGIA-REAL-TARGET-001 ===\nEvidence: /home/labestiadevigia/Downloads/VIGIA-REAL-TARGET-001.json\nEvidence SHA-256: 9729795f55babfb0d30cdba33a5b175dbb3f0a9a5705b00b3cc7482056f98d82\nAnalysis iterations: 1\nSelf-corrections applied: 0\n\n--- MAIN HYPOTHESIS ---\nHypothesis: SUSPICION_DETECTED\nPosterior confidence: 13/20\nConclusive: YES\n\n--- PEIRCEAN NARRATIVE ---\n[FIRSTNESS] 6 se\u00f1al(es): 6 primaria(s) de ['public malware analysis (HP / McAfee / IntelCrawler)', \"public reporting on Target's security gaps\", 'public reporting on black market sales', 'public reporting on data exfiltration', 'public reporting on supply chain compromise', 'public reporting on timing and alerts'], 0 derivada(s)/no-analizada(s). Top z: BlackPOS malware deployed on 1,800+ Targ=0.66, Multi-stage data exfiltration \u2014 11 GB ag=0.58, Black Friday timing and ignored FireEye =0.57.\n[SECONDNESS] Ninguna se\u00f1al primaria supera z>2 \u2014 sin desviaci\u00f3n estructural contra baseline en esta iteraci\u00f3n.\n[THIRDNESS] Hip\u00f3tesis: SUSPICION_DETECTED. Conclusiva: s\u00ed.\n\nRazonamiento del motor abductivo:\n[MOTOR] Label-blind selection: SUSPICION_DETECTED. Significant signal with structural support (score=0.3242)\n\n--- CASE CONTEXT (UNVERIFIED INPUT \u2014 NOT ANALYTICAL EVIDENCE) ---\nBetween November 15 and December 15, 2013, Target Corporation suffered one of the largest retail data breaches in history. Attackers compromised credentials from a third-party HVAC vendor (Fazio Mechanical Services), moved laterally through Target's poorly segmented network, and deployed BlackPOS malware on point-of-sale (POS) terminals across 1,800+ stores. The malware captured track data from 40 million payment cards and personal information from 70 million customers. The breach went undetecte\n\n--- TOP SIGNALS (top 5 by z-score) ---\n  [BlackPOS malware deployed on 1,800+ Target POS terminals. FIRSTNESS: m] z=0.656 conf=0.80 \u2014 \n  [Multi-stage data exfiltration \u2014 11 GB aggregated in Russia. FIRSTNESS:] z=0.585 conf=0.75 \u2014 \n  [Black Friday timing and ignored FireEye alerts \u2014 the operational sophi] z=0.574 conf=0.82 \u2014 \n  [Fazio Mechanical Services compromise \u2014 supply chain vector. FIRSTNESS:] z=0.562 conf=0.78 \u2014 \n  [Monetization \u2014 stolen cards sold on black market forums. FIRSTNESS: st] z=0.490 conf=0.72 \u2014 \n\n--- FINAL ALERT LEVEL ---\nMEDIUM \u2014 SUSPICION verdict with individual z-scores below threshold. Alert floored (B-028/B-065): an intent-class finding cannot present as LOW.\nReconciliation: verdict SUSPICION rests on hypothesis-level aggregation, not on any single high-magnitude signal. Per-signal magnitude level was: LOW (per-signal magnitude) \u2014 no individual primary signal exceeds z>2 in this iteration.\n\nCritical signals (z>3, primary): 0\nHigh signals (2<z<=3, primary): 0\nPrimary signals: 6 | Derived: 0 | Total: 6",
+  "pipeline_results": {
+    "abduction": {
+      "best_hypothesis": "SUSPICION_DETECTED",
+      "best_posterior": "13/20",
+      "confidence": {
+        "__fraction__": true,
+        "den": 20,
+        "num": 13
+      },
+      "is_conclusive": true,
+      "narrative": "[MOTOR] Label-blind selection: SUSPICION_DETECTED. Significant signal with structural support (score=0.3242)",
+      "narrative_provenance": "deterministic_motor_selection",
+      "scenario_context": "Between November 15 and December 15, 2013, Target Corporation suffered one of the largest retail data breaches in history. Attackers compromised credentials from a third-party HVAC vendor (Fazio Mechanical Services), moved laterally through Target's poorly segmented network, and deployed BlackPOS malware on point-of-sale (POS) terminals across 1,800+ stores. The malware captured track data from 40 million payment cards and personal information from 70 million customers. The breach went undetecte",
+      "scenario_context_provenance": "case_description_unverified"
+    },
+    "case_id": "VIGIA-REAL-TARGET-001",
+    "pipeline_meta": {
+      "artifact_count": 6,
+      "avg_score": "9979/20000",
+      "ebs_adapter_mode": "motor",
+      "expected_verdict": "MALICE",
+      "resolve": {
+        "motor_confidence": "0.65",
+        "motor_reason": "Significant signal with structural support (score=0.3242)",
+        "motor_score": "0.3242",
+        "motor_verdict": "SUSPICION",
+        "selection_function": "vigia_scorer._vigia_score (Aliseda selection)"
+      },
+      "source": "ebs_v1_json_adapter"
+    },
+    "signals": [
+      {
+        "artifact_id": "ART-001",
+        "confidence": {
+          "__fraction__": true,
+          "den": 5,
+          "num": 4
+        },
+        "description": "BlackPOS malware deployed on 1,800+ Target POS terminals. FIRSTNESS: malware scraped payment card track data from RAM of POS devices in real-time as customers swiped cards. SECONDNESS: the malware was",
+        "evidence_type": "malware_infrastructure",
+        "source": "public malware analysis (HP / McAfee / IntelCrawler)",
+        "z_score": {
+          "__fraction__": true,
+          "den": 125,
+          "num": 82
+        }
+      },
+      {
+        "artifact_id": "ART-002",
+        "confidence": {
+          "__fraction__": true,
+          "den": 4,
+          "num": 3
+        },
+        "description": "Multi-stage data exfiltration \u2014 11 GB aggregated in Russia. FIRSTNESS: stolen card data moved from POS terminals to internal FTP servers, then relayed to external drop sites. SECONDNESS: the exfiltrat",
+        "evidence_type": "network_communication_pattern",
+        "source": "public reporting on data exfiltration",
+        "z_score": {
+          "__fraction__": true,
+          "den": 200,
+          "num": 117
+        }
+      },
+      {
+        "artifact_id": "ART-003",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 39
+        },
+        "description": "Fazio Mechanical Services compromise \u2014 supply chain vector. FIRSTNESS: attackers compromised an HVAC vendor with access to Target's Ariba vendor portal. SECONDNESS: the vendor credentials were stolen ",
+        "evidence_type": "plaintext_credential",
+        "source": "public reporting on supply chain compromise",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 351
+        }
+      },
+      {
+        "artifact_id": "ART-004",
+        "confidence": {
+          "__fraction__": true,
+          "den": 50,
+          "num": 41
+        },
+        "description": "Black Friday timing and ignored FireEye alerts \u2014 the operational sophistication artifact. FIRSTNESS: malware was deployed on November 27, the day before Black Friday, the busiest shopping day of the y",
+        "evidence_type": "behavioral_context",
+        "source": "public reporting on timing and alerts",
+        "z_score": {
+          "__fraction__": true,
+          "den": 500,
+          "num": 287
+        }
+      },
+      {
+        "artifact_id": "ART-005",
+        "confidence": {
+          "__fraction__": true,
+          "den": 25,
+          "num": 18
+        },
+        "description": "Monetization \u2014 stolen cards sold on black market forums. FIRSTNESS: stolen payment card data appeared for sale on underground forums shortly after the breach. SECONDNESS: the cards were sold in batche",
+        "evidence_type": "outcome_signal",
+        "source": "public reporting on black market sales",
+        "z_score": {
+          "__fraction__": true,
+          "den": 625,
+          "num": 306
+        }
+      },
+      {
+        "artifact_id": "ART-006",
+        "confidence": {
+          "__fraction__": true,
+          "den": 20,
+          "num": 17
+        },
+        "description": "Target's security failures \u2014 the victim-vulnerability context. FIRSTNESS: Target had no MFA on vendor portal, poor network segmentation, unencrypted card data in transit, and 7-year email retention. S",
+        "evidence_type": "acquisition_context",
+        "source": "public reporting on Target's security gaps",
+        "z_score": {
+          "__fraction__": true,
+          "den": 400,
+          "num": 51
+        }
+      }
+    ]
+  },
+  "runtime_fingerprint": "f2d94e95391fc8282ba48e8a82c13355545908dde7980bf63ebf3ef40a59871f",
+  "sans_compliance": {
+    "accuracy_validation": true,
+    "analytical_reasoning": true,
+    "architectural_guardrails": true,
+    "audit_trail": true,
+    "evidence_integrity": true,
+    "self_correction": false
+  },
+  "self_corrections_applied": 0,
+  "signal_stats": {
+    "n_primary_signals": 6,
+    "n_total_signals": 6,
+    "n_unanalyzed_artifacts": 0
+  },
+  "vigia_agent_version": "1.0.0-SANS-2026"
+}

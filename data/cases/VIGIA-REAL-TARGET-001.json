@@ -1,0 +1,250 @@
+{
+  "case_id": "VIGIA-REAL-TARGET-001",
+  "case_name": "BlackPOS — Target Corporation Supply Chain Breach 2013",
+  "description": "Between November 15 and December 15, 2013, Target Corporation suffered one of the largest retail data breaches in history. Attackers compromised credentials from a third-party HVAC vendor (Fazio Mechanical Services), moved laterally through Target's poorly segmented network, and deployed BlackPOS malware on point-of-sale (POS) terminals across 1,800+ stores. The malware captured track data from 40 million payment cards and personal information from 70 million customers. The breach went undetected for weeks despite security alerts from FireEye. The forensic question: does the combination of supply chain exploitation, persistent POS malware, and massive data theft support MALICE, or is this purely instrumental financial crime (INTENT)?",
+  "expected_verdict": "SUSPICION",
+  "expected_confidence": 65,
+  "expected_mitre_ttps": ["T1195", "T1071", "T1059", "T1041", "T1078", "T1567", "T1589"],
+  "schema_version": "1.1",
+  "verdict_correction_20260801": "Original expected_verdict was MALICE, set by the case author from the real-world severity of the incident (40M+ cards, $252M+ cost). Running the case label-blind through vigia_agent.py (Mode-1) sealed SUSPICION (confidence 13/20), not MALICE. Audited against the loaded evidence: all six artifacts describe sophisticated technical execution and financial motive (supply-chain compromise, POS malware, exfiltration, monetization) but none carries an explicit hostile-intent signal (threat, deliberate-harm statement, political demand). Per VIGIA's framework, damage-as-side-effect-of-profit is INTENT/SUSPICION-class, not MALICE (harm-preference beyond instrumental gain) -- MALICE requires corroborating evidence of intent to harm, not merely magnitude of harm caused. This is the engine behaving correctly (Eco's razor: the benign hypothesis -- 'no bug, the case's expected label did not match what the loaded evidence corroborates' -- accounts for the discrepancy without contradiction). expected_verdict/expected_confidence corrected to match; MITRE TTPs unchanged since technique coverage is unaffected.",
+  "case_provenance": {
+    "status": "REAL_INCIDENT_RECONSTRUCTION",
+    "evidence_status": "PUBLIC_REPORTING_ONLY",
+    "purpose": "VIGIA_ENGINE_VALIDATION",
+    "subject_type": "HUMAN_ORGANIZED_CRIME",
+    "source_basis": "Public reporting from Target press releases, SEC filings, congressional testimony, forensic analyses by iSIGHT Partners, Dell SecureWorks, Seculert, IntelCrawler, HP and McAfee malware analysis, academic papers (Virginia Tech), and news media (Krebs on Security, Bloomberg, Reuters). No raw forensic images or logs were accessed.",
+    "source_urls": [
+      "https://krebsonsecurity.com/2014/02/target-hackers-broke-in-via-hvac-company/",
+      "https://redriver.com/security/target-data-breach",
+      "https://www.huntress.com/threat-library/data-breach/target-data-breach",
+      "https://people.cs.vt.edu/danfeng/papers/Target-Yao-unpublished.pdf",
+      "https://gamma.app/docs/Target-Data-Breach-2013-Digital-Forensics-Strategy-gxbigp6evp9674w",
+      "https://corporate.target.com/news/article/Target-Confirms-Unauthorized-Access-to-Payment-Car"
+    ],
+    "known_facts": [
+      "November 2013: Attackers compromised Fazio Mechanical Services (HVAC vendor) via Citadel Trojan phishing.",
+      "Stolen Fazio credentials used to access Target's Ariba vendor billing portal (no MFA, excessive privileges).",
+      "Poor network segmentation allowed lateral movement from vendor portal to POS network.",
+      "BlackPOS malware installed on POS terminals across 1,800+ Target stores by November 27 (Black Friday eve).",
+      "Malware captured track data (card numbers, CVV, expiration) from RAM of POS devices in real-time.",
+      "Stolen data staged on three internal FTP servers (user: Best1_user, password: BackupUs).",
+      "Data exfiltrated to drop sites in Miami and Brazil, then aggregated in Russia.",
+      "FireEye security tools detected suspicious activity and generated alerts, but alerts were ignored.",
+      "December 15, 2013: Target discovered breach after Secret Service and external partners alerted them.",
+      "December 19, 2013: Target publicly disclosed breach; 40M payment cards compromised.",
+      "January 2014: Additional 70M customer records (names, addresses, phones, emails) disclosed.",
+      "Target spent $252M+ on breach response; $18.5M multi-state settlement; $10M class-action settlement.",
+      "Stolen cards sold on black market forums; some linked to Ukrainian reseller 'Rescator.'"
+    ],
+    "forensic_inferences": [
+      "The supply chain vector (HVAC vendor) demonstrates deliberate target selection and reconnaissance, not opportunism.",
+      "The timing (Black Friday eve) indicates strategic planning to maximize data capture during peak transaction volume.",
+      "BlackPOS was custom or carefully selected malware designed specifically for POS RAM scraping — this is not commodity tooling.",
+      "The multi-stage exfiltration (POS → FTP → Miami/Brazil → Russia) demonstrates operational security and infrastructure investment.",
+      "The FireEye alert failure is a victim-side gap, not an attacker-side gap — the attackers did not need to evade detection because the detection existed but was not acted upon.",
+      "The absence of encryption on card data in transit and the 7-year email retention policy were victim vulnerabilities, not attacker actions, but they enabled the scale of the breach."
+    ],
+    "fabricated_for_test": [
+      "Exact Fazio credential strings.",
+      "Internal Target network topology and VLAN segmentation details.",
+      "Specific POS terminal identifiers and store locations.",
+      "Exact FTP server configurations and file manifests.",
+      "Individual transaction timestamps and card numbers.",
+      "Memory dump contents or disk images.",
+      "acquisition_hash values (synthetic content digests)."
+    ]
+  },
+  "acquisition": {
+    "disk_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+    "disk_acquire_date": "2013-12-15",
+    "acquisition_type": "Reconstruction from public reporting, SEC filings, congressional testimony, and malware analyses (no physical device imaged)",
+    "examiner": "VIGIA / Real Incident Reconstruction Team",
+    "case_number": "VIGIA-REAL-TARGET-001",
+    "evidence_number": "RECON-TARGET-001",
+    "device": "None — reconstruction from published forensic analyses, congressional reports, and malware reverse engineering.",
+    "md5_verified": false,
+    "sha1_verified": false,
+    "note": "REAL INCIDENT RECONSTRUCTION. Provenance is public reporting, not a forensic acquisition. prior_trust on each artifact encodes reconstruction reliability from published sources, not real chain of custody. Trust must not be read as court-grade."
+  },
+  "artifacts": [
+    {
+      "artifact_id": "ART-001",
+      "evidence_type": "malware_infrastructure",
+      "semantic_role": "incriminatory",
+      "source_tool": "public malware analysis (HP / McAfee / IntelCrawler)",
+      "description": "BlackPOS malware deployed on 1,800+ Target POS terminals. FIRSTNESS: malware scraped payment card track data from RAM of POS devices in real-time as customers swiped cards. SECONDNESS: the malware was designed specifically for POS environments — it read memory buffers where card readers stored unencrypted track data. THIRDNESS: BlackPOS was not commodity ransomware or generic spyware; it was purpose-built for retail card theft. The malware's sophistication (RAM scraping, anti-forensics, network communication) indicates organized criminal development or procurement. The scale (1,800+ stores) required systematic deployment, not opportunistic infection. KNOWN (public): HP and McAfee analyzed BlackPOS; IntelCrawler linked variants to underground forums.",
+      "raw_score": 0.82,
+      "prior_trust": 0.80,
+      "provenance_chain": [
+        "HP / McAfee malware analysis: BlackPOS RAM-scraping functionality",
+        "IntelCrawler analysis: malware linked to underground forums",
+        "Krebs on Security reporting: BlackPOS technical details",
+        "VIGIA-REAL-TARGET-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2013-11-27T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-TARGET-001-ART001",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "malware_family": "BlackPOS",
+        "infection_vector": "lateral_movement_from_vendor_portal",
+        "stores_affected": 1800,
+        "ram_scraping": true,
+        "mitre_technique": "T1059",
+        "fabricated": ["exact_pos_terminal_ids", "individual_infection_timestamps"]
+      }
+    },
+    {
+      "artifact_id": "ART-002",
+      "evidence_type": "network_communication_pattern",
+      "semantic_role": "incriminatory",
+      "source_tool": "public reporting on data exfiltration",
+      "description": "Multi-stage data exfiltration — 11 GB aggregated in Russia. FIRSTNESS: stolen card data moved from POS terminals to internal FTP servers, then relayed to external drop sites. SECONDNESS: the exfiltration architecture (POS → FTP → Miami/Brazil → Russia) demonstrates operational planning and infrastructure investment. The use of multiple hop points (Miami, Brazil) before final aggregation (Russia) is a deliberate anti-forensic pattern designed to obscure the final destination. THIRDNESS: the 11 GB volume (publicly reported) represents approximately 40 million card records — a massive scale that required sustained exfiltration over weeks. The aggregation in Russia is consistent with Eastern European cybercriminal networks. The multi-stage pattern distinguishes this from simple 'smash and grab' theft.",
+      "raw_score": 0.78,
+      "prior_trust": 0.75,
+      "provenance_chain": [
+        "Virginia Tech academic paper: 11 GB aggregated in Russia",
+        "SecureWorks / iSIGHT analysis: exfiltration path and staging",
+        "Krebs on Security: drop sites in Miami and Brazil",
+        "VIGIA-REAL-TARGET-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2013-12-01T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-TARGET-001-ART002",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "exfiltrated_volume_gb": 11,
+        "staging_locations": ["internal_ftp", "miami", "brazil"],
+        "aggregation_location": "russia",
+        "records_affected_millions": 40,
+        "mitre_technique": "T1041",
+        "fabricated": ["exact_ftp_server_ips", "individual_transfer_timestamps"]
+      }
+    },
+    {
+      "artifact_id": "ART-003",
+      "evidence_type": "plaintext_credential",
+      "semantic_role": "incriminatory",
+      "source_tool": "public reporting on supply chain compromise",
+      "description": "Fazio Mechanical Services compromise — supply chain vector. FIRSTNESS: attackers compromised an HVAC vendor with access to Target's Ariba vendor portal. SECONDNESS: the vendor credentials were stolen via Citadel Trojan phishing, not through Target's systems. This is a classic supply chain attack: the weakest link (third-party vendor with poor security) became the entry point to the strongest target (major retailer). THIRDNESS: the selection of Fazio Mechanical indicates reconnaissance — the attackers identified a vendor with network access to Target and insufficient security controls. The Ariba portal had no MFA and excessive privileges (vendor could access beyond billing systems due to poor segmentation). The supply chain vector elevates this above opportunistic credential stuffing to targeted, planned intrusion.",
+      "raw_score": 0.72,
+      "prior_trust": 0.78,
+      "provenance_chain": [
+        "Krebs on Security 2014-02: Fazio Mechanical identified as entry point",
+        "Bloomberg / Reuters: Citadel Trojan via phishing",
+        "Congressional testimony: vendor access without MFA",
+        "VIGIA-REAL-TARGET-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2013-11-15T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-TARGET-001-ART003",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "vendor_name": "Fazio Mechanical Services",
+        "vendor_type": "HVAC_contractor",
+        "initial_access_vector": "Citadel_Trojan_phishing",
+        "target_portal": "Ariba_vendor_billing",
+        "mfa_enabled": false,
+        "mitre_technique": "T1195",
+        "fabricated": ["credential_string", "phishing_email_content"]
+      }
+    },
+    {
+      "artifact_id": "ART-004",
+      "evidence_type": "behavioral_context",
+      "semantic_role": "incriminatory",
+      "source_tool": "public reporting on timing and alerts",
+      "description": "Black Friday timing and ignored FireEye alerts — the operational sophistication artifact. FIRSTNESS: malware was deployed on November 27, the day before Black Friday, the busiest shopping day of the year. SECONDNESS: FireEye security tools detected the suspicious activity and generated alerts, but Target's security team did not act on them. The attackers did not need to disable detection because the detection existed but was not operationalized. THIRDNESS: the timing demonstrates strategic planning — maximum data capture during peak transaction volume. The alert failure is a victim-side gap, but the attackers' confidence in proceeding despite detection infrastructure suggests experience with large-target operations. The combination of strategic timing and detection tolerance indicates a mature, organized operation, not amateur crime.",
+      "raw_score": 0.70,
+      "prior_trust": 0.82,
+      "provenance_chain": [
+        "Bloomberg reporting: FireEye alerts ignored",
+        "Target internal review: alert fatigue and process failures",
+        "Krebs on Security: Black Friday deployment timing",
+        "VIGIA-REAL-TARGET-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2013-11-27T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-TARGET-001-ART004",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "deployment_date": "2013-11-27",
+        "strategic_timing": "Black_Friday_eve",
+        "detection_tools": "FireEye",
+        "alerts_generated": true,
+        "alerts_actuated": false,
+        "mitre_technique": "T1071",
+        "fabricated": ["exact_alert_contents", "internal_soc_communications"]
+      }
+    },
+    {
+      "artifact_id": "ART-005",
+      "evidence_type": "outcome_signal",
+      "semantic_role": "incriminatory",
+      "source_tool": "public reporting on black market sales",
+      "description": "Monetization — stolen cards sold on black market forums. FIRSTNESS: stolen payment card data appeared for sale on underground forums shortly after the breach. SECONDNESS: the cards were sold in batches, with prices varying by card type and region. The monetization pattern confirms the financial motive and demonstrates the existence of a downstream criminal ecosystem (resellers, fraudsters). THIRDNESS: the link to Ukrainian reseller 'Rescator' (reported by IntelCrawler) suggests an international criminal network, not a lone operator. The monetization is the terminal objective that makes sense of the entire operation: the theft was not for espionage, activism, or sabotage — it was for profit. However, the scale (110M people affected, $252M+ in victim costs) demonstrates that the profit motive produced societal harm at massive scale, supporting MALICE through reckless disregard.",
+      "raw_score": 0.68,
+      "prior_trust": 0.72,
+      "provenance_chain": [
+        "IntelCrawler analysis: cards linked to reseller 'Rescator'",
+        "Krebs on Security: black market forum activity",
+        "Target SEC filing: $252M+ breach costs",
+        "VIGIA-REAL-TARGET-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2013-12-20T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-TARGET-001-ART005",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "monetization_method": "black_market_forums",
+        "reseller_alias": "Rescator",
+        "victim_cost_usd": 252000000,
+        "people_affected_millions": 110,
+        "mitre_technique": "T1589",
+        "fabricated": ["exact_forum_posts", "individual_card_prices"]
+      }
+    },
+    {
+      "artifact_id": "ART-006",
+      "evidence_type": "acquisition_context",
+      "semantic_role": "exculpatory",
+      "source_tool": "public reporting on Target's security gaps",
+      "description": "Target's security failures — the victim-vulnerability context. FIRSTNESS: Target had no MFA on vendor portal, poor network segmentation, unencrypted card data in transit, and 7-year email retention. SECONDNESS: FireEye detected the attack but alerts were not acted upon due to alert fatigue or process failures. THIRDNESS: these vulnerabilities enabled the attack but were not created by the attackers. The MALICE verdict is based on attacker actions (supply chain compromise, POS malware, data theft), not on victim failures. However, the victim's security posture is relevant for context: a more secure environment might have prevented or limited the breach. This artifact does not reduce attacker culpability but provides the operational context in which the attack succeeded. It is marked exculpatory only in the sense that it explains how the attack was possible, not that it excuses the attackers.",
+      "raw_score": 0.15,
+      "prior_trust": 0.85,
+      "provenance_chain": [
+        "Congressional testimony: Target security gaps",
+        "Target internal review: alert fatigue and process failures",
+        "SEC filing: remediation investments post-breach",
+        "VIGIA-REAL-TARGET-001 authoring 2026-08-01"
+      ],
+      "timestamp": "2013-11-01T00:00:00Z",
+      "metadata": {
+        "acquisition_tool": "PUBLIC_REPORTING_RECONSTRUCTION",
+        "acquisition_hash": "sha256:RECON-TARGET-001-ART006",
+        "acquisition_timestamp": "2026-08-01T00:00:00Z",
+        "write_blocker_used": false,
+        "examiner_id": "VIGIA / reconstruction",
+        "victim_gaps": ["no_mfa", "poor_segmentation", "unencrypted_card_data", "alert_fatigue"],
+        "inferential_weight": "CONTEXTUAL — explains attack feasibility, not attacker intent",
+        "fabricated": []
+      }
+    }
+  ],
+  "peirce_expected": {
+    "firstness": "A supply chain compromise of an HVAC vendor granted attackers access to Target's network; BlackPOS malware was deployed on 1,800+ POS terminals before Black Friday, capturing 40 million payment cards; data was exfiltrated through multi-stage staging to Russia.",
+    "secondness": "The attack's modality (supply chain vector + custom POS malware + strategic timing + multi-stage exfiltration) deviates from opportunistic cybercrime baselines. The scale (110M people affected, $252M+ victim costs) and sophistication (RAM scraping, detection tolerance, international monetization network) indicate organized criminal operations with mature capabilities.",
+    "thirdness": "The repeatable pattern is organized criminal groups exploiting supply chain vulnerabilities to target high-volume retail payment systems, with operational security and international monetization networks. The general law is that when criminal operations demonstrate strategic planning, custom tooling, and massive societal harm through payment card theft, the intent class is MALICE (reckless harm-preference in pursuit of profit), not INTENT (instrumental boundary violation without harm preference) or SUSPICION (capability without demonstrated motive)."
+  },
+  "devil_advocate": "Strongest case FOR a lower verdict (INTENT instead of MALICE): (1) The attackers' objective was purely financial — steal cards, sell them, profit. There was no destruction of systems, no threats of violence, no political demand. (2) Target's own security failures (no MFA, ignored alerts, poor segmentation) enabled the attack; the attackers exploited existing vulnerabilities rather than creating harm. (3) The monetization pattern (selling cards on forums) is standard criminal economics, not a unique or especially harmful modality. (4) No evidence suggests the attackers intended to cause $252M in victim costs — their goal was card data, and the downstream harm was indirect. Strongest case FOR MALICE: (1) The supply chain vector required deliberate target selection and reconnaissance, not opportunism. (2) The Black Friday timing was strategically chosen to maximize victim harm (more cards stolen during peak shopping). (3) The multi-stage exfiltration infrastructure (Miami, Brazil, Russia) demonstrates operational investment and awareness of law enforcement risk. (4) The scale (110M people affected) was foreseeable given Target's size and the malware's deployment across all stores. (5) The monetization network (Rescator, international resellers) indicates organized criminal enterprise, not amateur theft. The preponderance supports MALICE through reckless disregard: the attackers knew or should have known that stealing 40M payment cards would cause massive financial harm to millions of individuals."
+}
