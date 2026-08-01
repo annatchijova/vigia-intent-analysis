@@ -261,6 +261,18 @@ pytest_add_cli_args_test_selection = [
     # módulo no puede matar ningún mutante del alcance, luego excluirlo no
     # altera el score. Registrado en docs/MUTATION_TESTING.md §5.
     "--ignore=vigia/tests/test_lr_calibrator_serialization.py",
+    # El propio contrato de esta configuración. Lee pyproject.toml y
+    # .gitignore para validar el ALCANCE declarado del barrido — dentro de
+    # mutants/ lee la COPIA del sandbox, que legítimamente puede estar
+    # acotada (p.ej. el workflow_dispatch de mutation.yml reescribe
+    # only_mutate para medir un módulo suelto). Ejecutarlo ahí lo hace
+    # fallar contra un acotado deliberado y aborta la fase stats.
+    # Comprobado en carne propia: acotar only_mutate para medir una línea
+    # base tumbó el barrido con
+    # test_only_mutate_covers_the_sealed_verdict_scorer. El test es
+    # correcto; el sandbox no es su sitio. Corre en la suite normal, donde
+    # sí valida el alcance real del repositorio.
+    "--ignore=tests/test_mutation_config_contract.py",
 ]
 
 # Solo muta líneas que algún test ejecuta. Un mutante en línea no cubierta
