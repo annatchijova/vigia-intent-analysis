@@ -120,6 +120,37 @@ Los módulos que importan `vigia/vigia_sift_bridge.py` también quedan fuera: no
 colectan sin `mcp` instalable (`KNOWN_LIMITATIONS.md` L-045) y cubren la
 superficie MCP, no la ruta de veredicto.
 
+### 5.1 Anomalía abierta — `test_lr_calibrator_serialization.py`
+
+`vigia/tests/test_lr_calibrator_serialization.py::test_sklearn_backend_roundtrip_matches_before_save`
+está excluido por una razón distinta y **sin diagnóstico confirmado**.
+
+Observado (2026-08-01):
+
+| Contexto | Resultado |
+|----------|-----------|
+| Fase `stats` de mutmut | **FALLA** (2 de 2 corridas) |
+| Aislado, en `mutants/` | pasa (5 passed) |
+| Aislado, con `MUTANT_UNDER_TEST=stats` | pasa |
+| Suite completa en subproceso, dentro de `mutants/` | pasa (2016 passed) |
+| Suite completa replicando la invocación **in-process** de mutmut, con sus mismas variables de entorno | pasa (2023 passed) |
+
+La diferencia residual no aislada: mutmut ejecuta `list_all_tests`
+(`--collect-only`) y después `stats` **en el mismo proceso**, con su plugin
+`StatsCollector` registrado. No se ha confirmado que ése sea el mecanismo.
+
+Por qué importa registrarlo aunque se excluya: el test es determinista en su
+entrada (`_synthetic_z_scores(seed=42)`, `random.Random` local, solver `lbfgs`)
+y lo que compara es un round-trip `to_dict()`/`from_dict()` con `abs_tol=1e-6`.
+Una igualdad de floats sobre una serialización no debería depender del proceso
+que la ejecuta. Dado que el repo trata el determinismo como invariante duro
+(Invariante 4, `Fraction` con `prec=28`), queda anotado en vez de enterrado.
+
+Se excluye porque mutmut corre con `-x`: el fallo aborta la fase stats y con
+ella el barrido entero. `LRCalibrator` no está en `only_mutate`, así que este
+módulo no puede matar ningún mutante del alcance y su exclusión no altera el
+score.
+
 ## 6. Coste
 
 Es N ejecuciones de la suite, una por mutante. Con la suite del alcance en

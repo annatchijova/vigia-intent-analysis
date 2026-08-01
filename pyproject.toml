@@ -248,6 +248,19 @@ pytest_add_cli_args_test_selection = [
     "--ignore=tests/test_registry_integrity.py",
     "--ignore=tests/test_requirements_ci_contract.py",
     "--ignore=tests/test_security_md_rate_limit_contract.py",
+    # Falla SÓLO dentro de la fase `stats` de mutmut, de forma reproducible
+    # (2/2 corridas), y NO se reproduce en ningún otro contexto: aislado,
+    # en subproceso con la suite completa, ni replicando la invocación
+    # in-process de mutmut con sus mismas variables de entorno
+    # (MUTANT_UNDER_TEST=stats, MUTMUT_DEPENDENCY_DEPTH=-1) — 2023 passed.
+    # La diferencia residual no aislada es que mutmut ejecuta `list_all_tests`
+    # (--collect-only) y luego `stats` en el MISMO proceso, con su plugin
+    # StatsCollector registrado. Sin diagnóstico confirmado.
+    # Se excluye porque bloquea la fase stats (mutmut corre con -x y aborta
+    # el barrido entero), y porque LRCalibrator NO está en only_mutate: este
+    # módulo no puede matar ningún mutante del alcance, luego excluirlo no
+    # altera el score. Registrado en docs/MUTATION_TESTING.md §5.
+    "--ignore=vigia/tests/test_lr_calibrator_serialization.py",
 ]
 
 # Solo muta líneas que algún test ejecuta. Un mutante en línea no cubierta
