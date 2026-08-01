@@ -183,6 +183,13 @@ cifra según convenga. El registro de triaje vive en §8.
 Ver `docs/MUTATION_BASELINE.md` para la corrida de referencia, el score por
 módulo y el triaje de supervivientes.
 
+**Al comparar dos corridas, comprueba también el denominador.** Con
+`mutate_only_covered_lines = true`, subir la cobertura **agranda** el universo
+de mutantes: los tests nuevos cubren líneas que antes nadie tocaba y esas
+líneas pasan a ser mutables. En la primera línea base, `collapse_decision.py`
+pasó de 4/29 a 35/35 — el numerador y el denominador se movieron a la vez, y
+leer sólo el porcentaje habría ocultado la mitad de lo ocurrido.
+
 ## 9. Limitaciones declaradas
 
 - **No aplica a la capa LLM.** `reason_with_llm` y la narrativa no son
