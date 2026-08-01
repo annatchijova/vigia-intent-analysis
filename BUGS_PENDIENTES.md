@@ -219,9 +219,27 @@ Observar el patron en un segundo expediente judicial independiente (distinto a M
 > de Anna. El estado POSPUESTO se levanta a: **CABLEADO COMO SOMBRA —
 > observación en curso**.
 
+> **Update 2026-07-31 (re-medición post-cambios de pipeline, 0-flips
+> confirmado):** desde el cableado sombra, el pipeline recibió B-215/
+> B-220/B-224 y el corpus creció 202→205. Re-corrida la comparación
+> pre-registrada con metodología más estricta (`_vigia_score` real vs.
+> `shadow_signal_quality` monkeyparcheada a stub inerte, aislando el
+> efecto causal exacto): **0 flips** de verdict/score/confidence sobre
+> los 205 casos. Distribución 120 QUALITY_OK / 85 WARN, proporcional al
+> 117/84 del 22/07. El contrato de cero autoridad se sostiene después de
+> los cambios posteriores del pipeline. Nota de método: la primera
+> corrida del script tenía un bug propio (leía `status`/`verdict`,
+> ausentes en el payload real que usa `passed: bool`), corregido antes
+> de reportar — un "205 WARN uniforme" sospechoso se verificó contra el
+> campo real antes de confiarlo. Script:
+> `scripts/dryrun_b116_shadow_refresh.py`. Detalle en
+> `docs/B116_CONDITION4_DESIGN.md` §7. No cambia el estado (sigue
+> CABLEADO COMO SOMBRA); es evidencia de que el contrato no se degradó,
+> no una promoción.
+
 | Campo | Valor |
 |-------|-------|
-| **Estado** | CABLEADO COMO SOMBRA (WARN) — 2026-07-22, decisión de Anna. El gate evalúa y anexa `signal_quality_shadow` al resultado del scorer con CERO autoridad de veredicto (corrida comparativa: 0 flips en 202 casos). Condición 4 reducida a decisión doctrinal ya tomada. Ver los updates cronológicos abajo y `docs/B116_CONDITION4_DESIGN.md` §5-bis. (Estado previo: POSPUESTO — bloqueado por desajuste de interfaz y calidad de datos.) |
+| **Estado** | CABLEADO COMO SOMBRA (WARN) — 2026-07-22, decisión de Anna; 0-flips re-confirmado 2026-07-31 sobre 205 casos post-B-215/B-220/B-224. El gate evalúa y anexa `signal_quality_shadow` al resultado del scorer con CERO autoridad de veredicto. Condición 4 reducida a decisión doctrinal ya tomada. Ver los updates cronológicos abajo y `docs/B116_CONDITION4_DESIGN.md` §5-bis/§7. (Estado previo: POSPUESTO — bloqueado por desajuste de interfaz y calidad de datos.) |
 | **Severidad** | P2 (gate-level architectural gap — el mecanismo ahora observa en sombra; promoción a autoridad requiere nueva corrida 0-flips + firma) |
 | **Archivo** | `vigia/signal_quality_gate.py` AND `vigia/core/signal_quality_gate.py` (identical duplicates) |
 | **Detectado en** | Post-hackathon session 2026-07-14, dry-run script `scripts/dryrun_signal_quality_gate.py` |

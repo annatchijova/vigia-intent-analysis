@@ -168,3 +168,37 @@ PYTHONPATH=. python3 scripts/dryrun_b116_mode_c.py
 Baseline: `data/signal_calibration_dataset_20260709.json`
 (`dataset_sha256` interno en el archivo). Política de fallback y piso MAD
 declarados en el script y en §2.
+
+## 7. Re-medición 2026-07-31 — 0-flips confirmado sobre el corpus/pipeline actual
+
+Desde el cableado sombra del 22/07 (§5-bis), el pipeline recibió cambios
+reales (B-215, B-220, B-224, entre otros) y el corpus creció (202 → 205
+casos evaluables, +3 casos AI-agent nuevos). El gate pre-registrado del
+22/07 ("0 flips") nunca se re-verificó contra ese estado nuevo.
+
+Re-medido con metodología equivalente pero más estricta que el snapshot
+original: en vez de diffear "antes vs después de un edit puntual", se
+corre `_vigia_score(case)` dos veces por caso — una con
+`shadow_signal_quality` real, otra con la función monkeyparcheada a un
+stub inerte — aislando exactamente el efecto causal del anexo sombra en
+vez de un diff arbitrario. Script:
+`scripts/dryrun_b116_shadow_refresh.py`.
+
+**Resultado sobre 205 casos: 0 flips** de `verdict`/`score`/`confidence`.
+Distribución sombra: 120 QUALITY_OK / 85 WARN / 0 sin anexo / 0 error
+(proporcional al 117/84 sobre 202 casos del 22/07 — crecimiento
+consistente, no un salto sospechoso). El contrato de cero autoridad sigue
+sosteniéndose empíricamente después de los cambios de pipeline
+posteriores.
+
+**Nota de método:** la primera corrida de este script tenía un bug de
+medición propio — leía claves `status`/`verdict` que no existen en el
+payload real de `shadow_signal_quality` (que usa `passed: bool`), así que
+todo caso caía por default a "WARN" (205/0 en vez de la distribución
+real). Corregido antes de reportar el número — mismo principio ya
+aplicado en esta sesión (B-124/B-223): un resultado sospechosamente
+uniforme se verifica contra el campo real antes de confiarlo.
+
+Sigue sin cumplirse ninguna condición nueva para promover WARN a
+autoridad — este re-run es evidencia de que el contrato sombra sigue
+intacto, no un cambio de estado. Promoción sigue exigiendo firma de Anna.

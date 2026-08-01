@@ -162,11 +162,28 @@ Observe the pattern in a second independent judicial case file (other than MPF77
 > production callers): no verdict moved. Tests:
 > `tests/test_b116_placeholder_tools.py` (9, red-first).
 
+> **Sync note 2026-07-31 (this EN file was stale re: status):** the
+> Spanish registry (`BUGS_PENDIENTES.md`) has a fuller chronological
+> history not mirrored here (2026-07-16 through 2026-07-22-ter): the
+> duplicate `vigia/signal_quality_gate.py` file was deleted (2026-07-16,
+> only `vigia/core/signal_quality_gate.py` remains), and Anna resolved
+> condition 4's doctrinal question as **WARN, not cap** (2026-07-22) --
+> the gate is now **wired in shadow mode**
+> (`vigia/core/signal_quality_shadow.py`, an annex on `_vigia_score()`'s
+> result with zero verdict authority). Pre-registered comparison: 0 flips
+> on 202 corpus cases. Re-verified 2026-07-31 against the current
+> pipeline/corpus (post B-215/B-220/B-224, 205 cases): still 0 flips,
+> 120 QUALITY_OK / 85 WARN (`scripts/dryrun_b116_shadow_refresh.py`,
+> `docs/B116_CONDITION4_DESIGN.md` §7). The "Status: POSTPONED" line
+> below is stale as of this note -- see the Spanish file for the current
+> "CABLEADO COMO SOMBRA" status. Full EN translation of the intervening
+> history has not been done; flagged here rather than left silently wrong.
+
 | Field | Value |
 |-------|-------|
-| **Status** | POSTPONED — blocked by interface mismatch and data quality |
+| **Status** | STALE — see sync note above; ES registry has the current status (wired in shadow mode since 2026-07-22, re-verified 2026-07-31). Originally: POSTPONED — blocked by interface mismatch and data quality. |
 | **Severity** | P2 (gate-level architectural gap — safety mechanism exists but does not fire) |
-| **File** | `vigia/signal_quality_gate.py` AND `vigia/core/signal_quality_gate.py` (identical duplicates) |
+| **File** | `vigia/core/signal_quality_gate.py` (the `vigia/signal_quality_gate.py` duplicate mentioned below was deleted 2026-07-16) |
 | **Detected in** | Post-hackathon session 2026-07-14, dry-run script `scripts/dryrun_signal_quality_gate.py` |
 
 ### Description
