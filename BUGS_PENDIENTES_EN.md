@@ -275,6 +275,45 @@ tested, doctrinally correct). NOT candidates for deletion. Blocked until
 
 ---
 
+### CORRECTION 2026-08-01 — the stated rationale above is stale and dangerous
+
+The "Why not wired today" section claims the gate «passes unconditionally
+(`>= 0.50`)» with every dimension defaulted, and concludes that wiring it
+today would be **cosmetic**. That stopped being true with **H-04
+(2026-07-23)**, which added `dimensions_provided` / `insufficient_coverage`
+to the module.
+
+ACTUAL behaviour today, with all 4 dimensions absent (measured):
+
+```
+causal_closure_score  = 1/2
+dimensions_provided   = 0
+insufficient_coverage = True
+gate_passed           = False        <-- it no longer passes
+verdict_cap           = "ABSTAIN"
+explanation: "INSUFFICIENT COVERAGE (0/4 dimensions provided) — verdict
+              capped at ABSTAIN before gate evaluation (H-04). A
+              causal-closure gate cannot enable MALICE_HIGH on defaults."
+```
+
+The module already degrades honestly: with no information it enables nothing,
+and it says so. That is the correct behaviour.
+
+**The consequence inverts the risk.** Measured on the current corpus: 0 of 282
+cases supply any of the 4 dimensions. Wiring the gate today would not be
+cosmetic — it would **cap 282/282 cases at ABSTAIN**. VIGÍA would stop issuing
+any substantive verdict at all.
+
+The operational conclusion (do NOT wire) is unchanged; what changes is its
+basis, and with it the magnitude of the mistake someone would make by ignoring
+it. A reader who saw only the stale rationale — "it is cosmetic, it changes
+nothing" — could wire it believing the cost is wasted processing. The real cost
+is the entire corpus.
+
+What unblocks wiring is unchanged: the 4 producers in the dependency table.
+While none of them emits its dimension, `insufficient_coverage` is the correct
+answer, and wiring the gate would only propagate it corpus-wide.
+
 ## B-124 — Verdict/governance cluster: 6 modules designed, NOT wired — same pattern as B-123
 
 | Field | Value |

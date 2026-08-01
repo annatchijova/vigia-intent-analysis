@@ -491,6 +491,44 @@ queda cuantificado y re-medible en un comando (informe §6).
 
 ---
 
+### CORRECCIÓN 2026-08-01 — la razón declarada arriba es obsoleta y peligrosa
+
+La sección "Why not wired today" afirma que el gate «pasa incondicionalmente
+(`>= 0.50`)» con todas las dimensiones por defecto, y concluye que cablearlo
+hoy sería **cosmético**. Eso dejó de ser cierto con **H-04 (2026-07-23)**, que
+añadió `dimensions_provided` / `insufficient_coverage` al módulo.
+
+Comportamiento REAL hoy, con las 4 dimensiones ausentes (medido):
+
+```
+causal_closure_score  = 1/2
+dimensions_provided   = 0
+insufficient_coverage = True
+gate_passed           = False        <-- ya no pasa
+verdict_cap           = "ABSTAIN"
+explanation: "INSUFFICIENT COVERAGE (0/4 dimensions provided) — verdict
+              capped at ABSTAIN before gate evaluation (H-04). A
+              causal-closure gate cannot enable MALICE_HIGH on defaults."
+```
+
+El módulo ya hace degradación honesta: sin información no habilita nada, y
+lo dice. Es la conducta correcta.
+
+**La consecuencia invierte el riesgo.** Medido sobre el corpus actual: 0 de
+282 casos aportan alguna de las 4 dimensiones. Cablear el gate hoy no sería
+cosmético — **caparía 282/282 casos a ABSTAIN**. VIGÍA dejaría de emitir
+cualquier veredicto sustantivo.
+
+La conclusión operativa (NO cablear) no cambia; cambia su fundamento, y con
+él la magnitud del error que se cometería al ignorarla. Alguien que leyera
+sólo la razón obsoleta —"es cosmético, total no cambia nada"— podría cablearlo
+pensando que el coste es procesamiento inútil. El coste real es el corpus
+entero.
+
+Lo que desbloquea el cableado sigue siendo lo mismo: los 4 productores de la
+tabla de dependencias. Mientras ninguno emita su dimensión, `insufficient_coverage`
+es la respuesta correcta y cablear el gate sólo la propagaría a todo el corpus.
+
 ## B-124 — Verdict/governance cluster: 6 modules designed, tested, NOT wired — same pattern as B-123
 
 | Campo | Valor |
