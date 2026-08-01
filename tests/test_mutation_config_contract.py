@@ -160,7 +160,58 @@ def test_tests_are_never_mutated():
 
 
 # ---------------------------------------------------------------------------
-# 4. El sandbox mutado nunca entra al repo
+# 4. Lo declarado se mide de verdad
+# ---------------------------------------------------------------------------
+
+def test_ci_matrix_covers_every_module_in_only_mutate():
+    """Quinta variante de la misma clase: declarado pero nunca medido.
+
+    El workflow reparte un job por módulo (obligado: los 8 en un solo job
+    suman ~359 min y el tope duro de un job en GitHub Actions es 360). Esa
+    matriz es una segunda lista de módulos, y dos listas que deben coincidir
+    se desincronizan solas: añadir un módulo a only_mutate y olvidarlo en la
+    matriz lo deja fuera de la medición semanal para siempre, sin que nada
+    falle. Al revés — un módulo en la matriz que no está en only_mutate —
+    gasta un runner entero para no mutar nada.
+    """
+    yaml = pytest.importorskip("yaml")
+
+    workflow = REPO / ".github" / "workflows" / "mutation.yml"
+    assert workflow.is_file(), (
+        "falta .github/workflows/mutation.yml: el barrido semanal es lo que "
+        "mide los módulos que no caben en una sesión interactiva."
+    )
+
+    data = yaml.safe_load(workflow.read_text(encoding="utf-8"))
+    matrix = data["jobs"]["mutation"]["strategy"]["matrix"]["module"]
+
+    declared = set(CONFIG.get("only_mutate", []))
+    measured = set(matrix)
+
+    assert declared == measured, (
+        f"only_mutate y la matriz de mutation.yml difieren.\n"
+        f"  declarados pero NO medidos por CI: {sorted(declared - measured)}\n"
+        f"  en la matriz pero NO declarados:   {sorted(measured - declared)}"
+    )
+
+
+def test_ci_job_timeout_stays_under_the_github_hard_limit():
+    """El tope duro de un job en GitHub Actions es 360 min: un timeout mayor
+    no protege de nada — el job muere igual y deja un barrido a medias, que
+    es exactamente lo que docs/MUTATION_BASELINE.md §1 descarta como
+    medición válida."""
+    yaml = pytest.importorskip("yaml")
+
+    data = yaml.safe_load((REPO / ".github" / "workflows" / "mutation.yml").read_text(encoding="utf-8"))
+    timeout = data["jobs"]["mutation"]["timeout-minutes"]
+    assert timeout < 360, (
+        f"timeout-minutes={timeout} >= 360, el tope duro de GitHub Actions. "
+        f"El job se cancelaría sin resultado utilizable."
+    )
+
+
+# ---------------------------------------------------------------------------
+# 5. El sandbox mutado nunca entra al repo
 # ---------------------------------------------------------------------------
 
 def test_mutants_dir_is_gitignored():

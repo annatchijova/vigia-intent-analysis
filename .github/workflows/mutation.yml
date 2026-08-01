@@ -3,11 +3,18 @@ name: VIGÍA Mutation Testing
 # NO corre en push/PR: un barrido de mutación son N ejecuciones de la suite
 # (una por mutante) — trabajo de horas, no un check de pre-merge. Semanal +
 # manual. Ver docs/MUTATION_TESTING.md §6 (Coste).
+#
+# UN JOB POR MÓDULO, EN PARALELO. No es una preferencia de estilo: con el
+# ritmo medido (19,5 mutantes/min, 4 CPU — docs/MUTATION_BASELINE.md §1) los
+# 8 módulos en un solo job suman ~359 min, y el tope DURO de un job en GitHub
+# Actions es 360 min. Un job único no cabe: se cancelaría a mitad y dejaría
+# un resultado parcial, que es justo lo que la línea base rechaza como
+# medición. Repartido, el peor módulo (caie.py, ~145 min) entra con holgura.
 on:
   workflow_dispatch:
     inputs:
       only_mutate:
-        description: 'Glob opcional para acotar el barrido a un módulo (ej: vigia_scorer.py)'
+        description: 'Ruta de un módulo para medir sólo ese (ej: vigia_scorer.py). Vacío = todos, en paralelo.'
         required: false
         default: ''
   schedule:
@@ -15,11 +22,44 @@ on:
     - cron: '0 3 * * 1'
 
 jobs:
-  mutation:
+  # -------------------------------------------------------------------------
+  # Puerta previa, una sola vez: la suite debe estar VERDE antes de mutar.
+  # Sobre una suite roja el mutation score no significa nada — todo mutante
+  # se declara muerto por el fallo preexistente, y el resultado sale 100%.
+  # -------------------------------------------------------------------------
+  baseline:
     runs-on: ubuntu-latest
-    # Tope duro: si el barrido no cabe, se acota only_mutate en pyproject.toml,
-    # no se deja el job colgando.
-    timeout-minutes: 330
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r requirements.txt -r requirements-ci.txt && pip install scipy
+      - name: Suite verde (requisito del método)
+        run: python -m pytest tests/ vigia/tests/ -q --tb=short --no-cov
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+  mutation:
+    needs: baseline
+    runs-on: ubuntu-latest
+    # Holgura sobre el peor módulo medido (~145 min en 4 CPU). Si un runner
+    # es más lento, sigue por debajo del tope duro de 360.
+    timeout-minutes: 340
+    strategy:
+      # Un módulo lento no debe cancelar la medición de los demás.
+      fail-fast: false
+      matrix:
+        module:
+          - vigia_scorer.py
+          - vigia/tools/caie.py
+          - vigia/core/semiotic_detector_v2.py
+          - vigia/core/evidence_aggregator.py
+          - vigia/core/likelihood_engine.py
+          - vigia/core/decision_layer.py
+          - vigia/core/causal_closure.py
+          - vigia/collapse_decision.py
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -32,51 +72,61 @@ jobs:
       - run: pip install -r requirements.txt -r requirements-ci.txt && pip install scipy
       - run: pip install mutmut
 
-      # Puerta previa: la suite debe estar VERDE antes de mutar. Sobre una
-      # suite roja el mutation score no significa nada — todo mutante se
-      # declara muerto por el fallo preexistente.
-      - name: Baseline verde (requisito del método)
-        run: python -m pytest tests/ vigia/tests/ -q --tb=short --no-cov
-        env:
-          PYTHONPATH: ${{ github.workspace }}
-
-      - name: Acotar alcance (solo workflow_dispatch con input)
-        if: ${{ github.event.inputs.only_mutate != '' }}
+      - name: Acotar el barrido a este módulo
+        # `mutmut run <patrón>` NO acota nada (comprobado: ejecuta los 7.043
+        # igual). El único mecanismo que funciona es only_mutate en la config
+        # — docs/MUTATION_BASELINE.md §6.
         run: |
           python - <<'PY'
           import os, re, pathlib
           target = os.environ["ONLY"]
           p = pathlib.Path("pyproject.toml")
           src = p.read_text(encoding="utf-8")
-          src = re.sub(
-              r"(?ms)^only_mutate = \[.*?^\]",
-              'only_mutate = [\n    "%s",\n]' % target,
-              src,
-              count=1,
-          )
-          p.write_text(src, encoding="utf-8")
-          print("only_mutate acotado a:", target)
+          new = 'only_mutate = [\n    "%s",\n]' % target
+          out = re.sub(r"(?ms)^only_mutate = \[.*?^\]", new, src, count=1)
+          assert out != src, "no se pudo reescribir only_mutate"
+          p.write_text(out, encoding="utf-8")
+          print("only_mutate =", target)
           PY
         env:
-          ONLY: ${{ github.event.inputs.only_mutate }}
+          ONLY: ${{ github.event.inputs.only_mutate || matrix.module }}
 
       - name: Barrido de mutación
         run: python -m mutmut run --max-children 4
         env:
           PYTHONPATH: ${{ github.workspace }}
-        # El barrido no bloquea: un mutante superviviente es un hallazgo para
-        # triaje (hueco real / equivalente / código muerto — §7), no un fallo
-        # de build. Convertirlo en gate obligatorio antes de tener una línea
-        # base triada produciría rojos permanentes por mutantes equivalentes.
+        # No bloquea: un mutante superviviente es material de triaje (hueco
+        # real / equivalente / código defensivo — MUTATION_TESTING.md §7), no
+        # un fallo de build. Convertirlo en gate antes de tener una línea base
+        # triada produciría rojos permanentes por mutantes equivalentes.
         continue-on-error: true
 
       - name: Resultados
         if: always()
-        run: python -m mutmut results | tee mutation-results.txt
+        run: |
+          echo "### $MODULE" >> "$GITHUB_STEP_SUMMARY"
+          python -m mutmut results > survivors.txt 2>&1 || true
+          python -m mutmut results --all true > all.txt 2>&1 || true
+          K=$(grep -c ': killed'   all.txt || true)
+          S=$(grep -c ': survived' all.txt || true)
+          T=$((K+S))
+          if [ "$T" -gt 0 ]; then
+            echo "killed=$K survived=$S total=$T score=$((100*K/T))%" | tee -a "$GITHUB_STEP_SUMMARY"
+          else
+            echo "sin mutantes ejecutados (revisar el log del barrido)" | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+        env:
+          MODULE: ${{ github.event.inputs.only_mutate || matrix.module }}
+
+      - name: Nombre de artefacto seguro
+        if: always()
+        run: echo "SLUG=$(echo "${{ github.event.inputs.only_mutate || matrix.module }}" | tr '/.' '__')" >> "$GITHUB_ENV"
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: mutation-results
-          path: mutation-results.txt
+          name: mutation-${{ env.SLUG }}
+          path: |
+            survivors.txt
+            all.txt
           retention-days: 90
