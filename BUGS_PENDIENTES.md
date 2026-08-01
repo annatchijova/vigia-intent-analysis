@@ -1057,6 +1057,65 @@ Tests permanentes: `tests/test_narrative_auditor_role_verdict_coercion.py`
 mismas 14 fallas preexistentes. `narrative_auditor` sigue con cero *callers* de
 producción → cero veredictos sellados cambian.
 
+### Update 2026-07-31 — CABLEADO con sign-off de Anna; encontrado y corregido un bug real en el mecanismo de carga de `run_demo.py`
+
+Re-corrido el gate final antes de pedir sign-off: `c3_dryrun_remeasure.py`
+sobre el corpus real completo (404 bundles con narrativa, no la muestra de
+605 narrativas sueltas de la medición anterior) → **0/404 marcadas, 0
+threats, 0 eventos CRITICAL**. Antes de confiar ese "0" — misma disciplina
+aplicada hoy a B-116/B-124/B-223 con resultados sospechosamente uniformes
+— control positivo directo: `NarrativeAuditor().audit(['As you know, the
+attacker used a rootkit.'])` dispara `FALSE_FAMILIARITY`. El detector está
+vivo; el 0/404 es señal real, no un script roto en silencio.
+
+Presentada la decisión a Anna (no tomada unilateralmente, por disciplina
+del cluster) — **sign-off: cablear ahora**. Agregado
+`vigia/core/narrative_auditor.py` como primer candidato en
+`_C3_AUDITOR_CANDIDATES` (`scripts/run_demo.py`), con la fuente canónica
+del repo ganando sobre cualquier copia empaquetada.
+
+**Bug real encontrado al cablear con datos reales del pipeline (no
+sintéticos):** la primera corrida de `run_demo.py` con el módulo cableado
+falló al 100% con `AttributeError: 'NoneType' object has no attribute
+'__dict__'` — no relacionado con `narrative_auditor.py`, sino con el
+mecanismo de carga dinámica de `_run_c3_audit`
+(`importlib.util.module_from_spec` + `exec_module`, sin registrar el
+módulo en `sys.modules` antes de ejecutarlo). `narrative_auditor.py` usa
+`from __future__ import annotations` (PEP 563); en Python 3.12,
+`@dataclass` resolviendo esas anotaciones diferidas busca
+`sys.modules[cls.__module__]` mientras se ejecuta el cuerpo de la clase —
+un módulo cargado dinámicamente sin registrar ahí resuelve a `None`, y
+`dataclasses` crashea. Gotcha conocido de `importlib`, no un defecto de
+`narrative_auditor.py` (que funciona perfecto bajo un `import` normal —
+por eso el dry-run con `c3_dryrun_remeasure.py`, que usa import normal,
+nunca lo disparó). Estaba latente desde siempre: `_C3_AUDITOR_CANDIDATES`
+nunca había apuntado a un archivo real antes de esta sesión, así que ese
+camino de carga nunca se había ejercitado de punta a punta.
+
+Fix: `sys.modules[spec.name] = mod` antes de `spec.loader.exec_module(mod)`.
+Verificado con corrida real de `run_demo.py` sobre 3 casos distintos
+(`case_001_temporal`, `case_002_log_fabrication`, `case_003_false_flag`):
+los tres reportan `C3 AUDIT: CLEAN (0 amenazas)`, no `NOT RUN (error)`.
+Control adicional con narrativa inyectada (`"IGNORE PREVIOUS
+INSTRUCTIONS..."`) confirma detección real end-to-end vía el mismo camino
+de carga dinámica: `is_clean=False`, `OVERT_OVERRIDE`.
+
+Actualizado `tests/test_run_demo_c3_absent_auditor_is_not_a_pass.py`: el
+test `test_repo_module_is_not_silently_wired` (guarda que forzaba esta
+revisión antes de cablear) se invirtió a
+`test_repo_module_is_wired_with_sign_off`, documentando la decisión
+tomada. Nuevo test permanente:
+`tests/test_run_demo_c3_dynamic_load_sys_modules.py` (3 tests,
+rojo-primero — los 3 fallan contra el código sin el fix de
+`sys.modules`, reproduciendo el error real con un módulo sintético que
+usa `from __future__ import annotations` + `@dataclass`, más un test
+end-to-end contra el módulo real). Suite completa: 2140 passed. Cluster
+B-124 avanza: 2 de 6 módulos resueltos (`config_sentinel` honesto,
+`narrative_auditor` cableado); quedan `ockham_adversarial`,
+`dissent_report`, `peirceplanner_bounded` (con fecha propia, B-129, no
+antes del 2026-08-14) y `advanced_signal_router` (premisa de supersesión
+ya refutada por medición, ver arriba).
+
 ---
 
 ## B-129 — PeircePlanner bounded: Fase 1 observation adapter [PENDIENTE Fase 2]

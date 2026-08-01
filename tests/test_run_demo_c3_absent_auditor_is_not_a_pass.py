@@ -159,17 +159,27 @@ def test_present_auditor_reports_clean_narrative_as_clean(run_demo, monkeypatch,
 # Scope guard: the in-repo module is deliberately NOT in the candidate list
 # =============================================================================
 
-def test_repo_module_is_not_silently_wired(run_demo):
+def test_repo_module_is_wired_with_sign_off(run_demo):
     """
-    `vigia/core/narrative_auditor.py` exposes exactly the entry point run_demo
-    calls, so adding it to the candidates would make C3 run in-repo. That is a
-    behavior change for every demo case and needs a corpus dry-run plus
-    sign-off (B-124 cluster discipline) — it is deliberately NOT done here.
-    This test fails if someone wires it without that review, so the change is
-    a decision rather than a side effect.
+    B-124, 2026-07-31, Anna's sign-off: `vigia/core/narrative_auditor.py`
+    exposes exactly the entry point run_demo calls, and wiring it was gated
+    on a corpus dry-run showing it adds value without false positives —
+    93% coverage (14/15) on an injection-probe battery with 0 false
+    positives on realistic forensic prose/VIGÍA doctrine, and 0/404
+    narratives flagged across the full real corpus (a positive control
+    confirmed the detector fires on a known trigger phrase first, so the
+    0/404 is signal, not a silently broken script). C3 now runs for real
+    on every demo case.
+
+    This test used to assert the OPPOSITE (repo module absent from
+    candidates) as a guard forcing this exact review before wiring. That
+    guard did its job — the flip below is the reviewed decision, not a
+    side effect. It now asserts the module is present, and specifically
+    FIRST in the candidate list (the canonical repo source must win over
+    any stale packaged copy at the same layout paths).
     """
     candidates = [os.path.realpath(p) for p in run_demo._C3_AUDITOR_CANDIDATES]
     repo_module = os.path.realpath(
         os.path.join(_REPO_ROOT, "vigia", "core", "narrative_auditor.py")
     )
-    assert repo_module not in candidates
+    assert candidates[0] == repo_module

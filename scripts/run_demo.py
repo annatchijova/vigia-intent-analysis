@@ -162,12 +162,18 @@ C3_STATUS_ERROR   = "ERROR"
 # el repo, así que la ausencia del módulo es legítima. Constante a nivel módulo
 # para que los tests puedan sustituirla sin escribir dentro del repo.
 #
-# `vigia/core/narrative_auditor.py` NO está acá a propósito: expone exactamente
-# `audit_narrative_before_seal(...)`, de modo que agregarlo haría que C3 corra
-# de verdad en todos los casos del demo. Eso es un cambio de comportamiento que
-# necesita dry-run de corpus + sign-off (disciplina del cluster B-124), no un
-# efecto colateral de este fix de honestidad.
+# `vigia/core/narrative_auditor.py` (B-124, cableado 2026-07-31, sign-off de
+# Anna): condición de wiring cumplida — 93% cobertura (14/15) en batería de
+# sondas de inyección con 0 falsos positivos sobre prosa pericial/doctrina
+# VIGÍA, y 0/404 narrativas marcadas sobre el corpus real completo (control
+# positivo confirmó que el detector dispara sobre una frase conocida, así
+# que el 0/404 es señal, no un script roto en silencio). C3 corre de verdad
+# en todos los casos del demo desde acá. Va PRIMERO en la lista de
+# candidatos: si en algún layout empaquetado también existiera un
+# `narrative_auditor.py` junto al script, la fuente canónica del repo gana.
+_REPO_ROOT = os.path.dirname(_SCRIPT_DIR)
 _C3_AUDITOR_CANDIDATES: List[str] = [
+    os.path.join(_REPO_ROOT, "vigia", "core", "narrative_auditor.py"),
     os.path.join(_SCRIPT_DIR, "narrative_auditor.py"),
     os.path.join(_SCRIPT_DIR, "vigia_prod", "security", "narrative_auditor.py"),
 ]
@@ -231,6 +237,17 @@ def _run_c3_audit(
         if _auditor_path:
             spec = _ilu.spec_from_file_location("narrative_auditor", _auditor_path)
             mod  = _ilu.module_from_spec(spec)
+            # B-124 (2026-07-31): register in sys.modules BEFORE exec_module.
+            # narrative_auditor.py uses `from __future__ import annotations`
+            # (PEP 563 deferred annotations); @dataclass resolving those on a
+            # 3.12 dataclass looks up sys.modules[cls.__module__] while the
+            # class body executes. A dynamically loaded module that isn't
+            # registered yet resolves to None there, and dataclasses crashes
+            # with `'NoneType' object has no attribute '__dict__'` — a known
+            # importlib.util gotcha, not a defect in narrative_auditor.py.
+            # Reproduced directly before this fix; the candidate list was
+            # always empty before this session, so the crash was latent.
+            sys.modules[spec.name] = mod
             spec.loader.exec_module(mod)
             result = mod.audit_narrative_before_seal(narrative, investigation_id, verdict)
             audited = dict(result.to_dict())
