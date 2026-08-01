@@ -293,7 +293,13 @@ def test_all_test_imports_resolve_with_requirements_ci():
                         p
                         for pat in (f"{root}.py", f"{root}/__init__.py")
                         for p in REPO.rglob(pat)
-                        if ".git" not in p.parts and _is_repo_local(p, REPO)
+                        # "mutants": sandbox de mutation testing (gitignorado).
+                        # Resolver un módulo a su copia mutada haría que este
+                        # contrato clasifique imports leyendo fuente con
+                        # defectos inyectados, y obliga a recorrer ~300 MB.
+                        if ".git" not in p.parts
+                        and "mutants" not in p.parts
+                        and _is_repo_local(p, REPO)
                     ]
                     if hits:
                         local_roots.add(root)

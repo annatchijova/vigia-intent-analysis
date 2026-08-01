@@ -441,6 +441,14 @@ bash run_all_tests.sh                     # convenience wrapper
 The suite is organized by threat model and includes unit, integration, CAIE,
 red-team / anti-evasion, audit-gate, and real-case categories under `tests/`.
 
+**Line coverage answers "was this line executed?" — not "would anything notice
+if it were wrong?"** The second question is answered by mutation testing, which
+runs weekly (`.github/workflows/mutation.yml`, one job per module). Do not read
+a coverage percentage as evidence that the verdict path is verified: the first
+baseline found `vigia/collapse_decision.py` at 77.94% line coverage and 13.8%
+mutation score — the MALICE threshold could be moved to an unreachable value
+with no test failing. Operation and troubleshooting: `docs/MUTATION_RUNBOOK.md`.
+
 To confirm the deterministic verdict end-to-end without any LLM, run Mode 1 on a
 sample case and verify the sealed bundle:
 
@@ -464,6 +472,7 @@ rather than duplicating their content here:
 | `SECURITY.md` | Security policy and hardening notes. |
 | `docs/EPISTEMIC_KERNEL.md` | The epistemic kernel (`vigia/core/ontology.py`, `vigia/core/reasoning/abduction.py`) — attribution, repaired defects, and open design questions. **Not part of the verdict path:** it generates hypotheses and emits no verdict, score, or sealed output. Nothing in the scoring pipeline imports it, and a regression test enforces that. Irrelevant to running an investigation; required reading before refactoring those two modules. |
 | `docs/ENGINEERING_DISCIPLINE.md` | Development-discipline guide for any agent working *on* this code (abductive method, git hygiene, surgical patching, determinism invariants). Distinct from this runtime manual — that file governs the engineer, this one governs VIGÍA's investigative behavior. Do not conflate them. |
+| `docs/MUTATION_RUNBOOK.md` | **Start here for anything mutation-testing related.** Self-contained operations and failure guide: how the weekly sweep runs, how to read it, how to scope it locally, and every failure mode seen with its diagnosis. Links to `docs/MUTATION_TESTING.md` (method, scope and why it is narrow) and `docs/MUTATION_BASELINE.md` (measured scores and survivor triage). Required reading before changing `[tool.mutmut]`, the test selection, or `.github/workflows/mutation.yml` — several exclusions there look arbitrary and are not. |
 
 ---
 

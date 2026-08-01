@@ -109,7 +109,10 @@ def test_rule2_technical_result_and_semiotic_result_have_no_producer():
     about one call path."""
     for key in ("technical_result", "semiotic_result"):
         hits = subprocess.run(
-            ["grep", "-rn", key, "--include=*.py", "."],
+            # --exclude-dir=mutants: sandbox de mutation testing (gitignorado),
+            # una copia del árbol con defectos inyectados. Sus duplicados de
+            # vigia_agent.py se contarían como productores nuevos de la clave.
+            ["grep", "-rn", key, "--include=*.py", "--exclude-dir=mutants", "."],
             cwd=REPO, capture_output=True, text=True,
         ).stdout.splitlines()
         # Two classes of permitted occurrence, matched by content rather than

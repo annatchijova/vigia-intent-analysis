@@ -74,6 +74,10 @@ def test_no_stale_inverted_formula_outside_the_one_documented_exception():
         ["grep", "-rl", STALE_FORMULA,
          "--include=*.py", "--include=*.md",
          "--exclude-dir=docs_merged", "--exclude-dir=academic",
+         # mutants/ es el sandbox de mutation testing (gitignorado): una copia
+         # del árbol con defectos inyectados. Barrerlo reporta como hallazgo
+         # cada fichero que el propio harness duplicó. No es código del repo.
+         "--exclude-dir=mutants",
          "."],
         cwd=REPO, capture_output=True, text=True,
     )
