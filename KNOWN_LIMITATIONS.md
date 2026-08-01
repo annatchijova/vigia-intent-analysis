@@ -3055,6 +3055,40 @@ importing or running at all; see `docs/EPISTEMIC_KERNEL.md`.
 
 ---
 
+## L-070 — Case-JSON fields that are *outputs* can carry verdict authority (B-225) [MITIGATED FOR GRICE]
+
+`_vigia_score` reads 10 fields from the case dict. Some are genuine inputs
+(`artifacts`); others are **outputs of upstream analysers** that the pipeline
+writes back into the same dict before scoring. Where the same key carries both
+a live-computed result and an externally-declared one, the scorer cannot tell
+them apart without a provenance marker.
+
+Audited field by field (2026-08-01):
+
+| Field | Authority guard |
+|-------|-----------------|
+| `caie_fractures` | `caie_fractures_source` — B-170 / L-063 |
+| `temporal_violations` | pair reconstructed from artifacts — B-172 / L-062 |
+| `expected_verdict` | blinded before scoring — B-075 |
+| `grice_verdict`, `grice_deception_probability`, `pipeline_grice` | `grice_source` — **B-225, this entry** |
+| `provenance_analysis` | consumed only in the conservative direction (broken chain → abstain) |
+| `peirce_chain` | pass-through to the output; no authority |
+| `grice_signals` | read and never consumed — dead assignment, removed by B-225 |
+
+**Residual limitation.** The pattern is structural, not exhausted: any future
+field that carries an analyser's output back into the case dict inherits the
+same hazard, and nothing in the type system prevents it. The mitigation is a
+convention (`<producer>_source` marker + the shared authority gate), not an
+invariant the code enforces. A new decision-relevant field added without a
+marker would silently regain authority.
+
+The general remedy — a typed epistemic state that forces every stage to
+declare what it measured, what was missing, and what gaps remain, with the
+verdict derived from those rather than asserted alongside them — is a design
+change, not a patch, and is not adopted here.
+
+---
+
 ## L-069 — Mode-1's self-correction loop never actually iterates (B-224) [DOCUMENTED]
 
 `vigia_agent.py`'s `ContradictionDetector.detect()` implements 4 rules. 3 of

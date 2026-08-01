@@ -1173,6 +1173,17 @@ class SIFTOrchestrator:
                     blind["grice_verdict"] = _grice_result.get("verdict", "")
                     blind["grice_deception_probability"] = _grice_result.get(
                         "probability_deception", 0)
+                    # B-225 / L-070: marca de procedencia. `grice_verdict` es
+                    # una SALIDA del auditor Grice, pero viaja al scorer por
+                    # el mismo campo del dict del caso que puede escribir
+                    # cualquiera. Sin este marcador el scorer no puede
+                    # distinguir este resultado —calculado en vivo, aquí
+                    # arriba— de una declaración inyectada a mano en el JSON.
+                    # Misma forma y mismo remedio que `caie_fractures_source`
+                    # (B-170/L-063). Se fija DESPUÉS del cálculo: si el
+                    # auditor lanza, el except de abajo lo captura y el
+                    # marcador nunca llega a existir.
+                    blind["grice_source"] = "live_grice"
             except Exception as _e:
                 logger.debug("[B-127] Grice injection failed (non-fatal): %s", _e)
 

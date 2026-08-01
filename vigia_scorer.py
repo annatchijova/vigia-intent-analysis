@@ -626,6 +626,13 @@ def _vigia_score(case: dict) -> dict:
         if _sev_float(_entry["violation"].get("severity", 0), 0.0) >= 0.9
     ]
 
+    # B-225 / L-070: cuarta clase de la puerta de autoridad, junto a B-170
+    # (caie_fractures), B-171 (uniformidad estadística) y B-172 (par temporal
+    # duro). Se inicializa aquí, incondicionalmente, porque el gate Grice que
+    # la puebla vive dentro de un `if` mucho más abajo y la puerta de
+    # autoridad la lee siempre.
+    _unverified_json_grice_gate_claims: list[dict] = []
+
     # B-171 / L-064 + B-172 / L-062: preserve examiner declarations for the
     # evidence package and fail closed below, but remove only unverified claims
     # from every scoring input.  Otherwise they retain hidden authority through
@@ -1567,7 +1574,10 @@ def _vigia_score(case: dict) -> dict:
         and all(_b126_prior_trust(a) <= 0.30 for a in artifacts)
     ):
         # Check Grice signals from the case data (pre-computed or inline)
-        _grice_signals = case.get("grice_signals", [])
+        # B-225/L-070: `grice_signals` se leía aquí y no se usaba en ninguna
+        # rama — asignación muerta desde B-126. Retirada: un campo que se lee
+        # del caso y no se consume sugiere una entrada con efecto que no
+        # existe.
         _grice_verdict = case.get("grice_verdict", "")
         _grice_deception = case.get("grice_deception_probability", 0)
 
@@ -1577,7 +1587,34 @@ def _vigia_score(case: dict) -> dict:
             _grice_verdict = _pipeline_grice.get("verdict", "")
             _grice_deception = _pipeline_grice.get("probability_deception", 0)
 
-        if _grice_verdict == "SUSPICION" and _grice_deception >= 0.25:
+        # B-225 / L-070: `grice_verdict` y `grice_deception_probability` son
+        # SALIDAS de audit_grice_maxims, no entradas que un caso pueda
+        # declarar por su cuenta. Viajan al scorer por el mismo campo del
+        # dict que escribe el productor legítimo (sift_orchestrator, tras
+        # correr el auditor), así que sin marca de procedencia este gate no
+        # distingue un análisis real de una afirmación escrita a mano.
+        # Reproducido: un caso NOISE con dos campos inyectados —por
+        # `grice_verdict` o por `pipeline_grice`— salía SUSPICION.
+        #
+        # Misma clase y mismo remedio que B-170/L-063 para `caie_fractures`:
+        # sólo el productor en vivo tiene autoridad; la declaración se
+        # preserva para el examinador pero no mueve el veredicto. Una
+        # declaración que HABRÍA disparado el gate es decision-relevant, así
+        # que su falta de productor va a la puerta de autoridad de abajo y el
+        # resultado abstiene — no se llama limpio al caso ni se escala desde
+        # una afirmación no verificada.
+        _grice_gate_would_fire = (
+            _grice_verdict == "SUSPICION" and _grice_deception >= 0.25
+        )
+        _grice_source = str(case.get("grice_source", "") or "").strip().lower()
+        if _grice_gate_would_fire and _grice_source != "live_grice":
+            _unverified_json_grice_gate_claims.append({
+                "grice_verdict": _grice_verdict,
+                "grice_deception_probability": _grice_deception,
+                "declared_source": _grice_source or "absent",
+            })
+
+        if _grice_gate_would_fire and _grice_source == "live_grice":
             verdict = "SUSPICION"
             confidence = _dround(min(0.65, _grice_deception * 2), 2)
             reason = (
@@ -1872,6 +1909,7 @@ def _vigia_score(case: dict) -> dict:
         _unverified_json_caie_fractures
         or _unverified_statistical_uniformity_violations
         or _unverified_hard_temporal_gate_claims
+        or _unverified_json_grice_gate_claims
     ):
         _pre_unverified_authority_verdict = base_result["verdict"]
         _pre_unverified_authority_reason = base_result["reason"]
@@ -1921,6 +1959,22 @@ def _vigia_score(case: dict) -> dict:
             _authority_gaps.append(
                 "EFFECT_BEFORE_CAUSE was declared in case JSON but its "
                 "artifact pair did not verify the claimed ordering"
+            )
+        if _unverified_json_grice_gate_claims:
+            base_result["unverified_json_grice_gate_claims"] = list(
+                _unverified_json_grice_gate_claims
+            )
+            base_result["pre_unverified_grice_authority_verdict"] = (
+                _pre_unverified_authority_verdict
+            )
+            base_result["pre_unverified_grice_authority_reason"] = (
+                _pre_unverified_authority_reason
+            )
+            _authority_gaps.append(
+                "a Grice testimony gate escalation (grice_verdict=SUSPICION "
+                "with probability_deception >= 0.25) was supplied in case JSON "
+                "without grice_source='live_grice', so no live audit_grice_maxims "
+                "producer derived it"
             )
         base_result["reason"] = (
             "UNVERIFIED DECISION INPUT: " + "; ".join(_authority_gaps) + ". "

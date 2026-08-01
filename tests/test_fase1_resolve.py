@@ -131,6 +131,21 @@ class TestBlindGate:
                         _gr = asyncio.run(audit_grice_maxims(_msgs))
                         blind["grice_verdict"] = _gr.get("verdict", "")
                         blind["grice_deception_probability"] = _gr.get("probability_deception", 0)
+                        # B-225/L-070: el auditor SÍ corrió aquí arriba, así que
+                        # esta réplica debe marcar la procedencia igual que
+                        # resolve(). Sin el marcador el scorer trata el
+                        # resultado como declaración no verificada y abstiene,
+                        # y la comparación de este test falla contra la ruta
+                        # real (reproducido: RT-FN-COLLUSION-001 daba
+                        # SUSPICION_DETECTED por resolve() y ABSTAIN_DETECTED
+                        # por esta réplica).
+                        #
+                        # NOTA para quien mantenga esto: el test DUPLICA la
+                        # lógica de inyección de resolve() en vez de llamarla,
+                        # así que cada cambio en el productor real hay que
+                        # reflejarlo aquí a mano. Esa duplicación es la causa
+                        # de esta deriva, no B-225.
+                        blind["grice_source"] = "live_grice"
                 except Exception:
                     pass
 

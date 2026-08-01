@@ -3015,6 +3015,61 @@ el corpus completo**: cambia el veredicto de todos los casos mobile
 
 ---
 
+## B-225 / L-070 — `grice_verdict` declarado en JSON tenía autoridad de veredicto [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO 2026-08-01 |
+| **Severidad** | P1 de integridad epistémica: entrada NO VERIFICADA movía un veredicto sellado. Techo acotado (SUSPICION, `confidence <= 0.65`; no alcanza INTENT ni MALICE), pero la propiedad violada es la autoridad, no la magnitud. |
+| **Archivos** | `vigia_scorer.py` (gate de testimonio B-126), `sift_orchestrator.py` (productor legítimo), `scripts/dryrun_grice_b127.py` |
+| **Detectado en** | Auditoría sistemática de la clase B-170: los 10 campos que `_vigia_score` lee del dict del caso, uno por uno. |
+| **Tests** | `tests/test_b225_grice_json_verdict_authority.py` (12) |
+
+### Descripción
+
+Clase idéntica a **B-170/L-063** (`caie_fractures`). `grice_verdict` y
+`grice_deception_probability` son SALIDAS de `audit_grice_maxims`, pero viajan
+al scorer por el mismo campo del dict del caso que escribe el productor
+legítimo (`sift_orchestrator.py`, tras correr el auditor). Sin marca de
+procedencia, el gate B-126 no distinguía un análisis real de una afirmación
+escrita a mano.
+
+Reproducido antes del fix, por las DOS rutas de entrada:
+
+```
+caso NOISE + {"grice_verdict": "SUSPICION",
+              "grice_deception_probability": 0.99}          -> SUSPICION
+caso NOISE + {"pipeline_grice": {"verdict": "SUSPICION",
+              "probability_deception": 0.99}}               -> SUSPICION
+```
+
+Defecto menor en el mismo bloque: `grice_signals` se leía del caso y no se
+consumía en ninguna rama — asignación muerta desde B-126, retirada.
+
+### Fix
+
+Marcador `grice_source`; sólo `"live_grice"` tiene autoridad. Una declaración
+que HABRÍA disparado el gate sin productor en vivo es decision-relevant, así
+que entra en la puerta de autoridad ya existente —la misma que sirve a B-170,
+B-171 y B-172— y el resultado abstiene, preservando la declaración y el
+veredicto pre-puerta como procedencia.
+
+### Impacto en el corpus
+
+**Cero.** Ningún caso de `data/cases/` ni `cases/` trae campos `grice_*`
+(medido). El único consumidor real es la inyección en vivo de
+`sift_orchestrator`, que ahora emite el marcador.
+
+Un test tuvo que actualizarse:
+`test_fase1_resolve.py::test_motor_mode_matches_canonical_scorer_on_all_fixtures`
+**duplica** la lógica de inyección de `resolve()` en vez de llamarla, así que
+su copia quedó sin marcador y divergió de la ruta real
+(RT-FN-COLLUSION-001: `SUSPICION_DETECTED` por `resolve()` vs
+`ABSTAIN_DETECTED` por la réplica). La duplicación es la causa de esa deriva,
+no B-225; queda anotada en el propio test.
+
+---
+
 ## B-053 — shim: un pcap corrupto abortaba el caso COMPLETO (T-3) [RESUELTO]
 
 | Campo | Valor |

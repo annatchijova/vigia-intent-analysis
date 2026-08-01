@@ -3290,6 +3290,61 @@ would move from ABSTAIN to INTENT/MALICE). See
 
 ---
 
+## B-225 / L-070 — a JSON-declared `grice_verdict` carried verdict authority [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED 2026-08-01 |
+| **Severity** | P1 epistemic integrity: UNVERIFIED input moved a sealed verdict. The ceiling was bounded (SUSPICION, `confidence <= 0.65`; it cannot reach INTENT or MALICE), but the property violated is authority, not magnitude. |
+| **Files** | `vigia_scorer.py` (B-126 testimony gate), `sift_orchestrator.py` (legitimate producer), `scripts/dryrun_grice_b127.py` |
+| **Detected** | Systematic audit of the B-170 class: the 10 fields `_vigia_score` reads from the case dict, one by one. |
+| **Tests** | `tests/test_b225_grice_json_verdict_authority.py` (12) |
+
+### Description
+
+Same class as **B-170/L-063** (`caie_fractures`). `grice_verdict` and
+`grice_deception_probability` are OUTPUTS of `audit_grice_maxims`, but they
+reach the scorer through the same case-dict key the legitimate producer writes
+(`sift_orchestrator.py`, after running the auditor). With no provenance
+marker, the B-126 gate could not tell a real analysis from a hand-written
+assertion.
+
+Reproduced before the fix, through BOTH entry paths:
+
+```
+NOISE case + {"grice_verdict": "SUSPICION",
+              "grice_deception_probability": 0.99}          -> SUSPICION
+NOISE case + {"pipeline_grice": {"verdict": "SUSPICION",
+              "probability_deception": 0.99}}               -> SUSPICION
+```
+
+Minor defect in the same block: `grice_signals` was read from the case and
+consumed in no branch — a dead assignment since B-126, removed.
+
+### Fix
+
+A `grice_source` marker; only `"live_grice"` carries authority. A declaration
+that WOULD have fired the gate without a live producer is decision-relevant,
+so it enters the existing authority gate — the same one serving B-170, B-171
+and B-172 — and the result abstains, preserving the declaration and the
+pre-gate verdict as provenance.
+
+### Corpus impact
+
+**Zero.** No case in `data/cases/` or `cases/` carries `grice_*` fields
+(measured). The only real consumer is the live injection in
+`sift_orchestrator`, which now emits the marker.
+
+One test had to be updated:
+`test_fase1_resolve.py::test_motor_mode_matches_canonical_scorer_on_all_fixtures`
+**duplicates** `resolve()`'s injection logic instead of calling it, so its copy
+was left without the marker and diverged from the real path
+(RT-FN-COLLUSION-001: `SUSPICION_DETECTED` via `resolve()` vs
+`ABSTAIN_DETECTED` via the replica). That duplication is the cause of the
+drift, not B-225; it is noted in the test itself.
+
+---
+
 ## B-053 — shim: a corrupt pcap aborted the ENTIRE case (T-3) [RESOLVED]
 
 | Field | Value |

@@ -104,6 +104,11 @@ def main():
                     gr = asyncio.run(audit_grice_maxims(msgs))
                     blind["grice_verdict"] = gr.get("verdict", "")
                     blind["grice_deception_probability"] = gr.get("probability_deception", 0)
+                    # B-225 / L-070: este script SÍ corre el auditor en vivo
+                    # (audit_grice_maxims arriba), así que marca la
+                    # procedencia. Sin el marcador el scorer trataría el
+                    # resultado como una declaración no verificada y abstendría.
+                    blind["grice_source"] = "live_grice"
                     grice_injected += 1
                 except Exception:
                     pass
