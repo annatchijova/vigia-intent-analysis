@@ -222,12 +222,28 @@ def test_the_runbook_and_its_cross_references_survive():
     contrato persigue.
     """
     docs = {
-        "docs/MUTATION_RUNBOOK.md": "operación y averías",
-        "docs/MUTATION_TESTING.md": "método y alcance",
-        "docs/MUTATION_BASELINE.md": "resultados medidos y triaje",
+        "MUTATION_RUNBOOK": "operación y averías",
+        "MUTATION_TESTING": "método y alcance",
+        "MUTATION_BASELINE": "resultados medidos y triaje",
     }
-    missing = [f"{p} ({why})" for p, why in docs.items() if not (REPO / p).is_file()]
+
+    # El repo es bilingüe (README/INSTALL/DAUBERT): base = inglés, _ES =
+    # español. Que exista sólo una de las dos versiones es la forma habitual
+    # de que la documentación derive: se actualiza un idioma y el otro queda
+    # afirmando algo que ya no es cierto.
+    missing = []
+    for stem, why in docs.items():
+        for name in (f"docs/{stem}.md", f"docs/{stem}_ES.md"):
+            if not (REPO / name).is_file():
+                missing.append(f"{name} ({why})")
     assert not missing, f"faltan documentos de mutation testing: {missing}"
+
+    # Cada versión debe enlazar a la otra, o el par existe pero no se navega.
+    for stem in docs:
+        en = (REPO / f"docs/{stem}.md").read_text(encoding="utf-8")
+        es = (REPO / f"docs/{stem}_ES.md").read_text(encoding="utf-8")
+        assert f"{stem}_ES.md" in en, f"docs/{stem}.md no enlaza su versión ES"
+        assert f"{stem}.md" in es, f"docs/{stem}_ES.md no enlaza su versión EN"
 
     # Los manuales de entrada deben apuntar al runbook, o nadie lo encuentra.
     for manual in ("CLAUDE.md", "CONTRIBUTING.md"):

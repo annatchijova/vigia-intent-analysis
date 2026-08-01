@@ -150,15 +150,66 @@ class TestR41BestPrefixBitIdentical:
         caie.py:1099-1108) — codigo CUALITATIVAMENTE distinto ejecutado solo
         en t2, no comparable con t1. Con ambos n del mismo lado del umbral,
         las dos mediciones ejercitan el mismo camino de codigo (ver
-        docstring de _art_isolated arriba para el detalle completo)."""
+        docstring de _art_isolated arriba para el detalle completo).
+
+        ESTIMADOR: minimo de N muestras, no una muestra unica (2026-08-01).
+        La version previa media t1 y t2 una sola vez y fallaba de forma
+        intermitente en CI. Ultimo caso: ratio 4.15 (t1=0.05s t2=0.21s), que
+        a simple vista es la firma cuadratica exacta (n x2 -> t x4) y por eso
+        merecio medirse antes de tocar nada. Medido 10 veces en maquina
+        ociosa: mediana 2.30, min 1.74, max 3.02. El escalado REAL es
+        sub-cuadratico, pero el maximo ya rozaba el umbral de 3.0 sin ninguna
+        regresion presente — el test oscilaba en vez de detectar.
+
+        El minimo es el estimador correcto para tiempos: el ruido (GC,
+        planificador, latencia de fsync) solo puede SUMAR tiempo, nunca
+        restarlo, asi que la muestra mas rapida es la mas cercana al costo
+        real. Medido: con 1 muestra la dispersion del ratio es 0.29; con 3
+        baja a 0.12 y se centra en ~2.19; con 5 no mejora mas. De ahi N=3.
+
+        El umbral 3.0 se mantiene y ahora SI discrimina: estimacion ~2.19
+        frente a 4.0 de un O(n^2) real, con el umbral entre medias. Coste
+        anadido: ~0.6s.
+
+        Validado bajo carga: con 6 procesos en bucle sobre 4 CPUs (2.5x de
+        sobresuscripcion sostenida, mas duro que un runner compartido tipico)
+        el ratio se mantuvo en 2.03-2.51 y el test paso 5 de 5.
+
+        Se descarto POR MEDICION agrandar el brazo de palanca (n1=250, n2=750,
+        donde lineal=3x y cuadratico=9x separan mas): con n1 mas pequeno su
+        tiempo absoluto encoge y el ruido domina el DENOMINADOR del ratio.
+        Bajo el mismo estres dio 3.16-5.60 — peor, no mejor. Los n actuales
+        se mantienen tambien por la razon documentada arriba: ambos deben
+        quedar del mismo lado de _MAX_ARTIFACTS.
+
+        Si este test vuelve a fallar, el mensaje incluye TODAS las muestras.
+        Un ratio ~4 con muestras consistentes es una regresion real; muestras
+        dispares son ruido del runner y lo que hay que revisar es N."""
         def t(n):
             arts = [self._art_isolated(i) for i in range(n)]
             t0 = time.perf_counter()
             _vigia_score({"artifacts": arts})
             return time.perf_counter() - t0
+
         t(200)  # warmup (CAIE import / caches)
-        t1 = t(400)
-        t2 = t(800)
+
+        _N = 3
+        s1, s2 = [], []
+        for _ in range(_N):
+            # Intercaladas a proposito: si el runner se degrada a mitad del
+            # test, el sesgo se reparte entre ambos tamanos en vez de caer
+            # entero sobre el segundo.
+            s1.append(t(400))
+            s2.append(t(800))
+
+        t1, t2 = min(s1), min(s2)
         # x4 seria cuadratico puro; exigimos < x3 (holgado por el costo lineal
         # de CAIE que domina y no crece cuadraticamente).
-        assert t2 < t1 * 3.0, f"crecimiento super-lineal sospechoso: {t1:.2f}s -> {t2:.2f}s"
+        assert t2 < t1 * 3.0, (
+            f"crecimiento super-lineal sospechoso: {t1:.3f}s -> {t2:.3f}s "
+            f"(ratio {t2 / t1:.2f}, umbral 3.0)\n"
+            f"  muestras n=400: {[f'{x:.3f}' for x in s1]}\n"
+            f"  muestras n=800: {[f'{x:.3f}' for x in s2]}\n"
+            f"  ratio ~4 con muestras consistentes = regresion O(n^2) real; "
+            f"muestras dispares = ruido del runner."
+        )

@@ -1,201 +1,211 @@
+*English · [Español](./MUTATION_TESTING_ES.md)*
+
 # Mutation Testing — VIGÍA
 
-**Estado:** infraestructura activa. Alcance: ruta de veredicto sellado.
-**Herramienta:** `mutmut` 3.7. **Configuración:** `[tool.mutmut]` en `pyproject.toml`.
+**Status:** infrastructure active. Scope: the sealed-verdict path.
+**Tool:** `mutmut` 3.7. **Configuration:** `[tool.mutmut]` in `pyproject.toml`.
 
 ---
 
-## 1. Qué mide, y por qué no es cobertura
+## 1. What it measures, and why it is not coverage
 
-Mutation testing no prueba el código: prueba **la suite de tests**. Inyecta un
-defecto deliberado y pequeño en el fuente — un *mutante* — y ejecuta los tests
-contra esa versión rota.
+Mutation testing does not test the code: it tests **the test suite**. It injects
+a small, deliberate defect into the source — a *mutant* — and runs the tests
+against that broken version.
 
-- Si algún test falla, el mutante está **muerto** (killed). La suite detecta ese
-  cambio de lógica.
-- Si todos los tests pasan, el mutante **sobrevive**. Existe una modificación
-  real del comportamiento que nadie nota.
+- If some test fails, the mutant is **killed**. The suite detects that change
+  in logic.
+- If every test passes, the mutant **survives**. A real behavioural change
+  exists that nobody notices.
 
-**Mutation score = mutantes muertos / mutantes ejecutados.**
+**Mutation score = mutants killed / mutants executed.**
 
-La distinción operativa frente a la cobertura de línea:
+The operational distinction against line coverage:
 
-| Métrica | Pregunta que responde |
-|---------|-----------------------|
-| Cobertura de línea | ¿Se **ejecutó** esta línea durante los tests? |
-| Mutation score | ¿Se **verificó**? Si la rompo, ¿falla algo? |
+| Metric | Question it answers |
+|--------|---------------------|
+| Line coverage | Was this line **executed** during the tests? |
+| Mutation score | Was it **verified**? If I break it, does anything fail? |
 
-Una línea puede estar al 100% de cobertura y al 0% de mutation score: si un test
-la ejecuta pero no hace ningún `assert` sobre su efecto, está *visitada*, no
-*verificada*.
+A line can sit at 100 % coverage and 0 % mutation score: if a test runs it but
+makes no assertion about its effect, the line is *visited*, not *verified*.
 
-## 2. Por qué VIGÍA en particular
+## 2. Why VIGÍA in particular
 
-Tres razones específicas de este proyecto, no genéricas:
+Three reasons specific to this project, not generic ones:
 
-1. **La ruta de veredicto es aritmética de umbrales.** `vigia_scorer.py` son
-   ~1.900 líneas de comparaciones, `Fraction`, tablas de lookup y gates
-   (`n_artifacts < 2`, `_n_domains >= 2 and (_n_gate_arts >= 4 or ...)`). Es
-   código donde el operador mutado **es** la lógica de negocio. Un off-by-one
-   aquí no revienta: emite otro veredicto, y lo sella.
-2. **El listón Daubert.** Si un veredicto MALICE puede acabar en un tribunal,
-   "los tests pasan" es más débil de lo que parece. El mutation score es la
-   evidencia de que la suite **discrimina**, no sólo de que existe.
-3. **Desarrollo asistido por agentes.** Es la defensa más directa contra el
-   fallo que `docs/ENGINEERING_DISCIPLINE.md` y la disciplina de parcheo
-   quirúrgico intentan prevenir: un modelo reescribe más de lo que pretendía y
-   la suite lo aprueba.
+1. **The verdict path is threshold arithmetic.** `vigia_scorer.py` is ~1,900
+   lines of comparisons, `Fraction`, lookup tables and gates
+   (`n_artifacts < 2`, `_n_domains >= 2 and (_n_gate_arts >= 4 or ...)`). This
+   is code where the mutated operator **is** the business logic. An off-by-one
+   here does not crash: it emits a different verdict, and seals it.
+2. **The Daubert bar.** If a MALICE verdict can end up in a courtroom, "the
+   tests pass" is a weaker claim than it looks. The mutation score is the
+   evidence that the suite **discriminates**, not merely that it exists.
+3. **Agent-assisted development.** It is the most direct defence against the
+   failure that `docs/ENGINEERING_DISCIPLINE.md` and surgical-patching
+   discipline try to prevent: a model rewrites more than it intended and the
+   suite approves it.
 
-## 3. Cómo se ejecuta
+## 3. How to run it
 
 ```bash
-# Barrido completo del alcance configurado (largo — ver §6).
+# Full sweep of the configured scope (long — see §6).
 python3 -m mutmut run --max-children 4
 
-# Resultados: resumen y listado de supervivientes.
+# Results: summary and list of survivors.
 python3 -m mutmut results
 
-# Ver el diff exacto de un mutante concreto.
+# See the exact diff of one mutant.
 python3 -m mutmut show <mutant_id>
 
-# Volver a probar sólo un mutante tras escribir un test que debería matarlo.
+# Re-test a single mutant after writing a test that should kill it.
 python3 -m mutmut run <mutant_id>
 ```
 
-`mutmut` copia el fuente a `mutants/` e inyecta allí. **`mutants/` nunca se
-commitea** (`.gitignore`): contiene código de la ruta de veredicto con defectos
-deliberados inyectados — misma clase de riesgo que el benchmark
-`tests/unit/test_m4_floor.py`, y mismo tratamiento.
+`mutmut` copies the source into `mutants/` and injects there. **`mutants/` is
+never committed** (`.gitignore`): it holds verdict-path code with deliberate
+defects injected — the same class of hazard as the `tests/unit/test_m4_floor.py`
+benchmark, and therefore the same treatment.
 
-## 4. Alcance — y por qué es deliberadamente estrecho
+## 4. Scope — and why it is deliberately narrow
 
-`only_mutate` en `pyproject.toml` lista los módulos mutados:
+`only_mutate` in `pyproject.toml` lists the mutated modules:
 
-| Módulo | Cobertura de línea (baseline 2026-06-22) |
-|--------|------------------------------------------|
-| `vigia_scorer.py` | ruta de veredicto raíz |
-| `vigia/tools/caie.py` | 69,55% |
-| `vigia/core/semiotic_detector_v2.py` | 80,94% |
-| `vigia/core/evidence_aggregator.py` | 92,50% |
-| `vigia/core/likelihood_engine.py` | 88,68% |
-| `vigia/core/decision_layer.py` | 86,30% |
-| `vigia/core/causal_closure.py` | 82,76% |
-| `vigia/collapse_decision.py` | 77,94% |
+| Module | Line coverage (2026-06-22 baseline) |
+|--------|--------------------------------------|
+| `vigia_scorer.py` | root verdict path |
+| `vigia/tools/caie.py` | 69.55 % |
+| `vigia/core/semiotic_detector_v2.py` | 80.94 % |
+| `vigia/core/evidence_aggregator.py` | 92.50 % |
+| `vigia/core/likelihood_engine.py` | 88.68 % |
+| `vigia/core/decision_layer.py` | 86.30 % |
+| `vigia/core/causal_closure.py` | 82.76 % |
+| `vigia/collapse_decision.py` | 77.94 % |
 
-**Criterio de admisión: que ya haya tests que puedan morder.** Mutar un módulo
-al 0% de cobertura no enseña nada que la cobertura no diga ya más barato — el
-mutante sobrevive trivialmente y sólo añade ruido al triaje. Con el total del
-repo en 19,16%, mutar todo sería mayoritariamente ruido.
+**Admission criterion: tests must already exist that can bite.** Mutating a
+module at 0 % coverage teaches nothing that coverage does not say more cheaply
+— the mutant survives trivially and only adds triage noise. With the repository
+total at 19.16 %, mutating everything would be mostly noise.
 
-`mutate_only_covered_lines = true` aplica el mismo criterio a nivel de línea.
+`mutate_only_covered_lines = true` applies the same criterion per line.
 
-Ampliar el alcance = añadir módulos a `only_mutate` **después** de subirles la
-cobertura, no antes.
+Widening the scope means adding modules to `only_mutate` **after** raising
+their coverage, not before.
 
-## 5. Tests invisibles a la mutación
+## 5. Tests that are invisible to mutation
 
-Cuatro módulos de test están excluidos de la selección del runner
-(`pytest_add_cli_args_test_selection`) por una razón estructural, no por
-conveniencia:
+Four test modules are excluded from the runner's selection
+(`pytest_add_cli_args_test_selection`) for a structural reason, not for
+convenience:
 
 - `tests/test_m3_scorer_caie_parity.py`
 - `tests/test_registry_integrity.py`
 - `tests/test_requirements_ci_contract.py`
 - `tests/test_security_md_rate_limit_contract.py`
 
-Son tests **meta-repo**: no ejecutan la ruta de veredicto, **inspeccionan texto
-fuente** (regex sobre `caie.py`, `inspect.getsource`, `rglob` de `*.md`). Dentro
-de `mutants/` el fuente contiene todas las variantes mutantes en línea
-(`x_funcname__mutmut_N`, literales envueltos como `"XXFOOXX"`), así que estos
-tests leen artefactos del harness y fallan por una razón que no es la lógica
-bajo prueba.
+They are **repo-meta** tests: they do not exercise the verdict path, they
+**inspect source text** (regex over `caie.py`, `inspect.getsource`, `rglob` of
+`*.md`). Inside `mutants/` the source contains every mutant variant inline
+(`x_funcname__mutmut_N`, literals wrapped as `"XXFOOXX"`), so these tests read
+harness artefacts and fail for a reason that is not the logic under test.
 
-**No pueden matar un mutante de `only_mutate`** — no invocan ese código — luego
-excluirlos no altera el score. Es un hallazgo con valor propio: *un test que
-inspecciona fuente en lugar de ejecutar comportamiento es estructuralmente
-invisible a la mutación*. Aporta a la consistencia del repo, no a la
-verificación de la lógica.
+**They cannot kill a mutant in `only_mutate`** — they do not invoke that code —
+so excluding them does not change the score. It is a finding in its own right:
+*a test that inspects source instead of exercising behaviour is structurally
+invisible to mutation*. It contributes to repository consistency, not to
+verification of logic.
 
-Los módulos que importan `vigia/vigia_sift_bridge.py` también quedan fuera: no
-colectan sin `mcp` instalable (`KNOWN_LIMITATIONS.md` L-045) y cubren la
-superficie MCP, no la ruta de veredicto.
+Modules importing `vigia/vigia_sift_bridge.py` are also left out. The
+load-bearing reason is that they cover the MCP surface, **not** the verdict
+path: no mutant in `only_mutate` depends on them, so excluding them does not
+change the score.
 
-### 5.1 Anomalía abierta — `test_lr_calibrator_serialization.py`
+*Correction (2026-08-01):* this was first justified as "they do not collect
+without `mcp`". That was an environment failure, not a repository one — the
+missing piece was `fastmcp`, declared in `requirements.txt`, which resolves the
+import. With `requirements.txt` fully installed they collect and pass (full
+suite: 2176 passed). `KNOWN_LIMITATIONS.md` L-045 describes a narrower case
+than was assumed here.
+
+### 5.1 Open anomaly — `test_lr_calibrator_serialization.py`
 
 `vigia/tests/test_lr_calibrator_serialization.py::test_sklearn_backend_roundtrip_matches_before_save`
-está excluido por una razón distinta y **sin diagnóstico confirmado**.
+is excluded for a different reason and **with no confirmed diagnosis**.
 
-Observado (2026-08-01):
+Observed (2026-08-01):
 
-| Contexto | Resultado |
-|----------|-----------|
-| Fase `stats` de mutmut | **FALLA** (2 de 2 corridas) |
-| Aislado, en `mutants/` | pasa (5 passed) |
-| Aislado, con `MUTANT_UNDER_TEST=stats` | pasa |
-| Suite completa en subproceso, dentro de `mutants/` | pasa (2016 passed) |
-| Suite completa replicando la invocación **in-process** de mutmut, con sus mismas variables de entorno | pasa (2023 passed) |
+| Context | Result |
+|---------|--------|
+| mutmut `stats` phase | **FAILS** (2 of 2 runs) |
+| Isolated, inside `mutants/` | passes (5 passed) |
+| Isolated, with `MUTANT_UNDER_TEST=stats` | passes |
+| Full suite in a subprocess, inside `mutants/` | passes (2016 passed) |
+| Full suite replicating mutmut's **in-process** invocation, same env vars | passes (2023 passed) |
 
-La diferencia residual no aislada: mutmut ejecuta `list_all_tests`
-(`--collect-only`) y después `stats` **en el mismo proceso**, con su plugin
-`StatsCollector` registrado. No se ha confirmado que ése sea el mecanismo.
+The residual difference not isolated: mutmut runs `list_all_tests`
+(`--collect-only`) and then `stats` **in the same process**, with its
+`StatsCollector` plugin registered. It has not been confirmed that this is the
+mechanism.
 
-Por qué importa registrarlo aunque se excluya: el test es determinista en su
-entrada (`_synthetic_z_scores(seed=42)`, `random.Random` local, solver `lbfgs`)
-y lo que compara es un round-trip `to_dict()`/`from_dict()` con `abs_tol=1e-6`.
-Una igualdad de floats sobre una serialización no debería depender del proceso
-que la ejecuta. Dado que el repo trata el determinismo como invariante duro
-(Invariante 4, `Fraction` con `prec=28`), queda anotado en vez de enterrado.
+Why it is worth recording even though it is excluded: the test is deterministic
+in its input (`_synthetic_z_scores(seed=42)`, a local `random.Random`, the
+`lbfgs` solver) and what it compares is a `to_dict()`/`from_dict()` round trip
+with `abs_tol=1e-6`. A float equality over a serialisation should not depend on
+which process runs it. Since this repository treats determinism as a hard
+invariant (Invariant 4, `Fraction` at `prec=28`), it is recorded rather than
+buried.
 
-Se excluye porque mutmut corre con `-x`: el fallo aborta la fase stats y con
-ella el barrido entero. `LRCalibrator` no está en `only_mutate`, así que este
-módulo no puede matar ningún mutante del alcance y su exclusión no altera el
-score.
+It is excluded because mutmut runs with `-x`: the failure aborts the stats
+phase and with it the whole sweep. `LRCalibrator` is not in `only_mutate`, so
+this module cannot kill any mutant in scope and its exclusion does not change
+the score.
 
-## 6. Coste
+## 6. Cost
 
-Es N ejecuciones de la suite, una por mutante. Con la suite del alcance en
-~3,5 min y varios cientos de mutantes, un barrido completo es trabajo de horas.
-`mutmut` mitiga con selección de tests por función (`track_dependencies`) y
-caché de resultados entre corridas.
+It is N runs of the suite, one per mutant. With the in-scope suite at ~3.5 min
+and several hundred mutants, a full sweep is hours of work. `mutmut` mitigates
+with per-function test selection (`track_dependencies`) and a result cache
+between runs.
 
-**No es un check de pre-commit.** Es una tarea nocturna o de release.
+**This is not a pre-commit check.** It is a nightly or release task.
 
-## 7. Cómo leer un superviviente
+## 7. How to read a survivor
 
-Un mutante superviviente cae en una de tres categorías. El triaje es manual y
-es la parte que no se automatiza:
+A surviving mutant falls into one of three categories. Triage is manual and is
+the part that does not automate:
 
-1. **Hueco de test genuino.** La lógica cambió y nadie se enteró. Se escribe el
-   test que lo mata.
-2. **Mutante equivalente.** El cambio no altera el comportamiento observable
-   (`x = x + 0`, una guarda redundante, una rama defensiva inalcanzable). No es
-   un defecto de la suite y no se puede matar. Se documenta.
-3. **Código muerto / defensivo.** La rama no es alcanzable hoy. Ver
-   `tests/test_b151a_single_artifact_cap.py`, que pinea justamente la
-   inalcanzabilidad del cap de artefacto único: sobre esa rama casi todos los
-   mutantes sobreviven, correctamente.
+1. **Genuine test gap.** The logic changed and nobody noticed. Write the test
+   that kills it.
+2. **Equivalent mutant.** The change does not alter observable behaviour
+   (`x = x + 0`, a redundant guard, an unreachable defensive branch). It is not
+   a defect of the suite and cannot be killed. Document it.
+3. **Dead / defensive code.** The branch is not reachable today. See
+   `tests/test_b151a_single_artifact_cap.py`, which pins precisely the
+   unreachability of the single-artifact cap: over that branch nearly every
+   mutant survives, correctly.
 
-Reportar un mutation score sin separar (1) de (2) y (3) es inflar o deflactar la
-cifra según convenga. El registro de triaje vive en §8.
+Reporting a mutation score without separating (1) from (2) and (3) inflates or
+deflates the figure at will. The triage record lives in §8.
 
-## 8. Registro de corridas
+## 8. Run log
 
-Ver `docs/MUTATION_BASELINE.md` para la corrida de referencia, el score por
-módulo y el triaje de supervivientes.
+See `docs/MUTATION_BASELINE.md` for the reference run, the per-module score and
+the survivor triage.
 
-**Al comparar dos corridas, comprueba también el denominador.** Con
-`mutate_only_covered_lines = true`, subir la cobertura **agranda** el universo
-de mutantes: los tests nuevos cubren líneas que antes nadie tocaba y esas
-líneas pasan a ser mutables. En la primera línea base, `collapse_decision.py`
-pasó de 4/29 a 35/35 — el numerador y el denominador se movieron a la vez, y
-leer sólo el porcentaje habría ocultado la mitad de lo ocurrido.
+**When comparing two runs, check the denominator as well.** With
+`mutate_only_covered_lines = true`, raising coverage **enlarges** the mutant
+universe: new tests cover lines nobody touched before, and those lines become
+mutable. In the first baseline `collapse_decision.py` went from 4/29 to 35/35 —
+numerator and denominator moved together, and reading only the percentage would
+have hidden half of what happened.
 
-## 9. Limitaciones declaradas
+## 9. Declared limitations
 
-- **No aplica a la capa LLM.** `reason_with_llm` y la narrativa no son
-  deterministas; no hay oráculo estable que mate mutantes.
-- **El score depende del alcance.** Un score alto sobre 8 módulos escogidos no
-  dice nada sobre los ~170 restantes. La cifra debe citarse siempre con su
+- **Does not apply to the LLM layer.** `reason_with_llm` and the narrative are
+  not deterministic; there is no stable oracle to kill mutants.
+- **The score depends on the scope.** A high score over 8 hand-picked modules
+  says nothing about the ~170 others. The figure must always be cited with its
   `only_mutate`.
-- **La exclusión de tests MCP y meta-repo es un caveat del score**, declarado
-  aquí y en los comentarios de `pyproject.toml`, no una omisión silenciosa.
+- **Excluding the MCP and repo-meta tests is a declared caveat of the score**,
+  stated here and in the `pyproject.toml` comments, not a silent omission.

@@ -1,258 +1,271 @@
-# Runbook de mutation testing — operación y averías
+*English · [Español](./MUTATION_RUNBOOK_ES.md)*
 
-Documento **autosuficiente**. Está escrito para que cualquier persona o agente
-que llegue sin contexto previo pueda ejecutar, leer y reparar el barrido de
-mutación sin preguntarle a nadie.
+# Mutation testing runbook — operation and failures
 
-- **Qué es y por qué**: `docs/MUTATION_TESTING.md`
-- **Resultados medidos y triaje**: `docs/MUTATION_BASELINE.md`
-- **Este documento**: cómo se opera y qué hacer cuando falla.
+A **self-contained** document. It is written so that any person or agent
+arriving with no prior context can run, read and repair the mutation sweep
+without asking anyone.
 
-Todas las averías de §3 **ocurrieron de verdad** al montar esto el 2026-08-01.
-No son hipótesis: son el registro de lo que se rompió, cómo se diagnosticó y
-cómo se arregló.
+- **What it is and why**: `docs/MUTATION_TESTING.md`
+- **Measured results and triage**: `docs/MUTATION_BASELINE.md`
+- **This document**: how it is operated and what to do when it fails.
+
+Every failure in §3 **actually happened** while building this on 2026-08-01.
+They are not hypotheticals: they are the record of what broke, how it was
+diagnosed and how it was fixed.
 
 ---
 
-## 1. Operación normal
+## 1. Normal operation
 
-No hay que hacer nada. `.github/workflows/mutation.yml` corre solo los **lunes
-a las 03:00 UTC**: un job por módulo, en paralelo.
+Nothing to do. `.github/workflows/mutation.yml` runs by itself every **Monday
+at 03:00 UTC**: one job per module, in parallel.
 
-Para leer el resultado: pestaña **Actions** → corrida de *VIGÍA Mutation
-Testing*. Cada job escribe su resumen:
+To read the result: **Actions** tab → *VIGÍA Mutation Testing* run. Each job
+writes its summary:
 
 ```
 killed=172 survived=250 total=422 score=40%
 ```
 
-Cada job publica además un artefacto `mutation-<modulo>` con dos ficheros:
+Each job also publishes a `mutation-<module>` artifact with two files:
 
-| Fichero | Contenido |
-|---------|-----------|
-| `survivors.txt` | Sólo los supervivientes. **Es la lista de trabajo.** |
-| `all.txt` | Todos los mutantes con su estado. Sirve para recontar. |
+| File | Contents |
+|------|----------|
+| `survivors.txt` | Survivors only. **This is the work list.** |
+| `all.txt` | Every mutant with its status. Use it to re-count. |
 
-Para lanzarlo a mano: **Actions → VIGÍA Mutation Testing → Run workflow**. El
-campo `only_mutate` acepta la ruta de un módulo (p. ej. `vigia_scorer.py`);
-vacío mide todos.
+To trigger it manually: **Actions → VIGÍA Mutation Testing → Run workflow**.
+The `only_mutate` field takes one module path (e.g. `vigia_scorer.py`); leave
+it empty to measure all of them.
 
-### Cómo leerlo sin equivocarse
+### How to read it without getting it wrong
 
-1. **Comparar el total, no sólo el porcentaje.** Con
-   `mutate_only_covered_lines = true`, escribir tests **agranda** el universo
-   de mutantes: líneas antes no cubiertas pasan a ser mutables. En la primera
-   línea base `collapse_decision.py` pasó de `4/29` a `35/35` — numerador y
-   denominador se movieron a la vez.
-2. **Un superviviente no es siempre un defecto.** Tres clases, y separarlas es
-   el trabajo real: hueco de test genuino / mutante equivalente (no altera el
-   comportamiento observable) / rama defensiva inalcanzable. Ver
+1. **Compare the total, not only the percentage.** With
+   `mutate_only_covered_lines = true`, writing tests **enlarges** the mutant
+   universe: previously uncovered lines become mutable. In the first baseline
+   `collapse_decision.py` went from `4/29` to `35/35` — numerator and
+   denominator moved together.
+2. **A survivor is not always a defect.** Three classes, and separating them is
+   the real work: genuine test gap / equivalent mutant (does not alter
+   observable behaviour) / unreachable defensive branch. See
    `MUTATION_TESTING.md` §7.
-3. **Score bajo ≠ código malo.** Significa "tests flojos en esa zona".
+3. **A low score does not mean bad code.** It means "weak tests in that area".
 
 ---
 
-## 2. Ejecución local
+## 2. Running it locally
 
-### 2.1 Entorno desde cero
+### 2.1 Environment from scratch
 
 ```bash
 pip install -r requirements.txt -r requirements-ci.txt
 pip install scipy mutmut
 ```
 
-Si `pip install mcp` falla con `Cannot uninstall PyJWT ... RECORD file not
-found`, el intérprete tiene PyJWT del gestor de paquetes del sistema. Es
-`KNOWN_LIMITATIONS.md` L-045. Dos salidas:
+**Install `requirements.txt` in full.** If the modules importing
+`vigia/vigia_sift_bridge.py` fail to collect with
+`ModuleNotFoundError: No module named 'mcp'` — or worse, with
+`TypeError: issubclass() arg 1 must be a class` — the cause is almost certainly
+a missing `fastmcp`, not an `mcp` version problem. Installing `mcp` on its own
+and hunting versions is a dead end: several 1.x releases fail on PEP 604
+annotations and 2.x dropped `mcp.server.fastmcp` entirely. `fastmcp` pulls a
+compatible pair.
 
-- usar un virtualenv limpio (recomendado), o
-- `pip install --ignore-installed PyJWT mcp`.
+If `pip install` fails with `Cannot uninstall PyJWT ... RECORD file not found`,
+the interpreter has PyJWT from the system package manager
+(`KNOWN_LIMITATIONS.md` L-045). Two ways out:
 
-Sin `mcp`, los módulos que importan `vigia/vigia_sift_bridge.py` no colectan.
-No afecta al barrido: ya están excluidos en la selección de tests y no cubren
-la ruta de veredicto.
+- use a clean virtualenv (recommended), or
+- `pip install --ignore-installed PyJWT fastmcp`.
 
-### 2.2 Requisito previo — suite verde
+These modules are excluded from the mutation runner anyway, because they cover
+the MCP surface and not the verdict path — but the full suite needs them to
+collect, and CI runs the full suite as its green-baseline gate.
+
+### 2.2 Prerequisite — a green suite
 
 ```bash
 python3 -m pytest tests/ vigia/tests/ -q --tb=short --no-cov
 ```
 
-**Sobre una suite roja el mutation score no significa nada**: todo mutante se
-declara muerto por el fallo preexistente y el resultado sale ~100%. El
-workflow tiene un job `baseline` que lo comprueba antes de mutar. En local hay
-que comprobarlo a mano.
+**Over a red suite the mutation score means nothing**: every mutant is declared
+killed by the pre-existing failure and the result comes out at ~100 %. The
+workflow has a `baseline` job that checks this before mutating. Locally it must
+be checked by hand.
 
-### 2.3 Barrido
+### 2.3 Sweep
 
 ```bash
-python3 -m mutmut run --max-children 4   # ojo: los 8 módulos son ~6 horas
-python3 -m mutmut results                # supervivientes
-python3 -m mutmut results --all true     # todos, con estado
-python3 -m mutmut show <nombre_mutante>  # el diff exacto de un mutante
+python3 -m mutmut run --max-children 4   # note: all 8 modules is ~6 hours
+python3 -m mutmut results                # survivors
+python3 -m mutmut results --all true     # all, with status
+python3 -m mutmut show <mutant_name>     # the exact diff of one mutant
 ```
 
-### 2.4 Acotar a un módulo
+### 2.4 Narrowing to one module
 
-**`mutmut run <patrón>` NO acota nada** — comprobado: con cinco patrones de
-módulo ejecutó los 7.043 mutantes igual. El único mecanismo que funciona es
-`only_mutate` en `pyproject.toml`. El ciclo:
+**`mutmut run <pattern>` does NOT narrow anything** — verified: with five
+module patterns it ran all 7,043 mutants anyway. The only mechanism that works
+is `only_mutate` in `pyproject.toml`. The cycle:
 
-1. editar `only_mutate` dejando sólo el módulo deseado;
+1. edit `only_mutate`, leaving only the desired module;
 2. `rm -rf mutants && python3 -m mutmut run --max-children 4`;
-3. **restaurar `pyproject.toml`** en cuanto termine la generación — el sandbox
-   `mutants/` ya tiene su propia copia y no la vuelve a leer.
+3. **restore `pyproject.toml`** as soon as generation finishes — the `mutants/`
+   sandbox already has its own copy and does not read it again.
 
-El paso 3 importa: `tests/test_mutation_config_contract.py` exige que
-`vigia_scorer.py` siga en `only_mutate`, así que un acotado olvidado deja la
-suite roja. Es deliberado — el contrato existe para que un acotado temporal no
-se convierta en el alcance permanente sin que nadie lo note.
+Step 3 matters: `tests/test_mutation_config_contract.py` requires
+`vigia_scorer.py` to stay in `only_mutate`, so a forgotten narrowing leaves the
+suite red. That is deliberate — the contract exists so that a temporary
+narrowing does not silently become the permanent scope.
 
-### 2.5 Espacio en disco
+### 2.5 Disk space
 
-`mutants/` ocupa **~300 MB** con los 8 módulos (137 MB sólo el scorer mutado:
-mutmut escribe cada variante en línea). Está en `.gitignore`. Se puede borrar
-en cualquier momento; sólo cuesta regenerarlo.
+`mutants/` takes **~300 MB** with all 8 modules (137 MB for the mutated scorer
+alone: mutmut writes every variant inline). It is in `.gitignore`. It can be
+deleted at any time; the only cost is regenerating it.
 
 ---
 
-## 3. Averías conocidas
+## 3. Known failures
 
 ### 3.1 `failed to collect stats. runner returned 1`
 
-**Qué significa.** Antes de mutar, mutmut corre la suite entera para mapear qué
-test cubre qué función. Corre con `-x`: **un solo test que falle aborta el
-barrido completo**. El mensaje no dice cuál.
+**What it means.** Before mutating, mutmut runs the whole suite to map which
+test covers which function. It runs with `-x`: **a single failing test aborts
+the entire sweep**. The message does not say which one.
 
-**Cómo encontrar el culpable.** El log muestra el `FAILED` justo encima del
-traceback. Si no aparece, activar el modo detallado añadiendo `debug = true`
-en la sección `[tool.mutmut]` de `pyproject.toml`, relanzar, y **quitarlo
-después** (imprime la suite entera).
+**How to find the culprit.** The log shows the `FAILED` just above the
+traceback. If it does not appear, turn on verbose mode by adding `debug = true`
+to the `[tool.mutmut]` section of `pyproject.toml`, re-run, and **remove it
+afterwards** (it prints the entire suite).
 
-**Causas vistas, en orden de frecuencia:**
+**Causes seen, in order of frequency:**
 
-**a) Tests que inspeccionan texto fuente en vez de ejecutar comportamiento.**
-Dentro de `mutants/`, el fuente contiene *todas* las variantes mutantes en
-línea (`x_funcname__mutmut_N`, literales envueltos como `"XXFOOXX"`). Un test
-que hace regex sobre `caie.py`, `inspect.getsource`, o `rglob` de `*.md` lee
-artefactos del harness y falla por una razón que no es la lógica bajo prueba.
-Ya hay cuatro excluidos por esto (`MUTATION_TESTING.md` §5). **Si aparece uno
-nuevo: excluirlo sólo si no puede matar ningún mutante de `only_mutate`** —
-es decir, si no ejecuta ese código. Si sí lo ejecuta, excluirlo falsea el
-score y hay que arreglar el test.
+**a) Tests that inspect source text instead of exercising behaviour.** Inside
+`mutants/`, the source contains *every* mutant variant inline
+(`x_funcname__mutmut_N`, literals wrapped as `"XXFOOXX"`). A test doing regex
+over `caie.py`, `inspect.getsource`, or `rglob` of `*.md` reads harness
+artefacts and fails for a reason that is not the logic under test. Four are
+already excluded for this (`MUTATION_TESTING.md` §5). **If a new one appears:
+exclude it only if it cannot kill any mutant in `only_mutate`** — that is, if
+it does not execute that code. If it does, excluding it falsifies the score and
+the test must be fixed instead.
 
-**b) Ficheros de datos ausentes.** Si la suite falla dentro de `mutants/` con
-`FileNotFoundError`, falta algo en `also_copy`. Añadirlo. El síntoma peligroso
-es el contrario: si esto pasa desapercibido, **todos** los mutantes se
-declaran muertos y el score sale 100% falso.
-`tests/test_mutation_config_contract.py` lo cubre.
+**b) Missing data files.** If the suite fails inside `mutants/` with
+`FileNotFoundError`, something is missing from `also_copy`. Add it. The
+dangerous symptom is the opposite one: if this goes unnoticed, **every** mutant
+is declared killed and the score comes out at a false 100 %.
+`tests/test_mutation_config_contract.py` covers this.
 
-**c) Fallo que sólo ocurre bajo mutmut.** Ver §3.4.
+**c) A failure that only occurs under mutmut.** See §3.4.
 
-### 3.2 `BadTestExecutionCommandsException` / pytest sale con código 4
+### 3.2 `BadTestExecutionCommandsException` / pytest exits with code 4
 
-**Qué significa.** Código 4 de pytest = error de uso. Casi siempre: mutmut pasó
-un identificador de test que ya no resuelve (`ERROR: not found: ...`).
+**What it means.** pytest exit code 4 = usage error. Almost always: mutmut
+passed a test identifier that no longer resolves (`ERROR: not found: ...`).
 
-**Caso real y su causa raíz.** Ocurrió porque `tests/caie/test_canonical_cases.py`
-pasaba un **generador** a `@pytest.mark.parametrize`. Un generador se agota al
-consumirse y el objeto queda capturado en el marcador, a nivel de módulo.
-mutmut colecta varias veces en el mismo proceso (`list_all_tests`, `stats`,
-`clean run`), así que la segunda colección recibía un generador vacío: los 52
-casos canónicos dejaban de existir y sus identificadores no resolvían.
+**Real case and its root cause.** It happened because
+`tests/caie/test_canonical_cases.py` passed a **generator** to
+`@pytest.mark.parametrize`. A generator is exhausted when consumed and the
+object is captured in the marker, at module level. mutmut collects several
+times in the same process (`list_all_tests`, `stats`, `clean run`), so the
+second collection received an empty generator: the 52 canonical cases ceased to
+exist and their identifiers did not resolve.
 
-**Cómo diagnosticarlo:** `debug = true` en `[tool.mutmut]` hace que se imprima
-el error real de pytest, que nombra el identificador que no resuelve.
+**How to diagnose it:** `debug = true` in `[tool.mutmut]` makes pytest's real
+error print, naming the identifier that does not resolve.
 
-**Prevención activa:** `tests/test_parametrize_argvalues_are_reiterable.py`
-cierra esta clase — incluido un barrido AST contra expresiones generadoras
-usadas como `argvalues`. Si ese test falla, el defecto ha vuelto.
+**Active prevention:** `tests/test_parametrize_argvalues_are_reiterable.py`
+closes this class — including an AST sweep against generator expressions used
+as `argvalues`. If that test fails, the defect is back.
 
-### 3.3 La suite se pone roja *después* de correr mutmut
+### 3.3 The suite turns red *after* running mutmut
 
-Síntoma: tests que pasaban empiezan a fallar sin que se haya tocado el código.
+Symptom: tests that used to pass start failing without any code being touched.
 
-**Causa:** existe `mutants/`, y algún test barre el árbol entero
-(`grep -r .`, `rglob`) contando la copia mutada como código del repositorio.
-Pasó con `test_b117_stale_formula_sweep` y —más grave—
-`test_b224_contradiction_detector_dormancy`, cuya única función es afirmar que
-cierta regla no tiene productor *en todo el repositorio*: contaba
-`mutants/vigia_agent.py` como productor nuevo.
+**Cause:** `mutants/` exists, and some test sweeps the whole tree
+(`grep -r .`, `rglob`) counting the mutated copy as repository code. It
+happened with `test_b117_stale_formula_sweep` and — more seriously —
+`test_b224_contradiction_detector_dormancy`, whose sole purpose is to assert
+that a given rule has no producer *anywhere in the repository*: it counted
+`mutants/vigia_agent.py` as a new producer.
 
-**Arreglo:** añadir `--exclude-dir=mutants` al `grep`, o `"mutants" not in
-p.parts` al `rglob`. Hay tres precedentes en el árbol.
+**Fix:** add `--exclude-dir=mutants` to the `grep`, or `"mutants" not in
+p.parts` to the `rglob`. There are three precedents in the tree.
 
-**Atajo de diagnóstico:** `rm -rf mutants` y volver a correr. Si se pone verde,
-es esto.
+**Diagnostic shortcut:** `rm -rf mutants` and re-run. If it goes green, this
+was it.
 
-### 3.4 Un test falla sólo dentro de mutmut y no se reproduce fuera
+### 3.4 A test fails only inside mutmut and does not reproduce outside
 
-Antes de excluir nada, comprobar los cinco contextos —así se distinguió un
-problema del harness de un defecto real:
+Before excluding anything, check the five contexts — this is how a harness
+problem was told apart from a real defect:
 
-| Contexto | Comando |
-|----------|---------|
-| Aislado, en el sandbox | `cd mutants && pytest <ruta_del_test>` |
-| Aislado, con el entorno de stats | `MUTANT_UNDER_TEST=stats MUTMUT_DEPENDENCY_DEPTH=-1 pytest <ruta>` |
-| Suite completa, subproceso | `cd mutants && pytest <selección completa>` |
-| Suite completa, **in-process** | `python3 -c "import os,pytest; os.chdir('mutants'); pytest.main([...])"` |
-| mutmut real | `python3 -m mutmut run` |
+| Context | Command |
+|---------|---------|
+| Isolated, in the sandbox | `cd mutants && pytest <test_path>` |
+| Isolated, with the stats environment | `MUTANT_UNDER_TEST=stats MUTMUT_DEPENDENCY_DEPTH=-1 pytest <path>` |
+| Full suite, subprocess | `cd mutants && pytest <full selection>` |
+| Full suite, **in-process** | `python3 -c "import os,pytest; os.chdir('mutants'); pytest.main([...])"` |
+| Real mutmut | `python3 -m mutmut run` |
 
-El cuarto es el que más se parece a mutmut: corre pytest **dentro del mismo
-proceso**, que es donde aparecen los fallos por estado global que no sobrevive
-a una segunda colección. Si falla ahí, es un defecto real de la suite (fue el
-caso del generador, §3.2). Si sólo falla en el quinto, es interacción con el
-harness.
+The fourth is closest to mutmut: it runs pytest **inside the same process**,
+which is where failures from global state that does not survive a second
+collection appear. If it fails there, it is a real defect of the suite (this
+was the generator case, §3.2). If it only fails in the fifth, it is an
+interaction with the harness.
 
-**Anomalía abierta:** `vigia/tests/test_lr_calibrator_serialization.py` falla
-sólo bajo la fase `stats` (2 de 2 corridas) y pasa en los otros cuatro
-contextos. Sin diagnóstico. Excluida, con el razonamiento completo en
-`MUTATION_TESTING.md` §5.1. **Si alguien la diagnostica, actualizar esa
-sección y quitar la exclusión.**
+**Open anomaly:** `vigia/tests/test_lr_calibrator_serialization.py` fails only
+under the `stats` phase (2 of 2 runs) and passes in the other four contexts.
+Undiagnosed. Excluded, with the full reasoning in `MUTATION_TESTING.md` §5.1.
+**If someone diagnoses it, update that section and remove the exclusion.**
 
-### 3.5 El job de CI se cancela por tiempo
+### 3.5 The CI job is cancelled on time
 
-El tope **duro** de un job en GitHub Actions es 360 minutos; no se puede subir.
+The **hard** limit for a job on GitHub Actions is 360 minutes; it cannot be
+raised.
 
-Para redimensionar tras añadir módulos, con el ritmo medido (19,5
-mutantes/min con `--max-children 4` en 4 CPU):
+To re-size after adding modules, with the measured rate (19.5 mutants/min with
+`--max-children 4` on 4 CPU):
 
 ```
-mutantes ≈ (nº de líneas con "__mutmut_" en mutants/<modulo>) × 0,49
-minutos  ≈ mutantes / 19,5
+mutants ≈ (number of lines containing "__mutmut_" in mutants/<module>) × 0.49
+minutes ≈ mutants / 19.5
 ```
 
-Los 8 módulos en un solo job son ~359 min: **no caben**. Por eso el workflow
-usa `strategy.matrix` con un job por módulo. `tests/test_mutation_config_contract.py`
-verifica que el timeout siga por debajo de 360 y que la matriz cubra
-exactamente `only_mutate` — dos listas que deben coincidir se desincronizan
-solas, y un módulo declarado pero ausente de la matriz no se mediría nunca sin
-que nada falle.
+All 8 modules in a single job is ~359 min: **they do not fit**. That is why the
+workflow uses `strategy.matrix` with one job per module.
+`tests/test_mutation_config_contract.py` verifies that the timeout stays under
+360 and that the matrix covers exactly `only_mutate` — two lists that must
+match drift apart on their own, and a module declared but missing from the
+matrix would never be measured without anything failing.
 
 ---
 
-## 4. Cómo ampliar el alcance
+## 4. How to widen the scope
 
-1. Subir la **cobertura de línea** del módulo primero. Mutar código sin tests
-   produce supervivientes triviales y sólo añade ruido al triaje.
-2. Añadirlo a `only_mutate` en `pyproject.toml`.
-3. Añadirlo a `strategy.matrix.module` en `.github/workflows/mutation.yml`.
-   El contrato falla si se olvida este paso.
-4. Recalcular el tiempo con la fórmula de §3.5.
-5. Medir, triar, y registrar el resultado en `docs/MUTATION_BASELINE.md`.
+1. Raise the module's **line coverage** first. Mutating untested code produces
+   trivial survivors and only adds triage noise.
+2. Add it to `only_mutate` in `pyproject.toml`.
+3. Add it to `strategy.matrix.module` in `.github/workflows/mutation.yml`. The
+   contract fails if this step is forgotten.
+4. Recompute the time with the formula in §3.5.
+5. Measure, triage, and record the result in `docs/MUTATION_BASELINE.md`.
 
-## 5. Cómo retirar todo esto
+## 5. How to remove all of this
 
-Si alguna vez se decide que no compensa, hay que quitar **el conjunto
-completo**, no sólo la herramienta:
+If it is ever decided that it is not worth it, the **whole set** must go, not
+just the tool:
 
-- `[tool.mutmut]` en `pyproject.toml`
+- `[tool.mutmut]` in `pyproject.toml`
 - `.github/workflows/mutation.yml`
 - `tests/test_mutation_config_contract.py`
-- `docs/MUTATION_TESTING.md`, `docs/MUTATION_BASELINE.md`, este fichero
-- las entradas `mutants/`, `.mutmut-cache`, `mutmut-stats.json` de `.gitignore`
+- `docs/MUTATION_TESTING.md`, `docs/MUTATION_BASELINE.md`, this file, and their
+  `_ES` counterparts
+- the `mutants/`, `.mutmut-cache`, `mutmut-stats.json` entries in `.gitignore`
 
-**No retirar** `tests/test_parametrize_argvalues_are_reiterable.py`,
-`tests/test_collapse_decision_boundaries.py`, ni los `--exclude-dir=mutants`:
-son correcciones de defectos reales del repositorio, independientes de la
-herramienta que los expuso.
+**Do not remove** `tests/test_parametrize_argvalues_are_reiterable.py`,
+`tests/test_collapse_decision_boundaries.py`, or the `--exclude-dir=mutants`
+guards: they are fixes for real repository defects, independent of the tool
+that exposed them.

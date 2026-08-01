@@ -226,10 +226,14 @@ pytest_add_cli_args_test_selection = [
     "tests",
     "vigia/tests",
     "--ignore=tests/integration",
-    # Módulos que importan vigia/vigia_sift_bridge.py. No colectan sin `mcp`
-    # (KNOWN_LIMITATIONS L-045) y cubren la superficie MCP, no la ruta de
-    # veredicto: ningún mutante de only_mutate depende de ellos. Su exclusión
-    # es un CAVEAT declarado del score, no una omisión silenciosa —
+    # Módulos que importan vigia/vigia_sift_bridge.py. La razón que sostiene
+    # la exclusión es que cubren la superficie MCP, NO la ruta de veredicto:
+    # ningún mutante de only_mutate depende de ellos, así que excluirlos no
+    # altera el score. (Corrección 2026-08-01: se justificó primero por "no
+    # colectan sin `mcp`". Eso era un fallo de entorno, no del repositorio —
+    # faltaba instalar `fastmcp`, declarado en requirements.txt, que resuelve
+    # el import. Con requirements.txt completo colectan y pasan.) Su
+    # exclusión es un CAVEAT declarado del score, no una omisión silenciosa —
     # docs/MUTATION_TESTING.md §Limitaciones.
     "--ignore=tests/e2e",
     "--ignore=tests/test_b122_universal_tool_invoked_audit.py",
