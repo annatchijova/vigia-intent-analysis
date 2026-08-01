@@ -210,8 +210,37 @@ def test_ci_job_timeout_stays_under_the_github_hard_limit():
     )
 
 
+def test_the_runbook_and_its_cross_references_survive():
+    """El conocimiento operativo debe seguir siendo encontrable sin preguntar.
+
+    Toda la infraestructura de mutación es inútil si quien hereda el repo no
+    sabe que existe, cómo leerla, o por qué varias exclusiones que parecen
+    arbitrarias no lo son. Esa cadena está sostenida por tres documentos y
+    dos punteros desde manuales que la gente sí lee (CLAUDE.md, CONTRIBUTING).
+    Un renombrado deja los punteros colgando y el conocimiento se pierde sin
+    que nada falle — la misma clase de fallo silencioso que el resto de este
+    contrato persigue.
+    """
+    docs = {
+        "docs/MUTATION_RUNBOOK.md": "operación y averías",
+        "docs/MUTATION_TESTING.md": "método y alcance",
+        "docs/MUTATION_BASELINE.md": "resultados medidos y triaje",
+    }
+    missing = [f"{p} ({why})" for p, why in docs.items() if not (REPO / p).is_file()]
+    assert not missing, f"faltan documentos de mutation testing: {missing}"
+
+    # Los manuales de entrada deben apuntar al runbook, o nadie lo encuentra.
+    for manual in ("CLAUDE.md", "CONTRIBUTING.md"):
+        text = (REPO / manual).read_text(encoding="utf-8")
+        assert "MUTATION_RUNBOOK.md" in text, (
+            f"{manual} ya no referencia docs/MUTATION_RUNBOOK.md. Sin ese "
+            f"puntero, el runbook existe pero es invisible para quien llega "
+            f"sin contexto."
+        )
+
+
 # ---------------------------------------------------------------------------
-# 5. El sandbox mutado nunca entra al repo
+# 6. El sandbox mutado nunca entra al repo
 # ---------------------------------------------------------------------------
 
 def test_mutants_dir_is_gitignored():

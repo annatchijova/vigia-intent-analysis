@@ -269,6 +269,17 @@ before opening issues about verdict counts.
 6. If your contribution modifies verdict logic, include a corresponding
    update to `KNOWN_LIMITATIONS.md` if it resolves a documented limitation,
    or a new entry if it introduces one
+7. Tests must **discriminate**, not merely execute. A test that runs a
+   threshold check without pinning its exact cut-off point verifies nothing:
+   `base_score = 0.9` passes whether the threshold is `0.5` or `0.8`. Pin the
+   boundary itself. Mutation testing measures this and runs weekly — see
+   `docs/MUTATION_RUNBOOK.md`. If you add a module to `[tool.mutmut]`
+   `only_mutate`, add it to the CI matrix in
+   `.github/workflows/mutation.yml` too; a contract test enforces the pair.
+8. Repository-sweep tests (those that `grep -r .` or `rglob` the tree) must
+   exclude `mutants/`. It is the mutation-testing sandbox: a full copy of the
+   source with deliberate defects injected. A sweep that counts it is
+   reporting on a build directory, not on the repository.
 
 ### Documentation Contributions
 
