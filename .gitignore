@@ -155,3 +155,12 @@ results/agent_batch/
 # untracked so pytest-time source mutation can never be committed. See session
 # 2026-07-17 investigation.
 tests/unit/test_m4_floor.py
+
+# Mutation testing (mutmut) sandbox + result cache. mutants/ holds a full
+# copy of the source with deliberate defects injected — committing it would
+# put mutated verdict-path code in the repo. Same hazard class as the
+# test_m4_floor.py benchmark above, so same treatment: never tracked.
+mutants/
+.mutmut-cache
+mutmut-stats.json
+html/

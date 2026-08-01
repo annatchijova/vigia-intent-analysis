@@ -1,0 +1,82 @@
+name: VIGÍA Mutation Testing
+
+# NO corre en push/PR: un barrido de mutación son N ejecuciones de la suite
+# (una por mutante) — trabajo de horas, no un check de pre-merge. Semanal +
+# manual. Ver docs/MUTATION_TESTING.md §6 (Coste).
+on:
+  workflow_dispatch:
+    inputs:
+      only_mutate:
+        description: 'Glob opcional para acotar el barrido a un módulo (ej: vigia_scorer.py)'
+        required: false
+        default: ''
+  schedule:
+    # Lunes 03:00 UTC.
+    - cron: '0 3 * * 1'
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    # Tope duro: si el barrido no cabe, se acota only_mutate en pyproject.toml,
+    # no se deja el job colgando.
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Mismo conjunto que el job de tests (pytest.yml): el runner de mutación
+      # ejecuta esa misma suite dentro de mutants/, así que necesita idénticas
+      # dependencias o los mutantes mueren por ImportError, no por lógica.
+      - run: pip install -r requirements.txt -r requirements-ci.txt && pip install scipy
+      - run: pip install mutmut
+
+      # Puerta previa: la suite debe estar VERDE antes de mutar. Sobre una
+      # suite roja el mutation score no significa nada — todo mutante se
+      # declara muerto por el fallo preexistente.
+      - name: Baseline verde (requisito del método)
+        run: python -m pytest tests/ vigia/tests/ -q --tb=short --no-cov
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+
+      - name: Acotar alcance (solo workflow_dispatch con input)
+        if: ${{ github.event.inputs.only_mutate != '' }}
+        run: |
+          python - <<'PY'
+          import os, re, pathlib
+          target = os.environ["ONLY"]
+          p = pathlib.Path("pyproject.toml")
+          src = p.read_text(encoding="utf-8")
+          src = re.sub(
+              r"(?ms)^only_mutate = \[.*?^\]",
+              'only_mutate = [\n    "%s",\n]' % target,
+              src,
+              count=1,
+          )
+          p.write_text(src, encoding="utf-8")
+          print("only_mutate acotado a:", target)
+          PY
+        env:
+          ONLY: ${{ github.event.inputs.only_mutate }}
+
+      - name: Barrido de mutación
+        run: python -m mutmut run --max-children 4
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        # El barrido no bloquea: un mutante superviviente es un hallazgo para
+        # triaje (hueco real / equivalente / código muerto — §7), no un fallo
+        # de build. Convertirlo en gate obligatorio antes de tener una línea
+        # base triada produciría rojos permanentes por mutantes equivalentes.
+        continue-on-error: true
+
+      - name: Resultados
+        if: always()
+        run: python -m mutmut results | tee mutation-results.txt
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mutation-results
+          path: mutation-results.txt
+          retention-days: 90

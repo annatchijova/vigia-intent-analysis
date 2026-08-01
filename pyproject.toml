@@ -133,6 +133,127 @@ exclude_lines = [
     "raise NotImplementedError",
 ]
 
+# ---------------------------------------------------------------------------
+# Mutation testing (mutmut) — mide si la suite DETECTA cambios de lógica,
+# no si los ejecuta. Cobertura de línea responde "¿se ejecutó?"; el mutation
+# score responde "¿se verificó?". Ver docs/MUTATION_TESTING.md.
+#
+# ALCANCE DELIBERADO: solo la ruta de veredicto sellado. Mutar módulos con
+# ~0% de cobertura no enseña nada que la cobertura no diga ya más barato —
+# el mutante sobrevive trivialmente. only_mutate lista exactamente los
+# módulos donde ya hay tests que puedan morder.
+# ---------------------------------------------------------------------------
+[tool.mutmut]
+# Copiados al sandbox mutants/. Incluye los módulos raíz de la ruta de
+# decisión: son los que producen el veredicto sellado (mismo criterio que
+# [tool.coverage.run].source).
+source_paths = [
+    "vigia",
+    "vigia_scorer.py",
+    "vigia_agent.py",
+    "sift_orchestrator.py",
+]
+
+# Módulos efectivamente mutados. Criterio de admisión: cobertura de línea
+# suficiente para que un mutante superviviente signifique algo (>= ~45% en
+# coverage_baseline). Ampliar esta lista es la vía para subir el alcance.
+only_mutate = [
+    "vigia_scorer.py",
+    "vigia/tools/caie.py",
+    "vigia/core/semiotic_detector_v2.py",
+    "vigia/core/evidence_aggregator.py",
+    "vigia/core/likelihood_engine.py",
+    "vigia/core/decision_layer.py",
+    "vigia/core/causal_closure.py",
+    "vigia/collapse_decision.py",
+]
+
+# Los tests nunca se mutan (mutar un test no significa nada).
+do_not_mutate = [
+    "vigia/tests/*",
+    "*/tests/*",
+    "*_test.py",
+    "test_*.py",
+]
+
+# Ficheros de datos que la suite lee en runtime y que no viven bajo
+# source_paths. Sin esto los tests fallan dentro de mutants/ por FileNotFound
+# y TODOS los mutantes se declararían muertos por la razón equivocada.
+also_copy = [
+    # Datos y corpus leídos por la suite.
+    "data",
+    "cases",
+    "evidence",
+    "results",
+    "models",
+    "baselines_institucionales.yaml",
+    "phonetic_dict.json",
+    "requirements.txt",
+    "requirements-ci.txt",
+    # Lo lee tests/test_mutation_config_contract.py, que debe poder correr
+    # tanto en el árbol real como dentro de mutants/.
+    ".gitignore",
+    # Paquetes/directorios raíz importados o invocados por los tests.
+    "forensics",
+    "scripts",
+    "tools",
+    # Módulos raíz que los tests importan pero que NO se mutan (no son ruta
+    # de veredicto). Sin ellos, ModuleNotFoundError dentro de mutants/ y el
+    # runner de stats aborta antes de medir nada.
+    "run_all_agent.py",
+    "run_llm_cases.py",
+    "validate_case.py",
+    "verify_tool_log.py",
+    "vigia_api.py",
+    "caie_legacy_root.py",
+]
+
+# --no-cov: pyproject fuerza --cov vía addopts; medir cobertura por mutante
+# multiplica el coste sin aportar nada. -p no:randomly/no:cacheprovider
+# mantiene el runner determinista entre mutantes.
+pytest_add_cli_args = [
+    "--no-cov",
+    "-p", "no:cacheprovider",
+    "--tb=no",
+    "-q",
+]
+
+# Selección de tests. tests/integration se ignora por la misma razón que en
+# addopts (runner standalone, no módulo pytest). Los módulos que importan
+# el bridge MCP quedan fuera: no colectan sin `mcp` instalable
+# (KNOWN_LIMITATIONS L-045) y no cubren la ruta de veredicto.
+pytest_add_cli_args_test_selection = [
+    "tests",
+    "vigia/tests",
+    "--ignore=tests/integration",
+    # Módulos que importan vigia/vigia_sift_bridge.py. No colectan sin `mcp`
+    # (KNOWN_LIMITATIONS L-045) y cubren la superficie MCP, no la ruta de
+    # veredicto: ningún mutante de only_mutate depende de ellos. Su exclusión
+    # es un CAVEAT declarado del score, no una omisión silenciosa —
+    # docs/MUTATION_TESTING.md §Limitaciones.
+    "--ignore=tests/e2e",
+    "--ignore=tests/test_b122_universal_tool_invoked_audit.py",
+    "--ignore=tests/test_b164_mcp_mount_root.py",
+    "--ignore=tests/test_b169_mcp_invocation_audit.py",
+    "--ignore=tests/test_b173_bridge_work_root.py",
+    # Tests META-REPO: no ejecutan la ruta de veredicto, INSPECCIONAN texto
+    # fuente / ficheros del repo (regex sobre caie.py, inspect.getsource,
+    # rglob de *.md). Dentro de mutants/ el fuente contiene TODAS las
+    # variantes mutantes en línea (`x_f__mutmut_N`, literales "XX..XX"), así
+    # que estos tests leen artefactos del harness y fallan por una razón que
+    # no es la lógica bajo prueba. No pueden matar un mutante de
+    # only_mutate — no invocan ese código — luego excluirlos no altera el
+    # score. Ver docs/MUTATION_TESTING.md §"Tests invisibles a la mutación".
+    "--ignore=tests/test_m3_scorer_caie_parity.py",
+    "--ignore=tests/test_registry_integrity.py",
+    "--ignore=tests/test_requirements_ci_contract.py",
+    "--ignore=tests/test_security_md_rate_limit_contract.py",
+]
+
+# Solo muta líneas que algún test ejecuta. Un mutante en línea no cubierta
+# sobrevive trivialmente y sólo añade ruido al triaje.
+mutate_only_covered_lines = true
+
 [tool.ruff]
 line-length = 100
 target-version = "py310"
