@@ -867,6 +867,65 @@ weight (z_score or raw_score x (1 - spoofability)) and reach >70% agreement
 before Phase 3 integration is even considered; oscillation detection
 (ABSTAIN on contradictory evidence) is the primary value-add.
 
+### Addendum 2026-08-01 — investigated the L-027 gap before attempting to wire it (Anna's call to bring the abduction namespace forward), design notes only, no code
+
+While considering unblocking `ockham_adversarial` (B-124), Anna decided to
+bring forward the L-027 translation-layer work (originally not scheduled
+before 2026-08-14 via this same B-129). Before writing any code, this was
+investigated in depth, and it turns out **this exact thing was already
+attempted and reverted**:
+
+**Failure precedent (L-027, commit `86f6777`, 2026-06-22, already
+documented in `KNOWN_LIMITATIONS.md`):** the reverted adapter built
+`Artifact(name=str(signal.tool_name), category=VariableCategory.PROCESS)`
+-- it used the *tool*'s name (`"audit_network"`,
+`"calculate_shannon_entropy"`) as if it were the name of the *observed
+artifact* that `HYPOTHESIS_TEMPLATES` expects (`"timestamp_uniformity"`,
+`"credential_dumping"`, `"beaconing_pattern"`). Matching is exact string
+equality (`req in observed_names`), and with `category` also hardcoded to
+`PROCESS` for everything, the output was constant per phase -- coverage
+~0 always -- which forced `consistency_score` low and triggered spurious
+ABSTAIN on high-posterior cases. Documented as "worse than the original
+silent failure" -- the commit was reverted.
+
+**What was newly investigated this session (2026-08-01), reading
+`infer_habit()`/`detect_phase()` live, not just the registry:**
+
+1. **Matching is phase-scoped first.** `infer_habit()` only competes
+   among the hypotheses of the already-detected `IRPhase`
+   (`self.templates.get(phase, [])`) -- not all ~40 hypotheses across
+   every phase at once. This bounds the real problem: no universal
+   `tool_name -> artifact_type` mapping is needed, only an honest
+   correspondence for the phases VIGIA actually detects on real cases.
+2. **Phase detection (`VisibleVariablesEngine.detect_phase()`) does not
+   depend on signal names.** It depends on `mitre_ttps` (weight 40, via
+   the `MITRE_TTP_TO_PHASE` table) and `temporal_violations` (weight 35,
+   via `TEMPORAL_VIOLATION_TO_PHASE`). "Rule 3" (signal distribution)
+   doesn't even vote for a specific phase -- it just adds a flat base
+   score if any signals are present. I.e., the real input driving phase
+   detection is MITRE TTPs + temporal violations, not
+   `evidence_type`/`tool_name` directly.
+
+**Recommended path to pick this back up (NOT executed, decision was to
+stop digging today):** before designing any mapping table,
+**empirically measure** which phases `detect_phase()` actually detects
+on the real corpus given the `mitre_ttps`/`temporal_violations` that
+exist today (not the theoretical universe of all 15 `IRPhase` values).
+Only with that bounded, real distribution should anyone evaluate,
+phase-by-phase, whether those specific phases' `required_artifacts` have
+an honest correspondence to some real VIGIA producer -- without repeating
+the L-027 failure of mapping by convenience (generic `tool_name` ->
+specific artifact). If the correspondence isn't honest for a given
+phase, that phase stays uncovered (current, already-documented behavior)
+rather than forcing a spurious mapping.
+
+This also informs `ockham_adversarial.py` (B-124): it shares the same
+blocker (`hypothesis_lineage.py` is a tracker that receives already-
+computed costs, it doesn't generate them -- the real generator is
+`AbductiveIntentEngine`, blocked by this same gap). No code was touched;
+`hypothesis_lineage.py`, `AbductiveIntentEngine`, and
+`ockham_adversarial.py` remain exactly as they were.
+
 ---
 
 ## B-149 — T-5: a high-severity C2 IoC can collapse to NOISE when the exculpatory memory artifact was never network-analyzed (surfaced by B-148) [OPEN — synthetic-only]
