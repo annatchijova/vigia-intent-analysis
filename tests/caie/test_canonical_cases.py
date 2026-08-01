@@ -95,14 +95,32 @@ def canonical_case_params():
     unnoticed). strict=True enforces the documented contract: the moment a
     pending case passes (e.g. after the D-2 data repair), the suite fails
     until its entry is removed from KNOWN_PENDING.
+
+    Devuelve una LISTA, no un generador. Esto no es estilo: un generador se
+    consume una sola vez, y el objeto queda capturado en el marcador
+    @pytest.mark.parametrize del módulo. En una sesión pytest normal se
+    colecta una vez y funciona; en cualquier proceso que colecte DOS veces
+    —mutmut (list_all_tests + stats + clean run comparten proceso), un
+    pytest.main() repetido, un runner embebido— la segunda colección recibe
+    un generador ya agotado, produce CERO parámetros, y los 52 casos
+    canónicos del corpus DESAPARECEN sin error: pytest no falla, dice
+    "not found" para cada id y aborta con exit 4, o —peor— simplemente
+    colecta nada. Un corpus de regresión que se evapora en silencio es la
+    clase de fallo que este repo llama fósil.
+
+    Además, pasar un iterable no-Collection a parametrize está deprecado:
+    pytest lo señala con PytestRemovedIn10Warning y dejará de funcionar en
+    pytest 10. Detectado al montar mutation testing (docs/MUTATION_TESTING.md).
     """
+    params = []
     for case in load_canonical_cases():
         marks = []
         if case["case_id"] in KNOWN_PENDING:
             marks.append(
                 pytest.mark.xfail(reason=KNOWN_PENDING[case["case_id"]], strict=True)
             )
-        yield pytest.param(case, id=case["case_id"], marks=marks)
+        params.append(pytest.param(case, id=case["case_id"], marks=marks))
+    return params
 
 def load_canonical_cases():
     """Load all VIGIA-CAN-*.json files."""
