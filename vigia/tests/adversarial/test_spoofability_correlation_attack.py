@@ -263,26 +263,29 @@ def test_metadata_convention_present_triggers_golden_rule():
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "T-5 (B-149), confirmed after B-148/B-154: once absence stops triggering "
-        "LOG_VS_MEMORY (the fabrication rule was incidentally the anti-collapse "
-        "protection), a C2 IoC competing with a NETWORK-UNANALYZED exculpatory "
-        "artifact (no explicit verdict) collapses to NOISE. Synthetic-only: the "
-        "B-148 comparative corpus gate showed 0/201 real cases affected. The "
-        "proper fix — a high-severity confirmed IoC must resist NOISE collapse on "
-        "its own merits, not via a fracture coupled to absent memory — is tracked "
-        "as B-149 and deliberately NOT bundled into B-148. This test IS the "
-        "reproducible scenario; when B-149 lands, strict=True flips it to XPASS."
-    ),
-)
 def test_red_team_anchor_bypass():
     """
-    T-5 — now an expected failure (xfail, strict) documenting B-149. Before B-148
-    this asserted verdict != NOISE and passed only because LOG_VS_MEMORY fired on
-    ABSENT memory network fields — a false-positive fracture (B-154). With that
-    corrected, the real T-5 collapse (verdict == NOISE) is exposed. See B-149.
+    T-5 — assertion viva desde B-149 (2026-08-01). Marcador xfail(strict) retirado.
+
+    Historia, porque el recorrido explica el fix: antes de B-148 esto pasaba,
+    pero por la razón equivocada — LOG_VS_MEMORY disparaba sobre campos de red
+    AUSENTES, un falso positivo (B-154), y esa fractura espuria era
+    incidentalmente lo que impedía el colapso. B-148 corrigió la dirección
+    acusatoria (ausencia != negativo) y dejó al descubierto el colapso real a
+    NOISE, que quedó registrado como B-149 y marcado xfail(strict=True).
+
+    B-149 cierra la dirección EXCULPATORIA de la misma conflación: NOISE no
+    puede afirmarse sobre una capa que ningún artefacto analizó. Medido, mismo
+    IoC de C2 en los tres, variando sólo el artefacto de memoria:
+
+        memoria analizó la red, sin hallazgos  -> MALICE        (contradicción real)
+        NO hay artefacto de memoria            -> INCONCLUSIVE
+        memoria existe pero nunca miró la red  -> NOISE  (antes) / INCONCLUSIVE (ahora)
+
+    El tercer caso tenía la monotonicidad invertida: menos información sobre la
+    red que el primero, no más que el segundo, y el veredicto más benigno de
+    los tres. Añadir un artefacto silente sobre la capa en disputa hacía que el
+    caso pareciera más limpio que no tenerlo.
     """
     t = SpoofabilityCorrelationAttackTest()
     r = t.test_red_team_anchor_bypass()

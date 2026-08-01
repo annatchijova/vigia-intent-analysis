@@ -928,11 +928,11 @@ computed costs, it doesn't generate them -- the real generator is
 
 ---
 
-## B-149 — T-5: a high-severity C2 IoC can collapse to NOISE when the exculpatory memory artifact was never network-analyzed (surfaced by B-148) [OPEN — synthetic-only]
+## B-149 — T-5: a high-severity C2 IoC can collapse to NOISE when the exculpatory memory artifact was never network-analyzed (surfaced by B-148) [RESOLVED 2026-08-01]
 
 | Field | Value |
 |-------|-------|
-| **Status** | OPEN — synthetic-only (0/201 corpus cases). Documented as a limitation, not silently patched. Deliberately NOT bundled into B-148. |
+| **Status** | RESOLVED 2026-08-01 — unanalysed-layer guard in `caie.py`. Corpus impact: 0/282 cases. `xfail(strict)` on `test_red_team_anchor_bypass` removed. See the note at the end of this entry: the correct diagnosis was not an IoC floor but an inverted monotonicity. |
 | **Severity** | P2 (latent) — a real, corroborated C2 IoC should never read as NOISE ("nothing to see here"). Currently reproducible only synthetically. |
 | **File** | `vigia_scorer.py` (spoofability-weighted Noisy-OR / verdict cascade); probe: `vigia/tests/adversarial/test_spoofability_correlation_attack.py::test_red_team_anchor_bypass` (now `xfail(strict=True)`) |
 
@@ -959,6 +959,48 @@ deliberately. When it lands, the `xfail(strict=True)` on `test_red_team_anchor_b
 flips to XPASS and the marker is removed.
 
 ---
+
+
+### RESOLVED 2026-08-01 — the sharpened diagnosis
+
+La entrada proponía "un piso de IoC que la ponderación por spoofability no
+pueda empujar por debajo de SUSPICION". Medir el escenario mostró que el
+problema no era el IoC ni el piso, sino una **monotonicidad invertida**. Mismo
+IoC de C2 en los tres, variando sólo el artefacto de memoria:
+
+| Escenario | Información sobre la red | Veredicto |
+|-----------|--------------------------|-----------|
+| memoria analizó la red, sin hallazgos | más | MALICE (contradicción real) |
+| NO hay artefacto de memoria | menos | INCONCLUSIVE |
+| memoria existe pero nunca miró la red | intermedia | **NOISE** |
+
+El tercer caso tiene menos información sobre la red que el primero y no más
+que el segundo, y producía el veredicto **más benigno de los tres**. Añadir un
+artefacto silente sobre la capa en disputa hacía que el caso pareciera más
+limpio que no tenerlo.
+
+Es la misma conflación que B-154 nombra —ausencia ≡ negativo— pero en la
+dirección EXCULPATORIA. B-148/B-154 cerró la acusatoria (una capa no analizada
+dejó de alimentar LOG_VS_MEMORY); ésta quedaba abierta: NOISE significa
+"analizado y sin hallazgos", y aquí significaba "nadie lo analizó".
+
+**Fix aplicado** (`vigia/tools/caie.py`, tras el bloque CDL): si un log afirma
+actividad de red y NINGÚN artefacto técnico analizó la capa de red, el
+veredicto no puede ser NOISE — pasa a INCONCLUSIVE. Alcance deliberadamente
+estrecho: si algún artefacto la analizó, con o sin hallazgos, la guarda no
+interviene y la contradicción real sigue su curso. No toca `independent_sources`
+ni el scoring; sólo impide concluir limpieza sobre lo no observado.
+
+Se descartó el piso de IoC de la propuesta original: habría forzado SUSPICION
+desde un único log altamente spoofable sin corroboración, que es el error
+opuesto y el que la puerta de corroboración Daubert existe para evitar.
+
+**Impacto en el corpus: CERO** — 0 de 282 casos presentan la combinación
+(log que afirma red + todos los artefactos técnicos silentes sobre red).
+Coherente con el 0/201 que medía el gate de B-148.
+
+`test_red_team_anchor_bypass` pasa a verde y su `xfail(strict=True)` fue
+retirado, como esta entrada anticipaba.
 
 ## B-151 — Scorer downgrades: (a) silent single-artifact score clamp [RESOLVED, dead code]; (b) mandated contradiction_detector chain entry not wired in Mode-1 [OPEN — architecture decision]
 

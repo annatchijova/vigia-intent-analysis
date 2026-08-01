@@ -2984,6 +2984,57 @@ class CrossArtifactIncongruenceEngine:
             import logging
             logging.getLogger("caie").error("CDL evaluation failed: %s", exc)
 
+        # ------------------------------------------------------------------
+        # B-149 / T-5: NOISE no puede afirmarse sobre una capa que nadie miró.
+        #
+        # B-148/B-154 corrigió la dirección ACUSATORIA de este problema: una
+        # capa NO ANALIZADA dejó de emitir `memory_shows_no_network_activity`
+        # y por tanto de alimentar la regla de fabricación LOG_VS_MEMORY. Pero
+        # la dirección EXCULPATORIA quedó abierta, y es la que B-149 registra.
+        #
+        # Medido (vigia/tests/adversarial/test_spoofability_correlation_attack.py),
+        # mismo IoC de C2 en los tres, variando sólo el artefacto de memoria:
+        #
+        #   memoria analizó la red y no vio nada  -> MALICE        (contradicción real)
+        #   NO hay artefacto de memoria           -> INCONCLUSIVE  (menos información)
+        #   memoria existe pero NUNCA miró la red -> NOISE         (información intermedia)
+        #
+        # La monotonicidad está invertida: el escenario con MENOS información
+        # sobre la red que el primero, y no más que el segundo, produce el
+        # veredicto MÁS benigno de los tres. Añadir un artefacto silente sobre
+        # la capa en disputa hace que el caso parezca más limpio que no
+        # tenerlo. NOISE significa "analizado y sin hallazgos"; aquí significa
+        # "nadie lo analizó" — la conflación exacta que B-154 nombra.
+        #
+        # Alcance deliberadamente estrecho: sólo cuando un log AFIRMA actividad
+        # en la capa y NINGÚN artefacto técnico la analizó. Si alguno la
+        # analizó (con o sin hallazgos), esta guarda no interviene y la
+        # contradicción real sigue su curso. No toca `independent_sources` ni
+        # el scoring: sólo impide concluir limpieza sobre lo no observado.
+        if verdict == "NOISE":
+            _logs_b149 = [a for a in self._artifacts
+                          if a.evidence_type in ("log_entry", "usn_journal", "windows_event_log")]
+            _tech_b149 = [a for a in self._artifacts
+                          if a.evidence_type in ("memory_process", "lsass_session", "kernel_structure")]
+            if _logs_b149 and _tech_b149:
+                _log_as = frozenset().union(*(_extract_assertions(a) for a in _logs_b149))
+                _tech_as = frozenset().union(*(_extract_assertions(a) for a in _tech_b149))
+                _claims_network = "log_claims_outbound_connection" in _log_as
+                _nobody_looked = (
+                    "memory_network_not_analyzed" in _tech_as
+                    and "memory_shows_network_activity" not in _tech_as
+                    and "memory_shows_no_network_activity" not in _tech_as
+                )
+                if _claims_network and _nobody_looked:
+                    verdict = "INCONCLUSIVE"
+                    structural_verdict = "INCONCLUSIVE"
+                    daubert_note += (
+                        " B-149: log asserts outbound network activity and no "
+                        "technical artifact analysed the network layer. NOISE "
+                        "would state 'analysed and clean' about a layer nobody "
+                        "examined; the honest verdict is INCONCLUSIVE."
+                    )
+
         # Peirce chain
         top_adjusted = sorted(
             [

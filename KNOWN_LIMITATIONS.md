@@ -2995,7 +2995,7 @@ documented. Behavior is pinned unchanged until decided.
 
 ---
 
-## L-066 — A high-severity C2 IoC can read as NOISE when the competing memory artifact was never network-analyzed (T-5 / B-149) [DOCUMENTED]
+## L-066 — A high-severity C2 IoC can read as NOISE when the competing memory artifact was never network-analyzed (T-5 / B-149) [RESOLVED 2026-08-01 — B-149]
 
 Surfaced by B-148 (CAIE absence≡negative fix). The LOG_VS_MEMORY fabrication
 rule previously fired whenever a memory artifact lacked network fields, which
@@ -3022,6 +3022,18 @@ own merits (a scorer-level IoC floor), not via a fracture coupled to absent
 memory — is tracked as B-149 and pinned until designed deliberately.
 
 ---
+
+
+**RESOLVED 2026-08-01 (B-149).** The proposed remedy in this entry — an IoC
+floor — was discarded after measurement. The defect was not that the IoC
+lacked a floor but that monotonicity was inverted: a memory artifact that
+never examined the network layer made the case read *more benign* than having
+no memory artifact at all (NOISE vs INCONCLUSIVE), while one that did examine
+it produced MALICE. The fix forbids concluding NOISE about a layer no artifact
+analysed; it does not raise any score. An IoC floor would have forced
+SUSPICION from a single highly-spoofable uncorroborated log — the opposite
+error, and the one the Daubert corroboration gate exists to prevent.
+Corpus impact: 0 of 282 cases.
 
 ## L-068 — The epistemic kernel is integrated but not wired into the verdict path [DOCUMENTED]
 

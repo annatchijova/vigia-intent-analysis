@@ -17,8 +17,11 @@ ficheros:
 Medición correcta, con el parser de este módulo: **211 entradas — 199 CLOSED,
 8 OPEN, 4 PARTIAL, 0 sin estado.**
 
-  ABIERTAS  B-010 B-111 B-112 B-113 B-123 B-124 B-149 L-040
+  ABIERTAS  B-010 B-111 B-112 B-113 B-123 B-124 L-040
   PARCIALES B-129 B-145 B-151 B-162
+
+(B-149 figuraba abierta en la primera medición del día; se cerró horas después
+con el fix de la capa no analizada, y este módulo lo refleja.)
 
 Ninguno de los tres se equivocó por descuido. Se equivocaron porque el
 registro expresa el estado de **cuatro formas distintas**, y cada parser
@@ -208,7 +211,8 @@ def test_open_and_closed_counts_are_stable():
     assert counts["CLOSED"] >= 150, counts
     assert counts["OPEN"] + counts["PARTIAL"] <= 40, (
         f"{counts['OPEN']} abiertas + {counts['PARTIAL']} parciales. Medido el "
-        f"2026-08-01: 8 + 4 sobre 211 entradas. Un salto grande merece "
+        f"2026-08-01: 7 + 4 sobre 211 entradas (8+4 antes de cerrar B-149). "
+        f"Un salto grande merece "
         f"revisión del registro, no un ajuste de este umbral."
     )
 
@@ -248,12 +252,17 @@ def test_status_parser_distinguishes_the_documented_cases():
     # está por doctrina sellada (NOT ADOPTED), que es un cierre, no un resto.
     assert parse_status(*by_id["B-052"])[0] == "CLOSED"
 
-    # Los dos falsos parciales que costó distinguir: prosa que MENCIONA el
-    # vocabulario del otro estado sin serlo.
-    #   B-090 cita '"⏳ abierto" en la auditoría fuente' — cita histórica.
-    #   B-149 dice "Documentado como limitación" — describe el manejo, no un cierre.
+    # La trampa que costó distinguir: prosa que MENCIONA el vocabulario del
+    # otro estado sin serlo. B-090 cita '"⏳ abierto" en la auditoría fuente'
+    # — una cita histórica, no el estado actual.
     assert parse_status(*by_id["B-090"])[0] == "CLOSED"
-    assert parse_status(*by_id["B-149"])[0] == "OPEN"
+
+    # El segundo ejemplo era B-149 ('ABIERTO — ... Documentado como
+    # limitación'), cerrado el mismo día por el fix de la capa no analizada.
+    # Se conserva la aserción invertida a propósito: que este test tuviera que
+    # actualizarse al cerrar el bug es la prueba de que sigue a la realidad
+    # del registro y no a una foto congelada.
+    assert parse_status(*by_id["B-149"])[0] == "CLOSED"
 
 
 def test_cross_reference_is_not_a_side_effect():
