@@ -281,6 +281,35 @@ before opening issues about verdict counts.
    source with deliberate defects injected. A sweep that counts it is
    reporting on a build directory, not on the repository.
 
+### Registry status — how to read it without getting it wrong
+
+`BUGS_HISTORICO.md` and `BUGS_PENDIENTES.md` express an entry's status in four
+coexisting conventions (a `| **Estado** |` row, a plain `| Estado |` row, a
+`[TAG]` at the end of the heading, and split statuses like
+`(a) RESUELTO ... (b) ABIERTO`). Three independent audits of this registry —
+two by external models, one in-house — produced **false numbers** because each
+wrote its own regex and caught only one convention. Reported open bugs that
+were closed; reported "41% of fixes had side effects" when the real figure is
+3% (the parser had counted every cross-reference to another `B-NNN` as a side
+effect, and 71% of entries carry one).
+
+Do not write another regex. Import the shared parser:
+
+```python
+from tests.test_registry_status_contract import parse_status, _entries
+
+for bug_id, fname, heading, body in _entries():
+    state, text = parse_status(heading, body)   # CLOSED | OPEN | PARTIAL
+```
+
+`PARTIAL` is not decoration: it marks entries where one sub-item closed and
+another stayed open. Collapsing it into `CLOSED` is exactly how an open
+remainder disappears from view.
+
+`tests/test_registry_status_contract.py` enforces that every entry stays
+machine-readable. A new status token fails the test on purpose — classifying
+it is a decision, not a formatting detail.
+
 ### Documentation Contributions
 
 The codebase contains comments in Spanish. Translations to English are

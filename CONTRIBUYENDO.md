@@ -265,6 +265,36 @@ conteos de veredictos.
    correspondiente a `KNOWN_LIMITATIONS.md` si resuelve una limitación documentada, o
    una entrada nueva si introduce una
 
+### El estado del registro — cómo leerlo sin equivocarse
+
+`BUGS_HISTORICO.md` y `BUGS_PENDIENTES.md` expresan el estado de una entrada
+en cuatro convenciones que conviven (fila `| **Estado** |`, fila `| Estado |`
+sin negritas, tag `[TAG]` al final del encabezado, y estados divididos tipo
+`(a) RESUELTO ... (b) ABIERTO`). Tres auditorías independientes de este
+registro —dos de modelos externos, una interna— produjeron **números falsos**
+porque cada una escribió su propio regex y sólo capturó una convención.
+Reportaron como abiertos bugs que estaban cerrados; y "41% de los fixes con
+efectos colaterales" cuando la cifra real es 3% (el parseo contaba como efecto
+colateral toda referencia cruzada a otro `B-NNN`, y el 71% de las entradas
+lleva una).
+
+No escribas otro regex. Importá el parser compartido:
+
+```python
+from tests.test_registry_status_contract import parse_status, _entries
+
+for bug_id, fichero, encabezado, cuerpo in _entries():
+    estado, texto = parse_status(encabezado, cuerpo)   # CLOSED | OPEN | PARTIAL
+```
+
+`PARTIAL` no es decoración: marca entradas donde un sub-ítem se cerró y otro
+quedó abierto. Colapsarlo a `CLOSED` es exactamente cómo desaparece de la
+vista un resto abierto.
+
+`tests/test_registry_status_contract.py` garantiza que toda entrada siga
+siendo legible por máquina. Un token de estado nuevo falla el test a
+propósito: clasificarlo es una decisión, no un detalle de formato.
+
 ### Contribuciones de documentación
 
 El codebase contiene comentarios en español. Las traducciones al inglés son bienvenidas

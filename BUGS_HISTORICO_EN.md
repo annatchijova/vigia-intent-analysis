@@ -315,7 +315,7 @@ Smoke test: load without hash OK, load with correct hash OK, load with incorrect
 
 ---
 
-## B-007 — P0 Floats Introduced by Claude Code in the Scorer (Discarded)
+## B-007 — P0 Floats Introduced by Claude Code in the Scorer [DISCARDED]
 
 **Status:** DISCARDED — never reached the repository.
 

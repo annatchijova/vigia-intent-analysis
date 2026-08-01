@@ -317,7 +317,7 @@ Smoke test: load sin hash OK, load con hash correcto OK, load con hash incorrect
 
 ---
 
-## B-007 — Floats P0 introducidos por Claude Code en el scorer (descartado)
+## B-007 — Floats P0 introducidos por Claude Code en el scorer [DESCARTADO]
 
 **Estado:** DESCARTADO — nunca llegó al repositorio.
 
