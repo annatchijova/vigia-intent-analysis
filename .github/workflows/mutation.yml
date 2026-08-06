@@ -120,7 +120,9 @@ jobs:
 
       - name: Nombre de artefacto seguro
         if: always()
-        run: echo "SLUG=$(echo "${{ github.event.inputs.only_mutate || matrix.module }}" | tr '/.' '__')" >> "$GITHUB_ENV"
+        run: echo "SLUG=$(echo "$ONLY_MUTATE" | tr '/.' '__')" >> "$GITHUB_ENV"
+        env:
+          ONLY_MUTATE: ${{ github.event.inputs.only_mutate || matrix.module }}
 
       - uses: actions/upload-artifact@v4
         if: always()
