@@ -18,9 +18,9 @@
   Spanish (voseo, professional, neutral). Everything committed to the repo — code,
   tests, comments, docstrings, documentation, and commit messages — is in English.
 - **No emojis** anywhere in the repository or in generated output.
-- **Commit prefix.** Post-hackathon work is committed with the fixed prefix
-  `POST HACKATHON` so automated contributions are filterable in `git log`. Keep the
-  prefix consistent; provenance is the point.
+- **Commit prefix.** The fixed prefix `POST HACKATHON` applies **only to the
+  `vigia-repo` repository**, where it marks post-hackathon automated contributions
+  for filterability in `git log`. Do not use this prefix in any other repository.
 - **You do not know the repo state until you have read it.** Do not assume paths,
   branch, cleanliness, dependency versions, or that a project-knowledge snapshot
   matches the live tree. Verify, then claim. See §3.
@@ -221,14 +221,10 @@ The decision path must be reproducible bit-for-bit and tamper-evident.
   everywhere: type-tagged (so `1`, `"1"`, `1.0`, `True` are distinguishable — check
   `bool` before `int`), recursively key-sorted, and stamped with a
   `CANONICALIZE_VERSION`. Divergent ad-hoc encoders are how one input gets two hashes.
-- **Separate replay identity from custody identity.** Seal the complete per-run
-  artifact (including UUID and custody timestamps) with SHA-256, and expose a
-  second canonical fingerprint over the deterministic analytical projection.
-  Never call those two values interchangeable: the first proves integrity of a
-  particular execution; the second proves reproducible analysis. The verifier
-  is stdlib-only and independent of the producing code.
-- **Prove it.** Produce the result at least twice and assert the analytical
-  fingerprints match while the per-run custody seals remain distinct; better,
+- **Seal with SHA-256 over the canonical bytes**, storing the digest, the version, and
+  chain-of-custody metadata (inputs, tool versions, timestamp recorded *outside* the
+  sealed payload). The verifier is stdlib-only and independent of the producing code.
+- **Prove it.** Produce the result at least twice and assert the seals match; better,
   re-order inputs and run in a fresh process. Common leaks: a stray float, `set`/`dict`
   ordering, an unpinned timestamp or RNG seed, `PYTHONHASHSEED` randomization,
   locale-dependent formatting.
@@ -281,7 +277,7 @@ Before proposing a commit, confirm:
 - [ ] Limitations, WARNs, and gaps are documented, not hidden (§5.3).
 - [ ] Tests run and their real output was read (not assumed).
 - [ ] `git status` / `git log` reflect what will actually be committed (§2).
-- [ ] Commit message is in English, prefixed `POST HACKATHON`, and describes *why*.
+- [ ] Commit message is in English and describes *why*. (Prefix `POST HACKATHON` only if working in `vigia-repo`.)
 
 ---
 
@@ -297,6 +293,111 @@ Before proposing a commit, confirm:
 - Do not report a uniform green that cannot distinguish "verified correct" from "ran
   without crashing".
 - Do not guess when you can check. When in doubt, ask for the command output.
+
+---
+
+## 9. MANDATORY: CRONOS trace persistence
+
+**THIS IS NON-NEGOTIABLE AND APPLIES TO EVERY CONVERSATION.**
+
+Every time the CRONOS MCP tools are used (`cronos_open_trace`,
+`cronos_close_trace`, `cronos_explain_trace`, `cronos_list_traces`,
+`cronos_verify_chain`, or any `cronos_*` tool), the agent MUST
+immediately save the full result to the Desktop as a timestamped
+Markdown file:
+
+    $HOME/Desktop/cronos_audit_<topic>_<YYYY-MM-DD>.md
+
+One file per session. Created on the FIRST cronos call; appended on
+subsequent calls within the same session.
+
+**Do not ask for confirmation. Do not skip this step. Do not summarize
+instead of saving. No exceptions.**
+
+### Required format (follow this structure exactly)
+
+```markdown
+# Cronos Audit Trail — <TOPIC DESCRIPTION>
+<!-- trace_id: <trace_id> -->
+
+| Field | Value |
+|-------|-------|
+| Trace ID | `<trace_id>` |
+| Agent | `<agent_id>` |
+| Started | <ISO timestamp> UTC |
+| Closed | <ISO timestamp> UTC |
+| Quality | <quality_tier> (<detail>) |
+| Confidence | <stored fraction> (submitted <original> — <reason if capped>) |
+| Chain hash | `<entry_hash>` |
+| Chain integrity | <OK or BROKEN> |
+| Cronos version | <version> |
+
+---
+
+## Objective
+
+<What the agent was asked to accomplish.>
+
+---
+
+## Step-by-step trace
+
+### 1. <StepKind> — <tool or label> (<timestamp> UTC)
+
+<One-paragraph description of what happened at this step.>
+
+### 2. ...
+
+(Continue numbering for every step: Tool calls, Hypothesis registered,
+Evidence supporting/refuting, Discards, etc.)
+
+---
+
+## Hypotheses summary
+
+| Label | Status | Outcome |
+|-------|--------|---------|
+| `<label>` | <Active/Discarded> | <One-sentence explanation> |
+
+---
+
+## Decision
+
+**<Decision statement>**
+
+<Supporting details: commit hash, test results, patch method, etc.>
+
+---
+
+## Quality metrics
+
+| Metric | Value |
+|--------|-------|
+| Quality tier | <tier> |
+| Observational diversity | <groups covered> |
+| Confidence submitted | <fraction> (<percent>) |
+| Confidence stored | <fraction> (<percent>) — <reason if different> |
+
+**Confidence warnings:** <any warnings from Cronos>
+
+**Contradictions flagged by Cronos:**
+- <list any contradictions detected>
+
+---
+
+## Chain of custody
+
+\```
+entry_hash : <full hash>
+chain_ok   : <true/false>
+\```
+```
+
+The format above is the canonical CRONOS audit trail. Every field in
+the summary table MUST be filled from the actual tool results. The
+step-by-step trace MUST include EVERY step recorded during the session
+(tool calls, hypotheses, evidence, discards). Do not omit steps. Do
+not paraphrase — reproduce the actual content from the trace.
 
 ---
 
