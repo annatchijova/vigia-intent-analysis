@@ -45,6 +45,38 @@ VIGÍA implements:
 
 ---
 
+## Legal Basis for Hash-Based Authentication
+
+The chain-of-custody mechanisms above are not only an internal design
+choice — hash-based authentication of digital evidence is recognized
+evidentiary practice, not just VIGÍA's own logic.
+
+- **United States — FRE 902(13) and 902(14)** (in effect since December
+  1, 2017): these rules allow self-authentication of an electronic
+  record via a "process of digital identification" — a hash value —
+  without requiring foundational expert testimony at trial. A hash match
+  between an original and a copy is accepted authentication that the
+  data is what it purports to be.
+- **Argentina**: no single codified article mirrors 902(14) directly.
+  The equivalent exists as doctrine and case law: a hash is treated as a
+  digital fingerprint — if unchanged, it evidences that content,
+  creation date, and chain of custody were preserved. Digital chain of
+  custody is commonly described in three phases: obtención (collection),
+  incorporación al proceso (incorporation into the case file), and
+  valoración (judicial assessment). Metadata alteration or a broken
+  chain of custody typically leads to evidentiary exclusion for lack of
+  reliability.
+
+**Scope note:** this precedent covers hash-based authentication of
+integrity — it is what backs `read_evidence`'s atomic SHA-256 and the
+HMAC-chained audit log above. It does not, in either jurisdiction,
+address zero-knowledge proofs or other cryptographic proof systems as an
+authentication method; that remains unsettled law. Do not present ZK-based
+mechanisms elsewhere in this project as carrying the same legal backing
+as the hash-chain mechanisms described in this section.
+
+---
+
 ## Requirement 3: Qualified Human Operator
 
 **Daubert requires** that the technique be applied by a competent professional.

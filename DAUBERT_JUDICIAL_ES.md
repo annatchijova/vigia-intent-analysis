@@ -40,6 +40,36 @@ VIGIA implementa:
 - **WORM enforcement**: `audit_logger.enforce_worm()` aplica `chattr +i`
   (Linux ext4/xfs) al log, haciendolo inmutable a nivel kernel.
 
+### Base Legal para Autenticacion por Hash
+
+Los mecanismos de cadena de custodia de arriba no son solo una decision
+de diseno interna — la autenticacion de evidencia digital por hash es
+practica probatoria reconocida, no solo la logica propia de VIGIA.
+
+- **Estados Unidos — FRE 902(13) y 902(14)** (vigentes desde el 1 de
+  diciembre de 2017): estas reglas permiten la auto-autenticacion de un
+  registro electronico via un "proceso de identificacion digital" — un
+  valor hash — sin requerir testimonio pericial de base en el juicio. Una
+  coincidencia de hash entre un original y una copia se acepta como
+  autenticacion de que el dato es el que dice ser.
+- **Argentina**: no hay un articulo unico codificado equivalente a la
+  902(14). El equivalente existe como doctrina y jurisprudencia: el hash
+  se trata como huella digital — si no cambia, evidencia que contenido,
+  fecha de creacion y cadena de custodia se preservaron. La cadena de
+  custodia digital suele describirse en tres fases: obtencion,
+  incorporacion al proceso, y valoracion. La alteracion de metadatos o
+  una cadena de custodia rota tipicamente derivan en exclusion
+  probatoria por falta de confiabilidad.
+
+**Nota de alcance:** este precedente cubre autenticacion por hash de la
+integridad — es lo que respalda el SHA-256 atomico de `read_evidence` y
+el audit log encadenado con HMAC de arriba. No cubre, en ninguna de las
+dos jurisdicciones, pruebas de conocimiento cero (ZK) u otros sistemas de
+prueba criptografica como metodo de autenticacion; eso sigue siendo
+derecho no asentado. No presentar mecanismos basados en ZK en otra parte
+de este proyecto como si tuvieran el mismo respaldo legal que los
+mecanismos de cadena de hash descriptos en esta seccion.
+
 ### Requisito 3: Operador Humano Cualificado
 
 **Daubert exige** que la tecnica sea aplicada por un profesional competente.
