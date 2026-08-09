@@ -919,6 +919,8 @@ example (N=1/2) lives in "Accuracy by Mode", not here.*
 | L-049 | Spoofable-type flood saturates to MALICE (R4-3) | vigia_scorer.py | Mitigated (B-091 tail decay + gate v2; mobile-band residual closed by B-092) |
 | L-050 | Non-finite fail-closed on value/z_score/confidence × 4 impls | ebs_v1.py, signal_contract.py | **RESOLVED** (B-083/B-083b) |
 | L-071 | Cross-domain gate counts domain presence, not mass (1 near-zero artifact pivots SUSPICION→MALICE) | vigia_scorer.py B-068 gate | [OPEN] — calibration doctrine; refinement of the B-092 residual |
+| L-072 | `semantic_role` declared label neutralizes MALICE (37/52 corpus cases, label alone) | vigia_scorer.py D1 block | [OPEN] — doctrine; extends L-054, sibling of L-065/L-070 |
+| L-073 | Threshold compares `_dround` float vs `Fraction`; exact grid point grants higher rung | vigia_scorer.py verdict ladder | [OPEN] — latent, zero corpus incidence |
 | L-067 | §9.4-LIM: SUSPICION doctrinal ceiling for D3-only macOS/mobile (sealed 2026-07-10; renumbered from second L-051 on 2026-07-23) | sift_orchestrator.py verdict_ceiling | Sealed doctrine |
 | L-051 | Formal specification of arbitration contract (Axiom A1) — renumbered from shared L-029 | Scoring/CAIE precedence | [OPEN] — design gap, not a bug |
 | L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
@@ -3239,5 +3241,112 @@ the B-091/B-092 precedent.
 **Tests:** `tests/test_l071_cross_domain_pivot.py` — characterization only. They pin
 the measured behavior so a future recalibration is deliberate and visible; they do
 **not** assert the behavior is correct.
+
+---
+
+## L-072 — `semantic_role` is a DECLARED input with verdict authority; a label alone neutralizes MALICE [OPEN]
+
+**Affects:** `vigia_scorer.py::_vigia_score` (D1 exculpatory/Eco block) |
+**Status:** [OPEN] 2026-08-09, POST HACKATHON — doctrine decision pending. Sibling
+of L-065 (declared chain length) and L-070 (case-JSON fields carrying verdict
+authority). **Extends L-054**, whose protective rationale does not cover this path.
+**Severity:** Medium-High — verdict-path, false-negative direction
+**Origin:** external audit (DeepSeek), verified against live code. The **attack
+mechanism as stated was refuted**; a simpler and stronger one was confirmed.
+
+**Description:** `_semantic_role(a)` reads `semantic_role` straight from the case
+JSON (default `incriminatory`). Artifacts declared `exculpatory` are removed from
+scoring unless the Eco filter fires on their *text* (`description` +
+`metadata.content_preview`). Nothing verifies the declaration against the
+artifact's own content, type, score, or provenance.
+
+**Measured over the corpus (163 cases scored; 52 emit MALICE/INTENT):**
+
+```
+relabel ALL artifacts exculpatory (LABEL ONLY, original text untouched)
+    -> 37 / 52 MALICE cases lose the MALICE verdict (13 of them to NOISE)
+relabel ALL BUT ONE (strongest first, label only)
+    -> 35 / 52 lose MALICE
+relabel ALL + neutral description text
+    -> 52 / 52 collapse to NOISE, score 0.0000
+```
+
+**Refuted as stated (recorded for provenance):** the audit proposed writing a
+description resembling a honeypot / forensic investigation "to fool the Eco
+filter". That is **backwards**: bait terms make the Eco filter FIRE, which
+**retains** the artifact in scoring. Suppression requires the opposite — a bland
+description — and in 37/52 cases the original text was already bland enough that
+**no text crafting was needed at all**. The real exposure is larger than the one
+reported, and the Eco filter's contribution is partial (it saved 15/52).
+
+**Relation to L-054:** L-054 states the floor doctrine prevents "malicious actors
+from planting exculpatory metadata to suppress alerts", and analyses the case where
+a residual incriminatory artifact remains and the B-028/B-065 floor re-raises it.
+That reasoning does not reach the path measured here: when every device artifact is
+declared exculpatory, `_vigia_score` takes an **early return** emitting
+`NOISE, score 0.0, confidence 0.9` *before* any floor applies. A floor can raise a
+low alert; it cannot restore a MALICE verdict that was never computed.
+
+**Mitigating fact (verified, must be stated):** the suppression is **auditable, not
+silent** — every removed artifact is recorded in `refutation_context.set_aside`, and
+the emitted `reason` names the exculpatory path explicitly. The threat model is a
+corrupt or coerced case author (insider), not an anonymous remote attacker.
+
+**Scope of the measurement (honest bound):** measured at `_vigia_score` level, not
+through the full Mode 1 pipeline. Mode 1's hypothesis-level floors may re-raise some
+downgraded cases to SUSPICION; they cannot restore MALICE.
+
+**Recommendation (record only, not implemented):** treat `semantic_role` as a
+*claim requiring corroboration* rather than an instruction — e.g. require the
+declaration to be consistent with the artifact's evidence class and score before it
+can remove evidence, and/or forbid the total-relabel early return from emitting
+NOISE at confidence 0.9 (ABSTAIN is the honest verdict when the examiner has
+declared the entire evidence set away). Any change here is scoring doctrine and
+requires the full corpus gate.
+
+**Tests:** `tests/test_l072_declared_inputs_and_threshold_edge.py` — characterization.
+
+---
+
+## L-073 — Verdict thresholds compare a `_dround` float against a `Fraction`; the exact grid point grants the higher rung [OPEN]
+
+**Affects:** `vigia_scorer.py::_vigia_score` verdict ladder |
+**Status:** [OPEN] 2026-08-09 — latent edge, **zero corpus incidence measured**.
+**Severity:** Low — exactness/boundary, anti-conservative direction
+**Origin:** external audit (DeepSeek). **Direction of the finding was inverted.**
+
+**Description:** the ladder evaluates `final_score > Fraction(33, 100)` (likewise
+`10/100`, `8/100`, and the `0.65` single-artifact cap). `final_score` is a float
+from `_dround(..., 4)`, i.e. always a 4-decimal grid point — and `0.3300` is such a
+point. Python compares `float` against `Fraction` **exactly**, so the outcome depends
+on which side of the rational the nearest double falls.
+
+Measured: for all four thresholds the nearest double sits **above** the exact
+rational (`float(0.33) − 33/100 = 7/450359962737049600 > 0`). A score landing exactly
+on the threshold therefore satisfies a **strictly-greater** test that exact decimal
+arithmetic would fail — the case is promoted one rung.
+
+**Refuted as stated:** the audit claimed a false **negative** (a MALICE case demoted
+to SUSPICION by rounding down). The bias runs the other way. Its concrete example is
+also self-defeating: with a strict `>`, `Fraction(33,100)` is not MALICE under exact
+arithmetic either, so there is nothing to lose.
+
+**Not a determinism violation:** `_dround` yields the same double on every platform;
+Invariant 4 (`Fraction`/`Decimal` determinism) is intact. This is boundary exactness,
+not cross-platform divergence.
+
+**Reachability (measured):** across 163 corpus cases, **zero** land on or within two
+grid steps of any threshold. The defect is latent, not active — a crafted case could
+target it.
+
+**Adjacent latent hazard (recorded, not active):** `_dround` returns `0.0` for any
+argument that is not `int`/`float`, so a `Fraction` or `Decimal` reaching it would be
+silently zeroed rather than raising. Probed over 80 corpus cases: only `float`
+arguments occur (4449 calls), so the path is currently unreachable — but the guard
+fails silent in a module that uses both `Fraction` and `Decimal`.
+
+**Recommendation (record only):** keep the ladder in exact arithmetic end-to-end
+(compare `Fraction` against `Fraction`), or state the threshold semantics as
+"≥ next grid step" so the emitted rule matches the emitted verdict.
 
 ---
