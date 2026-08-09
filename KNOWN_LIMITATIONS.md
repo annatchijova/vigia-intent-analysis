@@ -918,6 +918,7 @@ example (N=1/2) lives in "Accuracy by Mode", not here.*
 | L-048 | Tool-log chain tail truncation (chain_tip_sha256) | core/tool_log_chain.py | **RESOLVED** (R3-5) |
 | L-049 | Spoofable-type flood saturates to MALICE (R4-3) | vigia_scorer.py | Mitigated (B-091 tail decay + gate v2; mobile-band residual closed by B-092) |
 | L-050 | Non-finite fail-closed on value/z_score/confidence × 4 impls | ebs_v1.py, signal_contract.py | **RESOLVED** (B-083/B-083b) |
+| L-071 | Cross-domain gate counts domain presence, not mass (1 near-zero artifact pivots SUSPICION→MALICE) | vigia_scorer.py B-068 gate | [OPEN] — calibration doctrine; refinement of the B-092 residual |
 | L-067 | §9.4-LIM: SUSPICION doctrinal ceiling for D3-only macOS/mobile (sealed 2026-07-10; renumbered from second L-051 on 2026-07-23) | sift_orchestrator.py verdict_ceiling | Sealed doctrine |
 | L-051 | Formal specification of arbitration contract (Axiom A1) — renumbered from shared L-029 | Scoring/CAIE precedence | [OPEN] — design gap, not a bug |
 | L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
@@ -3158,5 +3159,85 @@ tests, pinning the current broken state — they will FAIL the moment someone
 wires a producer or aligns a rule's vocabulary, which is the point) and
 `tests/test_b224_self_correction_docs_are_honest.py` (locks in the corrected
 docstrings/`--help` text against silent drift back to the false claim).
+
+---
+
+## L-071 — Cross-domain corroboration counts domain PRESENCE, not domain MASS [OPEN]
+
+**Affects:** `vigia_scorer.py::_vigia_score`, B-068 corroboration gate (R4-3 v2),
+cross-domain branch |
+**Status:** [OPEN] 2026-08-09, POST HACKATHON — calibration-doctrine question,
+deliberately **not** silently patched (same posture as L-049). Refinement of the
+B-092 residual ("a D3+D4 mix still opens the cross-domain branch").
+**Severity:** Medium — invariant/semantic (verdict-path)
+**Origin:** external audit (DeepSeek), verified against live code. The finding **as
+stated** was refuted; a different mechanism was confirmed — see "Refuted as stated".
+
+**Description:** the cross-domain branch opens on
+`_n_domains >= 2 AND (_n_gate_arts >= 4 OR len(_gate_types) >= 3)`. `_n_domains`
+is `len(set(_dom_arts))` — the count of *distinct collection domains represented*.
+A domain is "represented" by any artifact whose `adjusted_score > _M2_MIN_SIGNAL_ADJ`,
+and that constant is **exactly `0.0`** (strict `>`). Consequently a **single artifact
+of arbitrarily small positive evidential value** constitutes a full corroborating
+domain, and can flip a verdict that the gate had otherwise correctly capped.
+
+**Measured (`tests/test_l071_cross_domain_pivot.py`):**
+
+```
+ 16× D3 filesystem_metadata (1 domain)             → SUSPICION  0.5888
+   + 1× network_flow raw=0.01                      → MALICE     0.6152
+   + 1× network_flow raw=0.001                     → MALICE     0.6145
+   + 1× log_entry    raw=0.001                     → MALICE     0.6145
+   + 1× network_flow raw=0.0    (control)          → SUSPICION  0.5888
+```
+
+The pivot moves the **score** by +0.026 and the **verdict** by a full rung. The
+verdict change is therefore not carried by evidential mass; it is carried by the
+cardinality of a label. `raw_score=0.0` correctly does not corroborate — `0.0` is
+the only excluded value.
+
+**Refuted as stated (recorded for provenance):** the audit asserted that "Noisy-OR
+lets the hard domain be *activated* by the quantity of soft noise". This is **false**
+in this code: `r43_domain_scores` is computed per domain over that domain's own
+indices only (`_by_domain`), so soft artifacts contribute zero mass to a hard
+domain's score. The audit also assumed `caie.py::_SOURCE_MATERIALITY_FLOOR = 0.05`
+would exclude a `raw_score=0.01` artifact. That floor is in a **different module**
+and governs CAIE's own `independent_sources` / `confidence_penalty`; it has no
+authority over the scorer's B-068 gate, whose floor is `_M2_MIN_SIGNAL_ADJ = 0.0`.
+
+**Why the two obvious fixes are refuted by the corpus (measured, not assumed):**
+
+1. *Raise the per-artifact floor above 0.* Already measured and rejected in the
+   `_M2_MIN_SIGNAL_ADJ` calibration note (`vigia_scorer.py` ~L145, Round 2.1):
+   canonical MALICE cases corroborate with artifacts at adjusted **0.0017–0.002**,
+   while excluding the VIGIA-CAN-029 diluent needs **> 0.013** — an empty interval.
+   The pivot at `raw=0.01` lands *inside* that empty interval, so no corpus-compatible
+   per-artifact floor excludes it.
+2. *Require ≥2 artifacts per counted domain.* Refuted by the corpus: a large share of
+   canonical MALICE cases open this branch with reasons of the form
+   `cross-domain (4 domains, 4 artifacts)` / `(3 domains, 4 artifacts)` — i.e. by
+   pigeonhole, legitimate canonical cases rely on domains represented by **exactly one**
+   artifact. A count floor would flip them.
+
+**Forensic implication:** a party able to introduce one throwaway artifact of a
+second collection domain — at a `raw_score` low enough to attract no scrutiny — can
+convert a gate-capped SUSPICION into a sealed MALICE. Treat MALICE verdicts whose
+`reason` cites the cross-domain branch as requiring the corroborating domain's own
+mass to be inspected, not merely its presence.
+
+**Recommendation (record only, not implemented):** the gate should consult
+`r43_domain_scores`, which `_vigia_score` **already computes** (~L1149) and currently
+uses only for traceability — requiring the corroborating domain's own Noisy-OR score
+to clear a floor tests domain *mass* rather than domain *presence*, and is immune to
+both refutations above (it is neither a per-artifact floor nor a per-domain count).
+This mirrors the doctrine CAIE already adopted for the same bug class in its own
+corroboration count (`_SOURCE_MATERIALITY_FLOOR`, "a group only counts toward
+independent_sources if some member's raw_score reaches this floor"). Any such change
+is a scoring-semantics change and requires the full 199-case comparative gate, per
+the B-091/B-092 precedent.
+
+**Tests:** `tests/test_l071_cross_domain_pivot.py` — characterization only. They pin
+the measured behavior so a future recalibration is deliberate and visible; they do
+**not** assert the behavior is correct.
 
 ---

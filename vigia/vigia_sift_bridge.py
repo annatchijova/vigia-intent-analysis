@@ -1089,6 +1089,15 @@ async def _quarantine_malformed_evidence(
                     sha.update(chunk)
                     dst.write(chunk)
                     total_bytes += len(chunk)
+                # Sellado 0o400 SOBRE EL DESCRIPTOR, no sobre el nombre.
+                # os.chmod(path) resuelve el nombre y SIGUE symlinks: si un
+                # atacante local sustituye el temporal por un symlink despues
+                # del chequeo islink() de mas abajo (check-by-name clasico),
+                # un chmod por ruta aplicaria 0o400 al objetivo del symlink —
+                # un archivo arbitrario del uid propietario. fchmod actua
+                # sobre el inodo que realmente escribimos, sin ventana.
+                dst.flush()
+                os.fchmod(dst.fileno(), 0o400)
         finally:
             if fd_src >= 0:
                 os.close(fd_src)
@@ -1116,8 +1125,10 @@ async def _quarantine_malformed_evidence(
         # Renombrar al hash final — nombre canonico en el Purgatorio
         final_path = os.path.join(_PURGATORY_DIR, f"{raw_hash}.raw")
         os.rename(purgatory_tmp, final_path)
-        # 0o400: owner read-only — inmutable post-escritura
-        os.chmod(final_path, 0o400)
+        # El modo 0o400 (owner read-only, inmutable post-escritura) ya fue
+        # sellado con fchmod() sobre el descriptor antes del cierre — no se
+        # re-aplica por ruta aqui para no reintroducir la ventana chmod-sigue-
+        # symlink que el fchmod cierra.
         purgatory_path = final_path
 
     # Estado del timeout — se determina en el except
