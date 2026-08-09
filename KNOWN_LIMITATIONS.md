@@ -2969,6 +2969,12 @@ declared SU claim cannot add to a live CAIE fracture boost.
 **Mode affected:** all modes (`vigia_scorer._vigia_score` epc_factor path; CAIE `add_artifact` len<2 decay).**
 **Discovered:** 2026-07-18 pattern hunt (T-3), characterized in `tests/characterization/test_verdict_authority_inputs.py`.
 **Severity class:** integrity/contract gap (P2-class, sibling of L-062).
+**Layering question answered (2026-08-09, `docs/DEEPSEEK_AUDIT_20260809.md`):** no,
+this is not verified in another layer. `ChainOfCustody`
+(`vigia/core/chain_of_custody.py`) exists and is threaded through the SIFT
+analyzers, but always as `Optional[...] = None`, and nothing connects an
+instance of it to the scorer's `provenance_chain` field. The skeleton is real;
+it is not wired to the trust computation.
 
 ### Description
 
@@ -3174,6 +3180,7 @@ B-092 residual ("a D3+D4 mix still opens the cross-domain branch").
 **Severity:** Medium — invariant/semantic (verdict-path)
 **Origin:** external audit (DeepSeek), verified against live code. The finding **as
 stated** was refuted; a different mechanism was confirmed — see "Refuted as stated".
+**Document:** `docs/DEEPSEEK_AUDIT_20260809.md` (Finding 2).
 
 **Description:** the cross-domain branch opens on
 `_n_domains >= 2 AND (_n_gate_arts >= 4 OR len(_gate_types) >= 3)`. `_n_domains`
@@ -3253,6 +3260,7 @@ authority). **Extends L-054**, whose protective rationale does not cover this pa
 **Severity:** Medium-High — verdict-path, false-negative direction
 **Origin:** external audit (DeepSeek), verified against live code. The **attack
 mechanism as stated was refuted**; a simpler and stronger one was confirmed.
+**Document:** `docs/DEEPSEEK_AUDIT_20260809.md` (Finding 5).
 
 **Description:** `_semantic_role(a)` reads `semantic_role` straight from the case
 JSON (default `incriminatory`). Artifacts declared `exculpatory` are removed from
@@ -3314,6 +3322,7 @@ requires the full corpus gate.
 **Status:** [OPEN] 2026-08-09 — latent edge, **zero corpus incidence measured**.
 **Severity:** Low — exactness/boundary, anti-conservative direction
 **Origin:** external audit (DeepSeek). **Direction of the finding was inverted.**
+**Document:** `docs/DEEPSEEK_AUDIT_20260809.md` (Finding 4).
 
 **Description:** the ladder evaluates `final_score > Fraction(33, 100)` (likewise
 `10/100`, `8/100`, and the `0.65` single-artifact cap). `final_score` is a float

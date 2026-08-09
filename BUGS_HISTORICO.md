@@ -3070,6 +3070,51 @@ no B-225; queda anotada en el propio test.
 
 ---
 
+## B-226 — Purgatorio forense: sellado 0o400 por chmod-sobre-nombre seguía symlinks post-rename [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO 2026-08-09 |
+| **Severidad** | Baja — requiere el uid propietario (`_PURGATORY_DIR` es 0o700), así que no hay atacante remoto sin acceso local previo. La propiedad violada (sellado sobre el inodo escrito, no sobre un nombre resoluble) sí es de interés Daubert: un chmod-por-ruta post-rename puede aplicar el modo a un archivo distinto del que se escribió. |
+| **Archivo** | `vigia/vigia_sift_bridge.py` (`_quarantine_malformed_evidence`) |
+| **Detectado en** | Auditoría externa (DeepSeek), verificada contra el código vivo — `docs/DEEPSEEK_AUDIT_20260809.md` (Hallazgo 1). El mecanismo TOCTOU tal como fue enunciado por la auditoría (symlink entre `mkstemp()` y la apertura del FD) fue REFUTADO — `mkstemp()` devuelve `(fd, path)` de un solo syscall con `O_CREAT\|O_EXCL`, sin ventana posible. El residuo real se encontró al verificar esa premisa. |
+| **Tests** | `tests/test_purgatory_fd_sealing.py` (15) |
+
+### Descripción
+
+`os.rename(purgatory_tmp, final_path)` iba seguido de
+`os.chmod(final_path, 0o400)`. `chmod` por **ruta** resuelve el nombre y
+**sigue symlinks**, mientras el `os.path.islink()` que lo precedía es un
+chequeo por **nombre**. Un atacante con acceso de escritura a
+`_PURGATORY_DIR` podía sustituir el temporal por un symlink **después** de
+ese chequeo, y el `chmod` subsiguiente aplicaría `0o400` a un archivo
+arbitrario del uid propietario en vez de al archivo de cuarentena.
+
+Demostrado de forma aislada (`tests/test_purgatory_fd_sealing.py`):
+
+```python
+os.symlink(victim, link)
+os.chmod(link, 0o400)          # sigue el symlink
+os.lstat(victim).st_mode       # 0o400 — la VÍCTIMA quedó sellada, no el link
+```
+
+### Fix
+
+El sellado `0o400` ahora se aplica con `os.fchmod(dst.fileno(), 0o400)`
+**sobre el descriptor que realmente se escribió**, antes de cerrarlo — no
+hay resolución de nombre involucrada, así que no hay ventana. Se eliminó el
+`os.chmod(final_path, ...)` posterior al rename: reintroducirlo reabriría
+exactamente la ventana que `fchmod` cierra.
+
+### Impacto en el corpus
+
+Ninguno — cambio de mecanismo de sellado en la ruta de cuarentena de
+evidencia malformada, no en el pipeline de scoring. Suite completa antes/después:
+21 fallos preexistentes (dependencias opcionales ausentes: `psutil`,
+`fastapi`) en ambos casos, cero nuevos.
+
+---
+
 ## B-053 — shim: un pcap corrupto abortaba el caso COMPLETO (T-3) [RESUELTO]
 
 | Campo | Valor |

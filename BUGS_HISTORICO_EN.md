@@ -3345,6 +3345,51 @@ drift, not B-225; it is noted in the test itself.
 
 ---
 
+## B-226 — Forensic Purgatory: 0o400 chmod-by-name seal followed symlinks post-rename [RESOLVED]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED 2026-08-09 |
+| **Severity** | Low — requires the owning uid (`_PURGATORY_DIR` is `0o700`), so there is no remote attacker without prior local access. The violated property (sealing the written inode, not a resolvable name) is still Daubert-relevant: a post-rename path-based chmod can apply the mode to a different file than the one written. |
+| **File** | `vigia/vigia_sift_bridge.py` (`_quarantine_malformed_evidence`) |
+| **Detected in** | External audit (DeepSeek), verified against live code — `docs/DEEPSEEK_AUDIT_20260809.md` (Finding 1). The TOCTOU mechanism as stated by the audit (symlink race between `mkstemp()` and opening the FD) was REFUTED — `mkstemp()` returns `(fd, path)` from one syscall with `O_CREAT\|O_EXCL`, so no such window can exist. The real residual was found while verifying that premise. |
+| **Tests** | `tests/test_purgatory_fd_sealing.py` (15) |
+
+### Description
+
+`os.rename(purgatory_tmp, final_path)` was followed by
+`os.chmod(final_path, 0o400)`. `chmod` by **path** resolves the name and
+**follows symlinks**, while the `os.path.islink()` check preceding it is a
+check-by-**name**. An attacker with write access to `_PURGATORY_DIR` could
+swap the temp file for a symlink **after** that check, and the subsequent
+`chmod` would apply `0o400` to an arbitrary file of the owning uid instead of
+the quarantine file.
+
+Demonstrated in isolation (`tests/test_purgatory_fd_sealing.py`):
+
+```python
+os.symlink(victim, link)
+os.chmod(link, 0o400)          # follows the symlink
+os.lstat(victim).st_mode       # 0o400 — the VICTIM was sealed, not the link
+```
+
+### Fix
+
+The `0o400` seal is now applied with `os.fchmod(dst.fileno(), 0o400)` **on the
+descriptor that was actually written**, before it is closed — no name
+resolution is involved, so no window exists. The post-rename
+`os.chmod(final_path, ...)` was removed: re-adding it would reopen exactly the
+window `fchmod` closes.
+
+### Corpus impact
+
+None — this changes the sealing mechanism on the malformed-evidence
+quarantine path, not the scoring pipeline. Full suite before/after: 21
+pre-existing failures (missing optional deps: `psutil`, `fastapi`) in both,
+zero new.
+
+---
+
 ## B-053 — shim: a corrupt pcap aborted the ENTIRE case (T-3) [RESOLVED]
 
 | Field | Value |
