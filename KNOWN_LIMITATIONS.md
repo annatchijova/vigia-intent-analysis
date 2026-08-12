@@ -1831,10 +1831,11 @@ value over a single evtx.
 
 ## L-045 — `mcp` not installable in minimal CI environments (PyJWT conflict) [DOCUMENTED]
 
-**Affects:** `requirements-ci.txt`, `tests/e2e/test_integration_end_to_end.py`,
-`vigia/tests/adversarial/test_human_jitter_deterministic_bypass.py` |
+**Affects:** `requirements-ci.txt`, and every test module that imports
+`vigia.vigia_sift_bridge` at module scope (11 as of 2026-08-12) |
 **Status:** documented CI limitation (Fase 0, finding S-1 of
-`docs/PLAN_ABDUCTIVO_PENDIENTES_20260705.md`)
+`docs/PLAN_ABDUCTIVO_PENDIENTES_20260705.md`); scope and consequence
+corrected 2026-08-12 — see "Correction" below
 
 **Description:** the `mcp` package (required by the two e2e/adversarial test
 modules that exercise the MCP bridge) cannot be installed in environments
@@ -1844,9 +1845,76 @@ where `PyJWT` was provisioned by the system package manager (e.g. Debian):
 `requirements-ci.txt` deliberately; it remains in `requirements.txt` and
 `pyproject.toml` for full installs.
 
-**Consequence:** in a minimal CI environment (requirements-ci only), those two
-test modules do not collect. This is an infrastructure gap, not a forensic
-one — no verdict-path code depends on `mcp`.
+**Consequence:** in a minimal CI environment (requirements-ci only), the test
+modules that import the bridge do not collect. This is an infrastructure gap,
+not a forensic one — no verdict-path code depends on `mcp`.
+
+**Correction 2026-08-12 — the scope and the consequence above were both
+understated.** Two facts, measured on the live tree before anything was
+changed:
+
+1. *Scope.* The "Affects" list named two modules. Eleven import the bridge at
+   module scope. Six already carried the `pytest.importorskip("mcp")` guard —
+   `tests/test_mount_magic_bytes.py`, `tests/test_mcp_confused_deputy.py`,
+   `tests/test_mcp_transport_auth_theater.py`,
+   `tests/test_kassandra_salt_enforcement.py`,
+   `tests/test_grupob_b9_honey_token_lifecycle.py`, and
+   `vigia/tests/adversarial/test_human_jitter_deterministic_bypass.py`. That
+   last one is named in the original "Affects" list as broken; it had been
+   guarded at some point without this entry being updated.
+
+   Five did not: `tests/e2e/test_integration_end_to_end.py` (the other module
+   the original list named) and the four added after this entry was written —
+   `tests/test_b122_universal_tool_invoked_audit.py`,
+   `tests/test_b164_mcp_mount_root.py`,
+   `tests/test_b169_mcp_invocation_audit.py`, and
+   `tests/test_b173_bridge_work_root.py`. The convention existed; it was
+   simply not carried forward.
+
+2. *Consequence.* "Those modules do not collect" implies the rest of the suite
+   runs. It does not. A collection error is not a skip: pytest aborts the
+   session (`Interrupted: N errors during collection`) and executes **zero
+   tests**. Measured in a container built from `requirements-ci.txt` alone,
+   the authoritative full-suite command in `CLAUDE.md` collected 2352 tests,
+   reported 4 errors, and ran none of them. Anyone verifying this repository
+   from the documented minimal environment — including a third party
+   reproducing the forensic claims — saw a red suite with no signal in it.
+
+**Fix applied:** all thirteen guards in the suite now read
+`pytest.importorskip("mcp.server.fastmcp")` — the five modules that carried no
+guard at all, and the eight that named the bare `mcp` distribution rather than
+the subpackage `vigia_sift_bridge.py:49` actually imports. The distinction is
+not cosmetic: `mcp` 2.0.0 removed `mcp.server.fastmcp`, so a guard on the bare
+name passes while the bridge import still fails, reproducing the abort by a
+second route. Suite in the minimal environment: 2127 passed, 209 skipped, 28
+xfailed, 0 errors, 0 failed.
+
+Retargeting the guard fixes the abort but would let a genuinely broken install
+hide behind a wall of green skips, so the two states are deliberately
+separated: absent `mcp` skips (this entry's documented state), while an `mcp`
+that is installed but missing the subpackage fails loudly and specifically in
+`tests/test_mcp_dependency_contract.py` without taking the session down.
+Measured: minimal env 2127 passed / 0 failed; `mcp` 1.29.0 → 2237 passed / 0
+failed (the 110-test delta is the MCP surface genuinely running, which is what
+rules out over-skipping); `mcp` 2.0.0 → 2127 passed / 1 failed naming the
+cause.
+
+One of the repaired failures was a false pass rather than a plain error:
+`test_b173_rejects_work_root_nested_in_evidence` asserts that importing the
+bridge with `VIGIA_WORK_DIR` nested inside evidence exits non-zero. Without
+`mcp`, the import exits non-zero because `mcp` is missing, so that assertion
+passed for a reason unrelated to the rejection it exists to prove. It failed
+only on the subsequent stderr check. A module-level skip removes the
+ambiguity.
+
+**Guard:** `tests/test_minimal_ci_collects_without_errors.py` runs the real
+collection in a child interpreter with the allowlisted distributions forced
+unimportable, and fails if the session reports any collection error. It is
+environment-independent — it holds whether or not `mcp` is installed on the
+machine running it — and it checks the outcome that matters (the suite
+collects) rather than a syntactic proxy for it (a module contains an
+`importorskip` line). It carries a control test that fails if the blocker ever
+stops taking effect.
 
 **Guard:** `tests/test_requirements_ci_contract.py` enforces that every other
 third-party import reachable from `tests/` and `vigia/tests/` is covered by
@@ -1857,7 +1925,19 @@ of the drift class: defusedxml/T-2 in B-017, then psutil and pytest-cov —
 both reproduced 2026-07-05).
 
 **Workaround for full local runs:** `pip install --ignore-installed PyJWT`
-first (gives pip a RECORD to manage), then `pip install mcp`.
+first (gives pip a RECORD to manage), then `pip install "mcp<2"`.
+
+The version bound is not optional, and this line said plain `pip install mcp`
+until 2026-08-12. `mcp` 2.0.0 removed the `mcp.server.fastmcp` subpackage that
+`vigia/vigia_sift_bridge.py:49` imports, so the unbounded command installs a
+version under which the bridge cannot import at all — following this
+workaround verbatim produced a broken MCP surface, not a working one.
+Installing the full `requirements.txt` was never affected: `fastmcp` pulls
+`mcp<2` transitively. That transitive constraint is now also declared directly
+in `requirements.txt` and `pyproject.toml`, and pinned by
+`tests/test_mcp_dependency_contract.py` — no module in this repository imports
+`fastmcp`, so relying on it to bound `mcp` was one vestigial-dependency
+cleanup away from breaking Modes 2 and 5 silently.
 
 ---
 
