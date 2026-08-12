@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+pytest.importorskip("mcp.server.fastmcp")
+
 import vigia.vigia_sift_bridge as bridge
 
 

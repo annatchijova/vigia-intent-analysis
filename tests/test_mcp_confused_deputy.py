@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import pytest
 
-pytest.importorskip("mcp")
+pytest.importorskip("mcp.server.fastmcp")
 
 import vigia.vigia_sift_bridge as bridge
 import vigia.tools.vigia_planner as planner

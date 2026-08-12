@@ -14,6 +14,13 @@ from pathlib import Path
 
 import pytest
 
+# Without the bridge's MCP dependency the import fails, in-process and in the
+# child processes ``_import_bridge`` spawns.  Skipping the module is the honest
+# outcome: otherwise ``test_b173_rejects_work_root_nested_in_evidence`` observes
+# a non-zero returncode caused by the missing import rather than by the
+# rejection it is meant to prove.
+pytest.importorskip("mcp.server.fastmcp")
+
 REPO = Path(__file__).resolve().parent.parent
 
 

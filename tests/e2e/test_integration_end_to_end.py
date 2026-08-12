@@ -21,6 +21,8 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+pytest.importorskip("mcp.server.fastmcp")
+
 # Patch EVIDENCE_BASE_DIR before importing the bridge
 os.environ.setdefault("VIGIA_EVIDENCE_DIR", "/tmp/vigia_test_evidence")
 os.makedirs("/tmp/vigia_test_evidence", exist_ok=True)

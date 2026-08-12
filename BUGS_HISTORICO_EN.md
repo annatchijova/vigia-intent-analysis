@@ -9952,3 +9952,158 @@ allowlist updated: removed the `generate_execution_log.py` exception (no
 longer contains the stale formula) and added the new test's exception
 (quotes the old formula as historical evidence of the bug, not a live
 claim). Full suite: 2128 passed, 0 failed.
+
+---
+
+## B-227 — The full suite did not run in the documented minimal environment: 5 modules imported the MCP bridge without a guard and aborted the entire pytest session [RESOLVED — Claude 2026-08-12]
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 verifiability. Not a forensic bug — no verdict-path code depends on `mcp` — but it voided the only documented way to verify the repository. |
+| **Files** | `tests/e2e/test_integration_end_to_end.py`, `tests/test_b122_universal_tool_invoked_audit.py`, `tests/test_b164_mcp_mount_root.py`, `tests/test_b169_mcp_invocation_audit.py`, `tests/test_b173_bridge_work_root.py`, `KNOWN_LIMITATIONS.md` (L-045). |
+| **Detected in** | Session 2026-08-12, while measuring the suite baseline in a clean container built from `requirements-ci.txt`. |
+
+### Firstness — what was observed
+
+In an environment built from `requirements-ci.txt` alone, the authoritative
+command in `CLAUDE.md`:
+
+```
+pytest tests/ vigia/tests/ --ignore=tests/integration
+```
+
+returns `Interrupted: 4 errors during collection` and
+`2352 tests collected, 4 errors`. All four errors are the same
+`ModuleNotFoundError: No module named 'mcp'` at
+`vigia/vigia_sift_bridge.py:49`. With `--continue-on-collection-errors`, three
+further failures appear in `tests/test_b173_bridge_work_root.py`, same cause.
+
+### Secondness — the baseline this deviates from
+
+`mcp` is deliberately outside `requirements-ci.txt` (L-045: not installable
+where PyJWT came from the system package manager), and
+`tests/test_requirements_ci_contract.py` declares it the single permitted
+exception. The absence of `mcp` is therefore the *expected* state of the
+minimal environment, not a broken install.
+
+Under that expected state, the repo's own convention is
+`pytest.importorskip("mcp")` before importing the bridge — already applied in
+six sibling modules. Five did not carry it. And a collection error **is not a
+skip**: pytest aborts the session and runs **zero** tests. The consequence was
+not "four modules fail to collect", it was "the entire suite does not run".
+
+### Thirdness — the general rule producing this pattern
+
+The same drift class `test_requirements_ci_contract.py` was written to close
+(defusedxml/B-017, psutil, pytest-cov), one layer down. That test covers the
+*forward* half of the contract: every third-party import reachable from the
+suite is in `requirements-ci.txt`. It did not cover the other half: that a
+*permitted* exception degrades honestly. An allowlisted gap that raises at
+import time is not a documented exception — it is a downed suite with a
+footnote.
+
+All five unguarded modules postdate L-045's authoring. The convention existed;
+nobody carried it forward, and CI never noticed because `pytest.yml` installs
+`requirements.txt`, which does ship `mcp`. The environment documented as
+minimal and the environment actually exercised by CI diverged with no signal.
+
+### One failure was a false positive, not merely an error
+
+`test_b173_rejects_work_root_nested_in_evidence` asserts that importing the
+bridge with `VIGIA_WORK_DIR` nested inside evidence exits non-zero. Without
+`mcp`, the import exits non-zero **because `mcp` is missing** — that assertion
+passed for a reason unrelated to the rejection it exists to prove. It failed
+only on the subsequent stderr check. This is a security test (operational
+state must not nest inside evidence) half-passing for the wrong reason. A
+module-level skip removes the ambiguity.
+
+### Second finding: the guard pointed at the wrong module
+
+Verifying that the fix did not *over-skip* — that with `mcp` present the tests
+actually run again rather than going green by skipping — surfaced something the
+existing convention did not cover. The bridge does not import `mcp`, it imports
+`mcp.server.fastmcp` (line 49). **`mcp` 2.0.0 removed that subpackage**
+(verified against the published wheel: `mcp.server` still ships `lowlevel`,
+`session`, `stdio`, `streamable_http` and others, but no `fastmcp`). With mcp
+2.x installed, `importorskip("mcp")` passes, the bridge import blows up anyway,
+and the session aborts again — same symptom, different cause.
+
+All thirteen guards in the repo (including the six pre-existing ones) named the
+wrong module. They now name `mcp.server.fastmcp`, the real dependency.
+
+### An alarming hypothesis, formulated and REFUTED
+
+That led to a serious hypothesis: `requirements.txt` declared `mcp>=0.1.0` with
+no upper bound, so a clean install today would pull 2.0.0, meaning **Modes 2
+and 5 would not start** and CI's `pytest.yml` job would go down too. It was
+tested before being written up as a finding: clean venv,
+`pip install -r requirements.txt`. It resolved to `mcp 1.29.0`, not 2.0.0,
+because `fastmcp 3.4.7` carries a transitive `mcp<2`. The bridge imports and
+the 32 MCP-surface tests pass. **The hypothesis is false: the documented path
+was never broken.**
+
+What survives is the smaller, honest residual: the constraint holding all of
+this is a **transitive accident**. No module in this repository imports
+`fastmcp`, so a cleanup retiring it as vestigial — or a `fastmcp` release
+relaxing the bound — would break the MCP surface silently, with nothing in the
+repo objecting. And the workaround L-045 itself documents (`pip install mcp`,
+unbounded) does install the broken version today: that instruction was
+effectively down.
+
+### Fix applied
+
+1. `pytest.importorskip("mcp.server.fastmcp")` across all thirteen guards — the
+   five that had none and the eight that named the wrong module.
+2. Declared bound: `mcp>=1.0,<2` in `requirements.txt` and `pyproject.toml`,
+   with the reason in the comment. No longer relies on the transitive accident.
+3. L-045's workaround corrected to `pip install "mcp<2"`.
+
+Zero production-code changes, zero verdict impact.
+
+### Why the guard cannot be the only mechanism
+
+Aiming the guard at the real subpackage fixes the abort, but introduces a new
+risk: with mcp 2.x installed, all eleven bridge modules would skip silently. A
+genuinely broken install would look like a wall of green skips — exactly the
+dishonest degradation §5.3 of `docs/ENGINEERING_DISCIPLINE.md` forbids. The two
+states are not the same failure and must not produce the same outcome:
+
+- `mcp` **absent** → skip. The expected state of the minimal environment (L-045).
+- `mcp` **present but incompatible** → loud, specific failure.
+
+`tests/test_mcp_dependency_contract.py` covers the second case: it fails naming
+the exact cause and version, without taking the session down.
+
+L-045 corrected in `KNOWN_LIMITATIONS.md`: its "Affects" list named two
+modules (one of which had already been repaired without the entry being
+updated) when the real set of module-scope importers is eleven, and its
+"Consequence" said "those two modules do not collect" when the measured
+consequence was that no test ran at all.
+
+### Verified
+
+Red-first: the new guard fails against the unfixed tree (verified by
+`git stash`-ing the fix and running the guard: 1 failed) and passes with it.
+
+All three possible environment states, measured with the full suite:
+
+| State | Result | Before the fix |
+|-------|--------|----------------|
+| `mcp` absent (minimal env) | 2127 passed, 209 skipped, **0 failed** | 0 tests executed (session aborted) |
+| `mcp` 1.29.0 (compatible) | 2237 passed, 191 skipped, **0 failed** | same — was never broken |
+| `mcp` 2.0.0 (incompatible) | 2127 passed, **1 failed** naming the cause | 0 tests executed (session aborted) |
+
+The 110-test difference between rows 1 and 2 is the MCP surface genuinely
+running: it confirms the guards skip when they should and **not** when they
+should not.
+
+Permanent test: `tests/test_minimal_ci_collects_without_errors.py`. It runs
+the real collection in a child interpreter with the allowlisted distributions
+forced unimportable, and fails if the session reports any collection error. It
+is environment-independent — it holds whether or not `mcp` is installed on the
+machine running it — and it checks the property that matters (the suite
+collects) rather than a syntactic proxy for it (that a module contains an
+`importorskip` line). It carries a control test that fails if the blocker ever
+stops taking effect, so it cannot pass for the wrong reason — precisely the
+failure mode this bug exhibited in B-173.
