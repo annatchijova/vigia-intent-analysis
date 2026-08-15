@@ -3190,7 +3190,14 @@ change, not a patch, and is not adopted here.
 
 ---
 
-## L-069 — Mode-1's self-correction loop never actually iterates (B-224) [DOCUMENTED]
+## L-069 — Mode-1's self-correction loop never actually iterates (B-224) [RESOLVED 2026-08-15]
+
+> **Resolved 2026-08-15.** The loop is reachable: `VERDICT_FLIP`'s vocabulary
+> was aligned and `CONTRADICTION_THRESHOLD` lowered 2 → 1. Measured corpus
+> impact: zero — no case moved. **The diagnosis below is preserved as written
+> but was wrong on one point**: rule 3 is not "the only reachable rule", it is
+> unreachable by arithmetic. See "Correction and resolution" at the end of this
+> entry before citing anything above it.
 
 `vigia_agent.py`'s `ContradictionDetector.detect()` implements 4 rules. 3 of
 them read fields no Mode-1 producer ever writes: `ENTROPY_VS_BEHAVIORAL` and
@@ -3247,6 +3254,83 @@ tests, pinning the current broken state — they will FAIL the moment someone
 wires a producer or aligns a rule's vocabulary, which is the point) and
 `tests/test_b224_self_correction_docs_are_honest.py` (locks in the corrected
 docstrings/`--help` text against silent drift back to the false claim).
+
+### Correction and resolution (2026-08-15)
+
+**The entry above named the wrong survivor.** It records
+`CONFIDENCE_COLLAPSE` (rule 3) as "the only reachable rule", contributing at
+most 1 contradiction. Rule 3 is in fact **unreachable through
+`_detect_and_correct` on both of its MCA branches**, and unreachable by
+arithmetic rather than by a missing producer:
+
+`_detect_and_correct` derives `mca_score` as the mean of the very confidences
+rule 3 then thresholds on. The rule requires `mca > 6/10` while more than
+`7/10` of the terms are `< 3/10`. With `k/n > 7/10` the mean is bounded above
+by `1 − 7/10·(k/n) < 51/100`, which can never exceed `6/10`. Confirmed three
+ways: the algebraic bound, an exhaustive search over a 1/20 confidence lattice
+up to 7 signals (1,184,039 combinations, no counterexample), and the z-score
+fallback branch — which is taken only when no signal carries a `confidence`
+key, in which case rule 3's own `.get("confidence", 1)` default makes the
+low-confidence count 0. Rule 3 fires only against an aggregator that is *not*
+the plain mean of these confidences; no caller supplies one.
+
+So the reachable maximum was 1 before the fix and the surviving rule was
+**rule 4, not rule 3** — which changes the fix. The entry's own reasoning
+("reviving a single rule alone would not even help: the reachable maximum
+stays at 1, still below threshold 2") turns out to apply to the vocabulary
+alignment as well: fixing `VERDICT_FLIP` without touching the threshold would
+have left the loop exactly as inert.
+
+**Applied.** The three coupled decisions the entry left open, taken together:
+
+1. **`VERDICT_FLIP` aligned.** New module constant `BENIGN_HYPOTHESES`
+   (`BENIGN`, `NO_ANOMALY_DETECTED`, `NO_SEMIOTIC_ANOMALY_DETECTED`) replaces
+   the bare `"BENIGN"` literal. `"BENIGN"` is retained because
+   `vigia/verdict/quadripartite.py` and the integration bridges do emit it.
+   Rule 4 is now live and is the only live rule.
+2. **`CONTRADICTION_THRESHOLD` 2 → 1.** Required, per the arithmetic above.
+   This does **not** weaken the two-independent-source bar the verdict scale
+   applies to INTENT/MALICE: rule 4 already requires `len(critical_signals)
+   >= 2` inside its own predicate, so the two-source requirement moved into
+   the rule instead of being counted across rules.
+3. **Rules 1 and 2 left dormant, deliberately, and now reported.** Neither
+   was cosmetically re-keyed. Rule 1 was *not* re-pointed at `source`: that
+   field holds collection tools (`sift_netflow`, `Plaso/WinEVT`, …), not the
+   analytic module names the rule compares, so a rename would have made it
+   look wired while still never matching — it needs a producer. Rule 2 has no
+   producer for `technical_result` anywhere in the repository. Both, plus
+   rule 3, are now emitted per run in the audit trail's `rules_not_evaluable`,
+   so "no contradictions" is distinguishable from "could not check" (honest
+   degradation).
+
+**Corpus impact: ZERO.** All 21 cases under `cases/input/` re-run against the
+patched agent: no verdict changed, no correction applied, every case still
+converges in 1 iteration. No signal anywhere in the corpus exceeds `|z| > 3`,
+which is why rule 4 stays quiet on real data — the loop is now reachable and
+dormant, not reachable and active. `self_corrections_applied = 0` remains the
+honest observed value; what changed is that it is no longer the *only
+possible* value.
+
+Reachability is proven end-to-end instead of asserted:
+`test_self_correction_applies_end_to_end` drives a synthetic Mode-1-shaped
+input through `_detect_and_correct` and asserts the verdict is actually
+rewritten (`NO_SEMIOTIC_ANOMALY_DETECTED` →
+`MALICIOUS_INTENT_SUSPECTED [OVERRIDE: …]`).
+
+**This also closes B-151(b)**, whose remaining blocker was this one. The
+chained `contradiction_detector` event CLAUDE.md mandates was already wired
+in `vigia/core/reasoning_trace.py`; it had no input. New test
+`tests/test_b151b_contradiction_chain_emitted.py` drives detector → correction
+→ sealed trace and asserts the chained entry appears with its full schema and
+bundle-level tail anchor.
+
+Tests updated to pin the new state rather than the old:
+`tests/test_b224_contradiction_detector_dormancy.py` (17 tests — including the
+arithmetic proof for rule 3 and a `CONTRADICTION_THRESHOLD == 1` pin, so the
+coupled decision cannot drift back silently) and
+`tests/test_b224_self_correction_docs_are_honest.py` (13 tests — the risk
+inverted from overclaiming to stale under-claiming, and both directions are
+now guarded). Full suite after the change: 2138 passed, 0 failed.
 
 ---
 
