@@ -9,12 +9,16 @@
 # Agentic loop for SANS FIND EVIL Hackathon 2026.
 #
 # Architecture: Custom MCP Server pattern (architectural guardrails, not prompt-based).
-# Self-correction (designed, structurally inert — B-224, L-069, see
-# KNOWN_LIMITATIONS.md): ContradictionDetector.detect() implements 4 rules;
-# 3 of 4 read fields no producer in this Mode-1 path ever writes, so they
-# never fire, and the one reachable rule caps at 1 contradiction against a
-# threshold of 2 — CorrectionEngine is architecturally unreachable, not
-# merely quiet on this corpus. Distinct from vigia_scorer.py's Daubert
+# Self-correction (reachable, dormant on the current corpus — B-224, L-069,
+# see KNOWN_LIMITATIONS.md): ContradictionDetector.detect() implements 4
+# rules; only VERDICT_FLIP is live. Two lack a producer and one
+# (CONFIDENCE_COLLAPSE) is unsatisfiable by arithmetic; all three are
+# reported per-run in the audit trail's rules_not_evaluable. Reachable
+# maximum is 1 against a threshold of 1, so CorrectionEngine can fire —
+# before B-224 the maximum was 1 against a threshold of 2 and it could not
+# fire for any possible input. No case in the 21-case corpus produces even
+# one contradiction, so the loop is quiet here, not dead. Distinct from
+# vigia_scorer.py's Daubert
 # Corroboration Gate (Mode 2/API path, imported by vigia_api.py /
 # sift_orchestrator.py), which IS live and does gate pre-emission — that
 # gate is unrelated to this loop and unaffected by this note.
@@ -59,8 +63,29 @@ logger = logging.getLogger("vigia-agent")
 # ── Agent constants ──────────────────────────────────────────────────────────
 AGENT_VERSION = "1.0.0-SANS-2026"
 MAX_ITERATIONS = 3                    # Hard cap — prevents infinite loops
-CONTRADICTION_THRESHOLD = 2           # int: minimum contradictions to trigger re-analysis
+# B-224: was 2. Three of the detector's four rules are unreachable (two lack a
+# producer, one is arithmetically self-defeating — see ContradictionDetector),
+# so the reachable maximum is 1 and a threshold of 2 made correction impossible
+# for every possible input, not merely quiet on this corpus. Lowered to 1.
+# This does NOT weaken the two-independent-source bar the verdict scale applies
+# to INTENT/MALICE: the only live rule, VERDICT_FLIP, already requires >= 2
+# independent high-magnitude signals inside its own predicate, so the two-source
+# requirement moved into the rule rather than being counted across rules.
+CONTRADICTION_THRESHOLD = 1           # int: minimum contradictions to trigger re-analysis
 CONFIDENCE_FLOOR = Fraction(3, 10)    # Minimum MCA threshold for conclusive verdict
+
+# B-224: the complete benign vocabulary a producer may emit into
+# abduction["best_hypothesis"]. Mode-1's abductive reasoner spells "benign" as
+# NO_ANOMALY_DETECTED / NO_SEMIOTIC_ANOMALY_DETECTED and never as the literal
+# "BENIGN"; VERDICT_FLIP checked only the literal, so it could not match any
+# Mode-1 input. "BENIGN" is retained because other paths in this repository
+# (vigia/verdict/quadripartite.py, the integration bridges) do use it, and the
+# detector must stay correct if their output is ever fed here.
+BENIGN_HYPOTHESES = (
+    "BENIGN",
+    "NO_ANOMALY_DETECTED",
+    "NO_SEMIOTIC_ANOMALY_DETECTED",
+)
 
 # ── Verdict classification ────────────────────────────────────────────────────
 # Exit codes (documented): 0=no evil, 1=evil, 2=error, 3=intent, 4=ABSTAIN,
@@ -447,25 +472,56 @@ class ContradictionDetector:
     """
     Detects semantic contradictions between pipeline modules.
 
-    Implemented rules (B-224, KNOWN_LIMITATIONS.md L-069 — 3 of the 4 are
-    structurally unreachable in Mode 1, they read fields no producer here
-    writes; see the limitation entry before reviving one, since it moves
-    sealed verdicts and needs a corpus dry-run first):
+    Implemented rules (B-224, KNOWN_LIMITATIONS.md L-069). One is live; three
+    are dormant — two for want of a producer, one by arithmetic. `detect()`
+    records the producer-dormant ones in `last_dormant_rules`, and
+    `_detect_and_correct` adds the arithmetic one, so a bundle distinguishes
+    "checked, found nothing" from "could not check":
+
     1. ENTROPY_VS_BEHAVIORAL: high entropy + normal behavior (false negative)
-       — unreachable: filters on signal["tool"], Mode-1 signals carry
-       evidence_type/source instead.
+       — DORMANT: filters on signal["tool"], which Mode-1 signals do not
+       carry (they carry evidence_type/source), and nothing in this
+       repository produces behavioral_fingerprint signals. Deliberately NOT
+       re-keyed to `source`: that field holds collection tools
+       (sift_netflow, Plaso/WinEVT, ...), not the analytic module names this
+       rule compares, so re-keying would make the rule look wired while
+       still never matching. It needs a producer, not a rename.
     2. SEMIOTIC_VS_TECHNICAL: no linguistic patterns + high technical anomaly
-       — unreachable: reads module_results["technical_result"], which no
-       Mode-1 producer ever writes.
-    3. CONFIDENCE_COLLAPSE: high MCP but all individual modules low — the
-       only reachable rule; contributes at most 1 contradiction.
-    4. VERDICT_FLIP: opposing verdicts between equal-confidence engines —
-       unreachable: checks for the literal "BENIGN" in best_hypothesis,
-       Mode-1 emits NO_*_ANOMALY_DETECTED instead.
+       — DORMANT: reads module_results["technical_result"], which no
+       producer in this repository writes.
+    3. CONFIDENCE_COLLAPSE: high MCA but all individual modules low —
+       DORMANT, and unreachable by arithmetic rather than by a missing
+       producer. `_detect_and_correct` derives `mca_score` as the mean of the
+       very confidences this rule then thresholds on, so the rule asks for
+       mean > 6/10 while more than 7/10 of the terms are < 3/10. With
+       k/n > 7/10 the mean is bounded above by 1 - 7/10*(k/n) < 51/100,
+       which can never exceed 6/10. Verified by exhaustive search as well as
+       by the bound. Note this corrects B-224/L-069, which recorded rule 3 as
+       "the only reachable rule"; the rule was already dead, and the entry
+       named the wrong survivor. The rule is meaningful only against an
+       aggregator that is NOT the plain mean of these confidences — it needs
+       a different MCA producer, not a threshold tweak.
+    4. VERDICT_FLIP: abductive reasoner concludes benign while multiple
+       high-magnitude signals contradict it — LIVE as of B-224, and the only
+       live rule. It formerly checked only the literal "BENIGN" and so could
+       not match Mode-1's NO_*_ANOMALY_DETECTED spelling; it now tests
+       BENIGN_HYPOTHESES.
+
+    Reachable maximum is therefore 1 (rule 4 alone), which is why
+    CONTRADICTION_THRESHOLD moved from 2 to 1 in the same change: fixing the
+    vocabulary without the threshold would have left the loop just as
+    unreachable. See the constant for why this does not weaken the
+    two-source bar. Measured on the 21-case corpus under `cases/input/`:
+    zero captures produce even one contradiction, so the change moved no
+    sealed verdict — see L-069 for the dry-run.
 
     TEMPORAL_VS_CONTENT (timestamp inconsistent with artifact content) was
     never implemented; it does not appear anywhere in detect().
     """
+
+    def __init__(self) -> None:
+        # Populated by detect(); rules that could not be evaluated at all.
+        self.last_dormant_rules: List[str] = []
 
     def detect(
         self,
@@ -482,6 +538,26 @@ class ContradictionDetector:
         signals = module_results.get("signals", [])
         semiotic = module_results.get("semiotic_result", {})
         technical = module_results.get("technical_result", {})
+
+        # B-224: a rule whose input field no producer writes cannot fire, and
+        # silently returning "no contradictions" makes that indistinguishable
+        # from "checked, found nothing". Record which rules were unevaluable
+        # and why, so the audit trail states the difference and so wiring a
+        # producer later becomes immediately visible instead of inferred.
+        dormant: List[str] = []
+        if not any("tool" in s for s in signals):
+            dormant.append(
+                "ENTROPY_VS_BEHAVIORAL: no signal carries a 'tool' key "
+                "(this path emits evidence_type/source), and no producer "
+                "emits behavioral_fingerprint — rule not evaluable"
+            )
+        if "technical_result" not in module_results:
+            dormant.append(
+                "SEMIOTIC_VS_TECHNICAL: module_results has no "
+                "'technical_result' — no producer in this repository writes "
+                "it, so alert_level defaults to LOW — rule not evaluable"
+            )
+        self.last_dormant_rules = dormant
 
         # 1. ENTROPY_VS_BEHAVIORAL
         # High artifact entropy + normal temporal behavior
@@ -533,9 +609,11 @@ class ContradictionDetector:
             s for s in signals
             if abs(_to_frac(s.get("z_score", 0))) > Fraction(3, 1)
         ]
+        verdict_upper = abductive_verdict.upper()
+        concluded_benign = any(b in verdict_upper for b in BENIGN_HYPOTHESES)
         if (
             is_conclusive
-            and "BENIGN" in abductive_verdict.upper()
+            and concluded_benign
             and len(critical_signals) >= 2
         ):
             contradictions.append((
@@ -635,14 +713,17 @@ class VIGIAAgent:
     6. Generate investigative narrative
     7. Export sealed bundle with SHA-256
 
-    Self-correction is architectural, but step 5's loop never actually
-    repeats (B-224, KNOWN_LIMITATIONS.md L-069): ContradictionDetector
-    operates on rational scores, not text, and CorrectionEngine applies
-    documented deterministic adjustments -- but 3 of the detector's 4 rules
-    read fields no Mode-1 producer writes, so the maximum reachable
-    contradiction count is 1, below CONTRADICTION_THRESHOLD (2). Step 5's
-    condition is therefore never satisfied; iteration is always recorded
-    as 1 of 1. Honest, not a failure -- see the limitation entry before
+    Step 5's loop is reachable but quiet on the current corpus (B-224,
+    KNOWN_LIMITATIONS.md L-069): ContradictionDetector operates on rational
+    scores, not text, and CorrectionEngine applies documented deterministic
+    adjustments. Only VERDICT_FLIP is live -- two rules lack a producer and
+    one is unsatisfiable by arithmetic -- so the maximum reachable
+    contradiction count is 1, which meets CONTRADICTION_THRESHOLD (1) after
+    B-224 lowered it from 2. Before that change the maximum was 1 against a
+    threshold of 2 and step 5 could not be satisfied by any possible input.
+    No case in the 21-case corpus produces even one contradiction, so
+    iteration is still recorded as 1 of 1 in practice, and the audit trail
+    names which rules could not be evaluated. Honest, not a failure -- see the limitation entry before
     changing the threshold or reviving a rule, since either moves sealed
     verdicts and needs a corpus dry-run first.
     """
@@ -834,15 +915,36 @@ class VIGIAAgent:
 
         contradictions = self.contradiction_detector.detect(results, mca_score)
 
+        # B-224: report rules that could not be evaluated, so "no
+        # contradictions" is never read as "all four rules checked and
+        # cleared it". detect() reports the two missing-producer rules; rule 3
+        # is added here because only this scope knows where mca_score came
+        # from, which is what makes that rule unsatisfiable.
+        dormant = list(getattr(self.contradiction_detector, "last_dormant_rules", []))
+        dormant.append(
+            "CONFIDENCE_COLLAPSE: mca_score is the mean of the same "
+            "confidences the rule thresholds on, so 'mean > 6/10 while "
+            "> 7/10 of terms are < 3/10' is unsatisfiable — rule needs a "
+            "different MCA producer, not a threshold change"
+        )
+
         # Apply CONTRADICTION_THRESHOLD — only trigger correction if enough contradictions
         if len(contradictions) < CONTRADICTION_THRESHOLD:
             self.audit.log(
                 action="CONTRADICTION_CHECK",
                 tool="contradiction_detector",
                 inputs={"n_signals": len(results.get("signals", []))},
-                outputs={"contradictions_found": len(contradictions), "threshold": str(CONTRADICTION_THRESHOLD)},
+                outputs={
+                    "contradictions_found": len(contradictions),
+                    "threshold": str(CONTRADICTION_THRESHOLD),
+                    "rules_not_evaluable": dormant,
+                },
                 iteration=self.iteration,
-                note=f"{len(contradictions)} contradiction(s) — below threshold {CONTRADICTION_THRESHOLD}, no correction",
+                note=(
+                    f"{len(contradictions)} contradiction(s) — below threshold "
+                    f"{CONTRADICTION_THRESHOLD}, no correction"
+                    + (f"; {len(dormant)} rule(s) not evaluable" if dormant else "")
+                ),
             )
             return False, results
 
@@ -2045,11 +2147,13 @@ Examples:
   python3 vigia_agent.py --evidence /cases/xp-tdungan.raw --case-id XP-001
   python3 vigia_agent.py --evidence /cases/evidence.json --case-id TEST-001 --output report.json
 
-Self-correction: designed, no flags needed — but structurally does not
-  trigger in this mode today (max reachable contradictions=1 < threshold=2,
-  see KNOWN_LIMITATIONS.md L-069). Every run completes in 1 iteration.
+Self-correction: automatic, no flags needed. Reachable but quiet: 1 of the 4
+  contradiction rules is live (max 1, threshold 1); the other 3 are dormant —
+  two lack a producer, one is unsatisfiable by arithmetic — and the audit
+  trail names which. No case in the shipped corpus produces a contradiction,
+  so runs complete in 1 iteration in practice. See KNOWN_LIMITATIONS.md L-069.
 Narrative: 100% deterministic — no LLMs in core analysis.
-Max iterations: 3 (hard cap on the loop; not reached in practice — see above).
+Max iterations: 3 (hard cap on the loop; not reached on the shipped corpus).
 
 Exit codes:
   0  NO EVIL     — analyzed, no anomaly (NOISE / benign)
