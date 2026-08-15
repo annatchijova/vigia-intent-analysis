@@ -1,12 +1,5 @@
 # VIGÍA — Intentionality Analysis Bridge for SIFT Workstation
 
-> **Note (2026-06-19, post-submission):** one pre-existing corpus bundle
-> (`results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json`) was sealed before a
-> verifier strictness fix and will show a documented R7 failure if
-> re-verified. This is expected and intentional — see `KNOWN_LIMITATIONS.md`,
-> item L-026. It is the verifier correctly catching a gap that has since been
-> closed for all new bundles.
-
 [🇪🇸 Versión en español](./README_ES.md)
 
 > *"Making deception computationally expensive for the attacker."*
@@ -24,110 +17,6 @@
 >
 > If a system claims "MALICE" without being able to explain why with exact
 > mathematics, it is not forensics. It is divination.
-
----
-
-## VIGÍA Theme Song
-
-> *Written and produced by Olga Vasilieva*
-> 🎵 [Listen on Suno](https://suno.com/song/ae1f9bc9-a9eb-40b2-96e7-6132be0dc504)
-
-```
-In the world of forensics, they just look at the trace,
-They ask *what* happened in the digital space.
-They trust an EDR with a random score,
-But black-box divination cannot guard the door.
-Today, lying in a log or faking an attack is free,
-But VIGÍA is charging that price, you see!
-We don't look for the virus, we don't look for the sign,
-We find the logical fracture in the attacker's line!
-
-VIGÍA! The inference engine is live!
-Making deception too expensive to survive!
-From Firstness to Thirdness, the Peircean track,
-We seal the Forensic Bundle before the models talk back!
-No floating-point drift, no illusion, no bias,
-Pure rational arithmetic is here to untie us!
-
-An excessive perfection, a significant void,
-A Windows kernel habit that was cleanly destroyed.
-calc.exe is calling out to the net,
-A living-off-the-land trap that the adversary set.
-Ledoit-Wolf and KDE quantifying the risk,
-We find the hidden slips in the memory and disk.
-We measure the spoofability, we lock down the state,
-With a self-correcting agent at the SIFT workstation gate!
-
-VIGÍA! The inference engine is live!
-Making deception too expensive to survive!
-From Firstness to Thirdness, the Peircean track,
-We seal the Forensic Bundle before the models talk back!
-No floating-point drift, no illusion, no bias,
-Pure rational arithmetic is here to untie us!
-
-The LLM is isolated, it cannot change the code,
-It only tells the narrative when the data has flowed.
-Grice maxims, Carnegie patterns under review,
-Bringing the Daubert Standard of evidence to you!
-Three iterations maximum, the contradictions clear,
-The autonomous investigator is already here!
-
-VIGÍA! The inference engine is live!
-Making deception too expensive to survive!
-From Firstness to Thirdness, the Peircean track,
-We seal the Forensic Bundle before the models talk back!
-No floating-point drift, no illusion, no bias,
-Pure rational arithmetic is here to untie us!
-
-Not a detector. An inference engine.
-Why did it happen? Who benefits from the trace?
-Cryptographic hashes holding the evidence in place.
-VIGÍA. The truth is in the fracture.
-```
-
----
-
-## JUDGES: Submission Compliance Quick-Reference
-
-> All required components are present. This table tells you exactly where
-> to find each one.
-
-| Requirement | Location |
-|-------------|----------|
-| Public repository | `github.com/annatchijova/vigia-intent-analysis` |
-| License | [`LICENSE`](./LICENSE) (Apache 2.0) |
-| README with setup | This file — [Installation](#installation) |
-| Live demo / step-by-step | [`INSTALL.md`](./INSTALL.md) |
-| Feature description | [Overview](#the-paradigm-shift-from-ioc-to-ioi) |
-| **Demonstration video** | **[YouTube — VIGÍA Demo 2026](https://www.youtube.com/watch?v=NOquYzUwMkg)** |
-| Interactive architecture diagrams | [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html) — [hosted](https://annatchijova.github.io/vigia/vigia_diagrams.html) |
-| Mathematical logic simulator | [`vigia.html`](./vigia.html) — [hosted](https://annatchijova.github.io/vigia/vigia.html) |
-| **Simulador ES** | [`vigia-es.html`](./vigia-es.html) — [hosted](https://annatchijova.github.io/vigia/vigia-es.html) |
-| Command reference | [`vigia_commands_en.html`](./vigia_commands_en.html) — [hosted](https://annatchijova.github.io/vigia/vigia_commands_en.html) |
-| Known limitations | [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) |
-| Security policy | [`SECURITY.md`](./SECURITY.md) |
-| **Bug registry — open items** | [`BUGS_PENDIENTES.md`](./BUGS_PENDIENTES.md) (ES) · [`BUGS_PENDIENTES_EN.md`](./BUGS_PENDIENTES_EN.md) (EN) |
-| **Bug registry — resolved / historical** | [`BUGS_HISTORICO.md`](./BUGS_HISTORICO.md) (ES) · [`BUGS_HISTORICO_EN.md`](./BUGS_HISTORICO_EN.md) (EN) — full audit trail of every fix, useful if you're red-teaming VIGÍA and want to see exactly what's already been found and patched before you go looking for the next thing |
-| Authors | [`AUTHORS.md`](./AUTHORS.md) |
-| **Origin story** | **[`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) · [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES)** |
-| Full compliance index | [`SUBMISSION_COMPLIANCE.md`](./SUBMISSION_COMPLIANCE.md) |
-| **Real-case investigation prompts** | **[`PROMPTS_REALCASES_CLAUDE.md`](./PROMPTS_REALCASES_CLAUDE.md)** — copy-paste into Claude Code to run full forensic investigations on all 18 real cases |
-| **NGDC 2012 full investigation** | **[Report (EN)](./results/agent_batch/VIGIA-NGDC-2012-REPORT.md) · [Reporte (ES)](./results/agent_batch/VIGIA-NGDC-2012-REPORTE-ES.md) · [Amicus Curiae](./results/agent_batch/VIGIA-NGDC-2012-AMICUS-CURIAE.md)** — autonomous raw-evidence analysis of the SANS National Gallery DC 2012 case (17 artifacts, 7 findings, Peircean + Daubert compliant) |
-| **NGDC 2012 — tracy-home E01/E02 (physical layer)** | **[Report](./results/agent_batch/VIGIA-NGDC-2012-E01E02-REPORT.md) · [Amicus Curiae (EN)](./results/agent_batch/VIGIA-NGDC-2012-E01E02-AMICUS-CURIAE-EN.md) · [Amicus Curiae (ES)](./results/agent_batch/VIGIA-NGDC-2012-E01E02-AMICUS-CURIAE-ES.md)** — disk image analysis of Tracy's MacBook Air (5.5 GB HFS+): LogKext infrastructure, stolen stamp docs, anti-forensic VM, deleted account recovery. Physical corroboration of NGDC-002 verdict. |
-
-**Academic documentation (193 modules, 4 languages):**
-[`docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md`](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md)
-— EN / ES / RU / ZH — covers every module with technical glossary and
-scientific grounding in Peircean semiotics, Eco's overcodification theory,
-and Grice's maxims as deterministic, falsifiable computational constructs.
-
-https://annatchijova.github.io/vigia/vigia.html
-
-https://annatchijova.github.io/vigia/vigia_diagrams.html
-
-https://annatchijova.github.io/vigia/vigia_commands_en.html
-
-**Mini juego — Simulador VIGÍA:** [🇪🇸 Español](https://annatchijova.github.io/vigia/simulador.html) · [🇬🇧 English](https://annatchijova.github.io/vigia/simulator.html)
 
 ---
 
@@ -157,6 +46,42 @@ eliminate the **semiotic fractures** produced by deliberate fabrication. VIGÍA 
 
 ---
 
+## Repository Map — Where to Find Things
+
+> One row per thing people look for in this repository. Also serves as the
+> SANS FIND EVIL 2026 submission compliance index.
+
+| What | Where |
+|------|-------|
+| Public repository | `github.com/annatchijova/vigia-intent-analysis` |
+| License | [`LICENSE`](./LICENSE) (Apache 2.0) |
+| README with setup | This file — [Installation](#installation) |
+| Live demo / step-by-step | [`INSTALL.md`](./INSTALL.md) |
+| Feature description | [Overview](#the-paradigm-shift-from-ioc-to-ioi) |
+| **Demonstration video** | **[YouTube — VIGÍA Demo 2026](https://www.youtube.com/watch?v=NOquYzUwMkg)** |
+| Interactive architecture diagrams | [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html) — [hosted](https://annatchijova.github.io/vigia/vigia_diagrams.html) |
+| Mathematical logic simulator | [`vigia.html`](./vigia.html) — [hosted](https://annatchijova.github.io/vigia/vigia.html) |
+| **Simulador ES** | [`vigia-es.html`](./vigia-es.html) — [hosted](https://annatchijova.github.io/vigia/vigia-es.html) |
+| Command reference | [`vigia_commands_en.html`](./vigia_commands_en.html) — [hosted](https://annatchijova.github.io/vigia/vigia_commands_en.html) |
+| Known limitations | [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) |
+| Security policy | [`SECURITY.md`](./SECURITY.md) |
+| **Bug registry — open items** | [`BUGS_PENDIENTES.md`](./BUGS_PENDIENTES.md) (ES) · [`BUGS_PENDIENTES_EN.md`](./BUGS_PENDIENTES_EN.md) (EN) |
+| **Bug registry — resolved / historical** | [`BUGS_HISTORICO.md`](./BUGS_HISTORICO.md) (ES) · [`BUGS_HISTORICO_EN.md`](./BUGS_HISTORICO_EN.md) (EN) — full audit trail of every fix, useful if you're red-teaming VIGÍA and want to see exactly what's already been found and patched before you go looking for the next thing |
+| Authors | [`AUTHORS.md`](./AUTHORS.md) |
+| **Origin story** | **[`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) · [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES)** |
+| Full compliance index | [`SUBMISSION_COMPLIANCE.md`](./SUBMISSION_COMPLIANCE.md) |
+| **Real-case investigation prompts** | **[`PROMPTS_REALCASES_CLAUDE.md`](./docs/PROMPTS_REALCASES_CLAUDE.md)** — copy-paste into Claude Code to run full forensic investigations on all 18 real cases |
+| **NGDC 2012 full investigation** | **[Report (EN)](./results/archive/corpus_rebaseline_post-B104_def7408_2026-07-11/agent_batch_pre/VIGIA-NGDC-2012-REPORT.md) · [Reporte (ES)](./results/archive/corpus_rebaseline_post-B104_def7408_2026-07-11/agent_batch_pre/VIGIA-NGDC-2012-REPORTE-ES.md) · [Amicus Curiae](./results/archive/corpus_rebaseline_post-B104_def7408_2026-07-11/agent_batch_pre/VIGIA-NGDC-2012-AMICUS-CURIAE.md)** — autonomous raw-evidence analysis of the SANS National Gallery DC 2012 case (17 artifacts, 7 findings, Peircean + Daubert compliant) |
+| **NGDC 2012 — tracy-home E01/E02 (physical layer)** | **[Report](./results/archive/corpus_rebaseline_post-B104_def7408_2026-07-11/agent_batch_pre/VIGIA-NGDC-2012-E01E02-REPORT.md) · [Amicus Curiae (EN)](./results/archive/corpus_rebaseline_post-B104_def7408_2026-07-11/agent_batch_pre/VIGIA-NGDC-2012-E01E02-AMICUS-CURIAE-EN.md) · [Amicus Curiae (ES)](./results/archive/corpus_rebaseline_post-B104_def7408_2026-07-11/agent_batch_pre/VIGIA-NGDC-2012-E01E02-AMICUS-CURIAE-ES.md)** — disk image analysis of Tracy's MacBook Air (5.5 GB HFS+): LogKext infrastructure, stolen stamp docs, anti-forensic VM, deleted account recovery. Physical corroboration of NGDC-002 verdict. |
+
+**Academic documentation (193 modules, 4 languages):**
+[`docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md`](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md)
+— EN / ES / RU / ZH — covers every module with technical glossary and
+scientific grounding in Peircean semiotics, Eco's overcodification theory,
+and Grice's maxims as deterministic, falsifiable computational constructs.
+
+---
+
 ## Interactive Documentation
 
 No installation required. Open directly in any browser:
@@ -166,6 +91,7 @@ No installation required. Open directly in any browser:
 | **Mathematical Logic Simulator** | [vigia.html](https://annatchijova.github.io/vigia/vigia.html) | Step through scoring live. See Fraction arithmetic. Trace corroboration gate. Inspect every IoI contribution. |
 | **Architecture Diagrams** | [vigia_diagrams.html](https://annatchijova.github.io/vigia/vigia_diagrams.html) | Full pipeline from raw artifacts to sealed ForensicBundle. Component relationships, MCP phases, EBS v1 sealing flow. |
 | **Command Reference** | [vigia_commands_en.html](https://annatchijova.github.io/vigia/vigia_commands_en.html) | All operating modes with copy-paste examples and expected output. |
+| **Simulator (mini game)** | [English](https://annatchijova.github.io/vigia/simulator.html) · [Español](https://annatchijova.github.io/vigia/simulador.html) | Guided walkthrough of a case: pick the evidence, watch the verdict move. |
 
 ---
 
@@ -345,10 +271,8 @@ python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle
 ---
 
 ## Installation
-> **No API key required for evaluation:** Mode 1 (Python fallback, 0 tokens) and the browser simulator at https://annatchijova.github.io/vigia/vigia.html run without any API key, signup, or payment. Both are sufficient to evaluate the full scoring pipeline and reproduce all deterministic verdicts.
 
 > **No API key required for evaluation:** Mode 1 (Python fallback, 0 tokens) and the browser simulator at https://annatchijova.github.io/vigia/vigia.html run without any API key, signup, or payment. Both are sufficient to evaluate the full scoring pipeline and reproduce all deterministic verdicts.
-
 
 ### Requirements
 
@@ -1248,7 +1172,7 @@ that cannot describe its own failure modes is not Daubert-admissible.
 score or verdict inside an already-sealed Mode 1 bundle. Mode 2/3 reports may
 use model-guided, tool-driven investigation outside that seal; they are
 separately scoped artifacts, not mutations of it. This boundary is marked in
-the [architecture diagram](./vigia_diagrams__1_.html) and documented under
+the [architecture diagram](./docs/vigia_diagrams.html) and documented under
 L-056 — it is a contract to preserve in code and artifacts, not a system-prompt
 assumption.
 
@@ -1448,7 +1372,7 @@ minimum `acquisition_hash` length (64 hex chars), `examiner_id` presence.
 
 ---
 
-## For Judges
+## Reproducing the Results
 
 This page exists solely to make evaluation easier.
 
@@ -1545,6 +1469,13 @@ analysis, and distinct full `bundle_hash` values for distinct custody events.
 
 **Claim:** Every sealed bundle is independently verifiable using stdlib Python only,
 no VIGÍA code required. The verifier recomputes all hashes from scratch.
+
+> **Note (2026-06-19, post-submission):** the first bundle below
+> (`results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json`) was sealed before a
+> verifier strictness fix and will show a documented R7 failure if
+> re-verified. This is expected and intentional — see `KNOWN_LIMITATIONS.md`,
+> item L-026. It is the verifier correctly catching a gap that has since been
+> closed for all new bundles.
 
 ```bash
 # SRL-DMZ-FTP — EBS v1 cryptographic verification (legacy pipeline format)
@@ -1657,6 +1588,66 @@ H4 EBS verify  : PASS — Level 2
 **Claim:** Full scoring pipeline available in-browser. No API key, no signup.
 
 [https://annatchijova.github.io/vigia/vigia_commands_en.html](https://annatchijova.github.io/vigia/vigia_commands_en.html)
+
+---
+
+## VIGÍA Theme Song
+
+> *Written and produced by Olga Vasilieva*
+> 🎵 [Listen on Suno](https://suno.com/song/ae1f9bc9-a9eb-40b2-96e7-6132be0dc504)
+
+```
+In the world of forensics, they just look at the trace,
+They ask *what* happened in the digital space.
+They trust an EDR with a random score,
+But black-box divination cannot guard the door.
+Today, lying in a log or faking an attack is free,
+But VIGÍA is charging that price, you see!
+We don't look for the virus, we don't look for the sign,
+We find the logical fracture in the attacker's line!
+
+VIGÍA! The inference engine is live!
+Making deception too expensive to survive!
+From Firstness to Thirdness, the Peircean track,
+We seal the Forensic Bundle before the models talk back!
+No floating-point drift, no illusion, no bias,
+Pure rational arithmetic is here to untie us!
+
+An excessive perfection, a significant void,
+A Windows kernel habit that was cleanly destroyed.
+calc.exe is calling out to the net,
+A living-off-the-land trap that the adversary set.
+Ledoit-Wolf and KDE quantifying the risk,
+We find the hidden slips in the memory and disk.
+We measure the spoofability, we lock down the state,
+With a self-correcting agent at the SIFT workstation gate!
+
+VIGÍA! The inference engine is live!
+Making deception too expensive to survive!
+From Firstness to Thirdness, the Peircean track,
+We seal the Forensic Bundle before the models talk back!
+No floating-point drift, no illusion, no bias,
+Pure rational arithmetic is here to untie us!
+
+The LLM is isolated, it cannot change the code,
+It only tells the narrative when the data has flowed.
+Grice maxims, Carnegie patterns under review,
+Bringing the Daubert Standard of evidence to you!
+Three iterations maximum, the contradictions clear,
+The autonomous investigator is already here!
+
+VIGÍA! The inference engine is live!
+Making deception too expensive to survive!
+From Firstness to Thirdness, the Peircean track,
+We seal the Forensic Bundle before the models talk back!
+No floating-point drift, no illusion, no bias,
+Pure rational arithmetic is here to untie us!
+
+Not a detector. An inference engine.
+Why did it happen? Who benefits from the trace?
+Cryptographic hashes holding the evidence in place.
+VIGÍA. The truth is in the fracture.
+```
 
 ---
 

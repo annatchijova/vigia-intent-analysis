@@ -10677,3 +10677,151 @@ de un proxy sintáctico (que el módulo contenga una línea `importorskip`).
 Lleva un test de control que falla si el bloqueador deja de tener efecto, para
 que no pase por la razón equivocada — exactamente el modo de falla que este
 mismo bug exhibía en B-173.
+
+---
+
+## B-149 — T-5: un IoC de C2 de severidad alta puede colapsar a NOISE cuando el artefacto de memoria exculpatorio nunca fue analizado a nivel red (aflorado por B-148) [RESUELTO 2026-08-01]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO 2026-08-01 — guarda de capa no analizada en `caie.py`. Impacto en corpus: 0/282 casos. `xfail(strict)` de `test_red_team_anchor_bypass` retirado. Ver la nota al final de esta entrada: el diagnóstico correcto no era un piso de IoC sino una monotonicidad invertida. |
+| **Severidad** | P2 (latente) — un IoC de C2 real y corroborado nunca debería leerse como NOISE ("nada que ver acá"). Actualmente reproducible solo sintéticamente. |
+| **Archivo** | `vigia_scorer.py` (Noisy-OR ponderado por spoofability / cascada de veredicto); sonda: `vigia/tests/adversarial/test_spoofability_correlation_attack.py::test_red_team_anchor_bypass` (ahora `xfail(strict=True)`) |
+
+**Por qué B-148 lo hizo aflorar.** La regla de fabricación LOG_VS_MEMORY
+cumplía doble función: además de detectar fabricación, su disparo sobre
+memoria sin red era INCIDENTALMENTE el mecanismo que impedía que un log de C2
+de alta spoofability colapsara a NOISE. B-148 correctamente detiene el disparo
+por ausencia (era un falso positivo), lo que remueve esa protección
+incidental. Medido post-B-148: un IoC de C2 (`raw_score=0.95`, `log_entry`) +
+un artefacto de memoria exculpatorio NO ANALIZADO a nivel red sin `verdict`
+explícito → **veredicto = NOISE** (`test_red_team_anchor_bypass`), mientras
+que con un artefacto exculpatorio de veredicto explícito se sostiene en
+SUSPICION (`test_metadata_convention...`, ahora un pass de contradicción
+genuina).
+
+**Alcance honesto.** El gate de corpus de B-148 muestra que **0/201 casos
+reales** exhiben esto — la protección anti-colapso descansaba sobre un falso
+positivo, pero ningún caso real dependía de ella tampoco. Así que T-5 es un
+comportamiento latente, no una regresión viva de corpus.
+
+**Fix apropiado (diferido, necesita una decisión).** Un IoC de severidad alta,
+corroborado independientemente, debe resistir el colapso a NOISE **por sus
+propios méritos** — no vía una fractura acoplada a memoria ausente. Es un
+cambio a nivel de scorer (p. ej. un piso de IoC que la ponderación por
+spoofability no pueda empujar por debajo de SUSPICION), NO un re-acoplamiento
+al bug de ausencia que B-148 corrigió. Trackeado por separado para que el fix
+correcto se diseñe deliberadamente. Cuando aterrice, el `xfail(strict=True)`
+sobre `test_red_team_anchor_bypass` pasa a XPASS y se remueve el marcador.
+
+---
+
+
+### RESUELTO 2026-08-01 — el diagnóstico afinado
+
+La entrada proponía "un piso de IoC que la ponderación por spoofability no
+pueda empujar por debajo de SUSPICION". Medir el escenario mostró que el
+problema no era el IoC ni el piso, sino una **monotonicidad invertida**. Mismo
+IoC de C2 en los tres, variando sólo el artefacto de memoria:
+
+| Escenario | Información sobre la red | Veredicto |
+|-----------|--------------------------|-----------|
+| memoria analizó la red, sin hallazgos | más | MALICE (contradicción real) |
+| NO hay artefacto de memoria | menos | INCONCLUSIVE |
+| memoria existe pero nunca miró la red | intermedia | **NOISE** |
+
+El tercer caso tiene menos información sobre la red que el primero y no más
+que el segundo, y producía el veredicto **más benigno de los tres**. Añadir un
+artefacto silente sobre la capa en disputa hacía que el caso pareciera más
+limpio que no tenerlo.
+
+Es la misma conflación que B-154 nombra —ausencia ≡ negativo— pero en la
+dirección EXCULPATORIA. B-148/B-154 cerró la acusatoria (una capa no analizada
+dejó de alimentar LOG_VS_MEMORY); ésta quedaba abierta: NOISE significa
+"analizado y sin hallazgos", y aquí significaba "nadie lo analizó".
+
+**Fix aplicado** (`vigia/tools/caie.py`, tras el bloque CDL): si un log afirma
+actividad de red y NINGÚN artefacto técnico analizó la capa de red, el
+veredicto no puede ser NOISE — pasa a INCONCLUSIVE. Alcance deliberadamente
+estrecho: si algún artefacto la analizó, con o sin hallazgos, la guarda no
+interviene y la contradicción real sigue su curso. No toca `independent_sources`
+ni el scoring; sólo impide concluir limpieza sobre lo no observado.
+
+Se descartó el piso de IoC de la propuesta original: habría forzado SUSPICION
+desde un único log altamente spoofable sin corroboración, que es el error
+opuesto y el que la puerta de corroboración Daubert existe para evitar.
+
+**Impacto en el corpus: CERO** — 0 de 282 casos presentan la combinación
+(log que afirma red + todos los artefactos técnicos silentes sobre red).
+Coherente con el 0/201 que medía el gate de B-148.
+
+`test_red_team_anchor_bypass` pasa a verde y su `xfail(strict=True)` fue
+retirado, como esta entrada anticipaba.
+
+---
+
+## B-221 — Auditoría "Ronda 2" (invariantes epistemológicos): vectores investigados y descartados — registrados para no re-descubrirlos [DOCUMENTADO — Claude 2026-07-25]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | N/A — no son bugs. Documentado como referencia de auditoría, no como defecto. |
+| **Archivos** | `vigia/core/risk_bounded_layer.py` (`PolicyStabilityController`), `vigia/core/dissent_report.py` (`_compute_majority`, tie-break), `vigia/core/trust_fusion.py` (`NeighborhoodContext.mean_neighbor_trust`, `TrustFusionEngine.calculate_likelihood`, `add_artifact`). |
+| **Método** | A-D-I (Abductivo-Deductivo-Inductivo): cada vector se ejecutó contra el código vivo antes de aceptarlo o descartarlo, no solo se dedujo. |
+| **Detectado en** | Auditoría "Ronda 2", sesión 2026-07-25, re-verificado independientemente en esta sesión (no se aceptó ningún resultado del reporte pegado sin re-ejecutarlo). |
+
+### Descripción
+
+Cinco vectores se investigaron durante la auditoría "Ronda 2" y no se
+convirtieron en bugs. Se documentan aquí explícitamente para que una
+auditoría futura no vuelva a gastar tiempo re-descubriéndolos:
+
+**1. F5 — `PolicyStabilityController`: ¿diverge el resultado entre la rama
+numpy (`np.linalg.norm` + `np.array`) y el fallback stdlib (`math.sqrt` +
+listas)?** FALSIFICADO. Hipótesis original (deducida, no ejecutada): el
+veredicto podría depender silenciosamente de si `numpy` está instalado.
+Re-ejecutado en esta sesión, forzando ambas ramas sobre la misma secuencia de
+`stabilize()`: los tres parámetros resultantes (`lambda, gamma, epsilon`) son
+**bit-idénticos** entre ambas rutas (`0x1.b851eb851eb85p+1` en ambos casos,
+verificado con `.hex()` de float). Las dos ramas son aritméticamente
+equivalentes para esta operación; la divergencia BLAS que motivó la
+hipótesis es teórica para este caso, no demostrada. Se retira como hallazgo.
+
+**2. Tie-break de `_compute_majority` favorece MALICIOUS ante empate.** NO
+ES BUG. El desempate hacia el veredicto más severo ante un empate exacto de
+votos es determinista y *fail-safe* — es la política correcta para un
+sistema forense: ante incertidumbre genuina entre dos veredictos igual de
+votados, escalar es más defendible que promediar hacia abajo.
+
+**3. `NeighborhoodContext.mean_neighbor_trust` devuelve `1.0` cuando no hay
+vecinos — ¿es "ausencia de evidencia tratada como confianza perfecta"?**
+FALSIFICADO como riesgo de score. Verificado contra el código vivo:
+`TrustFusionEngine.calculate_likelihood` hace *short-circuit* a `return 0.5`
+cuando `neighborhood.neighbor_count == 0`, **antes** de leer
+`mean_neighbor_trust` — el valor `1.0` nunca llega a participar del cálculo
+de `likelihood`/`posterior`. El `1.0` sí aparece en el texto de la razón
+narrativa (`BOOST: trust vecindad={neighborhood.mean_neighbor_trust:.3f}`)
+en casos donde sí hay vecinos, así que no hay ninguna ruta donde el default
+de "sin vecinos" se cuele en un score. Riesgo real: ninguno confirmado.
+
+**4. `add_artifact` deduplica silenciosamente IDs duplicados.** Higiene, no
+bug de severidad. `add_artifact` devuelve `False` sin excepción ni registro
+cuando `artifact.artifact_id` ya existe (`trust_fusion.py`, línea ~207) — dos
+artefactos con el mismo ID colapsan a uno sin aparecer en ningún
+`rejected_details` o estructura equivalente. El comportamiento en sí es
+deseable (protege contra doble conteo), pero es invisible: nada en el output
+de `TrustFusionEngine` le dice a un perito que un artefacto fue descartado
+por duplicado. Ticket menor, no bloqueante — no se abre como bug numerado
+independiente porque no afecta ningún veredicto, se deja registrado aquí.
+
+### Nota de proceso
+
+Esta auditoría se hizo con disciplina A-D-I explícita después de una primera
+pasada (B-217 a B-220 más este bloque) que había *deducido* algunos hallazgos
+sin ejecutarlos. La re-verificación con inducción cambió el resultado: F1 se
+agravó (se demostró que la cadena completa está muerta, no solo que el
+módulo estaba huérfano), F2 y F4 bajaron de severidad al descubrirse sus
+precondiciones dormidas, y F5 se retiró por completo al ejecutarlo y
+encontrar resultados bit-idénticos. Se documenta el proceso, no solo el
+resultado, porque el proceso es replicable: cualquier hallazgo futuro de este
+tipo debe pasar por la misma re-verificación contra el código vivo antes de
+aceptarse como confirmado.
