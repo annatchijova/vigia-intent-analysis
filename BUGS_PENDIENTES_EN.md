@@ -37,6 +37,43 @@ correctly with the current architecture. It is migration debt for v3.0.
 Evaluate whether SemioticDetectorV2 covers all forensic_technical_detector use cases.
 Migration must be audited by the team before applying.
 
+### Update 2026-08-27 — coverage evaluation executed: the migration premise is REFUTED by measurement
+
+The evaluation this entry named as prerequisite was performed against
+live code and data, not docstrings:
+
+1. **Vocabulary coverage: 0 of 44.** The `SemioticDetectorV2` pattern DB
+   (`vigia/tools/forensic_patterns.sqlite`, `nlp_patterns`, 41 patterns)
+   contains manipulation semiotics exclusively — SOCIAL_ENGINEERING (19),
+   ANTI_FORENSIC (9), GRICE_VIOLATION (6), EVIDENCE_DESTRUCTION (6),
+   LINGUISTIC_ANOMALY (1); the Carnegie/Grice/Eco taxonomy. None of the
+   ~44 technical indicators in `IFT_CATALOG` (mimikatz, webshell, IFEO
+   hijack, timestomping, C2, exfil, process hollowing, ...) exists in
+   that DB.
+2. **Incompatible contracts.** FTD: input artifact dict
+   (`content`+`forensic_anomalies`+`type`), output `z_score` in
+   [0.4, 4.5] + `confidence` + `tool_prefix`. SDv2: input
+   text+timestamp, output `confidence_adjustment` capped at 0.30 + FSV +
+   alert_level. No adapter exists and the codomains are not translatable
+   without a fresh calibration decision.
+3. **FTD has a live caller:** `vigia/tools/vigia_case_adapter.py` loads
+   it and treats its absence as an error — it is not orphaned code.
+4. **Hidden behavior change inside the "migration":** SDv2 applies a
+   Negation Handler and fuzzy matching; a technical catalog ported there
+   would attenuate negated matches ("no mimikatz found" fires in FTD
+   today; SDv2 would halve it). That may or may not be desirable — but
+   it is a detection-semantics change, not a migration.
+
+**Conclusion:** the two detectors are complementary layers (technical vs
+semiotic), not versions of the same thing. "Migrate to
+SemioticDetectorV2" as the TODO states would require porting the full
+catalog into the DB, designing an output adapter, and deciding a
+negation policy — a rewrite with a design decision, not mechanical debt.
+Recommendation: close B-010 as REFUTED (or reclassify it as a v3.0
+design decision with that real scope). The TODO in the code stays as-is
+until that decision — deleting it without closing the entry would
+desynchronize them.
+
 ---
 
 ## B-111 — Mode 3 (Ollama/hermes3:8b): unreliable behavior on dense testimonial evidence — N=2, STOCHASTIC
@@ -178,6 +215,14 @@ Observe the pattern in a second independent judicial case file (other than MPF77
 > below is stale as of this note -- see the Spanish file for the current
 > "CABLEADO COMO SOMBRA" status. Full EN translation of the intervening
 > history has not been done; flagged here rather than left silently wrong.
+
+> **Update 2026-08-27 (observation data point):** the same pre-registered
+> script was re-run on the current corpus (208 cases): **0 flips** of
+> verdict/score/confidence; shadow distribution 123 QUALITY_OK / 85 WARN /
+> 0 missing annex / 0 error. Third consecutive 0-flips run (07-22, 07-31,
+> 08-27). The pending decision remains Anna's: keep observing, promote
+> WARN to some authority (with sign-off), or close B-116 as
+> wired-as-designed.
 
 | Field | Value |
 |-------|-------|

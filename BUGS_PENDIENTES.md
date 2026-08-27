@@ -38,6 +38,42 @@ correctamente con la arquitectura actual. Es deuda de migración para v3.0.
 Evaluar si SemioticDetectorV2 cubre todos los casos de forensic_technical_detector.
 Migración debe ser auditada por el colectivo antes de aplicar.
 
+### Update 2026-08-27 — evaluación de cobertura ejecutada: la premisa de la migración queda REFUTADA por medición
+
+La evaluación que este registro pedía como prerequisito se hizo contra
+código y datos vivos, no contra los docstrings:
+
+1. **Cobertura de vocabulario: 0 de 44.** La DB de patrones de
+   `SemioticDetectorV2` (`vigia/tools/forensic_patterns.sqlite`,
+   `nlp_patterns`, 41 patrones) contiene exclusivamente semiótica de
+   manipulación — SOCIAL_ENGINEERING (19), ANTI_FORENSIC (9),
+   GRICE_VIOLATION (6), EVIDENCE_DESTRUCTION (6), LINGUISTIC_ANOMALY (1);
+   taxonomía Carnegie/Grice/Eco. Ninguno de los ~44 indicadores técnicos
+   del `IFT_CATALOG` (mimikatz, webshell, IFEO hijack, timestomping, C2,
+   exfil, process hollowing, ...) existe en esa DB.
+2. **Contratos incompatibles.** FTD: input artifact dict
+   (`content`+`forensic_anomalies`+`type`), output `z_score` en
+   [0.4, 4.5] + `confidence` + `tool_prefix`. SDv2: input
+   texto+timestamp, output `confidence_adjustment` con cap 0.30 + FSV +
+   alert_level. No hay adaptador y los codominios no son traducibles sin
+   una decisión de calibración nueva.
+3. **FTD tiene caller vivo:** `vigia/tools/vigia_case_adapter.py` lo
+   carga y trata su ausencia como error — no es código huérfano.
+4. **Cambio de comportamiento oculto en la "migración":** SDv2 aplica
+   Negation Handler y fuzzy matching; un catálogo técnico portado ahí
+   atenuaría matches negados ("no se encontró mimikatz" hoy dispara en
+   FTD, en SDv2 se atenuaría a la mitad). Eso puede ser deseable o no —
+   pero es un cambio de semántica de detección, no una migración.
+
+**Conclusión:** los dos detectores son capas complementarias (técnica vs
+semiótica), no versiones de la misma cosa. "Migrar a SemioticDetectorV2"
+tal como lo dice el TODO exigiría portar el catálogo completo a la DB,
+diseñar un adaptador de salida y decidir política de negación — una
+reescritura con decisión de diseño, no deuda mecánica. Recomendación:
+cerrar B-010 como REFUTADO (o reclasificarlo como decisión de diseño v3.0
+con ese alcance real). El TODO en el código queda tal cual hasta esa
+decisión — borrarlo sin cerrar el registro los desincronizaría.
+
 ---
 
 ## B-111 — Mode 3 (Ollama/hermes3:8b): comportamiento no confiable en evidencia testimonial densa — N=2, ESTOCÁSTICO
@@ -236,6 +272,14 @@ Observar el patron en un segundo expediente judicial independiente (distinto a M
 > `docs/B116_CONDITION4_DESIGN.md` §7. No cambia el estado (sigue
 > CABLEADO COMO SOMBRA); es evidencia de que el contrato no se degradó,
 > no una promoción.
+
+> **Update 2026-08-27 (punto de datos de observación):** re-corrido el
+> mismo script pre-registrado sobre el corpus actual (208 casos):
+> **0 flips** de verdict/score/confidence; distribución sombra
+> 123 QUALITY_OK / 85 WARN / 0 sin anexo / 0 error. Tercer 0-flips
+> consecutivo (22/07, 31/07, 27/08). La decisión pendiente sigue siendo
+> de Anna: continuar observando, promover WARN a alguna autoridad (con
+> firma), o cerrar B-116 como cableado-según-diseño.
 
 | Campo | Valor |
 |-------|-------|
