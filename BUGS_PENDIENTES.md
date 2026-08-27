@@ -1320,6 +1320,41 @@ corpus serían overfit sin un corpus de validación separado. Ambos módulos
 siguen con cero callers de producción (observación pura, cluster B-124) →
 cero veredictos sellados cambian. Suite completa verde tras el cambio.
 
+### Update 2026-08-27 (bis) — ejecutada la medición de fases que el addendum del 2026-08-01 dejó prescripta: el mapeo L-027 es discutible — el bloqueo real está aguas arriba
+
+`scripts/dryrun_b129_phase_distribution.py` (comprometido, doble corrida
+con aborto por divergencia, 209 casos):
+
+**1. Corrida honesta (inputs reales del corpus): 208/209 casos detectan
+fase UNKNOWN.** El campo de input `mitre_ttps` existe en 0/209 casos (lo
+que existe es `expected_mitre_ttps` — etiqueta esperada, alimentarla
+sería fuga de label, misma clase que las guardas de B-162), y de los 15
+tipos de `temporal_violations` observados solo `STATISTICAL_UNIFORMITY`
+figura en `TEMPORAL_VIOLATION_TO_PHASE` (1 caso). Consecuencia directa:
+el matching de hipótesis por fase de `infer_habit()` es inalcanzable para
+el 99.5% del corpus — **diseñar la tabla de mapeo
+`tool_name → artifact_type` hoy sería resolver el problema equivocado**.
+
+**2. Gap de tabla notable:** `EFFECT_BEFORE_CAUSE` — el único tipo de
+violación que el scorer valida como autoritativo (B-172) — NO está en
+`TEMPORAL_VIOLATION_TO_PHASE` (5 claves, ninguna del vocabulario real
+del corpus salvo la mencionada).
+
+**3. Techo contrafáctico (labels como input, explícitamente NO cableable):**
+incluso alimentando `expected_mitre_ttps`, 161/209 siguen UNKNOWN.
+`MITRE_TTP_TO_PHASE` cubre 24 de 124 TTPs distintos del corpus (19%), y
+no normaliza subtécnicas: `T1070.006` (14 usos) no mapea aunque su padre
+`T1070` sí está en la tabla; `T1036` (masquerading, 11 usos) tampoco.
+
+**Camino de desbloqueo identificado (sin aplicar — cada entrada de tabla
+es doctrina y el fallback padre-de-subtécnica cambia comportamiento vivo
+del orquestador SIFT, necesita su propio dry-run sobre corridas vivas):**
+(a) productor real de TTPs como input del pipeline JSON; (b) fallback
+subtécnica→técnica padre en el lookup de `MITRE_TTP_TO_PHASE`;
+(c) extender `TEMPORAL_VIOLATION_TO_PHASE` al vocabulario real
+(empezando por `EFFECT_BEFORE_CAUSE`). Recién con fases detectables tiene
+sentido retomar la correspondencia honesta con `required_artifacts`.
+
 ---
 
 ## B-162 — El adaptador legacy borraba silenciosamente un schema de evidencia estructurada sin modelar [REPARACIÓN PARCIAL — Codex 2026-07-21]

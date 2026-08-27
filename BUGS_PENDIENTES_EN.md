@@ -1024,6 +1024,42 @@ separate validation corpus. Both modules still have zero production
 callers (observation only, B-124 cluster) — zero sealed verdicts change.
 Full suite green after the change.
 
+### Update 2026-08-27 (bis) — the phase measurement prescribed by the 2026-08-01 addendum was executed: the L-027 mapping is moot — the real blocker is upstream
+
+`scripts/dryrun_b129_phase_distribution.py` (committed, double-run with
+abort on divergence, 209 cases):
+
+**1. Honest run (real corpus inputs): 208/209 cases detect phase
+UNKNOWN.** The input field `mitre_ttps` exists in 0/209 cases (what
+exists is `expected_mitre_ttps` — an expected-output label; feeding it
+would be label leakage, the same class as B-162's guards), and of the 15
+observed `temporal_violations` types only `STATISTICAL_UNIFORMITY`
+appears in `TEMPORAL_VIOLATION_TO_PHASE` (1 case). Direct consequence:
+`infer_habit()`'s phase-scoped hypothesis matching is unreachable for
+99.5% of the corpus — **designing the `tool_name -> artifact_type`
+mapping table today would solve the wrong problem**.
+
+**2. Notable table gap:** `EFFECT_BEFORE_CAUSE` — the only violation
+type the scorer validates as authoritative (B-172) — is NOT in
+`TEMPORAL_VIOLATION_TO_PHASE` (5 keys, none of the corpus's real
+vocabulary except the one mentioned).
+
+**3. Counterfactual ceiling (labels as input, explicitly NOT wireable):**
+even feeding `expected_mitre_ttps`, 161/209 remain UNKNOWN.
+`MITRE_TTP_TO_PHASE` covers 24 of 124 distinct corpus TTPs (19%) and
+does not normalize subtechniques: `T1070.006` (14 uses) does not map even
+though its parent `T1070` is in the table; `T1036` (masquerading, 11
+uses) does not either.
+
+**Identified unblocking path (not applied — every table entry is
+doctrine, and the subtechnique-to-parent fallback changes live SIFT
+orchestrator behavior, so it needs its own dry-run over live runs):**
+(a) a real TTP producer as JSON-pipeline input; (b) subtechnique ->
+parent-technique fallback in the `MITRE_TTP_TO_PHASE` lookup; (c) extend
+`TEMPORAL_VIOLATION_TO_PHASE` to the real vocabulary (starting with
+`EFFECT_BEFORE_CAUSE`). Only with detectable phases does resuming the
+honest `required_artifacts` correspondence make sense.
+
 ---
 
 ## B-162 — The legacy adapter silently erased an unmodeled structured-evidence schema [PARTIALLY REMEDIATED — Codex 2026-07-21]
