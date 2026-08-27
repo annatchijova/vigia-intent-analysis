@@ -1355,6 +1355,58 @@ subtécnica→técnica padre en el lookup de `MITRE_TTP_TO_PHASE`;
 (empezando por `EFFECT_BEFORE_CAUSE`). Recién con fases detectables tiene
 sentido retomar la correspondencia honesta con `required_artifacts`.
 
+### Update 2026-08-27 (ter) — aplicados (b) y (c) con aprobación de Anna: `resolve_ttp_phase` + `EFFECT_BEFORE_CAUSE` en tabla. Corrección: `detect_phase` no tiene callers vivos
+
+**Corrección previa al cambio:** el update (bis) afirmaba que el fallback
+"cambia comportamiento vivo del orquestador SIFT". Verificado por grep
+exhaustivo antes de tocar: **`detect_phase()` y `analyze_focus()` tienen
+cero callers de producción** — `vigia/pipeline/pipeline.py` solo consume
+`get_visible_tools(detected_phase)` con una fase que le llega como
+parámetro externo, y `sift_orchestrator.py` no los invoca. El cambio es
+capa de observación/preparación, no toca ningún veredicto sellado.
+
+**Justificación medida sobre corridas vivas (no labels):** censo de los
+`mitre_ttps` PRODUCIDOS en `results/**/*.json` (104 archivos con el
+campo, 190 TTPs distintos): solo 13/190 mapeaban por clave exacta. Las
+subtécnicas de mayor frecuencia — `T1562.001` (43), `T1070.001/.002/.006`
+(121 combinadas), `T1566.003` (40) — no mapeaban aunque su técnica padre
+sí está en la tabla, y bundles narrativos emiten TTPs con sufijo de prosa
+(`"T1070.002 (Indicator Removal ...)"`) que tampoco mapeaban.
+
+**Cambios:**
+1. `resolve_ttp_phase()` en `visible_variables.py` — lookup determinista
+   en orden: hit exacto → id extraído por regex del inicio del string →
+   padre de subtécnica (semántica MITRE: la subtécnica refina al padre y
+   hereda su fase). `detect_phase` Regla 1 lo usa; las tablas congeladas
+   no se mutan.
+2. `EFFECT_BEFORE_CAUSE → DEFENSE_EVASION` en
+   `TEMPORAL_VIOLATION_TO_PHASE` — doctrina: efecto fechado antes de su
+   causa = manipulación retroactiva de timestamps, misma clase que
+   `RETROACTIVE_MODIFICATION` (ya mapeada así); es además el único tipo
+   que el scorer valida como autoritativo (B-172).
+
+Tests rojo-primero: `tests/test_b129_ttp_phase_resolution.py` (13; la
+importación y los dos tests de detección fallaban pre-fix, verificado).
+
+**Impacto re-medido (`dryrun_b129_phase_distribution.py`):** corrida
+honesta UNKNOWN 208/209 → 206/209 (los 2 `EFFECT_BEFORE_CAUSE` declarados
+ahora votan fase); techo contrafáctico UNKNOWN 161 → 130
+(defense_evasion 16→32, execution 7→23); TTPs de label resueltos
+24 → 50 de 124.
+
+**Residuo de tabla, documentado y NO aplicado (cada entrada es doctrina):**
+los TTPs frecuentes aún sin resolver se parten en dos clases —
+(i) inambiguos en MITRE, candidatos a agregarse con firma: `T1027`
+(Obfuscated Files → defense_evasion, 18 usos), `T1036` (Masquerading →
+defense_evasion, 17 con su subtécnica), `T1190` (Exploit Public-Facing
+App → initial_access, 7), `T1486` (Data Encrypted for Impact → impact, 6);
+(ii) multi-táctica en MITRE, que una tabla de fase única no puede
+representar honestamente sin decisión de diseño (¿multi-voto?): `T1078`
+(Valid Accounts, 4 tácticas, 19 usos), `T1055` (Process Injection, 2
+tácticas, 15), `T1053` (Scheduled Task, 3 tácticas). El ítem (a) —
+productor real de TTPs como input del pipeline JSON — sigue siendo el
+bloqueo principal para que la corrida honesta salga de UNKNOWN.
+
 ---
 
 ## B-162 — El adaptador legacy borraba silenciosamente un schema de evidencia estructurada sin modelar [REPARACIÓN PARCIAL — Codex 2026-07-21]

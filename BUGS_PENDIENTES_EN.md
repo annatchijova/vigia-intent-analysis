@@ -1060,6 +1060,59 @@ parent-technique fallback in the `MITRE_TTP_TO_PHASE` lookup; (c) extend
 `EFFECT_BEFORE_CAUSE`). Only with detectable phases does resuming the
 honest `required_artifacts` correspondence make sense.
 
+### Update 2026-08-27 (ter) — (b) and (c) applied with Anna's approval: `resolve_ttp_phase` + `EFFECT_BEFORE_CAUSE` table entry. Correction: `detect_phase` has no live callers
+
+**Correction made before touching anything:** the (bis) update claimed
+the fallback "changes live SIFT orchestrator behavior". Verified by
+exhaustive grep first: **`detect_phase()` and `analyze_focus()` have
+zero production callers** — `vigia/pipeline/pipeline.py` only consumes
+`get_visible_tools(detected_phase)` with an externally supplied phase,
+and `sift_orchestrator.py` never invokes them. The change is
+observation/groundwork layer; no sealed verdict is touched.
+
+**Justification measured over live runs (not labels):** census of the
+PRODUCED `mitre_ttps` in `results/**/*.json` (104 files carrying the
+field, 190 distinct TTPs): only 13/190 mapped by exact key. The
+highest-frequency subtechniques — `T1562.001` (43), `T1070.001/.002/
+.006` (121 combined), `T1566.003` (40) — did not map even though their
+parent technique is in the table, and narrative bundles emit TTPs with
+prose suffixes (`"T1070.002 (Indicator Removal ...)"`) that did not map
+either.
+
+**Changes:**
+1. `resolve_ttp_phase()` in `visible_variables.py` — deterministic
+   lookup in priority order: exact hit -> id extracted by regex from the
+   string head -> subtechnique's parent technique (MITRE semantics: a
+   subtechnique refines its parent and inherits its phase).
+   `detect_phase` Rule 1 uses it; the frozen tables are not mutated.
+2. `EFFECT_BEFORE_CAUSE -> DEFENSE_EVASION` in
+   `TEMPORAL_VIOLATION_TO_PHASE` — doctrine: an effect timestamped
+   before its cause is retroactive timestamp manipulation, the same
+   class as `RETROACTIVE_MODIFICATION` (already mapped there); it is
+   also the only type the scorer validates as authoritative (B-172).
+
+Red-first tests: `tests/test_b129_ttp_phase_resolution.py` (13; the
+import and both detection tests fail pre-fix, verified).
+
+**Re-measured impact (`dryrun_b129_phase_distribution.py`):** honest run
+UNKNOWN 208/209 -> 206/209 (the 2 declared `EFFECT_BEFORE_CAUSE` cases
+now vote a phase); counterfactual ceiling UNKNOWN 161 -> 130
+(defense_evasion 16->32, execution 7->23); resolved label TTPs
+24 -> 50 of 124.
+
+**Table residue, documented and NOT applied (every entry is doctrine):**
+the frequent still-unresolved TTPs split into two classes —
+(i) unambiguous in MITRE, candidates to add with sign-off: `T1027`
+(Obfuscated Files -> defense_evasion, 18 uses), `T1036` (Masquerading ->
+defense_evasion, 17 with its subtechnique), `T1190` (Exploit
+Public-Facing App -> initial_access, 7), `T1486` (Data Encrypted for
+Impact -> impact, 6); (ii) multi-tactic in MITRE, which a single-phase
+table cannot represent honestly without a design decision (multi-vote?):
+`T1078` (Valid Accounts, 4 tactics, 19 uses), `T1055` (Process
+Injection, 2 tactics, 15), `T1053` (Scheduled Task, 3 tactics). Item
+(a) — a real TTP producer as JSON-pipeline input — remains the main
+blocker for the honest run to leave UNKNOWN.
+
 ---
 
 ## B-162 — The legacy adapter silently erased an unmodeled structured-evidence schema [PARTIALLY REMEDIATED — Codex 2026-07-21]

@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 import logging
 import hashlib
+import re
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Set, Tuple, Any
@@ -113,7 +114,41 @@ TEMPORAL_VIOLATION_TO_PHASE: Dict[str, IRPhase] = {
     "FABRICATION": IRPhase.DEFENSE_EVASION,
     "LOG_TAMPERING": IRPhase.DEFENSE_EVASION,
     "TIMING_ANOMALY": IRPhase.EXFILTRATION,
+    # B-129/L-027: un efecto fechado antes de su causa es manipulación
+    # retroactiva de timestamps — misma clase semántica que
+    # RETROACTIVE_MODIFICATION. Es además el único tipo que el scorer
+    # valida como autoritativo contra timestamps reales (B-172).
+    "EFFECT_BEFORE_CAUSE": IRPhase.DEFENSE_EVASION,
 }
+
+
+# B-129/L-027: id de técnica MITRE al inicio del string — admite el sufijo
+# de subtécnica y tolera prosa posterior ("T1070.002 (Indicator Removal)").
+_TTP_ID_RE = re.compile(r"^(T\d{4,5})(?:\.\d{1,3})?")
+
+
+def resolve_ttp_phase(ttp: Any) -> Optional[IRPhase]:
+    """
+    Lookup determinista técnica MITRE → IRPhase, en orden de prioridad:
+      1. hit exacto en MITRE_TTP_TO_PHASE (comportamiento original);
+      2. hit exacto del id extraído del inicio del string (normaliza
+         sufijos de prosa que emiten los bundles narrativos);
+      3. fallback subtécnica → técnica padre (semántica MITRE: una
+         subtécnica es un refinamiento de su padre, hereda su fase).
+    Sin match → None. No muta ninguna tabla congelada.
+    """
+    if not isinstance(ttp, str):
+        return None
+    ttp = ttp.strip()
+    if ttp in MITRE_TTP_TO_PHASE:
+        return MITRE_TTP_TO_PHASE[ttp]
+    m = _TTP_ID_RE.match(ttp)
+    if not m:
+        return None
+    full_id = m.group(0)
+    if full_id in MITRE_TTP_TO_PHASE:
+        return MITRE_TTP_TO_PHASE[full_id]
+    return MITRE_TTP_TO_PHASE.get(m.group(1))
 
 # TABLA 3: Variables visibles por fase
 VISIBLE_VARIABLES_BY_PHASE: Dict[IRPhase, Dict[VariableCategory, List[str]]] = {
@@ -394,11 +429,14 @@ class VisibleVariablesEngine:
         phase_votes: Dict[IRPhase, int] = {phase: 0 for phase in IRPhase}
         
         # Regla 1: TTPs MITRE (peso: 40 por TTP)
+        # B-129/L-027: lookup vía resolve_ttp_phase (exacto → id extraído
+        # → padre de subtécnica); antes solo matcheaba claves exactas y
+        # las subtécnicas de las corridas vivas nunca votaban fase.
         if mitre_ttps:
             for ttp in mitre_ttps:
                 total_rules += 1
-                if ttp in MITRE_TTP_TO_PHASE:
-                    phase = MITRE_TTP_TO_PHASE[ttp]
+                phase = resolve_ttp_phase(ttp)
+                if phase is not None:
                     phase_votes[phase] += 40
                     matched_rules += 1
                     self._log(f" TTP {ttp} → {phase.value} (+40 puntos)")

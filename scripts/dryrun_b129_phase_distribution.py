@@ -49,9 +49,9 @@ sys.path.insert(0, str(REPO / "scripts"))
 
 from dryrun_signal_quality_gate import find_cases  # noqa: E402
 from vigia.tools.visible_variables import (  # noqa: E402
-    MITRE_TTP_TO_PHASE,
     TEMPORAL_VIOLATION_TO_PHASE,
     VisibleVariablesEngine,
+    resolve_ttp_phase,
 )
 
 
@@ -135,12 +135,18 @@ def main() -> None:
             print(f"DETERMINISM VIOLATION: {stem}: {r1} != {r2}")
             sys.exit(1)
         dist_cf[r1[0]] += 1
-    known = {t: n for t, n in label_ttps.items() if t in MITRE_TTP_TO_PHASE}
-    unknown = {t: n for t, n in label_ttps.items() if t not in MITRE_TTP_TO_PHASE}
+    known = {
+        t: n for t, n in label_ttps.items()
+        if resolve_ttp_phase(t) is not None
+    }
+    unknown = {
+        t: n for t, n in label_ttps.items()
+        if resolve_ttp_phase(t) is None
+    }
     print(f"   phase distribution: {dict(dist_cf.most_common())}")
     print(f"   distinct label TTPs: {len(label_ttps)} "
-          f"(mapped by MITRE_TTP_TO_PHASE: {len(known)}, "
-          f"unmapped: {len(unknown)})")
+          f"(resolved via resolve_ttp_phase, subtechnique fallback "
+          f"included: {len(known)}, unresolved: {len(unknown)})")
     print(f"   top mapped: {dict(Counter(known).most_common(8))}")
     print(f"   top unmapped: {dict(Counter(unknown).most_common(8))}")
     print()
