@@ -1160,7 +1160,7 @@ ya refutada por medición, ver arriba).
 
 | Campo | Valor |
 |-------|-------|
-| **Estado** | FASE 1 COMPLETADA — pendiente Fase 2 (calibracion) y Fase 3 (integracion) |
+| **Estado** | FASE 2 EJECUTADA 2026-08-27 — acuerdo 22% → 56%; objetivo >70% NO alcanzado, Fase 3 sigue bloqueada. Ver update 2026-08-27. |
 | **Severidad** | P3 (no afecta veredictos, modulo de observacion) |
 | **Archivos** | `vigia/core/planner_adapter.py` (nuevo), `vigia/core/peirceplanner_bounded.py` (existente) |
 | **Detectado en** | Investigation 2026-07-14 |
@@ -1262,6 +1262,63 @@ calculados, no los genera — el generador real es
 `AbductiveIntentEngine`, bloqueado por este mismo gap). Ningún código se
 tocó; `hypothesis_lineage.py`, `AbductiveIntentEngine`, y
 `ockham_adversarial.py` quedan exactamente como estaban.
+
+### Update 2026-08-27 — Fase 2 ejecutada: la causa raíz no era (solo) el peso — `_select_best` contradecía su propio contrato. Acuerdo 22% → 56%; objetivo 70% NO alcanzado
+
+La Fase 1 atribuyó el 22% de acuerdo al peso (confianza ≠ severidad de
+anomalía). El dry-run nuevo — `scripts/dryrun_b129_weight_calibration.py`,
+208 casos evaluables contra el veredicto vivo de `_vigia_score` (mismo
+método que B-116), doble corrida por combinación con aborto ante cualquier
+divergencia — separó las DOS variables que la Fase 1 midió mezcladas:
+
+**1. Hallazgo estructural, confirmado por medición.** `_select_best`
+(`peirceplanner_bounded.py`) declaraba en su docstring "mejor ratio
+cobertura/costo" pero implementaba `coverage × (1 − cost/max_cost)`: la
+hipótesis de costo máximo (H_MALICE, costo 4 = max) puntuaba exactamente 0
+con CUALQUIER cobertura — inseleccionable mientras existiera otra activa.
+Medido: **0 veredictos MALICE del planner sobre 208 casos** bajo las cuatro
+estrategias de peso, contra 113 MALICE del scorer (54% del corpus). Techo
+de acuerdo con esa fórmula: ~45% — el objetivo del 70% era inalcanzable por
+calibración de peso sola. La Fase 1 no podía ver esto porque su peso
+(confianza, mediana 0.8) dejaba las coberturas de BENIGN/SUSPICION en ~0 y
+el empate en 0 lo resolvía el orden de lista.
+
+**Fix:** `_select_best` ahora implementa el contrato declarado
+(`coverage / ockham_cost`, guarda para costo no-positivo). Tests
+rojo-primero: `tests/test_b129_select_best_ratio_contract.py` (10; los 4
+de contrato fallaban contra la implementación previa, verificado). La
+fórmula legacy queda copiada verbatim en el dry-run (selector `legacy`)
+para que la línea base histórica siga siendo reproducible — y se
+reproduce exacta: 22% con peso `conf`.
+
+**2. Calibración de peso (con el selector corregido), 208 casos:**
+
+| peso | acuerdo | nota |
+|---|---|---|
+| conf (Fase 1) | 52% | sobre-alerta: 176 MALICE del planner |
+| z_score | 45% | los z del corpus ya viven en [0,1] (p95=0.855) |
+| **raw_score × (1 − spoofability CAIE)** | **56%** | elegido — misma instanciación CAIE que el scorer Step 1 |
+| composite max(z, raw_spoof) | 52% | |
+
+`case_to_signals` queda recalibrado a `raw × (1 − spoofability)` con
+fallback a `z_score`, y con dos defectos del camino anterior eliminados:
+el default fabricaba peso `Fraction(5)` (fuera de [0,1]) para artefactos
+sin `raw_score`, y la confianza invertía la semántica (certeza alta de
+señal benigna pesaba como anomalía severa). Casos sin materia prima
+medible (20/208, la serie REAL/SRL sin `raw_score` en JSON — misma clase
+`UNMEASURABLE_FROM_JSON` de B-116) ahora reportan `NO_SIGNALS`/`ABSTAIN`
+en vez de un NOISE fabricado con pesos 0. Tests:
+`tests/test_b129_adapter_weight_calibration.py` (8).
+
+**Estado honesto:** 56% < 70% — la Fase 3 sigue bloqueada por su propio
+gate pre-registrado. Residuo caracterizado: MALICE→SUSPICION 29 casos y
+MALICE→NOISE 18 (el planner de 3 hipótesis sobre-alerta donde el pipeline
+de 5 niveles gradúa), NOISE→MALICE 20, más los 20 no medibles desde JSON.
+Cerrar esa brecha requiere o bien resolver la clase UNMEASURABLE (dato,
+no código) o bien umbrales de hipótesis calibrados — que contra este mismo
+corpus serían overfit sin un corpus de validación separado. Ambos módulos
+siguen con cero callers de producción (observación pura, cluster B-124) →
+cero veredictos sellados cambian. Suite completa verde tras el cambio.
 
 ---
 

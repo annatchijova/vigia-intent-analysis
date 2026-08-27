@@ -887,7 +887,7 @@ already refuted by measurement, see above).
 
 | Field | Value |
 |-------|-------|
-| **Status** | PHASE 1 COMPLETE — Phase 2 (calibration) and Phase 3 (integration) pending |
+| **Status** | PHASE 2 EXECUTED 2026-08-27 — agreement 22% → 56%; >70% target NOT met, Phase 3 remains blocked. See the 2026-08-27 update. |
 | **Severity** | P3 — observation-only module, does not affect verdicts |
 | **Files** | `vigia/core/planner_adapter.py` (new), `vigia/core/peirceplanner_bounded.py` |
 | **Detected** | Investigation 2026-07-14 |
@@ -964,6 +964,65 @@ computed costs, it doesn't generate them -- the real generator is
 `AbductiveIntentEngine`, blocked by this same gap). No code was touched;
 `hypothesis_lineage.py`, `AbductiveIntentEngine`, and
 `ockham_adversarial.py` remain exactly as they were.
+
+### Update 2026-08-27 — Phase 2 executed: the root cause was not (only) the weight — `_select_best` contradicted its own contract. Agreement 22% → 56%; the 70% target is NOT met
+
+Phase 1 attributed the 22% agreement to the weight (confidence is not
+anomaly severity). The new dry-run —
+`scripts/dryrun_b129_weight_calibration.py`, 208 evaluable cases against
+the live `_vigia_score` verdict (same method as B-116), each combination
+computed twice with an abort on any divergence — separated the TWO
+variables Phase 1 measured entangled:
+
+**1. Structural finding, confirmed by measurement.** `_select_best`
+(`peirceplanner_bounded.py`) declared "best coverage/cost ratio" in its
+docstring but implemented `coverage * (1 - cost/max_cost)`: the
+maximum-cost hypothesis (H_MALICE, cost 4 = max) scored exactly 0 for ANY
+coverage — unselectable while any other hypothesis remained active.
+Measured: **0 planner MALICE verdicts over 208 cases** under all four
+weight strategies, against 113 scorer MALICE cases (54% of the corpus).
+Agreement ceiling under that formula: ~45% — the 70% target was
+unreachable by weight calibration alone. Phase 1 could not see this
+because its weight (confidence, median 0.8) left BENIGN/SUSPICION
+coverages near 0 and the tie at 0 was resolved by list order.
+
+**Fix:** `_select_best` now implements the declared contract
+(`coverage / ockham_cost`, non-positive-cost guard). Red-first tests:
+`tests/test_b129_select_best_ratio_contract.py` (10; the 4 contract tests
+fail against the previous implementation, verified). The legacy formula
+is copied verbatim into the dry-run (selector `legacy`) so the historical
+baseline stays reproducible — and it reproduces exactly: 22% with the
+`conf` weight.
+
+**2. Weight calibration (with the corrected selector), 208 cases:**
+
+| weight | agreement | note |
+|---|---|---|
+| conf (Phase 1) | 52% | over-alerts: 176 planner MALICE |
+| z_score | 45% | corpus z_scores already live in [0,1] (p95=0.855) |
+| **raw_score * (1 - CAIE spoofability)** | **56%** | chosen — same CAIE instantiation as scorer Step 1 |
+| composite max(z, raw_spoof) | 52% | |
+
+`case_to_signals` is recalibrated to `raw * (1 - spoofability)` with a
+`z_score` fallback, removing two defects of the previous path: the
+fallback fabricated weight `Fraction(5)` (outside [0,1]) for artifacts
+missing `raw_score`, and confidence inverted the semantics (a
+highly-certain benign signal weighed like a severe anomaly). Cases with
+nothing measurable (20/208, the REAL/SRL series without `raw_score` in
+JSON — the same `UNMEASURABLE_FROM_JSON` class as B-116) now report
+`NO_SIGNALS`/`ABSTAIN` instead of a NOISE fabricated from zero weights.
+Tests: `tests/test_b129_adapter_weight_calibration.py` (8).
+
+**Honest state:** 56% < 70% — Phase 3 remains blocked by its own
+pre-registered gate. Characterized residue: MALICE->SUSPICION 29 cases
+and MALICE->NOISE 18 (the 3-hypothesis planner over-alerts where the
+5-level pipeline grades), NOISE->MALICE 20, plus the 20 unmeasurable-
+from-JSON cases. Closing that gap requires either resolving the
+UNMEASURABLE class (data, not code) or calibrated hypothesis thresholds —
+which, tuned against this same corpus, would be overfit without a
+separate validation corpus. Both modules still have zero production
+callers (observation only, B-124 cluster) — zero sealed verdicts change.
+Full suite green after the change.
 
 ---
 

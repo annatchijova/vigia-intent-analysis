@@ -49,34 +49,77 @@ def _to_fraction(raw: Any) -> Fraction:
         return Fraction(1, 10)
 
 
+def _clamp01(f: Fraction) -> Fraction:
+    return max(Fraction(0), min(Fraction(1), f))
+
+
+def _artifact_spoofability(a: Dict[str, Any]) -> Fraction:
+    """Same CAIE instantiation as vigia_scorer.py Step 1, same 0.50 fallback."""
+    try:
+        from vigia.tools.caie import Artifact as _CaieArtifact
+        filtered = {
+            k: v for k, v in a.items()
+            if k in {"source_tool", "evidence_type", "raw_score",
+                     "description", "metadata", "provenance_chain",
+                     "base_trust", "timestamp"}
+        }
+        filtered.setdefault(
+            "description", str(a.get("content", ""))[:200] or "legacy_artifact"
+        )
+        spoof = _CaieArtifact(**filtered).effective_spoofability
+        return _clamp01(Fraction(str(spoof)).limit_denominator(10000))
+    except Exception:
+        return Fraction(1, 2)
+
+
 def case_to_signals(case: Dict[str, Any]) -> List[EvidenceSignal]:
     """
     Translate case artifacts or signals into EvidenceSignal objects.
 
-    Uses the signal confidence as weight (already Fraction in the corpus).
-    Falls back to artifacts with raw_score if no signals exist.
-    """
-    signals_raw = case.get("signals", [])
-    if signals_raw:
-        return [
-            EvidenceSignal(
-                signal_id=s.get("artifact_id", f"S-{i:03d}"),
-                description=str(s.get("description", ""))[:200],
-                weight=_to_fraction(s.get("confidence", s.get("z_score", Fraction(1, 10)))),
-            )
-            for i, s in enumerate(signals_raw)
-            if isinstance(s, dict)
-        ]
+    Weight semantics: anomaly severity in [0, 1] (the planner hypotheses
+    read weight as "how anomalous", not "how certain").
 
-    artifacts = case.get("artifacts", [])
-    return [
-        EvidenceSignal(
+    B-129 Fase 2 calibration (2026-08-27, 208-case dry-run against the
+    live scorer — scripts/dryrun_b129_weight_calibration.py):
+      confidence-as-weight (Fase 1)          22% agreement
+      z_score                                45%
+      raw_score * (1 - CAIE spoofability)    56%  <- best, used here
+    Confidence measures certainty regardless of direction, so it was
+    replaced by the calibrated anomaly measure:
+
+    1. artifacts with raw_score -> raw * (1 - spoofability), spoofability
+       from the same CAIE Artifact call the scorer uses (0.50 fallback);
+    2. otherwise signal z_score (corpus z_scores already live in [0, 1]);
+    3. nothing measurable -> empty list, which run_planner_observation
+       reports as NO_SIGNALS/ABSTAIN. The previous fallback fabricated
+       weight 5 (out of range) for artifacts missing raw_score.
+    """
+    artifacts = [a for a in case.get("artifacts", []) if isinstance(a, dict)]
+    weighted = []
+    for i, a in enumerate(artifacts):
+        raw = a.get("raw_score")
+        if isinstance(raw, bool) or not isinstance(raw, (int, float)):
+            continue
+        try:
+            raw_frac = _clamp01(Fraction(str(raw)).limit_denominator(10000))
+        except (ValueError, ZeroDivisionError):
+            continue
+        weighted.append(EvidenceSignal(
             signal_id=a.get("artifact_id", f"A-{i:03d}"),
             description=str(a.get("description", ""))[:200],
-            weight=Fraction(int(a.get("raw_score", 5) * 10), 10),
+            weight=_clamp01(raw_frac * (Fraction(1) - _artifact_spoofability(a))),
+        ))
+    if weighted:
+        return weighted
+
+    return [
+        EvidenceSignal(
+            signal_id=s.get("artifact_id", f"S-{i:03d}"),
+            description=str(s.get("description", ""))[:200],
+            weight=_clamp01(_to_fraction(s.get("z_score", 0))),
         )
-        for i, a in enumerate(artifacts)
-        if isinstance(a, dict)
+        for i, s in enumerate(case.get("signals", []))
+        if isinstance(s, dict)
     ]
 
 
