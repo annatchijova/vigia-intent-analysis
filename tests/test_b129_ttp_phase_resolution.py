@@ -71,6 +71,14 @@ class TestResolveTtpPhase:
         assert resolve_ttp_phase("not a ttp") is None
         assert resolve_ttp_phase("1070.006") is None
 
+    def test_garbage_with_id_prefix_does_not_resolve(self):
+        """Adversarial-review finding (2026-08-27): without a boundary
+        after the id, 'T1070abc' resolved to DEFENSE_EVASION and cast a
+        +40 phase vote. A malformed bundle field must yield None."""
+        assert resolve_ttp_phase("T1070abc") is None
+        assert resolve_ttp_phase("T1059x99") is None
+        assert resolve_ttp_phase("T1070.006extra") is None
+
     def test_non_string_returns_none(self):
         assert resolve_ttp_phase(None) is None
         assert resolve_ttp_phase(1070) is None
@@ -110,6 +118,17 @@ class TestDetectPhaseUsesResolution:
         assert phase is IRPhase.UNKNOWN
         assert consistency == 0
 
+    def test_non_string_violation_type_does_not_crash(self):
+        """Adversarial-review finding (2026-08-27): Rule 2 called
+        .upper() on violation['type'] unconditionally — a None/numeric
+        type aborted the whole corpus measurement."""
+        engine = VisibleVariablesEngine()
+        phase, _ = engine.detect_phase(
+            signals=[],
+            temporal_violations=[{"type": None}, {"type": 7}, {}],
+        )
+        assert phase is IRPhase.UNKNOWN
+
     def test_determinism_double_run(self):
         engine = VisibleVariablesEngine()
         args = dict(
@@ -118,6 +137,50 @@ class TestDetectPhaseUsesResolution:
             mitre_ttps=["T1070.006", "T1048"],
         )
         assert engine.detect_phase(**args) == engine.detect_phase(**args)
+
+
+class TestSingleTacticAdditions:
+    """2026-08-27 (second batch): the four highest-frequency unresolved
+    TTPs from the corpus census that are SINGLE-tactic in MITRE ATT&CK —
+    the unambiguous class the registry update identified. Multi-tactic
+    techniques (T1078, T1055, T1053) stay deliberately absent: a
+    single-phase table cannot represent them without a design decision."""
+
+    def test_t1027_obfuscated_files_is_defense_evasion(self):
+        assert resolve_ttp_phase("T1027") is IRPhase.DEFENSE_EVASION
+
+    def test_t1036_masquerading_is_defense_evasion(self):
+        assert resolve_ttp_phase("T1036") is IRPhase.DEFENSE_EVASION
+        assert resolve_ttp_phase("T1036.005") is IRPhase.DEFENSE_EVASION
+
+    def test_t1190_exploit_public_facing_is_initial_access(self):
+        assert resolve_ttp_phase("T1190") is IRPhase.INITIAL_ACCESS
+
+    def test_t1486_data_encrypted_is_impact(self):
+        assert resolve_ttp_phase("T1486") is IRPhase.IMPACT
+
+    def test_multi_tactic_techniques_stay_unmapped(self):
+        """Guard: adding any of these requires a design decision first."""
+        assert resolve_ttp_phase("T1078") is None
+        assert resolve_ttp_phase("T1055") is None
+        assert resolve_ttp_phase("T1053") is None
+
+    def test_t1547_001_key_is_valid_mitre_id(self):
+        """The table carried "T1547.1" — not a valid MITRE id (the format
+        is .001). The corrected key must resolve exactly, and the parent
+        fallback covers other T1547 subtechniques."""
+        assert "T1547.1" not in MITRE_TTP_TO_PHASE
+        assert "T1547.001" in MITRE_TTP_TO_PHASE
+        assert resolve_ttp_phase("T1547.001") is IRPhase.PERSISTENCE
+
+    def test_t1547_key_also_fixed_in_picerl_table(self):
+        """Adversarial-review finding (2026-08-27): the parallel
+        MITRE_TTPS_BY_PHASE table in picerl_mapping.py — which flows
+        into generated PICERL reports — still carried the invalid id."""
+        from vigia.tools.picerl_mapping import MITRE_TTPS_BY_PHASE
+        all_ids = [t for ids in MITRE_TTPS_BY_PHASE.values() for t in ids]
+        assert "T1547.1" not in all_ids
+        assert "T1547.001" in all_ids
 
 
 class TestTablesStayFrozen:

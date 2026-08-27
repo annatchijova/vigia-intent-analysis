@@ -1087,6 +1087,24 @@ to the real file.
 - Real `observed_at` from signal timestamp
 - `consistency_score` as `Fraction(coverage_score, 100)` (no floats; `cost` remains `int`)
 
+> **Addendum 2026-08-27 (measurement supersedes the mapping-table plan
+> above):** the phase-distribution measurement prescribed by the B-129
+> addendum was executed (`scripts/dryrun_b129_phase_distribution.py`):
+> with the corpus's real inputs, `detect_phase()` yields UNKNOWN for
+> 206/209 cases, because no `mitre_ttps` input field exists in any corpus
+> case and the violation vocabulary was largely absent from the phase
+> tables. Building the `tool_name -> artifact_type` mapping first would
+> therefore solve the wrong problem — phase-scoped hypothesis matching is
+> unreachable before a TTP producer exists. What was applied instead
+> (B-129 registry, updates ter and 2026-08-27 second batch):
+> `resolve_ttp_phase()` (exact -> extracted id -> subtechnique parent),
+> `EFFECT_BEFORE_CAUSE` and four single-tactic techniques added to the
+> tables. The example mappings suggested above (e.g. `audit_network ->
+> lateral_movement_auth`) should be treated as illustrative only — the
+> reverted commit `86f6777` failed precisely by mapping tool names to
+> artifact names by convenience. See `BUGS_PENDIENTES.md` B-129 for the
+> current unblocking order.
+
 **Triplication resolved:** `vigia/tools/abductive_intent_engine.py`, `vigia/core/abductive_intent_engine.py`, and `vigia/abductive_intent_engine.py` (root) remain in place as archived originals — not deleted, not imported by any active path after this fix. The `.bak` file at `vigia/core/abductive_intent_engine.py.bak` captures the pre-fix state.
 
 **Discovered by:** Anna Tchijova + Claude + Kimi, live repo audit, 2026-06-22.

@@ -99,6 +99,29 @@ class TestCalibratedWeights:
         assert report["planner_status"] == "NO_SIGNALS"
         assert report["planner_verdict"] == "ABSTAIN"
 
+    def test_signals_without_z_score_are_skipped_not_zeroed(self):
+        """Adversarial-review finding (2026-08-27): a signal missing
+        z_score became weight 0, so an unmeasured case produced a BENIGN
+        observation with status OK instead of NO_SIGNALS/ABSTAIN —
+        'unmeasured' silently converted into 'measured as zero anomaly'."""
+        case = {
+            "case_id": "UNMEASURED-001",
+            "signals": [{"artifact_id": "S-001", "description": "no z"}],
+        }
+        assert case_to_signals(case) == []
+        report = run_planner_observation(case)
+        assert report["planner_status"] == "NO_SIGNALS"
+        assert report["planner_verdict"] == "ABSTAIN"
+
+    def test_z_score_of_zero_is_a_measurement_not_an_absence(self):
+        case = {
+            "signals": [
+                {"artifact_id": "S-001", "z_score": 0, "description": "z=0"},
+            ]
+        }
+        [sig] = case_to_signals(case)
+        assert sig.weight == Fraction(0)
+
     def test_weights_are_fractions(self):
         case = {"artifacts": [_artifact("A-001", 0.75)]}
         [sig] = case_to_signals(case)

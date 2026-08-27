@@ -71,6 +71,8 @@ from vigia.core.peirceplanner_bounded import (  # noqa: E402
     _signal_coverage,
 )
 from vigia.core.planner_adapter import (  # noqa: E402
+    _artifact_spoofability,
+    _signal_z_fraction,
     _to_fraction,
     build_hypotheses,
     case_to_signals,
@@ -85,23 +87,11 @@ def _clamp01(f: Fraction) -> Fraction:
     return max(Fraction(0), min(Fraction(1), f))
 
 
-def _spoofability_for(a: dict) -> Fraction:
-    """Same CAIE instantiation as vigia_scorer.py Step 1, same 0.50 fallback."""
-    try:
-        from vigia.tools.caie import Artifact as _CaieArtifact
-        filtered = {
-            k: v for k, v in a.items()
-            if k in {"source_tool", "evidence_type", "raw_score",
-                     "description", "metadata", "provenance_chain",
-                     "base_trust", "timestamp"}
-        }
-        filtered.setdefault(
-            "description", str(a.get("content", ""))[:200] or "legacy_artifact"
-        )
-        spoof = _CaieArtifact(**filtered).effective_spoofability
-        return _clamp01(Fraction(str(spoof)).limit_denominator(10000))
-    except Exception:
-        return Fraction(1, 2)
+# Spoofability: single source of truth is planner_adapter._artifact_spoofability
+# (the same CAIE instantiation vigia_scorer.py Step 1 performs) — the copy
+# this script carried was removed so the strategies cannot drift from the
+# shipped adapter (adversarial review 2026-08-27).
+_spoofability_for = _artifact_spoofability
 
 
 def _raw_fraction(a: dict) -> Optional[Fraction]:
@@ -143,25 +133,35 @@ def signals_conf(case: dict) -> list[EvidenceSignal]:
 
 
 def signals_z(case: dict) -> list[EvidenceSignal]:
-    sigs = [s for s in (case.get("signals") or []) if isinstance(s, dict)]
-    if sigs:
-        return [
-            EvidenceSignal(
-                signal_id=s.get("artifact_id", f"S-{i:03d}"),
-                description=str(s.get("description", ""))[:200],
-                weight=_clamp01(_to_fraction(s.get("z_score", 0))),
-            )
-            for i, s in enumerate(sigs)
-        ]
-    return [
-        EvidenceSignal(
+    # Absent-vs-zero discipline mirrors the shipped adapter (adversarial
+    # review 2026-08-27): a signal without z_score or an artifact without
+    # raw_score is unmeasured and gets skipped, never fabricated as 0.
+    out = []
+    for i, s in enumerate(case.get("signals") or []):
+        if not isinstance(s, dict):
+            continue
+        z = _signal_z_fraction(s)
+        if z is None:
+            continue
+        out.append(EvidenceSignal(
+            signal_id=s.get("artifact_id", f"S-{i:03d}"),
+            description=str(s.get("description", ""))[:200],
+            weight=z,
+        ))
+    if out:
+        return out
+    for i, a in enumerate(case.get("artifacts") or []):
+        if not isinstance(a, dict):
+            continue
+        raw = _raw_fraction(a)
+        if raw is None:
+            continue
+        out.append(EvidenceSignal(
             signal_id=a.get("artifact_id", f"A-{i:03d}"),
             description=str(a.get("description", ""))[:200],
-            weight=_raw_fraction(a) or Fraction(0),
-        )
-        for i, a in enumerate(case.get("artifacts") or [])
-        if isinstance(a, dict)
-    ]
+            weight=raw,
+        ))
+    return out
 
 
 def signals_raw_spoof(case: dict) -> list[EvidenceSignal]:

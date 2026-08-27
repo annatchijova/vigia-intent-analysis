@@ -53,6 +53,25 @@ def _clamp01(f: Fraction) -> Fraction:
     return max(Fraction(0), min(Fraction(1), f))
 
 
+def _signal_z_fraction(s: Dict[str, Any]) -> Optional[Fraction]:
+    """z_score de una señal como Fraction en [0,1], o None si está ausente
+    o no es parseable — ausente y cero son estados distintos."""
+    z = s.get("z_score")
+    if z is None or isinstance(z, bool):
+        return None
+    if isinstance(z, dict) and z.get("__fraction__"):
+        try:
+            return _clamp01(Fraction(int(z["num"]), int(z["den"])))
+        except (ValueError, TypeError, ZeroDivisionError):
+            return None
+    if isinstance(z, (int, float)):
+        try:
+            return _clamp01(Fraction(str(z)).limit_denominator(10000))
+        except (ValueError, ZeroDivisionError):
+            return None
+    return None
+
+
 def _artifact_spoofability(a: Dict[str, Any]) -> Fraction:
     """Same CAIE instantiation as vigia_scorer.py Step 1, same 0.50 fallback."""
     try:
@@ -112,15 +131,22 @@ def case_to_signals(case: Dict[str, Any]) -> List[EvidenceSignal]:
     if weighted:
         return weighted
 
-    return [
-        EvidenceSignal(
+    # Solo señales con z_score PRESENTE y parseable: una señal sin z es
+    # no-medida, no "anomalía cero" — convertirla en peso 0 producía un
+    # BENIGN de observación para casos sin medición (revisión 2026-08-27).
+    fallback = []
+    for i, s in enumerate(case.get("signals", [])):
+        if not isinstance(s, dict):
+            continue
+        z = _signal_z_fraction(s)
+        if z is None:
+            continue
+        fallback.append(EvidenceSignal(
             signal_id=s.get("artifact_id", f"S-{i:03d}"),
             description=str(s.get("description", ""))[:200],
-            weight=_clamp01(_to_fraction(s.get("z_score", 0))),
-        )
-        for i, s in enumerate(case.get("signals", []))
-        if isinstance(s, dict)
-    ]
+            weight=z,
+        ))
+    return fallback
 
 
 def build_hypotheses(signals: List[EvidenceSignal]) -> List[Hypothesis]:

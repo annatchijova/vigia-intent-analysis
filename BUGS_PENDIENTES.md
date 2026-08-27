@@ -1451,6 +1451,53 @@ tácticas, 15), `T1053` (Scheduled Task, 3 tácticas). El ítem (a) —
 productor real de TTPs como input del pipeline JSON — sigue siendo el
 bloqueo principal para que la corrida honesta salga de UNKNOWN.
 
+### Update 2026-08-27 (quater) — aplicada la clase (i) con la aprobación genérica de Anna de continuar; corregido un id MITRE inválido en la tabla
+
+Las cuatro mono-tácticas de la clase (i) entraron a `MITRE_TTP_TO_PHASE`
+(`T1027`, `T1036` → defense_evasion; `T1190` → initial_access; `T1486` →
+impact — cada una con una sola táctica en ATT&CK, sin ambigüedad de
+doctrina). Además se corrigió la clave `"T1547.1"` → `"T1547.001"` (el
+formato de subtécnica MITRE es `.NNN`; la clave vieja no era un id válido
+y solo matcheaba su propio literal). Tests rojo-primero ampliados en
+`tests/test_b129_ttp_phase_resolution.py` (19 en total; 5 nuevos
+fallaban pre-cambio), incluida una guarda que fija que las multi-táctica
+(`T1078`, `T1055`, `T1053`) siguen sin mapear hasta decisión de diseño.
+Re-medición: TTPs de label resueltos 50 → 59/124; techo contrafáctico
+UNKNOWN 130 → 127. `detect_phase` sigue con cero callers de producción.
+Documentación alineada: addendum en `KNOWN_LIMITATIONS.md` L-027 (el
+plan de tabla de mapeo queda supeditado a la medición) y nota de
+vigencia en `WHAT_IS_NEXT.md` (regla POST HACKATHON retirada).
+
+### Update 2026-08-27 (quinquies) — revisión adversarial del diff completo de la sesión: 6 hallazgos, todos verificados por ejecución y corregidos
+
+Antes de cerrar, el diff acumulado de la rama pasó por revisión
+adversarial. El fix central de `_select_best` y la calibración salieron
+limpios; los hallazgos, todos reproducidos en vivo antes de parchear:
+
+1. **Degradación deshonesta en el fallback de señales del adapter:** una
+   señal sin `z_score` se convertía en peso 0 — "no medido" se volvía
+   "medido como anomalía cero" y un caso inmedible producía BENIGN/OK en
+   vez de `NO_SIGNALS`/ABSTAIN. Ahora ausente ≠ cero: se salta.
+2. **Regex de TTP sin frontera:** `"T1070abc"` resolvía DEFENSE_EVASION
+   y votaba +40. Lookahead `(?![\w.])` agregado; la prosa legítima sigue
+   resolviendo.
+3. **Crash de `detect_phase` Regla 2** con `type` no-string en una
+   violación (`None.upper()`): endurecido a "regla no satisfecha".
+4. **Divergencia script/adapter:** los fallbacks de `signals_z`/
+   `raw_spoof` del dry-run fabricaban peso 0 donde el adapter salta;
+   ahora las filas `raw_spoof` y `adapter` son idénticas por
+   construcción (verificado: 118/208 con la misma distribución).
+5. **`"T1547.1"` seguía en la tabla paralela** `MITRE_TTPS_BY_PHASE`
+   (`picerl_mapping.py`), que fluye a reportes PICERL: corregido a
+   `T1547.001` — las dos tablas ya no discrepan.
+6. **Triplicación de la instanciación CAIE de spoofability:** el script
+   ahora importa `_artifact_spoofability` del adapter (fuente única);
+   la copia del scorer Step 1 no se toca (path sellado).
+
+Tests de guarda nuevos: 7 (rojo-primero verificado, 4 fallaban).
+Acuerdos de calibración sin cambios (los fixes solo re-etiquetan casos
+no medidos como `NO_SIGNALS`). Suite completa verde.
+
 ---
 
 ## B-162 — El adaptador legacy borraba silenciosamente un schema de evidencia estructurada sin modelar [REPARACIÓN PARCIAL — Codex 2026-07-21]
