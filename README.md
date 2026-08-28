@@ -127,7 +127,6 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 **Cases & examples**
 - [`docs/PROMPTS_REALCASES_CLAUDE.md`](./docs/PROMPTS_REALCASES_CLAUDE.md) — copy-paste prompts to run full investigations
 - [`RAW_CASES_LOG.md`](./RAW_CASES_LOG.md) · [ES](./RAW_CASES_LOG_ES.md) — per-case raw-evidence catalog
-- [`casos.md`](./casos.md) · [`casosfinal.md`](./casosfinal.md) · [`nuevoscasos.md`](./nuevoscasos.md) — semiotic case-design catalogs (ES)
 - [`docs/readme_benign_cases.md`](./docs/readme_benign_cases.md) — benign / authorized-use cases
 - [`docs/digital_corpora_complete_report.md`](./docs/digital_corpora_complete_report.md) · [`docs/nist_cfreds_full_report.md`](./docs/nist_cfreds_full_report.md) — full real-corpus reports
 - [`results/`](./results/) — sealed ForensicBundles, amicus curiae, and SHA-256 sidecars
@@ -137,7 +136,6 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 - [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) — documented limitations (Daubert transparency)
 - [`DAUBERT_JUDICIAL.md`](./DAUBERT_JUDICIAL.md) · [ES](./DAUBERT_JUDICIAL_ES.md) — Daubert admissibility rationale
 - [`docs/MUTATION_RUNBOOK.md`](./docs/MUTATION_RUNBOOK.md) — mutation-testing operations guide
-- [`SUBMISSION_COMPLIANCE.md`](./SUBMISSION_COMPLIANCE.md) — full component index
 
 **Theory & methodology**
 - [`docs/vigia_paper_methodology.md`](./docs/vigia_paper_methodology.md) — the formal methodology paper

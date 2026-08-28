@@ -189,8 +189,7 @@ constituye la métrica de precisión del sistema.
 > que mide reproducción de etiqueta, no detección. Se conserva como registro
 > histórico de la evaluación de envío. La métrica honesta vigente para este
 > camino es el **187/199 de detección ciega** en la nota de cambio de métrica de
-> arriba. `SUBMISSION_COMPLIANCE.md` refleja los claims tal como se presentaron y
-> queda intencionalmente sin modificar.
+> arriba.
 
 | Suite | Casos | Correctos |
 |-------|-------|-----------|

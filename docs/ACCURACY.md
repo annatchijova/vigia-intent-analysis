@@ -252,8 +252,6 @@ constitutes the system's accuracy claim.
 > measures label reproduction, not detection. It is retained as historical record of
 > the submission-time evaluation. The current honest metric for this path is the
 > **187/199 label-blind detection** figure in the metric-change note above.
-> `SUBMISSION_COMPLIANCE.md` reflects the claims as submitted and is intentionally
-> left unmodified.
 
 | Suite | Cases | Correct |
 |-------|-------|---------|
