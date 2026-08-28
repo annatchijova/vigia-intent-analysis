@@ -231,6 +231,12 @@ def create_app(repo_root: Optional[Path] = None) -> FastAPI:
             raise HTTPException(status_code=404, detail="unknown job id")
         return result
 
+    @app.on_event("shutdown")
+    def _stop_jobs():
+        runner = getattr(app.state, "job_runner", None)
+        if runner is not None:
+            runner.shutdown()
+
     # -- static SPA ---------------------------------------------------------
 
     @app.get("/")
