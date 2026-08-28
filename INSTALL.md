@@ -318,6 +318,48 @@ curl http://127.0.0.1:8000/health
 
 ---
 
+## 11b. Web UI (local dashboard)
+
+VIGÍA ships a local web dashboard: a read-only browser over every sealed
+bundle on disk (all three output families), an independent-verification
+panel, and a launcher for Mode 1 investigations with a live log.
+
+```bash
+./launch_vigia_ui.sh
+# Opens at http://127.0.0.1:8010 (loopback only)
+```
+
+Key properties:
+
+- **100% offline.** No CDNs, no external fonts, no outbound requests — a
+  CSP `default-src 'self'` tripwire blocks any accidental external
+  reference. Suitable for air-gapped forensic workstations.
+- **Verdicts verbatim.** The UI never computes, restates, or reconciles a
+  verdict. Bundles that carry more than one verdict-bearing field (e.g. an
+  EBS v1 sealed `decision_trace.decision` next to `caie_analysis.verdict`)
+  show all of them side by side with a disagreement banner.
+- **Independent verification.** The Verify tab runs
+  `forensics/verify_ebs_v1.py` and `verify_tool_log.py` as stdlib-only
+  subprocesses (never imported) and reports their output verbatim, plus a
+  pure SHA-256 sidecar check.
+- **Mode 1 launcher.** The Investigate view runs
+  `python3 vigia_agent.py --evidence … --case-id …` on evidence confined to
+  allowlisted roots (`cases/`, `data/cases/`, `evidence/`,
+  `blind_cases_for_mcp/`, `results/input/`). Sealed bundles land in
+  `results/webui/` with a job-id suffix so re-runs never overwrite a sealed
+  bundle. Finished jobs show exit code, its documented label, and the
+  bundle's `agent_verdict` side by side.
+- **No auth layer** — same deliberate stance as the REST API above: the
+  server binds `127.0.0.1` only. Put it behind an authenticated boundary
+  before any wider exposure. UI text is bilingual (English/Spanish) with a
+  persistent toggle, defaulting to the browser language; sealed vocabulary
+  (verdict values) and bundle content always render verbatim, untranslated.
+
+Configuration: `VIGIA_HOST` (default `127.0.0.1`), `VIGIA_UI_PORT`
+(default `8010`), `VIGIA_UI_MAX_JOBS` (default `1`).
+
+---
+
 ## 12. Claude Code integration (MCP Server Setup)
 
 Claude Code connects to VIGÍA via the MCP bridge (`vigia_sift_bridge.py`).

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Offline tripwire: any accidental external reference is blocked outright. -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'">
+<title>VIGÍA — Forensic Intent Dashboard</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="mast">
+    <div>
+      <div class="eyebrow" id="chrome-eyebrow">VIGÍA · Forensic Intent Analysis</div>
+      <h1 id="chrome-title">Intent Dashboard</h1>
+    </div>
+    <div class="sub" id="chrome-sub">Sealed bundles are rendered verbatim — this UI never computes a verdict.</div>
+    <nav class="nav" id="nav">
+      <a href="#/bundles" data-nav="bundles">Bundles</a>
+      <a href="#/investigate" data-nav="investigate">Investigate</a>
+      <a href="#/jobs" data-nav="jobs">Jobs</a>
+    </nav>
+    <button id="lang-toggle" title="English / Español">ES</button>
+    <button id="theme-toggle" title="Toggle dark mode">◐ theme</button>
+  </header>
+
+  <main id="app"><p class="muted">Loading…</p></main>
+
+  <footer id="chrome-footer">
+    VIGÍA Web UI · local viewer &amp; Mode 1 launcher · loopback only, no auth —
+    keep behind an authenticated boundary for any wider exposure.
+  </footer>
+</div>
+<script src="/static/i18n.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -40,6 +40,9 @@ aiofiles>=23.0.0
 # pinneado solo en requirements-ci.txt (B-168) y el workflow pytest.yml
 # instala requirements.txt — los 4 módulos de tests de API no colectaban.
 fastapi>=0.100.0
+# uvicorn: importado por vigia_api.py.__main__ y vigia/ui/__main__.py; era un
+# gap latente (importado pero no declarado) — corregido junto con la Web UI.
+uvicorn>=0.23
 
 # Testing
 pytest>=7.4.0

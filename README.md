@@ -50,6 +50,10 @@ python3 vigia_agent.py --evidence data/cases/converted/VIGIA-REAL-VANKO.json \
 python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json --verbose
 ```
 
+A local, fully offline web dashboard (bundle browser, verification panel,
+Mode 1 launcher) is available with `./launch_vigia_ui.sh` →
+`http://127.0.0.1:8010` — see INSTALL.md §11b.
+
 Exit codes: `0` = no evil, `1` = MALICE, `2` = error, `3` = intent/suspicion.
 Full setup: [`INSTALL.md`](./INSTALL.md) ([ES](./INSTALL_ES.md)) ·
 Command reference: [`vigia_commands_en.html`](https://annatchijova.github.io/vigia/vigia_commands_en.html).

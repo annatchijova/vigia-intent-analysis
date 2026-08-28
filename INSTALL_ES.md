@@ -289,6 +289,50 @@ curl http://127.0.0.1:8000/health
 
 ---
 
+## 11b. Interfaz web (panel local)
+
+VIGÍA incluye un panel web local: navegador de solo lectura sobre todos los
+bundles sellados en disco (las tres familias de salida), un panel de
+verificación independiente y un lanzador de investigaciones Modo 1 con log
+en vivo.
+
+```bash
+./launch_vigia_ui.sh
+# Se abre en http://127.0.0.1:8010 (solo loopback)
+```
+
+Propiedades clave:
+
+- **100% offline.** Sin CDNs, sin fuentes externas, sin peticiones
+  salientes — un tripwire CSP `default-src 'self'` bloquea cualquier
+  referencia externa accidental. Apto para estaciones forenses aisladas.
+- **Veredictos verbatim.** La UI nunca calcula, reformula ni reconcilia un
+  veredicto. Los bundles con más de un campo de veredicto (p. ej.
+  `decision_trace.decision` sellado junto a `caie_analysis.verdict` en
+  EBS v1) muestran todos lado a lado con un aviso de desacuerdo.
+- **Verificación independiente.** La pestaña Verify ejecuta
+  `forensics/verify_ebs_v1.py` y `verify_tool_log.py` como subprocesos
+  stdlib-only (nunca importados) y reporta su salida verbatim, más una
+  comprobación pura del sidecar SHA-256.
+- **Lanzador Modo 1.** La vista Investigate ejecuta
+  `python3 vigia_agent.py --evidence … --case-id …` con evidencia confinada
+  a raíces permitidas (`cases/`, `data/cases/`, `evidence/`,
+  `blind_cases_for_mcp/`, `results/input/`). Los bundles sellados van a
+  `results/webui/` con sufijo de job para que una re-ejecución nunca
+  sobrescriba un bundle sellado. Al terminar se muestran exit code, su
+  etiqueta documentada y el `agent_verdict` del bundle, lado a lado.
+- **Sin capa de autenticación** — misma postura deliberada que la API REST:
+  el servidor escucha solo en `127.0.0.1`. Ponlo detrás de una frontera
+  autenticada antes de cualquier exposición mayor. El texto de la UI es
+  bilingüe (español/inglés) con selector persistente, por defecto el idioma
+  del navegador; el vocabulario sellado (valores de veredicto) y el contenido
+  de los bundles se muestran siempre verbatim, sin traducir.
+
+Configuración: `VIGIA_HOST` (por defecto `127.0.0.1`), `VIGIA_UI_PORT`
+(por defecto `8010`), `VIGIA_UI_MAX_JOBS` (por defecto `1`).
+
+---
+
 ## 12. Integración con Claude Code
 
 Claude Code puede llamar a VIGÍA directamente como herramienta MCP.
