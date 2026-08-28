@@ -4,7 +4,19 @@
 > todo lo listado acá es track POST HACKATHON. Este documento reemplaza la
 > versión anterior (que era solo el track teórico Magnani/Aliseda/Nishida —
 > ahora §4, con sus claims corregidos: `resolve()` ya no está "ausente").
-> Todo commit derivado de este documento se etiqueta `POST HACKATHON`.
+> ~~Todo commit derivado de este documento se etiqueta `POST HACKATHON`.~~
+> **(Regla retirada el 2026-08-15 — ver `docs/ENGINEERING_DISCIPLINE.md` §0:
+> los commits nuevos NO llevan prefijo fijo; los históricos lo conservan.)**
+
+> **Nota de vigencia 2026-08-27:** las tablas de estado de este documento
+> (corpus, suite, trackers "hasta B-137") quedaron históricas — la fuente
+> de verdad vigente de pendientes es `BUGS_PENDIENTES.md` (ES) /
+> `BUGS_PENDIENTES_EN.md` (numeración compartida con `BUGS_HISTORICO.md`,
+> registrados hasta B-224). Estado del 2026-08-27: suite 2176+ passed / 0
+> failed; B-129 Fase 2 ejecutada (ver su entrada); pendientes activos:
+> B-010 (refutado, espera cierre), B-111..B-113 (candidatos), B-116
+> (sombra, 3x 0-flips), B-123/B-124 (pospuestos), B-129 Fase 3 (gate 70%),
+> B-162 (residual).
 
 ---
 

@@ -197,7 +197,9 @@ FALSIFIABLE_STATEMENT_BY_PHASE: Dict[IRPhase, str] = {
 
 # TABLA 5: IR Phase → MITRE TTPs
 MITRE_TTPS_BY_PHASE: Dict[IRPhase, List[str]] = {
-    IRPhase.PERSISTENCE: ["T1547", "T1547.1", "T1098", "T1137"],
+    # B-129 2026-08-27: "T1547.1" no era un id MITRE válido (formato .001);
+    # corregido en paralelo con MITRE_TTP_TO_PHASE (visible_variables.py).
+    IRPhase.PERSISTENCE: ["T1547", "T1547.001", "T1098", "T1137"],
     IRPhase.EXFILTRATION: ["T1020", "T1030", "T1048", "T1041"],
     IRPhase.LATERAL_MOVEMENT: ["T1570", "T1021", "T1091", "T1550"],
     IRPhase.DEFENSE_EVASION: ["T1548", "T1197", "T1140", "T1564", "T1562", "T1070"],

@@ -37,6 +37,43 @@ correctly with the current architecture. It is migration debt for v3.0.
 Evaluate whether SemioticDetectorV2 covers all forensic_technical_detector use cases.
 Migration must be audited by the team before applying.
 
+### Update 2026-08-27 — coverage evaluation executed: the migration premise is REFUTED by measurement
+
+The evaluation this entry named as prerequisite was performed against
+live code and data, not docstrings:
+
+1. **Vocabulary coverage: 0 of 44.** The `SemioticDetectorV2` pattern DB
+   (`vigia/tools/forensic_patterns.sqlite`, `nlp_patterns`, 41 patterns)
+   contains manipulation semiotics exclusively — SOCIAL_ENGINEERING (19),
+   ANTI_FORENSIC (9), GRICE_VIOLATION (6), EVIDENCE_DESTRUCTION (6),
+   LINGUISTIC_ANOMALY (1); the Carnegie/Grice/Eco taxonomy. None of the
+   ~44 technical indicators in `IFT_CATALOG` (mimikatz, webshell, IFEO
+   hijack, timestomping, C2, exfil, process hollowing, ...) exists in
+   that DB.
+2. **Incompatible contracts.** FTD: input artifact dict
+   (`content`+`forensic_anomalies`+`type`), output `z_score` in
+   [0.4, 4.5] + `confidence` + `tool_prefix`. SDv2: input
+   text+timestamp, output `confidence_adjustment` capped at 0.30 + FSV +
+   alert_level. No adapter exists and the codomains are not translatable
+   without a fresh calibration decision.
+3. **FTD has a live caller:** `vigia/tools/vigia_case_adapter.py` loads
+   it and treats its absence as an error — it is not orphaned code.
+4. **Hidden behavior change inside the "migration":** SDv2 applies a
+   Negation Handler and fuzzy matching; a technical catalog ported there
+   would attenuate negated matches ("no mimikatz found" fires in FTD
+   today; SDv2 would halve it). That may or may not be desirable — but
+   it is a detection-semantics change, not a migration.
+
+**Conclusion:** the two detectors are complementary layers (technical vs
+semiotic), not versions of the same thing. "Migrate to
+SemioticDetectorV2" as the TODO states would require porting the full
+catalog into the DB, designing an output adapter, and deciding a
+negation policy — a rewrite with a design decision, not mechanical debt.
+Recommendation: close B-010 as REFUTED (or reclassify it as a v3.0
+design decision with that real scope). The TODO in the code stays as-is
+until that decision — deleting it without closing the entry would
+desynchronize them.
+
 ---
 
 ## B-111 — Mode 3 (Ollama/hermes3:8b): unreliable behavior on dense testimonial evidence — N=2, STOCHASTIC
@@ -178,6 +215,14 @@ Observe the pattern in a second independent judicial case file (other than MPF77
 > below is stale as of this note -- see the Spanish file for the current
 > "CABLEADO COMO SOMBRA" status. Full EN translation of the intervening
 > history has not been done; flagged here rather than left silently wrong.
+
+> **Update 2026-08-27 (observation data point):** the same pre-registered
+> script was re-run on the current corpus (208 cases): **0 flips** of
+> verdict/score/confidence; shadow distribution 123 QUALITY_OK / 85 WARN /
+> 0 missing annex / 0 error. Third consecutive 0-flips run (07-22, 07-31,
+> 08-27). The pending decision remains Anna's: keep observing, promote
+> WARN to some authority (with sign-off), or close B-116 as
+> wired-as-designed.
 
 | Field | Value |
 |-------|-------|
@@ -887,7 +932,7 @@ already refuted by measurement, see above).
 
 | Field | Value |
 |-------|-------|
-| **Status** | PHASE 1 COMPLETE — Phase 2 (calibration) and Phase 3 (integration) pending |
+| **Status** | PHASE 2 EXECUTED 2026-08-27 — agreement 22% → 56%; >70% target NOT met, Phase 3 remains blocked. See the 2026-08-27 update. |
 | **Severity** | P3 — observation-only module, does not affect verdicts |
 | **Files** | `vigia/core/planner_adapter.py` (new), `vigia/core/peirceplanner_bounded.py` |
 | **Detected** | Investigation 2026-07-14 |
@@ -964,6 +1009,204 @@ computed costs, it doesn't generate them -- the real generator is
 `AbductiveIntentEngine`, blocked by this same gap). No code was touched;
 `hypothesis_lineage.py`, `AbductiveIntentEngine`, and
 `ockham_adversarial.py` remain exactly as they were.
+
+### Update 2026-08-27 — Phase 2 executed: the root cause was not (only) the weight — `_select_best` contradicted its own contract. Agreement 22% → 56%; the 70% target is NOT met
+
+Phase 1 attributed the 22% agreement to the weight (confidence is not
+anomaly severity). The new dry-run —
+`scripts/dryrun_b129_weight_calibration.py`, 208 evaluable cases against
+the live `_vigia_score` verdict (same method as B-116), each combination
+computed twice with an abort on any divergence — separated the TWO
+variables Phase 1 measured entangled:
+
+**1. Structural finding, confirmed by measurement.** `_select_best`
+(`peirceplanner_bounded.py`) declared "best coverage/cost ratio" in its
+docstring but implemented `coverage * (1 - cost/max_cost)`: the
+maximum-cost hypothesis (H_MALICE, cost 4 = max) scored exactly 0 for ANY
+coverage — unselectable while any other hypothesis remained active.
+Measured: **0 planner MALICE verdicts over 208 cases** under all four
+weight strategies, against 113 scorer MALICE cases (54% of the corpus).
+Agreement ceiling under that formula: ~45% — the 70% target was
+unreachable by weight calibration alone. Phase 1 could not see this
+because its weight (confidence, median 0.8) left BENIGN/SUSPICION
+coverages near 0 and the tie at 0 was resolved by list order.
+
+**Fix:** `_select_best` now implements the declared contract
+(`coverage / ockham_cost`, non-positive-cost guard). Red-first tests:
+`tests/test_b129_select_best_ratio_contract.py` (10; the 4 contract tests
+fail against the previous implementation, verified). The legacy formula
+is copied verbatim into the dry-run (selector `legacy`) so the historical
+baseline stays reproducible — and it reproduces exactly: 22% with the
+`conf` weight.
+
+**2. Weight calibration (with the corrected selector), 208 cases:**
+
+| weight | agreement | note |
+|---|---|---|
+| conf (Phase 1) | 52% | over-alerts: 176 planner MALICE |
+| z_score | 45% | corpus z_scores already live in [0,1] (p95=0.855) |
+| **raw_score * (1 - CAIE spoofability)** | **56%** | chosen — same CAIE instantiation as scorer Step 1 |
+| composite max(z, raw_spoof) | 52% | |
+
+`case_to_signals` is recalibrated to `raw * (1 - spoofability)` with a
+`z_score` fallback, removing two defects of the previous path: the
+fallback fabricated weight `Fraction(5)` (outside [0,1]) for artifacts
+missing `raw_score`, and confidence inverted the semantics (a
+highly-certain benign signal weighed like a severe anomaly). Cases with
+nothing measurable (20/208, the REAL/SRL series without `raw_score` in
+JSON — the same `UNMEASURABLE_FROM_JSON` class as B-116) now report
+`NO_SIGNALS`/`ABSTAIN` instead of a NOISE fabricated from zero weights.
+Tests: `tests/test_b129_adapter_weight_calibration.py` (8).
+
+**Honest state:** 56% < 70% — Phase 3 remains blocked by its own
+pre-registered gate. Characterized residue: MALICE->SUSPICION 29 cases
+and MALICE->NOISE 18 (the 3-hypothesis planner over-alerts where the
+5-level pipeline grades), NOISE->MALICE 20, plus the 20 unmeasurable-
+from-JSON cases. Closing that gap requires either resolving the
+UNMEASURABLE class (data, not code) or calibrated hypothesis thresholds —
+which, tuned against this same corpus, would be overfit without a
+separate validation corpus. Both modules still have zero production
+callers (observation only, B-124 cluster) — zero sealed verdicts change.
+Full suite green after the change.
+
+### Update 2026-08-27 (bis) — the phase measurement prescribed by the 2026-08-01 addendum was executed: the L-027 mapping is moot — the real blocker is upstream
+
+`scripts/dryrun_b129_phase_distribution.py` (committed, double-run with
+abort on divergence, 209 cases):
+
+**1. Honest run (real corpus inputs): 208/209 cases detect phase
+UNKNOWN.** The input field `mitre_ttps` exists in 0/209 cases (what
+exists is `expected_mitre_ttps` — an expected-output label; feeding it
+would be label leakage, the same class as B-162's guards), and of the 15
+observed `temporal_violations` types only `STATISTICAL_UNIFORMITY`
+appears in `TEMPORAL_VIOLATION_TO_PHASE` (1 case). Direct consequence:
+`infer_habit()`'s phase-scoped hypothesis matching is unreachable for
+99.5% of the corpus — **designing the `tool_name -> artifact_type`
+mapping table today would solve the wrong problem**.
+
+**2. Notable table gap:** `EFFECT_BEFORE_CAUSE` — the only violation
+type the scorer validates as authoritative (B-172) — is NOT in
+`TEMPORAL_VIOLATION_TO_PHASE` (5 keys, none of the corpus's real
+vocabulary except the one mentioned).
+
+**3. Counterfactual ceiling (labels as input, explicitly NOT wireable):**
+even feeding `expected_mitre_ttps`, 161/209 remain UNKNOWN.
+`MITRE_TTP_TO_PHASE` covers 24 of 124 distinct corpus TTPs (19%) and
+does not normalize subtechniques: `T1070.006` (14 uses) does not map even
+though its parent `T1070` is in the table; `T1036` (masquerading, 11
+uses) does not either.
+
+**Identified unblocking path (not applied — every table entry is
+doctrine, and the subtechnique-to-parent fallback changes live SIFT
+orchestrator behavior, so it needs its own dry-run over live runs):**
+(a) a real TTP producer as JSON-pipeline input; (b) subtechnique ->
+parent-technique fallback in the `MITRE_TTP_TO_PHASE` lookup; (c) extend
+`TEMPORAL_VIOLATION_TO_PHASE` to the real vocabulary (starting with
+`EFFECT_BEFORE_CAUSE`). Only with detectable phases does resuming the
+honest `required_artifacts` correspondence make sense.
+
+### Update 2026-08-27 (ter) — (b) and (c) applied with Anna's approval: `resolve_ttp_phase` + `EFFECT_BEFORE_CAUSE` table entry. Correction: `detect_phase` has no live callers
+
+**Correction made before touching anything:** the (bis) update claimed
+the fallback "changes live SIFT orchestrator behavior". Verified by
+exhaustive grep first: **`detect_phase()` and `analyze_focus()` have
+zero production callers** — `vigia/pipeline/pipeline.py` only consumes
+`get_visible_tools(detected_phase)` with an externally supplied phase,
+and `sift_orchestrator.py` never invokes them. The change is
+observation/groundwork layer; no sealed verdict is touched.
+
+**Justification measured over live runs (not labels):** census of the
+PRODUCED `mitre_ttps` in `results/**/*.json` (104 files carrying the
+field, 190 distinct TTPs): only 13/190 mapped by exact key. The
+highest-frequency subtechniques — `T1562.001` (43), `T1070.001/.002/
+.006` (121 combined), `T1566.003` (40) — did not map even though their
+parent technique is in the table, and narrative bundles emit TTPs with
+prose suffixes (`"T1070.002 (Indicator Removal ...)"`) that did not map
+either.
+
+**Changes:**
+1. `resolve_ttp_phase()` in `visible_variables.py` — deterministic
+   lookup in priority order: exact hit -> id extracted by regex from the
+   string head -> subtechnique's parent technique (MITRE semantics: a
+   subtechnique refines its parent and inherits its phase).
+   `detect_phase` Rule 1 uses it; the frozen tables are not mutated.
+2. `EFFECT_BEFORE_CAUSE -> DEFENSE_EVASION` in
+   `TEMPORAL_VIOLATION_TO_PHASE` — doctrine: an effect timestamped
+   before its cause is retroactive timestamp manipulation, the same
+   class as `RETROACTIVE_MODIFICATION` (already mapped there); it is
+   also the only type the scorer validates as authoritative (B-172).
+
+Red-first tests: `tests/test_b129_ttp_phase_resolution.py` (13; the
+import and both detection tests fail pre-fix, verified).
+
+**Re-measured impact (`dryrun_b129_phase_distribution.py`):** honest run
+UNKNOWN 208/209 -> 206/209 (the 2 declared `EFFECT_BEFORE_CAUSE` cases
+now vote a phase); counterfactual ceiling UNKNOWN 161 -> 130
+(defense_evasion 16->32, execution 7->23); resolved label TTPs
+24 -> 50 of 124.
+
+**Table residue, documented and NOT applied (every entry is doctrine):**
+the frequent still-unresolved TTPs split into two classes —
+(i) unambiguous in MITRE, candidates to add with sign-off: `T1027`
+(Obfuscated Files -> defense_evasion, 18 uses), `T1036` (Masquerading ->
+defense_evasion, 17 with its subtechnique), `T1190` (Exploit
+Public-Facing App -> initial_access, 7), `T1486` (Data Encrypted for
+Impact -> impact, 6); (ii) multi-tactic in MITRE, which a single-phase
+table cannot represent honestly without a design decision (multi-vote?):
+`T1078` (Valid Accounts, 4 tactics, 19 uses), `T1055` (Process
+Injection, 2 tactics, 15), `T1053` (Scheduled Task, 3 tactics). Item
+(a) — a real TTP producer as JSON-pipeline input — remains the main
+blocker for the honest run to leave UNKNOWN.
+
+### Update 2026-08-27 (quater) — class (i) applied under Anna's generic go-ahead to continue; fixed an invalid MITRE id in the table
+
+The four single-tactic techniques of class (i) entered
+`MITRE_TTP_TO_PHASE` (`T1027`, `T1036` -> defense_evasion; `T1190` ->
+initial_access; `T1486` -> impact — each has exactly one tactic in
+ATT&CK, no doctrinal ambiguity). The key `"T1547.1"` was also corrected
+to `"T1547.001"` (MITRE subtechnique format is `.NNN`; the old key was
+not a valid id and only matched its own literal). Red-first tests
+extended in `tests/test_b129_ttp_phase_resolution.py` (19 total; the 5
+new ones fail pre-change), including a guard pinning that the
+multi-tactic techniques (`T1078`, `T1055`, `T1053`) stay unmapped until
+a design decision. Re-measured: resolved label TTPs 50 -> 59/124;
+counterfactual ceiling UNKNOWN 130 -> 127. `detect_phase` still has zero
+production callers. Documentation aligned: addendum in
+`KNOWN_LIMITATIONS.md` L-027 (the mapping-table plan is now subordinate
+to the measurement) and a currency note in `WHAT_IS_NEXT.md` (the POST
+HACKATHON rule retirement is now reflected there).
+
+### Update 2026-08-27 (quinquies) — adversarial review of the session's full diff: 6 findings, all execution-verified and fixed
+
+Before closing, the branch's accumulated diff went through adversarial
+review. The core `_select_best` fix and the calibration came out clean;
+the findings, each reproduced live before patching:
+
+1. **Dishonest degradation in the adapter's signal fallback:** a signal
+   without `z_score` became weight 0 — "unmeasured" turned into
+   "measured as zero anomaly", and an unmeasurable case produced a
+   BENIGN/OK observation instead of `NO_SIGNALS`/ABSTAIN. Absent is now
+   distinct from zero: the signal is skipped.
+2. **TTP regex without a boundary:** `"T1070abc"` resolved to
+   DEFENSE_EVASION and cast a +40 vote. Lookahead `(?![\w.])` added;
+   legitimate prose suffixes still resolve.
+3. **`detect_phase` Rule 2 crash** on a non-string violation `type`
+   (`None.upper()`): hardened into "rule not satisfied".
+4. **Script/adapter divergence:** the dry-run's `signals_z`/`raw_spoof`
+   fallbacks fabricated weight 0 where the adapter skips; the
+   `raw_spoof` and `adapter` rows are now identical by construction
+   (verified: 118/208 with the same distribution).
+5. **`"T1547.1"` still lived in the parallel table**
+   `MITRE_TTPS_BY_PHASE` (`picerl_mapping.py`), which flows into PICERL
+   reports: corrected to `T1547.001` — the two tables no longer
+   disagree.
+6. **Triplicated CAIE spoofability instantiation:** the script now
+   imports `_artifact_spoofability` from the adapter (single source);
+   the scorer's Step 1 copy is untouched (sealed path).
+
+New guard tests: 7 (red-first verified, 4 failing pre-fix). Calibration
+agreements unchanged (the fixes only relabel unmeasured cases as
+`NO_SIGNALS`). Full suite green.
 
 ---
 
