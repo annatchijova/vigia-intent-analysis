@@ -44,6 +44,19 @@ inaccurate, shared string.
   root, not the richer `vigia/sift/sift_orchestrator.py`. Confirmed by
   direct `diff` between the two files, 2026-06-19.
 
+## The web UI is a viewer, not a fourth family
+
+`vigia/ui/` (launched by `launch_vigia_ui.sh`) renders bundles from BOTH
+output families — plus Mode 2 investigation bundles — through a tolerant
+normalizer (`vigia/ui/normalizer.py`) that detects the schema per file and
+copies every verdict-bearing field verbatim. It never computes, restates,
+or reconciles a verdict: when a bundle carries two verdicts (the sealed
+EBS `decision_trace.decision` next to `caie_analysis.verdict`), the UI
+shows both with a disagreement banner. As a launcher it starts Mode 1
+(`vigia_agent.py`) only; Mode 2 remains stdio-MCP and is browsed here as
+files. Unrecognized documents are listed honestly as `unknown` and render
+raw only.
+
 ## Open invitation
 
 If you want a concrete, well-scoped contribution: confirm whether any

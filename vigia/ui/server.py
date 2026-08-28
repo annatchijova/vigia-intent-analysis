@@ -14,6 +14,7 @@ cross-site form submissions from other pages in the same browser.
 
 from __future__ import annotations
 
+import contextlib
 import json
 import re
 from pathlib import Path
@@ -87,8 +88,15 @@ def create_app(repo_root: Optional[Path] = None) -> FastAPI:
     index.refresh()
     view = _BundleView(index)
 
+    @contextlib.asynccontextmanager
+    async def _lifespan(app_: FastAPI):
+        yield
+        runner = getattr(app_.state, "job_runner", None)
+        if runner is not None:
+            runner.shutdown()
+
     app = FastAPI(title="VIGÍA Web UI", version=UI_VERSION, docs_url=None,
-                  redoc_url=None, openapi_url=None)
+                  redoc_url=None, openapi_url=None, lifespan=_lifespan)
     app.state.repo_root = repo_root
     app.state.bundle_index = index
 
@@ -230,12 +238,6 @@ def create_app(repo_root: Optional[Path] = None) -> FastAPI:
         if result is None:
             raise HTTPException(status_code=404, detail="unknown job id")
         return result
-
-    @app.on_event("shutdown")
-    def _stop_jobs():
-        runner = getattr(app.state, "job_runner", None)
-        if runner is not None:
-            runner.shutdown()
 
     # -- static SPA ---------------------------------------------------------
 
