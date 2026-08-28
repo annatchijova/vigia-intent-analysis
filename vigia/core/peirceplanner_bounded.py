@@ -194,19 +194,23 @@ def _select_best(
 ) -> Optional[Hypothesis]:
     """
     Selecciona hipótesis con mejor ratio cobertura/costo.
-    score = coverage × (1 − normalized_cost)
-    Todo en Fraction.
+    score = coverage / ockham_cost
+    Todo en Fraction. Costo no-positivo (degenerado) puntúa 0.
+
+    B-129 Fase 2: la implementación previa usaba
+    coverage × (1 − cost/max_cost), que puntúa 0 a la hipótesis de costo
+    máximo con CUALQUIER cobertura — inseleccionable mientras exista otra
+    activa. Medido sobre 208 casos: 0 veredictos MALICE del planner contra
+    113 del scorer (scripts/dryrun_b129_weight_calibration.py).
     """
     active = [h for h in hypotheses if h.status == HypothesisStatus.ACTIVE]
     if not active:
         return None
 
-    max_cost = max(h.ockham_cost for h in active) or Fraction(1)
-
     def score(h: Hypothesis) -> Fraction:
-        cov  = _signal_coverage(h, signals)
-        norm = h.ockham_cost / max_cost if max_cost > 0 else Fraction(0)
-        return cov * (Fraction(1) - norm)
+        if h.ockham_cost <= 0:
+            return Fraction(0)
+        return _signal_coverage(h, signals) / h.ockham_cost
 
     return max(active, key=score)
 

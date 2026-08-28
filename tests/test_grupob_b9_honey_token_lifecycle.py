@@ -27,7 +27,7 @@ import pytest
 
 # L-045: the bridge imports `mcp`, which is not installable in minimal CI
 # environments. Skip instead of breaking the whole collection run (B-138).
-pytest.importorskip("mcp")
+pytest.importorskip("mcp.server.fastmcp")
 
 import vigia.vigia_sift_bridge as bridge
 

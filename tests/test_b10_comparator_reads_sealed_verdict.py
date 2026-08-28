@@ -154,7 +154,7 @@ class TestLlmFallbackReadsSealedVerdict:
     def _requires_mcp(self):
         # L-045: run_llm_cases imports the bridge, which imports `mcp` —
         # not installable in minimal CI environments; skip there (B-138).
-        pytest.importorskip("mcp")
+        pytest.importorskip("mcp.server.fastmcp")
 
     def _bundle(self, tmp_path, case_id, body):
         (tmp_path / f"{case_id}_agent_bundle.json").write_text(json.dumps(body))

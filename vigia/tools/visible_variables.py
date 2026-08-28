@@ -21,6 +21,7 @@ from __future__ import annotations
 import json
 import logging
 import hashlib
+import re
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Set, Tuple, Any
@@ -74,10 +75,14 @@ MITRE_TTP_TO_PHASE: Dict[str, IRPhase] = {
     # Initial Access
     "T1566": IRPhase.INITIAL_ACCESS, "T1200": IRPhase.INITIAL_ACCESS,
     "T1199": IRPhase.INITIAL_ACCESS,
+    # B-129 2026-08-27: T1190 es mono-táctica en ATT&CK (Initial Access).
+    "T1190": IRPhase.INITIAL_ACCESS,
     # Execution
     "T1059": IRPhase.EXECUTION, "T1204": IRPhase.EXECUTION,
     # Persistence
-    "T1547": IRPhase.PERSISTENCE, "T1547.1": IRPhase.PERSISTENCE,
+    # B-129 2026-08-27: "T1547.1" no era un id MITRE válido (el formato de
+    # subtécnica es .001) — corregido a T1547.001.
+    "T1547": IRPhase.PERSISTENCE, "T1547.001": IRPhase.PERSISTENCE,
     "T1098": IRPhase.PERSISTENCE, "T1137": IRPhase.PERSISTENCE,
     # Privilege Escalation
     "T1548": IRPhase.PRIVILEGE_ESCALATION, "T1134": IRPhase.PRIVILEGE_ESCALATION,
@@ -86,6 +91,11 @@ MITRE_TTP_TO_PHASE: Dict[str, IRPhase] = {
     "T1564": IRPhase.DEFENSE_EVASION, "T1562": IRPhase.DEFENSE_EVASION,
     "T1070": IRPhase.DEFENSE_EVASION, "T1565.001": IRPhase.DEFENSE_EVASION,
     "T1497": IRPhase.DEFENSE_EVASION,
+    # B-129 2026-08-27: mono-tácticas en ATT&CK, las dos de mayor
+    # frecuencia sin resolver en el censo del corpus (T1027 x18, T1036 x17
+    # con su subtécnica). Multi-tácticas (T1078, T1055, T1053) quedan
+    # deliberadamente afuera — requieren decisión de diseño.
+    "T1027": IRPhase.DEFENSE_EVASION, "T1036": IRPhase.DEFENSE_EVASION,
     # Credential Access
     "T1110": IRPhase.CREDENTIAL_ACCESS, "T1187": IRPhase.CREDENTIAL_ACCESS,
     "T1040": IRPhase.CREDENTIAL_ACCESS, "T1056.004": IRPhase.CREDENTIAL_ACCESS,
@@ -104,6 +114,8 @@ MITRE_TTP_TO_PHASE: Dict[str, IRPhase] = {
     "T1008": IRPhase.COMMAND_AND_CONTROL,
     # Impact
     "T1531": IRPhase.IMPACT, "T1561": IRPhase.IMPACT, "T1485": IRPhase.IMPACT,
+    # B-129 2026-08-27: T1486 es mono-táctica en ATT&CK (Impact).
+    "T1486": IRPhase.IMPACT,
 }
 
 # TABLA 2: Violation Type → IR Phase
@@ -113,7 +125,43 @@ TEMPORAL_VIOLATION_TO_PHASE: Dict[str, IRPhase] = {
     "FABRICATION": IRPhase.DEFENSE_EVASION,
     "LOG_TAMPERING": IRPhase.DEFENSE_EVASION,
     "TIMING_ANOMALY": IRPhase.EXFILTRATION,
+    # B-129/L-027: un efecto fechado antes de su causa es manipulación
+    # retroactiva de timestamps — misma clase semántica que
+    # RETROACTIVE_MODIFICATION. Es además el único tipo que el scorer
+    # valida como autoritativo contra timestamps reales (B-172).
+    "EFFECT_BEFORE_CAUSE": IRPhase.DEFENSE_EVASION,
 }
+
+
+# B-129/L-027: id de técnica MITRE al inicio del string — admite el sufijo
+# de subtécnica y tolera prosa posterior ("T1070.002 (Indicator Removal)").
+# El lookahead exige frontera tras el id: sin él, basura con prefijo
+# válido ("T1070abc") resolvía fase y votaba +40 (revisión 2026-08-27).
+_TTP_ID_RE = re.compile(r"^(T\d{4,5})(?:\.\d{1,3})?(?![\w.])")
+
+
+def resolve_ttp_phase(ttp: Any) -> Optional[IRPhase]:
+    """
+    Lookup determinista técnica MITRE → IRPhase, en orden de prioridad:
+      1. hit exacto en MITRE_TTP_TO_PHASE (comportamiento original);
+      2. hit exacto del id extraído del inicio del string (normaliza
+         sufijos de prosa que emiten los bundles narrativos);
+      3. fallback subtécnica → técnica padre (semántica MITRE: una
+         subtécnica es un refinamiento de su padre, hereda su fase).
+    Sin match → None. No muta ninguna tabla congelada.
+    """
+    if not isinstance(ttp, str):
+        return None
+    ttp = ttp.strip()
+    if ttp in MITRE_TTP_TO_PHASE:
+        return MITRE_TTP_TO_PHASE[ttp]
+    m = _TTP_ID_RE.match(ttp)
+    if not m:
+        return None
+    full_id = m.group(0)
+    if full_id in MITRE_TTP_TO_PHASE:
+        return MITRE_TTP_TO_PHASE[full_id]
+    return MITRE_TTP_TO_PHASE.get(m.group(1))
 
 # TABLA 3: Variables visibles por fase
 VISIBLE_VARIABLES_BY_PHASE: Dict[IRPhase, Dict[VariableCategory, List[str]]] = {
@@ -394,11 +442,14 @@ class VisibleVariablesEngine:
         phase_votes: Dict[IRPhase, int] = {phase: 0 for phase in IRPhase}
         
         # Regla 1: TTPs MITRE (peso: 40 por TTP)
+        # B-129/L-027: lookup vía resolve_ttp_phase (exacto → id extraído
+        # → padre de subtécnica); antes solo matcheaba claves exactas y
+        # las subtécnicas de las corridas vivas nunca votaban fase.
         if mitre_ttps:
             for ttp in mitre_ttps:
                 total_rules += 1
-                if ttp in MITRE_TTP_TO_PHASE:
-                    phase = MITRE_TTP_TO_PHASE[ttp]
+                phase = resolve_ttp_phase(ttp)
+                if phase is not None:
                     phase_votes[phase] += 40
                     matched_rules += 1
                     self._log(f" TTP {ttp} → {phase.value} (+40 puntos)")
@@ -409,7 +460,10 @@ class VisibleVariablesEngine:
         if temporal_violations:
             for violation in temporal_violations:
                 total_rules += 1
-                vtype = violation.get("type", "").upper()
+                # type no-string (None/numérico) cuenta como regla no
+                # satisfecha, no como crash (revisión 2026-08-27).
+                vtype_raw = violation.get("type", "")
+                vtype = vtype_raw.upper() if isinstance(vtype_raw, str) else ""
                 if vtype in TEMPORAL_VIOLATION_TO_PHASE:
                     phase = TEMPORAL_VIOLATION_TO_PHASE[vtype]
                     phase_votes[phase] += 35

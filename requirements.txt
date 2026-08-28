@@ -3,7 +3,14 @@
 
 # Core Framework
 fastmcp>=0.4.0
-mcp>=0.1.0
+# B-227: upper bound is REQUIRED, not cosmetic. vigia/vigia_sift_bridge.py does
+# `from mcp.server.fastmcp import FastMCP`; mcp 2.0.0 removed that subpackage,
+# so the bridge -- and with it Modes 2 and 5 -- cannot import under it. Until
+# this bound was declared, the only thing holding the line was `fastmcp`'s own
+# transitive `mcp<2`, which is an accident: no module in this repo imports
+# `fastmcp`, so a cleanup dropping it would have broken the MCP surface
+# silently. Pinned by tests/test_mcp_dependency_contract.py.
+mcp>=1.0,<2
 
 # LLM Integration
 anthropic>=0.18.0

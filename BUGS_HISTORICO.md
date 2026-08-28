@@ -3070,6 +3070,51 @@ no B-225; queda anotada en el propio test.
 
 ---
 
+## B-226 — Purgatorio forense: sellado 0o400 por chmod-sobre-nombre seguía symlinks post-rename [RESUELTO]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO 2026-08-09 |
+| **Severidad** | Baja — requiere el uid propietario (`_PURGATORY_DIR` es 0o700), así que no hay atacante remoto sin acceso local previo. La propiedad violada (sellado sobre el inodo escrito, no sobre un nombre resoluble) sí es de interés Daubert: un chmod-por-ruta post-rename puede aplicar el modo a un archivo distinto del que se escribió. |
+| **Archivo** | `vigia/vigia_sift_bridge.py` (`_quarantine_malformed_evidence`) |
+| **Detectado en** | Auditoría externa (DeepSeek), verificada contra el código vivo — `docs/DEEPSEEK_AUDIT_20260809.md` (Hallazgo 1). El mecanismo TOCTOU tal como fue enunciado por la auditoría (symlink entre `mkstemp()` y la apertura del FD) fue REFUTADO — `mkstemp()` devuelve `(fd, path)` de un solo syscall con `O_CREAT\|O_EXCL`, sin ventana posible. El residuo real se encontró al verificar esa premisa. |
+| **Tests** | `tests/test_purgatory_fd_sealing.py` (15) |
+
+### Descripción
+
+`os.rename(purgatory_tmp, final_path)` iba seguido de
+`os.chmod(final_path, 0o400)`. `chmod` por **ruta** resuelve el nombre y
+**sigue symlinks**, mientras el `os.path.islink()` que lo precedía es un
+chequeo por **nombre**. Un atacante con acceso de escritura a
+`_PURGATORY_DIR` podía sustituir el temporal por un symlink **después** de
+ese chequeo, y el `chmod` subsiguiente aplicaría `0o400` a un archivo
+arbitrario del uid propietario en vez de al archivo de cuarentena.
+
+Demostrado de forma aislada (`tests/test_purgatory_fd_sealing.py`):
+
+```python
+os.symlink(victim, link)
+os.chmod(link, 0o400)          # sigue el symlink
+os.lstat(victim).st_mode       # 0o400 — la VÍCTIMA quedó sellada, no el link
+```
+
+### Fix
+
+El sellado `0o400` ahora se aplica con `os.fchmod(dst.fileno(), 0o400)`
+**sobre el descriptor que realmente se escribió**, antes de cerrarlo — no
+hay resolución de nombre involucrada, así que no hay ventana. Se eliminó el
+`os.chmod(final_path, ...)` posterior al rename: reintroducirlo reabriría
+exactamente la ventana que `fchmod` cierra.
+
+### Impacto en el corpus
+
+Ninguno — cambio de mecanismo de sellado en la ruta de cuarentena de
+evidencia malformada, no en el pipeline de scoring. Suite completa antes/después:
+21 fallos preexistentes (dependencias opcionales ausentes: `psutil`,
+`fastapi`) en ambos casos, cero nuevos.
+
+---
+
 ## B-053 — shim: un pcap corrupto abortaba el caso COMPLETO (T-3) [RESUELTO]
 
 | Campo | Valor |
@@ -10473,3 +10518,677 @@ de `test_b117_stale_formula_sweep.py` actualizado: se retiró la excepción
 de `generate_execution_log.py` (ya no contiene la fórmula obsoleta) y se
 agregó la del nuevo test (cita la fórmula vieja como evidencia histórica
 del bug, no como claim vivo). Suite completa: 2128 passed, 0 failed.
+
+---
+
+## B-227 — La suite completa no corría en el entorno mínimo documentado: 5 módulos importaban el bridge MCP sin guard y abortaban la sesión entera de pytest [RESUELTO — Claude 2026-08-12]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P1 de verificabilidad. No es un bug forense — ningún código del camino de veredicto depende de `mcp` — pero anulaba la única forma documentada de verificar el repositorio. |
+| **Archivos** | `tests/e2e/test_integration_end_to_end.py`, `tests/test_b122_universal_tool_invoked_audit.py`, `tests/test_b164_mcp_mount_root.py`, `tests/test_b169_mcp_invocation_audit.py`, `tests/test_b173_bridge_work_root.py`, `KNOWN_LIMITATIONS.md` (L-045). |
+| **Detectado en** | Sesión 2026-08-12, al medir el baseline de la suite en un contenedor limpio construido con `requirements-ci.txt`. |
+
+### Firstness — qué se observó
+
+En un entorno construido sólo con `requirements-ci.txt`, el comando
+autoritativo de `CLAUDE.md`:
+
+```
+pytest tests/ vigia/tests/ --ignore=tests/integration
+```
+
+devuelve `Interrupted: 4 errors during collection` y
+`2352 tests collected, 4 errors`. Los cuatro errores son el mismo
+`ModuleNotFoundError: No module named 'mcp'` en
+`vigia/vigia_sift_bridge.py:49`. Con `--continue-on-collection-errors`
+aparecen además 3 fallos en `tests/test_b173_bridge_work_root.py`, de la
+misma causa.
+
+### Secondness — contra qué baseline es anómalo
+
+`mcp` está deliberadamente fuera de `requirements-ci.txt` (L-045: no
+instalable donde PyJWT vino del gestor de paquetes del sistema), y
+`tests/test_requirements_ci_contract.py` lo declara como la única excepción
+permitida. Es decir: la ausencia de `mcp` es el estado *esperado* del
+entorno mínimo, no una instalación rota.
+
+Bajo ese estado esperado, la convención del propio repo es
+`pytest.importorskip("mcp")` antes de importar el bridge — ya aplicada en
+seis módulos hermanos. Cinco no la llevaban. Y un error de colección **no es
+un skip**: pytest aborta la sesión y ejecuta **cero** tests. La consecuencia
+no era "cuatro módulos no colectan", era "la suite entera no corre".
+
+### Thirdness — la ley que produce el patrón
+
+Misma clase de deriva que `test_requirements_ci_contract.py` fue escrito para
+cerrar (defusedxml/B-017, psutil, pytest-cov), una capa más abajo. Ese test
+cubre la mitad *hacia adelante* del contrato: toda dependencia third-party
+alcanzable desde los tests está en `requirements-ci.txt`. No cubría la otra
+mitad: que una excepción *permitida* degrade honestamente. Una excepción
+allowlisteada que revienta en import time no es una excepción documentada, es
+una suite caída con una nota al pie.
+
+Los cinco módulos sin guard son todos posteriores a la redacción de L-045.
+La convención existía; nadie la arrastró hacia adelante, y CI no lo notó
+porque `pytest.yml` instala `requirements.txt`, que sí trae `mcp`. El
+entorno documentado como mínimo y el entorno realmente ejercitado por CI
+divergieron sin señal.
+
+### Un fallo que era un falso positivo, no sólo un error
+
+`test_b173_rejects_work_root_nested_in_evidence` afirma que importar el
+bridge con `VIGIA_WORK_DIR` anidado dentro de evidencia sale con returncode
+distinto de cero. Sin `mcp`, el import sale distinto de cero **porque falta
+`mcp`** — esa aserción pasaba por una razón ajena al rechazo que existe para
+probar. Sólo fallaba en el chequeo posterior de stderr. Es un test de
+seguridad (estado operativo no debe anidarse en evidencia) que pasaba a
+medias por el motivo equivocado. El skip a nivel de módulo elimina la
+ambigüedad.
+
+### Segundo hallazgo: el guard apuntaba al módulo equivocado
+
+Al verificar que el fix no *sobre-saltara* — que con `mcp` presente los tests
+volvieran a correr de verdad, y no quedaran verdes por skip — apareció algo que
+la convención existente no cubría. El bridge no importa `mcp`, importa
+`mcp.server.fastmcp` (línea 49). **`mcp` 2.0.0 eliminó ese subpaquete**
+(verificado contra el wheel publicado: `mcp.server` sigue trayendo `lowlevel`,
+`session`, `stdio`, `streamable_http` y otros, pero no `fastmcp`). Con mcp 2.x
+instalado, `importorskip("mcp")` pasa, el import del bridge revienta igual, y
+la sesión vuelve a abortar — el mismo síntoma por otra causa.
+
+Los trece guards del repo (los seis previos incluidos) apuntaban al nombre
+equivocado. Ahora apuntan a `mcp.server.fastmcp`, la dependencia real.
+
+### Hipótesis alarmante formulada y REFUTADA
+
+De ahí se siguió una hipótesis grave: `requirements.txt` declaraba
+`mcp>=0.1.0`, sin cota superior, así que una instalación limpia hoy traería
+2.0.0 y **Modos 2 y 5 no arrancarían**, además de tumbar el job `pytest.yml`
+de CI. Se la probó antes de escribirla como hallazgo: venv limpio,
+`pip install -r requirements.txt`. Resolvió a `mcp 1.29.0`, no 2.0.0, porque
+`fastmcp 3.4.7` arrastra `mcp<2`. El bridge importa y los 32 tests de la
+superficie MCP pasan. **La hipótesis es falsa: el camino documentado nunca
+estuvo roto.**
+
+Lo que sí queda es el residual honesto, más chico: la cota que sostiene todo
+es un **accidente transitivo**. Ningún módulo del repo importa `fastmcp`, así
+que una limpieza que lo retirara por vestigial — o un release de `fastmcp` que
+relajara la cota — rompería la superficie MCP en silencio, sin que nada en el
+repositorio objetara. Y el workaround que el propio L-045 documenta
+(`pip install mcp`, sin cota) sí instala hoy la versión rota: esa instrucción
+estaba efectivamente caída.
+
+### Fix aplicado
+
+1. `pytest.importorskip("mcp.server.fastmcp")` en los trece guards — los cinco
+   que no tenían ninguno y los ocho que apuntaban al nombre equivocado.
+2. Cota declarada: `mcp>=1.0,<2` en `requirements.txt` y `pyproject.toml`, con
+   la razón en el comentario. Deja de depender del accidente transitivo.
+3. Workaround de L-045 corregido a `pip install "mcp<2"`.
+
+Cero cambios en código de producción, cero impacto en veredictos.
+
+### Por qué el guard no puede ser el único mecanismo
+
+Apuntar el guard al subpaquete real arregla el aborto, pero introduce un riesgo
+nuevo: con mcp 2.x instalado, los once módulos del bridge saltarían en
+silencio. Una instalación genuinamente rota se vería como una pared de skips
+verdes — exactamente la degradación deshonesta que §5.3 de
+`docs/ENGINEERING_DISCIPLINE.md` prohíbe. Los dos estados no son el mismo
+fallo y no deben producir el mismo resultado:
+
+- `mcp` **ausente** → skip. Es el estado esperado del entorno mínimo (L-045).
+- `mcp` **presente pero incompatible** → fallo ruidoso y específico.
+
+`tests/test_mcp_dependency_contract.py` cubre el segundo caso: falla nombrando
+la causa exacta y la versión, sin tumbar la sesión.
+
+L-045 corregido en `KNOWN_LIMITATIONS.md`: su lista "Affects" nombraba dos
+módulos (uno de los cuales ya había sido reparado sin actualizar la entrada)
+cuando el conjunto real de importadores a nivel de módulo es once, y su
+"Consequence" decía "esos dos módulos no colectan" cuando la consecuencia
+medida era que no corría ningún test.
+
+### Verificado
+
+Rojo-primero: el guard nuevo falla contra el árbol sin el fix (verificado con
+`git stash` del fix y corriendo el guard: 1 failed) y pasa con el fix.
+
+Los tres estados posibles del entorno, medidos con la suite completa:
+
+| Estado | Resultado | Antes del fix |
+|--------|-----------|---------------|
+| `mcp` ausente (entorno mínimo) | 2127 passed, 209 skipped, **0 failed** | 0 tests ejecutados (sesión abortada) |
+| `mcp` 1.29.0 (compatible) | 2237 passed, 191 skipped, **0 failed** | igual — nunca estuvo roto |
+| `mcp` 2.0.0 (incompatible) | 2127 passed, **1 failed** nombrando la causa | 0 tests ejecutados (sesión abortada) |
+
+Las 110 pruebas de diferencia entre la fila 1 y la 2 son la superficie MCP
+corriendo de verdad: confirma que los guards saltan cuando deben y **no**
+cuando no deben.
+
+Test permanente: `tests/test_minimal_ci_collects_without_errors.py`. Corre la
+colección real en un intérprete hijo con las distribuciones allowlisteadas
+forzadas a no importables, y falla si la sesión reporta cualquier error de
+colección. Es independiente del entorno — vale corra o no `mcp` en la máquina
+que lo ejecuta — y chequea la propiedad que importa (la suite colecta) en vez
+de un proxy sintáctico (que el módulo contenga una línea `importorskip`).
+Lleva un test de control que falla si el bloqueador deja de tener efecto, para
+que no pase por la razón equivocada — exactamente el modo de falla que este
+mismo bug exhibía en B-173.
+
+---
+
+## B-149 — T-5: un IoC de C2 de severidad alta puede colapsar a NOISE cuando el artefacto de memoria exculpatorio nunca fue analizado a nivel red (aflorado por B-148) [RESUELTO 2026-08-01]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO 2026-08-01 — guarda de capa no analizada en `caie.py`. Impacto en corpus: 0/282 casos. `xfail(strict)` de `test_red_team_anchor_bypass` retirado. Ver la nota al final de esta entrada: el diagnóstico correcto no era un piso de IoC sino una monotonicidad invertida. |
+| **Severidad** | P2 (latente) — un IoC de C2 real y corroborado nunca debería leerse como NOISE ("nada que ver acá"). Actualmente reproducible solo sintéticamente. |
+| **Archivo** | `vigia_scorer.py` (Noisy-OR ponderado por spoofability / cascada de veredicto); sonda: `vigia/tests/adversarial/test_spoofability_correlation_attack.py::test_red_team_anchor_bypass` (ahora `xfail(strict=True)`) |
+
+**Por qué B-148 lo hizo aflorar.** La regla de fabricación LOG_VS_MEMORY
+cumplía doble función: además de detectar fabricación, su disparo sobre
+memoria sin red era INCIDENTALMENTE el mecanismo que impedía que un log de C2
+de alta spoofability colapsara a NOISE. B-148 correctamente detiene el disparo
+por ausencia (era un falso positivo), lo que remueve esa protección
+incidental. Medido post-B-148: un IoC de C2 (`raw_score=0.95`, `log_entry`) +
+un artefacto de memoria exculpatorio NO ANALIZADO a nivel red sin `verdict`
+explícito → **veredicto = NOISE** (`test_red_team_anchor_bypass`), mientras
+que con un artefacto exculpatorio de veredicto explícito se sostiene en
+SUSPICION (`test_metadata_convention...`, ahora un pass de contradicción
+genuina).
+
+**Alcance honesto.** El gate de corpus de B-148 muestra que **0/201 casos
+reales** exhiben esto — la protección anti-colapso descansaba sobre un falso
+positivo, pero ningún caso real dependía de ella tampoco. Así que T-5 es un
+comportamiento latente, no una regresión viva de corpus.
+
+**Fix apropiado (diferido, necesita una decisión).** Un IoC de severidad alta,
+corroborado independientemente, debe resistir el colapso a NOISE **por sus
+propios méritos** — no vía una fractura acoplada a memoria ausente. Es un
+cambio a nivel de scorer (p. ej. un piso de IoC que la ponderación por
+spoofability no pueda empujar por debajo de SUSPICION), NO un re-acoplamiento
+al bug de ausencia que B-148 corrigió. Trackeado por separado para que el fix
+correcto se diseñe deliberadamente. Cuando aterrice, el `xfail(strict=True)`
+sobre `test_red_team_anchor_bypass` pasa a XPASS y se remueve el marcador.
+
+---
+
+
+### RESUELTO 2026-08-01 — el diagnóstico afinado
+
+La entrada proponía "un piso de IoC que la ponderación por spoofability no
+pueda empujar por debajo de SUSPICION". Medir el escenario mostró que el
+problema no era el IoC ni el piso, sino una **monotonicidad invertida**. Mismo
+IoC de C2 en los tres, variando sólo el artefacto de memoria:
+
+| Escenario | Información sobre la red | Veredicto |
+|-----------|--------------------------|-----------|
+| memoria analizó la red, sin hallazgos | más | MALICE (contradicción real) |
+| NO hay artefacto de memoria | menos | INCONCLUSIVE |
+| memoria existe pero nunca miró la red | intermedia | **NOISE** |
+
+El tercer caso tiene menos información sobre la red que el primero y no más
+que el segundo, y producía el veredicto **más benigno de los tres**. Añadir un
+artefacto silente sobre la capa en disputa hacía que el caso pareciera más
+limpio que no tenerlo.
+
+Es la misma conflación que B-154 nombra —ausencia ≡ negativo— pero en la
+dirección EXCULPATORIA. B-148/B-154 cerró la acusatoria (una capa no analizada
+dejó de alimentar LOG_VS_MEMORY); ésta quedaba abierta: NOISE significa
+"analizado y sin hallazgos", y aquí significaba "nadie lo analizó".
+
+**Fix aplicado** (`vigia/tools/caie.py`, tras el bloque CDL): si un log afirma
+actividad de red y NINGÚN artefacto técnico analizó la capa de red, el
+veredicto no puede ser NOISE — pasa a INCONCLUSIVE. Alcance deliberadamente
+estrecho: si algún artefacto la analizó, con o sin hallazgos, la guarda no
+interviene y la contradicción real sigue su curso. No toca `independent_sources`
+ni el scoring; sólo impide concluir limpieza sobre lo no observado.
+
+Se descartó el piso de IoC de la propuesta original: habría forzado SUSPICION
+desde un único log altamente spoofable sin corroboración, que es el error
+opuesto y el que la puerta de corroboración Daubert existe para evitar.
+
+**Impacto en el corpus: CERO** — 0 de 282 casos presentan la combinación
+(log que afirma red + todos los artefactos técnicos silentes sobre red).
+Coherente con el 0/201 que medía el gate de B-148.
+
+`test_red_team_anchor_bypass` pasa a verde y su `xfail(strict=True)` fue
+retirado, como esta entrada anticipaba.
+
+---
+
+## B-221 — Auditoría "Ronda 2" (invariantes epistemológicos): vectores investigados y descartados — registrados para no re-descubrirlos [DOCUMENTADO — Claude 2026-07-25]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | N/A — no son bugs. Documentado como referencia de auditoría, no como defecto. |
+| **Archivos** | `vigia/core/risk_bounded_layer.py` (`PolicyStabilityController`), `vigia/core/dissent_report.py` (`_compute_majority`, tie-break), `vigia/core/trust_fusion.py` (`NeighborhoodContext.mean_neighbor_trust`, `TrustFusionEngine.calculate_likelihood`, `add_artifact`). |
+| **Método** | A-D-I (Abductivo-Deductivo-Inductivo): cada vector se ejecutó contra el código vivo antes de aceptarlo o descartarlo, no solo se dedujo. |
+| **Detectado en** | Auditoría "Ronda 2", sesión 2026-07-25, re-verificado independientemente en esta sesión (no se aceptó ningún resultado del reporte pegado sin re-ejecutarlo). |
+
+### Descripción
+
+Cinco vectores se investigaron durante la auditoría "Ronda 2" y no se
+convirtieron en bugs. Se documentan aquí explícitamente para que una
+auditoría futura no vuelva a gastar tiempo re-descubriéndolos:
+
+**1. F5 — `PolicyStabilityController`: ¿diverge el resultado entre la rama
+numpy (`np.linalg.norm` + `np.array`) y el fallback stdlib (`math.sqrt` +
+listas)?** FALSIFICADO. Hipótesis original (deducida, no ejecutada): el
+veredicto podría depender silenciosamente de si `numpy` está instalado.
+Re-ejecutado en esta sesión, forzando ambas ramas sobre la misma secuencia de
+`stabilize()`: los tres parámetros resultantes (`lambda, gamma, epsilon`) son
+**bit-idénticos** entre ambas rutas (`0x1.b851eb851eb85p+1` en ambos casos,
+verificado con `.hex()` de float). Las dos ramas son aritméticamente
+equivalentes para esta operación; la divergencia BLAS que motivó la
+hipótesis es teórica para este caso, no demostrada. Se retira como hallazgo.
+
+**2. Tie-break de `_compute_majority` favorece MALICIOUS ante empate.** NO
+ES BUG. El desempate hacia el veredicto más severo ante un empate exacto de
+votos es determinista y *fail-safe* — es la política correcta para un
+sistema forense: ante incertidumbre genuina entre dos veredictos igual de
+votados, escalar es más defendible que promediar hacia abajo.
+
+**3. `NeighborhoodContext.mean_neighbor_trust` devuelve `1.0` cuando no hay
+vecinos — ¿es "ausencia de evidencia tratada como confianza perfecta"?**
+FALSIFICADO como riesgo de score. Verificado contra el código vivo:
+`TrustFusionEngine.calculate_likelihood` hace *short-circuit* a `return 0.5`
+cuando `neighborhood.neighbor_count == 0`, **antes** de leer
+`mean_neighbor_trust` — el valor `1.0` nunca llega a participar del cálculo
+de `likelihood`/`posterior`. El `1.0` sí aparece en el texto de la razón
+narrativa (`BOOST: trust vecindad={neighborhood.mean_neighbor_trust:.3f}`)
+en casos donde sí hay vecinos, así que no hay ninguna ruta donde el default
+de "sin vecinos" se cuele en un score. Riesgo real: ninguno confirmado.
+
+**4. `add_artifact` deduplica silenciosamente IDs duplicados.** Higiene, no
+bug de severidad. `add_artifact` devuelve `False` sin excepción ni registro
+cuando `artifact.artifact_id` ya existe (`trust_fusion.py`, línea ~207) — dos
+artefactos con el mismo ID colapsan a uno sin aparecer en ningún
+`rejected_details` o estructura equivalente. El comportamiento en sí es
+deseable (protege contra doble conteo), pero es invisible: nada en el output
+de `TrustFusionEngine` le dice a un perito que un artefacto fue descartado
+por duplicado. Ticket menor, no bloqueante — no se abre como bug numerado
+independiente porque no afecta ningún veredicto, se deja registrado aquí.
+
+### Nota de proceso
+
+Esta auditoría se hizo con disciplina A-D-I explícita después de una primera
+pasada (B-217 a B-220 más este bloque) que había *deducido* algunos hallazgos
+sin ejecutarlos. La re-verificación con inducción cambió el resultado: F1 se
+agravó (se demostró que la cadena completa está muerta, no solo que el
+módulo estaba huérfano), F2 y F4 bajaron de severidad al descubrirse sus
+precondiciones dormidas, y F5 se retiró por completo al ejecutarlo y
+encontrar resultados bit-idénticos. Se documenta el proceso, no solo el
+resultado, porque el proceso es replicable: cualquier hallazgo futuro de este
+tipo debe pasar por la misma re-verificación contra el código vivo antes de
+aceptarse como confirmado.
+
+---
+
+## B-151 — Downgrades del scorer: (a) clamp silencioso de score de artefacto único [RESUELTO, código muerto]; (b) entrada de cadena contradiction_detector mandatada no cableada en Modo-1 [RESUELTO 2026-08-15 — cerrado por B-224]
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | (a) RESUELTO (2026-07-19) — clamp hecho auditable; además se encontró inalcanzable. (b) ABIERTO — decisión de arquitectura, deliberadamente NO empaquetada con (a). |
+| **Severidad** | (a) P3 (divulgación de un clamp de código muerto). (b) P2 (brecha doctrina-vs-implementación). |
+| **Archivo** | (a) `vigia_scorer.py` clamp ~1216 + marcador ~1620; (b) `vigia_scorer.py` (sin `ToolExecutionLogChain` en el camino de decisión). |
+
+**(a) Clamp silencioso de score de artefacto único — RESUELTO, con un giro
+honesto.** `if n_artifacts < 2 and final_score > 0.65: final_score = 0.65`
+reescribía en silencio el score sellado (una reducción de fuerza probatoria
+sin razón/marcador, a diferencia de todo otro downgrade de la cascada). Fix:
+capturar el score pre-cap y surfacear un marcador
+`single_artifact_score_cap` + nota de razón en `base_result`, espejando el
+patrón de divulgación `normalization_failures` / `temporal_pairs_skipped`.
+Neutro al veredicto (el cap ya aplicaba; la divulgación es aditiva).
+
+**Giro encontrado al verificar: el clamp es actualmente código muerto
+INALCANZABLE.** Un artefacto de señal único se suprime a un score máximo de
+~0.038 (`cryptographic_hash`, raw 0.99, todos los boosters) — muy por debajo
+del cap 0.65 — así que el "downgrade silencioso" que este ítem nombró no es un
+riesgo vivo; el clamp es defensivo y el marcador es divulgación prospectiva.
+Fijado por `tests/test_b151a_single_artifact_cap.py`: si un artefacto único
+alguna vez alcanza un score >= 0.65 el test falla, señalando que el camino del
+marcador se volvió vivo. `_dround` devuelve float, así que `final_score` acá
+es float por el diseño de redondeo determinista del scorer (no un camino puro
+de Fraction) — la asignación `= 0.65` es consistente en tipos, sin inyección
+nueva de float.
+
+**(b) Entrada de cadena contradiction_detector no cableada en Modo-1 —
+ABIERTO.** El "Self-Correction Event Schema" de CLAUDE.md manda que cada
+downgrade dirigido por gate agregue una entrada `contradiction_detector` vía
+`ToolExecutionLogChain`. Verificado: `vigia_scorer.py`, `bundle_builder.py`,
+`pipeline.py`, `sift_orchestrator.py` contienen **cero** referencias a
+`ToolExecutionLogChain` / `contradiction_detector` — el appender se instancia
+solo en tests y en un script de red team. Es decir, el camino determinista de
+Modo-1 no emite los eventos de auto-corrección a prueba de manipulación
+mandatados (la cascada SÍ setea strings `reason` legibles por humanos para 7/8
+downgrades — la brecha es el evento *encadenado*, no la razón). Es una
+decisión de arquitectura — cablearlo en Modo-1, o enmendar la doctrina para
+declarar que el evento de auto-corrección encadenado es una construcción de
+Modo-2 (Claude Code) por diseño. Deliberadamente NO corregido como one-liner.
+Aún sin decidir.
+
+**Actualización 2026-07-26 — la atribución de arriba quedó OBSOLETA (ver
+B-224).** Dos correcciones de hecho, ambas verificadas en vivo:
+
+1. *El cableado existe.* `vigia/core/reasoning_trace.py` implementa el
+   mecanismo mandatado, cita B-151b por nombre en su docstring, y está
+   cableado en el camino de sellado de `vigia_agent.py` (~2180):
+   `build_from_agent_bundle` encadena `pipeline_results["self_corrections"]`
+   como entradas `contradiction_detector` vía `ToolExecutionLogChain`.
+   Confirmado con una corrida real de Modo-1, que escribe un
+   `<stem>_reasoning_trace.json` encadenado y con tail-anchor. La frase "el
+   appender se instancia sólo en tests y en un script de red team" ya no es
+   cierta.
+2. *Lo que falta es el insumo, no el cableado.* B-224 documenta que
+   `ContradictionDetector` no puede disparar nunca en Modo-1: 3 de sus 4
+   reglas leen campos sin productor (`signal["tool"]`, `technical_result`) o
+   una grafía que el vocabulario real nunca usa (`"BENIGN"` vs
+   `NO_*_ANOMALY_DETECTED`), y `CONTRADICTION_THRESHOLD = 2` vuelve
+   insuficiente a la única regla viva (máximo alcanzable = 1). Es decir, la
+   rama de auto-correcciones del trace está vacía **siempre**, por
+   construcción — no sólo en casos sin contradicciones.
+
+**Lo que sigue abierto acá (independiente de B-224):** si cada gate del
+scorer debe emitir su propio evento encadenado. Nota estructural relevante
+para quien lo encare: los gates viven en `vigia_scorer.py`, que
+`vigia_agent.py` **no importa** (cero referencias, verificado) — son dos
+subsistemas disjuntos, y ningún marcador de gate (`normalization_failures`,
+`temporal_pairs_skipped`, `pre_unverified_*_verdict`,
+`single_artifact_score_cap`) llega jamás al bundle del agente. Por eso el fix
+no es "leer los marcadores en `build_from_agent_bundle`": no hay marcadores
+que leer en ese camino. La decisión de arquitectura sigue pendiente.
+
+### RESUELTO 2026-08-15 — (b) cerrado por el fix de B-224
+
+El bloqueante de (b) era el insumo, no el cableado — como ya registraba la
+actualización del 2026-07-26. B-224 quedó resuelto (regla `VERDICT_FLIP`
+alineada al vocabulario real + `CONTRADICTION_THRESHOLD` 2 → 1), así que
+`ContradictionDetector` puede disparar y `pipeline_results["self_corrections"]`
+puede poblarse. El evento `contradiction_detector` encadenado que manda el
+"Self-Correction Event Schema" de CLAUDE.md se emite ahora de punta a punta.
+
+Verificado por ejecución, no por lectura de las dos mitades:
+`tests/test_b151b_contradiction_chain_emitted.py` maneja detector → corrección
+→ traza sellada y verifica que la entrada encadenada aparece con su esquema
+completo (`seq`, `timestamp`, `tool`, `result_summary` con BEFORE/AFTER,
+`input_hash`, `prev_hash`, `entry_hash`) y con el ancla de cola a nivel bundle
+(`chain_tip_sha256` coincide con el `entry_hash` de la última entrada). Lleva
+un test de control que verifica que la entrada aparece porque hubo corrección
+y no porque el constructor de trazas la emita siempre.
+
+La decisión de arquitectura que (b) dejaba planteada — cablearlo en Modo-1 o
+enmendar la doctrina para declararlo una construcción de Modo-2 — se resuelve
+por la primera opción: está cableado en Modo-1 y ahora tiene insumo posible.
+
+---
+
+## B-224 — El loop de auto-corrección de Modo-1 es estructuralmente inerte: 3 de 4 reglas de `ContradictionDetector` leen campos que ningún productor escribe, y el umbral vuelve insuficiente a la única regla viva [RESUELTO 2026-08-15 — el diagnóstico nombró mal a la regla sobreviviente; ver la sección final]
+
+| Campo | Valor |
+|-------|-------|
+| **Severidad** | P1 (doctrina-vs-implementación + bandera de compliance). La auto-corrección es presentada como diferenciador central: `vigia_agent.py --help` dice "Self-correction: automatic — no flags needed" y "Max iterations: 3", y `CLAUDE.md` afirma que "la auto-corrección de VIGÍA ocurre pre-emisión". En Modo-1 no ocurre nunca. |
+| **Archivos** | `vigia_agent.py` — `ContradictionDetector.detect()` (líneas 451-528), `CONTRADICTION_THRESHOLD = 2` (línea 55), `_apply_self_correction` (guard en ~813), bandera `sans_compliance.self_correction` (~1398). |
+| **Detectado en** | Investigación del resto abierto de B-151(b) (2026-07-26). Medido sobre los 21 casos del corpus + prueba directa de alcanzabilidad por regla. |
+
+### Descripción
+
+`ContradictionDetector.detect()` implementa 4 reglas. Tres no pueden matchear
+ninguna entrada, porque leen campos que ningún camino de producción escribe:
+
+**Regla 1 — ENTROPY_VS_BEHAVIORAL.** Filtra por `signal["tool"] in
+("memory_forensics", "disk_forensics")` y `signal["tool"] ==
+"behavioral_fingerprint"`. Las señales de Modo-1 no tienen clave `tool`:
+llevan `evidence_type` y `source`. Medido: **196 de 196 señales** en los 21
+casos del corpus tienen `tool=None`. Verificado que la lógica de la regla en
+sí funciona — el mismo escenario con `tool` en lugar de `source` dispara
+correctamente (test de control incluido).
+
+**Regla 2 — SEMIOTIC_VS_TECHNICAL.** Lee
+`module_results["technical_result"]["alert_level"]` y requiere `HIGH`/
+`CRITICAL`. `technical_result` y `semiotic_result` se **leen** en
+`vigia_agent.py:464-465` y se **escriben en ningún lugar del repositorio** —
+confirmado por grep exhaustivo sobre todos los `*.py`, incluyendo `tests/`.
+El default `.get(..., "LOW")` gana siempre, y `"LOW"` no está en
+`("HIGH", "CRITICAL")`.
+
+**Regla 4 — VERDICT_FLIP.** Requiere `"BENIGN" in
+best_hypothesis.upper()`. El vocabulario completo que el productor emite
+(`vigia/inference/abductive_reasoner.py` + `vigia_agent.py`) es:
+`UNDETERMINED`, `REASONER_ERROR`, `ABSTAIN_V2`, `MALICIOUS_INTENT_DETECTED`,
+`INTENT_DETECTED`, `SUSPICION_DETECTED`, `NO_ANOMALY_DETECTED`,
+`NO_SEMIOTIC_ANOMALY_DETECTED`, `PIPELINE_ERROR`. **Ninguno contiene
+"BENIGN"** — Modo-1 escribe "benigno" como `NO_*_ANOMALY_DETECTED`. El propio
+`vigia_agent.py:164` documenta que ambas grafías existen
+("`NO_*_ANOMALY_DETECTED`, `BENIGN`"), pero la regla sólo chequea una.
+Verificado que la lógica funciona: con el literal `"BENIGN"` dispara.
+
+Queda la **Regla 3 (CONFIDENCE_COLLAPSE)** como única alcanzable, y agrega a
+lo sumo **una** contradicción. `CONTRADICTION_THRESHOLD = 2` gatea la
+corrección con `len(contradictions) >= 2`:
+
+```python
+if len(contradictions) < CONTRADICTION_THRESHOLD:
+    ...
+    return False, results          # sin corrección
+```
+
+Máximo alcanzable = 1 < 2. Por lo tanto `_apply_self_correction` retorna
+`(False, results)` **para toda entrada posible** — no "ninguna en este
+corpus", sino ninguna nunca.
+
+### Impacto
+
+Estructural, no dependiente del caso:
+
+- `self_corrections_applied` es siempre `0` e `iterations_executed` siempre
+  `1` — el loop de auto-corrección documentado como "max 3 iterations" no
+  itera nunca. Medido: 21/21 casos.
+- `sans_compliance.self_correction` (`= self.iteration > 0 or
+  len(self.corrections_applied) > 0`) sólo puede ser `False`. Medido: 21/21
+  `False`. Es particularmente sensible porque esa bandera fue introducida
+  explícitamente como "FIX P1-5: real verifications instead of hardcoded True
+  flags" — es una verificación real que reporta, correctamente, que algo no
+  pasó; el problema es que no puede pasar.
+- `contradictions_found = 0` en 21/21 casos del corpus, leído de los
+  `audit_trail` de corridas reales (no de una simulación): ni siquiera llega
+  al umbral, es cero absoluto.
+- El evento encadenado `contradiction_detector` que manda el "Self-Correction
+  Event Schema" de `CLAUDE.md` no puede ser emitido nunca por Modo-1.
+
+### Relación con B-151(b) — su atribución quedó obsoleta
+
+B-151(b) atribuye la ausencia de ese evento a que el cableado falta
+("`vigia_scorer.py`, `bundle_builder.py`, `pipeline.py`,
+`sift_orchestrator.py` contienen **cero** referencias a
+`ToolExecutionLogChain` / `contradiction_detector` — el appender se instancia
+sólo en tests y en un script de red team"). **Esa atribución es obsoleta.**
+`vigia/core/reasoning_trace.py` implementa el mecanismo, cita B-151b por
+nombre en su docstring, y está cableado en el camino de sellado de
+`vigia_agent.py` (~2180): `build_from_agent_bundle` encadena
+`pipeline_results["self_corrections"]` como entradas
+`contradiction_detector`. Verificado en vivo: una corrida real de Modo-1
+escribe un `<stem>_reasoning_trace.json` encadenado y con tail-anchor.
+
+Es decir: **el cableado existe y funciona; lo que no existe es el insumo.**
+La causa real está aguas arriba de donde B-151(b) la ubica. Nótese también
+que `BUGS_HISTORICO.md` (entrada de la Fase 1.5 del reasoning trace) describe
+el trace como "delgado (calidad MINIMAL)" para "casos sin nada de lo último" —
+tratándolo como dependiente del caso. Con este hallazgo, la rama de
+auto-correcciones del trace está vacía **siempre**, por construcción.
+
+El resto legítimamente abierto de B-151(b) (¿debe cada gate del scorer emitir
+un evento encadenado?) sigue abierto y es independiente de esto: los gates
+viven en `vigia_scorer.py`, que `vigia_agent.py` **no importa** (cero
+referencias, verificado) — son dos subsistemas disjuntos, y ningún marcador
+de gate llega jamás al bundle del agente.
+
+### Verificación hecha antes de documentar
+
+Inducción sobre el sistema vivo, no deducción:
+
+1. Corridas reales de `vigia_agent.py` sobre los 21 casos de `cases/input/`:
+   `self_corrections_applied=0`, `iterations_executed=1`,
+   `sans_compliance.self_correction=False`, y `contradictions_found=0` leído
+   de cada `audit_trail`.
+2. Inventario de claves de señal sobre las 21 corridas selladas: 196 señales,
+   `tool=None` en todas; claves reales
+   `{artifact_id, confidence, description, evidence_type, source, z_score}`.
+3. Grep exhaustivo: `technical_result` / `semiotic_result` sin productor en
+   ningún `*.py` del repo.
+4. Enumeración del vocabulario de `best_hypothesis` en el código del
+   productor (no sólo en el corpus) — sin ningún literal con "BENIGN".
+5. Prueba directa de alcanzabilidad por regla, alimentando a `detect()` con
+   escenarios construidos para disparar cada regla usando las formas de datos
+   **reales**: reglas 1, 2 y 4 devuelven `[]`; regla 3 devuelve 1; el máximo
+   apilando todo a la vez es 1, contra umbral 2.
+6. Tests de control (positivos) que prueban que la lógica de las reglas 1 y 4
+   funciona y que sólo el nombre de campo / la grafía están desalineados —
+   para no confundir "regla inalcanzable" con "regla incorrecta".
+
+Fijado por `tests/test_b224_contradiction_detector_dormancy.py` (10 tests).
+Todas sus aserciones documentan el **estado roto actual**, no el deseado: van
+a FALLAR cuando alguien cablee un productor o alinee el vocabulario, que es
+justamente el punto.
+
+### Fix propuesto (NO aplicado)
+
+No aplicado porque **toda opción posible afecta veredictos** y requiere
+re-validación del corpus más sign-off de Anna. Una corrección viva reescribe
+`abduction["best_hypothesis"]` (ver `_apply_self_correction`, acciones
+`OVERRIDE_ABDUCTIVE_CONCLUSION` / `ESCALATE_TO_CRITICAL`), así que revivir
+cualquier regla puede mover veredictos sellados sobre casos reales del corpus.
+
+Además hay una interacción que hace que los arreglos parciales no sirvan:
+revivir **una sola** regla deja el máximo en 1, todavía < 2, y no cambia
+nada. Un fix real requiere decidir en conjunto:
+
+- (a) Alinear la regla 1 con las claves reales (`evidence_type` / `source`) —
+  requiere definir qué valores de `evidence_type` cuentan como
+  memoria/disco y cuál es el equivalente real de `behavioral_fingerprint`.
+- (b) Alinear la regla 4 con el vocabulario real
+  (`NO_*_ANOMALY_DETECTED` además de `BENIGN`).
+- (c) Decidir si la regla 2 debe tener un productor (`technical_result`) o si
+  debe eliminarse como concepto muerto.
+- (d) Revisar `CONTRADICTION_THRESHOLD = 2` a la luz de cuántas reglas quedan
+  realmente vivas: con 4 reglas nominales el umbral 2 era plausible; con 1
+  viva es una condición imposible.
+- (e) Alternativa honesta si no se quiere tocar el scoring: documentar la
+  inercia en `KNOWN_LIMITATIONS.md` y ajustar `--help` / `CLAUDE.md` para no
+  presentar la auto-corrección de Modo-1 como activa. Bajo la doctrina de
+  degradación honesta (§5.3 de `docs/ENGINEERING_DISCIPLINE.md`), declarar
+  una capacidad inerte es peor que declararla ausente.
+
+También conviene notar que el docstring de `ContradictionDetector` enumera 5
+tipos de contradicción pero sólo implementa 4 — `TEMPORAL_VS_CONTENT`
+(listado como #1) no existe en el código.
+
+### Update 2026-07-31 — opción (e) aplicada: documentación honesta; el resto sigue abierto
+
+Aplicada la opción (e) del fix propuesto: cero riesgo de veredicto, ningún
+cambio de scoring. Antes de tocar nada se re-auditó la propia cita que
+sostenía la severidad P1: la frase de `CLAUDE.md` "VIGÍA's self-correction
+occurs pre-emission" **no** describe este loop — describe el Daubert
+Corroboration Gate de `vigia_scorer.py` (importado en producción por
+`vigia_api.py`/`sift_orchestrator.py`, el camino Modo 2/API), que está vivo
+y funciona de verdad. `vigia_agent.py` nunca importa `vigia_scorer.py`
+(verificado, cero referencias) — son subsistemas disjuntos, tal como el
+propio B-224 ya notaba en la sección "Relación con B-151(b)". La cita de
+`CLAUDE.md` en la justificación de severidad original conflacionaba ambos
+mecanismos; **no se tocó `CLAUDE.md`** porque esa frase es honesta sobre el
+sistema que describe.
+
+Lo que sí era autorreferencialmente falso — `vigia_agent.py` describiendo
+su **propio** loop como si iterara — se corrigió en el archivo vivo:
+docstring de módulo, docstring de `VIGIAAgent`, docstring de
+`ContradictionDetector` (removido `TEMPORAL_VS_CONTENT` de la lista de
+tipos implementados, anotado aparte como nunca implementado), y el epílogo
+de `--help` ("Self-correction: automatic" → estado real + puntero a
+`KNOWN_LIMITATIONS.md` L-069). Nueva entrada `L-069` documenta el hallazgo
+completo, incluyendo la aclaración Daubert-gate-vs-ContradictionDetector
+para que no se vuelva a conflacionar.
+
+Verificado: `vigia_agent.py --help` real ya no dice la frase falsa;
+`ast.parse()` limpio; corrida real de Modo 1 sobre los 3 casos AI (3/3
+PASS, mismos veredictos MALICE/SUSPICION/SUSPICION — el `agent_sha256`
+cambia porque el propio código fuente cambió, lo cual es esperado y no se
+propagó al resto del corpus committeado). Suite completa: 2137 passed.
+Tests permanentes: `tests/test_b224_self_correction_docs_are_honest.py`
+(9 tests, rojo-primero — los 9 fallan contra el código sin el fix) +
+`tests/test_b224_contradiction_detector_dormancy.py` (10 tests, ya
+existente, actualizado con anclaje robusto a números de línea en vez de
+hardcodeados, porque mis propios edits movieron las líneas que el test
+citaba).
+
+**Lo que sigue abierto, sin cambios:** las opciones (a)-(d) — alinear
+reglas al vocabulario real, decidir el destino de `SEMIOTIC_VS_TECHNICAL`,
+y revisar `CONTRADICTION_THRESHOLD` — siguen pendientes de decisión de
+arquitectura + dry-run de corpus, exactamente como estaban. Este bug
+permanece en `BUGS_PENDIENTES.md`, no se mueve a histórico: el mecanismo
+sigue inerte, solo dejó de mentir al respecto.
+
+---
+
+### RESUELTO 2026-08-15 — el diagnóstico corregido y el fix aplicado
+
+**Esta entrada nombró mal a la sobreviviente.** Dice que
+`CONFIDENCE_COLLAPSE` (regla 3) es "la única alcanzable". Medirla mostró que
+la regla 3 es **inalcanzable por aritmética**, no por falta de productor:
+`_detect_and_correct` deriva `mca_score` como la media de las mismas
+confianzas que la regla después umbraliza. La regla pide `mca > 6/10`
+mientras más de `7/10` de los términos son `< 3/10`; con `k/n > 7/10` la
+media está acotada por `1 − 7/10·(k/n) < 51/100`, que nunca supera `6/10`.
+Verificado por la cota algebraica, por búsqueda exhaustiva sobre una grilla
+de 1/20 hasta 7 señales (1.184.039 combinaciones, sin contraejemplo) y sobre
+la rama de fallback por z-score — que solo se toma cuando ninguna señal trae
+`confidence`, y ahí el default `.get("confidence", 1)` de la propia regla 3
+deja el conteo de baja confianza en 0.
+
+La sobreviviente real era la **regla 4**, muerta por vocabulario. Eso cambia
+el fix: alinear el vocabulario sin tocar el umbral habría dejado el loop
+igual de inerte, exactamente por el argumento que esta misma entrada usa
+("revivir una sola regla no alcanza: el máximo sigue en 1 < 2").
+
+**Aplicado, las tres decisiones acopladas juntas:**
+
+1. `VERDICT_FLIP` alineada vía la constante `BENIGN_HYPOTHESES` (`BENIGN`,
+   `NO_ANOMALY_DETECTED`, `NO_SEMIOTIC_ANOMALY_DETECTED`). Se conserva
+   `"BENIGN"` porque `vigia/verdict/quadripartite.py` y los bridges sí lo
+   emiten. Es ahora la única regla viva.
+2. `CONTRADICTION_THRESHOLD` 2 → 1. Necesario por la aritmética de arriba.
+   No debilita la barra de dos fuentes independientes: la regla 4 ya exige
+   `len(critical_signals) >= 2` dentro de su propio predicado, así que el
+   requisito de dos fuentes se mudó adentro de la regla en vez de contarse
+   entre reglas.
+3. Reglas 1 y 2 quedan dormidas a propósito y **reportadas**. La regla 1 NO
+   se re-apuntó a `source`: ese campo tiene herramientas de recolección
+   (`sift_netflow`, `Plaso/WinEVT`, …), no los nombres de módulo analítico
+   que la regla compara — renombrar la haría *parecer* cableada sin que
+   matchee nunca. Necesita un productor, no un rename. Las tres dormidas se
+   emiten por corrida en `rules_not_evaluable` del audit trail.
+
+**Impacto en el corpus: CERO.** Los 21 casos de `cases/input/` re-corridos
+contra el agente parchado: ningún veredicto cambió, ninguna corrección se
+aplicó, todos siguen convergiendo en 1 iteración. Ninguna señal del corpus
+supera `|z| > 3`, que es por qué la regla 4 queda quieta sobre datos reales.
+El loop pasó de inalcanzable a alcanzable-y-dormido; `self_corrections_applied
+= 0` sigue siendo el valor honesto observado, lo que cambió es que dejó de
+ser el único valor posible.
+
+La alcanzabilidad se prueba end-to-end, no se afirma:
+`test_self_correction_applies_end_to_end` maneja un input sintético con forma
+de Modo-1 y verifica que el veredicto se reescribe de verdad.
+
+**Cierra además B-151(b)**, cuyo bloqueante era éste. Ver esa entrada.
+
+Tests actualizados para clavar el estado nuevo:
+`tests/test_b224_contradiction_detector_dormancy.py` (17 tests, incluyendo la
+prueba aritmética de la regla 3 y un pin de `CONTRADICTION_THRESHOLD == 1`
+para que la decisión acoplada no derive en silencio) y
+`tests/test_b224_self_correction_docs_are_honest.py` (13 tests: el riesgo se
+invirtió de sobre-afirmar a sub-afirmar obsoleto, y ahora se guardan las dos
+direcciones). Suite completa: 2138 passed, 0 failed.

@@ -37,6 +37,43 @@ correctly with the current architecture. It is migration debt for v3.0.
 Evaluate whether SemioticDetectorV2 covers all forensic_technical_detector use cases.
 Migration must be audited by the team before applying.
 
+### Update 2026-08-27 — coverage evaluation executed: the migration premise is REFUTED by measurement
+
+The evaluation this entry named as prerequisite was performed against
+live code and data, not docstrings:
+
+1. **Vocabulary coverage: 0 of 44.** The `SemioticDetectorV2` pattern DB
+   (`vigia/tools/forensic_patterns.sqlite`, `nlp_patterns`, 41 patterns)
+   contains manipulation semiotics exclusively — SOCIAL_ENGINEERING (19),
+   ANTI_FORENSIC (9), GRICE_VIOLATION (6), EVIDENCE_DESTRUCTION (6),
+   LINGUISTIC_ANOMALY (1); the Carnegie/Grice/Eco taxonomy. None of the
+   ~44 technical indicators in `IFT_CATALOG` (mimikatz, webshell, IFEO
+   hijack, timestomping, C2, exfil, process hollowing, ...) exists in
+   that DB.
+2. **Incompatible contracts.** FTD: input artifact dict
+   (`content`+`forensic_anomalies`+`type`), output `z_score` in
+   [0.4, 4.5] + `confidence` + `tool_prefix`. SDv2: input
+   text+timestamp, output `confidence_adjustment` capped at 0.30 + FSV +
+   alert_level. No adapter exists and the codomains are not translatable
+   without a fresh calibration decision.
+3. **FTD has a live caller:** `vigia/tools/vigia_case_adapter.py` loads
+   it and treats its absence as an error — it is not orphaned code.
+4. **Hidden behavior change inside the "migration":** SDv2 applies a
+   Negation Handler and fuzzy matching; a technical catalog ported there
+   would attenuate negated matches ("no mimikatz found" fires in FTD
+   today; SDv2 would halve it). That may or may not be desirable — but
+   it is a detection-semantics change, not a migration.
+
+**Conclusion:** the two detectors are complementary layers (technical vs
+semiotic), not versions of the same thing. "Migrate to
+SemioticDetectorV2" as the TODO states would require porting the full
+catalog into the DB, designing an output adapter, and deciding a
+negation policy — a rewrite with a design decision, not mechanical debt.
+Recommendation: close B-010 as REFUTED (or reclassify it as a v3.0
+design decision with that real scope). The TODO in the code stays as-is
+until that decision — deleting it without closing the entry would
+desynchronize them.
+
 ---
 
 ## B-111 — Mode 3 (Ollama/hermes3:8b): unreliable behavior on dense testimonial evidence — N=2, STOCHASTIC
@@ -178,6 +215,14 @@ Observe the pattern in a second independent judicial case file (other than MPF77
 > below is stale as of this note -- see the Spanish file for the current
 > "CABLEADO COMO SOMBRA" status. Full EN translation of the intervening
 > history has not been done; flagged here rather than left silently wrong.
+
+> **Update 2026-08-27 (observation data point):** the same pre-registered
+> script was re-run on the current corpus (208 cases): **0 flips** of
+> verdict/score/confidence; shadow distribution 123 QUALITY_OK / 85 WARN /
+> 0 missing annex / 0 error. Third consecutive 0-flips run (07-22, 07-31,
+> 08-27). The pending decision remains Anna's: keep observing, promote
+> WARN to some authority (with sign-off), or close B-116 as
+> wired-as-designed.
 
 | Field | Value |
 |-------|-------|
@@ -887,7 +932,7 @@ already refuted by measurement, see above).
 
 | Field | Value |
 |-------|-------|
-| **Status** | PHASE 1 COMPLETE — Phase 2 (calibration) and Phase 3 (integration) pending |
+| **Status** | PHASE 2 EXECUTED 2026-08-27 — agreement 22% → 56%; >70% target NOT met, Phase 3 remains blocked. See the 2026-08-27 update. |
 | **Severity** | P3 — observation-only module, does not affect verdicts |
 | **Files** | `vigia/core/planner_adapter.py` (new), `vigia/core/peirceplanner_bounded.py` |
 | **Detected** | Investigation 2026-07-14 |
@@ -965,147 +1010,203 @@ computed costs, it doesn't generate them -- the real generator is
 `hypothesis_lineage.py`, `AbductiveIntentEngine`, and
 `ockham_adversarial.py` remain exactly as they were.
 
----
+### Update 2026-08-27 — Phase 2 executed: the root cause was not (only) the weight — `_select_best` contradicted its own contract. Agreement 22% → 56%; the 70% target is NOT met
 
-## B-149 — T-5: a high-severity C2 IoC can collapse to NOISE when the exculpatory memory artifact was never network-analyzed (surfaced by B-148) [RESOLVED 2026-08-01]
+Phase 1 attributed the 22% agreement to the weight (confidence is not
+anomaly severity). The new dry-run —
+`scripts/dryrun_b129_weight_calibration.py`, 208 evaluable cases against
+the live `_vigia_score` verdict (same method as B-116), each combination
+computed twice with an abort on any divergence — separated the TWO
+variables Phase 1 measured entangled:
 
-| Field | Value |
-|-------|-------|
-| **Status** | RESOLVED 2026-08-01 — unanalysed-layer guard in `caie.py`. Corpus impact: 0/282 cases. `xfail(strict)` on `test_red_team_anchor_bypass` removed. See the note at the end of this entry: the correct diagnosis was not an IoC floor but an inverted monotonicity. |
-| **Severity** | P2 (latent) — a real, corroborated C2 IoC should never read as NOISE ("nothing to see here"). Currently reproducible only synthetically. |
-| **File** | `vigia_scorer.py` (spoofability-weighted Noisy-OR / verdict cascade); probe: `vigia/tests/adversarial/test_spoofability_correlation_attack.py::test_red_team_anchor_bypass` (now `xfail(strict=True)`) |
+**1. Structural finding, confirmed by measurement.** `_select_best`
+(`peirceplanner_bounded.py`) declared "best coverage/cost ratio" in its
+docstring but implemented `coverage * (1 - cost/max_cost)`: the
+maximum-cost hypothesis (H_MALICE, cost 4 = max) scored exactly 0 for ANY
+coverage — unselectable while any other hypothesis remained active.
+Measured: **0 planner MALICE verdicts over 208 cases** under all four
+weight strategies, against 113 scorer MALICE cases (54% of the corpus).
+Agreement ceiling under that formula: ~45% — the 70% target was
+unreachable by weight calibration alone. Phase 1 could not see this
+because its weight (confidence, median 0.8) left BENIGN/SUSPICION
+coverages near 0 and the tie at 0 was resolved by list order.
 
-**Why B-148 surfaced it.** The LOG_VS_MEMORY fabrication rule was doing double
-duty: besides detecting fabrication, its firing on network-absent memory was
-INCIDENTALLY the mechanism that stopped a high-spoofability C2 log from collapsing
-to NOISE. B-148 correctly stops the absence-firing (it was a false positive), which
-removes that incidental protection. Measured post-B-148: a C2 IoC
-(`raw_score=0.95`, `log_entry`) + a network-UNANALYZED exculpatory memory artifact
-with no explicit `verdict` → **verdict = NOISE** (`test_red_team_anchor_bypass`),
-whereas with an explicit-verdict exculpatory artifact it holds at SUSPICION
-(`test_metadata_convention...`, now a genuine-contradiction pass).
+**Fix:** `_select_best` now implements the declared contract
+(`coverage / ockham_cost`, non-positive-cost guard). Red-first tests:
+`tests/test_b129_select_best_ratio_contract.py` (10; the 4 contract tests
+fail against the previous implementation, verified). The legacy formula
+is copied verbatim into the dry-run (selector `legacy`) so the historical
+baseline stays reproducible — and it reproduces exactly: 22% with the
+`conf` weight.
 
-**Honest scope.** The B-148 corpus gate shows **0/201 real cases** exhibit this —
-the anti-collapse protection rested on a false positive, but no real case relied
-on it either. So T-5 is a latent behavior, not a live corpus regression.
+**2. Weight calibration (with the corrected selector), 208 cases:**
 
-**Proper fix (deferred, needs a decision).** A high-severity, independently
-corroborated IoC must resist NOISE collapse **on its own merits** — not via a
-fracture coupled to absent memory. This is a scorer-level change (e.g. an IoC
-floor that spoofability weighting cannot push below SUSPICION), NOT a re-coupling
-to the absence bug B-148 fixed. Tracked separately so the correct fix is designed
-deliberately. When it lands, the `xfail(strict=True)` on `test_red_team_anchor_bypass`
-flips to XPASS and the marker is removed.
+| weight | agreement | note |
+|---|---|---|
+| conf (Phase 1) | 52% | over-alerts: 176 planner MALICE |
+| z_score | 45% | corpus z_scores already live in [0,1] (p95=0.855) |
+| **raw_score * (1 - CAIE spoofability)** | **56%** | chosen — same CAIE instantiation as scorer Step 1 |
+| composite max(z, raw_spoof) | 52% | |
 
----
+`case_to_signals` is recalibrated to `raw * (1 - spoofability)` with a
+`z_score` fallback, removing two defects of the previous path: the
+fallback fabricated weight `Fraction(5)` (outside [0,1]) for artifacts
+missing `raw_score`, and confidence inverted the semantics (a
+highly-certain benign signal weighed like a severe anomaly). Cases with
+nothing measurable (20/208, the REAL/SRL series without `raw_score` in
+JSON — the same `UNMEASURABLE_FROM_JSON` class as B-116) now report
+`NO_SIGNALS`/`ABSTAIN` instead of a NOISE fabricated from zero weights.
+Tests: `tests/test_b129_adapter_weight_calibration.py` (8).
 
+**Honest state:** 56% < 70% — Phase 3 remains blocked by its own
+pre-registered gate. Characterized residue: MALICE->SUSPICION 29 cases
+and MALICE->NOISE 18 (the 3-hypothesis planner over-alerts where the
+5-level pipeline grades), NOISE->MALICE 20, plus the 20 unmeasurable-
+from-JSON cases. Closing that gap requires either resolving the
+UNMEASURABLE class (data, not code) or calibrated hypothesis thresholds —
+which, tuned against this same corpus, would be overfit without a
+separate validation corpus. Both modules still have zero production
+callers (observation only, B-124 cluster) — zero sealed verdicts change.
+Full suite green after the change.
 
-### RESOLVED 2026-08-01 — the sharpened diagnosis
+### Update 2026-08-27 (bis) — the phase measurement prescribed by the 2026-08-01 addendum was executed: the L-027 mapping is moot — the real blocker is upstream
 
-La entrada proponía "un piso de IoC que la ponderación por spoofability no
-pueda empujar por debajo de SUSPICION". Medir el escenario mostró que el
-problema no era el IoC ni el piso, sino una **monotonicidad invertida**. Mismo
-IoC de C2 en los tres, variando sólo el artefacto de memoria:
+`scripts/dryrun_b129_phase_distribution.py` (committed, double-run with
+abort on divergence, 209 cases):
 
-| Escenario | Información sobre la red | Veredicto |
-|-----------|--------------------------|-----------|
-| memoria analizó la red, sin hallazgos | más | MALICE (contradicción real) |
-| NO hay artefacto de memoria | menos | INCONCLUSIVE |
-| memoria existe pero nunca miró la red | intermedia | **NOISE** |
+**1. Honest run (real corpus inputs): 208/209 cases detect phase
+UNKNOWN.** The input field `mitre_ttps` exists in 0/209 cases (what
+exists is `expected_mitre_ttps` — an expected-output label; feeding it
+would be label leakage, the same class as B-162's guards), and of the 15
+observed `temporal_violations` types only `STATISTICAL_UNIFORMITY`
+appears in `TEMPORAL_VIOLATION_TO_PHASE` (1 case). Direct consequence:
+`infer_habit()`'s phase-scoped hypothesis matching is unreachable for
+99.5% of the corpus — **designing the `tool_name -> artifact_type`
+mapping table today would solve the wrong problem**.
 
-El tercer caso tiene menos información sobre la red que el primero y no más
-que el segundo, y producía el veredicto **más benigno de los tres**. Añadir un
-artefacto silente sobre la capa en disputa hacía que el caso pareciera más
-limpio que no tenerlo.
+**2. Notable table gap:** `EFFECT_BEFORE_CAUSE` — the only violation
+type the scorer validates as authoritative (B-172) — is NOT in
+`TEMPORAL_VIOLATION_TO_PHASE` (5 keys, none of the corpus's real
+vocabulary except the one mentioned).
 
-Es la misma conflación que B-154 nombra —ausencia ≡ negativo— pero en la
-dirección EXCULPATORIA. B-148/B-154 cerró la acusatoria (una capa no analizada
-dejó de alimentar LOG_VS_MEMORY); ésta quedaba abierta: NOISE significa
-"analizado y sin hallazgos", y aquí significaba "nadie lo analizó".
+**3. Counterfactual ceiling (labels as input, explicitly NOT wireable):**
+even feeding `expected_mitre_ttps`, 161/209 remain UNKNOWN.
+`MITRE_TTP_TO_PHASE` covers 24 of 124 distinct corpus TTPs (19%) and
+does not normalize subtechniques: `T1070.006` (14 uses) does not map even
+though its parent `T1070` is in the table; `T1036` (masquerading, 11
+uses) does not either.
 
-**Fix aplicado** (`vigia/tools/caie.py`, tras el bloque CDL): si un log afirma
-actividad de red y NINGÚN artefacto técnico analizó la capa de red, el
-veredicto no puede ser NOISE — pasa a INCONCLUSIVE. Alcance deliberadamente
-estrecho: si algún artefacto la analizó, con o sin hallazgos, la guarda no
-interviene y la contradicción real sigue su curso. No toca `independent_sources`
-ni el scoring; sólo impide concluir limpieza sobre lo no observado.
+**Identified unblocking path (not applied — every table entry is
+doctrine, and the subtechnique-to-parent fallback changes live SIFT
+orchestrator behavior, so it needs its own dry-run over live runs):**
+(a) a real TTP producer as JSON-pipeline input; (b) subtechnique ->
+parent-technique fallback in the `MITRE_TTP_TO_PHASE` lookup; (c) extend
+`TEMPORAL_VIOLATION_TO_PHASE` to the real vocabulary (starting with
+`EFFECT_BEFORE_CAUSE`). Only with detectable phases does resuming the
+honest `required_artifacts` correspondence make sense.
 
-Se descartó el piso de IoC de la propuesta original: habría forzado SUSPICION
-desde un único log altamente spoofable sin corroboración, que es el error
-opuesto y el que la puerta de corroboración Daubert existe para evitar.
+### Update 2026-08-27 (ter) — (b) and (c) applied with Anna's approval: `resolve_ttp_phase` + `EFFECT_BEFORE_CAUSE` table entry. Correction: `detect_phase` has no live callers
 
-**Impacto en el corpus: CERO** — 0 de 282 casos presentan la combinación
-(log que afirma red + todos los artefactos técnicos silentes sobre red).
-Coherente con el 0/201 que medía el gate de B-148.
+**Correction made before touching anything:** the (bis) update claimed
+the fallback "changes live SIFT orchestrator behavior". Verified by
+exhaustive grep first: **`detect_phase()` and `analyze_focus()` have
+zero production callers** — `vigia/pipeline/pipeline.py` only consumes
+`get_visible_tools(detected_phase)` with an externally supplied phase,
+and `sift_orchestrator.py` never invokes them. The change is
+observation/groundwork layer; no sealed verdict is touched.
 
-`test_red_team_anchor_bypass` pasa a verde y su `xfail(strict=True)` fue
-retirado, como esta entrada anticipaba.
+**Justification measured over live runs (not labels):** census of the
+PRODUCED `mitre_ttps` in `results/**/*.json` (104 files carrying the
+field, 190 distinct TTPs): only 13/190 mapped by exact key. The
+highest-frequency subtechniques — `T1562.001` (43), `T1070.001/.002/
+.006` (121 combined), `T1566.003` (40) — did not map even though their
+parent technique is in the table, and narrative bundles emit TTPs with
+prose suffixes (`"T1070.002 (Indicator Removal ...)"`) that did not map
+either.
 
-## B-151 — Scorer downgrades: (a) silent single-artifact score clamp [RESOLVED, dead code]; (b) mandated contradiction_detector chain entry not wired in Mode-1 [OPEN — architecture decision]
+**Changes:**
+1. `resolve_ttp_phase()` in `visible_variables.py` — deterministic
+   lookup in priority order: exact hit -> id extracted by regex from the
+   string head -> subtechnique's parent technique (MITRE semantics: a
+   subtechnique refines its parent and inherits its phase).
+   `detect_phase` Rule 1 uses it; the frozen tables are not mutated.
+2. `EFFECT_BEFORE_CAUSE -> DEFENSE_EVASION` in
+   `TEMPORAL_VIOLATION_TO_PHASE` — doctrine: an effect timestamped
+   before its cause is retroactive timestamp manipulation, the same
+   class as `RETROACTIVE_MODIFICATION` (already mapped there); it is
+   also the only type the scorer validates as authoritative (B-172).
 
-| Field | Value |
-|-------|-------|
-| **Status** | (a) RESOLVED (2026-07-19) — clamp made auditable; also found unreachable. (b) OPEN — architecture decision, deliberately NOT bundled with (a). |
-| **Severity** | (a) P3 (disclosure of a dead-code clamp). (b) P2 (doctrine-vs-implementation gap). |
-| **File** | (a) `vigia_scorer.py` clamp ~1216 + marker ~1620; (b) `vigia_scorer.py` (no `ToolExecutionLogChain` in the decision path). |
+Red-first tests: `tests/test_b129_ttp_phase_resolution.py` (13; the
+import and both detection tests fail pre-fix, verified).
 
-**(a) Silent single-artifact score clamp — RESOLVED, with an honest twist.**
-`if n_artifacts < 2 and final_score > 0.65: final_score = 0.65` silently rewrote
-the sealed score (a probative-strength reduction with no reason/marker, unlike
-every other downgrade in the cascade). Fix: capture the pre-cap score and surface
-a `single_artifact_score_cap` marker + reason note into `base_result`, mirroring
-the `normalization_failures` / `temporal_pairs_skipped` disclosure pattern.
-Verdict-neutral (the cap already applied; disclosure is additive).
+**Re-measured impact (`dryrun_b129_phase_distribution.py`):** honest run
+UNKNOWN 208/209 -> 206/209 (the 2 declared `EFFECT_BEFORE_CAUSE` cases
+now vote a phase); counterfactual ceiling UNKNOWN 161 -> 130
+(defense_evasion 16->32, execution 7->23); resolved label TTPs
+24 -> 50 of 124.
 
-**Twist found while verifying: the clamp is currently UNREACHABLE dead code.** A
-single signal artifact is suppressed to a max score of ~0.038 (`cryptographic_hash`,
-raw 0.99, all boosters) — far below the 0.65 cap — so the "silent downgrade" this
-item named is not a live risk; the clamp is defensive and the marker is
-forward-looking disclosure. Pinned by `tests/test_b151a_single_artifact_cap.py`:
-if a single artifact ever scores >= 0.65 the test fails, flagging that the marker
-path has gone live. `_dround` returns float, so `final_score` here is float by the
-scorer's deterministic-rounding design (not a pure-Fraction path) — the `= 0.65`
-assignment is type-consistent, no new float injection.
+**Table residue, documented and NOT applied (every entry is doctrine):**
+the frequent still-unresolved TTPs split into two classes —
+(i) unambiguous in MITRE, candidates to add with sign-off: `T1027`
+(Obfuscated Files -> defense_evasion, 18 uses), `T1036` (Masquerading ->
+defense_evasion, 17 with its subtechnique), `T1190` (Exploit
+Public-Facing App -> initial_access, 7), `T1486` (Data Encrypted for
+Impact -> impact, 6); (ii) multi-tactic in MITRE, which a single-phase
+table cannot represent honestly without a design decision (multi-vote?):
+`T1078` (Valid Accounts, 4 tactics, 19 uses), `T1055` (Process
+Injection, 2 tactics, 15), `T1053` (Scheduled Task, 3 tactics). Item
+(a) — a real TTP producer as JSON-pipeline input — remains the main
+blocker for the honest run to leave UNKNOWN.
 
-**(b) contradiction_detector chain entry not wired in Mode-1 — OPEN.** CLAUDE.md's
-"Self-Correction Event Schema" mandates that every gate-driven downgrade append a
-`contradiction_detector` entry via `ToolExecutionLogChain`. Verified: `vigia_scorer.py`,
-`bundle_builder.py`, `pipeline.py`, `sift_orchestrator.py` contain **zero**
-references to `ToolExecutionLogChain` / `contradiction_detector` — the appender is
-instantiated only in tests and a red-team script. So the deterministic Mode-1 path
-does not emit the mandated tamper-evident self-correction events (the cascade DOES
-set human-readable `reason` strings for 7/8 downgrades — the gap is the *chained*
-event, not the reason). This is an architecture decision — wire it into Mode-1, or
-amend the doctrine to state the chained self-correction event is a Mode-2 (Claude
-Code) construct by design. Deliberately NOT fixed as a one-liner. Not yet decided.
+### Update 2026-08-27 (quater) — class (i) applied under Anna's generic go-ahead to continue; fixed an invalid MITRE id in the table
 
-**Update 2026-07-26 — the attribution above is now STALE (see B-224).** Two
-factual corrections, both verified live:
+The four single-tactic techniques of class (i) entered
+`MITRE_TTP_TO_PHASE` (`T1027`, `T1036` -> defense_evasion; `T1190` ->
+initial_access; `T1486` -> impact — each has exactly one tactic in
+ATT&CK, no doctrinal ambiguity). The key `"T1547.1"` was also corrected
+to `"T1547.001"` (MITRE subtechnique format is `.NNN`; the old key was
+not a valid id and only matched its own literal). Red-first tests
+extended in `tests/test_b129_ttp_phase_resolution.py` (19 total; the 5
+new ones fail pre-change), including a guard pinning that the
+multi-tactic techniques (`T1078`, `T1055`, `T1053`) stay unmapped until
+a design decision. Re-measured: resolved label TTPs 50 -> 59/124;
+counterfactual ceiling UNKNOWN 130 -> 127. `detect_phase` still has zero
+production callers. Documentation aligned: addendum in
+`KNOWN_LIMITATIONS.md` L-027 (the mapping-table plan is now subordinate
+to the measurement) and a currency note in `WHAT_IS_NEXT.md` (the POST
+HACKATHON rule retirement is now reflected there).
 
-1. *The wiring exists.* `vigia/core/reasoning_trace.py` implements the mandated
-   mechanism, cites B-151b by name in its docstring, and is wired into
-   `vigia_agent.py`'s sealing path (~2180): `build_from_agent_bundle` chains
-   `pipeline_results["self_corrections"]` as `contradiction_detector` entries
-   via `ToolExecutionLogChain`. Confirmed with a real Mode-1 run, which writes a
-   chained, tail-anchored `<stem>_reasoning_trace.json`. The claim "the appender
-   is instantiated only in tests and a red-team script" is no longer true.
-2. *What is missing is the input, not the wiring.* B-224 documents that
-   `ContradictionDetector` can never fire in Mode-1: 3 of its 4 rules read
-   fields with no producer (`signal["tool"]`, `technical_result`) or a spelling
-   the real vocabulary never uses (`"BENIGN"` vs `NO_*_ANOMALY_DETECTED`), and
-   `CONTRADICTION_THRESHOLD = 2` makes the single live rule insufficient
-   (maximum achievable = 1). So the trace's self-correction branch is **always**
-   empty, by construction — not only on cases without contradictions.
+### Update 2026-08-27 (quinquies) — adversarial review of the session's full diff: 6 findings, all execution-verified and fixed
 
-**What remains open here (independent of B-224):** whether each scorer gate
-should emit its own chained event. A structural note for whoever takes it on:
-the gates live in `vigia_scorer.py`, which `vigia_agent.py` does **not** import
-(zero references, verified) — they are two disjoint subsystems, and no gate
-marker (`normalization_failures`, `temporal_pairs_skipped`,
-`pre_unverified_*_verdict`, `single_artifact_score_cap`) ever reaches the agent
-bundle. So the fix is not "read the markers in `build_from_agent_bundle`":
-there are no markers to read on that path. The architecture decision stays
-pending.
+Before closing, the branch's accumulated diff went through adversarial
+review. The core `_select_best` fix and the calibration came out clean;
+the findings, each reproduced live before patching:
+
+1. **Dishonest degradation in the adapter's signal fallback:** a signal
+   without `z_score` became weight 0 — "unmeasured" turned into
+   "measured as zero anomaly", and an unmeasurable case produced a
+   BENIGN/OK observation instead of `NO_SIGNALS`/ABSTAIN. Absent is now
+   distinct from zero: the signal is skipped.
+2. **TTP regex without a boundary:** `"T1070abc"` resolved to
+   DEFENSE_EVASION and cast a +40 vote. Lookahead `(?![\w.])` added;
+   legitimate prose suffixes still resolve.
+3. **`detect_phase` Rule 2 crash** on a non-string violation `type`
+   (`None.upper()`): hardened into "rule not satisfied".
+4. **Script/adapter divergence:** the dry-run's `signals_z`/`raw_spoof`
+   fallbacks fabricated weight 0 where the adapter skips; the
+   `raw_spoof` and `adapter` rows are now identical by construction
+   (verified: 118/208 with the same distribution).
+5. **`"T1547.1"` still lived in the parallel table**
+   `MITRE_TTPS_BY_PHASE` (`picerl_mapping.py`), which flows into PICERL
+   reports: corrected to `T1547.001` — the two tables no longer
+   disagree.
+6. **Triplicated CAIE spoofability instantiation:** the script now
+   imports `_artifact_spoofability` from the adapter (single source);
+   the scorer's Step 1 copy is untouched (sealed path).
+
+New guard tests: 7 (red-first verified, 4 failing pre-fix). Calibration
+agreements unchanged (the fixes only relabel unmeasured cases as
+`NO_SIGNALS`). Full suite green.
 
 ---
 
@@ -1175,274 +1276,3 @@ disagreement is preserved and reinforces that VIGÍA must keep emitting
 materializes the facts it proposes to score.
 
 ---
-
-## B-221 — "Round 2" audit (epistemological invariants): investigated and discarded vectors — recorded to avoid re-discovering them [DOCUMENTED — Claude 2026-07-25]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | N/A — not bugs. Documented as audit reference, not as a defect. |
-| **Files** | `vigia/core/risk_bounded_layer.py` (`PolicyStabilityController`), `vigia/core/dissent_report.py` (`_compute_majority`, tie-break), `vigia/core/trust_fusion.py` (`NeighborhoodContext.mean_neighbor_trust`, `TrustFusionEngine.calculate_likelihood`, `add_artifact`). |
-| **Method** | A-D-I (Abductive-Deductive-Inductive): every vector was executed against the live code before being accepted or discarded, not just deduced. |
-| **Detected in** | "Round 2" audit, session 2026-07-25, independently re-verified in this session (no result from the pasted report was accepted without re-running it). |
-
-### Description
-
-Five vectors were investigated during the "Round 2" audit and did not turn
-into bugs. They're documented here explicitly so a future audit doesn't
-spend time re-discovering them:
-
-**1. F5 — `PolicyStabilityController`: does the result diverge between the
-numpy branch (`np.linalg.norm` + `np.array`) and the stdlib fallback
-(`math.sqrt` + lists)?** FALSIFIED. Original hypothesis (deduced, not
-executed): the verdict might silently depend on whether `numpy` is
-installed. Re-executed in this session, forcing both branches over the same
-`stabilize()` sequence: the three resulting parameters (`lambda, gamma,
-epsilon`) are **bit-identical** across both paths (`0x1.b851eb851eb85p+1` in
-both cases, verified via float `.hex()`). The two branches are
-arithmetically equivalent for this operation; the BLAS divergence that
-motivated the hypothesis is theoretical for this case, not demonstrated.
-Retracted as a finding.
-
-**2. `_compute_majority`'s tie-break favors MALICIOUS on a tie.** NOT A BUG.
-Breaking ties toward the more severe verdict on an exact vote tie is
-deterministic and fail-safe — it's the correct policy for a forensic system:
-under genuine uncertainty between two equally-voted verdicts, escalating is
-more defensible than averaging down.
-
-**3. `NeighborhoodContext.mean_neighbor_trust` returns `1.0` when there are
-no neighbors — is that "absence of evidence treated as perfect trust"?**
-FALSIFIED as a scoring risk. Verified against the live code:
-`TrustFusionEngine.calculate_likelihood` short-circuits to `return 0.5` when
-`neighborhood.neighbor_count == 0`, **before** ever reading
-`mean_neighbor_trust` — the `1.0` value never participates in the
-`likelihood`/`posterior` computation. The `1.0` does appear in the narrative
-reason text (`BOOST: trust vecindad={neighborhood.mean_neighbor_trust:.3f}`)
-in cases where neighbors DO exist, so there's no path where the "no
-neighbors" default leaks into a score. Confirmed real risk: none.
-
-**4. `add_artifact` silently deduplicates duplicate IDs.** Hygiene, not a
-severity bug. `add_artifact` returns `False` with no exception and no
-record when `artifact.artifact_id` already exists (`trust_fusion.py`, line
-~207) — two artifacts sharing an ID collapse into one without appearing in
-any `rejected_details` or equivalent structure. The behavior itself is
-desirable (guards against double-counting), but it's invisible: nothing in
-`TrustFusionEngine`'s output tells an expert witness that an artifact was
-dropped as a duplicate. Minor, non-blocking ticket — not opened as its own
-numbered bug since it affects no verdict; recorded here instead.
-
-### Process note
-
-This audit was done with explicit A-D-I discipline after an earlier pass
-(B-217 through B-220 plus this block) had *deduced* some findings without
-executing them. Re-verification with induction changed the outcome: F1 got
-worse (the full chain was shown to be dead, not just that the module was
-orphaned), F2 and F4 dropped in severity once their dormant preconditions
-were discovered, and F5 was fully retracted once executed and found
-bit-identical. The process is documented, not just the outcome, because the
-process is repeatable: any future finding of this kind should go through the
-same re-verification against live code before being accepted as confirmed.
-
-
----
-
-## B-224 — Mode-1's self-correction loop is structurally inert: 3 of 4 `ContradictionDetector` rules read fields no producer writes, and the threshold makes the one live rule insufficient [DOCUMENTED — Claude 2026-07-26]
-
-| Field | Value |
-|-------|-------|
-| **Severity** | P1 (doctrine-vs-implementation + compliance flag). Self-correction is presented as a core differentiator: `vigia_agent.py --help` says "Self-correction: automatic — no flags needed" and "Max iterations: 3", and `CLAUDE.md` states that "VIGÍA's self-correction occurs pre-emission". In Mode-1 it never occurs. |
-| **Files** | `vigia_agent.py` — `ContradictionDetector.detect()` (lines 451-528), `CONTRADICTION_THRESHOLD = 2` (line 55), `_apply_self_correction` (guard at ~813), `sans_compliance.self_correction` flag (~1398). |
-| **Detected in** | Investigation of B-151(b)'s open remainder (2026-07-26). Measured across the 21 corpus cases plus direct per-rule reachability testing. |
-
-### Description
-
-`ContradictionDetector.detect()` implements 4 rules. Three cannot match any
-input, because they read fields no production path writes:
-
-**Rule 1 — ENTROPY_VS_BEHAVIORAL.** Filters on `signal["tool"] in
-("memory_forensics", "disk_forensics")` and `signal["tool"] ==
-"behavioral_fingerprint"`. Mode-1 signals have no `tool` key: they carry
-`evidence_type` and `source`. Measured: **196 of 196 signals** across the 21
-corpus cases have `tool=None`. Verified that the rule's own logic is fine —
-the same scenario with `tool` instead of `source` fires correctly (control
-test included).
-
-**Rule 2 — SEMIOTIC_VS_TECHNICAL.** Reads
-`module_results["technical_result"]["alert_level"]` and requires `HIGH`/
-`CRITICAL`. `technical_result` and `semiotic_result` are **read** at
-`vigia_agent.py:464-465` and **written nowhere in the repository** —
-confirmed by exhaustive grep over every `*.py`, including `tests/`. The
-`.get(..., "LOW")` default always wins, and `"LOW"` is not in
-`("HIGH", "CRITICAL")`.
-
-**Rule 4 — VERDICT_FLIP.** Requires `"BENIGN" in
-best_hypothesis.upper()`. The producer's complete vocabulary
-(`vigia/inference/abductive_reasoner.py` + `vigia_agent.py`) is:
-`UNDETERMINED`, `REASONER_ERROR`, `ABSTAIN_V2`, `MALICIOUS_INTENT_DETECTED`,
-`INTENT_DETECTED`, `SUSPICION_DETECTED`, `NO_ANOMALY_DETECTED`,
-`NO_SEMIOTIC_ANOMALY_DETECTED`, `PIPELINE_ERROR`. **None contains "BENIGN"** —
-Mode-1 spells "benign" as `NO_*_ANOMALY_DETECTED`. `vigia_agent.py:164` itself
-documents that both spellings exist ("`NO_*_ANOMALY_DETECTED`, `BENIGN`"), but
-the rule only checks one. Verified the logic works: with the literal
-`"BENIGN"` it fires.
-
-That leaves **Rule 3 (CONFIDENCE_COLLAPSE)** as the only reachable rule, and
-it appends at most **one** contradiction. `CONTRADICTION_THRESHOLD = 2` gates
-correction on `len(contradictions) >= 2`:
-
-```python
-if len(contradictions) < CONTRADICTION_THRESHOLD:
-    ...
-    return False, results          # no correction
-```
-
-Maximum achievable = 1 < 2. Therefore `_apply_self_correction` returns
-`(False, results)` **for every possible input** — not "none on this corpus",
-but none ever.
-
-### Impact
-
-Structural, not case-dependent:
-
-- `self_corrections_applied` is always `0` and `iterations_executed` always
-  `1` — the self-correction loop documented as "max 3 iterations" never
-  iterates. Measured: 21/21 cases.
-- `sans_compliance.self_correction` (`= self.iteration > 0 or
-  len(self.corrections_applied) > 0`) can only ever be `False`. Measured:
-  21/21 `False`. This is particularly sensitive because that flag was
-  introduced explicitly as "FIX P1-5: real verifications instead of hardcoded
-  True flags" — it is a real verification correctly reporting that something
-  did not happen; the problem is that it cannot happen.
-- `contradictions_found = 0` on 21/21 corpus cases, read from the
-  `audit_trail` of real runs (not a simulation): it does not merely fall short
-  of the threshold, it is absolute zero.
-- The chained `contradiction_detector` event mandated by `CLAUDE.md`'s
-  "Self-Correction Event Schema" can never be emitted by Mode-1.
-
-### Relationship to B-151(b) — its attribution is now stale
-
-B-151(b) attributes the absence of that event to missing wiring
-("`vigia_scorer.py`, `bundle_builder.py`, `pipeline.py`,
-`sift_orchestrator.py` contain **zero** references to `ToolExecutionLogChain`
-/ `contradiction_detector` — the appender is instantiated only in tests and a
-red team script"). **That attribution is stale.**
-`vigia/core/reasoning_trace.py` implements the mechanism, cites B-151b by name
-in its docstring, and is wired into `vigia_agent.py`'s sealing path (~2180):
-`build_from_agent_bundle` chains `pipeline_results["self_corrections"]` as
-`contradiction_detector` entries. Verified live: a real Mode-1 run writes a
-chained, tail-anchored `<stem>_reasoning_trace.json`.
-
-That is: **the wiring exists and works; what does not exist is the input.**
-The real cause is upstream of where B-151(b) locates it. Note also that
-`BUGS_HISTORICO.md` (the reasoning-trace Phase 1.5 entry) describes the trace
-as "thin (MINIMAL quality)" for "cases without any of the latter" — treating
-it as case-dependent. With this finding, the trace's self-correction branch is
-**always** empty, by construction.
-
-B-151(b)'s legitimately open remainder (should each scorer gate emit a chained
-event?) stays open and is independent of this: the gates live in
-`vigia_scorer.py`, which `vigia_agent.py` does **not** import (zero
-references, verified) — they are two disjoint subsystems, and no gate marker
-ever reaches the agent bundle.
-
-### Verification done before documenting
-
-Induction against the live system, not deduction:
-
-1. Real `vigia_agent.py` runs over all 21 `cases/input/` cases:
-   `self_corrections_applied=0`, `iterations_executed=1`,
-   `sans_compliance.self_correction=False`, and `contradictions_found=0` read
-   from each `audit_trail`.
-2. Signal-key inventory across the 21 sealed runs: 196 signals, `tool=None` in
-   all of them; real keys
-   `{artifact_id, confidence, description, evidence_type, source, z_score}`.
-3. Exhaustive grep: `technical_result` / `semiotic_result` have no producer in
-   any `*.py` in the repo.
-4. Enumeration of the `best_hypothesis` vocabulary in the producer's own source
-   (not just in the corpus) — no literal containing "BENIGN".
-5. Direct per-rule reachability testing, feeding `detect()` scenarios built to
-   trigger each rule using the **real** data shapes: rules 1, 2 and 4 return
-   `[]`; rule 3 returns 1; the maximum with everything stacked at once is 1,
-   against threshold 2.
-6. Positive control tests proving rules 1 and 4 do work logically and that only
-   the field name / spelling is misaligned — so "unreachable rule" is not
-   confused with "incorrect rule".
-
-Locked by `tests/test_b224_contradiction_detector_dormancy.py` (10 tests). All
-of its assertions document the **current broken state**, not the desired one:
-they will FAIL when someone wires a producer or aligns the vocabulary, which is
-exactly the point.
-
-### Proposed fix (NOT applied)
-
-Not applied because **every possible option affects verdicts** and requires
-corpus re-validation plus Anna's sign-off. A live correction rewrites
-`abduction["best_hypothesis"]` (see `_apply_self_correction`, actions
-`OVERRIDE_ABDUCTIVE_CONCLUSION` / `ESCALATE_TO_CRITICAL`), so reviving any rule
-can move sealed verdicts on real corpus cases.
-
-There is also an interaction that makes partial fixes useless: reviving a
-**single** rule leaves the maximum at 1, still < 2, and changes nothing. A real
-fix requires deciding jointly:
-
-- (a) Align rule 1 with the real keys (`evidence_type` / `source`) — requires
-  defining which `evidence_type` values count as memory/disk and what the real
-  equivalent of `behavioral_fingerprint` is.
-- (b) Align rule 4 with the real vocabulary (`NO_*_ANOMALY_DETECTED` in
-  addition to `BENIGN`).
-- (c) Decide whether rule 2 should have a producer (`technical_result`) or be
-  removed as a dead concept.
-- (d) Revisit `CONTRADICTION_THRESHOLD = 2` in light of how many rules are
-  actually live: with 4 nominal rules a threshold of 2 was plausible; with 1
-  live rule it is an impossible condition.
-- (e) The honest alternative if scoring must not be touched: document the
-  inertness in `KNOWN_LIMITATIONS.md` and adjust `--help` / `CLAUDE.md` so
-  Mode-1 self-correction is not presented as active. Under the honest-degradation
-  doctrine (§5.3 of `docs/ENGINEERING_DISCIPLINE.md`), declaring an inert
-  capability is worse than declaring an absent one.
-
-Worth noting too: `ContradictionDetector`'s docstring enumerates 5 contradiction
-types but only implements 4 — `TEMPORAL_VS_CONTENT` (listed as #1) does not
-exist in the code.
-
-### Update 2026-07-31 — option (e) applied: honest documentation; the rest stays open
-
-Applied proposed-fix option (e): zero verdict risk, no scoring changed.
-Before touching anything, re-audited the very citation that drove the P1
-severity: `CLAUDE.md`'s "VIGÍA's self-correction occurs pre-emission"
-phrase does **not** describe this loop — it describes the Daubert
-Corroboration Gate in `vigia_scorer.py` (imported in production by
-`vigia_api.py`/`sift_orchestrator.py`, the Mode 2/API path), which is live
-and genuinely works. `vigia_agent.py` never imports `vigia_scorer.py`
-(verified, zero references) — they are disjoint subsystems, exactly as
-B-224 itself already noted in its "Relation to B-151(b)" section. The
-`CLAUDE.md` citation in the original severity justification conflated the
-two mechanisms; **`CLAUDE.md` was NOT touched** because that sentence is
-honest about the system it describes.
-
-What WAS self-referentially false -- `vigia_agent.py` describing its OWN
-loop as if it iterated -- was corrected in the live file: module
-docstring, `VIGIAAgent` docstring, `ContradictionDetector` docstring
-(removed `TEMPORAL_VS_CONTENT` from the implemented-types list, noted
-separately as never implemented), and the `--help` epilog
-("Self-correction: automatic" -> real status + pointer to
-`KNOWN_LIMITATIONS.md` L-069). New entry `L-069` documents the full
-finding, including the Daubert-gate-vs-ContradictionDetector distinction
-so it doesn't get conflated again.
-
-Verified: real `vigia_agent.py --help` output no longer says the false
-sentence; clean `ast.parse()`; a real Mode-1 run over the 3 AI cases (3/3
-PASS, same MALICE/SUSPICION/SUSPICION verdicts -- `agent_sha256` changes
-because the source itself changed, expected, not propagated to the rest
-of the committed corpus). Full suite: 2137 passed. Permanent tests:
-`tests/test_b224_self_correction_docs_are_honest.py` (9 tests, red-first --
-all 9 fail against the unfixed code) plus
-`tests/test_b224_contradiction_detector_dormancy.py` (10 tests, pre-existing,
-updated with a content-based anchor instead of hardcoded line numbers,
-since my own edits shifted the lines that test was citing).
-
-**What remains open, unchanged:** options (a)-(d) -- aligning rules to the
-real vocabulary, deciding `SEMIOTIC_VS_TECHNICAL`'s fate, and revisiting
-`CONTRADICTION_THRESHOLD` -- are still pending an architecture decision
-plus a corpus dry-run, exactly as before. This bug stays in
-`BUGS_PENDIENTES_EN.md`, not archived: the mechanism is still inert, it
-just stopped lying about it.

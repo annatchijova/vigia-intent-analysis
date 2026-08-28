@@ -39,7 +39,7 @@ class TestSingleSource:
     def test_bridge_reexports_canonical(self):
         # L-045: the bridge imports `mcp`, not installable in minimal CI
         # environments — skip this re-export check when absent (B-138).
-        pytest.importorskip("mcp")
+        pytest.importorskip("mcp.server.fastmcp")
         from vigia.vigia_sift_bridge import _sanitize_grep_pattern as bridge_fn
         assert bridge_fn is _sanitize_grep_pattern
 

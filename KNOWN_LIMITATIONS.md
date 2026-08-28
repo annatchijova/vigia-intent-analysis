@@ -918,6 +918,9 @@ example (N=1/2) lives in "Accuracy by Mode", not here.*
 | L-048 | Tool-log chain tail truncation (chain_tip_sha256) | core/tool_log_chain.py | **RESOLVED** (R3-5) |
 | L-049 | Spoofable-type flood saturates to MALICE (R4-3) | vigia_scorer.py | Mitigated (B-091 tail decay + gate v2; mobile-band residual closed by B-092) |
 | L-050 | Non-finite fail-closed on value/z_score/confidence × 4 impls | ebs_v1.py, signal_contract.py | **RESOLVED** (B-083/B-083b) |
+| L-071 | Cross-domain gate counts domain presence, not mass (1 near-zero artifact pivots SUSPICION→MALICE) | vigia_scorer.py B-068 gate | [OPEN] — calibration doctrine; refinement of the B-092 residual |
+| L-072 | `semantic_role` declared label neutralizes MALICE (37/52 corpus cases, label alone) | vigia_scorer.py D1 block | [OPEN] — doctrine; extends L-054, sibling of L-065/L-070 |
+| L-073 | Threshold compares `_dround` float vs `Fraction`; exact grid point grants higher rung | vigia_scorer.py verdict ladder | [OPEN] — latent, zero corpus incidence |
 | L-067 | §9.4-LIM: SUSPICION doctrinal ceiling for D3-only macOS/mobile (sealed 2026-07-10; renumbered from second L-051 on 2026-07-23) | sift_orchestrator.py verdict_ceiling | Sealed doctrine |
 | L-051 | Formal specification of arbitration contract (Axiom A1) — renumbered from shared L-029 | Scoring/CAIE precedence | [OPEN] — design gap, not a bug |
 | L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
@@ -1083,6 +1086,24 @@ to the real file.
 - Real `category` from signal metadata (not hardcoded `_VarCat.PROCESS`)
 - Real `observed_at` from signal timestamp
 - `consistency_score` as `Fraction(coverage_score, 100)` (no floats; `cost` remains `int`)
+
+> **Addendum 2026-08-27 (measurement supersedes the mapping-table plan
+> above):** the phase-distribution measurement prescribed by the B-129
+> addendum was executed (`scripts/dryrun_b129_phase_distribution.py`):
+> with the corpus's real inputs, `detect_phase()` yields UNKNOWN for
+> 206/209 cases, because no `mitre_ttps` input field exists in any corpus
+> case and the violation vocabulary was largely absent from the phase
+> tables. Building the `tool_name -> artifact_type` mapping first would
+> therefore solve the wrong problem — phase-scoped hypothesis matching is
+> unreachable before a TTP producer exists. What was applied instead
+> (B-129 registry, updates ter and 2026-08-27 second batch):
+> `resolve_ttp_phase()` (exact -> extracted id -> subtechnique parent),
+> `EFFECT_BEFORE_CAUSE` and four single-tactic techniques added to the
+> tables. The example mappings suggested above (e.g. `audit_network ->
+> lateral_movement_auth`) should be treated as illustrative only — the
+> reverted commit `86f6777` failed precisely by mapping tool names to
+> artifact names by convenience. See `BUGS_PENDIENTES.md` B-129 for the
+> current unblocking order.
 
 **Triplication resolved:** `vigia/tools/abductive_intent_engine.py`, `vigia/core/abductive_intent_engine.py`, and `vigia/abductive_intent_engine.py` (root) remain in place as archived originals — not deleted, not imported by any active path after this fix. The `.bak` file at `vigia/core/abductive_intent_engine.py.bak` captures the pre-fix state.
 
@@ -1828,10 +1849,11 @@ value over a single evtx.
 
 ## L-045 — `mcp` not installable in minimal CI environments (PyJWT conflict) [DOCUMENTED]
 
-**Affects:** `requirements-ci.txt`, `tests/e2e/test_integration_end_to_end.py`,
-`vigia/tests/adversarial/test_human_jitter_deterministic_bypass.py` |
+**Affects:** `requirements-ci.txt`, and every test module that imports
+`vigia.vigia_sift_bridge` at module scope (11 as of 2026-08-12) |
 **Status:** documented CI limitation (Fase 0, finding S-1 of
-`docs/PLAN_ABDUCTIVO_PENDIENTES_20260705.md`)
+`docs/PLAN_ABDUCTIVO_PENDIENTES_20260705.md`); scope and consequence
+corrected 2026-08-12 — see "Correction" below
 
 **Description:** the `mcp` package (required by the two e2e/adversarial test
 modules that exercise the MCP bridge) cannot be installed in environments
@@ -1841,9 +1863,76 @@ where `PyJWT` was provisioned by the system package manager (e.g. Debian):
 `requirements-ci.txt` deliberately; it remains in `requirements.txt` and
 `pyproject.toml` for full installs.
 
-**Consequence:** in a minimal CI environment (requirements-ci only), those two
-test modules do not collect. This is an infrastructure gap, not a forensic
-one — no verdict-path code depends on `mcp`.
+**Consequence:** in a minimal CI environment (requirements-ci only), the test
+modules that import the bridge do not collect. This is an infrastructure gap,
+not a forensic one — no verdict-path code depends on `mcp`.
+
+**Correction 2026-08-12 — the scope and the consequence above were both
+understated.** Two facts, measured on the live tree before anything was
+changed:
+
+1. *Scope.* The "Affects" list named two modules. Eleven import the bridge at
+   module scope. Six already carried the `pytest.importorskip("mcp")` guard —
+   `tests/test_mount_magic_bytes.py`, `tests/test_mcp_confused_deputy.py`,
+   `tests/test_mcp_transport_auth_theater.py`,
+   `tests/test_kassandra_salt_enforcement.py`,
+   `tests/test_grupob_b9_honey_token_lifecycle.py`, and
+   `vigia/tests/adversarial/test_human_jitter_deterministic_bypass.py`. That
+   last one is named in the original "Affects" list as broken; it had been
+   guarded at some point without this entry being updated.
+
+   Five did not: `tests/e2e/test_integration_end_to_end.py` (the other module
+   the original list named) and the four added after this entry was written —
+   `tests/test_b122_universal_tool_invoked_audit.py`,
+   `tests/test_b164_mcp_mount_root.py`,
+   `tests/test_b169_mcp_invocation_audit.py`, and
+   `tests/test_b173_bridge_work_root.py`. The convention existed; it was
+   simply not carried forward.
+
+2. *Consequence.* "Those modules do not collect" implies the rest of the suite
+   runs. It does not. A collection error is not a skip: pytest aborts the
+   session (`Interrupted: N errors during collection`) and executes **zero
+   tests**. Measured in a container built from `requirements-ci.txt` alone,
+   the authoritative full-suite command in `CLAUDE.md` collected 2352 tests,
+   reported 4 errors, and ran none of them. Anyone verifying this repository
+   from the documented minimal environment — including a third party
+   reproducing the forensic claims — saw a red suite with no signal in it.
+
+**Fix applied:** all thirteen guards in the suite now read
+`pytest.importorskip("mcp.server.fastmcp")` — the five modules that carried no
+guard at all, and the eight that named the bare `mcp` distribution rather than
+the subpackage `vigia_sift_bridge.py:49` actually imports. The distinction is
+not cosmetic: `mcp` 2.0.0 removed `mcp.server.fastmcp`, so a guard on the bare
+name passes while the bridge import still fails, reproducing the abort by a
+second route. Suite in the minimal environment: 2127 passed, 209 skipped, 28
+xfailed, 0 errors, 0 failed.
+
+Retargeting the guard fixes the abort but would let a genuinely broken install
+hide behind a wall of green skips, so the two states are deliberately
+separated: absent `mcp` skips (this entry's documented state), while an `mcp`
+that is installed but missing the subpackage fails loudly and specifically in
+`tests/test_mcp_dependency_contract.py` without taking the session down.
+Measured: minimal env 2127 passed / 0 failed; `mcp` 1.29.0 → 2237 passed / 0
+failed (the 110-test delta is the MCP surface genuinely running, which is what
+rules out over-skipping); `mcp` 2.0.0 → 2127 passed / 1 failed naming the
+cause.
+
+One of the repaired failures was a false pass rather than a plain error:
+`test_b173_rejects_work_root_nested_in_evidence` asserts that importing the
+bridge with `VIGIA_WORK_DIR` nested inside evidence exits non-zero. Without
+`mcp`, the import exits non-zero because `mcp` is missing, so that assertion
+passed for a reason unrelated to the rejection it exists to prove. It failed
+only on the subsequent stderr check. A module-level skip removes the
+ambiguity.
+
+**Guard:** `tests/test_minimal_ci_collects_without_errors.py` runs the real
+collection in a child interpreter with the allowlisted distributions forced
+unimportable, and fails if the session reports any collection error. It is
+environment-independent — it holds whether or not `mcp` is installed on the
+machine running it — and it checks the outcome that matters (the suite
+collects) rather than a syntactic proxy for it (a module contains an
+`importorskip` line). It carries a control test that fails if the blocker ever
+stops taking effect.
 
 **Guard:** `tests/test_requirements_ci_contract.py` enforces that every other
 third-party import reachable from `tests/` and `vigia/tests/` is covered by
@@ -1854,7 +1943,19 @@ of the drift class: defusedxml/T-2 in B-017, then psutil and pytest-cov —
 both reproduced 2026-07-05).
 
 **Workaround for full local runs:** `pip install --ignore-installed PyJWT`
-first (gives pip a RECORD to manage), then `pip install mcp`.
+first (gives pip a RECORD to manage), then `pip install "mcp<2"`.
+
+The version bound is not optional, and this line said plain `pip install mcp`
+until 2026-08-12. `mcp` 2.0.0 removed the `mcp.server.fastmcp` subpackage that
+`vigia/vigia_sift_bridge.py:49` imports, so the unbounded command installs a
+version under which the bridge cannot import at all — following this
+workaround verbatim produced a broken MCP surface, not a working one.
+Installing the full `requirements.txt` was never affected: `fastmcp` pulls
+`mcp<2` transitively. That transitive constraint is now also declared directly
+in `requirements.txt` and `pyproject.toml`, and pinned by
+`tests/test_mcp_dependency_contract.py` — no module in this repository imports
+`fastmcp`, so relying on it to bound `mcp` was one vestigial-dependency
+cleanup away from breaking Modes 2 and 5 silently.
 
 ---
 
@@ -2966,6 +3067,12 @@ declared SU claim cannot add to a live CAIE fracture boost.
 **Mode affected:** all modes (`vigia_scorer._vigia_score` epc_factor path; CAIE `add_artifact` len<2 decay).**
 **Discovered:** 2026-07-18 pattern hunt (T-3), characterized in `tests/characterization/test_verdict_authority_inputs.py`.
 **Severity class:** integrity/contract gap (P2-class, sibling of L-062).
+**Layering question answered (2026-08-09, `docs/DEEPSEEK_AUDIT_20260809.md`):** no,
+this is not verified in another layer. `ChainOfCustody`
+(`vigia/core/chain_of_custody.py`) exists and is threaded through the SIFT
+analyzers, but always as `Optional[...] = None`, and nothing connects an
+instance of it to the scorer's `provenance_chain` field. The skeleton is real;
+it is not wired to the trust computation.
 
 ### Description
 
@@ -3101,7 +3208,14 @@ change, not a patch, and is not adopted here.
 
 ---
 
-## L-069 — Mode-1's self-correction loop never actually iterates (B-224) [DOCUMENTED]
+## L-069 — Mode-1's self-correction loop never actually iterates (B-224) [RESOLVED 2026-08-15]
+
+> **Resolved 2026-08-15.** The loop is reachable: `VERDICT_FLIP`'s vocabulary
+> was aligned and `CONTRADICTION_THRESHOLD` lowered 2 → 1. Measured corpus
+> impact: zero — no case moved. **The diagnosis below is preserved as written
+> but was wrong on one point**: rule 3 is not "the only reachable rule", it is
+> unreachable by arithmetic. See "Correction and resolution" at the end of this
+> entry before citing anything above it.
 
 `vigia_agent.py`'s `ContradictionDetector.detect()` implements 4 rules. 3 of
 them read fields no Mode-1 producer ever writes: `ENTROPY_VS_BEHAVIORAL` and
@@ -3158,5 +3272,272 @@ tests, pinning the current broken state — they will FAIL the moment someone
 wires a producer or aligns a rule's vocabulary, which is the point) and
 `tests/test_b224_self_correction_docs_are_honest.py` (locks in the corrected
 docstrings/`--help` text against silent drift back to the false claim).
+
+### Correction and resolution (2026-08-15)
+
+**The entry above named the wrong survivor.** It records
+`CONFIDENCE_COLLAPSE` (rule 3) as "the only reachable rule", contributing at
+most 1 contradiction. Rule 3 is in fact **unreachable through
+`_detect_and_correct` on both of its MCA branches**, and unreachable by
+arithmetic rather than by a missing producer:
+
+`_detect_and_correct` derives `mca_score` as the mean of the very confidences
+rule 3 then thresholds on. The rule requires `mca > 6/10` while more than
+`7/10` of the terms are `< 3/10`. With `k/n > 7/10` the mean is bounded above
+by `1 − 7/10·(k/n) < 51/100`, which can never exceed `6/10`. Confirmed three
+ways: the algebraic bound, an exhaustive search over a 1/20 confidence lattice
+up to 7 signals (1,184,039 combinations, no counterexample), and the z-score
+fallback branch — which is taken only when no signal carries a `confidence`
+key, in which case rule 3's own `.get("confidence", 1)` default makes the
+low-confidence count 0. Rule 3 fires only against an aggregator that is *not*
+the plain mean of these confidences; no caller supplies one.
+
+So the reachable maximum was 1 before the fix and the surviving rule was
+**rule 4, not rule 3** — which changes the fix. The entry's own reasoning
+("reviving a single rule alone would not even help: the reachable maximum
+stays at 1, still below threshold 2") turns out to apply to the vocabulary
+alignment as well: fixing `VERDICT_FLIP` without touching the threshold would
+have left the loop exactly as inert.
+
+**Applied.** The three coupled decisions the entry left open, taken together:
+
+1. **`VERDICT_FLIP` aligned.** New module constant `BENIGN_HYPOTHESES`
+   (`BENIGN`, `NO_ANOMALY_DETECTED`, `NO_SEMIOTIC_ANOMALY_DETECTED`) replaces
+   the bare `"BENIGN"` literal. `"BENIGN"` is retained because
+   `vigia/verdict/quadripartite.py` and the integration bridges do emit it.
+   Rule 4 is now live and is the only live rule.
+2. **`CONTRADICTION_THRESHOLD` 2 → 1.** Required, per the arithmetic above.
+   This does **not** weaken the two-independent-source bar the verdict scale
+   applies to INTENT/MALICE: rule 4 already requires `len(critical_signals)
+   >= 2` inside its own predicate, so the two-source requirement moved into
+   the rule instead of being counted across rules.
+3. **Rules 1 and 2 left dormant, deliberately, and now reported.** Neither
+   was cosmetically re-keyed. Rule 1 was *not* re-pointed at `source`: that
+   field holds collection tools (`sift_netflow`, `Plaso/WinEVT`, …), not the
+   analytic module names the rule compares, so a rename would have made it
+   look wired while still never matching — it needs a producer. Rule 2 has no
+   producer for `technical_result` anywhere in the repository. Both, plus
+   rule 3, are now emitted per run in the audit trail's `rules_not_evaluable`,
+   so "no contradictions" is distinguishable from "could not check" (honest
+   degradation).
+
+**Corpus impact: ZERO.** All 21 cases under `cases/input/` re-run against the
+patched agent: no verdict changed, no correction applied, every case still
+converges in 1 iteration. No signal anywhere in the corpus exceeds `|z| > 3`,
+which is why rule 4 stays quiet on real data — the loop is now reachable and
+dormant, not reachable and active. `self_corrections_applied = 0` remains the
+honest observed value; what changed is that it is no longer the *only
+possible* value.
+
+Reachability is proven end-to-end instead of asserted:
+`test_self_correction_applies_end_to_end` drives a synthetic Mode-1-shaped
+input through `_detect_and_correct` and asserts the verdict is actually
+rewritten (`NO_SEMIOTIC_ANOMALY_DETECTED` →
+`MALICIOUS_INTENT_SUSPECTED [OVERRIDE: …]`).
+
+**This also closes B-151(b)**, whose remaining blocker was this one. The
+chained `contradiction_detector` event CLAUDE.md mandates was already wired
+in `vigia/core/reasoning_trace.py`; it had no input. New test
+`tests/test_b151b_contradiction_chain_emitted.py` drives detector → correction
+→ sealed trace and asserts the chained entry appears with its full schema and
+bundle-level tail anchor.
+
+Tests updated to pin the new state rather than the old:
+`tests/test_b224_contradiction_detector_dormancy.py` (17 tests — including the
+arithmetic proof for rule 3 and a `CONTRADICTION_THRESHOLD == 1` pin, so the
+coupled decision cannot drift back silently) and
+`tests/test_b224_self_correction_docs_are_honest.py` (13 tests — the risk
+inverted from overclaiming to stale under-claiming, and both directions are
+now guarded). Full suite after the change: 2138 passed, 0 failed.
+
+---
+
+## L-071 — Cross-domain corroboration counts domain PRESENCE, not domain MASS [OPEN]
+
+**Affects:** `vigia_scorer.py::_vigia_score`, B-068 corroboration gate (R4-3 v2),
+cross-domain branch |
+**Status:** [OPEN] 2026-08-09, POST HACKATHON — calibration-doctrine question,
+deliberately **not** silently patched (same posture as L-049). Refinement of the
+B-092 residual ("a D3+D4 mix still opens the cross-domain branch").
+**Severity:** Medium — invariant/semantic (verdict-path)
+**Origin:** external audit (DeepSeek), verified against live code. The finding **as
+stated** was refuted; a different mechanism was confirmed — see "Refuted as stated".
+**Document:** `docs/DEEPSEEK_AUDIT_20260809.md` (Finding 2).
+
+**Description:** the cross-domain branch opens on
+`_n_domains >= 2 AND (_n_gate_arts >= 4 OR len(_gate_types) >= 3)`. `_n_domains`
+is `len(set(_dom_arts))` — the count of *distinct collection domains represented*.
+A domain is "represented" by any artifact whose `adjusted_score > _M2_MIN_SIGNAL_ADJ`,
+and that constant is **exactly `0.0`** (strict `>`). Consequently a **single artifact
+of arbitrarily small positive evidential value** constitutes a full corroborating
+domain, and can flip a verdict that the gate had otherwise correctly capped.
+
+**Measured (`tests/test_l071_cross_domain_pivot.py`):**
+
+```
+ 16× D3 filesystem_metadata (1 domain)             → SUSPICION  0.5888
+   + 1× network_flow raw=0.01                      → MALICE     0.6152
+   + 1× network_flow raw=0.001                     → MALICE     0.6145
+   + 1× log_entry    raw=0.001                     → MALICE     0.6145
+   + 1× network_flow raw=0.0    (control)          → SUSPICION  0.5888
+```
+
+The pivot moves the **score** by +0.026 and the **verdict** by a full rung. The
+verdict change is therefore not carried by evidential mass; it is carried by the
+cardinality of a label. `raw_score=0.0` correctly does not corroborate — `0.0` is
+the only excluded value.
+
+**Refuted as stated (recorded for provenance):** the audit asserted that "Noisy-OR
+lets the hard domain be *activated* by the quantity of soft noise". This is **false**
+in this code: `r43_domain_scores` is computed per domain over that domain's own
+indices only (`_by_domain`), so soft artifacts contribute zero mass to a hard
+domain's score. The audit also assumed `caie.py::_SOURCE_MATERIALITY_FLOOR = 0.05`
+would exclude a `raw_score=0.01` artifact. That floor is in a **different module**
+and governs CAIE's own `independent_sources` / `confidence_penalty`; it has no
+authority over the scorer's B-068 gate, whose floor is `_M2_MIN_SIGNAL_ADJ = 0.0`.
+
+**Why the two obvious fixes are refuted by the corpus (measured, not assumed):**
+
+1. *Raise the per-artifact floor above 0.* Already measured and rejected in the
+   `_M2_MIN_SIGNAL_ADJ` calibration note (`vigia_scorer.py` ~L145, Round 2.1):
+   canonical MALICE cases corroborate with artifacts at adjusted **0.0017–0.002**,
+   while excluding the VIGIA-CAN-029 diluent needs **> 0.013** — an empty interval.
+   The pivot at `raw=0.01` lands *inside* that empty interval, so no corpus-compatible
+   per-artifact floor excludes it.
+2. *Require ≥2 artifacts per counted domain.* Refuted by the corpus: a large share of
+   canonical MALICE cases open this branch with reasons of the form
+   `cross-domain (4 domains, 4 artifacts)` / `(3 domains, 4 artifacts)` — i.e. by
+   pigeonhole, legitimate canonical cases rely on domains represented by **exactly one**
+   artifact. A count floor would flip them.
+
+**Forensic implication:** a party able to introduce one throwaway artifact of a
+second collection domain — at a `raw_score` low enough to attract no scrutiny — can
+convert a gate-capped SUSPICION into a sealed MALICE. Treat MALICE verdicts whose
+`reason` cites the cross-domain branch as requiring the corroborating domain's own
+mass to be inspected, not merely its presence.
+
+**Recommendation (record only, not implemented):** the gate should consult
+`r43_domain_scores`, which `_vigia_score` **already computes** (~L1149) and currently
+uses only for traceability — requiring the corroborating domain's own Noisy-OR score
+to clear a floor tests domain *mass* rather than domain *presence*, and is immune to
+both refutations above (it is neither a per-artifact floor nor a per-domain count).
+This mirrors the doctrine CAIE already adopted for the same bug class in its own
+corroboration count (`_SOURCE_MATERIALITY_FLOOR`, "a group only counts toward
+independent_sources if some member's raw_score reaches this floor"). Any such change
+is a scoring-semantics change and requires the full 199-case comparative gate, per
+the B-091/B-092 precedent.
+
+**Tests:** `tests/test_l071_cross_domain_pivot.py` — characterization only. They pin
+the measured behavior so a future recalibration is deliberate and visible; they do
+**not** assert the behavior is correct.
+
+---
+
+## L-072 — `semantic_role` is a DECLARED input with verdict authority; a label alone neutralizes MALICE [OPEN]
+
+**Affects:** `vigia_scorer.py::_vigia_score` (D1 exculpatory/Eco block) |
+**Status:** [OPEN] 2026-08-09, POST HACKATHON — doctrine decision pending. Sibling
+of L-065 (declared chain length) and L-070 (case-JSON fields carrying verdict
+authority). **Extends L-054**, whose protective rationale does not cover this path.
+**Severity:** Medium-High — verdict-path, false-negative direction
+**Origin:** external audit (DeepSeek), verified against live code. The **attack
+mechanism as stated was refuted**; a simpler and stronger one was confirmed.
+**Document:** `docs/DEEPSEEK_AUDIT_20260809.md` (Finding 5).
+
+**Description:** `_semantic_role(a)` reads `semantic_role` straight from the case
+JSON (default `incriminatory`). Artifacts declared `exculpatory` are removed from
+scoring unless the Eco filter fires on their *text* (`description` +
+`metadata.content_preview`). Nothing verifies the declaration against the
+artifact's own content, type, score, or provenance.
+
+**Measured over the corpus (163 cases scored; 52 emit MALICE/INTENT):**
+
+```
+relabel ALL artifacts exculpatory (LABEL ONLY, original text untouched)
+    -> 37 / 52 MALICE cases lose the MALICE verdict (13 of them to NOISE)
+relabel ALL BUT ONE (strongest first, label only)
+    -> 35 / 52 lose MALICE
+relabel ALL + neutral description text
+    -> 52 / 52 collapse to NOISE, score 0.0000
+```
+
+**Refuted as stated (recorded for provenance):** the audit proposed writing a
+description resembling a honeypot / forensic investigation "to fool the Eco
+filter". That is **backwards**: bait terms make the Eco filter FIRE, which
+**retains** the artifact in scoring. Suppression requires the opposite — a bland
+description — and in 37/52 cases the original text was already bland enough that
+**no text crafting was needed at all**. The real exposure is larger than the one
+reported, and the Eco filter's contribution is partial (it saved 15/52).
+
+**Relation to L-054:** L-054 states the floor doctrine prevents "malicious actors
+from planting exculpatory metadata to suppress alerts", and analyses the case where
+a residual incriminatory artifact remains and the B-028/B-065 floor re-raises it.
+That reasoning does not reach the path measured here: when every device artifact is
+declared exculpatory, `_vigia_score` takes an **early return** emitting
+`NOISE, score 0.0, confidence 0.9` *before* any floor applies. A floor can raise a
+low alert; it cannot restore a MALICE verdict that was never computed.
+
+**Mitigating fact (verified, must be stated):** the suppression is **auditable, not
+silent** — every removed artifact is recorded in `refutation_context.set_aside`, and
+the emitted `reason` names the exculpatory path explicitly. The threat model is a
+corrupt or coerced case author (insider), not an anonymous remote attacker.
+
+**Scope of the measurement (honest bound):** measured at `_vigia_score` level, not
+through the full Mode 1 pipeline. Mode 1's hypothesis-level floors may re-raise some
+downgraded cases to SUSPICION; they cannot restore MALICE.
+
+**Recommendation (record only, not implemented):** treat `semantic_role` as a
+*claim requiring corroboration* rather than an instruction — e.g. require the
+declaration to be consistent with the artifact's evidence class and score before it
+can remove evidence, and/or forbid the total-relabel early return from emitting
+NOISE at confidence 0.9 (ABSTAIN is the honest verdict when the examiner has
+declared the entire evidence set away). Any change here is scoring doctrine and
+requires the full corpus gate.
+
+**Tests:** `tests/test_l072_declared_inputs_and_threshold_edge.py` — characterization.
+
+---
+
+## L-073 — Verdict thresholds compare a `_dround` float against a `Fraction`; the exact grid point grants the higher rung [OPEN]
+
+**Affects:** `vigia_scorer.py::_vigia_score` verdict ladder |
+**Status:** [OPEN] 2026-08-09 — latent edge, **zero corpus incidence measured**.
+**Severity:** Low — exactness/boundary, anti-conservative direction
+**Origin:** external audit (DeepSeek). **Direction of the finding was inverted.**
+**Document:** `docs/DEEPSEEK_AUDIT_20260809.md` (Finding 4).
+
+**Description:** the ladder evaluates `final_score > Fraction(33, 100)` (likewise
+`10/100`, `8/100`, and the `0.65` single-artifact cap). `final_score` is a float
+from `_dround(..., 4)`, i.e. always a 4-decimal grid point — and `0.3300` is such a
+point. Python compares `float` against `Fraction` **exactly**, so the outcome depends
+on which side of the rational the nearest double falls.
+
+Measured: for all four thresholds the nearest double sits **above** the exact
+rational (`float(0.33) − 33/100 = 7/450359962737049600 > 0`). A score landing exactly
+on the threshold therefore satisfies a **strictly-greater** test that exact decimal
+arithmetic would fail — the case is promoted one rung.
+
+**Refuted as stated:** the audit claimed a false **negative** (a MALICE case demoted
+to SUSPICION by rounding down). The bias runs the other way. Its concrete example is
+also self-defeating: with a strict `>`, `Fraction(33,100)` is not MALICE under exact
+arithmetic either, so there is nothing to lose.
+
+**Not a determinism violation:** `_dround` yields the same double on every platform;
+Invariant 4 (`Fraction`/`Decimal` determinism) is intact. This is boundary exactness,
+not cross-platform divergence.
+
+**Reachability (measured):** across 163 corpus cases, **zero** land on or within two
+grid steps of any threshold. The defect is latent, not active — a crafted case could
+target it.
+
+**Adjacent latent hazard (recorded, not active):** `_dround` returns `0.0` for any
+argument that is not `int`/`float`, so a `Fraction` or `Decimal` reaching it would be
+silently zeroed rather than raising. Probed over 80 corpus cases: only `float`
+arguments occur (4449 calls), so the path is currently unreachable — but the guard
+fails silent in a module that uses both `Fraction` and `Decimal`.
+
+**Recommendation (record only):** keep the ladder in exact arithmetic end-to-end
+(compare `Fraction` against `Fraction`), or state the threshold semantics as
+"≥ next grid step" so the emitted rule matches the emitted verdict.
 
 ---
