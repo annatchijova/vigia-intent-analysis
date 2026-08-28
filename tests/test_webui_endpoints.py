@@ -110,3 +110,26 @@ def test_spa_served(client):
     assert "VIGÍA" in res.text
     assert client.get("/static/app.js").status_code == 200
     assert client.get("/static/style.css").status_code == 200
+    assert client.get("/static/i18n.js").status_code == 200
+    # i18n must load before the app so t() finds the tables
+    assert res.text.index("/static/i18n.js") < res.text.index("/static/app.js")
+
+
+def test_i18n_tables_have_identical_keys():
+    """EN and ES chrome tables must cover exactly the same keys — a missing
+    translation would silently fall back and go unnoticed."""
+    import re
+    from pathlib import Path
+
+    src = (Path(__file__).parent.parent / "vigia" / "ui" / "static"
+           / "i18n.js").read_text(encoding="utf-8")
+    sections = re.split(r"^\s{2}(en|es): \{", src, flags=re.M)
+    tables = {}
+    for name, body in zip(sections[1::2], sections[2::2]):
+        tables[name] = set(re.findall(r'^\s{4}"([a-z0-9_.]+)":', body, flags=re.M))
+    assert set(tables) == {"en", "es"}
+    assert tables["en"], "no keys extracted — regex out of sync with i18n.js"
+    assert tables["en"] == tables["es"], (
+        f"only in en: {sorted(tables['en'] - tables['es'])}; "
+        f"only in es: {sorted(tables['es'] - tables['en'])}"
+    )

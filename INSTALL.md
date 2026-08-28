@@ -351,8 +351,9 @@ Key properties:
   bundle's `agent_verdict` side by side.
 - **No auth layer** — same deliberate stance as the REST API above: the
   server binds `127.0.0.1` only. Put it behind an authenticated boundary
-  before any wider exposure. UI text is in English (project artifact
-  convention); bundle content renders verbatim in its original language.
+  before any wider exposure. UI text is bilingual (English/Spanish) with a
+  persistent toggle, defaulting to the browser language; sealed vocabulary
+  (verdict values) and bundle content always render verbatim, untranslated.
 
 Configuration: `VIGIA_HOST` (default `127.0.0.1`), `VIGIA_UI_PORT`
 (default `8010`), `VIGIA_UI_MAX_JOBS` (default `1`).

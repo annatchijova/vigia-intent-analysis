@@ -323,9 +323,10 @@ Propiedades clave:
   etiqueta documentada y el `agent_verdict` del bundle, lado a lado.
 - **Sin capa de autenticación** — misma postura deliberada que la API REST:
   el servidor escucha solo en `127.0.0.1`. Ponlo detrás de una frontera
-  autenticada antes de cualquier exposición mayor. El texto de la UI está
-  en inglés (convención de artefactos del proyecto); el contenido de los
-  bundles se muestra verbatim en su idioma original.
+  autenticada antes de cualquier exposición mayor. El texto de la UI es
+  bilingüe (español/inglés) con selector persistente, por defecto el idioma
+  del navegador; el vocabulario sellado (valores de veredicto) y el contenido
+  de los bundles se muestran siempre verbatim, sin traducir.
 
 Configuración: `VIGIA_HOST` (por defecto `127.0.0.1`), `VIGIA_UI_PORT`
 (por defecto `8010`), `VIGIA_UI_MAX_JOBS` (por defecto `1`).
