@@ -20,7 +20,7 @@ between both files: a given B-XXX never appears in both at once.
 | **Severity** | P3 — technical debt, not a functional bug |
 | **File** | `vigia/core/forensic_technical_detector.py` |
 | **Original lines** | 194 |
-| **Detected** | Post-hackathon session 2026-06-25 |
+| **Detected** | Session 2026-06-25 |
 
 ### Description
 
@@ -184,7 +184,7 @@ Observe the pattern in a second independent judicial case file (other than MPF77
 | **Status** | STALE — see sync note above; ES registry has the current status (wired in shadow mode since 2026-07-22, re-verified 2026-07-31). Originally: POSTPONED — blocked by interface mismatch and data quality. |
 | **Severity** | P2 (gate-level architectural gap — safety mechanism exists but does not fire) |
 | **File** | `vigia/core/signal_quality_gate.py` (the `vigia/signal_quality_gate.py` duplicate mentioned below was deleted 2026-07-16) |
-| **Detected in** | Post-hackathon session 2026-07-14, dry-run script `scripts/dryrun_signal_quality_gate.py` |
+| **Detected in** | Session 2026-07-14, dry-run script `scripts/dryrun_signal_quality_gate.py` |
 
 ### Description
 

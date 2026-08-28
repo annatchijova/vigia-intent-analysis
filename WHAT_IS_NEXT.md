@@ -4,7 +4,6 @@
 > todo lo listado acá es track POST HACKATHON. Este documento reemplaza la
 > versión anterior (que era solo el track teórico Magnani/Aliseda/Nishida —
 > ahora §4, con sus claims corregidos: `resolve()` ya no está "ausente").
-> Todo commit derivado de este documento se etiqueta `POST HACKATHON`.
 
 ---
 
@@ -226,7 +225,7 @@ entrada correcta; no se borró, para conservar el rastro de auditoría.
   (patrón B-069: medir, y si empeora, NO aplicar).
 - Suite verde + corpus 166/199 (o mejor, con explicación por caso) antes de
   commitear. 0 flips no explicados.
-- Commits `POST HACKATHON — ...`; los trackers EN/ES se actualizan en el mismo
+- Los trackers EN/ES se actualizan en el mismo
   commit que cierra el bug (lección de esta sincronización: B-071..B-074
   faltaban en EN, y todo lo posterior al 07-05 faltaba en ambos).
 

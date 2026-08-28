@@ -1,6 +1,5 @@
 # VIGÍA — Estado Técnico Completo del Sistema
 ## Análisis Forense de Intencionalidad para SIFT Workstation
-### SANS FIND EVIL Hackathon 2026
 
 **Autora:** Anna Tchijova — Investigadora Principal  
 **Colectivo de Auditoría:** Claude (Anthropic), Kimi (Moonshot), Gemini (Google), DeepSeek, Qwen, ChatGPT (adversarial)  

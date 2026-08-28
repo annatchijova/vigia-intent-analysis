@@ -2,7 +2,7 @@
 
 VIGÍA was built by one person — Anna Tchijova — working across many
 sessions with a multi-AI collective (Claude, Kimi, DeepSeek, Gemini, Qwen,
-ChatGPT, Grok), each assigned a different role, under a hackathon deadline.
+ChatGPT, Grok), each assigned a different role, under a tight deadline.
 As a result it has more than one way to run an analysis and seal a result,
 and they don't all produce the same kind of output. This document exists so
 nobody else has to reverse-engineer that the hard way.

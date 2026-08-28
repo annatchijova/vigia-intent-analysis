@@ -7,7 +7,7 @@
 2. Buscar explicación benigna verificable (Secondness)
 3. Concluir NOISE o ABSTAIN cuando la hipótesis benigna es más fuerte
 
-Esto demuestra el criterio **"Hallucination Management"** del hackathon SANS.
+Esto demuestra el criterio de **"Hallucination Management"**.
 
 ---
 
@@ -55,7 +55,7 @@ Cada caso incluye:
 
 ---
 
-## Uso en el Hackathon
+## Uso
 
 1. **Accuracy Report**: Correr VIGÍA contra estos 15 casos + los 10 reales. Medir:
    - True Negatives (NOISE correcto): 14 esperados

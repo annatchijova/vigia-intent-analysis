@@ -1,4 +1,4 @@
-# VIGÍA — SANS FIND EVIL Hackathon 2026: Submission Compliance Index
+# VIGÍA — Submission Compliance Index
 
 > This document exists for one purpose: to make it **impossible** for a judge to miss
 > any required submission component. Every item below maps a requirement to its exact
@@ -21,11 +21,10 @@
 | 4 | Live deployment URL or step-by-step instructions | ✅ | [`README.md`](./README.md#installation) + [`INSTALL.md`](./INSTALL.md) |
 | 5 | Text description: features and functionality | ✅ | [`README.md`](./README.md) — Overview + Feature sections |
 | 6 | Demonstration video | ✅ | [YouTube — VIGÍA Demo 2026](https://www.youtube.com/watch?v=NOquYzUwMkg) — see §6 below |
-| 7 | Architecture diagram | ✅ | [`README.md#architecture-overview`](./README.md#architecture-overview) + [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html) — see §7 below |
+| 7 | Architecture diagram | ✅ | [`README.md#architecture--llm-isolation`](./README.md#architecture--llm-isolation) + [`docs/vigia_diagrams.html`](./docs/vigia_diagrams.html) — see §7 below |
 | 8 | Evidence dataset documentation | ✅ | [`data/cases/`](./data/cases/) — see §8 below |
-| 9 | Accuracy report | ✅ | [`README.md#accuracy--evidence-dataset`](./README.md#accuracy--evidence-dataset) — see §9 below |
+| 9 | Accuracy report | ✅ | [`docs/ACCURACY.md`](./docs/ACCURACY.md) — see §9 below |
 | 10 | Agent execution logs | ✅ | [`results/srl2018/`](./results/srl2018/) — see §10 below |
-| 11 | VIGÍA Story (origin + design rationale) | ✅ | [`VIGIA_STORY.md`](./VIGIA_STORY.md) (ES) + [`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) (EN) — see §11 below |
 | 12 | Interactive live simulator (EN + ES) | ✅ | [vigia.html (EN)](https://annatchijova.github.io/vigia/vigia.html) · [vigia-es.html (ES)](https://annatchijova.github.io/vigia/vigia-es.html) — see §12 below |
 
 ---
@@ -415,23 +414,6 @@ python3 verify_ebs_v1.py results/demo_bundle.json --verbose
 
 ---
 
-## §11 — VIGÍA Story
-
-**Files:**
-- [`VIGIA_STORY.md`](./VIGIA_STORY.md) — Spanish original (Anna Tchijova)
-- [`VIGIA_STORY_EN.md`](./VIGIA_STORY_EN.md) — English translation
-
-Rob T. Lee requested this document during direct engagement with the project.
-It covers the origin of VIGÍA, the four theoretical sources (Gemini attack,
-phonetic evasion, stylometry, the Kiwi Case), the design philosophy, and the
-AI Collective working methodology.
-
-*"LLMs write for the ideal world and the ideal user. I anticipated malice."*
-
----
-
----
-
 ## §12 — Interactive Live Simulator
 
 No installation required. Any judge can open either link in a browser and
@@ -485,6 +467,5 @@ python3 evaluate_detector.py \
 
 **Principal Investigator:** Anna Tchijova  
 **Repository:** `https://github.com/annatchijova/vigia-intent-analysis`  
-**Hackathon track:** SANS FIND EVIL 2026  
 
 *"The question is not what happened, but why did someone make it happen — and who benefits from that interpretation?"* — VIGÍA

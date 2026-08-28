@@ -79,7 +79,7 @@ guessed, is in [`docs/EPISTEMIC_KERNEL.md`](./docs/EPISTEMIC_KERNEL.md).
   title     = {VIGÍA: Intentionality Analysis Bridge for SIFT Workstation},
   year      = {2026},
   url       = {https://github.com/annatchijova/vigia-intent-analysis},
-  note      = {SANS FIND EVIL Hackathon 2026. AI Collective: Claude (Anthropic),
+  note      = {AI Collective: Claude (Anthropic),
                Gemini (Google), Kimi (Moonshot), DeepSeek, Qwen (Alibaba),
                Grok (xAI), ChatGPT (OpenAI)}
 }

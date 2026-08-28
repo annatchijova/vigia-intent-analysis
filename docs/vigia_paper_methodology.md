@@ -1,7 +1,7 @@
 # Abductive Forensics and Deterministic Entropy: A Formally Verified Framework for APT Attribution Under the Daubert Standard
 
 **Anna Tchijova**  
-Independent Researcher, SANS FIND EVIL Hackathon 2026  
+Independent Researcher  
 `anna.tchijova@gmail.com` · GitHub: `annatchijova/vigia-intent-analysis`
 
 ---
@@ -191,4 +191,4 @@ Popper, K. (1959). *The Logic of Scientific Discovery*. Basic Books.
 
 ---
 
-*Manuscript submitted to SANS FIND EVIL Hackathon 2026. Supplementary materials including source code, calibration datasets, and verification toolchain available at* `https://github.com/annatchijova/vigia-intent-analysis`.
+*Supplementary materials including source code, calibration datasets, and verification toolchain available at* `https://github.com/annatchijova/vigia-intent-analysis`.

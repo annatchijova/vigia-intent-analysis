@@ -21,7 +21,7 @@ aparece en los dos a la vez.
 | **Severidad** | P3 — deuda técnica, no bug funcional |
 | **Archivo** | `vigia/core/forensic_technical_detector.py` |
 | **Línea** | 194 |
-| **Detectado en** | Sesión post-hackathon 2026-06-25 |
+| **Detectado en** | Sesión 2026-06-25 |
 
 ### Descripción
 
@@ -242,7 +242,7 @@ Observar el patron en un segundo expediente judicial independiente (distinto a M
 | **Estado** | CABLEADO COMO SOMBRA (WARN) — 2026-07-22, decisión de Anna; 0-flips re-confirmado 2026-07-31 sobre 205 casos post-B-215/B-220/B-224. El gate evalúa y anexa `signal_quality_shadow` al resultado del scorer con CERO autoridad de veredicto. Condición 4 reducida a decisión doctrinal ya tomada. Ver los updates cronológicos abajo y `docs/B116_CONDITION4_DESIGN.md` §5-bis/§7. (Estado previo: POSPUESTO — bloqueado por desajuste de interfaz y calidad de datos.) |
 | **Severidad** | P2 (gate-level architectural gap — el mecanismo ahora observa en sombra; promoción a autoridad requiere nueva corrida 0-flips + firma) |
 | **Archivo** | `vigia/signal_quality_gate.py` AND `vigia/core/signal_quality_gate.py` (identical duplicates) |
-| **Detectado en** | Post-hackathon session 2026-07-14, dry-run script `scripts/dryrun_signal_quality_gate.py` |
+| **Detectado en** | Sesión 2026-07-14, dry-run script `scripts/dryrun_signal_quality_gate.py` |
 
 ### Description
 

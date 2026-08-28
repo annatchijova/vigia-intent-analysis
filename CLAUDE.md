@@ -524,7 +524,7 @@ rather than duplicating their content here:
 it is not forensics. It is divination."*
 
 *Repository: github.com/annatchijova/vigia-intent-analysis*
-*License: Apache 2.0 | SANS FIND EVIL Hackathon 2026*
+*License: Apache 2.0*
 
 ## Token Usage Logging
 
