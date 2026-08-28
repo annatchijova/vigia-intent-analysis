@@ -5,7 +5,34 @@
 **Audit Collective:** Claude (Anthropic), Kimi (Moonshot), Gemini (Google), DeepSeek, Qwen, ChatGPT (adversarial red team)  
 **Repository:** `github.com/annatchijova/vigia-intent-analysis`  
 **Document Version:** 1.0 — May 18, 2026  
-**Classification:** Technical-forensic — Audience: Rob T. Lee, SANS judges, independent auditors
+**Classification:** Technical-forensic — Audience: independent auditors and reviewers
+
+---
+
+## Current State (recorded 2026-08-27)
+
+> This addendum records the live state of the project. The dossier below is the
+> original 2026-05-18 document: its architecture description remains accurate,
+> but the figures in this section supersede any dated numbers further down.
+> Figures are sourced from the repository trackers on the date shown.
+
+- **Test suite:** 2176+ passed / 0 failed in the full environment. The minimal-CI
+  environment collects a reduced subset (see B-227).
+- **Corpus (autonomous agent, label-blind):** 187/199 mixed-corpus aggregate;
+  detection corpus 158/162 (97.5%). Full methodology and segmentation:
+  [`ACCURACY.md`](./ACCURACY.md).
+- **Bug registry:** entries recorded through **B-227**, on shared numbering across
+  [`BUGS_HISTORICO.md`](../BUGS_HISTORICO.md) (resolved) and
+  [`BUGS_PENDIENTES.md`](../BUGS_PENDIENTES.md) (open).
+- **Active / open items:** B-010 (migration premise refuted by measurement,
+  awaiting formal closure), B-111..B-113 (Mode-3 / CAIE candidates), B-116 and
+  B-123/B-124 (decision gates designed and tested but not wired to the scorer),
+  B-129 Phase 3 (MITRE phase resolution, 70% gate), B-162 (residual).
+- **Source of truth for pending work:** [`BUGS_PENDIENTES.md`](../BUGS_PENDIENTES.md).
+  The roadmap tables in [`WHAT_IS_NEXT.md`](./WHAT_IS_NEXT.md) are historical.
+
+The remainder of this document is the original technical dossier (v1.0,
+2026-05-18), preserved as the architectural reference.
 
 ---
 

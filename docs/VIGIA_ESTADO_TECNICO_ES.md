@@ -1,12 +1,38 @@
 # VIGÍA — Estado Técnico Completo del Sistema
 ## Análisis Forense de Intencionalidad para SIFT Workstation
-### SANS FIND EVIL Hackathon 2026
 
 **Autora:** Anna Tchijova — Investigadora Principal  
 **Colectivo de Auditoría:** Claude (Anthropic), Kimi (Moonshot), Gemini (Google), DeepSeek, Qwen, ChatGPT (adversarial)  
 **Repositorio:** `github.com/annatchijova/vigia-intent-analysis`  
 **Versión del documento:** 1.0 — 18 de mayo de 2026  
-**Clasificación:** Técnico-forense — Audiencia: Rob T. Lee, jurados SANS, auditores independientes
+**Clasificación:** Técnico-forense — Audiencia: auditores y revisores independientes
+
+---
+
+## Estado Actual (registrado 2026-08-27)
+
+> Este apéndice registra el estado vivo del proyecto. El dossier de abajo es el
+> documento original del 2026-05-18: su descripción de arquitectura sigue vigente,
+> pero las cifras de esta sección reemplazan cualquier número fechado más abajo.
+> Las cifras provienen de los trackers del repositorio en la fecha indicada.
+
+- **Suite de tests:** 2176+ passed / 0 failed en el entorno completo. El entorno
+  mínimo de CI colecta un subconjunto reducido (ver B-227).
+- **Corpus (agente autónomo, ciego a etiqueta):** 187/199 agregado mixto; corpus
+  de detección 158/162 (97.5%). Metodología completa y segmentación:
+  [`ACCURACY_ES.md`](./ACCURACY_ES.md).
+- **Registro de bugs:** entradas registradas hasta **B-227**, con numeración
+  compartida entre [`BUGS_HISTORICO.md`](../BUGS_HISTORICO.md) (resueltos) y
+  [`BUGS_PENDIENTES.md`](../BUGS_PENDIENTES.md) (abiertos).
+- **Ítems activos / abiertos:** B-010 (premisa de migración refutada por medición,
+  espera cierre formal), B-111..B-113 (candidatos Modo 3 / CAIE), B-116 y
+  B-123/B-124 (compuertas de decisión diseñadas y testeadas pero sin cablear al
+  scorer), B-129 Fase 3 (resolución de fase MITRE, gate 70%), B-162 (residual).
+- **Fuente de verdad de pendientes:** [`BUGS_PENDIENTES.md`](../BUGS_PENDIENTES.md).
+  Las tablas de roadmap en [`WHAT_IS_NEXT.md`](./WHAT_IS_NEXT.md) son históricas.
+
+El resto de este documento es el dossier técnico original (v1.0, 2026-05-18),
+preservado como referencia de arquitectura.
 
 ---
 

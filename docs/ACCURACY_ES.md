@@ -127,8 +127,8 @@ Estos números no están inflados. Reflejan resultados en un corpus específico,
 > no tiene escalón INTENT — nunca al revés; etiquetas sintéticas de AMB-001/002
 > revisadas ABSTAIN→NOISE según el diseño documentado L-012, corpus real intacto).
 > Metodología completa, prueba de invariancia al label-flip y análisis por
-> cluster: [`docs/FASE1_RESOLVE_EBS.md`](./docs/FASE1_RESOLVE_EBS.md) y
-> [`docs/FASE2_DATASET_CALIBRACION.md`](./docs/FASE2_DATASET_CALIBRACION.md).
+> cluster: [`FASE1_RESOLVE_EBS.md`](./FASE1_RESOLVE_EBS.md) y
+> [`FASE2_DATASET_CALIBRACION.md`](./FASE2_DATASET_CALIBRACION.md).
 >
 > Las tasas pre-B-075 de este camino (p.ej. "129/129", "165/167") medían
 > reproducción de etiqueta, no detección, y se conservan abajo solo como registro
@@ -170,7 +170,7 @@ clases de artefacto todavía no alcanzan los motores (los hives de registro
 USB/shellbag/amcache son stubs honestos que abstienen; ver `KNOWN_LIMITATIONS.md`),
 y un caso cuya señal vive en una clase no cubierta degrada a ABSTAIN en vez de
 producir un NOISE falso (patrón F7/P1-E). B-032 (routing de `event_logs`) y B-036
-(threshold `z>5.0` imposible) están resueltos; ver [L-036](./KNOWN_LIMITATIONS.md)
+(threshold `z>5.0` imposible) están resueltos; ver [L-036](../KNOWN_LIMITATIONS.md)
 para el override de hipótesis basado en señales.
 
 > Los porcentajes de corpus de arriba aplican **solo al Dominio B**. Los resultados
@@ -230,7 +230,7 @@ de forzar un veredicto.
 
 **Nota de diseño:** ABSTAIN requiere conflicto estructural entre hipótesis
 competidoras con evidencia no trivial. Los casos de señal nula retornan
-correctamente NOISE. Ver [KNOWN_LIMITATIONS.md L-012](./KNOWN_LIMITATIONS.md).
+correctamente NOISE. Ver [KNOWN_LIMITATIONS.md L-012](../KNOWN_LIMITATIONS.md).
 **Revisión de etiquetas (2026-07-05, Fase 2):** las etiquetas sintéticas de
 AMB-001/002 se actualizaron ABSTAIN→NOISE para coincidir con esta doctrina
 documentada — las etiquetas originales contradecían la nota de diseño de
@@ -257,4 +257,4 @@ reclama admisibilidad Daubert — lo que requiere falsificabilidad documentada.
 | **Total Dominio C** | **16** | **14 (87,5%)** | 2 limitaciones documentadas |
 
 Resultados adversariales completos: `results/llm_mode/`
-Limitaciones conocidas: [KNOWN_LIMITATIONS.md](./KNOWN_LIMITATIONS.md)
+Limitaciones conocidas: [KNOWN_LIMITATIONS.md](../KNOWN_LIMITATIONS.md)

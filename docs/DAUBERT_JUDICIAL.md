@@ -1,134 +1,185 @@
-## Admisibilidad Judicial (ISO 27037 / Daubert Standard)
+# VIGÍA — Judicial Admissibility (ISO 27037 / Daubert Standard)
 
-VIGIA esta disenada para producir evidencia digital admisible en tribunales bajo
-el estandar **Daubert** (EE.UU.) y la norma **ISO 27037:2012** (internacional).
-A continuacion se detalla como cada componente del sistema satisface los
-requisitos de admisibilidad.
+VIGÍA is designed to produce digital evidence admissible in court under the
+**Daubert** standard (U.S.) and **ISO 27037:2012** (international). The
+following details how each system component satisfies admissibility requirements.
 
-### Requisito 1: Metodologia Cientifica Reproducible
+---
 
-**Daubert exige** que la tecnica sea testeable y haya sido sometida a revision.
+## Requirement 1: Reproducible Scientific Methodology
 
-VIGIA implementa:
+**Daubert requires** that the technique be testable and subject to peer review.
 
-- **Determinismo forzado** (`VIGIA_FORENSIC_LOCK=true`): temperatura del LLM
-  fijada en 0, seed fijo para Ollama (42). La misma evidencia produce el
-  mismo reporte. Verificable con `make check-determinism`.
-- **Marco teorico publicado**: semiotica de Peirce (abduccion), maximas de
-  Grice (pragmatica forense), patrones de Carnegie (deteccion de manipulacion),
-  filtro de Eco (sobreinterpretacion). Cada herramienta documenta que teoria
-  aplica y por que.
-- **Cadena abductiva explicita**: cada paso de la investigacion incluye un
-  campo `reasoning` que explica POR QUE se eligio la herramienta siguiente.
-  Un auditor puede reconstruir toda la logica sin ejecutar el sistema.
+VIGÍA implements:
 
-### Requisito 2: Cadena de Custodia Inmutable
+- **Forced determinism** (`VIGIA_FORENSIC_LOCK=true`): LLM temperature fixed at
+  0, fixed seed for Ollama (42). The same evidence always produces the same
+  report. Verifiable with `make check-determinism`.
+- **Published theoretical framework**: Peirce's semiotics (abduction), Grice's
+  maxims (forensic pragmatics), Carnegie's patterns (manipulation detection),
+  Eco's filter (overinterpretation). Each tool documents which theory it applies
+  and why.
+- **Explicit abductive chain**: every investigation step includes a `reasoning`
+  field explaining WHY the next tool was selected. An auditor can reconstruct
+  the full logic without executing the system.
 
-**ISO 27037 exige** que la evidencia digital no sea alterada durante el analisis.
+---
 
-VIGIA implementa:
+## Requirement 2: Immutable Chain of Custody
 
-- **Hash atomico durante lectura**: `read_evidence` usa `O_NOFOLLOW` +
-  `os.fstat(fd)` + lectura en un solo pass. El SHA-256 corresponde exactamente
-  a los bytes procesados (sin ventana TOCTOU).
-- **Audit log firmado con HMAC encadenado**: cada entrada del log forense
-  incluye `_prev_hmac` (hash de la entrada anterior) y `_hmac` (HMAC-SHA256
-  del contenido + hash previo). Alterar cualquier linea invalida toda la
-  cadena posterior. Verificable con `audit_logger.verify_chain()`.
-- **Evidencia montada en solo lectura**: Docker monta el directorio de
-  evidencia con `:ro`. El analisis no puede modificar la fuente.
-- **WORM enforcement**: `audit_logger.enforce_worm()` aplica `chattr +i`
-  (Linux ext4/xfs) al log, haciendolo inmutable a nivel kernel.
+**ISO 27037 requires** that digital evidence not be altered during analysis.
 
-### Requisito 3: Operador Humano Cualificado
+VIGÍA implements:
 
-**Daubert exige** que la tecnica sea aplicada por un profesional competente.
+- **Atomic hash during read**: `read_evidence` uses `O_NOFOLLOW` + `os.fstat(fd)`
+  + single-pass read. The SHA-256 corresponds exactly to the bytes processed
+  (no TOCTOU window).
+- **HMAC-chained signed audit log**: every forensic log entry includes
+  `_prev_hmac` (hash of the previous entry) and `_hmac` (HMAC-SHA256 of
+  content + previous hash). Altering any line invalidates the entire subsequent
+  chain. Verifiable with `audit_logger.verify_chain()`.
+- **Read-only evidence mount**: Docker mounts the evidence directory with `:ro`.
+  Analysis cannot modify the source.
+- **WORM enforcement**: `audit_logger.enforce_worm()` applies `chattr +i`
+  (Linux ext4/xfs) to the log, making it immutable at the kernel level.
 
-VIGIA implementa:
+---
 
-- **Witness Mode (Dual Custody)**: cuando el veredicto es MALICE o INTENT,
-  el reporte se firma con una segunda clave HMAC (`VIGIA_HUMAN_OPERATOR_KEY`)
-  que prueba que un analista autorizado estaba presente. Sin esta co-firma,
-  el reporte se marca como `UNSIGNED` con una advertencia.
-- **Explain Mode**: `make investigate MODE=explain` muestra que haria el
-  planner sin ejecutar nada. El operador revisa ANTES de autorizar.
-- **Self-correction**: `validate_and_correct_analysis` chequea 4 falacias
-  peirceanas antes de emitir un veredicto final.
+## Legal Basis for Hash-Based Authentication
 
-### Requisito 4: Tasa de Error Conocida
+The chain-of-custody mechanisms above are not only an internal design
+choice — hash-based authentication of digital evidence is recognized
+evidentiary practice, not just VIGÍA's own logic.
 
-**Daubert exige** que la tecnica tenga una tasa de error conocida o conocible.
+- **United States — FRE 902(13) and 902(14)** (in effect since December
+  1, 2017): these rules allow self-authentication of an electronic
+  record via a "process of digital identification" — a hash value —
+  without requiring foundational expert testimony at trial. A hash match
+  between an original and a copy is accepted authentication that the
+  data is what it purports to be.
+- **Argentina**: no single codified article mirrors 902(14) directly.
+  The equivalent exists as doctrine and case law: a hash is treated as a
+  digital fingerprint — if unchanged, it evidences that content,
+  creation date, and chain of custody were preserved. Digital chain of
+  custody is commonly described in three phases: obtención (collection),
+  incorporación al proceso (incorporation into the case file), and
+  valoración (judicial assessment). Metadata alteration or a broken
+  chain of custody typically leads to evidentiary exclusion for lack of
+  reliability.
 
-VIGIA implementa:
+**Scope note:** this precedent covers hash-based authentication of
+integrity — it is what backs `read_evidence`'s atomic SHA-256 and the
+HMAC-chained audit log above. It does not, in either jurisdiction,
+address zero-knowledge proofs or other cryptographic proof systems as an
+authentication method; that remains unsettled law. Do not present ZK-based
+mechanisms elsewhere in this project as carrying the same legal backing
+as the hash-chain mechanisms described in this section.
 
-- **Escala de 4 niveles** (NOISE / SUSPICION / INTENT / MALICE): no es
-  binario. Cada nivel requiere mas evidencia que el anterior.
-- **Cross-validation obligatoria**: ningun tool individual puede disparar
-  MALICE. Se requieren al menos 2 fuentes independientes de evidencia.
-- **Humildad epistemica**: cada conclusion incluye `what_would_falsify_this`
-  — la condicion bajo la cual la hipotesis seria falsa.
-- **`check_determinism.py`**: ejecuta N veces el mismo analisis y compara
-  hashes. Cualquier divergencia se reporta como NO-DETERMINISMO.
+---
 
-### Requisito 5: Aceptacion por la Comunidad Cientifica
+## Requirement 3: Qualified Human Operator
 
-**Daubert exige** aceptacion general de la tecnica en la comunidad relevante.
+**Daubert requires** that the technique be applied by a competent professional.
 
-VIGIA implementa:
+VIGÍA implements:
 
-- **Exportacion STIX 2.1**: los hallazgos se exportan a formato estandar
-  ingestable por OpenCTI, MISP, y cualquier plataforma compatible.
-- **Mapeo MITRE ATT&CK**: cada senal se vincula a una tecnica ATT&CK
-  especifica con su ID y URL.
-- **Codigo abierto (Apache 2.0)**: el sistema completo es auditable por cualquier
-  perito o contrapericia.
+- **Witness Mode (Dual Custody)**: when the verdict is MALICE or INTENT, the
+  report is signed with a second HMAC key (`VIGIA_HUMAN_OPERATOR_KEY`) proving
+  that an authorized analyst was present. Without this co-signature, the report
+  is marked `UNSIGNED` with an explicit warning.
+- **Explain Mode**: `make investigate MODE=explain` shows what the planner would
+  do without executing anything. The operator reviews BEFORE authorizing.
+- **Self-correction**: `validate_and_correct_analysis` checks 4 Peircean
+  fallacies before issuing a final verdict.
 
-### Protocolo de Uso en Contexto Judicial
+---
 
-```
-# 1. Generar claves
-make hmac-key                    # Clave del sistema
+## Requirement 4: Known Error Rate
+
+**Daubert requires** that the technique have a known or knowable error rate.
+
+VIGÍA implements:
+
+- **4-level scale** (NOISE / SUSPICION / INTENT / MALICE): not binary. Each
+  level requires more evidence than the previous one.
+- **Mandatory cross-validation**: no single tool can trigger MALICE. At least
+  2 independent sources of evidence are required.
+- **Epistemic humility**: every conclusion includes `what_would_falsify_this`
+  — the condition under which the hypothesis would be false.
+- **`check_determinism.py`**: runs the same analysis N times and compares
+  hashes. Any divergence is reported as NON-DETERMINISM.
+
+---
+
+## Requirement 5: General Acceptance by the Scientific Community
+
+**Daubert requires** general acceptance of the technique in the relevant community.
+
+VIGÍA implements:
+
+- **STIX 2.1 export**: findings are exported to the standard format ingestible
+  by OpenCTI, MISP, and any compatible platform.
+- **MITRE ATT&CK mapping**: every signal is linked to a specific ATT&CK
+  technique with its ID and URL.
+- **Open source (Apache 2.0)**: the complete system is auditable by any
+  expert or counter-expert witness.
+
+---
+
+## Judicial Use Protocol
+
+```bash
+# 1. Generate keys
+make hmac-key                    # System key
 export VIGIA_HUMAN_OPERATOR_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
 
-# 2. Activar modo forense
+# 2. Activate forensic mode
 export VIGIA_FORENSIC_LOCK=true
 export VIGIA_STRICT_MODEL_CHECK=true
 
-# 3. Analizar evidencia (aislado, sin red, read-only)
-EVIDENCE_PATH=/mnt/caso_2025_001 make run
+# 3. Analyze evidence (isolated, no network, read-only)
+EVIDENCE_PATH=/mnt/case_2025_001 make run
 
-# 4. Verificar integridad
-make check-integrity             # HMAC chain intacta
-make check-determinism           # Reproducibilidad confirmada
+# 4. Verify integrity
+make check-integrity             # HMAC chain intact
+make check-determinism           # Reproducibility confirmed
 
-# 5. Sellar log (WORM)
+# 5. Seal log (WORM)
 python3 -c "from vigia.security import audit_logger; print(audit_logger.enforce_worm())"
 
-# 6. Exportar para el tribunal
-cp reports/investigation_*.json /mnt/entrega_pericial/
-cp logs/security_audit.log      /mnt/entrega_pericial/
+# 6. Export for the court
+cp reports/investigation_*.json /mnt/forensic_delivery/
+cp logs/security_audit.log      /mnt/forensic_delivery/
 ```
 
-### Mapeo ISO 27037:2012
+---
 
-| Clausula ISO | Requisito | Implementacion VIGIA |
+## ISO 27037:2012 Mapping
+
+| ISO Clause | Requirement | VIGÍA Implementation |
 |---|---|---|
-| 5.4.1 | Preservacion de evidencia | Montaje read-only, hash atomico |
-| 5.4.2 | Documentacion de procesos | Audit log HMAC, campo `reasoning` |
-| 5.4.3 | Cadena de custodia | HMAC encadenado, WORM, timestamps UTC |
-| 6.2 | Competencia del operador | Witness Mode, HUMAN_OPERATOR_KEY |
-| 6.3 | Validacion de herramientas | check_determinism.py, tests E2E |
-| 7.1.2 | Integridad de datos | SHA-256 atomico, O_NOFOLLOW, O_EXCL |
+| 5.4.1 | Evidence preservation | Read-only mount, atomic hash |
+| 5.4.2 | Process documentation | HMAC audit log, `reasoning` field |
+| 5.4.3 | Chain of custody | Chained HMAC, WORM, UTC timestamps |
+| 6.2 | Operator competence | Witness Mode, HUMAN_OPERATOR_KEY |
+| 6.3 | Tool validation | check_determinism.py, E2E tests |
+| 7.1.2 | Data integrity | Atomic SHA-256, O_NOFOLLOW, O_EXCL |
 
-### Limitaciones Documentadas (Transparencia Pericial)
+---
 
-- Las herramientas basadas en LLM (`reason_with_llm`, `validate_and_correct_analysis`)
-  no son deterministicas al 100% incluso con temperature=0, debido a la naturaleza
-  de los modelos de lenguaje. `FORENSIC_LOCK` minimiza pero no elimina varianza.
-- La estilometria (`analyze_stylometry`) tiene falsos positivos en textos menores
-  a 50 palabras.
-- La calibracion cultural esta optimizada para espanol rioplatense. Otros
-  dialectos pueden requerir ajustes en los patrones de genero y los campos
-  obligatorios de documentos oficiales.
-- CLIP (`vision_intent_audit`) es un clasificador zero-shot — no fue entrenado
-  especificamente para deteccion de falsificacion documental.
+## Documented Limitations (Expert Witness Transparency)
+
+- LLM-based tools (`reason_with_llm`, `validate_and_correct_analysis`) are not
+  100% deterministic even with temperature=0, due to the nature of language
+  models. `FORENSIC_LOCK` minimizes but does not eliminate variance.
+- Stylometry (`analyze_stylometry`) produces false positives on texts shorter
+  than 50 words.
+- Cultural calibration is optimized for Rioplatense Spanish. Other dialects or
+  languages may require adjustments to gender patterns and official document
+  field detection.
+- CLIP (`vision_intent_audit`) is a zero-shot classifier — it was not trained
+  specifically for document forgery detection.
+
+---
+
+*Licensed under the Apache License, Version 2.0. Copyright 2026 Anna Tchijova.*

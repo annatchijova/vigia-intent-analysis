@@ -82,7 +82,7 @@ sealed. `ABSTAIN` is a valid, mathematically justified verdict.
 
 Mode 1 is the primary, evaluated forensic core; Modes 2–5 reuse local deterministic
 tools but have separately scoped investigation and reporting contracts (a Mode 2
-report never mutates a sealed Mode 1 bundle). See [`EXECUTION_MODES.md`](./EXECUTION_MODES.md)
+report never mutates a sealed Mode 1 bundle). See [`EXECUTION_MODES.md`](./docs/EXECUTION_MODES.md)
 and the Claude Code playbook [`CLAUDE.md`](./CLAUDE.md).
 
 | Mode | Description | LLM |
@@ -120,13 +120,13 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 **Getting started & usage**
 - [`INSTALL.md`](./INSTALL.md) · [`INSTALL_ES.md`](./INSTALL_ES.md) — setup and installation
 - [`docs/QUICK_START.md`](./docs/QUICK_START.md) — quick integration walkthrough
-- [`EXECUTION_MODES.md`](./EXECUTION_MODES.md) — map of every way to run an analysis
+- [`EXECUTION_MODES.md`](./docs/EXECUTION_MODES.md) — map of every way to run an analysis
 - [`CLAUDE.md`](./CLAUDE.md) — Claude Code / MCP investigation playbook (22 tools)
 - [Command reference](https://annatchijova.github.io/vigia/vigia_commands_en.html) — all modes, copy-paste examples
 
 **Cases & examples**
 - [`docs/PROMPTS_REALCASES_CLAUDE.md`](./docs/PROMPTS_REALCASES_CLAUDE.md) — copy-paste prompts to run full investigations
-- [`RAW_CASES_LOG.md`](./RAW_CASES_LOG.md) · [ES](./RAW_CASES_LOG_ES.md) — per-case raw-evidence catalog
+- [`RAW_CASES_LOG.md`](./docs/RAW_CASES_LOG.md) · [ES](./docs/RAW_CASES_LOG_ES.md) — per-case raw-evidence catalog
 - [`docs/readme_benign_cases.md`](./docs/readme_benign_cases.md) — benign / authorized-use cases
 - [`docs/digital_corpora_complete_report.md`](./docs/digital_corpora_complete_report.md) · [`docs/nist_cfreds_full_report.md`](./docs/nist_cfreds_full_report.md) — full real-corpus reports
 - [`results/`](./results/) — sealed ForensicBundles, amicus curiae, and SHA-256 sidecars
@@ -134,7 +134,7 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 **Accuracy, validation & compliance**
 - [`docs/ACCURACY.md`](./docs/ACCURACY.md) · [ES](./docs/ACCURACY_ES.md) — methodology and corpus metrics
 - [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md) — documented limitations (Daubert transparency)
-- [`DAUBERT_JUDICIAL.md`](./DAUBERT_JUDICIAL.md) · [ES](./DAUBERT_JUDICIAL_ES.md) — Daubert admissibility rationale
+- [`DAUBERT_JUDICIAL.md`](./docs/DAUBERT_JUDICIAL.md) · [ES](./docs/DAUBERT_JUDICIAL_ES.md) — Daubert admissibility rationale
 - [`docs/MUTATION_RUNBOOK.md`](./docs/MUTATION_RUNBOOK.md) — mutation-testing operations guide
 
 **Theory & methodology**
@@ -143,7 +143,7 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 - [`docs/skills/abductive-engineering/SKILL.md`](./docs/skills/abductive-engineering/SKILL.md) — abductive reasoning as a reusable skill
 
 **Architecture & technical state**
-- [`docs/VIGIA_TECHNICAL_STATE_EN.md`](./docs/VIGIA_TECHNICAL_STATE_EN.md) · [ES](./VIGIA_ESTADO_TECNICO_ES.md) — full system state
+- [`docs/VIGIA_TECHNICAL_STATE_EN.md`](./docs/VIGIA_TECHNICAL_STATE_EN.md) · [ES](./docs/VIGIA_ESTADO_TECNICO_ES.md) — full system state
 - [`docs/diagrama_pipeline.md`](./docs/diagrama_pipeline.md) — pipeline diagram
 - [Architecture diagrams](https://annatchijova.github.io/vigia/vigia_diagrams.html) · [Math simulator](https://annatchijova.github.io/vigia/vigia.html) · [Demo video](https://www.youtube.com/watch?v=NOquYzUwMkg)
 

@@ -160,15 +160,15 @@ en casos con `confidence = 0.5` exacto.
 
 | Directorio de Evidencia | Case ID Planificado | Estado | Tipos de Artefacto | Notas |
 |------------------------|---------------------|--------|-------------------|-------|
-| `evidence/magnet-2020-windows-artifacts/` | `MAGNET-2020-WIN-RAW-20260714` | **HECHO** — SUSPICION 3/5 | evtx, registry hives | [bundle](results/agent_batch/MAGNET-2020-WIN-RAW-20260714_bundle.json) |
-| `evidence/magnet-2022-windows-artifacts/` | `MAGNET-2022-WIN-RAW-20260714` | **HECHO** — SUSPICION 3/5 | evtx, hives | [bundle](results/agent_batch/MAGNET-2022-WIN-RAW-20260714_bundle.json) |
-| `evidence/magnet-2014-multidevice/` | `MAGNET-2014-RAW-20260714` | **HECHO** — ABSTAIN (UNDETERMINED: gap de evidencia) | prefetch, .docx | [bundle](results/agent_batch/MAGNET-2014-RAW-20260714_bundle.json) |
-| `evidence/owl-2019-hd1-windows/` | `OWL-HD1-RAW-20260714` | **HECHO** — ABSTAIN (ABSTAIN_V2: empate CCS 1/2) | evtx, NTUSER.DAT, prefetch, SAM/SYSTEM | [bundle](results/agent_batch/OWL-HD1-RAW-20260714_bundle.json) |
-| `evidence/owl-2019-nexus5-quick/` | `OWL-NEXUS5-RAW-20260714` | **HECHO** — ABSTAIN (MOBILE_EVIDENCE_ANALYZED: 1 señal) | artefactos Android | [bundle](results/agent_batch/OWL-NEXUS5-RAW-20260714_bundle.json) |
-| `evidence/flare-on/` | `FLAREON-RAW-20260714` | **HECHO** — ABSTAIN (UNDETERMINED) | artefactos malware CTF | [bundle](results/agent_batch/FLAREON-RAW-20260714_bundle.json) |
-| `evidence/image-2011-10-19/` | `IMAGE-2011-RAW-20260714` | **HECHO** — ABSTAIN (PIPELINE_ERROR: E01 requiere SIFT) | imagen de disco 2011-10-19-Sample.E01 | [bundle](results/agent_batch/IMAGE-2011-RAW-20260714_bundle.json) |
-| `evidence/dfworkbook/` | `DFWORKBOOK-RAW-20260714` | **HECHO** — ABSTAIN (PIPELINE_ERROR: E01 requiere SIFT) | 2011-10-19-Sample.E01 + eventlogs | [bundle](results/agent_batch/DFWORKBOOK-RAW-20260714_bundle.json) |
-| `evidence/takeout-2020/` | `TAKEOUT-RAW-20260714` | **HECHO** — SUSPICION 21/25 | exportación Google Takeout | [bundle](results/agent_batch/TAKEOUT-RAW-20260714_bundle.json) |
+| `evidence/magnet-2020-windows-artifacts/` | `MAGNET-2020-WIN-RAW-20260714` | **HECHO** — SUSPICION 3/5 | evtx, registry hives | [bundle](../results/agent_batch/MAGNET-2020-WIN-RAW-20260714_bundle.json) |
+| `evidence/magnet-2022-windows-artifacts/` | `MAGNET-2022-WIN-RAW-20260714` | **HECHO** — SUSPICION 3/5 | evtx, hives | [bundle](../results/agent_batch/MAGNET-2022-WIN-RAW-20260714_bundle.json) |
+| `evidence/magnet-2014-multidevice/` | `MAGNET-2014-RAW-20260714` | **HECHO** — ABSTAIN (UNDETERMINED: gap de evidencia) | prefetch, .docx | [bundle](../results/agent_batch/MAGNET-2014-RAW-20260714_bundle.json) |
+| `evidence/owl-2019-hd1-windows/` | `OWL-HD1-RAW-20260714` | **HECHO** — ABSTAIN (ABSTAIN_V2: empate CCS 1/2) | evtx, NTUSER.DAT, prefetch, SAM/SYSTEM | [bundle](../results/agent_batch/OWL-HD1-RAW-20260714_bundle.json) |
+| `evidence/owl-2019-nexus5-quick/` | `OWL-NEXUS5-RAW-20260714` | **HECHO** — ABSTAIN (MOBILE_EVIDENCE_ANALYZED: 1 señal) | artefactos Android | [bundle](../results/agent_batch/OWL-NEXUS5-RAW-20260714_bundle.json) |
+| `evidence/flare-on/` | `FLAREON-RAW-20260714` | **HECHO** — ABSTAIN (UNDETERMINED) | artefactos malware CTF | [bundle](../results/agent_batch/FLAREON-RAW-20260714_bundle.json) |
+| `evidence/image-2011-10-19/` | `IMAGE-2011-RAW-20260714` | **HECHO** — ABSTAIN (PIPELINE_ERROR: E01 requiere SIFT) | imagen de disco 2011-10-19-Sample.E01 | [bundle](../results/agent_batch/IMAGE-2011-RAW-20260714_bundle.json) |
+| `evidence/dfworkbook/` | `DFWORKBOOK-RAW-20260714` | **HECHO** — ABSTAIN (PIPELINE_ERROR: E01 requiere SIFT) | 2011-10-19-Sample.E01 + eventlogs | [bundle](../results/agent_batch/DFWORKBOOK-RAW-20260714_bundle.json) |
+| `evidence/takeout-2020/` | `TAKEOUT-RAW-20260714` | **HECHO** — SUSPICION 21/25 | exportación Google Takeout | [bundle](../results/agent_batch/TAKEOUT-RAW-20260714_bundle.json) |
 | `evidence/magnet-2022-ios-jess/` | `MAGNET-2022-IOS-JESS-RAW` | **PENDIENTE** | iOS E01 (8.2 GB) | Requiere extracción del zip primero; no bloquea los demás reruns |
 
 **Resultado de validación B-127:** Ninguno de los reruns completados produce `confidence = 0.5` exacto.
