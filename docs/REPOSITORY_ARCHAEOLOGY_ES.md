@@ -773,6 +773,13 @@ Divergencias doc/código y peligros que esta excavación sacó a la superficie,
 reportados según la regla de la casa (los hallazgos son afirmaciones para la
 mantenedora, no parches silenciosos):
 
+> **Actualización 2026-08-29:** a pedido de la mantenedora, estos hallazgos
+> quedaron registrados en `BUGS_PENDIENTES.md` / `BUGS_PENDIENTES_EN.md` —
+> el ítem 1 como **B-228**, el 2 como **B-229**, los ítems 3, 4 y 7 como
+> **B-230**, el 5 como **B-231**, el 6 como **B-232**, el 9 como **B-233**
+> y el 10 como **B-234**. El ítem 8 (git tags) es una observación de proceso
+> sin fix posible desde el repo y no se convirtió.
+
 1. **Sobre-reclamo de floats en `README.md:78` / Invariante 4 de `CLAUDE.md`**
    — "zero floating-point in the critical path" es falso tal como está
    escrito; `vigia_scorer._dround` devuelve floats vía el `round()` nativo.

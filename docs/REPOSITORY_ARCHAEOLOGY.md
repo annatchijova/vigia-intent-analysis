@@ -728,6 +728,13 @@ is descriptive taxonomy, not design intent.
 Doc/code divergences and hazards surfaced by this excavation, reported per the
 house rule (findings are claims for the maintainer, not silent patches):
 
+> **Update 2026-08-29:** at the maintainer's request, these findings are now
+> registered in `BUGS_PENDIENTES.md` / `BUGS_PENDIENTES_EN.md` — item 1 as
+> **B-228**, item 2 as **B-229**, items 3, 4 and 7 as **B-230**, item 5 as
+> **B-231**, item 6 as **B-232**, item 9 as **B-233**, and item 10 as
+> **B-234**. Item 8 (git tags) is a process observation with no repo-side
+> fix and was not converted.
+
 1. **`README.md:78` / `CLAUDE.md` Invariant 4 float overclaim** — "zero
    floating-point in the critical path" is false as written;
    `vigia_scorer._dround` returns floats via built-in `round()`. L-073 states

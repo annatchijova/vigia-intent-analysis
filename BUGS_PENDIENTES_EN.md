@@ -1276,3 +1276,263 @@ disagreement is preserved and reinforces that VIGÍA must keep emitting
 materializes the facts it proposes to score.
 
 ---
+
+## B-228 — README and CLAUDE.md overclaim "zero floating-point": the live scorer `_dround` returns float; only L-073 states the real invariant
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P2 — doc/code drift on the central determinism claim, legal-facing surface |
+| **Files** | `README.md:78`, `CLAUDE.md` (Invariant 4), `docs/ENGINEERING_DISCIPLINE.md` §5.2, `KNOWN_LIMITATIONS.md` (L-021), `vigia_scorer.py:174-182` |
+| **Detected in** | Repository archaeology excavation, 2026-08-29 (`docs/REPOSITORY_ARCHAEOLOGY.md` §11.1) |
+
+### Description
+
+`README.md:78` claims "zero floating-point in the critical path" and
+CLAUDE.md's Invariant 4 instructs treating any float in intermediate scoring
+as a determinism violation. But the scorer's live `_dround`
+(`vigia_scorer.py:174-182`) returns `float` using built-in `round()` —
+directly beneath the comment block explaining that Decimal was introduced to
+avoid exactly that. Only `_dsum` uses a Decimal accumulator, and its result
+goes back to float through `_dround`. The L-021 [RESOLVED] entry claims
+`_dround()` returns `decimal.Decimal` — true only for the
+`vigia/tools/caie.py` twin, not for the scorer.
+
+The only correct statement of the contract that actually holds is **L-073**:
+boundary-exact, platform-stable reproducibility (thresholds ARE `Fraction`;
+the boost/penalty accumulators ARE `Fraction` since the 2026-07-12 gate) —
+not float-free purity.
+
+### Impact
+
+An external auditor applying Invariant 4 literally "detects" a violation in
+the engine itself — exactly the class of confusion that has already produced
+refutable external findings (cf. the 2026-08-09 DeepSeek round, where the
+auditor's line numbers had drifted in all 5 cases). On a Daubert-facing
+surface, a claim stronger than the code is a cross-examination liability,
+not an asset.
+
+### Proposed fix
+
+Rewrite the three claims (README, CLAUDE.md Invariant 4,
+ENGINEERING_DISCIPLINE §5.2) to say what L-073 says, and correct L-021's
+statement about `vigia_scorer._dround`. **Do not touch the scorer's
+arithmetic**: changing `_dround` would require its own 0-flip corpus gate
+(FRACTION_GATE_RECORD_20260712 precedent) and is a separate decision.
+
+---
+
+## B-229 — "Mode 1 has no INTENT rung" (CLAUDE.md) is true of the motor and misleading for the sealed surface: the L-036 override mints INTENT at the agent layer
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P3 — documentation precision about the sealed verdict space |
+| **Files** | `CLAUDE.md:320-322`, `vigia_agent.py:1063-1078` (L-036 override), `vigia_agent.py:233-234`, `KNOWN_LIMITATIONS.md` (L-036) |
+| **Detected in** | Repository archaeology excavation, 2026-08-29 (`docs/REPOSITORY_ARCHAEOLOGY.md` §7.6) |
+
+### Description
+
+`CLAUDE.md:320-322` says Mode 1 "has no INTENT rung in its deterministic
+motor". Read against `vigia_scorer.py` it is accurate: the string `INTENT`
+does not occur in the scorer. But the agent layer above the motor does have
+the rung: the L-036 override manufactures `INTENT_DETECTED` when primary
+signals exceed |z| > 3 over an undetermined hypothesis
+(`vigia_agent.py:1072`), and `classify_agent_verdict` seals it as `INTENT`
+with exit code 3. Corpus bundles carry it and tests pin the behavior
+(`tests/test_b058_abstain_classification.py:74`,
+`tests/test_b097_motor_suspicion_verdict.py:95`). L-036 documents the
+override table honestly, but CLAUDE.md and L-036 never cross-reference: a
+reader of CLAUDE.md alone concludes a Mode-1 bundle cannot carry
+`agent_verdict: "INTENT"`, and the corpus contradicts that.
+
+### Proposed fix
+
+Make CLAUDE.md precise that the statement applies to the *scoring motor* and
+cross-reference L-036 as the documented path by which the agent layer can
+seal INTENT. No code change: the override is deliberate, test-pinned
+behavior with its own limitation entry.
+
+---
+
+## B-230 — Exit-code documentation drift plus a nonexistent path: README documents only 0–3, L-067 still says SUSPICION shares EXIT_INTENT, and KNOWN_LIMITATIONS cites `vigia/tools/caie_legacy_root.py`
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P3 — under-documented interface contract + two stale citations |
+| **Files** | `README.md:57`, `README_ES.md` (equivalent line), `KNOWN_LIMITATIONS.md:2222` and `:1158`, `vigia_agent.py:100-105` |
+| **Detected in** | Repository archaeology excavation, 2026-08-29 (`docs/REPOSITORY_ARCHAEOLOGY.md` §11.3, §11.4, §11.7) |
+
+### Description
+
+Three related drifts, all of the same class (the doc fell behind the code):
+
+1. `vigia_agent.py:100-105` defines six exit codes (`0=NOISE, 1=MALICE,
+   2=ERROR, 3=INTENT, 4=ABSTAIN, 5=SUSPICION`), but `README.md:57` documents
+   only "0 = no evil, 1 = MALICE, 2 = error, 3 = intent/suspicion". Codes 4
+   and 5 are de facto API for any wrapper scripting the agent.
+2. `KNOWN_LIMITATIONS.md:2222` (an L-067 paragraph) still says SUSPICION
+   "shares `EXIT_INTENT` (documented contract '3=intent/suspicion')" —
+   B-097 assigned it its own `EXIT_SUSPICION = 5` and the paragraph was
+   never updated.
+3. `KNOWN_LIMITATIONS.md:1158` cites `vigia/tools/caie_legacy_root.py`, a
+   path that does not exist: the file lives at repo root
+   (`caie_legacy_root.py`).
+
+### Proposed fix
+
+Update the exit-code line in both READMEs (all six codes, with a note that
+numeric order is chronological, not severity order), correct the L-067
+paragraph and the path at line 1158. Documentation only.
+
+---
+
+## B-231 — The Dockerfile healthcheck imports a nonexistent module and class — failing since the flat→package migration
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P2 — every container reports unhealthy; nobody noticed because nothing consumes the healthcheck |
+| **File** | `Dockerfile:81-83` |
+| **Detected in** | Repository archaeology excavation, 2026-08-29 (`docs/REPOSITORY_ARCHAEOLOGY.md` §3.1) |
+
+### Description
+
+The HEALTHCHECK runs:
+
+```dockerfile
+CMD python3 -c "from fractions import Fraction; from ebs_v1 import EvidenceBundle; print('OK')"
+```
+
+`ebs_v1` no longer exists as a root module (the flat→package migration moved
+it to `vigia/core/ebs_v1.py`), and no class named `EvidenceBundle` exists
+anywhere in the tree — the class is `ForensicBundle`
+(`vigia/core/ebs_v1.py:702`, `vigia/models/ebs.py:711`). The import fails
+with `ModuleNotFoundError`, so every container built from this Dockerfile
+turns `unhealthy` after the start period.
+
+### Proposed fix
+
+```dockerfile
+CMD python3 -c "from fractions import Fraction; from vigia.core.ebs_v1 import ForensicBundle; print('OK')"
+```
+
+### Verification
+
+`docker build` + `docker inspect --format='{{.State.Health.Status}}'` on a
+running container must go from `unhealthy` to `healthy`.
+
+---
+
+## B-232 — `document_integrity.py` reads a phonetic-dictionary path that does not exist, and the two real copies of the dictionary have diverged
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P2 — which dictionary loads depends on the code path; one documented path does not exist |
+| **Files** | `vigia/tools/document_integrity.py:54`, `vigia/phonetic_loader.py:22-38`, `phonetic_dict.json` (root) vs `data/phonetic_dict.json` |
+| **Detected in** | Repository archaeology excavation, 2026-08-29 (`docs/REPOSITORY_ARCHAEOLOGY.md` §3.4) |
+
+### Description
+
+`vigia/phonetic_loader.py` exists precisely to consolidate phonetic
+dictionary loading ("Antes de este módulo, el diccionario fonético se
+cargaba desde dos rutas distintas e incompatibles"), yet:
+
+1. `vigia/tools/document_integrity.py:54` does not use the loader — it
+   hardcodes `Path(__file__).parent.parent / "data" / "phonetic_dict.json"`,
+   i.e. `vigia/data/phonetic_dict.json`, **which does not exist**.
+2. The loader's own cascade lists that same nonexistent path as priority 2,
+   falling through to the root copy as priority 3.
+3. The two copies that do exist have diverged: `phonetic_dict.json` (root)
+   and `data/phonetic_dict.json` have different md5s. Which one is used
+   depends on who loads — the defect class the consolidation was meant to
+   close (same pattern as L-052: the result must not depend on how you
+   import or where you read from).
+
+### Proposed fix
+
+Migrate `document_integrity.py` to `phonetic_loader`; decide which copy is
+canonical, reconcile the content, and retire the other under the `attic/`
+protocol (or document why two must exist). Record the content diff before
+reconciling.
+
+---
+
+## B-233 — The architecture's flagship falsifier (narrator backend swap) is declared in ENGINEERING_DISCIPLINE §5.1 and has no implementing test
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN |
+| **Severity** | P3 — missing test for the central architectural claim ("LLM out of the decision path") |
+| **Files** | `docs/ENGINEERING_DISCIPLINE.md:209-211`; `tests/` suite (absence) |
+| **Detected in** | Repository archaeology excavation, 2026-08-29 (`docs/REPOSITORY_ARCHAEOLOGY.md` §8) |
+
+### Description
+
+The engineering discipline declares the test that would falsify the
+architecture: "swapping the narrator backend (Ollama ↔ hosted API) must
+change only the wording — never the verdict, seal, or chain of custody. If
+it can change the outcome, the narrator is in the decision path and the
+architecture is wrong." No test in the tree performs that swap. The indirect
+evidence is strong (zero LLM calls in the Mode-1 modules, the B-225 gates),
+but the claim's *declared* falsifier remains prose — in a project whose own
+doctrine is that a hypothesis without a checkable consequence is not yet an
+engineering hypothesis.
+
+### Proposed fix
+
+A test that runs the same case twice with different narrators (two mocked
+backends returning different prose is enough, or narrator present vs absent
+— no Ollama needed in CI) and asserts byte-identical `verdict`,
+`bundle_digest`, and chain of custody. What is under test is not the
+narrator but that the sealed result reads nothing from it.
+
+---
+
+## B-234 — Nine zero-reference fossils await their discriminating experiment (candidates for the attic/ protocol)
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN — candidates; none may be deleted without its own zero-reference verification at retirement time |
+| **Severity** | P4 — cleanup; no known functional risk |
+| **Files** | see list |
+| **Detected in** | Repository archaeology excavation, 2026-08-29 (`docs/REPOSITORY_ARCHAEOLOGY.md` §11.10) |
+
+### Description
+
+The excavation identified nine artifacts with zero references from live
+code, tests, CI, or operational docs, and no explanatory comment or audit
+citation retaining them (unlike `caie_legacy_root.py` or `apply_b047*.py`,
+which are retained with written reason):
+
+1. `initial_templates_v2.sql` — byte-identical to `initial_templates.sql`
+   (same md5); the `_v2` suffix carries no content.
+2. `vigia_recommendation_engine_v3.1_SAFE.sql` — tables from the Kubernetes
+   incarnation (May 2026); nothing loads them.
+3. `vigia/inference/recommendation_engine_v3.1.py` — its Python twin; the
+   dot in the filename makes it unimportable as a module. Doubly dead.
+4. `resultados/` — a single-case snapshot predating the `results/`
+   convention; no code reads or writes it.
+5. `coverage_baseline_20260622.txt` — a raw pytest transcript from the
+   author's machine; historical value only.
+6. `tools/vigia_prepare_evidence.py` — zero importers and zero references.
+7. `c3_pattern_compare.py` — orphaned measurement probe.
+8. `c3_role_verdict_probe.py` — likewise.
+9. `vigia/core/geopolitical_v2.py` — zero importers; named only by the mass
+   refactor table.
+
+(`convert_mans_to_ebs.py` was evaluated and left OUT of the immediate-action
+list: its docstring anchors it to the VIGIA-REAL-NFURY case as a development
+record — same class as the retained `apply_b*` scripts. Review separately.)
+
+### Proposed fix
+
+Apply the `attic/` protocol documented in `attic/README.md`: verify zero
+references at retirement time (do not trust this listing — verification goes
+stale), move preserving layout, update the `attic/` README with per-file
+justification, suite green before and after. **Do not delete**: retire with
+provenance, per the project's doctrine.
+
+---
