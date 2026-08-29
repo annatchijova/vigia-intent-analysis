@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIGÍA Repository Archaeology</title>
+<meta name="description" content="How VIGÍA came to exist: strata, fossils, invariants, and competing historical hypotheses — a forensic excavation of the repository itself.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root {
+    --bg: #f1f1ec;
+    --card: #faf9f5;
+    --ink: #232a2b;
+    --muted: #5d6a66;
+    --line: #d7d8cd;
+    --accent: #2e6e5e;       /* patina — the deliberate */
+    --accent-soft: #e2ece7;
+    --oxide: #9a5233;        /* oxide — the accidental */
+    --oxide-soft: #f0e4dc;
+    --chip-ink: #ffffff;
+    --code-bg: #e9eae2;
+    --shadow: 0 1px 2px rgba(30,40,38,.06), 0 8px 28px -12px rgba(30,40,38,.14);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141a19;
+      --card: #1b2221;
+      --ink: #e5e3d8;
+      --muted: #94a29b;
+      --line: #2d3634;
+      --accent: #6fbfa8;
+      --accent-soft: #1e332d;
+      --oxide: #d1976b;
+      --oxide-soft: #35271e;
+      --chip-ink: #10201b;
+      --code-bg: #222b29;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -12px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141a19;
+    --card: #1b2221;
+    --ink: #e5e3d8;
+    --muted: #94a29b;
+    --line: #2d3634;
+    --accent: #6fbfa8;
+    --accent-soft: #1e332d;
+    --oxide: #d1976b;
+    --oxide-soft: #35271e;
+    --chip-ink: #10201b;
+    --code-bg: #222b29;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 10px 30px -12px rgba(0,0,0,.5);
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+    font-size: 17px;
+    line-height: 1.65;
+    margin: 0;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 24px 96px; }
+
+  h1, h2, h3 { font-family: "Fraunces", Georgia, serif; text-wrap: balance; line-height: 1.15; }
+  h1 { font-size: clamp(2.1rem, 5.5vw, 3.4rem); font-weight: 700; margin: .3em 0 .25em; }
+  h2 { font-size: 1.65rem; font-weight: 600; margin: 2.6em 0 .5em; }
+  h3 { font-size: 1.15rem; font-weight: 600; margin: 1.8em 0 .4em; }
+  p { margin: .7em 0; }
+  a { color: var(--accent); }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .72rem; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin-top: 42px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  }
+  .eyebrow::before { content: ""; width: 34px; height: 2px; background: var(--accent); flex: none; }
+
+  .thesis { font-size: 1.18rem; color: var(--muted); max-width: 62ch; font-style: italic; }
+
+  /* Language + theme controls */
+  .controls { position: sticky; top: 12px; z-index: 9; display: flex; justify-content: flex-end; gap: 8px; padding-top: 14px; }
+  .controls button {
+    font-family: "IBM Plex Mono", monospace; font-size: .74rem; letter-spacing: .06em;
+    background: var(--card); color: var(--ink); border: 1px solid var(--line);
+    border-radius: 999px; padding: 6px 14px; cursor: pointer; box-shadow: var(--shadow);
+  }
+  .controls button[aria-pressed="true"] { background: var(--accent); color: var(--chip-ink); border-color: var(--accent); }
+  .controls button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* Bilingual switching */
+  .es { display: none; }
+  body.lang-es .es { display: revert; }
+  body.lang-es .en { display: none; }
+
+  /* Stats strip */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 34px 0 8px; }
+  .stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .stat b { font-family: "Fraunces", serif; font-size: 1.55rem; font-weight: 700; display: block; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .stat span { font-size: .8rem; color: var(--muted); line-height: 1.35; display: block; }
+
+  /* Strata diagram */
+  .strata { margin: 26px 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+  .stratum { display: grid; grid-template-columns: 130px 1fr; border-top: 1px solid var(--line); background: var(--card); }
+  .stratum:first-child { border-top: none; }
+  .stratum .depth {
+    font-family: "IBM Plex Mono", monospace; font-size: .72rem; color: var(--muted);
+    padding: 12px 14px; border-right: 2px solid var(--accent); background:
+      repeating-linear-gradient(-45deg, transparent 0 7px, var(--line) 7px 8px);
+  }
+  .stratum:nth-child(even) .depth { border-right-color: var(--oxide); }
+  .stratum .what { padding: 12px 16px; font-size: .95rem; }
+  .stratum .what b { font-family: "Fraunces", serif; }
+
+  /* Evidence citations */
+  code, .cite {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .82em;
+    background: var(--code-bg); border-radius: 4px; padding: .12em .4em; word-break: break-word;
+  }
+
+  /* Cards */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+    padding: 16px 18px; box-shadow: var(--shadow); font-size: .95rem;
+  }
+  .card h3 { margin-top: 0; }
+  .card.deliberate { border-top: 3px solid var(--accent); }
+  .card.accident { border-top: 3px solid var(--oxide); }
+
+  .tag {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: .68rem;
+    letter-spacing: .08em; text-transform: uppercase; border-radius: 999px; padding: 3px 10px;
+    margin-bottom: 8px;
+  }
+  .tag.deliberate { background: var(--accent-soft); color: var(--accent); }
+  .tag.accident { background: var(--oxide-soft); color: var(--oxide); }
+
+  /* Tables */
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+  table { border-collapse: collapse; width: 100%; font-size: .88rem; background: var(--card); }
+  th, td { text-align: left; padding: 10px 14px; border-top: 1px solid var(--line); vertical-align: top; }
+  thead th { border-top: none; font-family: "IBM Plex Mono", monospace; font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+  /* Hypothesis tribunal */
+  .case {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 20px 22px; margin: 18px 0; box-shadow: var(--shadow);
+  }
+  .case .pid { font-family: "IBM Plex Mono", monospace; font-size: .72rem; letter-spacing: .12em; color: var(--muted); }
+  .case h3 { margin: .25em 0 .6em; font-size: 1.25rem; }
+  .hyp { display: grid; grid-template-columns: 46px 1fr; gap: 10px; margin: 8px 0; font-size: .93rem; }
+  .hyp .hlabel {
+    font-family: "IBM Plex Mono", monospace; font-size: .72rem; font-weight: 500;
+    color: var(--muted); padding-top: 3px;
+  }
+  .evidence { border-left: 3px solid var(--line); padding: 2px 0 2px 14px; margin: 12px 0; font-size: .92rem; color: var(--muted); }
+  .verdict {
+    display: flex; align-items: baseline; gap: 10px; margin-top: 14px; flex-wrap: wrap;
+    border-top: 1px dashed var(--line); padding-top: 12px;
+  }
+  .verdict .vchip {
+    font-family: "IBM Plex Mono", monospace; font-size: .7rem; letter-spacing: .08em;
+    background: var(--accent); color: var(--chip-ink); border-radius: 4px; padding: 4px 9px; flex: none;
+  }
+  .verdict p { margin: 0; font-size: .93rem; }
+
+  ol.findings { padding-left: 1.3em; }
+  ol.findings li { margin: .55em 0; font-size: .95rem; }
+
+  .footer { margin-top: 70px; border-top: 1px solid var(--line); padding-top: 22px; color: var(--muted); font-size: .88rem; }
+  .quiet { color: var(--muted); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .case, .card, .stat { transition: transform .18s ease; }
+  }
+</style>
+</head>
+<body>
+<div class="controls">
+  <button id="langBtn" aria-pressed="false" title="Cambiar idioma / switch language">ES</button>
+</div>
+
+<div class="wrap">
+  <p class="eyebrow">
+    <span class="en">Forensic excavation · 2026-08-29 · read-only</span>
+    <span class="es">Excavación forense · 2026-08-29 · solo lectura</span>
+  </p>
+  <h1>
+    <span class="en">VIGÍA Repository Archaeology</span>
+    <span class="es">Arqueología del Repositorio VIGÍA</span>
+  </h1>
+  <p class="thesis">
+    <span class="en">Not what the system does — how it came to be shaped this way. The repository's own discipline (rival hypotheses, indices before conclusions, refutation before verdict), applied to the repository itself.</span>
+    <span class="es">No qué hace el sistema — cómo llegó a tener esta forma. La propia disciplina del repositorio (hipótesis rivales, índices antes que conclusiones, refutación antes del veredicto), aplicada al repositorio mismo.</span>
+  </p>
+
+  <div class="stats">
+    <div class="stat"><b>125</b><span class="en">commits of visible git history (Jul 21 – Aug 28, 2026)</span><span class="es">commits de historia git visible (21 jul – 28 ago 2026)</span></div>
+    <div class="stat"><b>3</b><span class="en">independent root commits — full ~3,000-file snapshots</span><span class="es">commits raíz independientes — snapshots completos de ~3.000 archivos</span></div>
+    <div class="stat"><b>77 / 85</b><span class="en">commit hashes cited in the docs that exist in no repository here</span><span class="es">hashes de commit citados en los docs que no existen en ningún repo acá</span></div>
+    <div class="stat"><b>B-227</b><span class="en">highest bug ID — the ledger, not git, is the true chronology</span><span class="es">ID de bug más alto — el registro, no git, es la cronología verdadera</span></div>
+    <div class="stat"><b>8</b><span class="en">patterns tried before the hypothesis tribunal below</span><span class="es">patrones juzgados en el tribunal de hipótesis de abajo</span></div>
+  </div>
+
+  <h2><span class="en">1 · Three history horizons</span><span class="es">1 · Tres horizontes de historia</span></h2>
+  <p>
+    <span class="en">The git history is younger than the project. The documents cite fix commits dated <b>2026-07-07</b> (<span class="cite">BUGS_HISTORICO.md:4085</span>) — two weeks before this repository's first commit. The project's own fossil hunt names an earlier squashed import, <span class="cite">dbba7ca</span>, on 2026-07-05. And the GitHub repo itself began as three parallel full-tree snapshots merged without shared ancestry.</span>
+    <span class="es">La historia git es más joven que el proyecto. Los documentos citan commits de fix fechados el <b>2026-07-07</b> (<span class="cite">BUGS_HISTORICO.md:4085</span>) — dos semanas antes del primer commit de este repositorio. La propia cacería de fósiles del proyecto nombra un import squasheado anterior, <span class="cite">dbba7ca</span>, del 2026-07-05. Y el repo de GitHub nació como tres snapshots paralelos de árbol completo fusionados sin ancestro común.</span>
+  </p>
+
+  <div class="strata">
+    <div class="stratum">
+      <div class="depth">II–VI 2026</div>
+      <div class="what">
+        <span class="en"><b>The lost stratum.</b> RSAC origin scene, the Kubernetes incarnation, four April audit rounds, the hackathon build. Survives only in documents: SQL headers, audit tables, a retrospective research report.</span>
+        <span class="es"><b>El estrato perdido.</b> La escena de origen en RSAC, la encarnación Kubernetes, cuatro rondas de auditoría de abril, el build del hackathon. Sobrevive solo en documentos: headers SQL, tablas de auditoría, un informe retrospectivo.</span>
+      </div>
+    </div>
+    <div class="stratum">
+      <div class="depth">VI–VII 2026</div>
+      <div class="what">
+        <span class="en"><b>The orphaned-git stratum.</b> Post-hackathon hardening, B-001…B-152, fossil hunts, the Fraction gate. Its commits survive only as 77 orphaned hashes in the ledger.</span>
+        <span class="es"><b>El estrato del git huérfano.</b> Hardening post-hackathon, B-001…B-152, cacerías de fósiles, el gate de Fraction. Sus commits sobreviven solo como 77 hashes huérfanos en el registro.</span>
+      </div>
+    </div>
+    <div class="stratum">
+      <div class="depth">21 VII 2026 →</div>
+      <div class="what">
+        <span class="en"><b>The visible stratum.</b> GitHub import from three snapshot roots; Codex lands ~50 ledger entries in one day; PRs #11–#22 through the web UI. The only stratum git can testify about.</span>
+        <span class="es"><b>El estrato visible.</b> Import a GitHub desde tres raíces snapshot; Codex aterriza ~50 entradas del registro en un día; PRs #11–#22 hasta la web UI. El único estrato del que git puede dar testimonio.</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="quiet">
+    <span class="en">Consequence for any future archaeologist: the bug ledger (B-001…B-227) and the limitations registry (L-001…L-073) are the project's true chronology. The first GitHub commit already references B-171..B-205.</span>
+    <span class="es">Consecuencia para cualquier arqueólogo futuro: el registro de bugs (B-001…B-227) y el de limitaciones (L-001…L-073) son la cronología verdadera del proyecto. El primer commit de GitHub ya referencia B-171..B-205.</span>
+  </p>
+
+  <h2><span class="en">2 · The eras, briefly</span><span class="es">2 · Las eras, en breve</span></h2>
+  <div class="tablewrap"><table>
+    <thead><tr>
+      <th><span class="en">When (2026)</span><span class="es">Cuándo (2026)</span></th>
+      <th><span class="en">Era</span><span class="es">Era</span></th>
+      <th><span class="en">Marker evidence</span><span class="es">Evidencia marcadora</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td>Feb–Apr</td>
+        <td><span class="en">Origin: Protocol SIFT, pattern DB, four security-audit rounds; CAIE is born</span><span class="es">Origen: Protocol SIFT, DB de patrones, cuatro rondas de auditoría; nace el CAIE</span></td>
+        <td><span class="cite">vigia_patterns_migration.sql:2</span> · <span class="cite">SECURITY.md:305-308</span></td></tr>
+      <tr><td>May 2</td>
+        <td><span class="en">The prior incarnation: a Kubernetes containment recommender (ISOLATE_POD, QUARANTINE_NAMESPACE)</span><span class="es">La encarnación anterior: recomendador de contención Kubernetes (ISOLATE_POD, QUARANTINE_NAMESPACE)</span></td>
+        <td><span class="cite">vigia_recommendation_engine_v3.1_SAFE.sql</span></td></tr>
+      <tr><td>~Jun 14</td>
+        <td><span class="en">SANS FIND EVIL 2026 submission closes (inferred from "día 14 post-hackathon")</span><span class="es">Cierra la entrega de SANS FIND EVIL 2026 (inferido de "día 14 post-hackathon")</span></td>
+        <td><span class="cite">BUGS_HISTORICO.md:2186</span></td></tr>
+      <tr><td>Jun 23 – Jul 11</td>
+        <td><span class="en">Crash sweep → state fuzzing → doctrine: the label-leak discovery rebuilds the accuracy metric</span><span class="es">Barrido de crashes → fuzzing de estados → doctrina: el label leak reconstruye la métrica de accuracy</span></td>
+        <td><span class="cite">docs/ACCURACY.md:67-77</span></td></tr>
+      <tr><td>Jul 10–14</td>
+        <td><span class="en">Self-archaeology: L-067 ceiling sealed with a signature; fossil hunts find 29 fossil-dependent verdicts; B-117 inverted verdicts fixed</span><span class="es">Auto-arqueología: se sella el techo L-067 con firma; las cacerías hallan 29 veredictos sostenidos por fósiles; se corrige B-117 (veredictos invertidos)</span></td>
+        <td><span class="cite">docs/FOSSIL_HUNT_20260711.md</span></td></tr>
+      <tr><td>Jul 21 – Aug 15</td>
+        <td><span class="en">GitHub era: Codex tranche, registry split, epistemic kernel (outside the verdict path), mutation testing, DeepSeek's return; POST HACKATHON prefix retired</span><span class="es">Era GitHub: tanda Codex, partición del registro, kernel epistémico (fuera de la ruta del veredicto), mutation testing, regreso de DeepSeek; se retira el prefijo POST HACKATHON</span></td>
+        <td><span class="cite">docs/DEEPSEEK_AUDIT_20260809.md</span></td></tr>
+      <tr><td>Aug 27–28</td>
+        <td><span class="en">Docs consolidation and the first GUI — from an author on record that "una app es un vector más de ataque"</span><span class="es">Consolidación de docs y la primera GUI — de una autora que dejó registrado que "una app es un vector más de ataque"</span></td>
+        <td><span class="cite">PR #22</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="quiet">
+    <span class="en">The bugs themselves stratify: early entries are crashes (UnboundLocalError, broken imports); late entries are epistemic — a sealed log fabricating its own formula (B-223), an inert self-correction loop (B-224), a JSON field holding covert verdict authority (B-225), a suite that silently ran zero tests (B-227). The failure the project came to fear was not breaking; it was <em>appearing to work</em>.</span>
+    <span class="es">Los propios bugs se estratifican: las entradas tempranas son crashes (UnboundLocalError, imports rotos); las tardías son epistémicas — un log sellado que fabrica su propia fórmula (B-223), un loop de auto-corrección inerte (B-224), un campo JSON con autoridad de veredicto encubierta (B-225), una suite que corría cero tests en silencio (B-227). La falla que el proyecto llegó a temer no era romperse; era <em>aparentar funcionar</em>.</span>
+  </p>
+
+  <h2><span class="en">3 · Deliberate vs. accident</span><span class="es">3 · Deliberado vs. accidente</span></h2>
+  <div class="grid2">
+    <div class="card deliberate">
+      <span class="tag deliberate"><span class="en">Deliberate</span><span class="es">Deliberado</span></span>
+      <h3><span class="en">LLM outside the decision path</span><span class="es">LLM fuera de la ruta de decisión</span></h3>
+      <p><span class="en">Mode 1 contains no LLM call; the only mentions in its three modules are negative assertions ("el LLM no puede anular este gate"). Leaks were closed with provenance stamps + an authority gate that forces ABSTAIN. "Zero verdict authority" recurs verbatim in five modules.</span>
+      <span class="es">El Modo 1 no contiene ninguna llamada a LLM; las únicas menciones en sus tres módulos son aserciones negativas ("el LLM no puede anular este gate"). Las fugas se cerraron con sellos de procedencia + una puerta de autoridad que fuerza ABSTAIN. "Zero verdict authority" se repite textual en cinco módulos.</span></p>
+    </div>
+    <div class="card deliberate">
+      <span class="tag deliberate"><span class="en">Deliberate</span><span class="es">Deliberado</span></span>
+      <h3><span class="en">An engine cannot seal its own lie</span><span class="es">Un motor no puede sellar su propia mentira</span></h3>
+      <p><span class="en">Sealing lives outside the data classes (<span class="cite">ebs_v1.py:20-36</span>); the third-party verifier is stdlib-only and deliberately outside the package. The tamper-evident log evolved against seven named attacks (A1–A7) plus the later tail-truncation residual, each reproduced before being closed.</span>
+      <span class="es">El sellado vive fuera de las clases de datos (<span class="cite">ebs_v1.py:20-36</span>); el verificador de terceros es stdlib puro y está deliberadamente fuera del paquete. El log tamper-evident evolucionó contra siete ataques nombrados (A1–A7) más el residual de truncamiento de cola, cada uno reproducido antes de cerrarse.</span></p>
+    </div>
+    <div class="card deliberate">
+      <span class="tag deliberate"><span class="en">Deliberate</span><span class="es">Deliberado</span></span>
+      <h3><span class="en">The SUSPICION ceiling</span><span class="es">El techo SUSPICION</span></h3>
+      <p><span class="en">Sealed doctrine (L-067, 2026-07-10, with the maintainer's signature): "whoever controls the disk controls all of those sources at once." Enforced only after a measured 0-flip gate over 291 bundles; it caps downward only, never upgrades.</span>
+      <span class="es">Doctrina sellada (L-067, 2026-07-10, con la firma de la mantenedora): "whoever controls the disk controls all of those sources at once". Aplicada recién tras un gate medido de 0 flips sobre 291 bundles; solo capea hacia abajo, nunca eleva.</span></p>
+    </div>
+    <div class="card deliberate">
+      <span class="tag deliberate"><span class="en">Deliberate</span><span class="es">Deliberado</span></span>
+      <h3><span class="en">Provenance over deletion</span><span class="es">Proveniencia antes que borrado</span></h3>
+      <p><span class="en"><span class="cite">attic/</span> retires files only after zero-reference verification, with per-file justifications and a NOT-moved list. The ledger is append-only and offered as red-team reading. Several fossils survive because audits cite them as evidence.</span>
+      <span class="es"><span class="cite">attic/</span> retira archivos solo tras verificar cero referencias, con justificación por archivo y lista de NO-movidos. El registro es append-only y se ofrece como lectura de red team. Varios fósiles sobreviven porque las auditorías los citan como evidencia.</span></p>
+    </div>
+    <div class="card accident">
+      <span class="tag accident"><span class="en">Accident</span><span class="es">Accidente</span></span>
+      <h3><span class="en">The unfinished flat→package migration</span><span class="es">La migración flat→package inconclusa</span></h3>
+      <p><span class="en">Shims point in both directions; canonical docstrings name a directory (<span class="cite">vigia/engine/</span>) that never existed; the duplicate hierarchy caused the B-097 import-shadowing bug; the Docker healthcheck still imports a module and class that no longer exist (<span class="cite">Dockerfile:83</span>) — failing silently since the migration.</span>
+      <span class="es">Los shims apuntan en ambas direcciones; docstrings canónicos nombran un directorio (<span class="cite">vigia/engine/</span>) que nunca existió; la jerarquía duplicada causó el bug de shadowing B-097; el healthcheck de Docker todavía importa un módulo y una clase que ya no existen (<span class="cite">Dockerfile:83</span>) — fallando en silencio desde la migración.</span></p>
+    </div>
+    <div class="card accident">
+      <span class="tag accident"><span class="en">Accident</span><span class="es">Accidente</span></span>
+      <h3><span class="en">Exit codes numbered by chronology</span><span class="es">Exit codes numerados por cronología</span></h3>
+      <p><span class="en">0/1/2 is the Unix triad of a hackathon literally named FIND EVIL ("0=no evil, 1=evil"); 3, 4, 5 were appended as verdicts entered the vocabulary. Severity order and numeric order diverged permanently (SUSPICION=5 &gt; INTENT=3), and the README documents only 0–3.</span>
+      <span class="es">0/1/2 es la tríada Unix de un hackathon literalmente llamado FIND EVIL ("0=no evil, 1=evil"); 3, 4 y 5 se agregaron a medida que los veredictos entraban al vocabulario. El orden de severidad y el numérico divergieron para siempre (SUSPICION=5 &gt; INTENT=3), y el README documenta solo 0–3.</span></p>
+    </div>
+    <div class="card accident">
+      <span class="tag accident"><span class="en">Accident</span><span class="es">Accidente</span></span>
+      <h3><span class="en">The prec=28 ceremony</span><span class="es">La ceremonia del prec=28</span></h3>
+      <p><span class="en">"prec=28 matches the Directiva 4 requirement" (<span class="cite">caie.py:120</span>) — no document named Directiva 4 survives, and 28 is Python's <em>default</em> Decimal precision. The scorer's own rounding bypasses the Decimal context entirely. Ceremony outliving both its lawgiver and its law.</span>
+      <span class="es">"prec=28 matches the Directiva 4 requirement" (<span class="cite">caie.py:120</span>) — no sobrevive ningún documento llamado Directiva 4, y 28 es la precisión <em>por defecto</em> de Decimal en Python. El redondeo del propio scorer saltea el contexto Decimal por completo. La ceremonia sobrevivió a su legislador y a su ley.</span></p>
+    </div>
+    <div class="card accident">
+      <span class="tag accident"><span class="en">Accident</span><span class="es">Accidente</span></span>
+      <h3><span class="en">Divergent twins</span><span class="es">Gemelos divergentes</span></h3>
+      <p><span class="en">Two <span class="cite">phonetic_dict.json</span> with different content and a consolidating loader whose priority-2 path doesn't exist; two <span class="cite">_sanitize_grep_pattern</span> with different bodies for the same security surface; <span class="cite">initial_templates.sql</span> and its "_v2" — byte-identical. The repo's own census counted 144 duplicated names with divergent bodies.</span>
+      <span class="es">Dos <span class="cite">phonetic_dict.json</span> con contenido distinto y un loader consolidador cuya ruta de prioridad 2 no existe; dos <span class="cite">_sanitize_grep_pattern</span> con cuerpos distintos para la misma superficie de seguridad; <span class="cite">initial_templates.sql</span> y su "_v2" — byte-idénticos. El censo del propio repo contó 144 nombres duplicados con cuerpos divergentes.</span></p>
+    </div>
+  </div>
+
+  <h2><span class="en">4 · Invariants that exist only in tests</span><span class="es">4 · Invariantes que existen solo en los tests</span></h2>
+  <p>
+    <span class="en">After two registry-drift incidents and one suite that silently ran nothing (B-227), the project converted documentation promises into executable contracts. A contributor learns these rules from a red CI run, not from prose:</span>
+    <span class="es">Tras dos incidentes de deriva de registros y una suite que corrió nada en silencio (B-227), el proyecto convirtió promesas documentales en contratos ejecutables. Un contribuidor descubre estas reglas por un CI rojo, no por la prosa:</span>
+  </p>
+  <div class="tablewrap"><table>
+    <thead><tr>
+      <th><span class="en">Invariant</span><span class="es">Invariante</span></th>
+      <th><span class="en">Lives only in</span><span class="es">Vive solo en</span></th>
+    </tr></thead>
+    <tbody>
+      <tr><td><span class="en">ES and EN bug registries must hold the identical B-* set ("a mirror that diverges stops being a mirror")</span><span class="es">Los registros ES y EN deben tener el conjunto B-* idéntico ("un registro espejo que diverge deja de ser espejo")</span></td><td><span class="cite">tests/test_registry_integrity.py:143</span></td></tr>
+      <tr><td><span class="en">Both FastAPI wrapper copies must expose identical protocol — five tests police a copy-paste</span><span class="es">Las dos copias del wrapper FastAPI deben exponer protocolo idéntico — cinco tests vigilan un copy-paste</span></td><td><span class="cite">tests/test_b168_api_contract_parity.py</span></td></tr>
+      <tr><td><span class="en">Every canonicalizer copy — including stdlib verifiers loaded by file path — must encode identically</span><span class="es">Toda copia del canonicalizador — incluidos verificadores stdlib cargados por ruta — debe codificar idéntico</span></td><td><span class="cite">tests/test_canonicalize_lockstep.py</span></td></tr>
+      <tr><td><span class="en">Determinism is asserted as equality between runs, never against a hardcoded score</span><span class="es">El determinismo se afirma como igualdad entre corridas, nunca contra un score hardcodeado</span></td><td><span class="cite">tests/test_determinism_sealed_verdict.py:16</span></td></tr>
+      <tr><td><span class="en">The dependency bound mcp&lt;2 (once held only by an accidental transitive pin) must match the imports</span><span class="es">El límite mcp&lt;2 (antes sostenido solo por un pin transitivo accidental) debe coincidir con los imports</span></td><td><span class="cite">tests/test_mcp_dependency_contract.py</span></td></tr>
+      <tr><td><span class="en">The self-correction documentation must tell the truth about its own dormancy</span><span class="es">La documentación de auto-corrección debe decir la verdad sobre su propia dormancia</span></td><td><span class="cite">tests/test_b224_self_correction_docs_are_honest.py</span></td></tr>
+      <tr><td><span class="en">The scoring pipeline must not import the epistemic kernel (a git grep inside a test)</span><span class="es">La pipeline de scoring no debe importar el kernel epistémico (un git grep dentro de un test)</span></td><td><span class="cite">tests/test_epistemic_kernel.py:443</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2><span class="en">5 · APIs shaped by vanished constraints</span><span class="es">5 · APIs moldeadas por restricciones desaparecidas</span></h2>
+  <ul>
+    <li><span class="en"><b>The 0-token primary mode.</b> By the author's own words: "como no tenía dinero para Claude Code, casi todo VIGIA fue construido para modo fallback o Ollama" (<span class="cite">VIGIA_RESEARCH_REPORT.md:592</span>). Scarcity first; doctrine second; both real.</span>
+    <span class="es"><b>El modo primario de 0 tokens.</b> En palabras de la propia autora: "como no tenía dinero para Claude Code, casi todo VIGIA fue construido para modo fallback o Ollama" (<span class="cite">VIGIA_RESEARCH_REPORT.md:592</span>). Primero la escasez; después la doctrina; ambas reales.</span></li>
+    <li><span class="en"><b>Hackathon rules still in force.</b> CLAUDE.md still mandates a token-usage block "under SANS submission rules" — for a competition that closed in June; the <span class="cite">[FIX DESIGNED]</span> tag encodes the submission-window freeze; the POST HACKATHON prefix outlived the event by two months.</span>
+    <span class="es"><b>Reglas del hackathon todavía vigentes.</b> CLAUDE.md sigue exigiendo un bloque de tokens "under SANS submission rules" — de una competencia que cerró en junio; el tag <span class="cite">[FIX DESIGNED]</span> codifica el freeze de la ventana de entrega; el prefijo POST HACKATHON sobrevivió dos meses al evento.</span></li>
+    <li><span class="en"><b>The Ollama-primary era.</b> The Daubert determinism case was written for "fixed seed for Ollama (42)"; Mode 3 was then demoted on a two-run blind experiment in which the local model hallucinated schema fields (B-111).</span>
+    <span class="es"><b>La era Ollama-primario.</b> El caso de determinismo Daubert se escribió para "fixed seed for Ollama (42)"; el Modo 3 fue degradado después por un experimento ciego de dos corridas en el que el modelo local alucinó campos de schema (B-111).</span></li>
+    <li><span class="en"><b>The Kubernetes incarnation.</b> Root SQL creates containment-action tables (ISOLATE_POD, REVOKE_SA_TOKEN) with a mandatory human HMAC signature and a verdict vocabulary that matches nothing in today's engine; its Python twin has a filename with a dot — unimportable, doubly dead.</span>
+    <span class="es"><b>La encarnación Kubernetes.</b> El SQL de raíz crea tablas de acciones de contención (ISOLATE_POD, REVOKE_SA_TOKEN) con firma HMAC humana obligatoria y un vocabulario de veredictos que no coincide con nada del motor actual; su gemelo Python tiene un punto en el nombre — no importable, doblemente muerto.</span></li>
+  </ul>
+
+  <h2><span class="en">6 · The hypothesis tribunal</span><span class="es">6 · El tribunal de hipótesis</span></h2>
+  <p class="quiet">
+    <span class="en">For each significant pattern: rival historical explanations, the evidence that discriminates, and a verdict in the project's own confidence vocabulary. The obvious explanation was not assumed correct.</span>
+    <span class="es">Para cada patrón significativo: explicaciones históricas rivales, la evidencia que discrimina, y un veredicto en el vocabulario de confianza del propio proyecto. No se asumió correcta la explicación obvia.</span>
+  </p>
+
+  <div class="case">
+    <div class="pid">P1</div>
+    <h3><span class="en">Why is the LLM outside the decision loop?</span><span class="es">¿Por qué el LLM está fuera del loop de decisión?</span></h3>
+    <div class="hyp"><div class="hlabel">H-A</div><div><span class="en">Doctrine-first: Daubert admissibility by design.</span><span class="es">Doctrina primero: admisibilidad Daubert por diseño.</span></div></div>
+    <div class="hyp"><div class="hlabel">H-B</div><div><span class="en">Scarcity-first: no API budget forced an LLM-free build, later elevated to principle.</span><span class="es">Escasez primero: sin presupuesto de API, el build sin LLM se elevó después a principio.</span></div></div>
+    <div class="hyp"><div class="hlabel">H-C</div><div><span class="en">Incident-driven: the boundary hardened in response to real authority leaks.</span><span class="es">Guiado por incidentes: la frontera se endureció respondiendo a fugas reales de autoridad.</span></div></div>
+    <div class="evidence"><span class="en">H-B has a direct quote from the author; H-A has the early theory docs; H-C has the record — B-225 (a JSON field with covert verdict authority), B-124 (verdict-coercion detection) and the confused-deputy scan all post-date the principle by weeks, and the declared backend-swap falsifier is still unimplemented.</span><span class="es">H-B tiene cita directa de la autora; H-A tiene los docs teóricos tempranos; H-C tiene el registro — B-225 (un campo JSON con autoridad encubierta), B-124 (detección de coerción de veredicto) y el escaneo confused-deputy son semanas posteriores al principio, y el falsificador declarado de swap de backend sigue sin implementar.</span></div>
+    <div class="verdict"><span class="vchip">CONFIRMED</span><p><span class="en">All three, at different layers. The principle is early and genuine; the primacy of the 0-token mode is economic in origin; the enforcement was earned incident by incident. The architecture docs narrate the outcome as born whole; the ledger shows it was earned.</span><span class="es">Las tres, en capas distintas. El principio es temprano y genuino; la primacía del modo 0 tokens es de origen económico; el enforcement se ganó incidente a incidente. Los docs narran el resultado como nacido entero; el registro muestra que se ganó.</span></p></div>
+  </div>
+
+  <div class="case">
+    <div class="pid">P2</div>
+    <h3><span class="en">Why exact-arithmetic determinism?</span><span class="es">¿Por qué determinismo de aritmética exacta?</span></h3>
+    <div class="hyp"><div class="hlabel">H-A</div><div><span class="en">A day-one design requirement ("zero floating-point in the critical path").</span><span class="es">Requisito del día uno ("zero floating-point in the critical path").</span></div></div>
+    <div class="hyp"><div class="hlabel">H-B</div><div><span class="en">Retrofitted after concrete nondeterminism incidents; never fully achieved; documentation overclaims.</span><span class="es">Retro-instalado tras incidentes concretos; nunca logrado del todo; la documentación sobre-reclama.</span></div></div>
+    <div class="evidence"><span class="en">The float purge spans two months of ledger entries; the decisive incident is quantified — accumulation order flipped two sealed verdicts at a 5e-5 rounding cliff (<span class="cite">FRACTION_GATE_RECORD_20260712.md</span>); and today the live scorer's <span class="cite">_dround</span> still rounds floats with built-in round(), directly beneath the comment explaining why Decimal was introduced. Only L-073 states the real invariant.</span><span class="es">La purga de floats abarca dos meses de registro; el incidente decisivo está cuantificado — el orden de acumulación dio vuelta dos veredictos sellados en un cliff de 5e-5 (<span class="cite">FRACTION_GATE_RECORD_20260712.md</span>); y hoy el <span class="cite">_dround</span> vivo del scorer sigue redondeando floats con el round() nativo, justo debajo del comentario que explica por qué se introdujo Decimal. Solo L-073 enuncia la invariante real.</span></div>
+    <div class="verdict"><span class="vchip">CONFIRMED · H-B</span><p><span class="en">The determinism that actually holds — bit-identical across runs and platforms — was earned late and incrementally. The README's stronger claim is false as written, contradicted by the project's own L-073.</span><span class="es">El determinismo que efectivamente vale — byte-idéntico entre corridas y plataformas — se ganó tarde e incrementalmente. La afirmación más fuerte del README es falsa tal como está escrita, contradicha por el propio L-073.</span></p></div>
+  </div>
+
+  <div class="case">
+    <div class="pid">P3</div>
+    <h3><span class="en">Why does Mode 1 stop at SUSPICION?</span><span class="es">¿Por qué el Modo 1 se detiene en SUSPICION?</span></h3>
+    <div class="hyp"><div class="hlabel">H-A</div><div><span class="en">Epistemic doctrine: an unattended engine cannot certify independence of sources.</span><span class="es">Doctrina epistémica: un motor sin supervisión no puede certificar independencia de fuentes.</span></div></div>
+    <div class="hyp"><div class="hlabel">H-B</div><div><span class="en">Calibration artifact: the ceiling fell out of the B-068 anti-drowning accuracy fix, rationalized afterward.</span><span class="es">Artefacto de calibración: el techo cayó del fix anti-drowning B-068, racionalizado después.</span></div></div>
+    <div class="evidence"><span class="en">L-067 is sealed doctrine with a signature, enforced only after a measured 0-flip gate (doctrine first, wiring later) — but the corroboration branches landed inside the accuracy-recovery campaign, the scorer never had an INTENT rung to remove, and the agent layer above it still mints INTENT via the L-036 override (<span class="cite">vigia_agent.py:1072</span>).</span><span class="es">L-067 es doctrina sellada con firma, aplicada recién tras un gate medido de 0 flips (doctrina primero, cableado después) — pero las ramas de corroboración aterrizaron dentro de la campaña de accuracy, el scorer nunca tuvo peldaño INTENT que remover, y la capa agente encima todavía acuña INTENT vía el override L-036 (<span class="cite">vigia_agent.py:1072</span>).</span></div>
+    <div class="verdict"><span class="vchip">CONFIRMED · CO-EVOLVED</span><p><span class="en">Real doctrine, applied with unusual discipline — but crystallized during the tuning campaign, and the sealed surface contradicts the "no INTENT" shorthand. The honest statement is L-067's, not CLAUDE.md's.</span><span class="es">Doctrina real, aplicada con disciplina inusual — pero cristalizó durante la campaña de tuning, y la superficie sellada contradice el atajo "no INTENT". La formulación honesta es la de L-067, no la de CLAUDE.md.</span></p></div>
+  </div>
+
+  <div class="case">
+    <div class="pid">P4</div>
+    <h3><span class="en">Why is everything bilingual?</span><span class="es">¿Por qué todo es bilingüe?</span></h3>
+    <div class="hyp"><div class="hlabel">H-A</div><div><span class="en">Market: designed for Spanish-speaking judicial systems.</span><span class="es">Mercado: diseñado para sistemas judiciales hispanohablantes.</span></div></div>
+    <div class="hyp"><div class="hlabel">H-B</div><div><span class="en">Biography + submission: a Rioplatense-Spanish working language, an English-language competition, and a parity test that ratcheted the duplication into law.</span><span class="es">Biografía + entrega: idioma de trabajo rioplatense, competencia en inglés, y un test de paridad que convirtió la duplicación en ley.</span></div></div>
+    <div class="evidence"><span class="en">The parity sentinel became a hard guard only after drift was caught twice; the EN registry was back-filled in bulk ("201 = 201"). But the detection substrate is bilingual by design: Spanish deception regexes, a Grice detector "bilingual EN+ES", cultural neutrality "calibrated for Rioplatense Spanish".</span><span class="es">El centinela de paridad se volvió guarda dura recién tras detectar deriva dos veces; el registro EN se retro-completó en bloque ("201 = 201"). Pero el sustrato de detección es bilingüe por diseño: regexes de engaño en español, detector de Grice "bilingual EN+ES", neutralidad cultural "calibrated for Rioplatense Spanish".</span></div>
+    <div class="verdict"><span class="vchip">CONFIRMED · SPLIT</span><p><span class="en">Two different bilingualisms with two different causes: H-B for the documentation duplication, H-A for the detector itself.</span><span class="es">Dos bilingüismos distintos con dos causas distintas: H-B para la duplicación documental, H-A para el detector.</span></p></div>
+  </div>
+
+  <div class="case">
+    <div class="pid">P5</div>
+    <h3><span class="en">Why does git history start on 2026-07-21 with three roots?</span><span class="es">¿Por qué la historia git empieza el 2026-07-21 con tres raíces?</span></h3>
+    <div class="hyp"><div class="hlabel">H-A</div><div><span class="en">Deliberate history scrub.</span><span class="es">Limpieza deliberada de historia.</span></div></div>
+    <div class="hyp"><div class="hlabel">H-B</div><div><span class="en">Workflow artifact: parallel lines (local machine + snapshot-seeded remote agent sessions) merged without common ancestry.</span><span class="es">Artefacto de workflow: líneas paralelas (máquina local + sesiones remotas sembradas por snapshots) fusionadas sin ancestro común.</span></div></div>
+    <div class="evidence"><span class="en">The three roots are near-identical full-tree snapshots; house rules forbid history rewriting; the orphaned hashes were left in the documents; and the project complains about its own resets (the fossil hunt calls the squash an obstacle; B-145 had to un-shallow a clone). Nothing supports a motive for H-A.</span><span class="es">Las tres raíces son snapshots casi idénticos de árbol completo; las reglas de la casa prohíben reescribir historia; los hashes huérfanos quedaron en los documentos; y el proyecto se queja de sus propios reinicios (la cacería llama obstáculo al squash; B-145 tuvo que des-shallowear un clon). Nada sostiene un motivo para H-A.</span></div>
+    <div class="verdict"><span class="vchip">CONFIRMED · H-B</span><p><span class="en">The resets were tooling events the project experienced as losses. Ironic footnote: its own threat literature treats git-history scrubbing as an Indicator of Intent; its own gaps are the benign twin of that signal — a live lesson in its own Refutation Protocol.</span><span class="es">Los reinicios fueron eventos de tooling vividos como pérdidas. Nota irónica: su propia literatura de amenazas trata el scrubbing de historia git como Indicador de Intencionalidad; sus propios huecos son el gemelo benigno de esa señal — una lección viva de su propio Protocolo de Refutación.</span></p></div>
+  </div>
+
+  <div class="case">
+    <div class="pid">P6</div>
+    <h3><span class="en">Why do two FastAPI wrapper copies survive, guarded by five parity tests?</span><span class="es">¿Por qué sobreviven dos copias del wrapper FastAPI, custodiadas por cinco tests de paridad?</span></h3>
+    <div class="hyp"><div class="hlabel">H-A</div><div><span class="en">Deliberate redundancy: two import paths as a supported contract.</span><span class="es">Redundancia deliberada: dos rutas de import como contrato soportado.</span></div></div>
+    <div class="hyp"><div class="hlabel">H-B</div><div><span class="en">A frozen accident: deleting was riskier than fencing, under the "no unrequested improvement" doctrine.</span><span class="es">Accidente congelado: borrar era más riesgoso que cercar, bajo la doctrina de "no unrequested improvement".</span></div></div>
+    <div class="evidence"><span class="en">The twins still differ — the root copy carries two security improvements the package copy lacks (the 404-oracle fix) — which true contract parity would have propagated. A deliberate two-path contract would use one source and a re-export shim, the pattern this same repo applies elsewhere.</span><span class="es">Los gemelos todavía difieren — la copia de raíz lleva dos mejoras de seguridad que a la del paquete le faltan (el fix del oráculo 404) — algo que una paridad de contrato verdadera habría propagado. Un contrato deliberado de dos rutas usaría una fuente y un shim de re-export, el patrón que este mismo repo aplica en otros lados.</span></div>
+    <div class="verdict"><span class="vchip">CONFIRMED BY INDUCTION · H-B</span><p><span class="en">An accident promoted to a test-guarded invariant; the surviving behavioral drift is the discriminator.</span><span class="es">Un accidente promovido a invariante custodiada por tests; la deriva de comportamiento sobreviviente es el discriminador.</span></p></div>
+  </div>
+
+  <div class="case">
+    <div class="pid">P7</div>
+    <h3><span class="en">Why is caie_legacy_root.py still at the repository root?</span><span class="es">¿Por qué caie_legacy_root.py sigue en la raíz del repositorio?</span></h3>
+    <div class="hyp"><div class="hlabel">H-A</div><div><span class="en">Hyrum compatibility: something might still import it.</span><span class="es">Compatibilidad Hyrum: algo podría importarlo todavía.</span></div></div>
+    <div class="hyp"><div class="hlabel">H-B</div><div><span class="en">Provenance: the historical record cites it; deletion would orphan the audit trail.</span><span class="es">Proveniencia: el registro histórico lo cita; borrarlo dejaría huérfano el audit trail.</span></div></div>
+    <div class="evidence"><span class="en">Zero importers (grep-verified by the project's own audit); the one latent import fallback names plain "caie", not this file. Meanwhile the ledger cites <span class="cite">caie_legacy_root.py:1464</span> as the site of the original B-001 bug — the file preserves the bug as evidence — and the engine attestation excludes it deliberately in two places with matching comments.</span><span class="es">Cero importadores (verificado por grep por la propia auditoría del proyecto); el único fallback latente nombra "caie" plano, no este archivo. Mientras tanto, el registro cita <span class="cite">caie_legacy_root.py:1464</span> como el sitio del bug B-001 original — el archivo preserva el bug como evidencia — y la atestación del motor lo excluye deliberadamente en dos lugares con comentarios idénticos.</span></div>
+    <div class="verdict"><span class="vchip">CONFIRMED · H-B</span><p><span class="en">A museum specimen with a catalog number, not a compatibility shim.</span><span class="es">Una pieza de museo con número de catálogo, no un shim de compatibilidad.</span></p></div>
+  </div>
+
+  <div class="case">
+    <div class="pid">P8</div>
+    <h3><span class="en">Why five deployment modes and five entry-point generations?</span><span class="es">¿Por qué cinco modos de despliegue y cinco generaciones de entry points?</span></h3>
+    <div class="hyp"><div class="hlabel">H-A</div><div><span class="en">Product design: deliberate deployment tiers.</span><span class="es">Diseño de producto: niveles de despliegue deliberados.</span></div></div>
+    <div class="hyp"><div class="hlabel">H-B</div><div><span class="en">Accretion under deadline and multi-model authorship, catalogued after the fact.</span><span class="es">Acreción bajo deadline y autoría multi-modelo, catalogada a posteriori.</span></div></div>
+    <div class="evidence"><span class="en">The project answers this itself: "built by one person … under a tight deadline. As a result it has more than one way to run an analysis and seal a result … We're not hiding the duplication — a project that's honest about how it grew is more useful to learn from than one that pretends it arrived fully formed" (<span class="cite">docs/EXECUTION_MODES.md</span>). The physical evidence agrees: two unreconciled sealing schemas, a healthcheck broken since the layout migration, a launcher hardcoded to the author's home directory.</span><span class="es">El proyecto se responde solo: "built by one person … under a tight deadline. As a result it has more than one way to run an analysis and seal a result … We're not hiding the duplication — a project that's honest about how it grew is more useful to learn from than one that pretends it arrived fully formed" (<span class="cite">docs/EXECUTION_MODES.md</span>). La evidencia física coincide: dos esquemas de sellado sin reconciliar, un healthcheck roto desde la migración, un launcher hardcodeado al home de la autora.</span></div>
+    <div class="verdict"><span class="vchip">CONFIRMED · BY CONFESSION</span><p><span class="en">The five-mode table in the README is descriptive taxonomy, not design intent.</span><span class="es">La tabla de cinco modos del README es taxonomía descriptiva, no intención de diseño.</span></p></div>
+  </div>
+
+  <h2><span class="en">7 · Findings not acted on</span><span class="es">7 · Hallazgos no accionados</span></h2>
+  <p class="quiet">
+    <span class="en">Reported per the house rule: findings are claims for the maintainer, not silent patches.</span>
+    <span class="es">Reportados según la regla de la casa: los hallazgos son afirmaciones para la mantenedora, no parches silenciosos.</span>
+  </p>
+  <ol class="findings">
+    <li><span class="en"><span class="cite">README.md:78</span> and CLAUDE.md Invariant 4 overclaim "zero floating-point in the critical path"; the live scorer rounds floats with built-in round(). L-073 states the correct invariant.</span><span class="es"><span class="cite">README.md:78</span> y la Invariante 4 de CLAUDE.md sobre-reclaman "zero floating-point in the critical path"; el scorer vivo redondea floats con round() nativo. L-073 enuncia la invariante correcta.</span></li>
+    <li><span class="en"><span class="cite">CLAUDE.md:320</span> ("no INTENT rung in Mode 1") is true of the motor, misleading for the sealed surface: L-036 mints INTENT at the agent layer, exit code 3.</span><span class="es"><span class="cite">CLAUDE.md:320</span> ("no INTENT rung in Mode 1") es cierto para el motor, engañoso para la superficie sellada: L-036 acuña INTENT en la capa agente, exit code 3.</span></li>
+    <li><span class="en"><span class="cite">README.md:57</span> documents exit codes 0–3 only; 4 (ABSTAIN) and 5 (SUSPICION, B-097) are missing. <span class="cite">KNOWN_LIMITATIONS.md:2222</span> still says SUSPICION shares code 3.</span><span class="es"><span class="cite">README.md:57</span> documenta solo los exit codes 0–3; faltan el 4 (ABSTAIN) y el 5 (SUSPICION, B-097). <span class="cite">KNOWN_LIMITATIONS.md:2222</span> todavía dice que SUSPICION comparte el código 3.</span></li>
+    <li><span class="en">The <span class="cite">Dockerfile:83</span> healthcheck imports a nonexistent module and class — failing since the flat→package migration.</span><span class="es">El healthcheck de <span class="cite">Dockerfile:83</span> importa un módulo y una clase inexistentes — falla desde la migración flat→package.</span></li>
+    <li><span class="en"><span class="cite">vigia/tools/document_integrity.py:54</span> reads a path that does not exist; the two phonetic dictionaries have divergent content.</span><span class="es"><span class="cite">vigia/tools/document_integrity.py:54</span> lee una ruta que no existe; los dos diccionarios fonéticos tienen contenido divergente.</span></li>
+    <li><span class="en">Zero git tags on the remote despite the mandated pre-session restore tags — unpracticed, or local-only (indiscriminable from a clone).</span><span class="es">Cero git tags en el remoto pese a los tags de restauración pre-sesión mandatorios — no se practica, o son solo locales (indiscriminable desde un clon).</span></li>
+    <li><span class="en">The architecture's flagship falsifier — the narrator backend-swap test declared in ENGINEERING_DISCIPLINE §5.1 — has no implementation.</span><span class="es">El falsificador insignia de la arquitectura — el test de swap de backend del narrador declarado en ENGINEERING_DISCIPLINE §5.1 — no tiene implementación.</span></li>
+    <li><span class="en">Nine zero-reference cleanup candidates (each still owed its own discriminating experiment before deletion), headed by the byte-identical <span class="cite">initial_templates_v2.sql</span> and the unimportable <span class="cite">recommendation_engine_v3.1.py</span>.</span><span class="es">Nueve candidatos a limpieza con cero referencias (cada uno debe su propio experimento discriminante antes de borrarse), encabezados por el byte-idéntico <span class="cite">initial_templates_v2.sql</span> y el no-importable <span class="cite">recommendation_engine_v3.1.py</span>.</span></li>
+  </ol>
+
+  <div class="footer">
+    <p>
+      <span class="en"><b>Method &amp; limitations.</b> Three parallel excavation sweeps (verdict path, fossils, historical narrative); highest-impact claims re-verified against live files; no code executed; "dead" statuses rest on reference analysis plus the project's own zero-reference audits. Pre-2026-07-21 chronology rests on the project's documents, which were partially back-filled. Full report: <span class="cite">docs/REPOSITORY_ARCHAEOLOGY.md</span> · <span class="cite">docs/REPOSITORY_ARCHAEOLOGY_ES.md</span>.</span>
+      <span class="es"><b>Método y limitaciones.</b> Tres barridos de excavación en paralelo (ruta del veredicto, fósiles, narrativa histórica); las afirmaciones de mayor impacto se re-verificaron contra archivos vivos; no se ejecutó código; los estados "muerto" descansan en análisis de referencias más las propias auditorías de cero referencias del proyecto. La cronología pre-2026-07-21 descansa en los documentos del proyecto, parcialmente retro-completados. Informe completo: <span class="cite">docs/REPOSITORY_ARCHAEOLOGY_ES.md</span> · <span class="cite">docs/REPOSITORY_ARCHAEOLOGY.md</span>.</span>
+    </p>
+    <p>
+      <span class="en">Prepared read-only on branch <span class="cite">claude/archaeologist-architecture-analysis-r48jxg</span>. No product code was modified.</span>
+      <span class="es">Preparado en solo lectura en la rama <span class="cite">claude/archaeologist-architecture-analysis-r48jxg</span>. No se modificó código de producto.</span>
+    </p>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById("langBtn");
+    var stored = null;
+    try { stored = localStorage.getItem("vigia_arch_lang"); } catch (e) { /* private mode etc. */ }
+    var lang = stored === "es" || stored === "en" ? stored :
+      ((navigator.language || "").toLowerCase().indexOf("es") === 0 ? "es" : "en");
+    function apply(l) {
+      document.body.classList.toggle("lang-es", l === "es");
+      document.documentElement.lang = l;
+      btn.textContent = l === "es" ? "EN" : "ES";
+      btn.setAttribute("aria-pressed", l === "es" ? "true" : "false");
+      try { localStorage.setItem("vigia_arch_lang", l); } catch (e) { /* ignore */ }
+    }
+    btn.addEventListener("click", function () {
+      apply(document.body.classList.contains("lang-es") ? "en" : "es");
+    });
+    apply(lang);
+  })();
+</script>
+</body>
+</html>
