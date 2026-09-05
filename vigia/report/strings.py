@@ -29,6 +29,7 @@ _EN: dict[str, str] = {
     "header.source_sha256": "Source SHA-256",
     "header.report_version": "Report layout version",
     "header.audience": "Audience",
+    "header.col_value": "Value",
     "audience.junior": "junior SOC analyst",
     "audience.expert": "expert forensic examiner",
     "header.disclaimer": (
@@ -286,6 +287,11 @@ _EN: dict[str, str] = {
         "Thirdness: what repeatable, deliberate pattern would produce it."
     ),
     "junior.s5.narrative_label": "Sealed narrative (verbatim)",
+    "junior.s5.gates_title": "Corrections recorded before the verdict was sealed",
+    "junior.s5.gates_intro": (
+        "A candidate verdict that a gate rejected never became the verdict. This is "
+        "the system correcting itself before emission, not a contradiction."
+    ),
     "junior.s5.summary_label": "Investigator's executive summary (verbatim)",
     "signals.col_artifact": "Artifact",
     "signals.col_type": "Evidence type",
@@ -459,6 +465,7 @@ _ES: dict[str, str] = {
     "header.source_sha256": "SHA-256 de origen",
     "header.report_version": "Versión del formato de reporte",
     "header.audience": "Audiencia",
+    "header.col_value": "Valor",
     "audience.junior": "analista SOC junior",
     "audience.expert": "perito forense experto",
     "header.disclaimer": (
@@ -718,6 +725,11 @@ _ES: dict[str, str] = {
         "Thirdness: qué patrón repetible y deliberado la produciría."
     ),
     "junior.s5.narrative_label": "Narrativa sellada (tal cual)",
+    "junior.s5.gates_title": "Correcciones registradas antes de sellar el veredicto",
+    "junior.s5.gates_intro": (
+        "Un veredicto candidato que un gate rechazó nunca llegó a ser el veredicto. "
+        "Es el sistema corrigiéndose antes de emitir, no una contradicción."
+    ),
     "junior.s5.summary_label": "Resumen ejecutivo del investigador (tal cual)",
     "signals.col_artifact": "Artefacto",
     "signals.col_type": "Tipo de evidencia",

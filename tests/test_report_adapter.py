@@ -53,7 +53,7 @@ def make_mcp_doc_kiwi():
              "confidence": "MEDIUM", "status": "INFERRED",
              "firstness": "a", "secondness": "b", "thirdness": "c",
              "mitre_ttps": ["T1585.001 (Establish Accounts)"],
-             "devil_advocate": "witnesses may share vocabulary naturally",
+             "devil_advocate": "witnesses who discussed the case can share vocabulary",
              "artifacts": ["A01"], "tools_used": ["analyze_stylometry"]},
         ],
         "refutation_gate_log": {
@@ -203,7 +203,7 @@ def test_verdict_entries_agent_keeps_both_fields():
 
 def test_devil_advocate_entries_pointers():
     assert adapter.devil_advocate_entries(load_view(_bytes(make_mcp_doc_kiwi()))) == [
-        ("/findings/0/devil_advocate", "witnesses may share vocabulary naturally"),
+        ("/findings/0/devil_advocate", "witnesses who discussed the case can share vocabulary"),
     ]
     assert adapter.devil_advocate_entries(load_view(_bytes(make_ebs_doc()))) == []
 
