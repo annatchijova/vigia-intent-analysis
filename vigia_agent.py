@@ -2136,6 +2136,35 @@ def _validate_agent_output_path(
     return str(resolved)
 
 
+def _write_audience_reports(bundle_path: str, audience: str, lang: str) -> list:
+    """Write junior/expert Markdown presentations next to an already-sealed bundle.
+
+    Viewer only (vigia/report): reads the bundle file that is already on disk,
+    computes nothing, and writes ``<stem>_report_<audience>_<lang>.md`` siblings
+    through the evidence-boundary writer. The kill switch
+    ``VIGIA_AUDIENCE_REPORTS_ENABLED=false`` skips the step with one log line.
+    Fail-soft: any error is logged and swallowed — the sealed bundle, its
+    ``.sha256`` sidecar and the reasoning trace are already written and must
+    not be discarded because a presentation failed. Returns the written paths
+    (empty on skip or failure).
+    """
+    if os.environ.get("VIGIA_AUDIENCE_REPORTS_ENABLED", "true").strip().lower() != "true":
+        logger.info("[REPORT] audience reports disabled (VIGIA_AUDIENCE_REPORTS_ENABLED=false)")
+        return []
+    try:
+        from vigia.report import AUDIENCES, LANGS
+        from vigia.report.writer import write_all
+        audiences = AUDIENCES if audience == "all" else (audience,)
+        langs = LANGS if lang == "all" else (lang,)
+        written = write_all(bundle_path, audiences, langs)
+        for _p in written:
+            logger.info("[REPORT] audience report: %s", _p)
+        return written
+    except Exception as _rep_err:  # noqa: BLE001 — non-critical, fail-soft
+        logger.warning("[REPORT] audience reports not written (non-fatal): %s", _rep_err)
+        return []
+
+
 def main() -> None:
     _warn_missing_critical_deps()
     parser = argparse.ArgumentParser(
@@ -2195,6 +2224,21 @@ Exit codes:
     parser.add_argument(
         "--examiner-id", default=None,
         help="Identity of the forensic examiner who acquired the evidence."
+    )
+    # Audience reports (vigia/report): Markdown presentations of the sealed
+    # verdict written as SIBLINGS of the bundle, after the bundle and its
+    # .sha256 sidecar. Opt-in so no existing output changes; a viewer, never
+    # part of the seal. `python3 -m vigia.report <bundle>` renders the same
+    # files from any already-sealed bundle.
+    parser.add_argument(
+        "--audience", default="none", choices=["none", "junior", "expert", "all"],
+        help="Also write <stem>_report_<audience>_<lang>.md next to the bundle: "
+             "junior (SOC analyst), expert (forensic examiner), all, or none (default)."
+    )
+    parser.add_argument(
+        "--audience-lang", default="all", choices=["en", "es", "all"],
+        help="Language(s) of the audience reports (default: all). Sealed values are "
+             "quoted verbatim in either language."
     )
     args = parser.parse_args()
 
@@ -2320,6 +2364,12 @@ Exit codes:
                         str(_trace_dict.get("chain_tip_sha256", ""))[:16])
         except Exception as _trace_err:  # noqa: BLE001 — non-critical, fail-soft
             logger.warning("[TRACE] reasoning trace not written (non-fatal): %s", _trace_err)
+
+    # Audience reports: presentation siblings, written LAST so a failure here
+    # can never affect the bundle, its sidecar or the reasoning trace already on
+    # disk. Same fail-soft contract as the trace (§5.3).
+    if not args.audit_only and args.audience != "none":
+        _write_audience_reports(output_path, args.audience, args.audience_lang)
 
     # Console summary
     abduction = bundle.get("pipeline_results", {}).get("abduction", {})
