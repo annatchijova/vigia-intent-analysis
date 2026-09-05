@@ -921,6 +921,7 @@ example (N=1/2) lives in "Accuracy by Mode", not here.*
 | L-071 | Cross-domain gate counts domain presence, not mass (1 near-zero artifact pivots SUSPICION→MALICE) | vigia_scorer.py B-068 gate | [OPEN] — calibration doctrine; refinement of the B-092 residual |
 | L-072 | `semantic_role` declared label neutralizes MALICE (37/52 corpus cases, label alone) | vigia_scorer.py D1 block | [OPEN] — doctrine; extends L-054, sibling of L-065/L-070 |
 | L-073 | Threshold compares `_dround` float vs `Fraction`; exact grid point grants higher rung | vigia_scorer.py verdict ladder | [OPEN] — latent, zero corpus incidence |
+| L-074 | Audience reports render sealed fields verbatim and cannot fill gaps a family does not record | vigia/report/ (presentation layer) | DOCUMENTED — by design, not a defect |
 | L-067 | §9.4-LIM: SUSPICION doctrinal ceiling for D3-only macOS/mobile (sealed 2026-07-10; renumbered from second L-051 on 2026-07-23) | sift_orchestrator.py verdict_ceiling | Sealed doctrine |
 | L-051 | Formal specification of arbitration contract (Axiom A1) — renumbered from shared L-029 | Scoring/CAIE precedence | [OPEN] — design gap, not a bug |
 | L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
@@ -3541,3 +3542,54 @@ fails silent in a module that uses both `Fraction` and `Decimal`.
 "≥ next grid step" so the emitted rule matches the emitted verdict.
 
 ---
+
+## L-074 — Audience reports render sealed fields verbatim and cannot fill gaps a family does not record [DOCUMENTED]
+
+**Affects:** `vigia/report/` (junior / expert Markdown presentations, EN + ES), the
+`vigia_agent.py --audience` hook, `docs/training/examples/` |
+**Status:** DOCUMENTED 2026-09-05 — by design. This is a presentation layer with
+zero verdict authority; the limitations below are what it inherits from the
+bundle it reads, not defects it could fix without inventing content.
+**Severity:** Informational — no verdict-path impact by construction
+(`tests/test_report_not_in_verdict_path.py` enforces that no sealed module imports it).
+
+**Description:** `python3 -m vigia.report <bundle>` (or `vigia_agent.py --audience`)
+renders any of the three bundle families into a junior-SOC and an expert
+presentation. Every value is copied verbatim through
+`vigia.ui.normalizer` + `vigia.report.adapter`; nothing is computed, rounded,
+reconciled or translated. Consequently:
+
+- **Family gaps stay gaps.** Agent bundles carry no per-signal Peircean triad, no
+  per-signal verdict and no declared TTP field; MCP bundles carry no granular
+  `audit_trail` (L-020); EBS v1 bundles carry no findings list. The report prints
+  "not present in this bundle" and never substitutes text from another source.
+- **Hashes are not comparable across families** (L-030, L-031). The expert view
+  prints each family's own custody anchors and says which ones the family does not
+  define. It does not attempt to derive one from another.
+- **Sealed floats are printed as sealed.** EBS v1 `decision_trace` holds floats
+  (L-021, L-073). The report shows the JSON literal, never a rounded or converted
+  value, so the reader sees the same anomaly the verifier sees.
+- **A verdict-bearing disagreement is shown, not resolved.** When an EBS v1 bundle
+  carries `decision_trace.decision` and `caie_analysis.verdict` with different
+  values, both appear with a `verdict_disagreement` notice.
+- **INTENT/MALICE without `devil_advocate`** is flagged as a GAP (L-022) and the
+  verdict is left untouched. The report cannot supply the missing refutation.
+- **MITRE coverage is the local dictionary** (`vigia/tools/mitre_mapping.py`,
+  27 techniques, ATT&CK v14.1). Ids outside it get a URL derived from the id and are
+  labeled as such; no name or description is invented.
+- **Quoted prose keeps its sealed language.** Agent narratives are Spanish/English
+  mixed; Mode 2 findings are in whatever language the investigator wrote. An
+  English report may therefore quote Spanish text verbatim. That is the record.
+- **"Next steps" are generic SOC guidance per rung**, stated as such. They are not
+  derived from the bundle and carry no case-specific authority.
+- **Worked examples are pinned** (`tests/test_training_worked_examples_pinned.py`).
+  A wording change in the renderer requires regenerating and committing them; the
+  diff is the review artifact.
+
+**Not a determinism concern:** rendering is a pure function of the bundle bytes
+(no clock, no randomness, no environment-dependent strings); byte identity across
+fresh interpreters with different `PYTHONHASHSEED`, locale and timezone is tested.
+
+**Kill switch:** `VIGIA_AUDIENCE_REPORTS_ENABLED=false` disables the agent hook. It
+is deliberately **not** registered in `vigia/core/config_sentinel.py`: that map
+feeds a sealed integrity report, and a presentation flag must not be able to move it.

@@ -48,6 +48,10 @@ python3 vigia_agent.py --evidence data/cases/converted/VIGIA-REAL-VANKO.json \
 
 # Verify a sealed bundle independently (stdlib only, no VIGÍA code required)
 python3 forensics/verify_ebs_v1.py results/srl2018/VIGIA-REAL-SRL-DMZ-FTP_bundle.json --verbose
+
+# Explain a sealed bundle for a SOC analyst or an expert, in English or Spanish
+# (viewer only: values verbatim, nothing computed, written beside the bundle)
+python3 -m vigia.report results/vanko_bundle.json --audience junior --lang es --stdout
 ```
 
 A local, fully offline web dashboard (bundle browser, verification panel,
@@ -127,6 +131,9 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 - [`EXECUTION_MODES.md`](./docs/EXECUTION_MODES.md) — map of every way to run an analysis
 - [`CLAUDE.md`](./CLAUDE.md) — Claude Code / MCP investigation playbook (22 tools)
 - [Command reference](https://annatchijova.github.io/vigia/vigia_commands_en.html) — all modes, copy-paste examples
+
+**Training**
+- [`docs/training/`](./docs/training/README.md) — how to read a verdict as a junior SOC analyst ([EN](./docs/training/JUNIOR_GUIDE.md) · [ES](./docs/training/JUNIOR_GUIDE_ES.md)) or review a sealed bundle as an expert ([EN](./docs/training/EXPERT_GUIDE.md) · [ES](./docs/training/EXPERT_GUIDE_ES.md)), with renderer-generated worked examples
 
 **Cases & examples**
 - [`docs/PROMPTS_REALCASES_CLAUDE.md`](./docs/PROMPTS_REALCASES_CLAUDE.md) — copy-paste prompts to run full investigations

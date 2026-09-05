@@ -57,6 +57,20 @@ shows both with a disagreement banner. As a launcher it starts Mode 1
 files. Unrecognized documents are listed honestly as `unknown` and render
 raw only.
 
+## Audience reports are a viewer, not a fourth family
+
+`vigia/report/` (`python3 -m vigia.report <bundle>`, or `vigia_agent.py --audience`)
+renders any of the three families into two Markdown presentations, for a
+junior SOC analyst and for an expert examiner, in English and Spanish. It
+sits on the same normalizer as the web UI and follows the same rule: every
+verdict-bearing field is copied verbatim, a disagreement is shown rather than
+reconciled, missing fields are listed as gaps, and sealed tokens are never
+translated. The reports are written as siblings
+(`<stem>_report_<audience>_<lang>.md`), never inside a bundle: all three
+families hash their whole payload, so a presentation inside the seal would
+change it. No timestamp is written, so the same bundle bytes always produce
+the same report bytes. See `docs/training/` and KNOWN_LIMITATIONS L-074.
+
 ## Open invitation
 
 If you want a concrete, well-scoped contribution: confirm whether any
