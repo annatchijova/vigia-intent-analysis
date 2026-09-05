@@ -285,3 +285,48 @@ def test_normalize_never_computes_a_verdict():
             assert v["verdict"] in raw, (
                 f"verdict {v['verdict']!r} not present verbatim in the raw bundle"
             )
+
+
+# ---------------------------------------------------------------------------
+# MCP field-name tolerance: KIWI-series bundles (final_verdict, bundle_sha256)
+# ---------------------------------------------------------------------------
+
+def make_mcp_doc_kiwi():
+    """KIWI style: final_verdict instead of overall_verdict, top-level
+    bundle_sha256 / primary_evidence_sha256 / timestamp_sealed / sans_phase."""
+    return {
+        "case_id": "CASE-KIWI",
+        "final_verdict": "SUSPICION",
+        "timestamp_sealed": "2026-06-20T10:00:00Z",
+        "primary_evidence_sha256": "11" * 32,
+        "bundle_sha256": "22" * 32,
+        "sans_phase": "Phase 5 — Lessons Learned",
+        "executive_summary": "resumen",
+        "findings": [
+            {"finding_id": "F-001", "title": "t", "verdict": "SUSPICION",
+             "confidence": "MEDIUM", "status": "INFERRED",
+             "firstness": "a", "secondness": "b", "thirdness": "c"},
+        ],
+        "tool_execution_log": [],
+    }
+
+
+def test_detect_mcp_final_verdict_variant():
+    assert detect_schema(make_mcp_doc_kiwi()) == SCHEMA_MCP
+    # still two markers: a lone final_verdict must not classify
+    assert detect_schema({"final_verdict": "NOISE"}) == SCHEMA_UNKNOWN
+
+
+def test_normalize_mcp_final_verdict_read_verbatim_with_custody_anchors():
+    norm = normalize(make_mcp_doc_kiwi())
+    assert norm["schema"] == SCHEMA_MCP
+    assert [(v["source"], v["verdict"], v["raw_pointer"]) for v in norm["verdicts"]] == [
+        ("final_verdict", "SUSPICION", "/final_verdict"),
+    ]
+    assert norm["sealed_at"] == "2026-06-20T10:00:00Z"
+    assert norm["integrity"]["bundle_sha256"] == "22" * 32
+    assert norm["integrity"]["primary_evidence_sha256"] == "11" * 32
+    assert norm["extra"]["sans_phase"] == "Phase 5 — Lessons Learned"
+    assert norm["extra"]["executive_summary"] == "resumen"
+    assert not any("overall_verdict" in w for w in norm["warnings"])
+    assert not any("timestamp" in w for w in norm["warnings"])

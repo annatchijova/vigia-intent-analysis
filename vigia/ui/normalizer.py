@@ -112,8 +112,11 @@ def detect_schema(doc: Any) -> str:
     ):
         return SCHEMA_AGENT_AUDIT
 
+    # Field names vary within the MCP family: the KIWI-series bundles sealed
+    # the top-level verdict as ``final_verdict`` instead of ``overall_verdict``.
     if ("findings" in doc or "tool_execution_log" in doc) and (
         "overall_verdict" in doc
+        or "final_verdict" in doc
         or "refutation_gate_log" in doc
         or "mitre_ttps_aggregate" in doc
     ):
@@ -337,8 +340,17 @@ def _normalize_mcp(doc: dict, warnings: list) -> dict:
             confidence=doc.get("overall_confidence"),
             raw_pointer="/overall_verdict",
         ))
+    elif "final_verdict" in doc:
+        # KIWI-series field name for the same sealed value. Copied verbatim,
+        # same as overall_verdict — the name differs, the rule does not.
+        verdicts.append(_verdict_entry(
+            "final_verdict",
+            doc.get("final_verdict"),
+            confidence=doc.get("overall_confidence"),
+            raw_pointer="/final_verdict",
+        ))
     else:
-        warnings.append("missing field: overall_verdict")
+        warnings.append("missing field: overall_verdict (also looked for final_verdict)")
 
     tool_log = doc.get("tool_execution_log") or []
     chain_version = None
@@ -347,7 +359,8 @@ def _normalize_mcp(doc: dict, warnings: list) -> dict:
 
     integrity = doc.get("integrity") or {}
     ts = _first_key(
-        doc, ("analysis_timestamp", "investigation_timestamp", "report_generated"),
+        doc, ("analysis_timestamp", "investigation_timestamp", "report_generated",
+              "timestamp_sealed", "sealed_at"),
         warnings, "timestamp",
     )
 
@@ -367,9 +380,15 @@ def _normalize_mcp(doc: dict, warnings: list) -> dict:
         "integrity": {
             "bundle_hash": integrity.get("bundle_hash"),
             "evidence_hash": doc.get("evidence_hash"),
+            # KIWI-series names for the same two custody anchors. Absent keys
+            # stay None — the viewer shows a gap, never a substitute.
+            "bundle_sha256": doc.get("bundle_sha256"),
+            "primary_evidence_sha256": doc.get("primary_evidence_sha256"),
         },
         "extra": decode_fractions({
             "verdict_rationale": doc.get("verdict_rationale"),
+            "executive_summary": doc.get("executive_summary"),
+            "sans_phase": doc.get("sans_phase"),
             "mitre_ttps_aggregate": doc.get("mitre_ttps_aggregate"),
             "refutation_gate_log": doc.get("refutation_gate_log"),
             "known_limitations": doc.get("known_limitations"),
