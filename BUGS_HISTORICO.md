@@ -12,6 +12,95 @@ Formato: un bloque por bug, con su impacto forense y el fix aplicado.
 
 ---
 
+## B-240 — El JobRunner terminaba un pid y no un árbol: las herramientas SIFT sobrevivían al "process terminated"
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P2 — procesos huérfanos sobre la evidencia tras timeout o apagado |
+| **Archivo** | `vigia/ui/jobs.py` |
+| **Detectado en** | Red Team Round 11, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND11_PROCESS_TREE.md` (R11-1) |
+
+### Descripción
+
+`jobs.py` lanza el agente con `start_new_session=True`, que lo hace líder de su
+propia sesión y grupo de procesos — mecanismo que existe precisamente para
+poder señalar al árbol entero sin tocar al servidor. Pero `_kill` (timeout) y
+`shutdown` llamaban `proc.terminate()`, que señala **un** pid.
+
+Alcance verificado por cadena de imports: `vigia_agent.py` → `sift_orchestrator`
+→ `memory_forensics`, `pcap_parser`, `registry_timeline_reconstructor`, que
+corren volatility3, tshark y regripper como subprocesos. Sobre una imagen de
+memoria, minutos u horas.
+
+Medido con el `JobRunner` real y un agente de prueba con una herramienta de 300s:
+pre-fix, la herramienta sobrevive tanto al timeout del job como al shutdown del
+servidor; post-fix, no.
+
+### Fix aplicado
+
+`_signal_process_tree(proc, sig)` resuelve el pgid y señala al grupo. Lo que lo
+hace seguro es `start_new_session=True`: el helper **compara contra
+`os.getpgid(0)`** y cae a señalar el pid si el hijo comparte grupo con el
+servidor. El alcance efectivo se escribe en el log del job.
+
+### Nota sobre el oráculo
+
+La primera medición dio un falso *"también sobrevive a killpg"*, que habría
+llevado a descartar el fix correcto. La causa era el oráculo: **`os.kill(pid, 0)`
+tiene éxito sobre un zombie**. El oráculo correcto lee `/proc/<pid>/stat` y
+descarta `'Z'`. Queda fijado por test.
+
+---
+
+## B-241 — Un solo timeout dejaba el lanzador Modo 1 de la web UI inutilizable hasta reiniciar el servidor
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P1 — denegación del lanzador sin atacante, por operación normal |
+| **Archivo** | `vigia/ui/jobs.py` |
+| **Detectado en** | Red Team Round 11, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND11_PROCESS_TREE.md` (R11-2) |
+
+### Descripción
+
+Consecuencia de B-240 que la medición destapó y la lectura no había previsto —
+apareció porque un test falló con `assert 'running' == 'error'`, un estado sin
+explicación bajo el modelo que yo tenía del código.
+
+```
+timeout -> proc.terminate() mata al agente, no al nieto
+    ↓ el nieto heredó el pipe de stdout del agente
+`for line in proc.stdout` NUNCA ve EOF — el escritor sigue abierto
+    ↓ proc.wait() no corre; el job queda en "running" para siempre
+el `finally: self._slots.release()` no se ejecuta jamás
+    ↓ max_jobs = 1 por defecto
+todo submit posterior -> 409 "an investigation is already running"
+```
+
+No hace falta atacante: la precondición es un job que alcanza su timeout (30
+minutos por defecto, normal sobre una imagen de memoria) o un apagado del
+servidor.
+
+Medido: pre-fix, estado `running`, herramienta viva y segundo job rechazado con
+409; post-fix, estado `error`, herramienta muerta y segundo job aceptado.
+
+### Fix aplicado
+
+Matar el grupo (B-240) cierra el pipe, así que este defecto se resuelve por
+construcción. Se registra aparte porque su severidad y su consecuencia son
+distintas: quien lea sólo "terminación de árbol de procesos" no deduciría que el
+lanzador quedaba bloqueado.
+
+### Regresión
+
+`tests/test_r11_process_tree_termination.py` (9 tests; 8 rojos contra el código
+pre-R11) y `scripts/redteam_round11_process_tree.py`.
+
+---
+
 ## B-239 — `bool` es subclase de `int`: las dos copias del predicado de Fraction no decían lo mismo
 
 | Campo | Valor |

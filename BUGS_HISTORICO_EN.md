@@ -12,6 +12,94 @@ Format: one block per bug, with its forensic impact and the fix applied.
 
 ---
 
+## B-240 — The JobRunner terminated a pid, not a tree: SIFT tools survived "process terminated"
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 — orphaned processes over the evidence after a timeout or shutdown |
+| **File** | `vigia/ui/jobs.py` |
+| **Found in** | Red Team Round 11, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND11_PROCESS_TREE.md` (R11-1) |
+
+### Description
+
+`jobs.py` launches the agent with `start_new_session=True`, making it the leader
+of its own session and process group — a mechanism that exists precisely so the
+whole tree can be signalled without touching the server. Yet `_kill` (timeout)
+and `shutdown` called `proc.terminate()`, which signals **one** pid.
+
+Reachability verified by import chain: `vigia_agent.py` → `sift_orchestrator` →
+`memory_forensics`, `pcap_parser`, `registry_timeline_reconstructor`, which run
+volatility3, tshark and regripper as subprocesses. On a memory image, minutes to
+hours.
+
+Measured with the real `JobRunner` and a test agent launching a 300s tool:
+pre-fix the tool survives both the job timeout and the server shutdown; post-fix
+it does not.
+
+### Fix applied
+
+`_signal_process_tree(proc, sig)` resolves the pgid and signals the group. What
+makes it safe is `start_new_session=True`: the helper **compares against
+`os.getpgid(0)`** and falls back to signalling the pid if the child shares the
+server's group. The effective scope is written into the job log.
+
+### Note on the oracle
+
+The first measurement produced a false *"killpg does not reach it either"*,
+which would have led to discarding the correct fix. The cause was the oracle:
+**`os.kill(pid, 0)` succeeds on a zombie**. The correct oracle reads
+`/proc/<pid>/stat` and rejects `'Z'`. Pinned by test.
+
+---
+
+## B-241 — A single timeout left the web UI's Mode 1 launcher unusable until the server restarted
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — launcher denial with no attacker, through normal operation |
+| **File** | `vigia/ui/jobs.py` |
+| **Found in** | Red Team Round 11, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND11_PROCESS_TREE.md` (R11-2) |
+
+### Description
+
+A consequence of B-240 that measurement uncovered and reading had not predicted
+— it surfaced because a test failed with `assert 'running' == 'error'`, a state
+with no explanation under the model I held of the code.
+
+```
+timeout -> proc.terminate() kills the agent, not the grandchild
+    ↓ the grandchild inherited the agent's stdout pipe
+`for line in proc.stdout` NEVER sees EOF — the writer is still open
+    ↓ proc.wait() never runs; the job stays "running" forever
+the `finally: self._slots.release()` never executes
+    ↓ max_jobs = 1 by default
+every later submit -> 409 "an investigation is already running"
+```
+
+No attacker is needed: the precondition is a job reaching its timeout (30
+minutes by default, normal on a memory image) or a server shutdown.
+
+Measured: pre-fix, state `running`, tool alive and the second job rejected with
+409; post-fix, state `error`, tool dead and the second job accepted.
+
+### Fix applied
+
+Killing the group (B-240) closes the pipe, so this defect is resolved by
+construction. It is recorded separately because its severity and consequence
+differ: a reader seeing only "process-tree termination" would not deduce that
+the launcher was left blocked.
+
+### Regression
+
+`tests/test_r11_process_tree_termination.py` (9 tests; 8 red against pre-R11
+code) and `scripts/redteam_round11_process_tree.py`.
+
+---
+
 ## B-239 — `bool` is a subclass of `int`: the two copies of the Fraction predicate disagreed
 
 | Field | Value |

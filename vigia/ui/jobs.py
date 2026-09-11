@@ -21,6 +21,7 @@ import collections
 import datetime
 import json
 import re
+import signal
 import subprocess
 import sys
 import threading
@@ -40,6 +41,47 @@ EXIT_LABELS = {0: "NOISE", 1: "MALICE", 2: "ERROR", 3: "INTENT",
 _LOG_MAXLEN = 5000
 _DEFAULT_TIMEOUT_S = 30 * 60
 _TERMINATE_GRACE_S = 10
+
+
+def _signal_process_tree(proc: subprocess.Popen, sig: int) -> str:
+    """R11-1 — Señala al GRUPO de procesos, no sólo al hijo directo.
+
+    El agente se lanza con ``start_new_session=True``, que lo hace líder de su
+    propia sesión y grupo: eso existe precisamente para poder señalar al árbol
+    entero sin tocar al servidor. Pero `_kill` y `shutdown` llamaban
+    `proc.terminate()`, que señala UN pid.
+
+    `vigia_agent.py` llega, vía `sift_orchestrator`, a `memory_forensics`,
+    `pcap_parser` y `registry_timeline_reconstructor`, que corren volatility,
+    tshark y regripper como subprocesos — minutos u horas sobre una imagen de
+    memoria. Medido: tras `terminate()` el nieto sigue corriendo; tras
+    `killpg` no. Así que la UI decía "process terminated" mientras la
+    herramienta pesada seguía viva sobre la evidencia, y el slot de
+    concurrencia quedaba libre para un job nuevo que arrancaba junto al
+    fantasma.
+
+    Que sea seguro depende de `start_new_session=True`: sin eso el grupo sería
+    el del propio servidor. Si el grupo no se puede resolver, se cae a señalar
+    el pid — degradar es mejor que señalar un grupo equivocado.
+
+    Devuelve el alcance efectivo, para poder decirlo en el log del job.
+    """
+    if hasattr(os, "killpg") and hasattr(os, "getpgid"):
+        try:
+            pgid = os.getpgid(proc.pid)
+        except OSError:
+            pgid = None
+        if pgid is not None and pgid != os.getpgid(0):
+            try:
+                os.killpg(pgid, sig)
+                return f"grupo de procesos {pgid}"
+            except OSError:
+                pass
+    try:
+        proc.send_signal(sig)
+    except OSError:
+        return "ninguno (el proceso ya no existe)"
+    return f"sólo el pid {proc.pid}"
 
 
 class JobValidationError(ValueError):
@@ -206,14 +248,16 @@ class JobRunner:
         proc = job.proc
         if proc is None or proc.poll() is not None:
             return
-        job.error = f"timeout after {self.timeout_s}s — process terminated"
+        job.error = f"timeout after {self.timeout_s}s — process tree terminated"
         job.append_line(f"[webui] {job.error}")
+        alcance = _signal_process_tree(proc, signal.SIGTERM)
+        job.append_line(f"[webui] SIGTERM a {alcance}")
         try:
-            proc.terminate()
-            try:
-                proc.wait(timeout=_TERMINATE_GRACE_S)
-            except subprocess.TimeoutExpired:
-                proc.kill()
+            proc.wait(timeout=_TERMINATE_GRACE_S)
+        except subprocess.TimeoutExpired:
+            alcance = _signal_process_tree(proc, signal.SIGKILL)
+            job.append_line(f"[webui] SIGKILL a {alcance} tras "
+                            f"{_TERMINATE_GRACE_S}s de gracia")
         except OSError:
             pass
 
@@ -272,11 +316,14 @@ class JobRunner:
         }
 
     def shutdown(self) -> None:
-        """Terminate running jobs (used on server shutdown)."""
+        """Terminate running jobs (used on server shutdown).
+
+        R11-1: al grupo entero. Un `terminate()` al pid dejaba corriendo las
+        herramientas SIFT que el agente hubiera lanzado, después de que el
+        servidor se fue y ya nadie las mira.
+        """
         for job in self._jobs.values():
             proc = job.proc
             if proc is not None and proc.poll() is None:
-                try:
-                    proc.terminate()
-                except OSError:
-                    pass
+                alcance = _signal_process_tree(proc, signal.SIGTERM)
+                job.append_line(f"[webui] shutdown: SIGTERM a {alcance}")
