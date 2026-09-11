@@ -12,6 +12,89 @@ Formato: un bloque por bug, con su impacto forense y el fix aplicado.
 
 ---
 
+## B-235 — La clave HMAC de la web UI viajaba por argv, legible en /proc por cualquier proceso local
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P2 — exposición de secreto a usuario local |
+| **Archivo** | `vigia/ui/verify.py` |
+| **Detectado en** | Red Team Round 8, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND8_UI.md` (R8-1) |
+
+### Descripción
+
+La clave HMAC que el usuario pega en la web llegaba por cuerpo HTTP y se pasaba
+al verificador como `--hmac-key-hex <clave>` en argv del subproceso. El
+comentario del código decía *"passed as argv, never logged and never echoed back
+in the response"*: la segunda mitad es cierta, la primera describe una defensa
+contra la amenaza equivocada. En Linux `/proc/<pid>/cmdline` es legible por
+cualquier proceso del sistema.
+
+Medido: un proceso local sin privilegios leyendo `/proc/*/cmdline` en bucle
+durante la verificación recupera la clave completa.
+
+### Fix aplicado
+
+La clave va por el **entorno** del hijo (`verify_tool_log._resolve_hmac_key` ya
+lee `VIGIA_HMAC_KEY`). `_run` acepta `extra_env` y sólo construye entorno propio
+cuando hay algo que agregar; sin clave, el hijo hereda el del servidor.
+
+**Límite honesto:** `/proc/<pid>/environ` está restringido al usuario dueño del
+proceso. Esto **no** cierra "mismo usuario o root" — saca la clave del alcance de
+cualquier usuario local, que es lo cerrable sin tocar el verificador. Migrar a
+`--hmac-key-file` con permisos 0600 queda como recomendación.
+
+### Nota sobre el test
+
+`test_tool_log_hmac_key_in_argv_not_in_response` afirmaba
+`assert "--hmac-key-hex" in seen["cmd"]` — descripción fiel de la implementación
+de entonces. Se invirtió la mitad que cambió y se conservó la que sigue siendo
+cierta, con el porqué escrito en el test. Un test verde sobre una conducta
+insegura es justamente lo que impide notarla.
+
+---
+
+## B-236 — La web UI afirmaba "traza presente" sin abrir nunca la traza
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P2 |
+| **Archivos** | `vigia/ui/verify.py`, `vigia/ui/server.py`, `vigia/ui/static/app.js`, `vigia/ui/static/i18n.js` |
+| **Detectado en** | Red Team Round 8, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND8_UI.md` (R8-2) |
+
+### Descripción
+
+`has_reasoning_trace` se calcula con la sola existencia del archivo
+`<stem>_reasoning_trace.json` al lado del bundle, y la UI lo muestra como badge
+"trace" en la tabla y como "traza: presente" en el detalle. Nunca abría el
+archivo. `verdict_disagreement` no lo cubre: compara campos portadores de
+veredicto **dentro de un mismo bundle**, no bundle contra traza.
+
+Medido con artefactos reales: el bundle de FLAREON-2017-M1 (MALICE) con la traza
+de JESS-M1 (SUSPICION) puesta como hermana se muestra con `case_id`
+FLAREON-2017-M1, `verdict_disagreement: False` y badge "trace" — indistinguible
+de un par legítimo. Es B-234 llevado a la UI, donde además lo lee un humano en
+una pantalla titulada "Verificación independiente".
+
+### Fix aplicado
+
+Un verificador más, expuesto como los otros: `reasoning_trace` corre
+`verify_tool_log.py <traza> --paired-bundle <bundle>` — que desde B-234 comprueba
+la cadena **y** el emparejamiento — y reporta su exit code verbatim. Se ofrece
+como aplicable sólo cuando hay traza hermana, en EN y ES. La bandera del índice
+sigue siendo lo que era (dato de inventario); lo que faltaba era poder pedir la
+verificación.
+
+### Regresión
+
+`tests/test_r8_ui_verification.py` (9 tests; 6 rojos contra el código pre-R8).
+`tests/test_webui_verify.py` actualizado.
+
+---
+
 ## B-234 — El emparejamiento reasoning trace ↔ bundle sellado no lo hacía cumplir ningún verificador
 
 | Campo | Valor |

@@ -12,6 +12,91 @@ Format: one block per bug, with its forensic impact and the fix applied.
 
 ---
 
+## B-235 — The web UI's HMAC key travelled on argv, readable in /proc by any local process
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 — secret exposure to a local user |
+| **File** | `vigia/ui/verify.py` |
+| **Found in** | Red Team Round 8, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND8_UI.md` (R8-1) |
+
+### Description
+
+The HMAC key a user pastes into the web UI arrived over an HTTP body and was
+handed to the verifier as `--hmac-key-hex <key>` in the subprocess argv. The code
+comment read *"passed as argv, never logged and never echoed back in the
+response"*: the second half is true, the first describes a defence against the
+wrong threat. On Linux `/proc/<pid>/cmdline` is readable by any process on the
+system.
+
+Measured: an unprivileged local process polling `/proc/*/cmdline` during the
+verification recovers the full key.
+
+### Fix applied
+
+The key goes through the child's **environment**
+(`verify_tool_log._resolve_hmac_key` already reads `VIGIA_HMAC_KEY`). `_run`
+takes `extra_env` and only builds its own environment when there is something to
+add; with no key the child inherits the server's, as before.
+
+**Honest limit:** `/proc/<pid>/environ` is restricted to the process owner. This
+does **not** close the "same user or root" case — it removes the key from the
+reach of *any* local user, which is what is closable without touching the
+verifier. Moving to `--hmac-key-file` with 0600 permissions is recorded as a
+recommendation.
+
+### Note on the test
+
+`test_tool_log_hmac_key_in_argv_not_in_response` asserted
+`assert "--hmac-key-hex" in seen["cmd"]` — a faithful description of the
+implementation at the time. The half that changed was inverted and the half that
+is still true was kept, with the reason written into the test. A green test over
+an insecure behaviour is precisely what keeps it from being noticed.
+
+---
+
+## B-236 — The web UI asserted "trace present" without ever opening the trace
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 |
+| **Files** | `vigia/ui/verify.py`, `vigia/ui/server.py`, `vigia/ui/static/app.js`, `vigia/ui/static/i18n.js` |
+| **Found in** | Red Team Round 8, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND8_UI.md` (R8-2) |
+
+### Description
+
+`has_reasoning_trace` is computed from the mere existence of
+`<stem>_reasoning_trace.json` next to the bundle, and the UI shows it as a
+"trace" badge in the table and "trace: present" in the detail view. It never
+opened the file. `verdict_disagreement` does not cover this: it compares
+verdict-bearing fields **within one bundle**, not bundle against trace.
+
+Measured with real artifacts: the FLAREON-2017-M1 bundle (MALICE) with the
+JESS-M1 trace (SUSPICION) placed as its sibling displays `case_id`
+FLAREON-2017-M1, `verdict_disagreement: False` and a "trace" badge —
+indistinguishable from a legitimate pair. It is B-234 carried into the UI, where
+a human reads it on a screen titled "Independent verification".
+
+### Fix applied
+
+One more verifier, exposed like the others: `reasoning_trace` runs
+`verify_tool_log.py <trace> --paired-bundle <bundle>` — which since B-234 checks
+the chain **and** the pairing — and reports its exit code verbatim. It is offered
+as applicable only when a sibling trace exists, in EN and ES. The index flag
+stays what it was (an inventory fact); what was missing was the ability to ask
+for the verification.
+
+### Regression
+
+`tests/test_r8_ui_verification.py` (9 tests; 6 red against pre-R8 code).
+`tests/test_webui_verify.py` updated.
+
+---
+
 ## B-234 — The reasoning trace ↔ sealed bundle pairing was enforced by no verifier
 
 | Field | Value |

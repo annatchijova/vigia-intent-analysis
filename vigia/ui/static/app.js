@@ -375,12 +375,16 @@ function toolLogTab(norm) {
 /* ---------- verify tab ---------- */
 
 function verifyTab(norm) {
+  /* R8-2: reasoning_trace es aplicable siempre que el bundle declare tener
+     una traza hermana — la bandera del indice dice que el archivo existe, no
+     que explique este bundle; esto ultimo lo decide el verificador. */
   const applicable = {
     ebs_v1: ["ebs_v1", "sidecar"],
     mcp_investigation: ["tool_log", "sidecar"],
     agent_audit: ["tool_log", "sidecar"],
   }[norm.schema] || ["sidecar"];
-  const all = ["ebs_v1", "tool_log", "sidecar"];
+  if ((norm.sidecar || {}).has_reasoning_trace) applicable.push("reasoning_trace");
+  const all = ["ebs_v1", "tool_log", "reasoning_trace", "sidecar"];
   return `<section class="panel">
     <div class="sec-head"><span class="n">§</span><h2>${esc(t("verify.title"))}</h2></div>
     <p class="muted">${esc(t("verify.note"))}</p>
@@ -408,7 +412,8 @@ function wireVerify(id, norm) {
       box.innerHTML = `<span class="muted">${esc(t("verify.running"))}</span>`;
       const payload = {verifier: v};
       const hmac = document.getElementById("v-hmac");
-      if (v === "tool_log" && hmac && hmac.value.trim()) payload.hmac_key_hex = hmac.value.trim();
+      if ((v === "tool_log" || v === "reasoning_trace") && hmac && hmac.value.trim())
+        payload.hmac_key_hex = hmac.value.trim();
       try {
         const r = await post(`/api/bundles/${encodeURIComponent(id)}/verify`, payload);
         const cls = {PASS: "pass", VERIFIED: "pass", MATCH: "pass",

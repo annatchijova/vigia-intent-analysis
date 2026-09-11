@@ -41,7 +41,7 @@ _STATIC_DIR = Path(__file__).parent / "static"
 # must not be defined inside create_app().
 
 class VerifyRequest(BaseModel):
-    verifier: str = Field(pattern="^(ebs_v1|tool_log|sidecar)$")
+    verifier: str = Field(pattern="^(ebs_v1|tool_log|reasoning_trace|sidecar)$")
     hmac_key_hex: Optional[str] = Field(default=None, max_length=1024,
                                         pattern="^[0-9a-fA-F]*$")
 
@@ -186,6 +186,11 @@ def create_app(repo_root: Optional[Path] = None) -> FastAPI:
         if req.verifier == "tool_log":
             return verify_mod.run_tool_log(repo_root, path,
                                            hmac_key_hex=req.hmac_key_hex)
+        if req.verifier == "reasoning_trace":
+            # R8-2: el indice marcaba has_reasoning_trace por existencia del
+            # archivo. Esto abre la traza y comprueba que explique ESTE bundle.
+            return verify_mod.run_reasoning_trace(repo_root, path,
+                                                  hmac_key_hex=req.hmac_key_hex)
         return verify_mod.check_sidecar(path)
 
     # -- investigations (phase 4) -------------------------------------------
