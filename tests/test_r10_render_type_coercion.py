@@ -38,6 +38,7 @@ import json
 import shutil
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -149,13 +150,47 @@ class TestFrontendSurvivesEveryType:
 
 
 class TestRenderErrorIsNotCalledARequestFailure:
-    def test_api_tags_its_own_errors(self):
-        src = (REPO_ROOT / "vigia" / "ui" / "static" / "app.js").read_text()
-        assert 'err.kind = "request"' in src
+    """Auditoria de la propia rama: estos asserts eran grep sobre el fuente —
+    habrian pasado con el string en un comentario y no probaban conducta
+    alguna. Ahora se EJECUTA `errorView` tal como esta en el app.js servido y
+    se compara el banner que produce para cada clase de error."""
 
-    def test_error_view_distinguishes_the_two(self):
-        src = (REPO_ROOT / "vigia" / "ui" / "static" / "app.js").read_text()
-        assert 'err.kind === "request" ? "err.request" : "err.render"' in src
+    def _render_error_view(self, err_js: str) -> str:
+        node = shutil.which("node") or shutil.which("nodejs")
+        if not node:
+            pytest.skip("node no disponible")
+        app_js = REPO_ROOT / "vigia" / "ui" / "static" / "app.js"
+        src = app_js.read_text()
+        esc_body = src.split("function esc(v) {", 1)[1].split("\n}", 1)[0]
+        ev_body = src.split("function errorView(err) {", 1)[1].split("\n}", 1)[0]
+        script = (
+            "const esc = function(v) {" + esc_body + "};\n"
+            "const t = (k) => k;\n"
+            "let captured = '';\n"
+            "const app = { set innerHTML(v) { captured = v; }, "
+            "get innerHTML() { return captured; } };\n"
+            "const errorView = function(err) {" + ev_body + "};\n"
+            "errorView(" + err_js + ");\n"
+            "console.log(captured);\n"
+        )
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "ev.mjs"
+            path.write_text(script)
+            r = subprocess.run([node, str(path)], capture_output=True,
+                               text=True, timeout=60)
+            assert r.returncode == 0, r.stderr
+            return r.stdout
+
+    def test_request_failure_says_request(self):
+        out = self._render_error_view(
+            "Object.assign(new Error('500: boom'), {kind: 'request'})")
+        assert "err.request" in out and "err.render" not in out, out
+
+    def test_render_failure_does_not_say_request(self):
+        """El caso que motivo R10-2: un bundle malformado no es un fallo de red."""
+        out = self._render_error_view(
+            "new Error('e.timestamp.slice is not a function')")
+        assert "err.render" in out and "err.request" not in out, out
 
     def test_both_locales_have_the_new_key(self):
         i18n = (REPO_ROOT / "vigia" / "ui" / "static" / "i18n.js").read_text()

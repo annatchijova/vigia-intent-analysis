@@ -146,10 +146,51 @@ class TestR8ReasoningTracePairing:
 
 
 class TestR8Wiring:
-    def test_endpoint_accepts_the_new_verifier(self):
-        src = (REPO_ROOT / "vigia" / "ui" / "server.py").read_text()
-        assert "reasoning_trace" in src
-        assert "run_reasoning_trace" in src
+    """Auditoria de la propia rama: `test_endpoint_accepts_the_new_verifier`
+    era un grep sobre server.py — habria pasado con el string en un comentario.
+    Ahora se ejerce la ruta real y se comprueba que DESPACHA al verificador
+    nuevo, y que un nombre inventado sigue siendo rechazado por el modelo."""
+
+    def _client(self, tmp_path):
+        pytest.importorskip("fastapi")
+        from fastapi.testclient import TestClient
+        from vigia.ui.server import create_app
+        _require(MALICE_BUNDLE, SUSPICION_TRACE)
+        (tmp_path / "results").mkdir()
+        shutil.copy(MALICE_BUNDLE, tmp_path / "results" / "x_mode1_bundle.json")
+        shutil.copy(SUSPICION_TRACE,
+                    tmp_path / "results" / "x_mode1_bundle_reasoning_trace.json")
+        for name in ("verify_tool_log.py",):
+            shutil.copy(REPO_ROOT / name, tmp_path / name)
+        (tmp_path / "forensics").mkdir()
+        shutil.copy(REPO_ROOT / "forensics" / "verify_ebs_v1.py",
+                    tmp_path / "forensics" / "verify_ebs_v1.py")
+        app = create_app(tmp_path)
+        return TestClient(app), app
+
+    def _bundle_id(self, app):
+        items = app.state.bundle_index.query()["items"]
+        assert items, "el indice no levanto el bundle de prueba"
+        return items[0]["id"]
+
+    def test_endpoint_dispatches_to_the_new_verifier(self, tmp_path):
+        client, app = self._client(tmp_path)
+        bid = self._bundle_id(app)
+        r = client.post(f"/api/bundles/{bid}/verify",
+                        json={"verifier": "reasoning_trace"})
+        assert r.status_code == 200, r.text
+        body = r.json()
+        assert body["verifier"] == "reasoning_trace"
+        # el par es cruzado a proposito: la traza es de otro caso
+        assert body["status"] == "BROKEN", body
+        assert "SUSPICION" in body["detail"] and "MALICE" in body["detail"]
+
+    def test_unknown_verifier_is_still_rejected(self, tmp_path):
+        client, app = self._client(tmp_path)
+        bid = self._bundle_id(app)
+        r = client.post(f"/api/bundles/{bid}/verify",
+                        json={"verifier": "inventado"})
+        assert r.status_code == 422, r.text
 
     def test_frontend_offers_it_and_has_both_locales(self):
         app_js = (REPO_ROOT / "vigia" / "ui" / "static" / "app.js").read_text()
