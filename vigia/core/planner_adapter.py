@@ -38,11 +38,29 @@ from vigia.core.peirceplanner_bounded import (
 
 
 def _to_fraction(raw: Any) -> Fraction:
-    """Convert raw value to Fraction, handling tagged dicts and strings."""
+    """Convert raw value to Fraction, handling tagged dicts and strings.
+
+    R10-4 — la rama del dict etiquetado quedaba fuera del `try`: un
+    `{"__fraction__":true,"num":1,"den":false}` levantaba ZeroDivisionError,
+    `num="x"` un ValueError y un `num` ausente un KeyError, todos sin atrapar.
+    Ademas `int(True)` es 1, asi que un booleano se convertia en la fraccion
+    1/1 en vez de ser rechazado — `_signal_z_fraction`, quince lineas mas
+    abajo en este mismo modulo, ya guardaba contra `bool`; esta no.
+
+    Alcance honesto: en este commit `_to_fraction` NO tiene llamadores (ni en
+    este modulo ni fuera), asi que esto es endurecimiento de un helper sin
+    cablear, no la reparacion de un camino vivo. El modulo si se usa
+    (scripts/dryrun_b129_weight_calibration.py y los tests de B-129), y es
+    observation-only: cero llamadores en el camino del veredicto.
+    """
     if isinstance(raw, Fraction):
         return raw
     if isinstance(raw, dict) and raw.get("__fraction__"):
-        return Fraction(int(raw["num"]), int(raw["den"]))
+        num, den = raw.get("num"), raw.get("den")
+        if all(isinstance(v, int) and not isinstance(v, bool) for v in (num, den)) \
+                and den != 0:
+            return Fraction(num, den)
+        return Fraction(1, 10)
     try:
         return Fraction(str(raw)).limit_denominator(1000)
     except (ValueError, ZeroDivisionError):

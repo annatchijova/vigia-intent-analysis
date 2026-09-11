@@ -45,13 +45,33 @@ _KNOWN_VERDICTS = ("NOISE", "SUSPICION", "INTENT", "MALICE", "ABSTAIN")
 # Fractions
 # ---------------------------------------------------------------------------
 
+def _is_exact_int(value: Any) -> bool:
+    """R10-4: `bool` es subclase de `int` en Python, asi que
+    `isinstance(True, int)` es True. `Number.isInteger(true)` en JS es False.
+    Las dos copias del predicado deben decir lo mismo — en un sistema cuya
+    propiedad declarada es la aritmetica exacta, `{"num": true, "den": 1}` no
+    es la fraccion 1/1: es un campo con el tipo equivocado, y mostrarlo como
+    `True/1` (o peor, `1/True`) lo presenta como si fuera un valor.
+
+    Lo verifica tests/test_r10_4_fraction_bool.py contra la copia de app.js.
+    """
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
 def is_serialized_fraction(obj: Any) -> bool:
     return (
         isinstance(obj, dict)
         and obj.get("__fraction__") is True
-        and isinstance(obj.get("num"), int)
-        and isinstance(obj.get("den"), int)
+        and _is_exact_int(obj.get("num"))
+        and _is_exact_int(obj.get("den"))
     )
+
+
+def claims_to_be_fraction(obj: Any) -> bool:
+    """Lleva la etiqueta `__fraction__` pero no pasa el predicado. Un bundle
+    ajeno puede traer esto; se declara en vez de mostrarlo como una fraccion."""
+    return (isinstance(obj, dict) and obj.get("__fraction__") is True
+            and not is_serialized_fraction(obj))
 
 
 def fraction_display(obj: Any) -> Optional[str]:
@@ -61,13 +81,25 @@ def fraction_display(obj: Any) -> Optional[str]:
     return f"{obj['num']}/{obj['den']}"
 
 
-def decode_fractions(obj: Any) -> Any:
+def decode_fractions(obj: Any, warnings: Optional[list] = None,
+                     label: str = "") -> Any:
     """Recursively replace serialized Fractions with a display-safe dict.
 
     ``{"__fraction__":true,"num":N,"den":D}`` becomes
     ``{"is_fraction":true,"display":"N/D","num":N,"den":D}``.
     Integers stay exact; nothing is coerced to float.
+
+    R10-4: un dict etiquetado `__fraction__` cuyos campos no son enteros
+    exactos NO se convierte —se deja crudo— y, si hay una lista de warnings,
+    se declara. Mostrar `True/1` como si fuera una fraccion seria inventar un
+    valor, que es justo lo que el docstring del modulo prohibe.
     """
+    if claims_to_be_fraction(obj) and warnings is not None:
+        warnings.append(
+            f"{label or 'campo'}: lleva la etiqueta __fraction__ pero num/den "
+            f"no son enteros exactos (num={type(obj.get('num')).__name__}, "
+            f"den={type(obj.get('den')).__name__}) — mostrado sin convertir"
+        )
     if is_serialized_fraction(obj):
         return {
             "is_fraction": True,
@@ -76,10 +108,18 @@ def decode_fractions(obj: Any) -> Any:
             "den": obj["den"],
         }
     if isinstance(obj, dict):
-        return {k: decode_fractions(v) for k, v in obj.items()}
+        return {k: decode_fractions(v, warnings, f"{label}.{k}" if label else k)
+                for k, v in obj.items()}
     if isinstance(obj, list):
-        return [decode_fractions(v) for v in obj]
+        return [decode_fractions(v, warnings, f"{label}[{i}]")
+                for i, v in enumerate(obj)]
     return obj
+
+
+def _decode_extra(warnings: list, payload: dict) -> dict:
+    """`extra` de cada normalizador: decodifica fracciones declarando los
+    dicts que se dicen fraccion y no lo son (R10-4)."""
+    return decode_fractions(payload, warnings, "extra")
 
 
 def _scalar_display(value: Any) -> Any:
@@ -254,7 +294,7 @@ def _normalize_ebs_v1(doc: dict, warnings: list) -> dict:
         "integrity": {
             "bundle_hash": integrity.get("bundle_hash"),
         },
-        "extra": decode_fractions({
+        "extra": _decode_extra(warnings, {
             "decision_trace": decision_trace,
             "caie_reason": caie.get("reason"),
             "caie_composite_score": caie.get("composite_score"),
@@ -338,7 +378,7 @@ def _normalize_agent_audit(doc: dict, warnings: list) -> dict:
             "evidence_sha256": doc.get("evidence_sha256"),
             "runtime_fingerprint": doc.get("runtime_fingerprint"),
         },
-        "extra": decode_fractions({
+        "extra": _decode_extra(warnings, {
             "narrative": doc.get("narrative"),
             "abduction": abduction,
             "signal_stats": doc.get("signal_stats"),
@@ -428,14 +468,14 @@ def _normalize_mcp(doc: dict, warnings: list) -> dict:
             "chain_tip_sha256": doc.get("chain_tip_sha256"),
             "entries": decode_fractions(coerce_entry_text(
                 tool_log, ("timestamp", "entry_hash", "prev_hash"),
-                "tool_execution_log", warnings)),
+                "tool_execution_log", warnings), warnings, "tool_execution_log"),
         },
         "audit_trail": {"present": False, "entry_count": 0, "entries_preview": []},
         "integrity": {
             "bundle_hash": integrity.get("bundle_hash"),
             "evidence_hash": doc.get("evidence_hash"),
         },
-        "extra": decode_fractions({
+        "extra": _decode_extra(warnings, {
             "verdict_rationale": doc.get("verdict_rationale"),
             "mitre_ttps_aggregate": doc.get("mitre_ttps_aggregate"),
             "refutation_gate_log": doc.get("refutation_gate_log"),

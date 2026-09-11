@@ -12,6 +12,77 @@ Format: one block per bug, with its forensic impact and the fix applied.
 
 ---
 
+## B-239 — `bool` is a subclass of `int`: the two copies of the Fraction predicate disagreed
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P3 — an invented value in the view, not reaching the seal path |
+| **Files** | `vigia/ui/normalizer.py`, `vigia/core/planner_adapter.py` |
+| **Found in** | Red Team Round 10 (recommendation 2), fixed 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND10_RENDER_TYPES.md` (R10-4) |
+
+### Description
+
+In Python `isinstance(True, int)` is `True`; in JS `Number.isInteger(true)` is
+`false`. `is_serialized_fraction` used a bare `isinstance(..., int)`, so it
+accepted booleans that the `app.js` copy rejected. Measured on live code:
+
+```
+{"__fraction__": true, "num": true, "den": 1}  -> display 'True/1'
+{"__fraction__": true, "num": 1, "den": true}  -> display '1/True'
+{"__fraction__": true, "num": 1, "den": false} -> semantically a zero denominator
+```
+
+In a system whose declared property is exact arithmetic, `{"num": true}` is not
+the fraction 1/1: it is a field of the wrong type, and rendering it as `True/1`
+presents it as if it were a value — exactly what the normalizer's own docstring
+forbids (*"never an invented value"*).
+
+**Scope, measured and bounded:** the class does **not** reach the seal path. All
+three canonicalization copies (`vigia/core/canonicalize.py`,
+`vigia/models/ebs.py`, `verify_tool_log.py`) check `isinstance(obj, bool)`
+BEFORE `isinstance(obj, int)`, so `True` and `1` canonicalize differently and no
+hash changes. Pinned by test so it cannot regress.
+
+### Fix applied
+
+`_is_exact_int` rejects `bool`. A `__fraction__`-tagged dict that fails the
+predicate is left **raw** and declared in `warnings[]` with its path, in line
+with the B-238 doctrine.
+
+Variant from the same sweep: `planner_adapter._to_fraction` had no bool guard —
+while `_signal_z_fraction`, fifteen lines below in the same module, did — and
+left the dict branch outside its `try`, so `den=false` raised
+`ZeroDivisionError`, `num="x"` a `ValueError` and a missing `num` a `KeyError`,
+all uncaught. **Honest scope:** `_to_fraction` has no callers in this commit, so
+this is hardening of an unwired helper, not the repair of a live path; the
+module is used (`scripts/dryrun_b129_weight_calibration.py` and the B-129 tests)
+and is observation-only.
+
+### Irreducible divergence, found by the lockstep test itself
+
+The test comparing the two copies found a second case that prior reading had not
+predicted: `{"num": 1.0}`. Python rejects it; JS accepts it, because it has no
+separate integer type and `JSON.parse("1.0")` yields the same Number as
+`JSON.parse("1")`. **The JS side cannot see the difference** without changing
+the wire format (e.g. serializing num/den as strings).
+
+Observable consequence, documented rather than hidden: a third-party bundle with
+`{"num": 1.0, "den": 2}` renders as `1/2` in the raw-JSON tab — which reads the
+file without passing through the normalizer — and as an unconverted dict, with
+its warning, in the normalized views. Python is deliberately left on the strict
+side: the producer emits `obj.numerator`, always an exact int.
+
+### Regression
+
+`tests/test_r10_4_fraction_bool.py` (26 tests; 16 red against the previous
+code). It includes the lockstep that evaluates the predicate as it stands in the
+served `app.js`, and two tests pinning that canonicalization distinguishes
+`True` from `1`.
+
+---
+
 ## B-238 — Six bundle fields with the wrong type crashed the web UI renderer
 
 | Field | Value |

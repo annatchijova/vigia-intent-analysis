@@ -30,6 +30,7 @@ CODE FACT · PLAUSIBLE HYPOTHESIS · **CONFIRMED BY INDUCTION** · FALSIFIED
 | R10-1 | Media | **CONFIRMED BY INDUCTION** | vuln (robustez) | Seis campos de un bundle con el tipo equivocado hacen **lanzar** al renderizador. Uno de ellos (`artifacts` como string) ni siquiera es hostil: es una variante de esquema plausible. | **FIXED** |
 | R10-2 | Baja | **CONFIRMED BY INDUCTION** | honest degradation | El fallo se mostraba como **"La petición falló"**. La petición no había fallado: el bundle estaba malformado. Misatribución de causa en una herramienta forense. | **FIXED** |
 | R10-3 | — | **FALSIFIED** | — | Hipótesis de entrada: XSS almacenado desde un bundle de terceros. El frontend escapa de forma consistente y la CSP no tiene `unsafe-inline`. | Refutada |
+| R10-4 | Baja | **CONFIRMED BY INDUCTION** | vuln (valor inventado) | `bool` es subclase de `int` en Python: `is_serialized_fraction` aceptaba `{"num": true}` y lo mostraba como `True/1`. La copia de `app.js` lo rechazaba. **No alcanza el camino del sello** — la canonicalización chequea `bool` antes que `int` en sus tres copias. | **FIXED** |
 
 ---
 
@@ -171,16 +172,97 @@ No se pudo mostrar este bundle (campo malformado) — …
 - `tests/test_r10_render_type_coercion.py` → 15 tests. **Control negativo ejecutado:** 14 fallan contra el código pre-R10; el único que pasa en ambos estados es el control (un bundle limpio no debe ganar ruido). Honestidad sobre el control: los tests unitarios de `coerce_*` fallan allí por `AttributeError` (la función no existía), no por conducta — los que fallan por conducta son el barrido de node, los tres del banner y `test_tool_log_text_fields`.
 - Suite completa: `2325 passed, 211 skipped, 28 xfailed`. Los 7 fallos restantes son **pre-existentes** y de causa ambiental.
 
+---
+
+## R10-4 — Las dos copias del predicado de Fraction no decían lo mismo · FIXED
+
+**Severidad:** Baja  **Nivel:** CONFIRMED BY INDUCTION  **Bucket:** vulnerabilidad (valor inventado)
+
+Registrado primero como recomendación 2 de esta ronda y corregido a continuación.
+
+### Sorpresa
+
+`isinstance(True, int)` es `True` en Python. `Number.isInteger(true)` es `false`
+en JS. Dos copias del mismo predicado, dos respuestas distintas:
+
+```
+{"__fraction__": true, "num": true, "den": 1}  ->  display 'True/1'
+{"__fraction__": true, "num": 1, "den": true}  ->  display '1/True'
+{"__fraction__": true, "num": 1, "den": false} ->  denominador cero semántico
+```
+
+Mostrar `True/1` como si fuera una fracción es inventar un valor, que es
+exactamente lo que el docstring del normalizador prohíbe.
+
+### Alcance — lo primero que se midió, porque decide la severidad
+
+**La clase no alcanza el camino del sello.** Las tres copias de la
+canonicalización —`vigia/core/canonicalize.py`, `vigia/models/ebs.py` y
+`verify_tool_log.py`— chequean `isinstance(obj, bool)` **antes** que
+`isinstance(obj, int)`, así que `True` y `1` canonicalizan distinto y ningún
+hash cambia. Eso es una falsificación, no una suposición, y queda fijada por
+test para que no regresione en silencio.
+
+El barrido de `isinstance(..., int)` en el repositorio devolvió cuatro
+consumidores del predicado `__fraction__`, con cuatro estricteces distintas.
+Sólo uno estaba mal en un camino que se muestra a un humano.
+
+### Fix
+
+`_is_exact_int` rechaza `bool`. Un dict etiquetado `__fraction__` que no pasa el
+predicado se deja **crudo** y se declara con su ruta, en línea con R10-1:
+
+```
+⚠ extra.a[0]: lleva la etiqueta __fraction__ pero num/den no son enteros exactos
+  (num=bool, den=int) — mostrado sin convertir
+```
+
+Variante del mismo barrido: `planner_adapter._to_fraction` no guardaba contra
+`bool` —mientras `_signal_z_fraction`, quince líneas más abajo **en el mismo
+módulo**, sí lo hacía; la misma asimetría que delató a `prev_hash` en R10-1— y
+dejaba la rama del dict fuera de su `try`. Honestamente: `_to_fraction` no tiene
+llamadores en este commit, así que es endurecimiento de un helper sin cablear,
+no la reparación de un camino vivo.
+
+### La divergencia que encontró el propio test
+
+El lockstep entre las dos copias encontró un segundo caso que la lectura previa
+**no** había predicho: `{"num": 1.0}`. Python lo rechaza; JS lo acepta, porque
+no tiene tipo entero separado y `JSON.parse("1.0")` produce el mismo Number que
+`JSON.parse("1")`. El lado JS **no puede** ver la diferencia sin cambiar el
+formato de cable.
+
+Consecuencia observable, documentada en vez de escondida: un bundle con
+`{"num": 1.0, "den": 2}` se muestra como `1/2` en la pestaña de JSON crudo —que
+lee el archivo sin pasar por el normalizador— y como un dict sin convertir, con
+su warning, en las vistas normalizadas. Python queda del lado estricto a
+propósito: el productor emite `obj.numerator`, siempre un int exacto, así que un
+`1.0` significa que el bundle lo escribió otra cosa.
+
+Un test de lockstep que encuentra una divergencia que el autor no había previsto
+es el argumento entero a favor de escribirlo en vez de asumir que dos copias
+coinciden.
+
+### Verificación
+
+`tests/test_r10_4_fraction_bool.py` → 26 tests; **16 rojos** contra el código
+previo. Los que pasan en ambos estados son los controles (enteros legítimos, el
+bundle limpio sin ruido) y las dos falsificaciones del camino del sello.
+
+---
+
 ## Recomendaciones (fuera del alcance de este cambio — sólo registradas)
 
 1. **Extender la coerción a los normalizadores EBS v1 y agent_audit.** El fix cubre los
    campos que hoy rompen el render, medidos. Los otros dos normalizadores construyen su
    propia forma de display y no fueron barridos con el mismo rigor.
-2. **`isinstance(obj.get("num"), int)` acepta `True`** en `is_serialized_fraction`
-   (en Python, `bool` es subclase de `int`), así que `{"__fraction__":true,"num":true,"den":1}`
-   se muestra como `True/1`. El frontend lo rechaza (`Number.isInteger(true)` es `false`),
-   así que hoy es sólo una inconsistencia cosmética entre las dos copias — pero las dos
-   deberían decir lo mismo.
-3. Heredadas y aún abiertas: `integrity` sin capa keyed (R6), `bundle_digest` dentro de
+2. ~~`isinstance(obj.get("num"), int)` acepta `True`~~ — **corregido**, ver R10-4
+   arriba. La medición mostró que era algo más que cosmético (`'1/True'`, y un
+   denominador cero semántico con `den=false`) y destapó una divergencia
+   irreducible con la copia de JS que quedó documentada.
+3. **Formato de cable para las fracciones.** La divergencia de `1.0` sólo se
+   cierra serializando `num`/`den` como strings, para que el lado JS pueda ver
+   lo que el lado Python ve. Es un cambio de formato — decisión, no parche.
+4. Heredadas y aún abiertas: `integrity` sin capa keyed (R6), `bundle_digest` dentro de
    la traza (R7), clave HMAC a `--hmac-key-file` (R8), advertencia de bind no-loopback en
    la API Modo 5 (R9).
