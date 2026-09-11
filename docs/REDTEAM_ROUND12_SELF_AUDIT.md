@@ -174,9 +174,34 @@ Dos frases se revisaron por precisión de lenguaje (§7) y se sostienen: R5 dice
 selló un veredicto equivocado"* y no *"el sello es manipulable"*; R9 dice *"se confirmó
 el bind y la ausencia de auth desde loopback"* y no *"explotado remotamente"*.
 
+## A-9 — Los "7 fallos ambientales" eran una afirmación a medio verificar
+
+**Nivel:** CODE FACT · **CERRADO**
+
+Durante siete rondas reporté esos fallos como "pre-existentes y de causa ambiental".
+La primera mitad estaba probada (fallan igual en `main`); **la segunda no**: que algo
+sea pre-existente no lo hace ambiental. Diagnosticados de verdad:
+
+- **6** son tests `async def` que fallan sin `pytest-asyncio`, declarado en
+  `pyproject.toml`, `requirements.txt` y `requirements-ci.txt` — este último con un
+  comentario explícito de que es obligatorio. Instalándolo pasan los 11.
+- **1** es `test_all_test_imports_resolve_with_requirements_ci`, que detectaba la
+  ausencia de `psutil` (también declarado). **Estaba haciendo su trabajo**, no fallando.
+
+Ninguno era un defecto de código. Con las dependencias declaradas instaladas:
+
+```
+rama         : 2368 passed, 0 failed
+origin/main  : 2248 passed, 0 failed
+```
+
+Se registra porque repetir una atribución sin verificarla es exactamente el defecto
+que R10-2 corrigió en el código (el banner que decía "la petición falló" ante un bundle
+malformado). Lo hice yo, en prosa, siete veces.
+
 ## Verificación
 
-- Suite completa: `2361 passed, 211 skipped, 28 xfailed`. Los 7 fallos restantes son **pre-existentes** (`test_requirements_ci_contract`, `test_trust_fusion_disclosure`), reproducidos idénticos sobre `origin/main`, de causa ambiental.
+- Suite completa con las dependencias declaradas instaladas: **`2368 passed, 0 failed`**; `origin/main` da `2248 passed, 0 failed`. La rama agrega 120 tests y ningún fallo.
 - Los dos tests elevados fallan contra `origin/main` y pasan sobre la rama.
 
 ## Pendientes acumulados (decisiones de formato — no aplicadas)
