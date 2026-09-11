@@ -26,6 +26,13 @@ Soporta ambos esquemas de cadena:
       residual de que chain_tip_sha256 por sí solo es recomputable por
       cualquiera con acceso de escritura.
 
+R5-1 — ANTI-DEGRADACION: el esquema se deduce de TODOS los marcadores v2
+(chain_version="2", entry_hash, entry_hmac en cualquier entrada;
+chain_tip_sha256 / chain_tip_hmac a nivel bundle), nunca de un unico campo
+borrable. Un bundle v2 al que se le borre entry_hash NO cae a la via v1: se
+verifica como v2 y falla como contenido alterado. Con clave HMAC provista, un
+log v1 se reporta como degradacion salvo --allow-legacy-v1.
+
 self_correction_events are reported separately (not in hash chain by design).
 
 Usage:
@@ -45,6 +52,36 @@ from pathlib import Path
 GENESIS_V1 = "GENESIS"
 GENESIS_V2 = "0" * 64
 _STRUCTURAL_FIELDS = frozenset({"seq", "prev_hash", "entry_hash", "entry_hmac"})
+_V2_ENTRY_MARKERS = ("entry_hash", "entry_hmac")
+_V2_BUNDLE_MARKERS = ("chain_tip_sha256", "chain_tip_hmac")
+
+
+def _detect_schema(log: list, bundle: dict) -> tuple:
+    """R5-1: el esquema se decide por TODOS los marcadores v2 del bundle, no
+    por `log[0]["entry_hash"]`.
+
+    Elegir el esquema a partir de un solo campo borrable convierte al dato
+    controlado por el atacante en selector del algoritmo de verificacion: con
+    borrar `entry_hash` de la primera entrada, la cadena se validaba por la
+    via v1 — que no cubre timestamp/tool/target/input_hash, no recibe la clave
+    HMAC y no mira chain_tip_sha256. Si CUALQUIER entrada o el bundle declara
+    v2, se verifica como v2; una entrada a la que le falte entry_hash falla
+    entonces como contenido alterado, que es lo que es.
+
+    Devuelve (version, markers) — markers documenta por que se eligio v2.
+    """
+    markers = []
+    for entry in log:
+        if not isinstance(entry, dict):
+            continue
+        if str(entry.get("chain_version", "")) == "2":
+            markers.append(f'seq={entry.get("seq", "?")}: chain_version="2"')
+        for field in _V2_ENTRY_MARKERS:
+            if field in entry:
+                markers.append(f'seq={entry.get("seq", "?")}: {field}')
+    markers += [f"bundle: {f}" for f in _V2_BUNDLE_MARKERS if f in bundle]
+    return ("2" if markers else "1"), markers
+
 
 # R3-4: ventana forense plausible (mismos limites fijos que la libreria /
 # regla TCV R3-1). Techo 2038 = overflow epoch 32-bit.
@@ -207,7 +244,8 @@ def _resolve_hmac_key(args) -> bytes | None:
 
 # ── Verificación v1 (legacy) ──────────────────────────────────────────────
 
-def _verify_v1(log: list, verbose: bool) -> bool:
+def _verify_v1(log: list, verbose: bool, hmac_key: bytes | None = None,
+               allow_legacy: bool = False) -> bool:
     ok = True
     prev_result = None
     for entry in log:
@@ -242,6 +280,19 @@ def _verify_v1(log: list, verbose: bool) -> bool:
         "result_summary de la última entrada es editable. Re-sellar con "
         "chain_version=2 para cobertura completa."
     )
+    # R5-1 (residual): quien tiene la clave espera autenticidad. El esquema v1
+    # no puede darla — no hay entry_hmac que verificar — asi que un atacante
+    # que borre TODOS los marcadores v2 quedaria indistinguible de un bundle
+    # legacy. Con clave en mano eso se reporta como degradacion, no como
+    # "VERIFIED". --allow-legacy-v1 es la via explicita para bundles historicos.
+    if hmac_key is not None and not allow_legacy:
+        print(
+            "  [FAIL] esquema v1 con clave HMAC provista: v1 no lleva "
+            "entry_hmac, asi que la cadena no puede autenticarse. Si el bundle "
+            "fue sellado en v2, esto es una DEGRADACION de esquema; si es un "
+            "bundle historico genuino, re-ejecutar con --allow-legacy-v1."
+        )
+        ok = False
     return ok
 
 
@@ -254,6 +305,11 @@ def _verify_v2(
     ok = True
     expected_prev = GENESIS_V2
     expected_seq = 1
+    # R5-2: "este bundle fue sellado con clave" es observable por el entry_hmac
+    # de las entradas, no por lo que el atacante haya dejado a nivel bundle.
+    keyed_entries = any(
+        isinstance(e, dict) and e.get("entry_hmac") for e in log
+    )
 
     for entry in log:
         seq = entry.get("seq", "?")
@@ -308,6 +364,16 @@ def _verify_v2(
             ok = False
         else:
             print(f"  [OK  ] chain_tip_sha256 | coincide con la punta recomputada")
+        if hmac_key is not None and expected_tip_hmac is None and keyed_entries:
+            # R5-2: mismo borrado, un campo mas adentro — chain_tip_sha256 solo
+            # es recomputable por cualquiera con acceso de escritura; el HMAC de
+            # la punta es lo unico que lo ancla. Borrarlo lo deja recomputable.
+            print(
+                "  [FAIL] chain_tip_hmac ausente en un bundle con entry_hmac: "
+                "chain_tip_sha256 sin su HMAC es recomputable por quien escriba "
+                "el archivo."
+            )
+            ok = False
         if hmac_key is not None and expected_tip_hmac is not None:
             expected = _hmac.new(hmac_key, expected_prev.encode("utf-8"), "sha256").hexdigest()
             if not _hmac.compare_digest(expected_tip_hmac, expected):
@@ -318,6 +384,18 @@ def _verify_v2(
                 ok = False
             else:
                 print("  [OK  ] chain_tip_hmac | coincide")
+    elif hmac_key is not None and keyed_entries:
+        # R5-2: un bundle sellado con clave SIEMPRE lleva chain_tip_sha256 y
+        # chain_tip_hmac (ToolExecutionLogChain.bundle_fields los emite juntos).
+        # Si las entradas traen entry_hmac pero el ancla no esta, fue borrada
+        # despues del sellado — y sin ancla, truncar la cola vuelve a ser
+        # indetectable. Ausencia != bundle viejo cuando hay HMAC por entrada.
+        print(
+            "  [FAIL] chain_tip_sha256 ausente en un bundle con entry_hmac: "
+            "el sellado keyed siempre ancla la punta. El ancla fue borrada — "
+            "truncar la cola seria indetectable."
+        )
+        ok = False
     else:
         print(
             "\n  [NOTE] Sin chain_tip_sha256 en el bundle: truncar la cola "
@@ -349,22 +427,38 @@ def verify_chain(bundle_path: str, verbose: bool = False, args=None) -> int:
         print("Use: python3 forensics/verify_ebs_v1.py <bundle> --verbose")
         return 2
 
+    # R5-3 (hygiene): un log malformado debe dar un diagnostico, no un
+    # traceback. El exit code ya era 1 por la excepcion — fail-safe — pero un
+    # traceback no le dice a un perito que mirar.
+    if not isinstance(log, list):
+        print(f"ERROR: tool_execution_log debe ser una lista, es {type(log).__name__}")
+        return 1
+    bad = [i for i, e in enumerate(log) if not isinstance(e, dict)]
+    if bad:
+        print(f"ERROR: entradas malformadas (no son objetos JSON) en los "
+              f"indices {bad[:10]} de tool_execution_log")
+        return 1
+
     case_id = (bundle.get("case_id")
                or bundle.get("metadata", {}).get("case_id", "UNKNOWN"))
-    version = "2" if log[0].get("entry_hash") else "1"
+    version, markers = _detect_schema(log, bundle)
+    hmac_key = _resolve_hmac_key(args) if args else None
+    allow_legacy = bool(getattr(args, "allow_legacy_v1", False))
     print(f"Bundle : {bundle_path}")
     print(f"Case   : {case_id}")
     print(f"Schema : chain v{version}")
     print(f"Entries: {len(log)} MCP tool calls")
+    if version == "2":
+        print(f"v2 markers: {len(markers)} ({', '.join(markers[:3])}"
+              f"{', ...' if len(markers) > 3 else ''})")
     print()
 
     if version == "2":
-        hmac_key = _resolve_hmac_key(args) if args else None
         expected_tip = bundle.get("chain_tip_sha256")
         expected_tip_hmac = bundle.get("chain_tip_hmac")
         ok = _verify_v2(log, verbose, hmac_key, expected_tip, expected_tip_hmac)
     else:
-        ok = _verify_v1(log, verbose)
+        ok = _verify_v1(log, verbose, hmac_key, allow_legacy)
 
     sc = bundle.get("self_correction_events", [])
     if sc:
@@ -414,5 +508,9 @@ if __name__ == "__main__":
                    help="Clave HMAC en hex para verificación keyed (v2)")
     p.add_argument("--hmac-key-file", default="",
                    help="Archivo con la clave HMAC en bytes crudos (v2)")
+    p.add_argument("--allow-legacy-v1", action="store_true",
+                   help="Aceptar un bundle esquema v1 aunque se haya provisto "
+                        "clave HMAC (bundles historicos). Sin este flag, v1 + "
+                        "clave se reporta como degradacion de esquema — R5-1.")
     cli_args = p.parse_args()
     sys.exit(verify_chain(cli_args.bundle, cli_args.verbose, cli_args))

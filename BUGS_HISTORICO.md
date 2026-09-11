@@ -12,6 +12,117 @@ Formato: un bloque por bug, con su impacto forense y el fix aplicado.
 
 ---
 
+## B-228 — Degradación de esquema v2→v1 en `verify_tool_log.py`: el dato no autenticado elegía el algoritmo de verificación
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P1 — integridad del audit trail bajo Daubert |
+| **Archivo** | `verify_tool_log.py` |
+| **Línea original** | 314 (`version = "2" if log[0].get("entry_hash") else "1"`) |
+| **Detectado en** | Red Team Round 5, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND5_DOWNGRADE.md` (R5-1) |
+
+### Descripción
+
+El verificador standalone elegía entre el esquema de cadena v2 y el v1 legacy
+mirando un único campo borrable **dentro del arreglo que el atacante edita**.
+Borrando `entry_hash` de la primera entrada y reescribiendo `prev_hash` según la
+regla v1 (ninguna de las dos cosas requiere la clave HMAC), la verificación caía
+a `_verify_v1`, que:
+
+- sólo encadena `result_summary` — `timestamp`, `tool`, `target` e `input_hash`
+  quedan sin cubrir;
+- **no recibe la clave HMAC** (la función no tenía el parámetro), así que
+  `entry_hmac` nunca se verificaba aunque el perito la tuviera;
+- **no consulta `chain_tip_sha256`**, así que el ancla de cola de R3-5 no
+  participaba ni estando presente.
+
+Las tres defensas acumuladas en R3-2, A3 y R3-5 se apagaban juntas. Confirmado
+por inducción: `VERDICT: MALICE` reescrito como `VERDICT: NOISE`, `target` y
+`timestamp` alterados, verificado **con la clave correcta** → `CHAIN VERIFIED
+(schema v1)`, exit 0.
+
+`tool_execution_log` no está cubierto por `bundle_hash` (`BundleBuilder.seal`
+arma `bundle_payload` sin él), así que no había un sello exterior que atenuara
+el impacto: este verificador es su única protección.
+
+### Fix aplicado
+
+`_detect_schema(log, bundle)` deduce el esquema de **todos** los marcadores v2
+(`chain_version == "2"`, `entry_hash`, `entry_hmac` en cualquier entrada;
+`chain_tip_sha256` / `chain_tip_hmac` a nivel bundle). Si algo declara v2 se
+verifica como v2, y la entrada sin `entry_hash` falla como contenido alterado.
+`_verify_v1` recibe la clave y reporta el log v1 como degradación cuando hay
+clave provista, salvo `--allow-legacy-v1` para bundles históricos.
+
+**Residual documentado:** borrar *todos* los marcadores v2 sigue siendo
+indistinguible de un bundle legacy genuino si el verificador corre **sin** clave.
+Medido, con test: `test_full_marker_strip_is_flagged_only_when_keyed`.
+
+### Regresión
+
+`tests/test_r5_schema_downgrade.py` (12 tests; 9 rojos contra el código
+pre-fix), `scripts/redteam_round5_downgrade.py` (12 vectores). Cero cambios de
+exit code sobre los 35 bundles reales del repositorio.
+
+---
+
+## B-229 — Borrar `chain_tip_sha256` reactivaba la truncación de cola que R3-5 había cerrado
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P2 |
+| **Archivo** | `verify_tool_log.py` (`_verify_v2`) |
+| **Detectado en** | Red Team Round 5, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND5_DOWNGRADE.md` (R5-2) |
+
+### Descripción
+
+R3-5 ancló la cola de la cadena con `chain_tip_sha256` fuera del arreglo que un
+atacante truncaría. Pero la **presencia** del ancla también la decide el
+atacante, y su ausencia se reportaba como `[NOTE]` de retrocompatibilidad, no
+como fallo. Truncar el log y borrar el ancla devolvía la truncación a
+indetectable **incluso con la clave provista**: el mismo ataque que R3-5 detecta
+se vuelve a esconder borrando el detector.
+
+### Fix aplicado
+
+Que un bundle fue sellado con clave es observable dentro de la propia lista:
+`entry_hmac` presente en alguna entrada. `ToolExecutionLogChain.bundle_fields()`
+emite `chain_tip_sha256` y `chain_tip_hmac` juntos siempre que hay clave, así que
+`entry_hmac` presente + ancla ausente = borrado, no bundle viejo → `[FAIL]`.
+Ídem `chain_tip_hmac` ausente con `chain_tip_sha256` presente.
+
+El contrato de R3-5 para bundles **sin** clave queda intacto: sin `entry_hmac`,
+la ausencia de ancla sigue siendo `[NOTE]` y exit 0.
+
+---
+
+## B-230 — `verify_tool_log.py` producía traceback en vez de diagnóstico ante un log malformado
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P3 — hygiene |
+| **Archivo** | `verify_tool_log.py` (`verify_chain`) |
+| **Detectado en** | Red Team Round 5, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND5_DOWNGRADE.md` (R5-3) |
+
+### Descripción
+
+`log[0].get(...)` sobre una entrada `str`/`None`, o sobre un
+`tool_execution_log` que es un dict, levantaba `AttributeError` / `KeyError`. El
+exit code resultante era 1 — fail-safe, sin `VERIFIED` falso — pero un traceback
+no le dice a un perito qué mirar. Mismo tipo que B-R4-4.
+
+### Fix aplicado
+
+Guarda de forma con diagnóstico explícito que nombra los índices malformados.
+
+---
+
 ## B-001 — `daubert_note` UnboundLocalError en el path CollapseDecisionLayer
 
 | Campo | Valor |
