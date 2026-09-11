@@ -328,8 +328,19 @@ Propiedades clave:
   del navegador; el vocabulario sellado (valores de veredicto) y el contenido
   de los bundles se muestran siempre verbatim, sin traducir.
 
-Configuración: `VIGIA_HOST` (por defecto `127.0.0.1`), `VIGIA_UI_PORT`
+Configuración: `VIGIA_UI_HOST` (por defecto `127.0.0.1`), `VIGIA_UI_PORT`
 (por defecto `8010`), `VIGIA_UI_MAX_JOBS` (por defecto `1`).
+
+> **Dirección de escucha (R9-1).** `VIGIA_UI_HOST` es la variable propia de
+> esta UI. `VIGIA_HOST` se sigue leyendo como fallback, pero está
+> **compartida con la API Modo 5**: un operador que ponga `VIGIA_HOST=0.0.0.0`
+> para dejar la API detrás de un proxy inverso autenticado moverìa también
+> esta UI a todas las interfaces, sin autenticación alguna y con un endpoint
+> `POST /api/investigations` que lanza `vigia_agent.py`. Por eso la UI **se
+> niega a arrancar** en una dirección no-loopback salvo que
+> `VIGIA_UI_ALLOW_REMOTE=1` indique que fue deliberado. Para exponer la API
+> manteniendo la UI local: `VIGIA_UI_HOST=127.0.0.1`.
+> Ver `docs/REDTEAM_ROUND9_EXPOSURE.md`.
 
 ---
 

@@ -12,6 +12,77 @@ Format: one block per bug, with its forensic impact and the fix applied.
 
 ---
 
+## B-237 — `VIGIA_HOST` shared between the Mode 5 API and the web UI: exposing one silently exposed the other
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — an unauthenticated service with a subprocess launcher, exposed to the network |
+| **Files** | `vigia/ui/__main__.py`, `launch_vigia_ui.sh`, `INSTALL.md`, `INSTALL_ES.md` |
+| **Found in** | Red Team Round 9, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND9_EXPOSURE.md` (R9-1) |
+
+### Description
+
+`VIGIA_HOST` is read by **two** services: the Mode 5 API
+(`vigia/vigia_api.py`, port 8000) and the web UI (`vigia/ui/__main__.py`, port
+8010). INSTALL.md warns against setting it to `0.0.0.0` and, where remote
+access is required, directs the operator to put the API behind an
+authenticated reverse proxy — all correct, and all written in the API section.
+
+An operator following that documented escape hatch also moves the web UI onto
+every interface. The UI has no authentication layer of any kind and exposes
+`POST /api/investigations`, which launches `vigia_agent.py` as a subprocess.
+
+Measured against the real server:
+
+```
+INFO: Uvicorn running on http://0.0.0.0:8099
+POST /api/investigations  (no Origin, no Referer)  -> HTTP 422
+GET  /api/evidence        (no credential)          -> full inventory
+```
+
+The 422 is business validation: the request passed the cross-site guard and
+reached the launcher. With a valid evidence path it would have started the
+subprocess.
+
+**Honest scope:** the `0.0.0.0` bind and the absence of auth were confirmed
+from loopback. A remote attacker on a LAN was **not** demonstrated — not
+reproducible in the session environment.
+
+### Fix applied
+
+1. **Decoupling:** the UI reads `VIGIA_UI_HOST` first, so the API can be
+   exposed without dragging the UI along
+   (`VIGIA_HOST=0.0.0.0 VIGIA_UI_HOST=127.0.0.1`). `VIGIA_HOST` remains a
+   backward-compatible fallback.
+2. **Refusal, not a warning:** a non-loopback address aborts startup with a
+   message naming the responsible variable and giving both ways out. The
+   deliberate escape is `VIGIA_UI_ALLOW_REMOTE=1`, which also warns on every
+   start.
+
+`is_loopback` does not assume a name it cannot evaluate lexically is local.
+
+### Falsified in the same round (defences that do work)
+
+- **Traversal via `evidence_path`:** `resolve_evidence_path` rejects absolute
+  paths and `..`, compares `parts` tuples against allowlisted roots (not string
+  prefixes), rejects symlink components, and requires an `lstat` regular
+  file/directory.
+- **`case_id` validated only client-side:** `jobs.submit` applies `CASE_ID_RE`
+  server-side. Defence placement, not absence.
+- **CSRF via a cross-site form:** the middleware requires
+  `Content-Type: application/json`, which an HTML form cannot set and a `fetch`
+  only achieves through a preflight the server does not permit.
+
+### Regression
+
+`tests/test_r9_ui_bind_exposure.py` (25 tests; the 3 behavioural ones red
+against pre-R9 code). The three legitimate paths measured against the real
+server.
+
+---
+
 ## B-235 — The web UI's HMAC key travelled on argv, readable in /proc by any local process
 
 | Field | Value |
