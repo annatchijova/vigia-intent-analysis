@@ -90,6 +90,67 @@ def _scalar_display(value: Any) -> Any:
 
 
 # ---------------------------------------------------------------------------
+# R10-1 — Coercion de forma en el limite
+#
+# Un bundle puede venir de un tercero (otra pericia, la contraparte): la UI
+# existe justamente para inspeccionarlo. Un campo con el tipo equivocado
+# —`timestamp` numerico, `artifacts` como string en vez de lista— hacia
+# explotar al renderizador (`.slice`/`.join`/`.map` sobre lo que no era), y el
+# router mostraba "La peticion fallo", misatribuyendo a la red un bundle
+# malformado.
+#
+# Este es el limite entre un archivo no confiable y la forma de display: acá se
+# coacciona y se DECLARA. Nunca se inventa un valor y nunca se retipa en
+# silencio — el desajuste entra a `warnings[]`, que la UI ya muestra.
+# ---------------------------------------------------------------------------
+
+def coerce_text(value: Any, label: str, warnings: list) -> Any:
+    """Devuelve texto (o None). Un valor no textual se muestra como texto y el
+    desajuste de forma queda registrado."""
+    if value is None or isinstance(value, str):
+        return value
+    warnings.append(
+        f"{label}: se esperaba texto, se encontro {type(value).__name__} "
+        f"— mostrado como texto"
+    )
+    return str(value)
+
+
+def coerce_list(value: Any, label: str, warnings: list) -> list:
+    """Devuelve una lista. Un escalar se envuelve en una lista de un elemento;
+    el desajuste queda registrado."""
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return value
+    warnings.append(
+        f"{label}: se esperaba lista, se encontro {type(value).__name__} "
+        f"— envuelto en una lista de un elemento"
+    )
+    return [value]
+
+
+def coerce_entry_text(entries: Any, fields: tuple, label: str,
+                      warnings: list) -> list:
+    """Aplica `coerce_text` a `fields` en cada entrada de una lista de dicts."""
+    out = []
+    for idx, entry in enumerate(coerce_list(entries, label, warnings)):
+        if not isinstance(entry, dict):
+            warnings.append(
+                f"{label}[{idx}]: se esperaba un objeto, se encontro "
+                f"{type(entry).__name__} — omitido"
+            )
+            continue
+        fixed = dict(entry)
+        for field in fields:
+            if field in fixed:
+                fixed[field] = coerce_text(
+                    fixed[field], f"{label}[{idx}].{field}", warnings)
+        out.append(fixed)
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Schema detection
 # ---------------------------------------------------------------------------
 
@@ -254,7 +315,9 @@ def _normalize_agent_audit(doc: dict, warnings: list) -> dict:
         if isinstance(e, dict):
             preview.append({
                 "seq": e.get("seq"),
-                "timestamp": e.get("timestamp"),
+                # R10-1: el front rebana este campo; si no es texto, explota.
+                "timestamp": coerce_text(e.get("timestamp"),
+                                         "audit_trail.timestamp", warnings),
                 "action": e.get("action"),
                 "tool": e.get("tool"),
                 "note": e.get("note"),
@@ -311,11 +374,13 @@ def _normalize_mcp_finding(f: dict, idx: int, warnings: list) -> dict:
         "status": f.get("status"),
         "peirce": peirce,
         "carnegie": f.get("carnegie_pattern", f.get("carnegie")),
-        "mitre_ttps": f.get("mitre_ttps", f.get("mitre")) or [],
+        "mitre_ttps": coerce_list(f.get("mitre_ttps", f.get("mitre")),
+                                  f"finding[{idx}].mitre_ttps", warnings),
         "devil_advocate": f.get("devil_advocate"),
         "corroboration": f.get("corroboration"),
-        "artifacts": artifacts or [],
-        "tools_used": f.get("tools_used") or [],
+        "artifacts": coerce_list(artifacts, f"finding[{idx}].artifacts", warnings),
+        "tools_used": coerce_list(f.get("tools_used"),
+                                  f"finding[{idx}].tools_used", warnings),
         "kind": "finding",
         "raw_pointer": f"/findings/{idx}",
     }
@@ -361,7 +426,9 @@ def _normalize_mcp(doc: dict, warnings: list) -> dict:
             "entry_count": len(tool_log),
             "chain_version": chain_version,
             "chain_tip_sha256": doc.get("chain_tip_sha256"),
-            "entries": decode_fractions(tool_log),
+            "entries": decode_fractions(coerce_entry_text(
+                tool_log, ("timestamp", "entry_hash", "prev_hash"),
+                "tool_execution_log", warnings)),
         },
         "audit_trail": {"present": False, "entry_count": 0, "entries_preview": []},
         "integrity": {

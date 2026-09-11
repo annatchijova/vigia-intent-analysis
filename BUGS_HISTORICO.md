@@ -12,6 +12,77 @@ Formato: un bloque por bug, con su impacto forense y el fix aplicado.
 
 ---
 
+## B-238 — Seis campos de un bundle con el tipo equivocado hacían explotar el renderizador de la web UI
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P2 — la pestaña no renderiza, con causa misatribuida |
+| **Archivos** | `vigia/ui/normalizer.py`, `vigia/ui/static/app.js`, `vigia/ui/static/i18n.js` |
+| **Detectado en** | Red Team Round 10, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND10_RENDER_TYPES.md` (R10-1, R10-2) |
+
+### Descripción
+
+La web UI existe para inspeccionar bundles, y un bundle puede venir de un
+tercero: otra pericia, la contraparte, otro laboratorio. Su contenido es
+entrada no confiable. El normalizador lo pasaba crudo al frontend, que asumía
+el tipo de cada campo.
+
+Medido ejecutando las funciones reales de `app.js` con node, barriendo cada
+tipo hostil en cada campo (variant sweep, no un caso suelto):
+
+```
+toolLogTab / entry.timestamp   LANZA  (e.timestamp || "").slice is not a function
+toolLogTab / entry.entry_hash  LANZA  e.entry_hash.slice is not a function
+toolLogTab / entry.prev_hash   ok            <- el único con String(...)
+toolLogTab / audit.timestamp   LANZA  (e.timestamp || "").slice is not a function
+findingsTab / mitre_ttps       LANZA  (f.mitre_ttps || []).map is not a function
+findingsTab / artifacts        LANZA  f.artifacts.join is not a function
+findingsTab / tools_used       LANZA  f.tools_used.join is not a function
+```
+
+`prev_hash` estaba envuelto en `String(...)` y sus dos vecinos no: la huella de
+un arreglo puntual que no barrió la clase.
+
+El caso de `artifacts` ni siquiera es hostil — el tipo que lo rompe es
+**string**. Un bundle escrito por otra herramienta con `"artifacts": "/a, /b"`
+en vez de una lista rompe la pestaña. Es interoperabilidad, no sólo adversarial.
+
+**R10-2:** el router mostraba el fallo como *"La petición falló"*. La petición
+no había fallado: devolvió 200 con un bundle malformado. En una herramienta
+forense, "reintentá, la red falló" y "este archivo tiene un campo con el tipo
+equivocado" mandan a mirar lugares distintos.
+
+### Fix aplicado
+
+En el **límite** (`normalizer.py`), donde un archivo no confiable se convierte
+en forma de display, extendiendo la doctrina que el módulo ya declaraba para
+campos ausentes: `coerce_text`, `coerce_list` y `coerce_entry_text` coaccionan y
+**declaran** el desajuste en `warnings[]`, que la UI ya muestra. Nunca se
+inventa un valor ni se retipa en silencio. Una entrada que no es un objeto se
+omite y se declara.
+
+En el frontend, `txt()` y `arr()` como defensa en profundidad — no como el
+arreglo. Y `api()` marca sus propios errores para que el banner distinga un
+fallo de petición de uno de renderizado, en ambos idiomas.
+
+### Falsificado en la misma ronda
+
+La hipótesis de entrada era XSS almacenado desde un bundle de terceros. Se
+descartó midiendo: `esc()` consistente en todo valor derivado del bundle,
+`esc(JSON.stringify(o))` en el visor crudo, el render de Fractions tipado en
+ambos lados (`isinstance(int)` y `Number.isInteger`), y CSP
+`script-src 'self'` sin `unsafe-inline`.
+
+### Regresión
+
+`tests/test_r10_render_type_coercion.py` (15 tests; 14 rojos contra el código
+pre-R10) y `scripts/redteam_round10_render_types.mjs` (0 campos lanzan
+post-fix, 6 contra el checkout anterior).
+
+---
+
 ## B-237 — `VIGIA_HOST` compartida entre la API Modo 5 y la web UI: exponer una exponía la otra en silencio
 
 | Campo | Valor |

@@ -12,6 +12,77 @@ Format: one block per bug, with its forensic impact and the fix applied.
 
 ---
 
+## B-238 — Six bundle fields with the wrong type crashed the web UI renderer
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 — the tab fails to render, with the cause misattributed |
+| **Files** | `vigia/ui/normalizer.py`, `vigia/ui/static/app.js`, `vigia/ui/static/i18n.js` |
+| **Found in** | Red Team Round 10, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND10_RENDER_TYPES.md` (R10-1, R10-2) |
+
+### Description
+
+The web UI exists to inspect bundles, and a bundle may come from a third party:
+another examination, opposing counsel, another lab. Its content is untrusted
+input. The normalizer passed it through raw to the frontend, which assumed each
+field's type.
+
+Measured by running the real `app.js` functions under node, sweeping every
+hostile type across every field (a variant sweep, not a single case):
+
+```
+toolLogTab / entry.timestamp   THROWS  (e.timestamp || "").slice is not a function
+toolLogTab / entry.entry_hash  THROWS  e.entry_hash.slice is not a function
+toolLogTab / entry.prev_hash   ok             <- the only one with String(...)
+toolLogTab / audit.timestamp   THROWS  (e.timestamp || "").slice is not a function
+findingsTab / mitre_ttps       THROWS  (f.mitre_ttps || []).map is not a function
+findingsTab / artifacts        THROWS  f.artifacts.join is not a function
+findingsTab / tools_used       THROWS  f.tools_used.join is not a function
+```
+
+`prev_hash` was wrapped in `String(...)` while its two neighbours were not — the
+fingerprint of a one-off fix that never swept the class.
+
+The `artifacts` case is not even hostile: the type that breaks it is **string**.
+A bundle written by another tool with `"artifacts": "/a, /b"` instead of a list
+breaks the tab. That is interoperability, not only adversarial input.
+
+**R10-2:** the router surfaced the failure as *"Request failed"*. The request had
+not failed: it returned 200 with a malformed bundle. In a forensic tool,
+"retry, the network failed" and "this file has a field of the wrong type" send
+the examiner to different places.
+
+### Fix applied
+
+At the **boundary** (`normalizer.py`), where an untrusted file becomes display
+shape, extending the doctrine the module already stated for missing fields:
+`coerce_text`, `coerce_list` and `coerce_entry_text` coerce and **declare** the
+mismatch in `warnings[]`, which the UI already renders. No value is ever
+invented and nothing is silently retyped. A non-object entry is dropped and
+declared.
+
+In the frontend, `txt()` and `arr()` as defence in depth — not as the fix. And
+`api()` tags its own errors so the banner distinguishes a request failure from a
+render failure, in both locales.
+
+### Falsified in the same round
+
+The entry hypothesis was stored XSS from a third-party bundle. It was discarded
+by measurement: `esc()` consistently applied to every bundle-derived value,
+`esc(JSON.stringify(o))` in the raw viewer, the Fraction renderer type-guarded
+on both sides (`isinstance(int)` and `Number.isInteger`), and a CSP of
+`script-src 'self'` with no `unsafe-inline`.
+
+### Regression
+
+`tests/test_r10_render_type_coercion.py` (15 tests; 14 red against pre-R10 code)
+and `scripts/redteam_round10_render_types.mjs` (0 fields throw post-fix, 6
+against the previous checkout).
+
+---
+
 ## B-237 — `VIGIA_HOST` shared between the Mode 5 API and the web UI: exposing one silently exposed the other
 
 | Field | Value |

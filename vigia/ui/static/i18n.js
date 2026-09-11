@@ -17,6 +17,7 @@ window.VIGIA_I18N = {
     "theme.toggle": "◐ theme",
 
     "err.request": "Request failed —",
+    "err.render": "This bundle could not be displayed (malformed field) —",
 
     "filters.verdict_all": "verdict: all",
     "filters.schema_all": "schema: all",
@@ -143,6 +144,7 @@ window.VIGIA_I18N = {
     "theme.toggle": "◐ tema",
 
     "err.request": "La petición falló —",
+    "err.render": "No se pudo mostrar este bundle (campo malformado) —",
 
     "filters.verdict_all": "veredicto: todos",
     "filters.schema_all": "esquema: todos",
