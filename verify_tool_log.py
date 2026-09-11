@@ -414,6 +414,74 @@ def _verify_v2(
     return ok
 
 
+def _looks_like_trace(doc: dict) -> bool:
+    """Una reasoning trace sellada: artefacto hermano del bundle, con cadena
+    propia. Se reconoce por trace_id + verdict (ver vigia/core/reasoning_trace)."""
+    return isinstance(doc.get("trace_id"), str) and "verdict" in doc
+
+
+def _find_sibling_bundle(trace_path: str):
+    """<stem>_reasoning_trace.json -> <stem>.json, si existe."""
+    p = Path(trace_path)
+    marker = "_reasoning_trace.json"
+    if not p.name.endswith(marker):
+        return None
+    sibling = p.with_name(p.name[: -len(marker)] + ".json")
+    return sibling if sibling.is_file() else None
+
+
+def _check_trace_pairing(trace: dict, trace_path: str, bundle_arg: str) -> bool:
+    """R7-1: la traza vive FUERA del digest del bundle — es un archivo aparte
+    con integridad propia. Su cadena puede estar perfectamente intacta y aun asi
+    explicar OTRO caso: nada en la cadena dice a que bundle pertenece.
+
+    `vigia/core/reasoning_trace.verify_reasoning_trace` implementa la
+    comparacion (case_id + verdict) y su docstring la declara obligatoria
+    — "MUST fail verification, never be silently reconciled" — pero solo se
+    llamaba desde un test: ningun CLI la exponia. Medido: la traza de un caso
+    SUSPICION presentada junto al bundle de un caso MALICE daba
+    "CHAIN VERIFIED", exit 0.
+
+    Devuelve True si el emparejamiento es correcto o no habia con que
+    compararlo; False si diverge. Nunca pasa en silencio: cuando no se puede
+    comparar, lo dice.
+    """
+    path = bundle_arg or _find_sibling_bundle(trace_path)
+    if not path:
+        print("\n  [NOTE] Reasoning trace verificada EN AISLAMIENTO: no se "
+              "encontro el bundle hermano. La cadena prueba que la traza no "
+              "fue alterada, NO que explique el bundle que la acompana. "
+              "Pasar --paired-bundle <path> para verificar el emparejamiento.")
+        return True
+    try:
+        bundle = json.loads(Path(path).read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"\n  [FAIL] Pairing: no se pudo leer el bundle {path}: {exc}")
+        return False
+
+    ok = True
+    print(f"\nPairing traza <-> bundle: {path}")
+    t_case, b_case = trace.get("case_id"), bundle.get("case_id")
+    if t_case != b_case:
+        print(f"  [FAIL] case_id | traza={t_case!r} bundle={b_case!r}")
+        ok = False
+    else:
+        print(f"  [OK  ] case_id | {t_case!r}")
+
+    t_verdict = trace.get("verdict")
+    b_verdict = bundle.get("agent_verdict")
+    if b_verdict is None:
+        print("  [NOTE] el bundle no declara agent_verdict: veredicto NO comparado")
+    elif t_verdict != b_verdict:
+        print(f"  [FAIL] veredicto | la traza registro {t_verdict!r} pero el "
+              f"bundle sellado dice {b_verdict!r} — la traza se construyo a "
+              f"partir de otro resultado que el que se sello")
+        ok = False
+    else:
+        print(f"  [OK  ] veredicto | {t_verdict!r}")
+    return ok
+
+
 def verify_chain(bundle_path: str, verbose: bool = False, args=None) -> int:
     try:
         bundle = json.loads(Path(bundle_path).read_text())
@@ -489,6 +557,13 @@ def verify_chain(bundle_path: str, verbose: bool = False, args=None) -> int:
     if note:
         print(f"\nNote: {note[:140]}")
 
+    # R7-1: si el archivo es una reasoning trace, su cadena intacta NO prueba
+    # que pertenezca al bundle con el que se la presenta.
+    if _looks_like_trace(bundle):
+        if not _check_trace_pairing(bundle, bundle_path,
+                                    getattr(args, "paired_bundle", "") if args else ""):
+            ok = False
+
     status = f"CHAIN VERIFIED ({len(log)} entries, schema v{version})" if ok else "CHAIN BROKEN"
     print(f"\nResult: {status}")
 
@@ -519,6 +594,12 @@ if __name__ == "__main__":
                    help="Clave HMAC en hex para verificación keyed (v2)")
     p.add_argument("--hmac-key-file", default="",
                    help="Archivo con la clave HMAC en bytes crudos (v2)")
+    # dest propio: el argumento posicional ya ocupa "bundle", y una colision
+    # de dest hace que el flag pise la ruta del archivo a verificar.
+    p.add_argument("--paired-bundle", dest="paired_bundle", default="",
+                   help="Bundle sellado con el que emparejar una reasoning "
+                        "trace (case_id + veredicto). Por defecto se busca el "
+                        "hermano <stem>.json — R7-1.")
     p.add_argument("--allow-legacy-v1", action="store_true",
                    help="Aceptar un bundle esquema v1 aunque se haya provisto "
                         "clave HMAC (bundles historicos). Sin este flag, v1 + "

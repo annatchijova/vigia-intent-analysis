@@ -12,6 +12,62 @@ Format: one block per bug, with its forensic impact and the fix applied.
 
 ---
 
+## B-234 — The reasoning trace ↔ sealed bundle pairing was enforced by no verifier
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — process evidence attributable to the wrong case |
+| **Files** | `verify_tool_log.py`, `vigia_agent.py` |
+| **Found in** | Red Team Round 7, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND7_PAIRING.md` (R7-1) |
+
+### Description
+
+`vigia/core/reasoning_trace.py` states the invariant in its own docstring —
+*"any verifier MUST assert this equals the sealed bundle verdict [...] must FAIL
+verification, never be silently reconciled"* — and implements it correctly in
+`verify_reasoning_trace()`, which compares `case_id` and verdict.
+
+That function was called **only from a test**. `vigia_agent.py` named it in a
+comment ("verify_reasoning_trace() binds the two") without invoking it, and no
+CLI exposed it: `verify_tool_log.py` verifies the trace's chain in isolation and
+`forensics/verify_ebs_v1.py` verifies the bundle, neither looking at the other
+file.
+
+The trace lives outside the bundle digest — a sibling artifact with its own
+integrity — so its chain can be intact and still explain a different case.
+
+Measured on real artifacts in `vigia/results/mode1_crosscheck/`: the JESS-M1
+trace (SUSPICION) presented alongside the FLAREON-2017-M1 bundle (MALICE)
+returned `CHAIN VERIFIED`, exit 0, `Timeline: PLAUSIBLE`. One case's reasoning,
+presented as the explanation for another case's MALICE verdict, passed every
+documented verification.
+
+### Fix applied
+
+Both ends. **Production:** `vigia_agent.py` calls `verify_reasoning_trace()`
+before writing the trace and does not write it on divergence; the fail-soft
+posture toward the already-sealed bundle is kept (§5.3) but separated from a
+write failure by a dedicated exception at `error` level (`WIRING BUG`).
+**Verification:** `verify_tool_log.py` recognizes a reasoning trace,
+auto-detects the sibling bundle `<stem>.json` (or takes `--paired-bundle`), and
+compares `case_id` and verdict. With no bundle to compare against it says so
+explicitly, rather than letting `CHAIN VERIFIED` read as "this trace explains
+that bundle".
+
+**Documented limit:** the pairing compares two fields an attacker with write
+access can make match. A `bundle_digest` inside the trace would make it
+cryptographic — a format change, recorded as a recommendation.
+
+### Regression
+
+`tests/test_r7_trace_bundle_pairing.py` (9 tests; 6 red against pre-R7 code).
+The 5 real pairs in `mode1_crosscheck/` stay green; 0 exit-code changes across
+the 35 bundles carrying a `tool_execution_log`.
+
+---
+
 ## B-231 — Authority conflict: `seal_with_chain()` produced bundles `verify_ebs_v1.py` declared invalid
 
 | Field | Value |
