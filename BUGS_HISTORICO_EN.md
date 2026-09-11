@@ -12,6 +12,221 @@ Format: one block per bug, with its forensic impact and the fix applied.
 
 ---
 
+## B-231 — Authority conflict: `seal_with_chain()` produced bundles `verify_ebs_v1.py` declared invalid
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — two VIGÍA components disagreeing about the same file |
+| **Files** | `forensics/verify_ebs_v1.py`, `vigia/core/bundle_builder.py`, `vigia/forensics/vigia_chain_of_custody.py` |
+| **Found in** | Red Team Round 6, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND6_PERIMETER.md` (R6-1) |
+
+### Description
+
+`BundleBuilder.seal()` builds `bundle_payload` from a fixed key list, so any
+field added after sealing falls outside the hash by construction. The custody
+ledger knew this and excluded `integrity`, `forensic_chain` and `pki` when
+recomputing. The other two verifiers rebuilt the payload as "everything except
+`integrity`".
+
+Measured result: a bundle produced by VIGÍA's own `seal_with_chain()` — which
+injects `forensic_chain` outside the payload, by documented design — was
+declared **intact** by the ledger and **invalid** by `verify_ebs_v1.py` and
+`BundleBuilder.quick_verify`. Same for `pki`: notarizing the bundle with an
+RFC 3161 receipt broke its own verification.
+
+For an expert proceeding this is the worst possible disagreement: opposing
+counsel picks whichever verifier helps.
+
+### Fix applied
+
+One shared notion of presentation fields —
+`PRESENTATION_FIELDS = (integrity, forensic_chain, pki, tool_execution_log)` —
+with a local copy in each stdlib-only verifier and a lockstep test. **Both**
+historical payload schemes are supported (older bundles hash
+`tool_execution_log` inside the payload): both are tried and the SHA-256 must
+match one exactly, so an attacker gains no forging margin. New `R1_SEAL_SCOPE`
+check, informational, naming which part of the file the seal does **not** back
+and where each part's authenticity comes from instead.
+
+---
+
+## B-232 — The `tool_execution_log` was not anchored to the sealed bundle, and could not be
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 |
+| **File** | `vigia/core/bundle_builder.py` (`seal`) |
+| **Found in** | Red Team Round 6, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND6_PERIMETER.md` (R6-2) |
+
+### Description
+
+CLAUDE.md instructs the agent to write `tool_execution_log` and
+`chain_tip_sha256` as siblings of the bundle. Measured: attaching **any**
+sibling key to a sealed bundle breaks the seal. So two individually correct
+documented behaviours composed into an invalid bundle — which is why the audit
+trail lived outside the cryptographic perimeter, with nothing preventing its
+deletion.
+
+### Fix applied
+
+`seal(tool_log_tip=...)` puts the chain **tip** (`chain_tip_sha256` /
+`chain_tip_hmac`) inside the sealed payload, while the entry array travels as a
+presentation field. The field does not move: it becomes covered. Measured
+result: truncating the log breaks the comparison against the tip; recomputing
+the tip to hide that breaks `bundle_hash`, which is itself anchored in the
+custody ledger with an HMAC checkpoint.
+
+**Honest limit, not closed:** excluding the log from the hash opens a vector
+that did not exist before — attaching a *fabricated* log to a legitimate bundle
+no longer breaks the seal. It is reported as an `R1_SEAL_SCOPE` WARNING
+("SIN ANCLA" / unanchored), not an ERROR, because an unanchored log does not
+prove the bundle was altered. Promoting it to ERROR waits on every producer
+passing `tool_log_tip`.
+
+---
+
+## B-233 — Deleting the whole `tool_execution_log` was reported as "bundle without a log", not as a deleted log
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P3 |
+| **File** | `verify_tool_log.py` (`verify_chain`) |
+| **Found in** | Red Team Round 6, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND6_PERIMETER.md` (R6-3) |
+
+### Description
+
+Deleting the whole array returned exit 2 (`NO tool_execution_log —
+fallback/EBS bundle`) while the seal stayed intact: nothing said something
+sealed was missing. A silent absence, of the kind CLAUDE.md marks as incomplete
+under Daubert.
+
+### Fix applied
+
+With the tip sealed (B-232) the absence is detectable: if the bundle declares
+`chain_tip_sha256` and the array is not there, it is reported as a broken chain
+(exit 1), not as a bundle without a log.
+
+---
+
+## B-228 — Schema downgrade v2→v1 in `verify_tool_log.py`: unauthenticated data selected the verification algorithm
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — audit-trail integrity under Daubert |
+| **File** | `verify_tool_log.py` |
+| **Original line** | 314 (`version = "2" if log[0].get("entry_hash") else "1"`) |
+| **Found in** | Red Team Round 5, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND5_DOWNGRADE.md` (R5-1) |
+
+### Description
+
+The standalone verifier chose between the v2 chain schema and the legacy v1
+one by reading a single deletable field **inside the array the attacker
+edits**. Deleting `entry_hash` from the first entry and rewriting `prev_hash`
+per the v1 rule (neither requires the HMAC key) dropped verification to
+`_verify_v1`, which:
+
+- chains only `result_summary` — `timestamp`, `tool`, `target` and
+  `input_hash` are left uncovered;
+- **never received the HMAC key** (the function had no such parameter), so
+  `entry_hmac` was never verified even when the examiner held the key;
+- **never consults `chain_tip_sha256`**, so the R3-5 tail anchor took no part
+  even when present.
+
+The three defences accumulated in R3-2, A3 and R3-5 switched off together.
+Confirmed by induction: `VERDICT: MALICE` rewritten as `VERDICT: NOISE`,
+`target` and `timestamp` altered, verified **with the correct key** →
+`CHAIN VERIFIED (schema v1)`, exit 0.
+
+`tool_execution_log` is not covered by `bundle_hash` (`BundleBuilder.seal`
+builds `bundle_payload` without it), so no outer seal softened the impact:
+this verifier was its only protection.
+
+### Fix applied
+
+`_detect_schema(log, bundle)` derives the schema from **every** v2 marker
+(`chain_version == "2"`, `entry_hash`, `entry_hmac` in any entry;
+`chain_tip_sha256` / `chain_tip_hmac` at bundle level). If anything declares
+v2 it is verified as v2, and an entry missing `entry_hash` fails as altered
+content. `_verify_v1` now receives the key and reports a v1 log as a downgrade
+whenever a key was supplied, unless `--allow-legacy-v1` is passed.
+
+**Documented residual:** stripping *every* v2 marker is still
+indistinguishable from a genuine legacy bundle when the verifier runs
+**without** a key. Measured, with a test:
+`test_full_marker_strip_is_flagged_only_when_keyed`.
+
+### Regression
+
+`tests/test_r5_schema_downgrade.py` (12 tests; 9 red against the pre-fix
+code), `scripts/redteam_round5_downgrade.py` (12 vectors). Zero exit-code
+changes across the 35 real bundles in the repository.
+
+---
+
+## B-229 — Deleting `chain_tip_sha256` re-enabled the tail truncation R3-5 had closed
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 |
+| **File** | `verify_tool_log.py` (`_verify_v2`) |
+| **Found in** | Red Team Round 5, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND5_DOWNGRADE.md` (R5-2) |
+
+### Description
+
+R3-5 anchored the chain tail with `chain_tip_sha256`, outside the array an
+attacker would truncate. But the **presence** of the anchor is also decided by
+the attacker, and its absence was reported as a backward-compatibility
+`[NOTE]`, not a failure. Truncating the log and deleting the anchor made
+truncation undetectable again **even with the key supplied**: the very attack
+R3-5 detects, hidden by deleting the detector.
+
+### Fix applied
+
+Whether a bundle was sealed with a key is observable inside the list itself:
+`entry_hmac` present in any entry. `ToolExecutionLogChain.bundle_fields()`
+always emits `chain_tip_sha256` and `chain_tip_hmac` together when a key is
+configured, so `entry_hmac` present + anchor absent means deletion, not an old
+bundle → `[FAIL]`. Likewise for `chain_tip_hmac` absent with
+`chain_tip_sha256` present.
+
+The R3-5 contract for **unkeyed** bundles is untouched: without `entry_hmac`,
+a missing anchor stays a `[NOTE]` with exit 0.
+
+---
+
+## B-230 — `verify_tool_log.py` produced a traceback instead of a diagnostic on a malformed log
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P3 — hygiene |
+| **File** | `verify_tool_log.py` (`verify_chain`) |
+| **Found in** | Red Team Round 5, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND5_DOWNGRADE.md` (R5-3) |
+
+### Description
+
+`log[0].get(...)` over a `str`/`None` entry, or over a `tool_execution_log`
+that is a dict, raised `AttributeError` / `KeyError`. The resulting exit code
+was 1 — fail-safe, no false `VERIFIED` — but a traceback does not tell an
+examiner what to look at. Same class as R4-4.
+
+### Fix applied
+
+A shape guard with an explicit diagnostic naming the malformed indices.
+
+---
+
 ## B-001 — `daubert_note` UnboundLocalError in the CollapseDecisionLayer Path
 
 | Field | Value |

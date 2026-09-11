@@ -155,6 +155,43 @@ def _canonicalize(obj: Any) -> Any:
     return _canonicalize_v2(obj)
 
 
+# R6-1 — Campos que viajan en el bundle pero NO entran al payload hasheado por
+# BundleBuilder.seal(). Copia local por diseno (verificador stdlib-only, sin
+# imports de produccion) — debe quedar en lockstep con
+# vigia/core/bundle_builder.PRESENTATION_FIELDS y con el _PRESENTATION_FIELDS
+# del ledger de custodia; lo verifica tests/test_r6_presentation_lockstep.py.
+#
+# Antes de R6-1 este verificador excluia solo "integrity", asi que un bundle
+# producido por el propio seal_with_chain() de VIGIA (que inyecta
+# forensic_chain FUERA del payload, por diseno documentado) se declaraba
+# invalido aca mientras el ledger lo daba por integro: dos componentes de VIGIA
+# en desacuerdo sobre el mismo bundle.
+_PRESENTATION_FIELDS = ("integrity", "forensic_chain", "pki", "tool_execution_log")
+
+
+# R6-1: dos esquemas de payload historicos — ver bundle_builder._sealed_payload.
+# Los bundles modernos llevan tool_execution_log como campo de presentacion
+# (anclado por chain_tip_sha256, sellado dentro del payload); los historicos lo
+# hashean. Se prueban ambos: el SHA-256 debe coincidir exactamente con uno, asi
+# que el atacante no gana margen de forja — pero el ALCANCE del sello cambia y
+# R1_SEAL_SCOPE lo reporta.
+_LEGACY_HASHED_FIELDS = ("tool_execution_log",)
+
+
+def _sealed_payload(bundle: Dict, legacy: bool = False) -> Dict:
+    excluded = tuple(f for f in _PRESENTATION_FIELDS
+                     if not (legacy and f in _LEGACY_HASHED_FIELDS))
+    return {k: v for k, v in bundle.items() if k not in excluded}
+
+
+def _matching_payload(bundle: Dict, stored: str):
+    for legacy in (False, True):
+        payload = _sealed_payload(bundle, legacy=legacy)
+        if _sha256_dict_matches(payload, stored):
+            return payload, ("legacy" if legacy else "moderno")
+    return None, None
+
+
 def _sha256_dict_matches(obj: Dict, stored: str) -> bool:
     """True si el hash de `obj` recomputa bajo v2 O v1 (R3-2 backward-compat).
     Un bundle manipulado no reproduce ninguno; los historicos (v1) siguen
@@ -321,7 +358,10 @@ def _check_analysis_fingerprint(bundle: Dict) -> Tuple[bool, str]:
     stored = bundle.get("integrity", {}).get("analysis_fingerprint", "")
     if not stored:
         return True, "analysis_fingerprint absent — legacy bundle; not required"
-    payload = {k: v for k, v in bundle.items() if k != "integrity"}
+    bundle_stored = bundle.get("integrity", {}).get("bundle_hash", "")
+    payload, _scheme = _matching_payload(bundle, bundle_stored)
+    if payload is None:
+        payload = _sealed_payload(bundle)
     projection = _analysis_projection(payload)
     if not _sha256_dict_matches(projection, stored):
         return False, "analysis_fingerprint NO coincide — analytical projection changed"
@@ -333,18 +373,55 @@ def _check_bundle_hash(bundle: Dict) -> Tuple[bool, str]:
     bundle_hash = SHA256(todo el contenido incluyendo evidence_graph con graph_hash asignado).
     Cualquier modificacion de cualquier campo invalida el bundle.
     """
-    payload = {k: v for k, v in bundle.items() if k != "integrity"}
     stored = bundle.get("integrity", {}).get("bundle_hash", "")
     if not stored:
         return False, "bundle_hash ausente en integrity"
-    if not _sha256_dict_matches(payload, stored):
-        return False, f"bundle_hash NO coincide — bundle modificado o corrompido"
-    return True, "bundle_hash integro"
+    payload, scheme = _matching_payload(bundle, stored)
+    if payload is None:
+        return False, "bundle_hash NO coincide — bundle modificado o corrompido"
+    return True, f"bundle_hash integro (esquema de payload: {scheme})"
 
 
 # ---------------------------------------------------------------------------
 # Level 1 — Estructura
 # ---------------------------------------------------------------------------
+
+def _check_presentation_fields(bundle: Dict) -> Tuple[bool, str]:
+    """R6-1: los campos de presentacion viajan con el bundle pero NO estan
+    cubiertos por bundle_hash. Excluirlos del hash es correcto — no son parte
+    del payload sellado — pero callarlo no: un lector veria "bundle_hash
+    integro" y asumiria que TODO el archivo esta sellado. Este check nunca
+    falla; nombra explicitamente que parte del archivo el sello no respalda y
+    de donde viene la autenticidad de cada una."""
+    stored = bundle.get("integrity", {}).get("bundle_hash", "")
+    _payload, scheme = _matching_payload(bundle, stored)
+    present = [f for f in _PRESENTATION_FIELDS
+               if f != "integrity" and f in bundle]
+    if scheme == "legacy":
+        present = [f for f in present if f not in _LEGACY_HASHED_FIELDS]
+    if not present:
+        return True, "bundle_hash cubre todo el archivo"
+
+    origen = {
+        "forensic_chain": "ledger de custodia (chain_hash + checkpoint HMAC)",
+        "pki": "receipt RFC 3161 / firma HSM",
+    }
+    partes = []
+    for field in present:
+        if field == "tool_execution_log":
+            if bundle.get("chain_tip_sha256"):
+                partes.append("tool_execution_log -> anclado por chain_tip_sha256, "
+                              "que SI esta sellado (verificar con verify_tool_log.py)")
+            else:
+                partes.append("tool_execution_log -> SIN ANCLA: el log no esta "
+                              "cubierto por bundle_hash ni por chain_tip_sha256. "
+                              "El sello no respalda este audit trail")
+        else:
+            partes.append(f"{field} -> {origen.get(field, 'sin ancla declarada')}")
+    unanchored = ("tool_execution_log" in present
+                  and not bundle.get("chain_tip_sha256"))
+    return (not unanchored), "NO cubiertos por bundle_hash: " + "; ".join(partes)
+
 
 def _check_structure(bundle: Dict) -> Tuple[bool, str]:
     required = [
@@ -563,6 +640,15 @@ def verify_bundle(
 
     ok_b, msg_b = _check_bundle_hash(bundle)
     result.add("R1_BUNDLE_HASH", ok_b, msg_b, severity="ERROR" if not ok_b else "INFO")
+
+    # R6-1: alcance del sello — informativo, nunca falla.
+    ok_pf, msg_pf = _check_presentation_fields(bundle)
+    # WARNING, no ERROR: un log sin anclar no prueba que el bundle este
+    # alterado, pero tampoco puede presentarse como respaldado por el sello.
+    # Promoverlo a ERROR es una decision para cuando todos los productores
+    # pasen tool_log_tip a seal() — ver docs/REDTEAM_ROUND6_PERIMETER.md.
+    result.add("R1_SEAL_SCOPE", ok_pf, msg_pf,
+               severity="WARNING" if not ok_pf else "INFO")
 
     hash_ok = ok_g and ok_p and ok_d and ok_a and ok_b
 

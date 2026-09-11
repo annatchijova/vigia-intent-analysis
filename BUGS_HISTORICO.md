@@ -12,6 +12,106 @@ Formato: un bloque por bug, con su impacto forense y el fix aplicado.
 
 ---
 
+## B-231 — Conflicto de autoridad: `seal_with_chain()` producía bundles que `verify_ebs_v1.py` declaraba inválidos
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P1 — dos componentes de VIGÍA en desacuerdo sobre el mismo archivo |
+| **Archivos** | `forensics/verify_ebs_v1.py`, `vigia/core/bundle_builder.py`, `vigia/forensics/vigia_chain_of_custody.py` |
+| **Detectado en** | Red Team Round 6, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND6_PERIMETER.md` (R6-1) |
+
+### Descripción
+
+`BundleBuilder.seal()` arma `bundle_payload` desde una lista fija de claves, así
+que todo campo agregado después del sellado queda fuera del hash por
+construcción. El ledger de custodia lo sabía y excluía `integrity`,
+`forensic_chain` y `pki` al recomputar. Los otros dos verificadores
+recomponían el payload como "todo menos `integrity`".
+
+Resultado medido: un bundle producido por el propio `seal_with_chain()` de
+VIGÍA — que inyecta `forensic_chain` fuera del payload, por diseño documentado
+— era declarado **íntegro** por el ledger e **inválido** por `verify_ebs_v1.py`
+y por `BundleBuilder.quick_verify`. Lo mismo con `pki`: notarizar el bundle con
+un receipt RFC 3161 rompía su propia verificación.
+
+Para una pericia es el peor desacuerdo posible: la contraparte elige el
+verificador que le sirve.
+
+### Fix aplicado
+
+Una sola noción compartida de campos de presentación —
+`PRESENTATION_FIELDS = (integrity, forensic_chain, pki, tool_execution_log)` —
+con copia local en cada verificador stdlib-only y un test de lockstep. Se
+soportan los **dos** esquemas de payload históricos (los bundles antiguos
+hashean `tool_execution_log` dentro del payload): se prueban ambos y el
+SHA-256 debe coincidir exactamente con uno, así que el atacante no gana margen
+de forja. Nuevo check `R1_SEAL_SCOPE`, informativo, que nombra qué parte del
+archivo el sello **no** respalda y de dónde viene la autenticidad de cada una.
+
+---
+
+## B-232 — El `tool_execution_log` no estaba anclado al bundle sellado, y no podía estarlo
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P2 |
+| **Archivo** | `vigia/core/bundle_builder.py` (`seal`) |
+| **Detectado en** | Red Team Round 6, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND6_PERIMETER.md` (R6-2) |
+
+### Descripción
+
+CLAUDE.md indica al agente escribir `tool_execution_log` y `chain_tip_sha256`
+como hermanos del bundle. Medido: adjuntar **cualquier** clave hermana a un
+bundle sellado rompe el sello. O sea que las dos conductas documentadas,
+individualmente correctas, componían un bundle inválido — y por eso el audit
+trail vivía fuera del perímetro criptográfico, sin nada que impidiera borrarlo.
+
+### Fix aplicado
+
+`seal(tool_log_tip=...)` mete la **punta** de la cadena (`chain_tip_sha256` /
+`chain_tip_hmac`) dentro del payload sellado, mientras el arreglo de entradas
+viaja como campo de presentación. El campo no cambia de lugar: pasa a estar
+cubierto. Resultado medido: truncar el log rompe la comparación contra el tip;
+recomputar el tip para taparlo rompe `bundle_hash`, que a su vez está anclado
+en el ledger con checkpoint HMAC.
+
+**Límite honesto, no cerrado:** excluir el log del hash abre un vector que
+antes no existía — adjuntar un log *fabricado* a un bundle legítimo ya no rompe
+el sello. Se reporta como `R1_SEAL_SCOPE` WARNING ("SIN ANCLA"), no como ERROR,
+porque un log sin anclar no prueba que el bundle esté alterado. Promoverlo a
+ERROR queda pendiente de que todos los productores pasen `tool_log_tip`.
+
+---
+
+## B-233 — Borrar el `tool_execution_log` entero se reportaba como "bundle sin log", no como log borrado
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | RESUELTO |
+| **Severidad** | P3 |
+| **Archivo** | `verify_tool_log.py` (`verify_chain`) |
+| **Detectado en** | Red Team Round 6, sesión 2026-09-11 |
+| **Informe** | `docs/REDTEAM_ROUND6_PERIMETER.md` (R6-3) |
+
+### Descripción
+
+Borrar el arreglo completo daba exit 2 (`NO tool_execution_log — fallback/EBS
+bundle`) mientras el sello seguía intacto: nadie decía que faltaba algo que se
+había sellado. Ausencia silenciosa, del tipo que CLAUDE.md marca como
+incompleto bajo Daubert.
+
+### Fix aplicado
+
+Con el tip sellado (B-232) la ausencia es detectable: si el bundle declara
+`chain_tip_sha256` y el arreglo no está, se reporta como cadena rota (exit 1),
+no como bundle sin log.
+
+---
+
 ## B-228 — Degradación de esquema v2→v1 en `verify_tool_log.py`: el dato no autenticado elegía el algoritmo de verificación
 
 | Campo | Valor |

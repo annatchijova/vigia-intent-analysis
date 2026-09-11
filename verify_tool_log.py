@@ -423,6 +423,17 @@ def verify_chain(bundle_path: str, verbose: bool = False, args=None) -> int:
 
     log = bundle.get("tool_execution_log", [])
     if not log:
+        # R6-3: un bundle que declara chain_tip_sha256 SELLO una cadena. Si el
+        # arreglo no esta, no es "un bundle EBS sin log" — es un log borrado.
+        # Sin este chequeo, borrar el log entero daba exit 2 (NO_LOG) mientras
+        # el sello seguia intacto: nadie decia que faltaba algo que se sello.
+        if bundle.get("chain_tip_sha256"):
+            print("NO tool_execution_log, pero el bundle declara "
+                  f"chain_tip_sha256={bundle['chain_tip_sha256'][:16]}...")
+            print("  [FAIL] el bundle sello una cadena de herramientas y el "
+                  "arreglo no esta: el log fue borrado despues del sellado.")
+            print("\nResult: CHAIN BROKEN")
+            return 1
         print("NO tool_execution_log — fallback/EBS bundle.")
         print("Use: python3 forensics/verify_ebs_v1.py <bundle> --verbose")
         return 2
