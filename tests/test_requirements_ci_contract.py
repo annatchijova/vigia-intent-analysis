@@ -328,6 +328,20 @@ def test_all_test_imports_resolve_with_requirements_ci():
         "O falta la dependencia o el import está roto (clase BUG-EML-001)."
     )
 
+    # LÍMITE CONOCIDO de este contrato (medido 2026-09-11, auditoría de rama):
+    # la resolución usa importlib.util.find_spec, que LOCALIZA un módulo sin
+    # ejecutarlo. Un módulo que se localiza bien pero LANZA al importarse por
+    # una dependencia transitiva ausente es invisible acá.
+    #
+    # Caso real: `fastapi.testclient` resuelve con find_spec, pero al importarse
+    # sin httpx levanta RuntimeError. httpx no aparece en third_party_roots
+    # porque ningún test lo importa por nombre — lo exige starlette en tiempo de
+    # import. El contrato daba verde con requirements-ci.txt incompleto.
+    #
+    # httpx y uvicorn ya se agregaron a requirements-ci.txt. Cerrar la CLASE
+    # exigiría importar de verdad cada raíz third-party, con los efectos
+    # secundarios que eso trae; se deja declarado en vez de disimulado.
+
     missing: dict[str, list[str]] = {}
     for root in sorted(third_party_roots):
         if root in KNOWN_CI_GAPS:

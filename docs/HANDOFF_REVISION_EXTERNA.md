@@ -24,6 +24,38 @@ ejecutó, dice que no se ejecutó.
 | Conflictos con `main` | 0 | `git merge-tree` |
 | `seal()` determinista | `analysis_fingerprint` idéntico main↔rama | ver §5 |
 
+### Dependencias de CI — dos huecos cerrados en este commit
+
+Auditando la pregunta *"¿están actualizados los requirements?"* aparecieron dos
+faltantes **pre-existentes** en `requirements-ci.txt`, que golpeaban justo a los tests
+de conducta de esta rama:
+
+| Faltaba | Efecto medido |
+|---------|---------------|
+| `httpx` | `fastapi.testclient.TestClient` lo exige en tiempo de import. Sin él, los 3 archivos que lo usan levantan `RuntimeError` — **no es un skip, es un error de colección** |
+| `uvicorn` | `tests/test_r9_ui_bind_exposure.py` hace `importorskip("uvicorn")`: sin él, los dos tests que comprueban que la UI **se niega** a ligar fuera de loopback **se saltean en silencio** |
+
+El job principal (`pytest.yml`) los tenía por instalar también `requirements.txt`, así
+que el hueco estaba enmascarado; pero el propio comentario de B-212 declara que
+`requirements-ci.txt` es *"el archivo que el contrato S-1 garantiza completo para la
+suite"*, y no lo era.
+
+**Por qué el contrato no lo detectaba:** `test_all_test_imports_resolve_with_requirements_ci`
+resuelve con `importlib.util.find_spec`, que **localiza** un módulo sin ejecutarlo. Un
+módulo que se localiza bien pero lanza al importarse por una dependencia transitiva
+ausente es invisible. Y `httpx` no aparece entre las raíces third-party porque ningún
+test lo importa por nombre: lo exige starlette por dentro. Es la clase *"dependencia
+transitiva por uso"*. El límite quedó documentado dentro del propio test; cerrar la
+clase exigiría importar de verdad cada raíz, con los efectos secundarios que eso trae.
+
+**Node:** ningún workflow tenía `setup-node`, así que los 3 tests que ejecutan el
+`app.js` servido —incluido el barrido que encontró los 6 campos que hacían explotar el
+render y el lockstep que encontró la divergencia `1.0`— **se salteaban en CI**. Se
+agregó `actions/setup-node@v4` a `pytest.yml`.
+
+La rama **no introduce ninguna dependencia Python nueva**: todo lo agregado en código de
+producción es stdlib (`ipaddress`, `signal`, `os`). Verificado sobre el diff completo.
+
 ### Advertencia sobre las dependencias
 
 Durante casi toda la sesión la suite mostró **7 fallos** que reporté como

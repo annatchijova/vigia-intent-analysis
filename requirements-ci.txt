@@ -28,3 +28,20 @@ pyyaml>=6.0.0
 # contract tests. Keep it in the minimal CI environment rather than relying on
 # a developer machine's global installation.
 fastapi>=0.100.0
+
+# httpx: NO lo importa ningun test por nombre — lo exige en tiempo de import
+# `fastapi.testclient.TestClient` (starlette). Sin el, los 3 archivos que usan
+# TestClient (test_webui_endpoints, test_webui_security, test_r8_ui_verification)
+# levantan RuntimeError, que no es un skip: es un error de coleccion.
+#
+# El contrato S-1 (tests/test_requirements_ci_contract.py) NO puede verlo: resuelve
+# con importlib.util.find_spec, que LOCALIZA el modulo sin ejecutarlo, asi que el
+# RuntimeError nunca se dispara durante el barrido. Es la clase
+# "dependencia transitiva por uso": invisible a un contrato estatico.
+httpx>=0.25.0
+
+# uvicorn: lo importa vigia/ui/__main__.py, que tests/test_r9_ui_bind_exposure.py
+# ejecuta como subproceso para comprobar que la UI se NIEGA a ligar fuera de
+# loopback. Sin uvicorn esos tests hacen importorskip y se saltean EN SILENCIO —
+# quedaria verde sin haber probado la negativa a exponerse.
+uvicorn>=0.23
