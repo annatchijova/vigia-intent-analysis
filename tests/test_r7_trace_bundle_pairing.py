@@ -62,13 +62,38 @@ def _run(*args):
 
 
 class TestR7CliPairing:
-    def test_legitimate_pair_verifies_and_reports_the_pairing(self):
+
+    def test_cli_rejects_tampered_displayed_trace_with_intact_keyed_log(self, tmp_path, monkeypatch):
+        """A valid chain cannot authenticate mutable trace siblings anymore."""
+        from fractions import Fraction
+        from vigia.core.reasoning_trace import ForensicReasoningTrace
+
+        key = bytes.fromhex("42" * 32)
+        monkeypatch.setenv("VIGIA_HMAC_KEY", key.hex())
+        trace = ForensicReasoningTrace("MANIFEST", "original objective").seal(
+            "MALICE", Fraction(1, 2), sealed_at="2026-01-01T00:00:00+00:00"
+        )
+        trace["steps"][0]["payload"]["objective"] = "attacker replacement"
+        bundle = {"case_id": "MANIFEST", "agent_verdict": "MALICE"}
+        trace_path = tmp_path / "x_bundle_reasoning_trace.json"
+        bundle_path = tmp_path / "x_bundle.json"
+        trace_path.write_text(json.dumps(trace))
+        bundle_path.write_text(json.dumps(bundle))
+
+        r = _run(trace_path, "--paired-bundle", bundle_path,
+                 "--hmac-key-hex", key.hex())
+
+        assert r.returncode == 1, r.stdout
+        assert "semantic manifest" in r.stdout
+
+    def test_legacy_pair_reports_its_missing_semantic_binding(self):
         _require(MALICE_TRACE, MALICE_BUNDLE)
         r = _run(MALICE_TRACE)
-        assert r.returncode == 0, r.stdout
+        assert r.returncode == 1, r.stdout
         assert "Pairing traza <-> bundle" in r.stdout
         assert "[OK  ] case_id" in r.stdout
         assert "[OK  ] veredicto" in r.stdout
+        assert "semantic manifest" in r.stdout
 
     def test_swapped_trace_is_rejected(self):
         """El vector: traza SUSPICION presentada junto al bundle MALICE."""
@@ -115,14 +140,15 @@ class TestR7CliPairing:
         assert r2.returncode == 0, r2.stdout
         assert "Pairing" not in r2.stdout
 
-    def test_all_real_pairs_still_verify(self):
-        """Regresion: los pares legitimos del repo no deben romperse."""
+    def test_historical_pairs_are_not_mistaken_for_semantically_bound_traces(self):
+        """Pre-manifest traces retain chain evidence, not full trace integrity."""
         traces = sorted(CROSS.glob("*_reasoning_trace.json"))
         if not traces:
             pytest.skip("sin pares de referencia")
         for trace in traces:
             r = _run(trace)
-            assert r.returncode == 0, f"{trace.name}:\n{r.stdout}"
+            assert r.returncode == 1, f"{trace.name}:\n{r.stdout}"
+            assert "semantic manifest" in r.stdout
 
 
 class TestR7ProductionSideEnforcement:
@@ -145,9 +171,10 @@ class TestR7ProductionSideEnforcement:
         assert not result.valid
         assert any("VERDICT DIVERGENCE" in e for e in result.errors)
 
-    def test_matching_trace_passes(self):
+    def test_historical_matching_trace_is_not_semantically_verified(self):
         from vigia.core.reasoning_trace import verify_reasoning_trace
         _require(MALICE_BUNDLE, MALICE_TRACE)
         result = verify_reasoning_trace(json.loads(MALICE_BUNDLE.read_text()),
                                         json.loads(MALICE_TRACE.read_text()))
-        assert result.valid, result.errors
+        assert not result.valid
+        assert any("semantic manifest" in error for error in result.errors)

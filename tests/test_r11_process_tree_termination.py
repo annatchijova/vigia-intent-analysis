@@ -85,6 +85,16 @@ def _fake_agent(tmp: Path, pidfile: Path) -> None:
         "time.sleep(300)\n" % str(pidfile))
 
 
+def _fake_agent_that_exits_before_its_child(tmp: Path, pidfile: Path) -> None:
+    (tmp / "cases" / "caso").mkdir(parents=True)
+    (tmp / "cases" / "caso" / "ev.txt").write_text("evidencia")
+    (tmp / "vigia_agent.py").write_text(
+        "import subprocess, sys\n"
+        "subprocess.Popen([sys.executable, '-c',\n"
+        "  \"import time, os\\nopen(%r,'w').write(str(os.getpid()))\\ntime.sleep(300)\"])\n"
+        "print('agent exits', flush=True)\n" % str(pidfile))
+
+
 @pytest.fixture
 def runner_con_herramienta():
     creados = []
@@ -154,6 +164,29 @@ class TestTimeoutDoesNotBrickTheLauncher:
         except JobBusyError as exc:
             pytest.fail(f"el slot no se libero tras el timeout: {exc}")
         runner.shutdown()
+
+    def test_exited_leader_does_not_hide_a_live_child(self, monkeypatch):
+        """The group ID survives its leader: timeout must still kill it."""
+        import vigia.ui.jobs as jobs
+        monkeypatch.setattr(jobs, "_TERMINATE_GRACE_S", 0)
+        tmp = Path(tempfile.mkdtemp())
+        try:
+            pidfile = tmp / "tool.pid"
+            _fake_agent_that_exits_before_its_child(tmp, pidfile)
+            runner = JobRunner(tmp, agent_script=tmp / "vigia_agent.py", timeout_s=1)
+            runner.submit(evidence_path="cases/caso", case_id="EXITED-LEADER")
+            for _ in range(100):
+                if pidfile.exists():
+                    break
+                time.sleep(0.05)
+            assert pidfile.exists()
+            tool = int(pidfile.read_text())
+            time.sleep(2)
+            assert not _running(tool), "child survived after its leader exited"
+            assert runner.list_jobs()[0]["state"] == "error"
+        finally:
+            runner.shutdown() if "runner" in locals() else None
+            shutil.rmtree(tmp, ignore_errors=True)
 
 
 class TestShutdownReachesTheWholeTree:

@@ -235,6 +235,41 @@ def test_verify_trace_FAILS_on_tampered_chain():
     assert any("chain invalid" in e for e in r.errors)
 
 
+def test_verify_trace_FAILS_when_displayed_steps_are_tampered_even_with_hmac(monkeypatch):
+    """The chain must authenticate the displayed trace, not only its log."""
+    key = bytes.fromhex("42" * 32)
+    monkeypatch.setenv("VIGIA_HMAC_KEY", key.hex())
+    sealed = _full_trace(case_id="CASE-MANIFEST").seal(
+        "SUSPICION", Fraction(3, 5), sealed_at=_TS
+    )
+    bundle = {"case_id": "CASE-MANIFEST", "agent_verdict": "SUSPICION"}
+    tampered = copy.deepcopy(sealed)
+    tampered["steps"][0]["payload"]["objective"] = "ATTACKER REPLACED OBJECTIVE"
+    tampered["quality"] = "FULL"
+
+    result = verify_reasoning_trace(bundle, tampered, hmac_key=key)
+
+    assert not result.valid
+    assert any("semantic manifest" in error for error in result.errors)
+
+
+def test_verify_trace_FAILS_when_one_v2_marker_is_removed(monkeypatch):
+    """A keyed v2 trace must not select legacy verification from entry zero."""
+    key = bytes.fromhex("43" * 32)
+    monkeypatch.setenv("VIGIA_HMAC_KEY", key.hex())
+    sealed = _full_trace(case_id="CASE-NO-DOWNGRADE").seal(
+        "SUSPICION", Fraction(3, 5), sealed_at=_TS
+    )
+    bundle = {"case_id": "CASE-NO-DOWNGRADE", "agent_verdict": "SUSPICION"}
+    tampered = copy.deepcopy(sealed)
+    tampered["tool_execution_log"][0].pop("entry_hash")
+
+    result = verify_reasoning_trace(bundle, tampered, hmac_key=key)
+
+    assert not result.valid
+    assert any("chain invalid" in error for error in result.errors)
+
+
 def test_verify_trace_FAILS_on_truncated_log_with_declared_tail():
     """B-161: the trace's declared v2 tail must detect a removed final event."""
     sealed = _full_trace(case_id="CASE-TAIL").seal(

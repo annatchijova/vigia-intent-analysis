@@ -170,6 +170,19 @@ def coerce_list(value: Any, label: str, warnings: list) -> list:
     return [value]
 
 
+def coerce_dict(value: Any, label: str, warnings: list) -> dict:
+    """Return a mapping or an empty display-safe mapping with a warning."""
+    if value is None:
+        return {}
+    if isinstance(value, dict):
+        return value
+    warnings.append(
+        f"{label}: se esperaba objeto, se encontro {type(value).__name__} "
+        f"— mostrado como estructura vacia"
+    )
+    return {}
+
+
 def coerce_entry_text(entries: Any, fields: tuple, label: str,
                       warnings: list) -> list:
     """Aplica `coerce_text` a `fields` en cada entrada de una lista de dicts."""
@@ -263,9 +276,9 @@ def _disagreement(verdicts: list) -> bool:
 # ---------------------------------------------------------------------------
 
 def _normalize_ebs_v1(doc: dict, warnings: list) -> dict:
-    decision_trace = doc.get("decision_trace") or {}
-    caie = doc.get("caie_analysis") or {}
-    integrity = doc.get("integrity") or {}
+    decision_trace = coerce_dict(doc.get("decision_trace"), "decision_trace", warnings)
+    caie = coerce_dict(doc.get("caie_analysis"), "caie_analysis", warnings)
+    integrity = coerce_dict(doc.get("integrity"), "integrity", warnings)
 
     verdicts = []
     if "decision" in decision_trace:
@@ -305,10 +318,10 @@ def _normalize_ebs_v1(doc: dict, warnings: list) -> dict:
 
 
 def _normalize_agent_audit(doc: dict, warnings: list) -> dict:
-    audit = doc.get("audit_trail") or {}
-    pipeline = doc.get("pipeline_results") or {}
-    abduction = pipeline.get("abduction") or {}
-    entries = audit.get("entries") or []
+    audit = coerce_dict(doc.get("audit_trail"), "audit_trail", warnings)
+    pipeline = coerce_dict(doc.get("pipeline_results"), "pipeline_results", warnings)
+    abduction = coerce_dict(pipeline.get("abduction"), "pipeline_results.abduction", warnings)
+    entries = coerce_list(audit.get("entries"), "audit_trail.entries", warnings)
 
     verdicts = []
     if "agent_verdict" in doc:
@@ -329,7 +342,7 @@ def _normalize_agent_audit(doc: dict, warnings: list) -> dict:
             raw_pointer="/pipeline_results/abduction/best_hypothesis",
         ))
 
-    signals = pipeline.get("signals") or []
+    signals = coerce_list(pipeline.get("signals"), "pipeline_results.signals", warnings)
     findings = []
     for i, sig in enumerate(signals):
         if not isinstance(sig, dict):
@@ -427,7 +440,7 @@ def _normalize_mcp_finding(f: dict, idx: int, warnings: list) -> dict:
 
 
 def _normalize_mcp(doc: dict, warnings: list) -> dict:
-    raw_findings = doc.get("findings") or []
+    raw_findings = coerce_list(doc.get("findings"), "findings", warnings)
     findings = [
         _normalize_mcp_finding(f, i, warnings)
         for i, f in enumerate(raw_findings)
@@ -445,12 +458,12 @@ def _normalize_mcp(doc: dict, warnings: list) -> dict:
     else:
         warnings.append("missing field: overall_verdict")
 
-    tool_log = doc.get("tool_execution_log") or []
+    tool_log = coerce_list(doc.get("tool_execution_log"), "tool_execution_log", warnings)
     chain_version = None
     if tool_log and isinstance(tool_log[0], dict):
         chain_version = tool_log[0].get("chain_version", "1")
 
-    integrity = doc.get("integrity") or {}
+    integrity = coerce_dict(doc.get("integrity"), "integrity", warnings)
     ts = _first_key(
         doc, ("analysis_timestamp", "investigation_timestamp", "report_generated"),
         warnings, "timestamp",

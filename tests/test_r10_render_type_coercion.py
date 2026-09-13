@@ -135,6 +135,19 @@ class TestNormalizerCoercesHostileBundle:
         shape = [w for w in norm["warnings"] if "se esperaba" in w]
         assert shape == [], shape
 
+    @pytest.mark.parametrize("doc", [
+        {"bundle_version": "1", "evidence_graph": {}, "integrity": {},
+         "decision_trace": {}, "caie_analysis": 7},
+        {"agent_verdict": "NOISE", "audit_trail": "not-an-object",
+         "pipeline_results": {}},
+        {"overall_verdict": "NOISE", "findings": 7},
+    ])
+    def test_nested_wrong_shapes_degrade_to_warnings(self, doc):
+        """The untrusted-bundle boundary must not turn a type mismatch into 500."""
+        norm = normalizer.normalize(doc, "cases/hostile-shape.json")
+        assert norm["warnings"]
+        assert any("se esperaba" in warning for warning in norm["warnings"])
+
 
 class TestFrontendSurvivesEveryType:
     """Ejecuta los renderizadores reales de app.js — el barrido de R10."""

@@ -50,6 +50,8 @@ changes:
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 from dataclasses import dataclass, field
 from enum import Enum
@@ -58,7 +60,31 @@ from typing import Any, Dict, List, Optional
 
 from vigia.core.tool_log_chain import ToolExecutionLogChain, verify_tool_execution_log
 
-CRONOS_TRACE_VERSION = "1.0"
+CRONOS_TRACE_VERSION = "1.1"
+
+_TRACE_SEMANTIC_FIELDS = (
+    "trace_id", "case_id", "trace_version", "sealed_at", "verdict",
+    "confidence_submitted", "confidence_stored", "confidence_warnings",
+    "quality", "diversity", "contradictions", "steps",
+)
+
+
+def _trace_semantic_payload(trace: Dict[str, Any]) -> Dict[str, Any]:
+    """The displayed reasoning content, excluding its chain envelope."""
+    return {field: trace.get(field) for field in _TRACE_SEMANTIC_FIELDS}
+
+
+def _trace_payload_hash(trace: Dict[str, Any]) -> str:
+    """Stable digest of every field presented as the reasoning trace.
+
+    The digest is subsequently embedded in the HMAC-covered DECISION chain
+    entry.  Keeping the digest's own input free of log fields avoids a cycle.
+    """
+    encoded = json.dumps(
+        _trace_semantic_payload(trace), sort_keys=True, ensure_ascii=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
 
 
 # ── Enums ──────────────────────────────────────────────────────────────────────
@@ -331,22 +357,6 @@ class ForensicReasoningTrace:
         contradictions = find_contradictions(self._steps)
         adj_confidence, warnings = apply_confidence_constraints(confidence, self._steps)
 
-        # Chain every step with the existing v2 chain. Deterministic: event_id
-        # and timestamp are injected from trace_id/seq/sealed_at (no uuid4/now()).
-        chain = ToolExecutionLogChain(mode=self.mode)
-        log: List[Dict[str, Any]] = []
-        for step in self._steps:
-            entry = chain.append(
-                tool=(f"contradiction_detector" if step.kind == StepKind.SELF_CORRECTION
-                      else f"reasoning:{step.kind.value}"),
-                target=self.case_id,
-                result_summary=self._summarize(step),
-                arguments={"seq": step.seq, "payload": step.payload},
-                event_id=f"{self.trace_id}:{step.seq}",
-                timestamp=sealed_at,
-            )
-            log.append(entry)
-
         sealed = {
             "trace_id": self.trace_id,
             "case_id": self.case_id,
@@ -361,8 +371,35 @@ class ForensicReasoningTrace:
             "contradictions": contradictions,
             "steps": [{"seq": s.seq, "kind": s.kind.value, "payload": s.payload}
                       for s in self._steps],
-            "tool_execution_log": log,
         }
+        # The complete displayed trace is bound into the HMAC-covered DECISION
+        # entry below.  A valid tool log alone must never authenticate mutable
+        # sibling fields such as steps, quality, or confidence.
+        manifest = _trace_payload_hash(sealed)
+        sealed["trace_payload_sha256"] = manifest
+
+        # Chain every step with the existing v2 chain. Deterministic: event_id
+        # and timestamp are injected from trace_id/seq/sealed_at (no uuid4/now()).
+        chain = ToolExecutionLogChain(mode=self.mode)
+        log: List[Dict[str, Any]] = []
+        for step in self._steps:
+            summary = self._summarize(step)
+            if step.kind == StepKind.DECISION:
+                # The digest comes first so the 120-character summary cap never
+                # truncates it.  entry_hash/HMAC cover the full stored summary.
+                summary = f"trace_payload_sha256={manifest}; {summary}"
+            entry = chain.append(
+                tool=(f"contradiction_detector" if step.kind == StepKind.SELF_CORRECTION
+                      else f"reasoning:{step.kind.value}"),
+                target=self.case_id,
+                result_summary=summary,
+                arguments={"seq": step.seq, "payload": step.payload},
+                event_id=f"{self.trace_id}:{step.seq}",
+                timestamp=sealed_at,
+            )
+            log.append(entry)
+
+        sealed["tool_execution_log"] = log
         sealed.update(chain.bundle_fields())  # chain_tip_sha256 (+ chain_tip_hmac)
         return sealed
 
@@ -437,6 +474,29 @@ def verify_reasoning_trace(bundle: Dict[str, Any], trace: Dict[str, Any],
     bundle_case = bundle.get("case_id")
     if trace_case != bundle_case:
         errors.append(f"case_id mismatch: trace={trace_case!r} bundle={bundle_case!r}")
+
+    declared_manifest = trace.get("trace_payload_sha256")
+    recomputed_manifest = _trace_payload_hash(trace)
+    if not isinstance(declared_manifest, str) or declared_manifest != recomputed_manifest:
+        errors.append("trace semantic manifest is absent or does not match displayed trace content")
+    else:
+        marker = f"trace_payload_sha256={declared_manifest};"
+        decision_entries = [
+            entry for entry in log if isinstance(entry, dict)
+            and entry.get("tool") == "reasoning:decision"
+        ] if isinstance(log, list) else []
+        if len(decision_entries) != 1 or not str(
+                decision_entries[0].get("result_summary", "")).startswith(marker):
+            errors.append("trace semantic manifest is not bound by the DECISION chain entry")
+
+    decision_steps = [
+        step for step in trace.get("steps", []) if isinstance(step, dict)
+        and step.get("kind") == StepKind.DECISION.value
+    ]
+    if len(decision_steps) != 1 or not isinstance(decision_steps[0].get("payload"), dict):
+        errors.append("trace must contain exactly one DECISION step")
+    elif trace.get("verdict") != decision_steps[0]["payload"].get("verdict"):
+        errors.append("trace top-level verdict disagrees with its DECISION step")
 
     trace_verdict = sealed_trace_verdict(trace)
     bundle_verdict = bundle.get("agent_verdict")

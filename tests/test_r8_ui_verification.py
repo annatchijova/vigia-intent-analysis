@@ -112,9 +112,10 @@ class TestR8ReasoningTracePairing:
         shutil.copy(MALICE_BUNDLE, tmp / "solo_mode1_bundle.json")
         return tmp
 
-    def test_legitimate_pair_verifies(self, verify_mod, corpus):
+    def test_legacy_pair_is_not_presented_as_semantically_verified(self, verify_mod, corpus):
         r = verify_mod.run_reasoning_trace(REPO_ROOT, corpus / "ok_mode1_bundle.json")
-        assert r["status"] == "VERIFIED", r.get("detail", "")[-600:]
+        assert r["status"] == "BROKEN", r.get("detail", "")[-600:]
+        assert "semantic manifest" in r.get("detail", "")
 
     def test_swapped_trace_is_reported_broken(self, verify_mod, corpus):
         r = verify_mod.run_reasoning_trace(REPO_ROOT, corpus / "swap_mode1_bundle.json")

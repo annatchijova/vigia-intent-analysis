@@ -54,6 +54,11 @@ GENESIS_V2 = "0" * 64
 _STRUCTURAL_FIELDS = frozenset({"seq", "prev_hash", "entry_hash", "entry_hmac"})
 _V2_ENTRY_MARKERS = ("entry_hash", "entry_hmac")
 _V2_BUNDLE_MARKERS = ("chain_tip_sha256", "chain_tip_hmac")
+_TRACE_SEMANTIC_FIELDS = (
+    "trace_id", "case_id", "trace_version", "sealed_at", "verdict",
+    "confidence_submitted", "confidence_stored", "confidence_warnings",
+    "quality", "diversity", "contradictions", "steps",
+)
 
 
 def _detect_schema(log: list, bundle: dict) -> tuple:
@@ -420,6 +425,46 @@ def _looks_like_trace(doc: dict) -> bool:
     return isinstance(doc.get("trace_id"), str) and "verdict" in doc
 
 
+def _trace_payload_hash(trace: dict) -> str:
+    """Stdlib mirror of reasoning_trace._trace_payload_hash()."""
+    payload = {field: trace.get(field) for field in _TRACE_SEMANTIC_FIELDS}
+    encoded = json.dumps(
+        payload, sort_keys=True, ensure_ascii=True, separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _check_trace_manifest(trace: dict) -> bool:
+    """Verify that the displayed trace, not only its tool log, is sealed.
+
+    The manifest is embedded in the HMAC-covered DECISION entry.  This keeps a
+    valid chain from authenticating mutable sibling fields such as ``steps``.
+    """
+    declared = trace.get("trace_payload_sha256")
+    if not isinstance(declared, str) or declared != _trace_payload_hash(trace):
+        print("  [FAIL] trace semantic manifest absent or does not match displayed content")
+        return False
+
+    entries = [
+        entry for entry in trace.get("tool_execution_log", [])
+        if isinstance(entry, dict) and entry.get("tool") == "reasoning:decision"
+    ]
+    marker = f"trace_payload_sha256={declared};"
+    if len(entries) != 1 or not str(entries[0].get("result_summary", "")).startswith(marker):
+        print("  [FAIL] trace semantic manifest is not bound by the DECISION chain entry")
+        return False
+
+    decisions = [
+        step for step in trace.get("steps", []) if isinstance(step, dict)
+        and step.get("kind") == "decision" and isinstance(step.get("payload"), dict)
+    ]
+    if len(decisions) != 1 or decisions[0]["payload"].get("verdict") != trace.get("verdict"):
+        print("  [FAIL] trace top-level verdict disagrees with its DECISION step")
+        return False
+    print("  [OK  ] trace semantic manifest + DECISION binding")
+    return True
+
+
 def _find_sibling_bundle(trace_path: str):
     """<stem>_reasoning_trace.json -> <stem>.json, si existe."""
     p = Path(trace_path)
@@ -459,7 +504,7 @@ def _check_trace_pairing(trace: dict, trace_path: str, bundle_arg: str) -> bool:
         print(f"\n  [FAIL] Pairing: no se pudo leer el bundle {path}: {exc}")
         return False
 
-    ok = True
+    ok = _check_trace_manifest(trace)
     print(f"\nPairing traza <-> bundle: {path}")
     t_case, b_case = trace.get("case_id"), bundle.get("case_id")
     if t_case != b_case:
