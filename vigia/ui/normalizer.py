@@ -45,13 +45,33 @@ _KNOWN_VERDICTS = ("NOISE", "SUSPICION", "INTENT", "MALICE", "ABSTAIN")
 # Fractions
 # ---------------------------------------------------------------------------
 
+def _is_exact_int(value: Any) -> bool:
+    """R10-4: `bool` es subclase de `int` en Python, asi que
+    `isinstance(True, int)` es True. `Number.isInteger(true)` en JS es False.
+    Las dos copias del predicado deben decir lo mismo — en un sistema cuya
+    propiedad declarada es la aritmetica exacta, `{"num": true, "den": 1}` no
+    es la fraccion 1/1: es un campo con el tipo equivocado, y mostrarlo como
+    `True/1` (o peor, `1/True`) lo presenta como si fuera un valor.
+
+    Lo verifica tests/test_r10_4_fraction_bool.py contra la copia de app.js.
+    """
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
 def is_serialized_fraction(obj: Any) -> bool:
     return (
         isinstance(obj, dict)
         and obj.get("__fraction__") is True
-        and isinstance(obj.get("num"), int)
-        and isinstance(obj.get("den"), int)
+        and _is_exact_int(obj.get("num"))
+        and _is_exact_int(obj.get("den"))
     )
+
+
+def claims_to_be_fraction(obj: Any) -> bool:
+    """Lleva la etiqueta `__fraction__` pero no pasa el predicado. Un bundle
+    ajeno puede traer esto; se declara en vez de mostrarlo como una fraccion."""
+    return (isinstance(obj, dict) and obj.get("__fraction__") is True
+            and not is_serialized_fraction(obj))
 
 
 def fraction_display(obj: Any) -> Optional[str]:
@@ -61,13 +81,25 @@ def fraction_display(obj: Any) -> Optional[str]:
     return f"{obj['num']}/{obj['den']}"
 
 
-def decode_fractions(obj: Any) -> Any:
+def decode_fractions(obj: Any, warnings: Optional[list] = None,
+                     label: str = "") -> Any:
     """Recursively replace serialized Fractions with a display-safe dict.
 
     ``{"__fraction__":true,"num":N,"den":D}`` becomes
     ``{"is_fraction":true,"display":"N/D","num":N,"den":D}``.
     Integers stay exact; nothing is coerced to float.
+
+    R10-4: un dict etiquetado `__fraction__` cuyos campos no son enteros
+    exactos NO se convierte —se deja crudo— y, si hay una lista de warnings,
+    se declara. Mostrar `True/1` como si fuera una fraccion seria inventar un
+    valor, que es justo lo que el docstring del modulo prohibe.
     """
+    if claims_to_be_fraction(obj) and warnings is not None:
+        warnings.append(
+            f"{label or 'campo'}: lleva la etiqueta __fraction__ pero num/den "
+            f"no son enteros exactos (num={type(obj.get('num')).__name__}, "
+            f"den={type(obj.get('den')).__name__}) — mostrado sin convertir"
+        )
     if is_serialized_fraction(obj):
         return {
             "is_fraction": True,
@@ -76,10 +108,18 @@ def decode_fractions(obj: Any) -> Any:
             "den": obj["den"],
         }
     if isinstance(obj, dict):
-        return {k: decode_fractions(v) for k, v in obj.items()}
+        return {k: decode_fractions(v, warnings, f"{label}.{k}" if label else k)
+                for k, v in obj.items()}
     if isinstance(obj, list):
-        return [decode_fractions(v) for v in obj]
+        return [decode_fractions(v, warnings, f"{label}[{i}]")
+                for i, v in enumerate(obj)]
     return obj
+
+
+def _decode_extra(warnings: list, payload: dict) -> dict:
+    """`extra` de cada normalizador: decodifica fracciones declarando los
+    dicts que se dicen fraccion y no lo son (R10-4)."""
+    return decode_fractions(payload, warnings, "extra")
 
 
 def _scalar_display(value: Any) -> Any:
@@ -87,6 +127,80 @@ def _scalar_display(value: Any) -> Any:
     if is_serialized_fraction(value):
         return fraction_display(value)
     return value
+
+
+# ---------------------------------------------------------------------------
+# R10-1 — Coercion de forma en el limite
+#
+# Un bundle puede venir de un tercero (otra pericia, la contraparte): la UI
+# existe justamente para inspeccionarlo. Un campo con el tipo equivocado
+# —`timestamp` numerico, `artifacts` como string en vez de lista— hacia
+# explotar al renderizador (`.slice`/`.join`/`.map` sobre lo que no era), y el
+# router mostraba "La peticion fallo", misatribuyendo a la red un bundle
+# malformado.
+#
+# Este es el limite entre un archivo no confiable y la forma de display: acá se
+# coacciona y se DECLARA. Nunca se inventa un valor y nunca se retipa en
+# silencio — el desajuste entra a `warnings[]`, que la UI ya muestra.
+# ---------------------------------------------------------------------------
+
+def coerce_text(value: Any, label: str, warnings: list) -> Any:
+    """Devuelve texto (o None). Un valor no textual se muestra como texto y el
+    desajuste de forma queda registrado."""
+    if value is None or isinstance(value, str):
+        return value
+    warnings.append(
+        f"{label}: se esperaba texto, se encontro {type(value).__name__} "
+        f"— mostrado como texto"
+    )
+    return str(value)
+
+
+def coerce_list(value: Any, label: str, warnings: list) -> list:
+    """Devuelve una lista. Un escalar se envuelve en una lista de un elemento;
+    el desajuste queda registrado."""
+    if value is None:
+        return []
+    if isinstance(value, list):
+        return value
+    warnings.append(
+        f"{label}: se esperaba lista, se encontro {type(value).__name__} "
+        f"— envuelto en una lista de un elemento"
+    )
+    return [value]
+
+
+def coerce_dict(value: Any, label: str, warnings: list) -> dict:
+    """Return a mapping or an empty display-safe mapping with a warning."""
+    if value is None:
+        return {}
+    if isinstance(value, dict):
+        return value
+    warnings.append(
+        f"{label}: se esperaba objeto, se encontro {type(value).__name__} "
+        f"— mostrado como estructura vacia"
+    )
+    return {}
+
+
+def coerce_entry_text(entries: Any, fields: tuple, label: str,
+                      warnings: list) -> list:
+    """Aplica `coerce_text` a `fields` en cada entrada de una lista de dicts."""
+    out = []
+    for idx, entry in enumerate(coerce_list(entries, label, warnings)):
+        if not isinstance(entry, dict):
+            warnings.append(
+                f"{label}[{idx}]: se esperaba un objeto, se encontro "
+                f"{type(entry).__name__} — omitido"
+            )
+            continue
+        fixed = dict(entry)
+        for field in fields:
+            if field in fixed:
+                fixed[field] = coerce_text(
+                    fixed[field], f"{label}[{idx}].{field}", warnings)
+        out.append(fixed)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -162,9 +276,9 @@ def _disagreement(verdicts: list) -> bool:
 # ---------------------------------------------------------------------------
 
 def _normalize_ebs_v1(doc: dict, warnings: list) -> dict:
-    decision_trace = doc.get("decision_trace") or {}
-    caie = doc.get("caie_analysis") or {}
-    integrity = doc.get("integrity") or {}
+    decision_trace = coerce_dict(doc.get("decision_trace"), "decision_trace", warnings)
+    caie = coerce_dict(doc.get("caie_analysis"), "caie_analysis", warnings)
+    integrity = coerce_dict(doc.get("integrity"), "integrity", warnings)
 
     verdicts = []
     if "decision" in decision_trace:
@@ -193,7 +307,7 @@ def _normalize_ebs_v1(doc: dict, warnings: list) -> dict:
         "integrity": {
             "bundle_hash": integrity.get("bundle_hash"),
         },
-        "extra": decode_fractions({
+        "extra": _decode_extra(warnings, {
             "decision_trace": decision_trace,
             "caie_reason": caie.get("reason"),
             "caie_composite_score": caie.get("composite_score"),
@@ -204,10 +318,10 @@ def _normalize_ebs_v1(doc: dict, warnings: list) -> dict:
 
 
 def _normalize_agent_audit(doc: dict, warnings: list) -> dict:
-    audit = doc.get("audit_trail") or {}
-    pipeline = doc.get("pipeline_results") or {}
-    abduction = pipeline.get("abduction") or {}
-    entries = audit.get("entries") or []
+    audit = coerce_dict(doc.get("audit_trail"), "audit_trail", warnings)
+    pipeline = coerce_dict(doc.get("pipeline_results"), "pipeline_results", warnings)
+    abduction = coerce_dict(pipeline.get("abduction"), "pipeline_results.abduction", warnings)
+    entries = coerce_list(audit.get("entries"), "audit_trail.entries", warnings)
 
     verdicts = []
     if "agent_verdict" in doc:
@@ -228,7 +342,7 @@ def _normalize_agent_audit(doc: dict, warnings: list) -> dict:
             raw_pointer="/pipeline_results/abduction/best_hypothesis",
         ))
 
-    signals = pipeline.get("signals") or []
+    signals = coerce_list(pipeline.get("signals"), "pipeline_results.signals", warnings)
     findings = []
     for i, sig in enumerate(signals):
         if not isinstance(sig, dict):
@@ -254,7 +368,9 @@ def _normalize_agent_audit(doc: dict, warnings: list) -> dict:
         if isinstance(e, dict):
             preview.append({
                 "seq": e.get("seq"),
-                "timestamp": e.get("timestamp"),
+                # R10-1: el front rebana este campo; si no es texto, explota.
+                "timestamp": coerce_text(e.get("timestamp"),
+                                         "audit_trail.timestamp", warnings),
                 "action": e.get("action"),
                 "tool": e.get("tool"),
                 "note": e.get("note"),
@@ -275,7 +391,7 @@ def _normalize_agent_audit(doc: dict, warnings: list) -> dict:
             "evidence_sha256": doc.get("evidence_sha256"),
             "runtime_fingerprint": doc.get("runtime_fingerprint"),
         },
-        "extra": decode_fractions({
+        "extra": _decode_extra(warnings, {
             "narrative": doc.get("narrative"),
             "abduction": abduction,
             "signal_stats": doc.get("signal_stats"),
@@ -311,18 +427,20 @@ def _normalize_mcp_finding(f: dict, idx: int, warnings: list) -> dict:
         "status": f.get("status"),
         "peirce": peirce,
         "carnegie": f.get("carnegie_pattern", f.get("carnegie")),
-        "mitre_ttps": f.get("mitre_ttps", f.get("mitre")) or [],
+        "mitre_ttps": coerce_list(f.get("mitre_ttps", f.get("mitre")),
+                                  f"finding[{idx}].mitre_ttps", warnings),
         "devil_advocate": f.get("devil_advocate"),
         "corroboration": f.get("corroboration"),
-        "artifacts": artifacts or [],
-        "tools_used": f.get("tools_used") or [],
+        "artifacts": coerce_list(artifacts, f"finding[{idx}].artifacts", warnings),
+        "tools_used": coerce_list(f.get("tools_used"),
+                                  f"finding[{idx}].tools_used", warnings),
         "kind": "finding",
         "raw_pointer": f"/findings/{idx}",
     }
 
 
 def _normalize_mcp(doc: dict, warnings: list) -> dict:
-    raw_findings = doc.get("findings") or []
+    raw_findings = coerce_list(doc.get("findings"), "findings", warnings)
     findings = [
         _normalize_mcp_finding(f, i, warnings)
         for i, f in enumerate(raw_findings)
@@ -340,12 +458,12 @@ def _normalize_mcp(doc: dict, warnings: list) -> dict:
     else:
         warnings.append("missing field: overall_verdict")
 
-    tool_log = doc.get("tool_execution_log") or []
+    tool_log = coerce_list(doc.get("tool_execution_log"), "tool_execution_log", warnings)
     chain_version = None
     if tool_log and isinstance(tool_log[0], dict):
         chain_version = tool_log[0].get("chain_version", "1")
 
-    integrity = doc.get("integrity") or {}
+    integrity = coerce_dict(doc.get("integrity"), "integrity", warnings)
     ts = _first_key(
         doc, ("analysis_timestamp", "investigation_timestamp", "report_generated"),
         warnings, "timestamp",
@@ -361,14 +479,16 @@ def _normalize_mcp(doc: dict, warnings: list) -> dict:
             "entry_count": len(tool_log),
             "chain_version": chain_version,
             "chain_tip_sha256": doc.get("chain_tip_sha256"),
-            "entries": decode_fractions(tool_log),
+            "entries": decode_fractions(coerce_entry_text(
+                tool_log, ("timestamp", "entry_hash", "prev_hash"),
+                "tool_execution_log", warnings), warnings, "tool_execution_log"),
         },
         "audit_trail": {"present": False, "entry_count": 0, "entries_preview": []},
         "integrity": {
             "bundle_hash": integrity.get("bundle_hash"),
             "evidence_hash": doc.get("evidence_hash"),
         },
-        "extra": decode_fractions({
+        "extra": _decode_extra(warnings, {
             "verdict_rationale": doc.get("verdict_rationale"),
             "mitre_ttps_aggregate": doc.get("mitre_ttps_aggregate"),
             "refutation_gate_log": doc.get("refutation_gate_log"),

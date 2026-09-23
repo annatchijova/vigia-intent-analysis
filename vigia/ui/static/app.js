@@ -74,6 +74,17 @@ function esc(v) {
   }[c]));
 }
 
+/* R10-1: el normalizer coacciona la forma en el limite (ver normalizer.py).
+   Estos dos son defensa en profundidad: un renderizador de una herramienta
+   forense no debe explotar por el tipo de un campo de un bundle ajeno. */
+function txt(v) {
+  return v === null || v === undefined ? "" : String(v);
+}
+
+function arr(v) {
+  return Array.isArray(v) ? v : (v === null || v === undefined ? [] : [v]);
+}
+
 function chip(verdict) {
   if (verdict === null || verdict === undefined) return '<span class="chip other">—</span>';
   const cls = KNOWN_VERDICTS.includes(verdict) || verdict === "ERROR" ? verdict : "other";
@@ -92,7 +103,9 @@ async function api(path, opts) {
   try { body = await res.json(); } catch (e) { /* raw endpoints */ }
   if (!res.ok) {
     const msg = body && body.detail ? JSON.stringify(body.detail) : res.statusText;
-    throw new Error(`${res.status}: ${msg}`);
+    const err = new Error(`${res.status}: ${msg}`);
+    err.kind = "request";      // R10-2: distinguible de un fallo de renderizado
+    throw err;
   }
   return body;
 }
@@ -112,7 +125,11 @@ function setNav(name) {
 }
 
 function errorView(err) {
-  app.innerHTML = `<div class="banner error">${esc(t("err.request"))} ${esc(err.message)}</div>`;
+  /* R10-2: un fallo al RENDERIZAR no es un fallo de la peticion. Decir
+     "la peticion fallo" ante un bundle malformado manda al perito a mirar la
+     red en vez del archivo. `api()` marca sus propios errores. */
+  const key = err && err.kind === "request" ? "err.request" : "err.render";
+  app.innerHTML = `<div class="banner error">${esc(t(key))} ${esc(err.message)}</div>`;
 }
 
 /* Pretty-print raw JSON, highlighting serialized Fractions as N/D. */
@@ -314,7 +331,7 @@ function findingsTab(norm) {
         <div><b>${esc(t("peirce.second"))}</b><p>${esc(f.peirce.secondness)}</p></div>
         <div><b>${esc(t("peirce.third"))}</b><p>${esc(f.peirce.thirdness)}</p></div>
       </div>` : "";
-    const mitre = (f.mitre_ttps || []).map(x => `<span class="badge">${esc(x)}</span>`).join(" ");
+    const mitre = arr(f.mitre_ttps).map(x => `<span class="badge">${esc(x)}</span>`).join(" ");
     const kv = [];
     if (f.status) kv.push([t("f.status"), f.status]);
     if (f.confidence) kv.push([t("f.confidence"), confDisplay(f.confidence)]);
@@ -324,8 +341,8 @@ function findingsTab(norm) {
       if (f.z_score) kv.push([t("f.zscore"), f.z_score]);
     }
     if (f.carnegie) kv.push([t("f.carnegie"), f.carnegie]);
-    if ((f.artifacts || []).length) kv.push([t("f.artifacts"), f.artifacts.join(", ")]);
-    if ((f.tools_used || []).length) kv.push([t("f.tools"), f.tools_used.join(", ")]);
+    if (arr(f.artifacts).length) kv.push([t("f.artifacts"), arr(f.artifacts).join(", ")]);
+    if (arr(f.tools_used).length) kv.push([t("f.tools"), arr(f.tools_used).join(", ")]);
     return `<section class="panel">
       <div class="sec-head"><span class="n">${esc(f.id || "")}</span>
         <h2>${esc(f.title || t("findings.untitled"))}</h2>${chip(f.verdict)}</div>
@@ -353,9 +370,9 @@ function toolLogTab(norm) {
         <li><span class="tool">#${esc(e.seq)} ${esc(e.tool)}</span>
           <span class="muted">→ ${esc(e.target)}</span><br>
           <span>${esc(e.result_summary)}</span><br>
-          <span class="hash">${esc((e.timestamp || "").slice(0, 23))}
-            ${e.entry_hash ? " · entry " + esc(e.entry_hash.slice(0, 16)) + "…" : ""}
-            ${e.prev_hash ? " · prev " + esc(String(e.prev_hash).slice(0, 16)) + "…" : ""}</span>
+          <span class="hash">${esc(txt(e.timestamp).slice(0, 23))}
+            ${e.entry_hash ? " · entry " + esc(txt(e.entry_hash).slice(0, 16)) + "…" : ""}
+            ${e.prev_hash ? " · prev " + esc(txt(e.prev_hash).slice(0, 16)) + "…" : ""}</span>
         </li>`).join("")}</ol></section>`;
   }
   if (audit.present) {
@@ -366,7 +383,7 @@ function toolLogTab(norm) {
         <li><span class="tool">#${esc(e.seq)} ${esc(e.action)}</span>
           <span class="muted">${esc(e.tool || "")}</span><br>
           <span>${esc(e.note || "")}</span><br>
-          <span class="hash">${esc((e.timestamp || "").slice(0, 23))}</span></li>`).join("")}
+          <span class="hash">${esc(txt(e.timestamp).slice(0, 23))}</span></li>`).join("")}
       </ol></section>`;
   }
   return out || `<p class="muted">${esc(t("toollog.none"))}</p>`;
@@ -375,12 +392,16 @@ function toolLogTab(norm) {
 /* ---------- verify tab ---------- */
 
 function verifyTab(norm) {
+  /* R8-2: reasoning_trace es aplicable siempre que el bundle declare tener
+     una traza hermana — la bandera del indice dice que el archivo existe, no
+     que explique este bundle; esto ultimo lo decide el verificador. */
   const applicable = {
     ebs_v1: ["ebs_v1", "sidecar"],
     mcp_investigation: ["tool_log", "sidecar"],
     agent_audit: ["tool_log", "sidecar"],
   }[norm.schema] || ["sidecar"];
-  const all = ["ebs_v1", "tool_log", "sidecar"];
+  if ((norm.sidecar || {}).has_reasoning_trace) applicable.push("reasoning_trace");
+  const all = ["ebs_v1", "tool_log", "reasoning_trace", "sidecar"];
   return `<section class="panel">
     <div class="sec-head"><span class="n">§</span><h2>${esc(t("verify.title"))}</h2></div>
     <p class="muted">${esc(t("verify.note"))}</p>
@@ -408,7 +429,8 @@ function wireVerify(id, norm) {
       box.innerHTML = `<span class="muted">${esc(t("verify.running"))}</span>`;
       const payload = {verifier: v};
       const hmac = document.getElementById("v-hmac");
-      if (v === "tool_log" && hmac && hmac.value.trim()) payload.hmac_key_hex = hmac.value.trim();
+      if ((v === "tool_log" || v === "reasoning_trace") && hmac && hmac.value.trim())
+        payload.hmac_key_hex = hmac.value.trim();
       try {
         const r = await post(`/api/bundles/${encodeURIComponent(id)}/verify`, payload);
         const cls = {PASS: "pass", VERIFIED: "pass", MATCH: "pass",

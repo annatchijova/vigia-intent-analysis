@@ -157,6 +157,61 @@ def _sha256_dict(obj: Dict, canon=_canonicalize) -> str:
     return hashlib.sha256(serialized).hexdigest()
 
 
+# R6-1 — Campos que viajan en el bundle pero NO forman parte del payload
+# hasheado por seal(). seal() los excluye por construccion (arma bundle_payload
+# desde una lista fija), asi que TODO verificador que recomponga el payload como
+# "todo menos integrity" debe excluirlos tambien, o declarara invalido un bundle
+# que VIGIA produjo correctamente.
+#
+#   integrity          — lo escribe seal(): contiene el bundle_hash
+#   forensic_chain     — lo inyecta seal_with_chain(): posicion en el ledger
+#   pki                — lo inyecta pki_tools: receipt RFC 3161 / firma HSM
+#   tool_execution_log — lo adjunta el agente (Modo 2): anclado por
+#                        chain_tip_sha256, que SI va dentro del payload sellado
+#
+# Estos campos NO estan cubiertos por bundle_hash. Su autenticidad viene de otro
+# lado (el ledger, el receipt RFC 3161, la cadena de verify_tool_log.py
+# respectivamente) y los verificadores deben decirlo, no callarlo.
+PRESENTATION_FIELDS = ("integrity", "forensic_chain", "pki", "tool_execution_log")
+
+
+# R6-1: historicamente existen DOS esquemas de payload y hay bundles sellados
+# validos de cada uno. Los bundles modernos llevan el tool_execution_log como
+# campo de presentacion (anclado por chain_tip_sha256, que si va dentro del
+# sello); los historicos lo tienen DENTRO del payload hasheado. Un verificador
+# que asuma uno solo declara invalido al otro.
+#
+# No es una degradacion al estilo R5-1: el atacante no elige el esquema, se
+# prueban ambos y el SHA-256 tiene que coincidir con uno u otro exactamente —
+# no gana margen de forja. Lo que si cambia es el ALCANCE del sello, y eso hay
+# que reportarlo: bajo el esquema moderno el log no esta cubierto por
+# bundle_hash, asi que un log sin chain_tip_sha256 no esta anclado por nada.
+_LEGACY_HASHED_FIELDS = ("tool_execution_log",)
+
+
+def _sealed_payload(sealed_dict: Dict, legacy: bool = False) -> Dict:
+    """Payload hasheado de un bundle sellado: todo menos los de presentacion.
+
+    `legacy=True` reincorpora los campos que el esquema historico hasheaba.
+    """
+    excluded = tuple(f for f in PRESENTATION_FIELDS
+                     if not (legacy and f in _LEGACY_HASHED_FIELDS))
+    return {k: v for k, v in sealed_dict.items() if k not in excluded}
+
+
+def _matching_payload(sealed_dict: Dict, stored: str):
+    """Devuelve (payload, esquema) cuyo hash coincide con `stored`, o (None, None).
+
+    Se prueba primero el esquema moderno: si ambos coincidieran (bundle sin
+    tool_execution_log), son el mismo payload y da igual.
+    """
+    for legacy in (False, True):
+        payload = _sealed_payload(sealed_dict, legacy=legacy)
+        if _sha256_dict_matches(payload, stored):
+            return payload, ("legacy" if legacy else "moderno")
+    return None, None
+
+
 def _sha256_dict_matches(obj: Dict, stored: str) -> bool:
     """True si el hash de `obj` recomputa bajo v2 O v1 (R3-2 backward-compat)."""
     return any(
@@ -221,6 +276,7 @@ class BundleBuilder:
         engine_attestation_hash: str = "",
         ecl_hash: str = "",
         caie_analysis: Optional[Dict[str, Any]] = None,
+        tool_log_tip: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
         """
         Sella el bundle produciendo un dict JSON completo con hashes encadenados.
@@ -284,6 +340,20 @@ class BundleBuilder:
             bundle_payload["abduction_trace"] = bundle.abduction_trace.to_dict()
         if caie_analysis is not None:
             bundle_payload["caie_analysis"] = caie_analysis
+
+        # R6-2 — Ancla del tool_execution_log DENTRO del sello. El arreglo de
+        # entradas viaja como campo de presentacion (no se puede hashear un
+        # hermano sin romper el sello: seal() arma el payload desde una lista
+        # fija), pero su PUNTA si entra al bundle_hash. Resultado: truncar o
+        # reescribir el log rompe la comparacion de verify_tool_log.py contra
+        # el tip, y reescribir el tip para taparlo rompe el bundle_hash — que a
+        # su vez esta anclado en el ledger de custodia con checkpoint HMAC.
+        # Pasar ToolExecutionLogChain.bundle_fields() aca.
+        if tool_log_tip:
+            for field in ("chain_tip_sha256", "chain_tip_hmac"):
+                value = tool_log_tip.get(field)
+                if value:
+                    bundle_payload[field] = value
         
         # Calcular config_hash
         config_for_hash = dict(config_attestation)
@@ -404,11 +474,13 @@ class BundleBuilder:
                 recomputed_graph = _sha256_dict(graph_for_hash)
                 return False, f"graph_hash invalido: {recomputed_graph[:8]}!={stored_graph_hash[:8]}"
 
-            # Verificar bundle_hash (prueba v2 y cae a v1 — R3-2)
-            payload = {
-                k: v for k, v in sealed_dict.items() if k != "integrity"
-            }
-            if not _sha256_dict_matches(payload, stored_bundle_hash):
+            # Verificar bundle_hash (prueba v2 y cae a v1 — R3-2).
+            # R6-1: excluir TODOS los campos de presentacion, no solo integrity
+            # — si no, un bundle con forensic_chain/pki/tool_execution_log
+            # legitimos se declara invalido.
+            payload, _scheme = _matching_payload(sealed_dict, stored_bundle_hash)
+            if payload is None:
+                payload = _sealed_payload(sealed_dict)
                 recomputed_bundle = _sha256_dict(payload)
                 return False, f"bundle_hash invalido: {recomputed_bundle[:8]}!={stored_bundle_hash[:8]}"
 

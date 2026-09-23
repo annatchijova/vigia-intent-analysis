@@ -2299,6 +2299,11 @@ Exit codes:
         atomic_write_text(sha256_path, f"{disk_digest}  {abs_output_path}\n")
         logger.info("[BUNDLE] Verification: sha256sum -c %s", sha256_path)
 
+    class _TracePairingError(RuntimeError):
+        """R7-1: la traza no empareja con el bundle sellado (case_id/veredicto).
+        Distinta de un fallo de escritura: no es ruido operativo, es un bug de
+        cableado — la traza se construyo a partir de otro resultado."""
+
     # Reasoning trace (Cronos-in-VIGÍA): a PROCESS-evidence sibling of the bundle,
     # sealed with its own ToolExecutionLogChain and written OUTSIDE the
     # bundle_digest. The agent bundle hashes its ENTIRE dict (sha256sum -c), so
@@ -2308,8 +2313,20 @@ Exit codes:
     # error must never discard the already-sealed bundle (§5.3 honest degradation).
     if not args.audit_only:
         try:
-            from vigia.core.reasoning_trace import build_from_agent_bundle
+            from vigia.core.reasoning_trace import (
+                build_from_agent_bundle, verify_reasoning_trace)
             _trace_dict = build_from_agent_bundle(bundle)
+            # R7-1: el comentario de arriba decia que verify_reasoning_trace()
+            # ata los dos artefactos, pero nadie la llamaba fuera de un test.
+            # La traza vive FUERA del bundle_digest, asi que este emparejamiento
+            # (case_id + veredicto) es lo UNICO que la liga al bundle: si
+            # diverge, la traza explica otro resultado que el que se sello y no
+            # debe escribirse como si lo explicara.
+            _pairing = verify_reasoning_trace(bundle, _trace_dict)
+            if not _pairing.valid:
+                raise _TracePairingError(
+                    "reasoning trace no empareja con el bundle sellado: "
+                    + "; ".join(_pairing.errors))
             _trace_path = (output_path[:-5] + "_reasoning_trace.json"
                            if output_path.endswith(".json")
                            else output_path + "_reasoning_trace.json")
@@ -2318,6 +2335,13 @@ Exit codes:
             logger.info("[TRACE] reasoning trace: %s (verdict=%s, chain_tip=%s)",
                         _trace_path, _trace_dict.get("verdict"),
                         str(_trace_dict.get("chain_tip_sha256", ""))[:16])
+        except _TracePairingError as _pair_err:  # R7-1: no es un error de escritura
+            # Fail-soft respecto del bundle (§5.3: un problema con la traza nunca
+            # descarta un bundle ya sellado), pero NO es rutina: la traza
+            # explicaba otro resultado que el sellado. No se escribe, y se
+            # reporta como el bug de cableado que es.
+            logger.error("[TRACE] WIRING BUG — reasoning trace NO escrita: %s",
+                         _pair_err)
         except Exception as _trace_err:  # noqa: BLE001 — non-critical, fail-soft
             logger.warning("[TRACE] reasoning trace not written (non-fatal): %s", _trace_err)
 

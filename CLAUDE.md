@@ -607,6 +607,23 @@ inside `tool_execution_log` notices the tail is gone. Write
 }
 ```
 
+**Sealing the tip (R6-2).** Writing `chain_tip_sha256` as a sibling leaves it
+outside `bundle_hash`: `BundleBuilder.seal()` hashes a fixed key list, so any
+sibling added afterwards is uncovered — and attaching one to an already-sealed
+bundle breaks its verification. Pass the tip **through the seal** instead, so
+the array travels as a presentation field while its anchor is sealed:
+
+```python
+sealed = BundleBuilder.seal(bundle, tool_log_tip=chain.bundle_fields())
+sealed["tool_execution_log"] = log        # presentation field, anchored by the tip
+```
+
+Truncating the log then breaks the comparison against the tip, and recomputing
+the tip to hide that breaks `bundle_hash`. A bundle carrying a
+`tool_execution_log` with no sealed `chain_tip_sha256` is reported by
+`forensics/verify_ebs_v1.py` as `R1_SEAL_SCOPE` WARNING — the seal does not
+back that audit trail. See `docs/REDTEAM_ROUND6_PERIMETER.md`.
+
 `chain_tip_sha256` alone catches an attacker who truncates the tail without
 also updating it; it does NOT catch one who updates both (a bare SHA-256 is
 recomputable by anyone with write access — same limit as `entry_hash`

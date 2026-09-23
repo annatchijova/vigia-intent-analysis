@@ -174,10 +174,25 @@ class ToolExecutionLogChain:
 # Verificación dual v1 / v2
 # ──────────────────────────────────────────────────────────────────────────
 
-def detect_chain_version(log: Sequence[Dict[str, Any]]) -> str:
-    """v2 si la primera entrada trae entry_hash; v1 en caso contrario."""
-    if log and log[0].get("entry_hash"):
+def detect_chain_version(
+    log: Sequence[Dict[str, Any]], *, expected_tip: Optional[str] = None,
+    expected_tip_hmac: Optional[str] = None,
+) -> str:
+    """Detect v2 from every non-removable marker, never just entry zero.
+
+    A v2 chain cannot be downgraded by deleting ``entry_hash`` from its first
+    entry: any v2 marker elsewhere (including the bundle-level tail anchor)
+    keeps it on the v2 verifier, where a missing structural field fails.
+    """
+    if expected_tip is not None or expected_tip_hmac is not None:
         return "2"
+    for entry in log:
+        if not isinstance(entry, dict):
+            continue
+        if str(entry.get("chain_version", "")) == "2":
+            return "2"
+        if "entry_hash" in entry or "entry_hmac" in entry:
+            return "2"
     return "1"
 
 
@@ -203,7 +218,9 @@ def verify_tool_execution_log(
     bundle["chain_tip_hmac"] aquí ancla la COLA del log — sin esto, borrar
     las últimas entradas deja el resto de la cadena internamente válida.
     """
-    if detect_chain_version(log) == "2":
+    if detect_chain_version(
+        log, expected_tip=expected_tip, expected_tip_hmac=expected_tip_hmac,
+    ) == "2":
         links = [
             ChainLink(
                 seq=e.get("seq", 0),

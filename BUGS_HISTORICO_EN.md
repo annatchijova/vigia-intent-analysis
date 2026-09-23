@@ -12,6 +12,663 @@ Format: one block per bug, with its forensic impact and the fix applied.
 
 ---
 
+## B-240 — The JobRunner terminated a pid, not a tree: SIFT tools survived "process terminated"
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 — orphaned processes over the evidence after a timeout or shutdown |
+| **File** | `vigia/ui/jobs.py` |
+| **Found in** | Red Team Round 11, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND11_PROCESS_TREE.md` (R11-1) |
+
+### Description
+
+`jobs.py` launches the agent with `start_new_session=True`, making it the leader
+of its own session and process group — a mechanism that exists precisely so the
+whole tree can be signalled without touching the server. Yet `_kill` (timeout)
+and `shutdown` called `proc.terminate()`, which signals **one** pid.
+
+Reachability verified by import chain: `vigia_agent.py` → `sift_orchestrator` →
+`memory_forensics`, `pcap_parser`, `registry_timeline_reconstructor`, which run
+volatility3, tshark and regripper as subprocesses. On a memory image, minutes to
+hours.
+
+Measured with the real `JobRunner` and a test agent launching a 300s tool:
+pre-fix the tool survives both the job timeout and the server shutdown; post-fix
+it does not.
+
+### Fix applied
+
+`_signal_process_tree(proc, sig)` resolves the pgid and signals the group. What
+makes it safe is `start_new_session=True`: the helper **compares against
+`os.getpgid(0)`** and falls back to signalling the pid if the child shares the
+server's group. The effective scope is written into the job log.
+
+### Note on the oracle
+
+The first measurement produced a false *"killpg does not reach it either"*,
+which would have led to discarding the correct fix. The cause was the oracle:
+**`os.kill(pid, 0)` succeeds on a zombie**. The correct oracle reads
+`/proc/<pid>/stat` and rejects `'Z'`. Pinned by test.
+
+---
+
+## B-241 — A single timeout left the web UI's Mode 1 launcher unusable until the server restarted
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — launcher denial with no attacker, through normal operation |
+| **File** | `vigia/ui/jobs.py` |
+| **Found in** | Red Team Round 11, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND11_PROCESS_TREE.md` (R11-2) |
+
+### Description
+
+A consequence of B-240 that measurement uncovered and reading had not predicted
+— it surfaced because a test failed with `assert 'running' == 'error'`, a state
+with no explanation under the model I held of the code.
+
+```
+timeout -> proc.terminate() kills the agent, not the grandchild
+    ↓ the grandchild inherited the agent's stdout pipe
+`for line in proc.stdout` NEVER sees EOF — the writer is still open
+    ↓ proc.wait() never runs; the job stays "running" forever
+the `finally: self._slots.release()` never executes
+    ↓ max_jobs = 1 by default
+every later submit -> 409 "an investigation is already running"
+```
+
+No attacker is needed: the precondition is a job reaching its timeout (30
+minutes by default, normal on a memory image) or a server shutdown.
+
+Measured: pre-fix, state `running`, tool alive and the second job rejected with
+409; post-fix, state `error`, tool dead and the second job accepted.
+
+### Fix applied
+
+Killing the group (B-240) closes the pipe, so this defect is resolved by
+construction. It is recorded separately because its severity and consequence
+differ: a reader seeing only "process-tree termination" would not deduce that
+the launcher was left blocked.
+
+### Regression
+
+`tests/test_r11_process_tree_termination.py` (9 tests; 8 red against pre-R11
+code) and `scripts/redteam_round11_process_tree.py`.
+
+---
+
+## B-239 — `bool` is a subclass of `int`: the two copies of the Fraction predicate disagreed
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P3 — an invented value in the view, not reaching the seal path |
+| **Files** | `vigia/ui/normalizer.py`, `vigia/core/planner_adapter.py` |
+| **Found in** | Red Team Round 10 (recommendation 2), fixed 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND10_RENDER_TYPES.md` (R10-4) |
+
+### Description
+
+In Python `isinstance(True, int)` is `True`; in JS `Number.isInteger(true)` is
+`false`. `is_serialized_fraction` used a bare `isinstance(..., int)`, so it
+accepted booleans that the `app.js` copy rejected. Measured on live code:
+
+```
+{"__fraction__": true, "num": true, "den": 1}  -> display 'True/1'
+{"__fraction__": true, "num": 1, "den": true}  -> display '1/True'
+{"__fraction__": true, "num": 1, "den": false} -> semantically a zero denominator
+```
+
+In a system whose declared property is exact arithmetic, `{"num": true}` is not
+the fraction 1/1: it is a field of the wrong type, and rendering it as `True/1`
+presents it as if it were a value — exactly what the normalizer's own docstring
+forbids (*"never an invented value"*).
+
+**Scope, measured and bounded:** the class does **not** reach the seal path. All
+three canonicalization copies (`vigia/core/canonicalize.py`,
+`vigia/models/ebs.py`, `verify_tool_log.py`) check `isinstance(obj, bool)`
+BEFORE `isinstance(obj, int)`, so `True` and `1` canonicalize differently and no
+hash changes. Pinned by test so it cannot regress.
+
+### Fix applied
+
+`_is_exact_int` rejects `bool`. A `__fraction__`-tagged dict that fails the
+predicate is left **raw** and declared in `warnings[]` with its path, in line
+with the B-238 doctrine.
+
+Variant from the same sweep: `planner_adapter._to_fraction` had no bool guard —
+while `_signal_z_fraction`, fifteen lines below in the same module, did — and
+left the dict branch outside its `try`, so `den=false` raised
+`ZeroDivisionError`, `num="x"` a `ValueError` and a missing `num` a `KeyError`,
+all uncaught. **Honest scope:** `_to_fraction` has no callers in this commit, so
+this is hardening of an unwired helper, not the repair of a live path; the
+module is used (`scripts/dryrun_b129_weight_calibration.py` and the B-129 tests)
+and is observation-only.
+
+### Irreducible divergence, found by the lockstep test itself
+
+The test comparing the two copies found a second case that prior reading had not
+predicted: `{"num": 1.0}`. Python rejects it; JS accepts it, because it has no
+separate integer type and `JSON.parse("1.0")` yields the same Number as
+`JSON.parse("1")`. **The JS side cannot see the difference** without changing
+the wire format (e.g. serializing num/den as strings).
+
+Observable consequence, documented rather than hidden: a third-party bundle with
+`{"num": 1.0, "den": 2}` renders as `1/2` in the raw-JSON tab — which reads the
+file without passing through the normalizer — and as an unconverted dict, with
+its warning, in the normalized views. Python is deliberately left on the strict
+side: the producer emits `obj.numerator`, always an exact int.
+
+### Regression
+
+`tests/test_r10_4_fraction_bool.py` (26 tests; 16 red against the previous
+code). It includes the lockstep that evaluates the predicate as it stands in the
+served `app.js`, and two tests pinning that canonicalization distinguishes
+`True` from `1`.
+
+---
+
+## B-238 — Six bundle fields with the wrong type crashed the web UI renderer
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 — the tab fails to render, with the cause misattributed |
+| **Files** | `vigia/ui/normalizer.py`, `vigia/ui/static/app.js`, `vigia/ui/static/i18n.js` |
+| **Found in** | Red Team Round 10, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND10_RENDER_TYPES.md` (R10-1, R10-2) |
+
+### Description
+
+The web UI exists to inspect bundles, and a bundle may come from a third party:
+another examination, opposing counsel, another lab. Its content is untrusted
+input. The normalizer passed it through raw to the frontend, which assumed each
+field's type.
+
+Measured by running the real `app.js` functions under node, sweeping every
+hostile type across every field (a variant sweep, not a single case):
+
+```
+toolLogTab / entry.timestamp   THROWS  (e.timestamp || "").slice is not a function
+toolLogTab / entry.entry_hash  THROWS  e.entry_hash.slice is not a function
+toolLogTab / entry.prev_hash   ok             <- the only one with String(...)
+toolLogTab / audit.timestamp   THROWS  (e.timestamp || "").slice is not a function
+findingsTab / mitre_ttps       THROWS  (f.mitre_ttps || []).map is not a function
+findingsTab / artifacts        THROWS  f.artifacts.join is not a function
+findingsTab / tools_used       THROWS  f.tools_used.join is not a function
+```
+
+`prev_hash` was wrapped in `String(...)` while its two neighbours were not — the
+fingerprint of a one-off fix that never swept the class.
+
+The `artifacts` case is not even hostile: the type that breaks it is **string**.
+A bundle written by another tool with `"artifacts": "/a, /b"` instead of a list
+breaks the tab. That is interoperability, not only adversarial input.
+
+**R10-2:** the router surfaced the failure as *"Request failed"*. The request had
+not failed: it returned 200 with a malformed bundle. In a forensic tool,
+"retry, the network failed" and "this file has a field of the wrong type" send
+the examiner to different places.
+
+### Fix applied
+
+At the **boundary** (`normalizer.py`), where an untrusted file becomes display
+shape, extending the doctrine the module already stated for missing fields:
+`coerce_text`, `coerce_list` and `coerce_entry_text` coerce and **declare** the
+mismatch in `warnings[]`, which the UI already renders. No value is ever
+invented and nothing is silently retyped. A non-object entry is dropped and
+declared.
+
+In the frontend, `txt()` and `arr()` as defence in depth — not as the fix. And
+`api()` tags its own errors so the banner distinguishes a request failure from a
+render failure, in both locales.
+
+### Falsified in the same round
+
+The entry hypothesis was stored XSS from a third-party bundle. It was discarded
+by measurement: `esc()` consistently applied to every bundle-derived value,
+`esc(JSON.stringify(o))` in the raw viewer, the Fraction renderer type-guarded
+on both sides (`isinstance(int)` and `Number.isInteger`), and a CSP of
+`script-src 'self'` with no `unsafe-inline`.
+
+### Regression
+
+`tests/test_r10_render_type_coercion.py` (15 tests; 14 red against pre-R10 code)
+and `scripts/redteam_round10_render_types.mjs` (0 fields throw post-fix, 6
+against the previous checkout).
+
+---
+
+## B-237 — `VIGIA_HOST` shared between the Mode 5 API and the web UI: exposing one silently exposed the other
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — an unauthenticated service with a subprocess launcher, exposed to the network |
+| **Files** | `vigia/ui/__main__.py`, `launch_vigia_ui.sh`, `INSTALL.md`, `INSTALL_ES.md` |
+| **Found in** | Red Team Round 9, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND9_EXPOSURE.md` (R9-1) |
+
+### Description
+
+`VIGIA_HOST` is read by **two** services: the Mode 5 API
+(`vigia/vigia_api.py`, port 8000) and the web UI (`vigia/ui/__main__.py`, port
+8010). INSTALL.md warns against setting it to `0.0.0.0` and, where remote
+access is required, directs the operator to put the API behind an
+authenticated reverse proxy — all correct, and all written in the API section.
+
+An operator following that documented escape hatch also moves the web UI onto
+every interface. The UI has no authentication layer of any kind and exposes
+`POST /api/investigations`, which launches `vigia_agent.py` as a subprocess.
+
+Measured against the real server:
+
+```
+INFO: Uvicorn running on http://0.0.0.0:8099
+POST /api/investigations  (no Origin, no Referer)  -> HTTP 422
+GET  /api/evidence        (no credential)          -> full inventory
+```
+
+The 422 is business validation: the request passed the cross-site guard and
+reached the launcher. With a valid evidence path it would have started the
+subprocess.
+
+**Honest scope:** the `0.0.0.0` bind and the absence of auth were confirmed
+from loopback. A remote attacker on a LAN was **not** demonstrated — not
+reproducible in the session environment.
+
+### Fix applied
+
+1. **Decoupling:** the UI reads `VIGIA_UI_HOST` first, so the API can be
+   exposed without dragging the UI along
+   (`VIGIA_HOST=0.0.0.0 VIGIA_UI_HOST=127.0.0.1`). `VIGIA_HOST` remains a
+   backward-compatible fallback.
+2. **Refusal, not a warning:** a non-loopback address aborts startup with a
+   message naming the responsible variable and giving both ways out. The
+   deliberate escape is `VIGIA_UI_ALLOW_REMOTE=1`, which also warns on every
+   start.
+
+`is_loopback` does not assume a name it cannot evaluate lexically is local.
+
+### Falsified in the same round (defences that do work)
+
+- **Traversal via `evidence_path`:** `resolve_evidence_path` rejects absolute
+  paths and `..`, compares `parts` tuples against allowlisted roots (not string
+  prefixes), rejects symlink components, and requires an `lstat` regular
+  file/directory.
+- **`case_id` validated only client-side:** `jobs.submit` applies `CASE_ID_RE`
+  server-side. Defence placement, not absence.
+- **CSRF via a cross-site form:** the middleware requires
+  `Content-Type: application/json`, which an HTML form cannot set and a `fetch`
+  only achieves through a preflight the server does not permit.
+
+### Regression
+
+`tests/test_r9_ui_bind_exposure.py` (25 tests; the 3 behavioural ones red
+against pre-R9 code). The three legitimate paths measured against the real
+server.
+
+---
+
+## B-235 — The web UI's HMAC key travelled on argv, readable in /proc by any local process
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 — secret exposure to a local user |
+| **File** | `vigia/ui/verify.py` |
+| **Found in** | Red Team Round 8, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND8_UI.md` (R8-1) |
+
+### Description
+
+The HMAC key a user pastes into the web UI arrived over an HTTP body and was
+handed to the verifier as `--hmac-key-hex <key>` in the subprocess argv. The code
+comment read *"passed as argv, never logged and never echoed back in the
+response"*: the second half is true, the first describes a defence against the
+wrong threat. On Linux `/proc/<pid>/cmdline` is readable by any process on the
+system.
+
+Measured: an unprivileged local process polling `/proc/*/cmdline` during the
+verification recovers the full key.
+
+### Fix applied
+
+The key goes through the child's **environment**
+(`verify_tool_log._resolve_hmac_key` already reads `VIGIA_HMAC_KEY`). `_run`
+takes `extra_env` and only builds its own environment when there is something to
+add; with no key the child inherits the server's, as before.
+
+**Honest limit:** `/proc/<pid>/environ` is restricted to the process owner. This
+does **not** close the "same user or root" case — it removes the key from the
+reach of *any* local user, which is what is closable without touching the
+verifier. Moving to `--hmac-key-file` with 0600 permissions is recorded as a
+recommendation.
+
+### Note on the test
+
+`test_tool_log_hmac_key_in_argv_not_in_response` asserted
+`assert "--hmac-key-hex" in seen["cmd"]` — a faithful description of the
+implementation at the time. The half that changed was inverted and the half that
+is still true was kept, with the reason written into the test. A green test over
+an insecure behaviour is precisely what keeps it from being noticed.
+
+---
+
+## B-236 — The web UI asserted "trace present" without ever opening the trace
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 |
+| **Files** | `vigia/ui/verify.py`, `vigia/ui/server.py`, `vigia/ui/static/app.js`, `vigia/ui/static/i18n.js` |
+| **Found in** | Red Team Round 8, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND8_UI.md` (R8-2) |
+
+### Description
+
+`has_reasoning_trace` is computed from the mere existence of
+`<stem>_reasoning_trace.json` next to the bundle, and the UI shows it as a
+"trace" badge in the table and "trace: present" in the detail view. It never
+opened the file. `verdict_disagreement` does not cover this: it compares
+verdict-bearing fields **within one bundle**, not bundle against trace.
+
+Measured with real artifacts: the FLAREON-2017-M1 bundle (MALICE) with the
+JESS-M1 trace (SUSPICION) placed as its sibling displays `case_id`
+FLAREON-2017-M1, `verdict_disagreement: False` and a "trace" badge —
+indistinguishable from a legitimate pair. It is B-234 carried into the UI, where
+a human reads it on a screen titled "Independent verification".
+
+### Fix applied
+
+One more verifier, exposed like the others: `reasoning_trace` runs
+`verify_tool_log.py <trace> --paired-bundle <bundle>` — which since B-234 checks
+the chain **and** the pairing — and reports its exit code verbatim. It is offered
+as applicable only when a sibling trace exists, in EN and ES. The index flag
+stays what it was (an inventory fact); what was missing was the ability to ask
+for the verification.
+
+### Regression
+
+`tests/test_r8_ui_verification.py` (9 tests; 6 red against pre-R8 code).
+`tests/test_webui_verify.py` updated.
+
+---
+
+## B-234 — The reasoning trace ↔ sealed bundle pairing was enforced by no verifier
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — process evidence attributable to the wrong case |
+| **Files** | `verify_tool_log.py`, `vigia_agent.py` |
+| **Found in** | Red Team Round 7, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND7_PAIRING.md` (R7-1) |
+
+### Description
+
+`vigia/core/reasoning_trace.py` states the invariant in its own docstring —
+*"any verifier MUST assert this equals the sealed bundle verdict [...] must FAIL
+verification, never be silently reconciled"* — and implements it correctly in
+`verify_reasoning_trace()`, which compares `case_id` and verdict.
+
+That function was called **only from a test**. `vigia_agent.py` named it in a
+comment ("verify_reasoning_trace() binds the two") without invoking it, and no
+CLI exposed it: `verify_tool_log.py` verifies the trace's chain in isolation and
+`forensics/verify_ebs_v1.py` verifies the bundle, neither looking at the other
+file.
+
+The trace lives outside the bundle digest — a sibling artifact with its own
+integrity — so its chain can be intact and still explain a different case.
+
+Measured on real artifacts in `vigia/results/mode1_crosscheck/`: the JESS-M1
+trace (SUSPICION) presented alongside the FLAREON-2017-M1 bundle (MALICE)
+returned `CHAIN VERIFIED`, exit 0, `Timeline: PLAUSIBLE`. One case's reasoning,
+presented as the explanation for another case's MALICE verdict, passed every
+documented verification.
+
+### Fix applied
+
+Both ends. **Production:** `vigia_agent.py` calls `verify_reasoning_trace()`
+before writing the trace and does not write it on divergence; the fail-soft
+posture toward the already-sealed bundle is kept (§5.3) but separated from a
+write failure by a dedicated exception at `error` level (`WIRING BUG`).
+**Verification:** `verify_tool_log.py` recognizes a reasoning trace,
+auto-detects the sibling bundle `<stem>.json` (or takes `--paired-bundle`), and
+compares `case_id` and verdict. With no bundle to compare against it says so
+explicitly, rather than letting `CHAIN VERIFIED` read as "this trace explains
+that bundle".
+
+**Documented limit:** the pairing compares two fields an attacker with write
+access can make match. A `bundle_digest` inside the trace would make it
+cryptographic — a format change, recorded as a recommendation.
+
+### Regression
+
+`tests/test_r7_trace_bundle_pairing.py` (9 tests; 6 red against pre-R7 code).
+The 5 real pairs in `mode1_crosscheck/` stay green; 0 exit-code changes across
+the 35 bundles carrying a `tool_execution_log`.
+
+---
+
+## B-231 — Authority conflict: `seal_with_chain()` produced bundles `verify_ebs_v1.py` declared invalid
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — two VIGÍA components disagreeing about the same file |
+| **Files** | `forensics/verify_ebs_v1.py`, `vigia/core/bundle_builder.py`, `vigia/forensics/vigia_chain_of_custody.py` |
+| **Found in** | Red Team Round 6, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND6_PERIMETER.md` (R6-1) |
+
+### Description
+
+`BundleBuilder.seal()` builds `bundle_payload` from a fixed key list, so any
+field added after sealing falls outside the hash by construction. The custody
+ledger knew this and excluded `integrity`, `forensic_chain` and `pki` when
+recomputing. The other two verifiers rebuilt the payload as "everything except
+`integrity`".
+
+Measured result: a bundle produced by VIGÍA's own `seal_with_chain()` — which
+injects `forensic_chain` outside the payload, by documented design — was
+declared **intact** by the ledger and **invalid** by `verify_ebs_v1.py` and
+`BundleBuilder.quick_verify`. Same for `pki`: notarizing the bundle with an
+RFC 3161 receipt broke its own verification.
+
+For an expert proceeding this is the worst possible disagreement: opposing
+counsel picks whichever verifier helps.
+
+### Fix applied
+
+One shared notion of presentation fields —
+`PRESENTATION_FIELDS = (integrity, forensic_chain, pki, tool_execution_log)` —
+with a local copy in each stdlib-only verifier and a lockstep test. **Both**
+historical payload schemes are supported (older bundles hash
+`tool_execution_log` inside the payload): both are tried and the SHA-256 must
+match one exactly, so an attacker gains no forging margin. New `R1_SEAL_SCOPE`
+check, informational, naming which part of the file the seal does **not** back
+and where each part's authenticity comes from instead.
+
+---
+
+## B-232 — The `tool_execution_log` was not anchored to the sealed bundle, and could not be
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 |
+| **File** | `vigia/core/bundle_builder.py` (`seal`) |
+| **Found in** | Red Team Round 6, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND6_PERIMETER.md` (R6-2) |
+
+### Description
+
+CLAUDE.md instructs the agent to write `tool_execution_log` and
+`chain_tip_sha256` as siblings of the bundle. Measured: attaching **any**
+sibling key to a sealed bundle breaks the seal. So two individually correct
+documented behaviours composed into an invalid bundle — which is why the audit
+trail lived outside the cryptographic perimeter, with nothing preventing its
+deletion.
+
+### Fix applied
+
+`seal(tool_log_tip=...)` puts the chain **tip** (`chain_tip_sha256` /
+`chain_tip_hmac`) inside the sealed payload, while the entry array travels as a
+presentation field. The field does not move: it becomes covered. Measured
+result: truncating the log breaks the comparison against the tip; recomputing
+the tip to hide that breaks `bundle_hash`, which is itself anchored in the
+custody ledger with an HMAC checkpoint.
+
+**Honest limit, not closed:** excluding the log from the hash opens a vector
+that did not exist before — attaching a *fabricated* log to a legitimate bundle
+no longer breaks the seal. It is reported as an `R1_SEAL_SCOPE` WARNING
+("SIN ANCLA" / unanchored), not an ERROR, because an unanchored log does not
+prove the bundle was altered. Promoting it to ERROR waits on every producer
+passing `tool_log_tip`.
+
+---
+
+## B-233 — Deleting the whole `tool_execution_log` was reported as "bundle without a log", not as a deleted log
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P3 |
+| **File** | `verify_tool_log.py` (`verify_chain`) |
+| **Found in** | Red Team Round 6, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND6_PERIMETER.md` (R6-3) |
+
+### Description
+
+Deleting the whole array returned exit 2 (`NO tool_execution_log —
+fallback/EBS bundle`) while the seal stayed intact: nothing said something
+sealed was missing. A silent absence, of the kind CLAUDE.md marks as incomplete
+under Daubert.
+
+### Fix applied
+
+With the tip sealed (B-232) the absence is detectable: if the bundle declares
+`chain_tip_sha256` and the array is not there, it is reported as a broken chain
+(exit 1), not as a bundle without a log.
+
+---
+
+## B-228 — Schema downgrade v2→v1 in `verify_tool_log.py`: unauthenticated data selected the verification algorithm
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P1 — audit-trail integrity under Daubert |
+| **File** | `verify_tool_log.py` |
+| **Original line** | 314 (`version = "2" if log[0].get("entry_hash") else "1"`) |
+| **Found in** | Red Team Round 5, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND5_DOWNGRADE.md` (R5-1) |
+
+### Description
+
+The standalone verifier chose between the v2 chain schema and the legacy v1
+one by reading a single deletable field **inside the array the attacker
+edits**. Deleting `entry_hash` from the first entry and rewriting `prev_hash`
+per the v1 rule (neither requires the HMAC key) dropped verification to
+`_verify_v1`, which:
+
+- chains only `result_summary` — `timestamp`, `tool`, `target` and
+  `input_hash` are left uncovered;
+- **never received the HMAC key** (the function had no such parameter), so
+  `entry_hmac` was never verified even when the examiner held the key;
+- **never consults `chain_tip_sha256`**, so the R3-5 tail anchor took no part
+  even when present.
+
+The three defences accumulated in R3-2, A3 and R3-5 switched off together.
+Confirmed by induction: `VERDICT: MALICE` rewritten as `VERDICT: NOISE`,
+`target` and `timestamp` altered, verified **with the correct key** →
+`CHAIN VERIFIED (schema v1)`, exit 0.
+
+`tool_execution_log` is not covered by `bundle_hash` (`BundleBuilder.seal`
+builds `bundle_payload` without it), so no outer seal softened the impact:
+this verifier was its only protection.
+
+### Fix applied
+
+`_detect_schema(log, bundle)` derives the schema from **every** v2 marker
+(`chain_version == "2"`, `entry_hash`, `entry_hmac` in any entry;
+`chain_tip_sha256` / `chain_tip_hmac` at bundle level). If anything declares
+v2 it is verified as v2, and an entry missing `entry_hash` fails as altered
+content. `_verify_v1` now receives the key and reports a v1 log as a downgrade
+whenever a key was supplied, unless `--allow-legacy-v1` is passed.
+
+**Documented residual:** stripping *every* v2 marker is still
+indistinguishable from a genuine legacy bundle when the verifier runs
+**without** a key. Measured, with a test:
+`test_full_marker_strip_is_flagged_only_when_keyed`.
+
+### Regression
+
+`tests/test_r5_schema_downgrade.py` (12 tests; 9 red against the pre-fix
+code), `scripts/redteam_round5_downgrade.py` (12 vectors). Zero exit-code
+changes across the 35 real bundles in the repository.
+
+---
+
+## B-229 — Deleting `chain_tip_sha256` re-enabled the tail truncation R3-5 had closed
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P2 |
+| **File** | `verify_tool_log.py` (`_verify_v2`) |
+| **Found in** | Red Team Round 5, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND5_DOWNGRADE.md` (R5-2) |
+
+### Description
+
+R3-5 anchored the chain tail with `chain_tip_sha256`, outside the array an
+attacker would truncate. But the **presence** of the anchor is also decided by
+the attacker, and its absence was reported as a backward-compatibility
+`[NOTE]`, not a failure. Truncating the log and deleting the anchor made
+truncation undetectable again **even with the key supplied**: the very attack
+R3-5 detects, hidden by deleting the detector.
+
+### Fix applied
+
+Whether a bundle was sealed with a key is observable inside the list itself:
+`entry_hmac` present in any entry. `ToolExecutionLogChain.bundle_fields()`
+always emits `chain_tip_sha256` and `chain_tip_hmac` together when a key is
+configured, so `entry_hmac` present + anchor absent means deletion, not an old
+bundle → `[FAIL]`. Likewise for `chain_tip_hmac` absent with
+`chain_tip_sha256` present.
+
+The R3-5 contract for **unkeyed** bundles is untouched: without `entry_hmac`,
+a missing anchor stays a `[NOTE]` with exit 0.
+
+---
+
+## B-230 — `verify_tool_log.py` produced a traceback instead of a diagnostic on a malformed log
+
+| Field | Value |
+|-------|-------|
+| **Status** | RESOLVED |
+| **Severity** | P3 — hygiene |
+| **File** | `verify_tool_log.py` (`verify_chain`) |
+| **Found in** | Red Team Round 5, session 2026-09-11 |
+| **Report** | `docs/REDTEAM_ROUND5_DOWNGRADE.md` (R5-3) |
+
+### Description
+
+`log[0].get(...)` over a `str`/`None` entry, or over a `tool_execution_log`
+that is a dict, raised `AttributeError` / `KeyError`. The resulting exit code
+was 1 — fail-safe, no false `VERIFIED` — but a traceback does not tell an
+examiner what to look at. Same class as R4-4.
+
+### Fix applied
+
+A shape guard with an explicit diagnostic naming the malformed indices.
+
+---
+
 ## B-001 — `daubert_note` UnboundLocalError in the CollapseDecisionLayer Path
 
 | Field | Value |

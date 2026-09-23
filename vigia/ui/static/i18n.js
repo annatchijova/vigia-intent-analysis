@@ -17,6 +17,7 @@ window.VIGIA_I18N = {
     "theme.toggle": "◐ theme",
 
     "err.request": "Request failed —",
+    "err.render": "This bundle could not be displayed (malformed field) —",
 
     "filters.verdict_all": "verdict: all",
     "filters.schema_all": "schema: all",
@@ -90,6 +91,7 @@ window.VIGIA_I18N = {
     "verify.anyway": "also offer verifiers not applicable to this schema (an honest NONCONFORMANT on a foreign schema is documented behavior)",
     "verify.name.ebs_v1": "EBS v1 verifier (forensics/verify_ebs_v1.py)",
     "verify.name.tool_log": "Tool-log chain verifier (verify_tool_log.py)",
+    "verify.name.reasoning_trace": "Reasoning trace + pairing (verify_tool_log.py --paired-bundle)",
     "verify.name.sidecar": "SHA-256 sidecar check",
     "verify.running": "running…",
     "verify.hmac_ph": "HMAC key hex (optional)",
@@ -142,6 +144,7 @@ window.VIGIA_I18N = {
     "theme.toggle": "◐ tema",
 
     "err.request": "La petición falló —",
+    "err.render": "No se pudo mostrar este bundle (campo malformado) —",
 
     "filters.verdict_all": "veredicto: todos",
     "filters.schema_all": "esquema: todos",
@@ -215,6 +218,7 @@ window.VIGIA_I18N = {
     "verify.anyway": "ofrecer también verificadores no aplicables a este esquema (un NONCONFORMANT honesto sobre un esquema ajeno es comportamiento documentado)",
     "verify.name.ebs_v1": "Verificador EBS v1 (forensics/verify_ebs_v1.py)",
     "verify.name.tool_log": "Verificador de cadena tool-log (verify_tool_log.py)",
+    "verify.name.reasoning_trace": "Reasoning trace + emparejamiento (verify_tool_log.py --paired-bundle)",
     "verify.name.sidecar": "Comprobación del sidecar SHA-256",
     "verify.running": "ejecutando…",
     "verify.hmac_ph": "clave HMAC hex (opcional)",

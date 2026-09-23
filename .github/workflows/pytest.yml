@@ -12,6 +12,14 @@ jobs:
       # contrato S-1 (tests/test_requirements_ci_contract.py) garantiza
       # completo para la suite. Instalar solo requirements.txt dejó este job
       # sin fastapi (4 módulos de tests de API sin colectar, exit 2).
+      #
+      # node: tests/test_r10_render_type_coercion.py y test_r10_4_fraction_bool.py
+      # ejecutan los renderizadores y el predicado de Fraction TAL COMO estan en
+      # el app.js que se sirve. Sin node hacen skip y se pierde justamente el
+      # barrido que encontro los 6 campos que hacian explotar el render.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - run: pip install -r requirements.txt -r requirements-ci.txt && pip install scipy
       - run: python -m pytest tests/ vigia/tests/ -q --tb=short --no-cov
         env:

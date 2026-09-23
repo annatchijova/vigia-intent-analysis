@@ -79,9 +79,14 @@ GENESIS_HASH = "0" * 64  # hash del nodo anterior para el primer bloque
 #   integrity      — lo escribe el propio seal() (contiene el bundle_hash)
 #   forensic_chain — lo inyecta seal_with_chain() (metadata de esta cadena)
 #   pki            — lo inyecta pki_tools (receipt RFC 3161 / firma HSM)
+#   tool_execution_log — lo adjunta el agente (Modo 2); su punta viaja
+#                    sellada en chain_tip_sha256, dentro del payload (R6-2)
 # La recomputación del bundle_hash debe excluirlos — mismo esquema que
 # BundleBuilder.quick_verify() y forensics/verify_ebs_v1.py.
-_PRESENTATION_FIELDS = ("integrity", "forensic_chain", "pki")
+_PRESENTATION_FIELDS = ("integrity", "forensic_chain", "pki", "tool_execution_log")
+# R6-1: los bundles historicos hashean tool_execution_log DENTRO del payload.
+# Se prueban ambos esquemas antes de declarar un bundle alterado.
+_LEGACY_HASHED_FIELDS = ("tool_execution_log",)
 
 
 def _default_ledger_path() -> str:
@@ -232,9 +237,24 @@ def _recompute_sealed_bundle_hash(bundle: Dict) -> str:
     SHA-256 del payload canónico excluyendo los campos de presentación
     (integrity, forensic_chain, pki).
     """
-    payload = {k: v for k, v in bundle.items() if k not in _PRESENTATION_FIELDS}
+    return _sealed_hash(bundle, legacy=False)
+
+
+def _sealed_hash(bundle: Dict, legacy: bool = False) -> str:
+    excluded = tuple(f for f in _PRESENTATION_FIELDS
+                     if not (legacy and f in _LEGACY_HASHED_FIELDS))
+    payload = {k: v for k, v in bundle.items() if k not in excluded}
     canonical = json.dumps(_canonicalize(payload), sort_keys=True, ensure_ascii=True)
     return _sha256(canonical)
+
+
+def _sealed_hash_matching(bundle: Dict, declared: str) -> Optional[str]:
+    """El hash recomputado que coincide con `declared`, o None."""
+    for legacy in (False, True):
+        candidate = _sealed_hash(bundle, legacy=legacy)
+        if candidate == declared:
+            return candidate
+    return None
 
 
 def _compute_bundle_hash(bundle: Dict) -> str:
@@ -251,8 +271,11 @@ def _compute_bundle_hash(bundle: Dict) -> str:
     legacy sin canonicalize — compatible con ledgers existentes.
     """
     integrity = bundle.get("integrity", {})
-    if integrity.get("bundle_hash", ""):
-        return _recompute_sealed_bundle_hash(bundle)
+    declared = integrity.get("bundle_hash", "")
+    if declared:
+        # R6-1: conservar el esquema con el que el bundle fue sellado, para que
+        # un bundle historico entre al ledger con el mismo hash de siempre.
+        return _sealed_hash_matching(bundle, declared) or _recompute_sealed_bundle_hash(bundle)
     # Fallback legacy: serializar y hashear el dict completo
     canonical = json.dumps(bundle, sort_keys=True, ensure_ascii=True)
     return _sha256(canonical)
@@ -266,8 +289,9 @@ def _declared_hash_mismatch(bundle: Dict) -> Optional[str]:
     declared = bundle.get("integrity", {}).get("bundle_hash", "")
     if not declared:
         return None
-    recomputed = _recompute_sealed_bundle_hash(bundle)
-    if recomputed != declared:
+    recomputed = _sealed_hash_matching(bundle, declared)
+    if recomputed is None:
+        recomputed = _recompute_sealed_bundle_hash(bundle)
         return (
             f"integrity.bundle_hash declarado ({declared[:16]}...) no "
             f"recomputa desde el contenido canónico ({recomputed[:16]}...). "

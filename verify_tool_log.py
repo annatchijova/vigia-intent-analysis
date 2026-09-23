@@ -26,6 +26,13 @@ Soporta ambos esquemas de cadena:
       residual de que chain_tip_sha256 por sí solo es recomputable por
       cualquiera con acceso de escritura.
 
+R5-1 — ANTI-DEGRADACION: el esquema se deduce de TODOS los marcadores v2
+(chain_version="2", entry_hash, entry_hmac en cualquier entrada;
+chain_tip_sha256 / chain_tip_hmac a nivel bundle), nunca de un unico campo
+borrable. Un bundle v2 al que se le borre entry_hash NO cae a la via v1: se
+verifica como v2 y falla como contenido alterado. Con clave HMAC provista, un
+log v1 se reporta como degradacion salvo --allow-legacy-v1.
+
 self_correction_events are reported separately (not in hash chain by design).
 
 Usage:
@@ -45,6 +52,41 @@ from pathlib import Path
 GENESIS_V1 = "GENESIS"
 GENESIS_V2 = "0" * 64
 _STRUCTURAL_FIELDS = frozenset({"seq", "prev_hash", "entry_hash", "entry_hmac"})
+_V2_ENTRY_MARKERS = ("entry_hash", "entry_hmac")
+_V2_BUNDLE_MARKERS = ("chain_tip_sha256", "chain_tip_hmac")
+_TRACE_SEMANTIC_FIELDS = (
+    "trace_id", "case_id", "trace_version", "sealed_at", "verdict",
+    "confidence_submitted", "confidence_stored", "confidence_warnings",
+    "quality", "diversity", "contradictions", "steps",
+)
+
+
+def _detect_schema(log: list, bundle: dict) -> tuple:
+    """R5-1: el esquema se decide por TODOS los marcadores v2 del bundle, no
+    por `log[0]["entry_hash"]`.
+
+    Elegir el esquema a partir de un solo campo borrable convierte al dato
+    controlado por el atacante en selector del algoritmo de verificacion: con
+    borrar `entry_hash` de la primera entrada, la cadena se validaba por la
+    via v1 — que no cubre timestamp/tool/target/input_hash, no recibe la clave
+    HMAC y no mira chain_tip_sha256. Si CUALQUIER entrada o el bundle declara
+    v2, se verifica como v2; una entrada a la que le falte entry_hash falla
+    entonces como contenido alterado, que es lo que es.
+
+    Devuelve (version, markers) — markers documenta por que se eligio v2.
+    """
+    markers = []
+    for entry in log:
+        if not isinstance(entry, dict):
+            continue
+        if str(entry.get("chain_version", "")) == "2":
+            markers.append(f'seq={entry.get("seq", "?")}: chain_version="2"')
+        for field in _V2_ENTRY_MARKERS:
+            if field in entry:
+                markers.append(f'seq={entry.get("seq", "?")}: {field}')
+    markers += [f"bundle: {f}" for f in _V2_BUNDLE_MARKERS if f in bundle]
+    return ("2" if markers else "1"), markers
+
 
 # R3-4: ventana forense plausible (mismos limites fijos que la libreria /
 # regla TCV R3-1). Techo 2038 = overflow epoch 32-bit.
@@ -207,7 +249,8 @@ def _resolve_hmac_key(args) -> bytes | None:
 
 # ── Verificación v1 (legacy) ──────────────────────────────────────────────
 
-def _verify_v1(log: list, verbose: bool) -> bool:
+def _verify_v1(log: list, verbose: bool, hmac_key: bytes | None = None,
+               allow_legacy: bool = False) -> bool:
     ok = True
     prev_result = None
     for entry in log:
@@ -242,6 +285,19 @@ def _verify_v1(log: list, verbose: bool) -> bool:
         "result_summary de la última entrada es editable. Re-sellar con "
         "chain_version=2 para cobertura completa."
     )
+    # R5-1 (residual): quien tiene la clave espera autenticidad. El esquema v1
+    # no puede darla — no hay entry_hmac que verificar — asi que un atacante
+    # que borre TODOS los marcadores v2 quedaria indistinguible de un bundle
+    # legacy. Con clave en mano eso se reporta como degradacion, no como
+    # "VERIFIED". --allow-legacy-v1 es la via explicita para bundles historicos.
+    if hmac_key is not None and not allow_legacy:
+        print(
+            "  [FAIL] esquema v1 con clave HMAC provista: v1 no lleva "
+            "entry_hmac, asi que la cadena no puede autenticarse. Si el bundle "
+            "fue sellado en v2, esto es una DEGRADACION de esquema; si es un "
+            "bundle historico genuino, re-ejecutar con --allow-legacy-v1."
+        )
+        ok = False
     return ok
 
 
@@ -254,6 +310,11 @@ def _verify_v2(
     ok = True
     expected_prev = GENESIS_V2
     expected_seq = 1
+    # R5-2: "este bundle fue sellado con clave" es observable por el entry_hmac
+    # de las entradas, no por lo que el atacante haya dejado a nivel bundle.
+    keyed_entries = any(
+        isinstance(e, dict) and e.get("entry_hmac") for e in log
+    )
 
     for entry in log:
         seq = entry.get("seq", "?")
@@ -308,6 +369,16 @@ def _verify_v2(
             ok = False
         else:
             print(f"  [OK  ] chain_tip_sha256 | coincide con la punta recomputada")
+        if hmac_key is not None and expected_tip_hmac is None and keyed_entries:
+            # R5-2: mismo borrado, un campo mas adentro — chain_tip_sha256 solo
+            # es recomputable por cualquiera con acceso de escritura; el HMAC de
+            # la punta es lo unico que lo ancla. Borrarlo lo deja recomputable.
+            print(
+                "  [FAIL] chain_tip_hmac ausente en un bundle con entry_hmac: "
+                "chain_tip_sha256 sin su HMAC es recomputable por quien escriba "
+                "el archivo."
+            )
+            ok = False
         if hmac_key is not None and expected_tip_hmac is not None:
             expected = _hmac.new(hmac_key, expected_prev.encode("utf-8"), "sha256").hexdigest()
             if not _hmac.compare_digest(expected_tip_hmac, expected):
@@ -318,6 +389,18 @@ def _verify_v2(
                 ok = False
             else:
                 print("  [OK  ] chain_tip_hmac | coincide")
+    elif hmac_key is not None and keyed_entries:
+        # R5-2: un bundle sellado con clave SIEMPRE lleva chain_tip_sha256 y
+        # chain_tip_hmac (ToolExecutionLogChain.bundle_fields los emite juntos).
+        # Si las entradas traen entry_hmac pero el ancla no esta, fue borrada
+        # despues del sellado — y sin ancla, truncar la cola vuelve a ser
+        # indetectable. Ausencia != bundle viejo cuando hay HMAC por entrada.
+        print(
+            "  [FAIL] chain_tip_sha256 ausente en un bundle con entry_hmac: "
+            "el sellado keyed siempre ancla la punta. El ancla fue borrada — "
+            "truncar la cola seria indetectable."
+        )
+        ok = False
     else:
         print(
             "\n  [NOTE] Sin chain_tip_sha256 en el bundle: truncar la cola "
@@ -336,6 +419,114 @@ def _verify_v2(
     return ok
 
 
+def _looks_like_trace(doc: dict) -> bool:
+    """Una reasoning trace sellada: artefacto hermano del bundle, con cadena
+    propia. Se reconoce por trace_id + verdict (ver vigia/core/reasoning_trace)."""
+    return isinstance(doc.get("trace_id"), str) and "verdict" in doc
+
+
+def _trace_payload_hash(trace: dict) -> str:
+    """Stdlib mirror of reasoning_trace._trace_payload_hash()."""
+    payload = {field: trace.get(field) for field in _TRACE_SEMANTIC_FIELDS}
+    encoded = json.dumps(
+        payload, sort_keys=True, ensure_ascii=True, separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _check_trace_manifest(trace: dict) -> bool:
+    """Verify that the displayed trace, not only its tool log, is sealed.
+
+    The manifest is embedded in the HMAC-covered DECISION entry.  This keeps a
+    valid chain from authenticating mutable sibling fields such as ``steps``.
+    """
+    declared = trace.get("trace_payload_sha256")
+    if not isinstance(declared, str) or declared != _trace_payload_hash(trace):
+        print("  [FAIL] trace semantic manifest absent or does not match displayed content")
+        return False
+
+    entries = [
+        entry for entry in trace.get("tool_execution_log", [])
+        if isinstance(entry, dict) and entry.get("tool") == "reasoning:decision"
+    ]
+    marker = f"trace_payload_sha256={declared};"
+    if len(entries) != 1 or not str(entries[0].get("result_summary", "")).startswith(marker):
+        print("  [FAIL] trace semantic manifest is not bound by the DECISION chain entry")
+        return False
+
+    decisions = [
+        step for step in trace.get("steps", []) if isinstance(step, dict)
+        and step.get("kind") == "decision" and isinstance(step.get("payload"), dict)
+    ]
+    if len(decisions) != 1 or decisions[0]["payload"].get("verdict") != trace.get("verdict"):
+        print("  [FAIL] trace top-level verdict disagrees with its DECISION step")
+        return False
+    print("  [OK  ] trace semantic manifest + DECISION binding")
+    return True
+
+
+def _find_sibling_bundle(trace_path: str):
+    """<stem>_reasoning_trace.json -> <stem>.json, si existe."""
+    p = Path(trace_path)
+    marker = "_reasoning_trace.json"
+    if not p.name.endswith(marker):
+        return None
+    sibling = p.with_name(p.name[: -len(marker)] + ".json")
+    return sibling if sibling.is_file() else None
+
+
+def _check_trace_pairing(trace: dict, trace_path: str, bundle_arg: str) -> bool:
+    """R7-1: la traza vive FUERA del digest del bundle — es un archivo aparte
+    con integridad propia. Su cadena puede estar perfectamente intacta y aun asi
+    explicar OTRO caso: nada en la cadena dice a que bundle pertenece.
+
+    `vigia/core/reasoning_trace.verify_reasoning_trace` implementa la
+    comparacion (case_id + verdict) y su docstring la declara obligatoria
+    — "MUST fail verification, never be silently reconciled" — pero solo se
+    llamaba desde un test: ningun CLI la exponia. Medido: la traza de un caso
+    SUSPICION presentada junto al bundle de un caso MALICE daba
+    "CHAIN VERIFIED", exit 0.
+
+    Devuelve True si el emparejamiento es correcto o no habia con que
+    compararlo; False si diverge. Nunca pasa en silencio: cuando no se puede
+    comparar, lo dice.
+    """
+    path = bundle_arg or _find_sibling_bundle(trace_path)
+    if not path:
+        print("\n  [NOTE] Reasoning trace verificada EN AISLAMIENTO: no se "
+              "encontro el bundle hermano. La cadena prueba que la traza no "
+              "fue alterada, NO que explique el bundle que la acompana. "
+              "Pasar --paired-bundle <path> para verificar el emparejamiento.")
+        return True
+    try:
+        bundle = json.loads(Path(path).read_text())
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"\n  [FAIL] Pairing: no se pudo leer el bundle {path}: {exc}")
+        return False
+
+    ok = _check_trace_manifest(trace)
+    print(f"\nPairing traza <-> bundle: {path}")
+    t_case, b_case = trace.get("case_id"), bundle.get("case_id")
+    if t_case != b_case:
+        print(f"  [FAIL] case_id | traza={t_case!r} bundle={b_case!r}")
+        ok = False
+    else:
+        print(f"  [OK  ] case_id | {t_case!r}")
+
+    t_verdict = trace.get("verdict")
+    b_verdict = bundle.get("agent_verdict")
+    if b_verdict is None:
+        print("  [NOTE] el bundle no declara agent_verdict: veredicto NO comparado")
+    elif t_verdict != b_verdict:
+        print(f"  [FAIL] veredicto | la traza registro {t_verdict!r} pero el "
+              f"bundle sellado dice {b_verdict!r} — la traza se construyo a "
+              f"partir de otro resultado que el que se sello")
+        ok = False
+    else:
+        print(f"  [OK  ] veredicto | {t_verdict!r}")
+    return ok
+
+
 def verify_chain(bundle_path: str, verbose: bool = False, args=None) -> int:
     try:
         bundle = json.loads(Path(bundle_path).read_text())
@@ -345,26 +536,53 @@ def verify_chain(bundle_path: str, verbose: bool = False, args=None) -> int:
 
     log = bundle.get("tool_execution_log", [])
     if not log:
+        # R6-3: un bundle que declara chain_tip_sha256 SELLO una cadena. Si el
+        # arreglo no esta, no es "un bundle EBS sin log" — es un log borrado.
+        # Sin este chequeo, borrar el log entero daba exit 2 (NO_LOG) mientras
+        # el sello seguia intacto: nadie decia que faltaba algo que se sello.
+        if bundle.get("chain_tip_sha256"):
+            print("NO tool_execution_log, pero el bundle declara "
+                  f"chain_tip_sha256={bundle['chain_tip_sha256'][:16]}...")
+            print("  [FAIL] el bundle sello una cadena de herramientas y el "
+                  "arreglo no esta: el log fue borrado despues del sellado.")
+            print("\nResult: CHAIN BROKEN")
+            return 1
         print("NO tool_execution_log — fallback/EBS bundle.")
         print("Use: python3 forensics/verify_ebs_v1.py <bundle> --verbose")
         return 2
 
+    # R5-3 (hygiene): un log malformado debe dar un diagnostico, no un
+    # traceback. El exit code ya era 1 por la excepcion — fail-safe — pero un
+    # traceback no le dice a un perito que mirar.
+    if not isinstance(log, list):
+        print(f"ERROR: tool_execution_log debe ser una lista, es {type(log).__name__}")
+        return 1
+    bad = [i for i, e in enumerate(log) if not isinstance(e, dict)]
+    if bad:
+        print(f"ERROR: entradas malformadas (no son objetos JSON) en los "
+              f"indices {bad[:10]} de tool_execution_log")
+        return 1
+
     case_id = (bundle.get("case_id")
                or bundle.get("metadata", {}).get("case_id", "UNKNOWN"))
-    version = "2" if log[0].get("entry_hash") else "1"
+    version, markers = _detect_schema(log, bundle)
+    hmac_key = _resolve_hmac_key(args) if args else None
+    allow_legacy = bool(getattr(args, "allow_legacy_v1", False))
     print(f"Bundle : {bundle_path}")
     print(f"Case   : {case_id}")
     print(f"Schema : chain v{version}")
     print(f"Entries: {len(log)} MCP tool calls")
+    if version == "2":
+        print(f"v2 markers: {len(markers)} ({', '.join(markers[:3])}"
+              f"{', ...' if len(markers) > 3 else ''})")
     print()
 
     if version == "2":
-        hmac_key = _resolve_hmac_key(args) if args else None
         expected_tip = bundle.get("chain_tip_sha256")
         expected_tip_hmac = bundle.get("chain_tip_hmac")
         ok = _verify_v2(log, verbose, hmac_key, expected_tip, expected_tip_hmac)
     else:
-        ok = _verify_v1(log, verbose)
+        ok = _verify_v1(log, verbose, hmac_key, allow_legacy)
 
     sc = bundle.get("self_correction_events", [])
     if sc:
@@ -383,6 +601,13 @@ def verify_chain(bundle_path: str, verbose: bool = False, args=None) -> int:
     note = bundle.get("tool_execution_log_note", "")
     if note:
         print(f"\nNote: {note[:140]}")
+
+    # R7-1: si el archivo es una reasoning trace, su cadena intacta NO prueba
+    # que pertenezca al bundle con el que se la presenta.
+    if _looks_like_trace(bundle):
+        if not _check_trace_pairing(bundle, bundle_path,
+                                    getattr(args, "paired_bundle", "") if args else ""):
+            ok = False
 
     status = f"CHAIN VERIFIED ({len(log)} entries, schema v{version})" if ok else "CHAIN BROKEN"
     print(f"\nResult: {status}")
@@ -414,5 +639,15 @@ if __name__ == "__main__":
                    help="Clave HMAC en hex para verificación keyed (v2)")
     p.add_argument("--hmac-key-file", default="",
                    help="Archivo con la clave HMAC en bytes crudos (v2)")
+    # dest propio: el argumento posicional ya ocupa "bundle", y una colision
+    # de dest hace que el flag pise la ruta del archivo a verificar.
+    p.add_argument("--paired-bundle", dest="paired_bundle", default="",
+                   help="Bundle sellado con el que emparejar una reasoning "
+                        "trace (case_id + veredicto). Por defecto se busca el "
+                        "hermano <stem>.json — R7-1.")
+    p.add_argument("--allow-legacy-v1", action="store_true",
+                   help="Aceptar un bundle esquema v1 aunque se haya provisto "
+                        "clave HMAC (bundles historicos). Sin este flag, v1 + "
+                        "clave se reporta como degradacion de esquema — R5-1.")
     cli_args = p.parse_args()
     sys.exit(verify_chain(cli_args.bundle, cli_args.verbose, cli_args))

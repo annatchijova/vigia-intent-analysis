@@ -21,9 +21,11 @@ import collections
 import datetime
 import json
 import re
+import signal
 import subprocess
 import sys
 import threading
+import time
 import os
 import uuid
 from pathlib import Path
@@ -40,6 +42,61 @@ EXIT_LABELS = {0: "NOISE", 1: "MALICE", 2: "ERROR", 3: "INTENT",
 _LOG_MAXLEN = 5000
 _DEFAULT_TIMEOUT_S = 30 * 60
 _TERMINATE_GRACE_S = 10
+
+
+def _signal_process_tree(proc: subprocess.Popen, sig: int,
+                         process_group_id: Optional[int] = None) -> str:
+    """R11-1 — Señala al GRUPO de procesos, no sólo al hijo directo.
+
+    El agente se lanza con ``start_new_session=True``, que lo hace líder de su
+    propia sesión y grupo: eso existe precisamente para poder señalar al árbol
+    entero sin tocar al servidor. Pero `_kill` y `shutdown` llamaban
+    `proc.terminate()`, que señala UN pid.
+
+    `vigia_agent.py` llega, vía `sift_orchestrator`, a `memory_forensics`,
+    `pcap_parser` y `registry_timeline_reconstructor`, que corren volatility,
+    tshark y regripper como subprocesos — minutos u horas sobre una imagen de
+    memoria. Medido: tras `terminate()` el nieto sigue corriendo; tras
+    `killpg` no. Así que la UI decía "process terminated" mientras la
+    herramienta pesada seguía viva sobre la evidencia, y el slot de
+    concurrencia quedaba libre para un job nuevo que arrancaba junto al
+    fantasma.
+
+    Que sea seguro depende de `start_new_session=True`: sin eso el grupo sería
+    el del propio servidor. Si el grupo no se puede resolver, se cae a señalar
+    el pid — degradar es mejor que señalar un grupo equivocado.
+
+    Devuelve el alcance efectivo, para poder decirlo en el log del job.
+    """
+    if hasattr(os, "killpg") and hasattr(os, "getpgid"):
+        pgid = process_group_id
+        if pgid is None:
+            try:
+                pgid = os.getpgid(proc.pid)
+            except OSError:
+                pgid = None
+        if pgid is not None and pgid != os.getpgid(0):
+            try:
+                os.killpg(pgid, sig)
+                return f"grupo de procesos {pgid}"
+            except OSError:
+                pass
+    try:
+        proc.send_signal(sig)
+    except OSError:
+        return "ninguno (el proceso ya no existe)"
+    return f"sólo el pid {proc.pid}"
+
+
+def _process_group_exists(process_group_id: Optional[int]) -> bool:
+    """True while at least one member of the dedicated job group remains."""
+    if process_group_id is None or not hasattr(os, "killpg"):
+        return False
+    try:
+        os.killpg(process_group_id, 0)
+        return True
+    except OSError:
+        return False
 
 
 class JobValidationError(ValueError):
@@ -69,6 +126,7 @@ class _Job:
         self.verdict_from_bundle: Optional[str] = None
         self.bundle_id: Optional[str] = None
         self.proc: Optional[subprocess.Popen] = None
+        self.process_group_id: Optional[int] = None
         self.log: collections.deque = collections.deque(maxlen=_LOG_MAXLEN)
         self.log_start = 0             # absolute offset of log[0]
         self.log_total = 0             # total lines ever appended
@@ -180,6 +238,9 @@ class JobRunner:
                 text=True, errors="replace", start_new_session=True,
             )
             job.proc = proc
+            # start_new_session makes the child PID the stable process-group
+            # identifier. Keep it even if the leader exits before its children.
+            job.process_group_id = proc.pid
             timer = threading.Timer(self.timeout_s, self._kill, args=(job,))
             timer.daemon = True
             timer.start()
@@ -204,18 +265,26 @@ class JobRunner:
 
     def _kill(self, job: _Job) -> None:
         proc = job.proc
-        if proc is None or proc.poll() is not None:
+        if proc is None:
             return
-        job.error = f"timeout after {self.timeout_s}s — process terminated"
+        if proc.poll() is not None and not _process_group_exists(job.process_group_id):
+            return
+        job.error = f"timeout after {self.timeout_s}s — process tree terminated"
         job.append_line(f"[webui] {job.error}")
-        try:
-            proc.terminate()
+        alcance = _signal_process_tree(proc, signal.SIGTERM, job.process_group_id)
+        job.append_line(f"[webui] SIGTERM a {alcance}")
+        if proc.poll() is None:
             try:
                 proc.wait(timeout=_TERMINATE_GRACE_S)
             except subprocess.TimeoutExpired:
-                proc.kill()
-        except OSError:
-            pass
+                pass
+        # The leader may already have exited while a child keeps stdout open.
+        # In that case wait() succeeds immediately but the group still needs
+        # escalation; never let the leader's state decide the tree's state.
+        if _process_group_exists(job.process_group_id):
+            alcance = _signal_process_tree(proc, signal.SIGKILL, job.process_group_id)
+            job.append_line(f"[webui] SIGKILL a {alcance} tras "
+                            f"{_TERMINATE_GRACE_S}s de gracia")
 
     def _read_sealed_bundle(self, job: _Job) -> None:
         """Read agent_verdict from the sealed bundle — the bundle, not the
@@ -272,11 +341,26 @@ class JobRunner:
         }
 
     def shutdown(self) -> None:
-        """Terminate running jobs (used on server shutdown)."""
+        """Terminate running jobs (used on server shutdown).
+
+        R11-1: al grupo entero. Un `terminate()` al pid dejaba corriendo las
+        herramientas SIFT que el agente hubiera lanzado, después de que el
+        servidor se fue y ya nadie las mira.
+        """
+        running = []
         for job in self._jobs.values():
             proc = job.proc
-            if proc is not None and proc.poll() is None:
-                try:
-                    proc.terminate()
-                except OSError:
-                    pass
+            if proc is not None and (proc.poll() is None or
+                                     _process_group_exists(job.process_group_id)):
+                alcance = _signal_process_tree(proc, signal.SIGTERM, job.process_group_id)
+                job.append_line(f"[webui] shutdown: SIGTERM a {alcance}")
+                running.append(job)
+        deadline = time.monotonic() + _TERMINATE_GRACE_S
+        while (any(_process_group_exists(job.process_group_id) for job in running)
+               and time.monotonic() < deadline):
+            time.sleep(0.05)
+        for job in running:
+            if _process_group_exists(job.process_group_id):
+                alcance = _signal_process_tree(job.proc, signal.SIGKILL,
+                                                job.process_group_id)
+                job.append_line(f"[webui] shutdown: SIGKILL a {alcance}")

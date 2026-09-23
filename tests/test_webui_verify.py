@@ -47,23 +47,48 @@ def test_tool_log_exit_code_map(monkeypatch, tmp_path):
     for code, status in ((0, "VERIFIED"), (1, "BROKEN"), (2, "NO_LOG"),
                          (3, "ERROR")):
         monkeypatch.setattr(verify, "_run",
-                            lambda cmd, cwd, c=code: _completed(c, "out"))
+                            lambda cmd, cwd, extra_env=None, c=code: _completed(c, "out"))
         r = verify.run_tool_log(tmp_path, tmp_path / "b.json")
         assert r["status"] == status, code
 
 
-def test_tool_log_hmac_key_in_argv_not_in_response(monkeypatch, tmp_path):
+def test_tool_log_hmac_key_in_env_not_in_argv_nor_response(monkeypatch, tmp_path):
+    """R8-1: la clave pasa por el ENTORNO del hijo, no por argv.
+
+    Este test afirmaba lo contrario (`"--hmac-key-hex" in seen["cmd"]`), que era
+    una descripcion fiel de la implementacion de entonces. /proc/<pid>/cmdline es
+    legible por cualquier proceso local mientras el verificador corre — medido en
+    tests/test_r8_ui_verification.py — asi que la mitad "en argv" se invierte y la
+    mitad "no vuelve en la respuesta", que sigue siendo cierta, se conserva.
+    """
     (tmp_path / "verify_tool_log.py").write_text("# stub")
     seen = {}
 
-    def fake_run(cmd, cwd):
+    def fake_run(cmd, cwd, extra_env=None):
         seen["cmd"] = cmd
+        seen["env"] = extra_env
         return _completed(0, "VERIFIED")
 
     monkeypatch.setattr(verify, "_run", fake_run)
     r = verify.run_tool_log(tmp_path, tmp_path / "b.json", hmac_key_hex="deadbeef")
-    assert "--hmac-key-hex" in seen["cmd"]
+    assert "--hmac-key-hex" not in seen["cmd"]
+    assert "deadbeef" not in " ".join(seen["cmd"])
+    assert (seen["env"] or {}).get("VIGIA_HMAC_KEY") == "deadbeef"
     assert "deadbeef" not in json.dumps({k: v for k, v in r.items()})
+
+
+def test_tool_log_without_key_passes_no_env_override(monkeypatch, tmp_path):
+    """Sin clave no se toca el entorno del hijo: hereda el del servidor."""
+    (tmp_path / "verify_tool_log.py").write_text("# stub")
+    seen = {}
+
+    def fake_run(cmd, cwd, extra_env=None):
+        seen["env"] = extra_env
+        return _completed(0, "VERIFIED")
+
+    monkeypatch.setattr(verify, "_run", fake_run)
+    verify.run_tool_log(tmp_path, tmp_path / "b.json")
+    assert seen["env"] is None
 
 
 def test_sidecar_match_and_mismatch(tmp_path):

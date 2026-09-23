@@ -6,7 +6,11 @@
 # binds loopback only (see INSTALL.md §11); put it behind an authenticated
 # boundary before any wider exposure.
 #
-#   VIGIA_HOST      bind address   (default 127.0.0.1 — keep it)
+#   VIGIA_UI_HOST   bind address for THIS UI (default 127.0.0.1 — keep it)
+#   VIGIA_HOST      shared fallback, also read by the Mode 5 API. A
+#                   non-loopback value from either is REFUSED unless
+#                   VIGIA_UI_ALLOW_REMOTE=1 — see R9-1 in
+#                   docs/REDTEAM_ROUND9_EXPOSURE.md
 #   VIGIA_UI_PORT   port           (default 8010; Mode 5 API uses 8000)
 #   VIGIA_UI_MAX_JOBS  concurrent Mode 1 investigations (default 1)
 set -euo pipefail
@@ -21,7 +25,7 @@ fi
 
 mkdir -p results/webui
 
-HOST="${VIGIA_HOST:-127.0.0.1}"
+HOST="${VIGIA_UI_HOST:-${VIGIA_HOST:-127.0.0.1}}"
 PORT="${VIGIA_UI_PORT:-8010}"
 echo "VIGÍA Web UI → http://${HOST}:${PORT}/   (Ctrl-C to stop)"
 exec python3 -m vigia.ui
