@@ -56,7 +56,8 @@ Mode 1 launcher) is available with `./launch_vigia_ui.sh` →
 
 Exit codes: `0` = no evil, `1` = MALICE, `2` = error, `3` = intent/suspicion.
 Full setup: [`INSTALL.md`](./INSTALL.md) ([ES](./INSTALL_ES.md)) ·
-Command reference: [`vigia_commands_en.html`](https://annatchijova.github.io/vigia/vigia_commands_en.html).
+Command reference: [`vigia_commands_en.html`](https://annatchijova.github.io/vigia/vigia_commands_en.html) ·
+Math simulator: [`vigia.html`](https://annatchijova.github.io/vigia/vigia.html).
 
 ---
 

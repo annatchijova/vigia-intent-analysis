@@ -56,7 +56,8 @@ verificación, lanzador Modo 1) está disponible con `./launch_vigia_ui.sh` →
 
 Códigos de salida: `0` = sin mal, `1` = MALICE, `2` = error, `3` = intención/sospecha.
 Instalación completa: [`INSTALL_ES.md`](./INSTALL_ES.md) ([EN](./INSTALL.md)) ·
-Referencia de comandos: [`vigia_commands_en.html`](https://annatchijova.github.io/vigia/vigia_commands_en.html).
+Referencia de comandos: [`vigia_commands_en.html`](https://annatchijova.github.io/vigia/vigia_commands_en.html) ·
+Simulador matemático: [`vigia.html`](https://annatchijova.github.io/vigia/vigia.html).
 
 ---
 
