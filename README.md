@@ -57,7 +57,7 @@ Mode 1 launcher) is available with `./launch_vigia_ui.sh` →
 Exit codes: `0` = no evil, `1` = MALICE, `2` = error, `3` = intent/suspicion.
 Full setup: [`INSTALL.md`](./INSTALL.md) ([ES](./INSTALL_ES.md)) ·
 Command reference: [`vigia_commands_en.html`](https://annatchijova.github.io/vigia/vigia_commands_en.html) ·
-Math simulator: [`vigia.html`](https://annatchijova.github.io/vigia/vigia.html).
+Simulator: [`vigia.html`](https://annatchijova.github.io/vigia/vigia.html).
 
 ---
 
@@ -150,7 +150,7 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 **Architecture & technical state**
 - [`docs/VIGIA_TECHNICAL_STATE_EN.md`](./docs/VIGIA_TECHNICAL_STATE_EN.md) · [ES](./docs/VIGIA_ESTADO_TECNICO_ES.md) — full system state
 - [`docs/diagrama_pipeline.md`](./docs/diagrama_pipeline.md) — pipeline diagram
-- [Architecture diagrams](https://annatchijova.github.io/vigia/vigia_diagrams.html) · [Math simulator](https://annatchijova.github.io/vigia/vigia.html) · [Demo video](https://www.youtube.com/watch?v=NOquYzUwMkg)
+- [Architecture diagrams](https://annatchijova.github.io/vigia/vigia_diagrams.html) · [Simulator](https://annatchijova.github.io/vigia/vigia.html) · [Demo video](https://www.youtube.com/watch?v=NOquYzUwMkg)
 
 **Development & project**
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) · [`CONTRIBUYENDO.md`](./CONTRIBUYENDO.md) — contribution guide
