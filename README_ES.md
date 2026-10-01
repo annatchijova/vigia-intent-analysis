@@ -1,6 +1,6 @@
 # VIGÍA — Motor de Análisis de Intencionalidad para SIFT Workstation
 
-[English version](./README.md) · Autora: Anna Tchijova · Licencia: Apache 2.0
+[English version](./README.md) · [Technical README (EN)](./docs/VIGIA_TECHNICAL_STATE_EN.md) · [Estado técnico completo (ES)](./docs/VIGIA_ESTADO_TECNICO_ES.md) · Autora: Anna Tchijova · Licencia: Apache 2.0
 
 > *"Hacer que el engaño sea computacionalmente caro para el atacante."*
 > Hoy, mentir en un log o falsificar un ataque es gratis. VIGÍA le pone precio
