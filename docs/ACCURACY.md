@@ -181,6 +181,22 @@ override.
 
 ### Why Claude/MCP mode reaches 100% while the Python agent is at 97.5%
 
+**Neither number is "Claude's accuracy."** In both modes, every sealed verdict is
+produced and gated by the same deterministic engine (`vigia_scorer.py`) — Claude
+cannot override that gate. In Mode 2, the LLM can propose a candidate verdict from
+its own reasoning, but the candidate still passes through the same mathematical
+gates as Mode 1 (e.g. the Daubert Corroboration Gate) before anything reaches a
+sealed `ForensicBundle`: a candidate the gate rejects is capped, and the capped
+verdict — not the LLM's original candidate — is what gets sealed and counted. See
+the Refutation Protocol worked example in
+[`CLAUDE.md`](../CLAUDE.md#refutation-protocol-documentation-requirement)
+("Forensic note: Architectural self-correction. No incorrect verdict was sealed.
+LLM cannot override this gate."). So the 100% figure below does not mean "the LLM
+judged correctly every time" — it means the same sealing authority that drives
+Mode 1's accuracy held across every Mode 2 investigation too, with Claude
+contributing a wider evidence intake (full raw artifacts via the MCP toolchain)
+rather than decision authority.
+
 The two numbers measure fundamentally different things and are not comparable with
 each other. They arise from different evaluation methodologies applied to different
 modes of operation.

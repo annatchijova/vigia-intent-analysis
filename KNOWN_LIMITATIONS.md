@@ -792,6 +792,22 @@ heterogeneous evidence.
 
 ## Accuracy by Mode — Empirical Results (June 2026)
 
+> **Superseded 2026-07-05 (B-075) — read before citing any number below.**
+> The "Agent mode" and "LLM-assisted mode" figures here predate the fix
+> documented in `docs/ACCURACY.md`'s metric-change note: the JSON-corpus batch
+> path (`run_all_agent.py`) was reproducing each case's `expected_verdict`
+> label instead of deriving the verdict from evidence (label leak, P2-C) —
+> with the label stripped, that path detected **zero** malicious cases. The
+> "134/136 (98.5%)" and "31/34 (91%)" numbers below measure label
+> reproduction, not detection, and are retained only as historical record —
+> same status as the superseded "129/129" table in `docs/ACCURACY.md`. **Also
+> note:** neither number below is "Claude's accuracy" — every sealed verdict,
+> in every mode, is produced and gated by the deterministic engine
+> (`vigia_scorer.py`); the LLM proposes a candidate, it does not decide (see
+> `CLAUDE.md`'s Refutation Protocol). For the current, label-blind,
+> gate-explained numbers, use `docs/ACCURACY.md` and `docs/ACCURACY_ES.md`,
+> not this section.
+
 Two operational modes produce materially different accuracy profiles.
 Both are documented here for Daubert transparency.
 

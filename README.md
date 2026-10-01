@@ -103,16 +103,25 @@ and the Claude Code playbook [`CLAUDE.md`](./CLAUDE.md).
 
 ## Accuracy
 
-Full methodology and three-domain breakdown: [`docs/ACCURACY.md`](./docs/ACCURACY.md)
-([ES](./docs/ACCURACY_ES.md)).
+**Every sealed verdict, in every mode, is produced and gated by the deterministic
+Python engine (`vigia_scorer.py`) — an LLM can propose, it cannot decide or
+override the gate.** None of the numbers below are "Claude's accuracy"; see
+[`docs/ACCURACY.md`](./docs/ACCURACY.md) ([ES](./docs/ACCURACY_ES.md)) for the
+full methodology, the gate mechanism, and the three-domain breakdown, and
+[`CLAUDE.md` — Refutation Protocol](./CLAUDE.md#refutation-protocol-documentation-requirement)
+for the worked example of the gate rejecting an LLM candidate verdict.
 
-- **Agent over JSON (Domain B)** — the only corpus-wide number: detection corpus
-  **158/162 (97.5%)**, label-blind; mixed-corpus aggregate 187/199.
-- **Claude Code / MCP (Domain A)** — evaluated per-case on real raw evidence.
-- **Agent over raw evidence (Domain C)** — 43 raw evidence sources with sealed
-  bundles in `results/`.
+- **Agent over JSON (Domain B), Python only, 0 LLM calls** — the only
+  corpus-wide number: detection corpus **158/162 (97.5%)**, label-blind;
+  mixed-corpus aggregate 187/199.
+- **Claude Code / MCP (Domain A), LLM-assisted investigation, same
+  deterministic seal** — evaluated per case on real raw evidence, not a
+  corpus-wide figure.
+- **Agent over raw evidence (Domain C), Python only, 0 LLM calls** — 43 raw
+  evidence sources with sealed bundles in `results/`.
 
-VIGÍA documents its own failure modes: [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
+Known failure modes — including stale pre-fix figures that are flagged, not
+deleted: [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
 
 ```bash
 python3 -m pytest tests/ -v          # deterministic core regression suite

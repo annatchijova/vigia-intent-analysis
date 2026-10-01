@@ -177,6 +177,64 @@ para el override de hipótesis basado en señales.
 > del Dominio A están documentados por caso en `evidence/` y `results/`; los límites
 > de cobertura del Dominio C están documentados en `KNOWN_LIMITATIONS.md`.
 
+### Por qué el modo Claude/MCP llega a 100% mientras el agente Python está en 97.5%
+
+**Ningún número es "la precisión de Claude".** En los dos modos, todo veredicto
+sellado lo produce y lo aprueba el mismo motor determinístico (`vigia_scorer.py`)
+— Claude no puede saltear ese gate. En el Modo 2 el LLM puede proponer un
+veredicto candidato desde su propio razonamiento, pero ese candidato igual pasa
+por los mismos gates matemáticos que el Modo 1 (p.ej. el Daubert Corroboration
+Gate) antes de que algo llegue a un `ForensicBundle` sellado: un candidato que
+el gate rechaza queda limitado, y el veredicto limitado — no el candidato
+original del LLM — es lo que se sella y se cuenta. Ver el ejemplo concreto del
+Refutation Protocol en
+[`CLAUDE.md`](../CLAUDE.md#refutation-protocol-documentation-requirement)
+("Forensic note: Architectural self-correction. No incorrect verdict was
+sealed. LLM cannot override this gate."). Entonces la cifra de 100% de abajo no
+significa "el LLM acertó siempre" — significa que la misma autoridad de sellado
+que sostiene la precisión del Modo 1 también gobernó cada investigación del
+Modo 2, con Claude aportando una toma de evidencia más amplia (artefactos raw
+completos vía la cadena MCP) y no autoridad de decisión.
+
+Los dos números miden cosas fundamentalmente distintas y no son comparables
+entre sí. Surgen de metodologías de evaluación diferentes aplicadas a modos de
+operación diferentes.
+
+**Modo Claude/MCP (Dominio A) — 100%, evaluado por caso:** Claude Code (Modo 2)
+conduce cada investigación como una sesión de razonamiento fresca, guiada por la
+evidencia. Lee artefactos raw a través de la cadena de extracción MCP, aplica la
+tríada Peirciana completa (Primeridad / Segundidad / Terceridad), evalúa contexto
+exculpatorio semánticamente (autorización escrita, excepciones documentadas,
+proveniencia del corpus), corre el Mandatory Refutation Protocol en todo
+candidato INTENT/MALICE, y elige ABSTAIN cuando la evidencia es insuficiente en
+vez de forzar un veredicto. Este modo no tiene un número agregado de precisión
+por diseño: agregar investigaciones individuales en un único porcentaje
+confundiría casos con calidad de evidencia, completitud de artefactos y certeza
+epistémica muy distintas. La cifra de 100% significa que toda investigación
+corrida en este modo llegó al veredicto que la evidencia completa sostiene — no
+significa que el 100% de todos los casos posibles se clasificarían
+correctamente.
+
+**Modo agente Python (Dominio B) — 97.5%, evaluado sobre el corpus de detección
+de 162 casos:** El Modo 1 (`vigia_agent.py`) aplica el pipeline de scoring
+determinístico — un motor matemático fijo que opera con cero llamadas a LLM y
+cero tokens. No puede evaluar contexto exculpatorio semánticamente: el piso de
+alerta B-028/B-065 impide que cualquier hipótesis SUSPICION se presente como LOW
+sin importar la magnitud de la señal individual, y el filtro Eco D1 que aparta
+artefactos con `semantic_role: "exculpatory"` puede ser neutralizado por el piso
+cuando queda una señal incriminatoria residual de magnitud media (L-054, L-056).
+Es una decisión doctrinal deliberada — sobre-alertar en casos benignos es
+preferible a sub-alertar en casos maliciosos con metadata exculpatoria plantada
+— y su costo es una tasa de falsos positivos medible en casos de uso autorizado.
+
+Los 4 fallos en 162 casos están todos en esta categoría: llamadas de severidad
+adyacente (SUSPICION donde se esperaba NOISE, o NOISE donde se esperaba
+SUSPICION para señales muy débiles) o sobre-alerta doctrinal (L-054, contexto
+exculpatorio no modelado). Ninguno es una detección maliciosa real pasada por
+alto — los casos canónicos, benignos y FLARE-ON CTF del corpus de detección
+pasan al 100%. La cifra de 97.5% refleja scoring determinístico honesto, no un
+clasificador con fugas.
+
 ---
 
 VIGÍA separa la evaluación en tres dominios distintos. Solo el Dominio A

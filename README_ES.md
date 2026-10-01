@@ -104,16 +104,26 @@ separadamente delimitados (un reporte de Modo 2 nunca muta un bundle sellado de 
 
 ## Precisión
 
-Metodología completa y desglose por dominios: [`docs/ACCURACY_ES.md`](./docs/ACCURACY_ES.md)
-([EN](./docs/ACCURACY.md)).
+**Todo veredicto sellado, en todos los modos, lo produce y lo aprueba el motor
+Python determinístico (`vigia_scorer.py`) — el LLM puede proponer, no decide ni
+puede saltear el gate.** Ninguno de los números de abajo es "la precisión de
+Claude"; ver [`docs/ACCURACY_ES.md`](./docs/ACCURACY_ES.md)
+([EN](./docs/ACCURACY.md)) para la metodología completa, el mecanismo del gate
+y el desglose por dominios, y
+[`CLAUDE.md` — Refutation Protocol](./CLAUDE.md#refutation-protocol-documentation-requirement)
+para el ejemplo concreto del gate rechazando un veredicto candidato del LLM.
 
-- **Agente sobre JSON (Dominio B)** — la única cifra a nivel corpus: corpus de
-  detección **158/162 (97.5%)**, ciego a etiqueta; agregado mixto 187/199.
-- **Claude Code / MCP (Dominio A)** — evaluado por caso sobre evidencia raw real.
-- **Agente sobre evidencia raw (Dominio C)** — 43 fuentes de evidencia raw con
-  bundles sellados en `results/`.
+- **Agente sobre JSON (Dominio B), solo Python, 0 llamadas a LLM** — la única
+  cifra a nivel corpus: corpus de detección **158/162 (97.5%)**, ciego a
+  etiqueta; agregado mixto 187/199.
+- **Claude Code / MCP (Dominio A), investigación asistida por LLM, mismo
+  sello determinístico** — evaluado por caso sobre evidencia raw real, no es
+  una cifra de corpus.
+- **Agente sobre evidencia raw (Dominio C), solo Python, 0 llamadas a LLM** —
+  43 fuentes de evidencia raw con bundles sellados en `results/`.
 
-VIGÍA documenta sus propios modos de fallo: [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
+Modos de fallo conocidos — incluyendo cifras pre-fix obsoletas que están
+marcadas, no borradas: [`KNOWN_LIMITATIONS.md`](./KNOWN_LIMITATIONS.md).
 
 ```bash
 python3 -m pytest tests/ -v          # suite de regresión del núcleo determinista
