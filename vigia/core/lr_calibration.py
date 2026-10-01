@@ -367,7 +367,11 @@ class LRCalibrator:
 
         self._fitted = True
         self._meta.update({
-            "fit_timestamp": datetime.datetime.utcnow().isoformat() + "Z",
+            "fit_timestamp": (
+                datetime.datetime.now(datetime.timezone.utc)
+                .isoformat()
+                .replace("+00:00", "Z")
+            ),
             "n_authentic": len(authentic_z),
             "n_fabricated": len(fabricated_z),
             "authentic_z_median": round(statistics.median(authentic_z), 4),

@@ -36,6 +36,8 @@ that actually matters instead of a proxy for it (a module could satisfy any
 
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -129,3 +131,44 @@ def test_blocking_actually_takes_effect() -> None:
 
         assert probe.returncode != 0, distribution
         assert "ModuleNotFoundError" in probe.stderr, probe.stderr
+
+
+def test_local_vigia_import_resolves_to_checkout() -> None:
+    """Reject a false green caused by an unrelated installed ``vigia`` package."""
+    import vigia
+
+    assert Path(vigia.__file__).resolve().parent == REPO / "vigia"
+
+
+def test_pytest_console_launcher_can_collect_caie_scripts() -> None:
+    """The documented bare ``pytest`` command must import the local package."""
+    pytest_executable = shutil.which("pytest")
+    assert pytest_executable is not None
+
+    env = os.environ.copy()
+    env.pop("PYTHONPATH", None)
+    completed = subprocess.run(
+        [
+            pytest_executable,
+            "--no-cov",
+            "-q",
+            (
+                "tests/test_minimal_ci_collects_without_errors.py"
+                "::test_local_vigia_import_resolves_to_checkout"
+            ),
+            "tests/caie/test_caie_break.py",
+            "tests/caie/test_caie_direct_raw.py",
+            "tests/caie/test_caie_directo.py",
+        ],
+        cwd=REPO,
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+        timeout=60,
+    )
+    combined = completed.stdout + completed.stderr
+
+    assert completed.returncode == 0, combined[-4000:]
+    assert "errors during collection" not in combined, combined[-4000:]
+    assert "ModuleNotFoundError: No module named 'vigia'" not in combined, combined[-4000:]

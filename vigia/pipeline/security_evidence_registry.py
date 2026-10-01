@@ -16,7 +16,11 @@ from vigia.security.output_boundary import validate_external_output_path
 # ---------------------------------------------------------------------------
 
 def _utc_now() -> str:
-    return datetime.datetime.utcnow().isoformat() + "Z"
+    return (
+        datetime.datetime.now(datetime.timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 def _sha256(data: bytes) -> str:

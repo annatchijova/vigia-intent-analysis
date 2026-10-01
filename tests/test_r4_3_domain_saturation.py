@@ -141,7 +141,8 @@ class TestClassifyDomainV2:
 
 class TestBreak014Acceptance:
     @pytest.fixture(scope="class")
-    def case(self):
+    @classmethod
+    def case(cls):
         return json.load(open("data/cases/VIGIA-BREAK-014.json"))
 
     def test_verdict_is_suspicion(self, case):

@@ -14,7 +14,7 @@ import argparse
 # NameError justo en los pasos de seguridad del sanitizador.
 import os
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 try:
     import fitz  # PyMuPDF
@@ -205,7 +205,7 @@ def encrypt_mapping(mapping, password=None):
 
 def write_audit_log(operation, details):
     """Escribe log de auditoría."""
-    timestamp = datetime.utcnow().isoformat() + "Z"
+    timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     with open(LOG_FILE, 'a', encoding='utf-8') as f:
         f.write(f"[{timestamp}] {operation}: {details}\n")
 

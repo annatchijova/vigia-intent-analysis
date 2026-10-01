@@ -34,7 +34,11 @@ def decode_base64_image(b64: str) -> BytesIO:
 
 
 def utc_now() -> str:
-    return datetime.datetime.utcnow().isoformat() + "Z"
+    return (
+        datetime.datetime.now(datetime.timezone.utc)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 # ---------------------------------------------------------------------------

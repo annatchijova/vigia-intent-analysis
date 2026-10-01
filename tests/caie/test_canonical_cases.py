@@ -159,7 +159,8 @@ class TestCanonicalCases:
     """Pytest class for canonical case validation."""
 
     @pytest.fixture(scope="class")
-    def canonical_cases(self):
+    @classmethod
+    def canonical_cases(cls):
         return load_canonical_cases()
 
     def test_all_cases_load(self, canonical_cases):

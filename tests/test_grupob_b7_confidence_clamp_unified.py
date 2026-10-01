@@ -79,7 +79,8 @@ class TestFallbackVariantsAgree:
     ahora las CUATRO implementaciones coinciden para 1.7/-0.3/2.0."""
 
     @pytest.fixture(scope="class")
-    def fallbacks(self):
+    @classmethod
+    def fallbacks(cls):
         import importlib.util
         import sys
 

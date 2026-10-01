@@ -139,7 +139,11 @@ def _make_baseline(version: str, domain: str, source: str, stats: dict) -> Basel
         version=version,
         domain=domain,
         source=source,
-        created_at=datetime.datetime.utcnow().isoformat() + "Z",
+        created_at=(
+            datetime.datetime.now(datetime.timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z")
+        ),
         stats=stats_tuple,
     )
 

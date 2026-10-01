@@ -248,7 +248,11 @@ def main():
     # ── Guardar metadata Daubert ──────────────────────────────────────
     meta_path = os.path.join(repo_root, "models/calibration_metadata.json")
     meta = {
-        "calibration_date":    datetime.datetime.utcnow().isoformat() + "Z",
+        "calibration_date": (
+            datetime.datetime.now(datetime.timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z")
+        ),
         "script_version":      "run_calibration-v1.0",
         "corpus_hash":         corpus_hash,
         "corpus_size":         len(files),
