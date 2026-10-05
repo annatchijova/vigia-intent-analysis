@@ -147,9 +147,27 @@ def _canonicalize_v2(obj: Any) -> Any:
     if isinstance(obj, Fraction):
         return f"{obj.numerator}/{obj.denominator}:frac"
     if isinstance(obj, dict):
+        # RT1-F1/F4 (portado de la auditoria MOIRA 2026-10-05): las claves
+        # deben ser str. Una clave no-str seria coercionada por json.dumps y
+        # colisionaria con una clave str del mismo deletreo ({1: x} vs
+        # {"1": x}); claves de tipo mixto rompen sorted() con TypeError.
+        # Fail-closed en el borde de sellado en vez de emitir una forma
+        # canonica ambigua. Para payloads JSON-legales (claves str) el
+        # encoding es byte-identico: CANONICALIZE_VERSION sigue "2".
+        for _k in obj.keys():
+            if not isinstance(_k, str):
+                raise ValueError(
+                    f"canonicalize v2: non-str dict key {_k!r}; "
+                    "coerce explicitly before sealing")
         return {k: _canonicalize_v2(v) for k, v in sorted(obj.items())}
     if isinstance(obj, (list, tuple)):
         return [_canonicalize_v2(v) for v in obj]
+    if isinstance(obj, (set, frozenset)):
+        # RT1-F2: str(set) itera en orden de hash (PYTHONHASHSEED) — un set en
+        # un payload sellado es un defecto de determinismo entre procesos.
+        raise ValueError(
+            "canonicalize v2: set/frozenset has no stable canonical form; "
+            "serialize as a sorted list instead")
     return _V2_STR_PREFIX + _v2_norm_str(str(obj))
 
 

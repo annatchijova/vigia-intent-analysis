@@ -198,9 +198,22 @@ def _canonicalize_v2(obj):
     if isinstance(obj, _Fraction):
         return f"{obj.numerator}/{obj.denominator}:frac"
     if isinstance(obj, dict):
+        # RT1-F1/F4 (MOIRA audit port): dict keys must be str — a non-str key
+        # collides after json.dumps coercion and mixed types crash sorted().
+        # Identical encoding for JSON-legal payloads; fail closed otherwise.
+        for _k in obj.keys():
+            if not isinstance(_k, str):
+                raise ValueError(
+                    f"canonicalize v2: non-str dict key {_k!r}; "
+                    "coerce explicitly before sealing")
         return {k: _canonicalize_v2(v) for k, v in sorted(obj.items())}
     if isinstance(obj, (list, tuple)):
         return [_canonicalize_v2(v) for v in obj]
+    if isinstance(obj, (set, frozenset)):
+        # RT1-F2: str(set) leaks PYTHONHASHSEED ordering into seals.
+        raise ValueError(
+            "canonicalize v2: set/frozenset has no stable canonical form; "
+            "serialize as a sorted list instead")
     return _V2_STR_PREFIX + _v2_norm_str(str(obj))
 
 

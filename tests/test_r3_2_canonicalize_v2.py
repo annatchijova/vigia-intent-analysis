@@ -149,3 +149,37 @@ class TestFreshV2SealVerifies:
         sealed = BundleBuilder.seal(bundle)
         ok, msg = BundleBuilder.quick_verify(sealed)
         assert ok, f"sello v2 no verifica: {msg}"
+
+
+class TestV2FailClosedHardening:
+    """RT1-F1/F2/F4 — portado de la auditoria MOIRA (2026-10-05).
+    v2 ahora RECHAZA inputs cuya forma canonica seria ambigua o inestable:
+    claves de dict no-str (colision por coercion json.dumps + crash en
+    sorted() con tipos mixtos) y set/frozenset (str() depende del orden de
+    hash — dos sellos para el mismo objeto logico entre procesos).
+    Para payloads JSON-legales el encoding es byte-identico: el test de
+    lockstep y los sellos historicos no cambian."""
+
+    def test_non_str_dict_key_raises(self):
+        with pytest.raises(ValueError, match="non-str dict key"):
+            _canonicalize({1: "x"})
+
+    def test_mixed_type_dict_keys_raise(self):
+        with pytest.raises(ValueError, match="non-str dict key"):
+            _canonicalize({1: "a", "b": "c"})
+
+    def test_nested_non_str_key_raises(self):
+        with pytest.raises(ValueError, match="non-str dict key"):
+            _canonicalize({"outer": {2: "x"}})
+
+    def test_set_and_frozenset_raise(self):
+        with pytest.raises(ValueError, match="stable canonical form"):
+            _canonicalize({"a", "b"})
+        with pytest.raises(ValueError, match="stable canonical form"):
+            _canonicalize({"k": frozenset({"x"})})
+
+    def test_legal_payload_unchanged(self):
+        # Guard de regresion: claves str, sin sets — la forma canonica
+        # es identica a la que producia v2 antes del hardening.
+        assert _canonicalize({"b": 1, "a": "x"}) == {"a": "s:x",
+                                                    "b": "1:int"}
