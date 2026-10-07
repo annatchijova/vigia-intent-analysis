@@ -146,7 +146,15 @@ for the worked example of the gate rejecting an LLM candidate verdict.
   subset; it is not a raw-evidence or all-modes performance claim.
 - **Claude Code / MCP (Domain A), LLM-assisted investigation, same
   deterministic seal** — evaluated per case on real raw evidence, not a
-  corpus-wide figure.
+  corpus-wide figure. **100% correct verdicts on every investigation run to
+  date** across VIGÍA's own cases, real public forensic evidence, and the
+  adversarial BREAK suite — a record over cases actually run, not a claim that
+  it holds for any future case. The gap with Domain B's 97.5% has a concrete
+  cause, not a vague "the LLM is smarter": Claude can read a field like a
+  username that is literally `tevoyamatar@gmail.com` and recognize the string
+  itself as a threat, something the deterministic engine has no feature to do.
+  Details and the invitation to report any false positive/negative immediately:
+  [`docs/ACCURACY.md`](./docs/ACCURACY.md#why-claudemcp-mode-reaches-100-while-the-python-agent-is-at-975).
 - **Agent over raw evidence (Domain C), Python only, 0 LLM calls** — 43 raw
   evidence sources with sealed bundles in `results/`.
 

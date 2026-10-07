@@ -201,6 +201,18 @@ The two numbers measure fundamentally different things and are not comparable wi
 each other. They arise from different evaluation methodologies applied to different
 modes of operation.
 
+**The mechanism behind the gap, concretely:** the deterministic scorer scores fixed
+signal classes over structured fields — entropy, timing, declared `evidence_type`,
+`trust_fusion` weights — and has no feature for interpreting freeform semantic
+content. If a username in a log is literally `tevoyamatar@gmail.com`, a human
+Spanish speaker (and Claude, reading the raw artifact through the MCP toolchain)
+recognizes that string itself as a death threat. The deterministic engine has no
+path to that inference: unless a human has pre-tagged that field with a
+`semantic_role` and a `raw_score`, the string is bytes like any other, indistinguishable
+from a routine identifier of the same entropy. This is the literal reason Domain A's
+evidence intake is wider than Domain B's — not a general claim that "the LLM is
+smarter," but a specific, falsifiable gap in what the math engine can see.
+
 **Claude/MCP mode (Domain A) — 100%, evaluated per-case:**
 
 Claude Code (Mode 2) conducts each investigation as a fresh, evidence-driven
@@ -220,7 +232,19 @@ investigations into a single percentage would conflate cases with vastly differe
 evidence quality, artifact completeness, and epistemic certainty. The 100% figure
 means every investigation run in this mode reached the verdict that the full
 evidence supports — it does not mean 100% of all possible cases would be correctly
-classified.
+classified, and it is **not a guarantee about cases that have not been run yet.**
+
+It is a record over the cases actually investigated in this mode to date: VIGÍA's
+own synthetic/canonical corpus, real public forensic evidence (SRL 2018, NPS,
+Magnet, NGDC, Tuck 2019, among others), and the adversarial BREAK suite built
+specifically to break the system. Nothing about the architecture makes 100% a
+property that has to hold going forward — it is the current state of a record we
+keep extending, not an upper bound on what a future case could reveal.
+
+**If an investigation in this mode produces a false positive or a false negative,
+report it immediately** — see [`CONTRIBUTING.md`](../CONTRIBUTING.md#reporting-issues).
+A miss here is more valuable to this project than the number staying at 100%:
+understanding *why* it happened is the point, not preserving the figure.
 
 **Python agent mode (Domain B) — 97.5%, evaluated on the 162-case detection corpus:**
 

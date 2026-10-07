@@ -150,7 +150,17 @@ para el ejemplo concreto del gate rechazando un veredicto candidato del LLM.
   los modos.
 - **Claude Code / MCP (Dominio A), investigación asistida por LLM, mismo
   sello determinístico** — evaluado por caso sobre evidencia raw real, no es
-  una cifra de corpus.
+  una cifra de corpus. **100% de veredictos correctos en toda investigación
+  corrida hasta la fecha**, sobre casos propios de VIGÍA, evidencia forense
+  pública real y la suite adversarial BREAK — un registro sobre los casos
+  efectivamente corridos, no una promesa de que se sostenga para un caso
+  futuro cualquiera. La brecha con el 97,5% del Dominio B tiene una causa
+  concreta, no un vago "el LLM es más inteligente": Claude puede leer un
+  campo como un username que es literalmente `tevoyamatar@gmail.com` y
+  reconocer esa cadena misma como una amenaza, algo que el motor
+  determinístico no tiene ninguna capacidad para hacer. Detalle e invitación
+  a reportar de inmediato cualquier falso positivo/negativo:
+  [`docs/ACCURACY_ES.md`](./docs/ACCURACY_ES.md#por-qué-el-modo-claudemcp-llega-a-100-mientras-el-agente-python-está-en-975).
 - **Agente sobre evidencia raw (Dominio C), solo Python, 0 llamadas a LLM** —
   43 fuentes de evidencia raw con bundles sellados en `results/`.
 

@@ -200,6 +200,21 @@ Los dos números miden cosas fundamentalmente distintas y no son comparables
 entre sí. Surgen de metodologías de evaluación diferentes aplicadas a modos de
 operación diferentes.
 
+**El mecanismo detrás de la brecha, en concreto:** el motor determinístico
+puntúa clases de señal fijas sobre campos estructurados —entropía, timing,
+`evidence_type` declarado, pesos de `trust_fusion`— y no tiene ninguna
+capacidad para interpretar contenido semántico libre. Si un username en un log
+es literalmente `tevoyamatar@gmail.com`, un hablante de español (y Claude,
+leyendo el artefacto raw a través de la cadena MCP) reconoce esa cadena misma
+como una amenaza de muerte. El motor determinístico no tiene ningún camino
+para hacer esa inferencia: salvo que un humano haya pre-etiquetado ese campo
+con un `semantic_role` y un `raw_score`, la cadena es bytes como cualquier
+otra, indistinguible de un identificador de rutina con la misma entropía. Esta
+es la razón literal por la que la toma de evidencia del Dominio A es más
+amplia que la del Dominio B —no una afirmación general de que "el LLM es más
+inteligente", sino una brecha específica y falsificable en lo que el motor
+matemático puede ver.
+
 **Modo Claude/MCP (Dominio A) — 100%, evaluado por caso:** Claude Code (Modo 2)
 conduce cada investigación como una sesión de razonamiento fresca, guiada por la
 evidencia. Lee artefactos raw a través de la cadena de extracción MCP, aplica la
@@ -213,7 +228,21 @@ confundiría casos con calidad de evidencia, completitud de artefactos y certeza
 epistémica muy distintas. La cifra de 100% significa que toda investigación
 corrida en este modo llegó al veredicto que la evidencia completa sostiene — no
 significa que el 100% de todos los casos posibles se clasificarían
-correctamente.
+correctamente, y **no es una garantía sobre casos que todavía no se corrieron.**
+
+Es un registro sobre los casos efectivamente investigados en este modo hasta
+la fecha: el corpus propio sintético/canónico de VIGÍA, evidencia forense
+pública real (SRL 2018, NPS, Magnet, NGDC, Tuck 2019, entre otras) y la suite
+adversarial BREAK construida específicamente para romper el sistema. Nada en
+la arquitectura hace que el 100% tenga que sostenerse hacia adelante — es el
+estado actual de un registro que seguimos extendiendo, no una cota superior
+sobre lo que un caso futuro podría revelar.
+
+**Si una investigación en este modo produce un falso positivo o un falso
+negativo, reportalo de inmediato** — ver
+[`CONTRIBUYENDO.md`](../CONTRIBUYENDO.md#reportando-issues). Un fallo acá vale
+más para este proyecto que mantener la cifra en 100%: entender *por qué*
+pasó es el punto, no preservar el número.
 
 **Modo agente Python (Dominio B) — 97.5%, evaluado sobre el corpus de detección
 de 162 casos:** El Modo 1 (`vigia_agent.py`) aplica el pipeline de scoring
