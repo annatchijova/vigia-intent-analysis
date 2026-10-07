@@ -36,7 +36,15 @@
   of production Python** (108,805 across 273 files, tests excluded), more than
   **540,000 lines** of JSON and Markdown across cases, evidence, sealed bundles
   and documentation, and more than **713,000 lines** of text under version
-  control. The code has undergone 11 in-house red-team rounds and weekly mutation
+  control. The code has undergone 11 in-house red-team rounds — each one leaving a
+  preserved record of what it found (invariant violations, epistemic and
+  architectural fractures, boundary and perimeter breaks), not a "passed" stamp:
+  see [`BUGS_HISTORICO.md`](../BUGS_HISTORICO.md) / the English mirror
+  [`BUGS_HISTORICO_EN.md`](../BUGS_HISTORICO_EN.md) for root cause and fix, and the
+  individual round reports from
+  [Round 2](./REDTEAM_ROUND2_MONOTONICITY.md) through
+  [Round 12](./REDTEAM_ROUND12_SELF_AUDIT.md) for threat model and reproducible
+  evidence — plus weekly mutation
   testing. Per-module documentation covers **193 modules in four languages**
   (EN / ES / RU / ZH) in the
   [academic documentation index](./academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md).

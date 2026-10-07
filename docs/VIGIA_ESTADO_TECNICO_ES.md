@@ -129,9 +129,13 @@ Distribución del código de producción por paquete (líneas físicas):
 - **70 limitaciones documentadas**, numeradas de L-001 a L-073, en
   [`KNOWN_LIMITATIONS.md`](../KNOWN_LIMITATIONS.md), incluidas las abiertas: se
   marcan, no se borran.
-- **11 rondas de red team** propias (`docs/REDTEAM_ROUND2` a `ROUND12`), más
-  auditorías abductivas, de cobertura, de seguridad del veredicto sellado y
-  censos de punto flotante en `docs/AUDITORIA_*` y `docs/AUDIT_*`.
+- **11 rondas de red team** propias (ver tabla en [§16.3](#163-red-team-y-auditorías)),
+  cada una con hallazgos preservados como historia —no como un "pasó limpio"—:
+  violaciones de invariantes, fracturas epistemológicas y arquitectónicas, roturas
+  de frontera y de perímetro, con causa raíz y fix en
+  [`BUGS_HISTORICO.md`](../BUGS_HISTORICO.md). Más auditorías abductivas, de
+  cobertura, de seguridad del veredicto sellado y censos de punto flotante en
+  `docs/AUDITORIA_*` y `docs/AUDIT_*`.
 - **Mutation testing semanal** del camino del veredicto (ver [§16](#16-verificación-del-propio-sistema-tests-mutation-testing-y-red-team)).
 - **193 módulos documentados académicamente en 4 idiomas** (ver [§3](#3-documentación-académica-193-módulos-en-4-idiomas)).
 
@@ -817,6 +821,13 @@ valor inalcanzable sin que fallara ningún test. Operación y diagnóstico:
 
 ### 16.3 Red team y auditorías
 
+Cada ronda documenta hallazgos reales, no un trámite superado: violaciones de
+invariantes (monotonicidad, determinismo, sellado), fracturas epistemológicas y
+arquitectónicas (composición de módulos individualmente correctos que falla en las
+costuras), y roturas de frontera/perímetro (UI, red, proceso). Causa raíz, fix y
+verificación de cada uno están en [`BUGS_HISTORICO.md`](../BUGS_HISTORICO.md); los
+informes completos, con modelo de amenaza y evidencia reproducible, están acá:
+
 | Ronda | Tema |
 |-------|------|
 | [Ronda 2](./REDTEAM_ROUND2_MONOTONICITY.md) | Monotonicidad del veredicto |
@@ -879,7 +890,7 @@ error conocida y aceptación general.
 | Criterio | Implementación en VIGÍA |
 |----------|-------------------------|
 | Testabilidad | Verificadores stdlib independientes, 22 vectores canónicos P2, suite de regresión y mutation testing |
-| Revisión por pares | Colectivo de auditoría multi-IA con roles definidos, 11 rondas de red team, auditorías externas documentadas |
+| Revisión por pares | Colectivo de auditoría multi-IA con roles definidos; 11 rondas de red team con hallazgos de invariantes y fracturas epistemológicas/arquitectónicas preservados en [`BUGS_HISTORICO.md`](../BUGS_HISTORICO.md) y en los informes de ronda ([§16.3](#163-red-team-y-auditorías)); auditorías externas documentadas |
 | Tasa de error | Métricas por dominio en `ACCURACY_ES.md`; calibración en `models/calibration_metadata.json`; fallos conocidos en `KNOWN_LIMITATIONS.md` |
 | Aceptación general | MITRE ATT&CK, escala ENFSI, STIX 2.1, ISO/IEC 27037, RFC 3161 |
 

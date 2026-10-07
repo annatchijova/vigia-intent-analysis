@@ -44,8 +44,15 @@ manipulación de Carnegie y violaciones de las máximas de Grice.
 | **Bundles forenses sellados** | 617, verificables sin el código de VIGÍA |
 | **Documentación académica** | **193 módulos en 4 idiomas** (EN / ES / RU / ZH) |
 
-El código pasó por 11 rondas propias de red team, auditorías externas y mutation
-testing semanal del camino del veredicto. La documentación de cada módulo está en el
+El código pasó por 11 rondas propias de red team y auditorías externas. Los
+hallazgos de cada ronda —violaciones de invariantes, fracturas epistemológicas y
+arquitectónicas, roturas de frontera y de perímetro— se conservan como historia, no
+se borran: el registro completo está en
+[`BUGS_HISTORICO.md`](./BUGS_HISTORICO.md) (resueltos) y
+[`BUGS_PENDIENTES.md`](./BUGS_PENDIENTES.md) (abiertos), con los informes de cada
+ronda desde la [Ronda 2](./docs/REDTEAM_ROUND2_MONOTONICITY.md) hasta la
+[Ronda 12](./docs/REDTEAM_ROUND12_SELF_AUDIT.md) en `docs/`. El mutation testing
+semanal cubre el camino del veredicto. La documentación de cada módulo está en el
 [índice de documentación académica](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md),
 que cubre los 193 módulos en inglés, español, ruso y chino. El desglose de cada
 cifra y los comandos para reproducirlas están en el

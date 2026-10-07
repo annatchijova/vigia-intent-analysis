@@ -44,8 +44,14 @@ manipulation patterns, and Grice maxim violations.
 | **Sealed forensic bundles** | 617, verifiable without VIGÍA's code |
 | **Academic documentation** | **193 modules in 4 languages** (EN / ES / RU / ZH) |
 
-The code has gone through 11 in-house red-team rounds, external audits, and weekly
-mutation testing of the verdict path. Per-module documentation lives in the
+The code has gone through 11 in-house red-team rounds and external audits. Each
+round's findings — invariant violations, epistemic and architectural fractures,
+boundary and perimeter breaks — are kept as history, not erased: the full record is
+in [`BUGS_HISTORICO.md`](./BUGS_HISTORICO.md) (resolved) and
+[`BUGS_PENDIENTES.md`](./BUGS_PENDIENTES.md) (open), with the individual round
+reports from [Round 2](./docs/REDTEAM_ROUND2_MONOTONICITY.md) through
+[Round 12](./docs/REDTEAM_ROUND12_SELF_AUDIT.md) in `docs/`. Weekly mutation testing
+covers the verdict path. Per-module documentation lives in the
 [academic documentation index](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md),
 covering all 193 modules in English, Spanish, Russian and Chinese. The breakdown of
 every figure and the commands to reproduce it are in the
