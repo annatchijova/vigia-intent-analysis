@@ -1,6 +1,6 @@
 # VIGÍA — Motor de Análisis de Intencionalidad para SIFT Workstation
 
-[English](./README.md) · [Español](./README_ES.md) · [README técnico](./docs/VIGIA_TECHNICAL_STATE_EN.md) · [Estado técnico completo (ES)](./docs/VIGIA_ESTADO_TECNICO_ES.md) · Autora: Anna Tchijova · Licencia: Apache 2.0
+[English](./README.md) · [Español](./README_ES.md) · [README técnico](./docs/VIGIA_ESTADO_TECNICO_ES.md) · [Technical README (EN)](./docs/VIGIA_TECHNICAL_STATE_EN.md) · Autora: Anna Tchijova · Licencia: Apache 2.0
 
 **Índice:** [Qué hace VIGÍA](#de-ioc-a-ioi) · [Inicio rápido](#inicio-rápido) · [Precisión y evaluación](#precisión-y-evaluación) · [Documentación](#documentación) · [Otros proyectos DFIR](#otros-proyectos-dfir)
 
@@ -33,13 +33,23 @@ Un atacante puede fabricar o suprimir evidencia técnica (IoC). No puede elimina
 temporales, silencios significativos (Eco), perfección digital excesiva, patrones de
 manipulación de Carnegie y violaciones de las máximas de Grice.
 
-El repositorio contiene más de **102.000 líneas de Python** y su código ha pasado
-por extensas revisiones adversariales de red team. Un inventario histórico describe
-**193 módulos en cuatro idiomas**; ese inventario **no se mantiene actualizado** y
-debe leerse como una referencia histórica, no como una métrica vigente. Consulta el
-[README técnico](./docs/VIGIA_TECHNICAL_STATE_EN.md) y el
-[índice de documentación académica](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md)
-para ver mapas más detallados.
+### La magnitud del trabajo
+
+| | |
+|---|---|
+| **Python de producción** | más de **102.000 líneas** (108.805 en 273 archivos, sin contar tests) |
+| **Tests** | 46.931 líneas más; 2.066 funciones de test en 255 archivos |
+| **JSON y Markdown** (casos, evidencia, bundles sellados, documentación) | más de **540.000 líneas** |
+| **Total versionado** | más de **713.000 líneas** de texto |
+| **Bundles forenses sellados** | 617, verificables sin el código de VIGÍA |
+| **Documentación académica** | **193 módulos en 4 idiomas** (EN / ES / RU / ZH) |
+
+El código pasó por 11 rondas propias de red team, auditorías externas y mutation
+testing semanal del camino del veredicto. La documentación de cada módulo está en el
+[índice de documentación académica](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md),
+que cubre los 193 módulos en inglés, español, ruso y chino. El desglose de cada
+cifra y los comandos para reproducirlas están en el
+[README técnico](./docs/VIGIA_ESTADO_TECNICO_ES.md#2-magnitud-del-trabajo).
 
 ---
 
@@ -149,8 +159,12 @@ python3 run_all_agent.py --timeout 90  # corpus completo, ciego a etiqueta
 
 ## Documentación
 
-Para navegar el material académico, consulta el
-[índice de documentación académica de VIGÍA](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md).
+La documentación de referencia está en el
+[índice de documentación académica de VIGÍA](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md):
+193 módulos documentados en 4 idiomas (EN / ES / RU / ZH), con índices en
+[inglés](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md),
+[ruso](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_RU.md) y
+[chino](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_ZH.md).
 
 ### Mapa del repositorio
 
@@ -190,7 +204,7 @@ vigia-repo/
 - [`docs/skills/abductive-engineering/SKILL.md`](./docs/skills/abductive-engineering/SKILL.md) — razonamiento abductivo como skill reutilizable
 
 **Arquitectura y estado técnico**
-- [`VIGIA_ESTADO_TECNICO_ES.md`](./docs/VIGIA_ESTADO_TECNICO_ES.md) · [EN](./docs/VIGIA_TECHNICAL_STATE_EN.md) — estado completo del sistema
+- [`VIGIA_ESTADO_TECNICO_ES.md`](./docs/VIGIA_ESTADO_TECNICO_ES.md) · [EN](./docs/VIGIA_TECHNICAL_STATE_EN.md) — README técnico: magnitud medida, arquitectura y estado actual
 - [`docs/diagrama_pipeline.md`](./docs/diagrama_pipeline.md) — diagrama del pipeline
 - [Diagramas de arquitectura](https://annatchijova.github.io/vigia/vigia_diagrams.html) · [VIGÍA (modelo matemático)](https://annatchijova.github.io/vigia/vigia.html) · [Simulador](https://annatchijova.github.io/vigia/simulador.html) · [Video demo](https://www.youtube.com/watch?v=NOquYzUwMkg)
 

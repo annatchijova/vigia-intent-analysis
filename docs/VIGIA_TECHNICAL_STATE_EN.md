@@ -32,11 +32,18 @@
   B-129 Phase 3 (MITRE phase resolution, 70% gate), B-162 (residual).
 - **Source of truth for pending work:** [`BUGS_PENDIENTES.md`](../BUGS_PENDIENTES.md).
   The roadmap tables in [`WHAT_IS_NEXT.md`](./WHAT_IS_NEXT.md) are historical.
-- **Codebase scale and review:** more than **102,000 lines of Python**; the code
-  has undergone extensive adversarial red-team review. A separate historical
-  inventory reports **193 modules across four languages**; it is not maintained
-  and is not a current module count. The 151-Python-module inventory in §15 is
-  an older, dated catalog and should not be read as a live count.
+- **Codebase scale and review (measured 2026-10-07):** more than **102,000 lines
+  of production Python** (108,805 across 273 files, tests excluded), more than
+  **540,000 lines** of JSON and Markdown across cases, evidence, sealed bundles
+  and documentation, and more than **713,000 lines** of text under version
+  control. The code has undergone 11 in-house red-team rounds and weekly mutation
+  testing. Per-module documentation covers **193 modules in four languages**
+  (EN / ES / RU / ZH) in the
+  [academic documentation index](./academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md).
+  Full breakdown and reproduction commands: the up-to-date
+  [Spanish technical README](./VIGIA_ESTADO_TECNICO_ES.md#2-magnitud-del-trabajo),
+  §2–§4. The 151-Python-module inventory in §15 below is an older, dated catalog
+  and should not be read as a live count.
 
 The remainder of this document is the original technical dossier (v1.0,
 2026-05-18), preserved as the architectural reference.

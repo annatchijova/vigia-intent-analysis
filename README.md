@@ -33,12 +33,23 @@ the **semiotic fractures** that deliberate fabrication produces: temporal
 incoherencies, significant silences (Eco), excessive digital perfection, Carnegie
 manipulation patterns, and Grice maxim violations.
 
-The repository contains more than **102,000 lines of Python**, and its code has
-undergone extensive adversarial red-team review. A historical inventory describes
-**193 modules across four languages**; that inventory is **not currently maintained**
-and should be read as a dated snapshot, not a live metric. See the [technical
-README](./docs/VIGIA_TECHNICAL_STATE_EN.md) and the [academic documentation
-index](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md) for deeper maps.
+### Scale of the work
+
+| | |
+|---|---|
+| **Production Python** | more than **102,000 lines** (108,805 across 273 files, tests excluded) |
+| **Tests** | 46,931 further lines; 2,066 test functions in 255 files |
+| **JSON and Markdown** (cases, evidence, sealed bundles, documentation) | more than **540,000 lines** |
+| **Total under version control** | more than **713,000 lines** of text |
+| **Sealed forensic bundles** | 617, verifiable without VIGÍA's code |
+| **Academic documentation** | **193 modules in 4 languages** (EN / ES / RU / ZH) |
+
+The code has gone through 11 in-house red-team rounds, external audits, and weekly
+mutation testing of the verdict path. Per-module documentation lives in the
+[academic documentation index](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md),
+covering all 193 modules in English, Spanish, Russian and Chinese. The breakdown of
+every figure and the commands to reproduce it are in the
+[Spanish technical README](./docs/VIGIA_ESTADO_TECNICO_ES.md#2-magnitud-del-trabajo).
 
 ---
 
@@ -145,8 +156,12 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 
 ## Documentation
 
-For a navigable map of the academic material, see the
-[VIGÍA academic documentation index](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md).
+Reference documentation lives in the
+[VIGÍA academic documentation index](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_EN.md):
+193 modules documented in 4 languages (EN / ES / RU / ZH), with indexes in
+[Spanish](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md),
+[Russian](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_RU.md) and
+[Chinese](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX_ZH.md).
 
 ### Repository map
 
