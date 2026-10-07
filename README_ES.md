@@ -1,6 +1,8 @@
 # VIGÍA — Motor de Análisis de Intencionalidad para SIFT Workstation
 
-[English version](./README.md) · [Technical README (EN)](./docs/VIGIA_TECHNICAL_STATE_EN.md) · [Estado técnico completo (ES)](./docs/VIGIA_ESTADO_TECNICO_ES.md) · Autora: Anna Tchijova · Licencia: Apache 2.0
+[English](./README.md) · [Español](./README_ES.md) · [README técnico](./docs/VIGIA_TECHNICAL_STATE_EN.md) · [Estado técnico completo (ES)](./docs/VIGIA_ESTADO_TECNICO_ES.md) · Autora: Anna Tchijova · Licencia: Apache 2.0
+
+**Índice:** [Qué hace VIGÍA](#de-ioc-a-ioi) · [Inicio rápido](#inicio-rápido) · [Precisión y evaluación](#precisión-y-evaluación) · [Documentación](#documentación) · [Otros proyectos DFIR](#otros-proyectos-dfir)
 
 > *"Hacer que el engaño sea computacionalmente caro para el atacante."*
 > Hoy, mentir en un log o falsificar un ataque es gratis. VIGÍA le pone precio
@@ -30,6 +32,14 @@ Un atacante puede fabricar o suprimir evidencia técnica (IoC). No puede elimina
 **fracturas semióticas** que produce la fabricación deliberada: incoherencias
 temporales, silencios significativos (Eco), perfección digital excesiva, patrones de
 manipulación de Carnegie y violaciones de las máximas de Grice.
+
+El repositorio contiene más de **102.000 líneas de Python** y su código ha pasado
+por extensas revisiones adversariales de red team. Un inventario histórico describe
+**193 módulos en cuatro idiomas**; ese inventario **no se mantiene actualizado** y
+debe leerse como una referencia histórica, no como una métrica vigente. Consulta el
+[README técnico](./docs/VIGIA_TECHNICAL_STATE_EN.md) y el
+[índice de documentación académica](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md)
+para ver mapas más detallados.
 
 ---
 
@@ -102,7 +112,7 @@ separadamente delimitados (un reporte de Modo 2 nunca muta un bundle sellado de 
 
 ---
 
-## Precisión
+## Precisión y evaluación
 
 **Todo veredicto sellado, en todos los modos, lo produce y lo aprueba el motor
 Python determinístico (`vigia_scorer.py`) — el LLM puede proponer, no decide ni
@@ -113,9 +123,14 @@ y el desglose por dominios, y
 [`CLAUDE.md` — Refutation Protocol](./CLAUDE.md#refutation-protocol-documentation-requirement)
 para el ejemplo concreto del gate rechazando un veredicto candidato del LLM.
 
-- **Agente sobre JSON (Dominio B), solo Python, 0 llamadas a LLM** — la única
-  cifra a nivel corpus: corpus de detección **158/162 (97.5%)**, ciego a
-  etiqueta; agregado mixto 187/199.
+- **Agente sobre JSON (Dominio B), solo Python, 0 llamadas a LLM** — **158/162
+  (97,5%)**, ciego a las etiquetas, en el *corpus de detección*. El **187/199
+  (94,0%)** es el agregado del corpus mixto. Incluye 31 casos adversariales diseñados
+  para romper el sistema: **16 BREAK**, **7 KIWI**, **3 de falsos negativos (FN)** y
+  **5 de falsos positivos (FP)**. Esos resultados miden resistencia y límites
+  documentados, no la precisión de detección ordinaria. El 97,5% corresponde solo al
+  subconjunto de detección; no representa evidencia raw ni el rendimiento de todos
+  los modos.
 - **Claude Code / MCP (Dominio A), investigación asistida por LLM, mismo
   sello determinístico** — evaluado por caso sobre evidencia raw real, no es
   una cifra de corpus.
@@ -133,6 +148,21 @@ python3 run_all_agent.py --timeout 90  # corpus completo, ciego a etiqueta
 ---
 
 ## Documentación
+
+Para navegar el material académico, consulta el
+[índice de documentación académica de VIGÍA](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md).
+
+### Mapa del repositorio
+
+```text
+vigia-repo/
+├── vigia/          # módulos de análisis forense e integraciones
+├── forensics/      # verificación de bundles y utilidades forenses
+├── docs/           # metodología, arquitectura, auditorías e índices
+├── data/cases/     # casos de entrada y corpus de evaluación
+├── results/        # bundles, informes y resultados generados
+└── tests/          # suites de regresión y pruebas adversariales
+```
 
 **Inicio y uso**
 - [`INSTALL_ES.md`](./INSTALL_ES.md) · [`INSTALL.md`](./INSTALL.md) — instalación y setup
@@ -174,6 +204,14 @@ python3 run_all_agent.py --timeout 90  # corpus completo, ciego a etiqueta
 > `docs/` también contiene el rastro completo de auditorías internas, red-team y
 > registros de diseño (`AUDITORIA_*`, `REDTEAM_ROUND*`, `FASE*`, `B0*`), preservados
 > como historia del proyecto.
+
+## Otros proyectos DFIR
+
+También recomiendo visitar [Velo](https://github.com/annatchijova/velo),
+[Zaynor](https://github.com/annatchijova/zaynor) y
+[Annaconda](https://github.com/annatchijova/annaconda), otros proyectos DFIR de la
+misma autora. Hay más trabajo DFIR en curso, además de repositorios separados de red
+team y blue team que están en construcción.
 
 ---
 

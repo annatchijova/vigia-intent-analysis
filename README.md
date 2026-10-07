@@ -1,6 +1,8 @@
 # VIGÍA — Intentionality Analysis Bridge for the SIFT Workstation
 
-[Versión en español](./README_ES.md) · [Technical README](./docs/VIGIA_TECHNICAL_STATE_EN.md) · Author: Anna Tchijova · License: Apache 2.0
+[English](./README.md) · [Español](./README_ES.md) · [Technical README](./docs/VIGIA_TECHNICAL_STATE_EN.md) · Author: Anna Tchijova · License: Apache 2.0
+
+**Index:** [What VIGÍA does](#from-ioc-to-ioi) · [Quick start](#quick-start) · [Accuracy and evaluation](#accuracy-and-evaluation) · [Documentation](#documentation) · [Related DFIR projects](#related-dfir-projects)
 
 > *"Making deception computationally expensive for the attacker."*
 > Today, lying in a log or faking an attack is free. VIGÍA charges that price
@@ -30,6 +32,13 @@ Attackers can fabricate or suppress technical evidence (IoC). They cannot elimin
 the **semiotic fractures** that deliberate fabrication produces: temporal
 incoherencies, significant silences (Eco), excessive digital perfection, Carnegie
 manipulation patterns, and Grice maxim violations.
+
+The repository contains more than **102,000 lines of Python**, and its code has
+undergone extensive adversarial red-team review. A historical inventory describes
+**193 modules across four languages**; that inventory is **not currently maintained**
+and should be read as a dated snapshot, not a live metric. See the [technical
+README](./docs/VIGIA_TECHNICAL_STATE_EN.md) and the [academic documentation
+index](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md) for deeper maps.
 
 ---
 
@@ -101,7 +110,7 @@ and the Claude Code playbook [`CLAUDE.md`](./CLAUDE.md).
 
 ---
 
-## Accuracy
+## Accuracy and evaluation
 
 **Every sealed verdict, in every mode, is produced and gated by the deterministic
 Python engine (`vigia_scorer.py`) — an LLM can propose, it cannot decide or
@@ -111,9 +120,13 @@ full methodology, the gate mechanism, and the three-domain breakdown, and
 [`CLAUDE.md` — Refutation Protocol](./CLAUDE.md#refutation-protocol-documentation-requirement)
 for the worked example of the gate rejecting an LLM candidate verdict.
 
-- **Agent over JSON (Domain B), Python only, 0 LLM calls** — the only
-  corpus-wide number: detection corpus **158/162 (97.5%)**, label-blind;
-  mixed-corpus aggregate 187/199.
+- **Agent over JSON (Domain B), Python only, 0 LLM calls** — **158/162 (97.5%)**
+  label-blind on the *detection corpus*. The separate **187/199 (94.0%)** figure
+  is the mixed-corpus aggregate. It includes 31 adversarial stress cases designed to
+  break the system: **16 BREAK**, **7 KIWI**, **3 false-negative (FN)** and **5
+  false-positive (FP)** cases. Those results measure resistance and documented
+  limits, not ordinary detection accuracy. The 97.5% applies only to the detection
+  subset; it is not a raw-evidence or all-modes performance claim.
 - **Claude Code / MCP (Domain A), LLM-assisted investigation, same
   deterministic seal** — evaluated per case on real raw evidence, not a
   corpus-wide figure.
@@ -131,6 +144,21 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 ---
 
 ## Documentation
+
+For a navigable map of the academic material, see the
+[VIGÍA academic documentation index](./docs/academic/ACADEMIC_DOCS_MASTER_INDEX.md).
+
+### Repository map
+
+```text
+vigia-repo/
+├── vigia/          # forensic analysis modules and integrations
+├── forensics/      # bundle verification and forensic utilities
+├── docs/           # methodology, architecture, audits, and indexes
+├── data/cases/     # case inputs and evaluation corpora
+├── results/        # generated bundles, reports, and evaluation outputs
+└── tests/          # regression and adversarial test suites
+```
 
 **Getting started & usage**
 - [`INSTALL.md`](./INSTALL.md) · [`INSTALL_ES.md`](./INSTALL_ES.md) — setup and installation
@@ -171,6 +199,14 @@ python3 run_all_agent.py --timeout 90  # full corpus, label-blind
 
 > `docs/` also holds the full trail of internal audit, red-team, and design records
 > (`AUDITORIA_*`, `REDTEAM_ROUND*`, `FASE*`, `B0*`), preserved as project history.
+
+## Related DFIR projects
+
+I also recommend [Velo](https://github.com/annatchijova/velo),
+[Zaynor](https://github.com/annatchijova/zaynor), and
+[Annaconda](https://github.com/annatchijova/annaconda), other DFIR projects by the
+same author. More DFIR work is in progress, alongside separate red-team and
+blue-team repositories under construction.
 
 ---
 

@@ -1,6 +1,8 @@
 # VIGÍA — Estado Técnico Completo del Sistema
 ## Análisis Forense de Intencionalidad para SIFT Workstation
 
+[README en inglés](../README.md) · [Español](../README_ES.md) · [README técnico (EN)](./VIGIA_TECHNICAL_STATE_EN.md) · [Índice técnico](./academic/ACADEMIC_DOCS_MASTER_INDEX.md)
+
 **Autora:** Anna Tchijova — Investigadora Principal  
 **Colectivo de Auditoría:** Claude (Anthropic), Kimi (Moonshot), Gemini (Google), DeepSeek, Qwen, ChatGPT (adversarial)  
 **Repositorio:** `github.com/annatchijova/vigia-intent-analysis`  
@@ -30,6 +32,11 @@
   scorer), B-129 Fase 3 (resolución de fase MITRE, gate 70%), B-162 (residual).
 - **Fuente de verdad de pendientes:** [`BUGS_PENDIENTES.md`](../BUGS_PENDIENTES.md).
   Las tablas de roadmap en [`WHAT_IS_NEXT.md`](./WHAT_IS_NEXT.md) son históricas.
+- **Tamaño y revisión del código:** más de **102.000 líneas de Python**; el código
+  pasó por extensas revisiones adversariales de red team. Un inventario histórico
+  separado informa **193 módulos en cuatro idiomas**; no se mantiene y no representa
+  un conteo vigente. El inventario de 151 módulos Python de §15 es un catálogo
+  anterior y tampoco debe leerse como métrica actual.
 
 El resto de este documento es el dossier técnico original (v1.0, 2026-05-18),
 preservado como referencia de arquitectura.
@@ -826,9 +833,13 @@ La calibración con corpus forense real (`fit_calibration.py` + dataset SIFT rea
 
 ---
 
-## 15. Módulos Implementados — Inventario Completo
+## 15. Módulos Implementados — Inventario Histórico
 
-El proyecto cuenta con 151 módulos Python. Clasificación por función:
+Esta sección es un catálogo histórico, no un inventario completo vigente. Enumera
+151 módulos Python de la pasada de documentación original. Otro inventario histórico
+del proyecto informó 193 módulos en cuatro idiomas; ninguno de los conteos se
+mantiene actualizado. Para conocer el alcance y la evidencia actuales, consulta el
+repositorio y el índice de documentación.
 
 ### 15.1 Core Pipeline (14 módulos)
 `ebs.py`, `ebs_v1.py`, `pipeline.py`, `run_pipeline.py`, `run_vigia_full.py`, `bundle_builder.py`, `verify_ebs_v1.py`, `signal_contract.py`, `signal_mapper.py`, `signal_adapter.py`, `signal_quality_gate.py`, `vigia_integration_bridge.py`, `vigia_case_adapter.py`, `vigia_scorer.py`
