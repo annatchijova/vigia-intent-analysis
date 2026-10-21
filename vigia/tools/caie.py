@@ -7,7 +7,7 @@ VIGIA — Cross-Artifact Incongruence Engine (CAIE) — v2.0 EXPANDED [DETERMINI
 
 Author: Kimi (Moonshot) — Forensic Systems Specialist
 Integration: Claude (Anthropic) — Systems Integration Engineer
-Expansion: Gemini, Qwen, DeepSeek — "Golden Forensic Rules"
+Expansion: Gemini, ChatGPT, Qwen, DeepSeek — "Golden Forensic Rules"
 Determinism Protocol: Qwen (Tongyi Qianwen) — "The One Who Turned Paranoia into Protocol"
 
 Theoretical foundation
