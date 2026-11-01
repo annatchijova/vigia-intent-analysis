@@ -1565,3 +1565,87 @@ debe seguir emitiendo `ABSTAIN` hasta que un extractor determinista,
 source-specific y hash-bound materialice los hechos que pretende puntuar.
 
 ---
+
+## B-242 — Eliminación de float del camino de decisión en vigia_scorer.py — pendiente de revisión cruzada multi-agente
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | APLICADO (commit `94b55b55`) — **pendiente de revisión cruzada por otros agentes**. No es un defecto abierto; se registra acá a pedido explícito de Anna para que otros agentes lo auditen de forma independiente, no por desconfianza puntual sobre el fix. |
+| **Severidad** | P1 — determinismo del motor de veredicto Mode 2 (Daubert / CLAUDE.md §5.2 / skill `deterministic-core`) |
+| **Archivo** | `vigia_scorer.py` (motor), `tests/test_r4_boundaries.py` (literales pineados actualizados) |
+| **Detectado en** | Sesión 2026-11-01. Origen: una afirmación externa ("este scorer todavía contiene floats") que Anna pidió verificar contra el archivo vivo. |
+
+### Descripción
+
+`vigia_scorer.py` (raíz, motor de Mode 2/API — importado por `vigia_api.py` y
+`sift_orchestrator.py`) mezclaba `Fraction` exacto con `float` en toda la
+cadena que produce `final_score`/`composite`/`confidence` y decide el
+veredicto: `effective → adjusted → _prefix_factor → r43_scores →
+r43_domain_scores → composite → raw_intent_score → final_score → confidence
+→ _apply_quadripartite`. Los helpers `_dround`/`_dsum` (patches P5/P6, Kimi
+2026-05-19) acumulaban en `decimal.Decimal` pero **devolvían `float`**, así
+que cada paso downstream reintroducía el riesgo de redondeo binario
+dependiente de orden/plataforma que el acumulador decimal intentaba eliminar
+— exactamente lo que CLAUDE.md §5.2 prohíbe ("no float en el camino de
+decisión"). `vigia_agent.py` (Mode 1) ya era `Fraction`-puro; este motor no.
+
+### Qué se hizo
+
+Reescritura quirúrgica (plan completo en la sesión, revisado con
+`EnterPlanMode`/`ExitPlanMode`) de toda la cadena a `Fraction` exacto.
+`float` solo puede aparecer en dos puntos, ambos explícitos en el código:
+`_to_exact()` en la entrada (nunca `Fraction(float)` directo — captura el
+error binario; sí `Fraction(str(x))`, mismo criterio que
+`vigia_agent.py::_to_frac`) y `_to_float()` en el único punto de salida al
+construir el dict público JSON-serializable. `math.prod` sobre floats
+(combinaciones Noisy-OR) se reemplazó por `_fraction_complement_product`
+(reductor exacto). `_apply_quadripartite` no necesitó cambios: ya convertía
+su input a `Fraction` correctamente (`Fraction(round(x,4))` es exacto
+cuando `x` ya es `Fraction`).
+
+### Validación hecha en esta sesión
+
+1. **Gate de bit-identidad corpus-wide** (`scripts/experiments/fraction_gate.py`,
+   202 casos, patrón ya establecido por la migración Invariant-4): 22 casos
+   difieren por exactamente ±0.0001 en el 4º decimal; **cero** cambios de
+   `verdict`/`boost`/`penalty`/`reason` más allá del número. Snapshots
+   `before`/`after` quedaron en el scratchpad de la sesión (no persisten —
+   regenerar con el comando del script si se necesita repetir la comparación).
+2. **Verificación manual independiente** (caso `VIGIA-FN-001`, 3 artefactos):
+   recalculé la fórmula a mano con aritmética `Fraction` exacta, fuera de
+   ambas implementaciones, y confirmé que el valor NUEVO (0.0203) es el
+   matemáticamente correcto — el valor VIEJO (0.0201) era la manifestación
+   del bug.
+3. **Tests con literales legados pineados**: `tests/test_invariant4_fraction_accumulators.py`
+   (incluyendo `TestBitCompatibilityWithLegacyTerms`), `tests/test_b151a_single_artifact_cap.py`
+   siguieron pasando sin tocar. `tests/test_r4_boundaries.py::TestR41BestPrefixBitIdentical`
+   sí necesitó actualizar sus literales `EXPECTED` (10/50/100: 0.1861/0.1866/0.1866
+   → 0.1862/0.1867/0.1867) — mismo patrón de sesgo consistente (+0.0001 en
+   los tres), documentado en el propio test con la justificación.
+4. **Suite completa**: `2495 passed, 190 skipped, 28 xfailed, 0 failed`.
+5. **Prueba explícita de invarianza de orden** (regla 4 de `deterministic-core`):
+   `VIGIA-FLAREON-8` (uno de los 22 casos con delta) corrido en orden directo,
+   invertido y shuffled — `verdict`/`score` bit-idénticos en los tres.
+
+### Qué debería revisar un agente independiente
+
+- Las otras 21 diferencias del gate (solo verifiqué `VIGIA-FN-001` a mano) —
+  confirmar que todas siguen el mismo patrón de signo mixto ±0.0001 sin
+  excepción, no solo asumirlo por la muestra.
+- Si algún consumidor de `_vigia_score()` además de `vigia_api.py` y
+  `sift_orchestrator.py` (revisados por lectura estática, no ejecutados
+  end-to-end en esta sesión) espera `Fraction` en vez de `float` en algún
+  campo del dict público.
+- `_naive_score()` (línea ~423 antes del cambio) quedó sin tocar — confirmado
+  dead code (no la llama nadie en este archivo) en esta sesión, pero vale
+  una segunda confirmación.
+- Mutation score de `vigia_scorer.py` tras el cambio — no se corrió `mutmut`
+  en esta sesión (ver `docs/MUTATION_RUNBOOK.md`); el precedente de
+  `collapse_decision.py` (77.94% cobertura, 13.8% mutation score) es la
+  razón concreta para no asumir que "los tests pasan" equivale a "el camino
+  de veredicto está verificado".
+- Revisión adversarial per CLAUDE.md §6 (Multi-AI adversarial audit) — esta
+  sesión fue implementador único; falta el segundo rol auditor/adversarial
+  antes de considerar esto cerrado del todo.
+
+---

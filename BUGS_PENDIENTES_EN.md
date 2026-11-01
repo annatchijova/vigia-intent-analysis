@@ -1276,3 +1276,88 @@ disagreement is preserved and reinforces that VIGÍA must keep emitting
 materializes the facts it proposes to score.
 
 ---
+
+## B-242 — Eliminate float from the decision path in vigia_scorer.py — pending multi-agent cross-review
+
+| Field | Value |
+|-------|-------|
+| **Status** | APPLIED (commit `94b55b55`) — **pending cross-review by other agents**. Not an open defect; logged here at Anna's explicit request so other agents can audit it independently, not out of specific distrust of the fix. |
+| **Severity** | P1 — determinism of the Mode-2 verdict engine (Daubert / CLAUDE.md §5.2 / `deterministic-core` skill) |
+| **File** | `vigia_scorer.py` (engine), `tests/test_r4_boundaries.py` (updated pinned literals) |
+| **Detected in** | Session 2026-11-01. Origin: an external claim ("this scorer still contains floats") Anna asked to verify against the live file. |
+
+### Description
+
+`vigia_scorer.py` (root, Mode-2/API engine — imported by `vigia_api.py` and
+`sift_orchestrator.py`) mixed exact `Fraction` arithmetic with `float` along
+the whole chain producing `final_score`/`composite`/`confidence` and
+deciding the verdict: `effective → adjusted → _prefix_factor → r43_scores →
+r43_domain_scores → composite → raw_intent_score → final_score → confidence
+→ _apply_quadripartite`. The `_dround`/`_dsum` helpers (P5/P6 patches, Kimi
+2026-05-19) accumulated in `decimal.Decimal` but **returned `float`**, so
+every downstream step reintroduced the order/platform-dependent binary
+rounding risk the decimal accumulator was meant to remove — exactly what
+CLAUDE.md §5.2 prohibits ("no float in the decision path"). `vigia_agent.py`
+(Mode 1) was already Fraction-pure; this engine was not.
+
+### What was done
+
+Surgical rewrite (full plan reviewed via `EnterPlanMode`/`ExitPlanMode`
+during the session) of the whole chain to exact `Fraction`. `float` may
+only appear at two explicit points in the code: `_to_exact()` on entry
+(never `Fraction(float)` directly — captures binary noise; `Fraction(str(x))`
+instead, same criterion as `vigia_agent.py::_to_frac`) and `_to_float()` at
+the single output boundary building the public JSON-serializable dict.
+`math.prod` over floats (Noisy-OR combinations) was replaced with
+`_fraction_complement_product` (exact reducer). `_apply_quadripartite`
+needed no change: it already converted its input to `Fraction` correctly
+(`Fraction(round(x,4))` is exact when `x` is already a `Fraction`).
+
+### Validation done this session
+
+1. **Corpus-wide bit-identity gate** (`scripts/experiments/fraction_gate.py`,
+   202 cases, same pattern already established by the Invariant-4
+   migration): 22 cases differ by exactly ±0.0001 at the 4th decimal; **zero**
+   `verdict`/`boost`/`penalty`/`reason` changes beyond that digit. The
+   before/after snapshots stayed in the session's scratchpad (do not
+   persist — regenerate with the script's own command to repeat the
+   comparison).
+2. **Independent manual verification** (case `VIGIA-FN-001`, 3 artifacts):
+   recomputed the formula by hand with exact `Fraction` arithmetic, outside
+   both implementations, and confirmed the NEW value (0.0203) is the
+   mathematically correct one — the OLD value (0.0201) was the bug's
+   manifestation.
+3. **Tests pinning legacy literals**: `tests/test_invariant4_fraction_accumulators.py`
+   (including `TestBitCompatibilityWithLegacyTerms`) and
+   `tests/test_b151a_single_artifact_cap.py` kept passing untouched.
+   `tests/test_r4_boundaries.py::TestR41BestPrefixBitIdentical` did need its
+   `EXPECTED` literals updated (10/50/100: 0.1861/0.1866/0.1866 →
+   0.1862/0.1867/0.1867) — same consistent +0.0001 bias across all three,
+   documented in the test itself with the justification.
+4. **Full suite**: `2495 passed, 190 skipped, 28 xfailed, 0 failed`.
+5. **Explicit order-invariance proof** (`deterministic-core` skill rule 4):
+   `VIGIA-FLAREON-8` (one of the 22 cases with a delta) run in forward,
+   reversed, and shuffled artifact order — bit-identical `verdict`/`score`
+   across all three.
+
+### What an independent agent should review
+
+- The other 21 gate differences (only `VIGIA-FN-001` was hand-verified) —
+  confirm all follow the same mixed-sign ±0.0001 pattern without exception,
+  rather than assuming it from the one sample.
+- Whether any consumer of `_vigia_score()` besides `vigia_api.py` and
+  `sift_orchestrator.py` (checked by static reading this session, not run
+  end-to-end) expects `Fraction` rather than `float` in any public dict
+  field.
+- `_naive_score()` (around line 423 before the change) was left untouched —
+  confirmed dead code (no caller in this file) this session, but a second
+  confirmation is worthwhile.
+- Mutation score of `vigia_scorer.py` after the change — `mutmut` was not
+  run this session (see `docs/MUTATION_RUNBOOK.md`); the `collapse_decision.py`
+  precedent (77.94% coverage, 13.8% mutation score) is the concrete reason
+  not to assume "tests pass" means "the verdict path is verified."
+- Adversarial review per CLAUDE.md §6 (Multi-AI adversarial audit) — this
+  session was a single implementer; the second auditor/adversarial role is
+  still missing before calling this fully closed.
+
+---
