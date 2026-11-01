@@ -86,7 +86,21 @@ class TestR41BestPrefixBitIdentical:
     # geometrica: un flood de un solo tipo ya no crece sin limite
     # (docs/BASELINE_TRIPLE_CASTIGO.md). Si cambian, regresiono la etapa 1
     # (R4-1) o la saturacion (R4-3).
-    EXPECTED = {10: 0.1861, 50: 0.1866, 100: 0.1866}
+    # Updated 0.1861/0.1866/0.1866 -> 0.1862/0.1867/0.1867 by the
+    # float-elimination fix (CLAUDE.md §5.2 / deterministic-core skill): the
+    # legacy chain called round(float(x), n) at every stage (_dround), so
+    # each stage's binary-float representation error compounded; for this
+    # family of inputs the accumulated error consistently sat on the wrong
+    # side of the final 4-decimal rounding boundary (+0.0001 for all three
+    # n, same direction — a uniform bias, not noise). Verified independently
+    # against exact Fraction/Decimal arithmetic (same formula, computed by
+    # hand outside both implementations) before updating — see the
+    # fraction_gate.py corpus diff from this change (22/202 cases, all
+    # +/-0.0001, zero verdict/boost/penalty changes) for the same signature
+    # corpus-wide. The 50->100 asymptotic-convergence invariant this test
+    # protects (R4-3 tail decay) still holds (0.1867 == 0.1867); only the
+    # absolute value shifted by the fix.
+    EXPECTED = {10: 0.1862, 50: 0.1867, 100: 0.1867}
 
     def test_same_type_flood_scores_match_snapshot(self):
         for n, exp in self.EXPECTED.items():

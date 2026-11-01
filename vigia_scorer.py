@@ -197,12 +197,70 @@ def _dsum(values) -> float:
     """
     Sum with decimal.Decimal accumulator to avoid floating-point drift.
     Accepts any iterable of int/float. Non-finite values are discarded.
+
+    NOTE: presentation-layer only — see _to_exact/_fround below for the
+    decision-path (CLAUDE.md §5.2 / deterministic-core skill: no float in
+    the path that feeds a sealed verdict). _dsum/_dround accumulate via
+    decimal.Decimal but RETURN float, so any caller that keeps computing on
+    that return value reintroduces the exact ordering/platform risk the
+    decimal accumulator was meant to remove. Do not use for a value that
+    still feeds final_score/composite/confidence/any verdict threshold.
     """
     acc = _D_ZERO
     for v in values:
         if isinstance(v, (int, float)) and math.isfinite(v):
             acc += decimal.Decimal(str(v))
     return _dround(float(acc), _DETERMINISTIC_INTERNAL_PREC)
+
+
+def _to_exact(value) -> Fraction:
+    """
+    Converts any numeric type to an exact Fraction — the decision-path
+    entry point. Never uses Fraction(float) directly (captures the float's
+    binary representation error, e.g. Fraction(0.1) != Fraction(1, 10));
+    uses Fraction(str(value)) instead, same precedent as
+    vigia_agent.py::_to_frac (Mode 1's own exact-conversion helper).
+    """
+    if isinstance(value, Fraction):
+        return value
+    if isinstance(value, bool):
+        return Fraction(int(value), 1)
+    if isinstance(value, int):
+        return Fraction(value, 1)
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            return Fraction(0, 1)
+        return Fraction(str(value))
+    return Fraction(0, 1)
+
+
+def _fround(frac: Fraction, precision: int) -> Fraction:
+    """
+    Exact decimal rounding of a Fraction, returning a Fraction — the
+    decision-path replacement for _dround. round() on a Fraction with an
+    ndigits argument is exact (no float involved at any point).
+    """
+    return round(frac, precision)
+
+
+def _to_float(value, precision: int) -> float:
+    """
+    Decision-path OUTPUT BOUNDARY: the only sanctioned place a Fraction
+    decision value becomes float, for the public (JSON-serializable)
+    result dict. Never use upstream of this point for a value that still
+    feeds the verdict.
+    """
+    if isinstance(value, Fraction):
+        return round(float(value), precision)
+    return _dround(value, precision)
+
+
+def _fraction_complement_product(values) -> Fraction:
+    """Exact Noisy-OR complement: Π(1 - v) over Fraction values, each (1-v) clamped to >= 0."""
+    result = Fraction(1, 1)
+    for v in values:
+        result *= max(Fraction(0, 1), Fraction(1, 1) - v)
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -931,7 +989,8 @@ def _vigia_score(case: dict) -> dict:
             _score_authoritative_violations,
             a.get("artifact_id", ""),
         )
-        effective   = _dround(prov_trust * epc_factor * temp_factor, _DETERMINISTIC_OUTPUT_PREC)
+        # Decision-path: exact Fraction from here on (CLAUDE.md §5.2).
+        effective   = _fround(_to_exact(prov_trust) * epc_factor * temp_factor, _DETERMINISTIC_OUTPUT_PREC)
 
         # P2 + acquisition_assurance: CAIE formula with contextual spoofability.
         # Instantiates Artifact to obtain effective_spoofability, which incorporates
@@ -961,9 +1020,9 @@ def _vigia_score(case: dict) -> dict:
             spoofability = 0.50
             weight       = 0.20
 
-        step1    = _dround(raw_score  * (1.0 - spoofability), _DETERMINISTIC_INTERNAL_PREC)
-        step2    = _dround(step1      * weight,               _DETERMINISTIC_INTERNAL_PREC)
-        adjusted = _dround(step2      * effective,            _DETERMINISTIC_OUTPUT_PREC)
+        step1    = _fround(_to_exact(raw_score) * (Fraction(1, 1) - _to_exact(spoofability)), _DETERMINISTIC_INTERNAL_PREC)
+        step2    = _fround(step1      * _to_exact(weight),    _DETERMINISTIC_INTERNAL_PREC)
+        adjusted = _fround(step2      * effective,            _DETERMINISTIC_OUTPUT_PREC)
 
         effective_trusts.append({
             "artifact_id":     a.get("artifact_id"),
@@ -999,8 +1058,9 @@ def _vigia_score(case: dict) -> dict:
     unique_types    = len({
         et["evidence_type"] for et, _sig in zip(effective_trusts, _signal_flags) if _sig
     })
-    diversity_bonus = _dround(
-        min(0.2, max(0, unique_types - 1) * 0.05), _DETERMINISTIC_INTERNAL_PREC
+    diversity_bonus = _fround(
+        min(Fraction(1, 5), Fraction(max(0, unique_types - 1), 1) * Fraction(5, 100)),
+        _DETERMINISTIC_INTERNAL_PREC,
     )
 
     # -----------------------------------------------------------------------
@@ -1074,22 +1134,22 @@ def _vigia_score(case: dict) -> dict:
     #   pueden ganar. Se evalúan en orden ascendente con `<=` para conservar el
     #   desempate legacy (prefijo más grande gana). Costo: O(n) por tipo.
     def _prefix_factor(_ranked, _k):
-        _pen = min(0.5, (_k - 1) * 0.15)
+        _pen = min(Fraction(1, 2), Fraction(_k - 1, 1) * Fraction(15, 100))
         _adjs = [
-            _dround(effective_trusts[_i]["adjusted_score"] * (1 - _pen),
+            _fround(effective_trusts[_i]["adjusted_score"] * (Fraction(1, 1) - _pen),
                     _DETERMINISTIC_OUTPUT_PREC)
             for _i in _ranked[:_k]
         ]
-        return math.prod(max(0.0, 1.0 - _s) for _s in _adjs), _adjs
+        return _fraction_complement_product(_adjs), _adjs
 
-    adj_scores = [0.0] * len(effective_trusts)
+    adj_scores = [Fraction(0, 1)] * len(effective_trusts)
     for _idxs in _by_type.values():
         _ranked = sorted(_idxs, key=lambda i: -effective_trusts[i]["adjusted_score"])
         _n = len(_ranked)
         _candidates = list(range(1, _n + 1)) if _n <= 4 else [1, 2, 3, 4, _n]
-        _best_factor = 1.0   # factor Noisy-OR del grupo: menor = más señal
+        _best_factor = Fraction(1, 1)   # factor Noisy-OR del grupo: menor = más señal
         _best_k      = 0
-        _best_adjs: list[float] = []
+        _best_adjs: list[Fraction] = []
         for _k in _candidates:
             _factor, _adjs = _prefix_factor(_ranked, _k)
             # <= : ante empate se prefiere el prefijo MÁS GRANDE (máxima
@@ -1097,7 +1157,7 @@ def _vigia_score(case: dict) -> dict:
             if _factor <= _best_factor:
                 _best_factor, _best_k, _best_adjs = _factor, _k, _adjs
         for _pos, _i in enumerate(_ranked):
-            adj_scores[_i] = _best_adjs[_pos] if _pos < _best_k else 0.0
+            adj_scores[_i] = _best_adjs[_pos] if _pos < _best_k else Fraction(0, 1)
 
 
     try:
@@ -1114,8 +1174,9 @@ def _vigia_score(case: dict) -> dict:
     # r de cola por sub-banda: replicabilidad del canal (CR-002/CR-004).
     _R43_TAIL_START = 4          # posiciones 1-4 intactas (cabeza legacy)
     _R43_SUBBAND_DECAY = {
-        "D1a": 0.5, "D1b": 0.7, "D2": 0.7, "D3": 0.7, "D4": 0.7,
-        "D5-soft": 0.5, "D0": 0.5,
+        "D1a": Fraction(1, 2), "D1b": Fraction(7, 10), "D2": Fraction(7, 10),
+        "D3": Fraction(7, 10), "D4": Fraction(7, 10),
+        "D5-soft": Fraction(1, 2), "D0": Fraction(1, 2),
     }
     _R43_EXEMPT_BANDS = frozenset({"D5-media", "D5-hard"})
 
@@ -1133,12 +1194,12 @@ def _vigia_score(case: dict) -> dict:
             continue
         if len(_sb_idxs) <= _R43_TAIL_START:
             continue  # sin cola: bit-exacto legacy
-        _r = _R43_SUBBAND_DECAY.get(_band, 0.7)
+        _r = _R43_SUBBAND_DECAY.get(_band, Fraction(7, 10))
         _dranked = sorted(_sb_idxs, key=lambda i: -adj_scores[i])
         for _pos, _i in enumerate(_dranked):
             if _pos < _R43_TAIL_START:
                 continue
-            r43_scores[_i] = _dround(
+            r43_scores[_i] = _fround(
                 adj_scores[_i] * (_r ** (_pos - _R43_TAIL_START + 1)),
                 _DETERMINISTIC_OUTPUT_PREC,
             )
@@ -1146,22 +1207,22 @@ def _vigia_score(case: dict) -> dict:
     # Score por dominio (Noisy-OR intra-dominio sobre los pesos saturados) —
     # trazabilidad Daubert y entrada del gate B-068 por dominios.
     r43_domain_scores = {
-        _dom: _dround(
-            1.0 - math.prod(max(0.0, 1.0 - r43_scores[_i]) for _i in _idxs),
+        _dom: _fround(
+            Fraction(1, 1) - _fraction_complement_product(r43_scores[_i] for _i in _idxs),
             _DETERMINISTIC_OUTPUT_PREC,
         )
         for _dom, _idxs in sorted(_by_domain.items())
     }
 
     if not r43_scores:
-        composite = 0.0
+        composite = Fraction(0, 1)
     else:
-        raw_composite = _dround(
-            1.0 - math.prod([max(0.0, 1.0 - s) for s in r43_scores]),
+        raw_composite = _fround(
+            Fraction(1, 1) - _fraction_complement_product(r43_scores),
             _DETERMINISTIC_INTERNAL_PREC,
         )
-        composite = _dround(raw_composite * (1.0 + diversity_bonus), _DETERMINISTIC_OUTPUT_PREC)
-        composite = min(0.99, composite)
+        composite = _fround(raw_composite * (Fraction(1, 1) + diversity_bonus), _DETERMINISTIC_OUTPUT_PREC)
+        composite = min(Fraction(99, 100), composite)
 
     # -----------------------------------------------------------------------
     # Step 3: CAIE fracture analysis
@@ -1193,8 +1254,8 @@ def _vigia_score(case: dict) -> dict:
     # LIMITATION: boost=0.45 and penalty=0.25 coefficients are heuristic.
     #   Roadmap: Bayesian calibration on labelled case dataset.
     # -----------------------------------------------------------------------
-    fracture_malice_boost        = 0.0
-    fracture_credibility_penalty = 0.0
+    fracture_malice_boost        = Fraction(0, 1)
+    fracture_credibility_penalty = Fraction(0, 1)
 
     MALICIOUS_FRACTURE_TYPES = {
         "FALSE_FLAG_PATTERN",
@@ -1302,15 +1363,15 @@ def _vigia_score(case: dict) -> dict:
     _boost_terms   = []
     _penalty_terms = []
     for f in _fractures_with_score_authority:
-        sev = _sev_float(f.get("severity", 0.5))
+        sev_frac = _to_exact(_sev_float(f.get("severity", 0.5)))
         ft  = f.get("fracture_type", "")
         if ft in MALICIOUS_FRACTURE_TYPES:
-            _boost_terms.append(Fraction(sev * 0.45))
+            _boost_terms.append(sev_frac * Fraction(45, 100))
         elif ft in CREDIBILITY_REDUCING_TYPES:
-            _penalty_terms.append(Fraction(sev * 0.25))
+            _penalty_terms.append(sev_frac * Fraction(25, 100))
 
-    fracture_malice_boost        = float(min(Fraction(1, 2),  sum(_boost_terms,   Fraction(0))))
-    fracture_credibility_penalty = float(min(Fraction(7, 20), sum(_penalty_terms, Fraction(0))))
+    fracture_malice_boost        = min(Fraction(1, 2),  sum(_boost_terms,   Fraction(0)))
+    fracture_credibility_penalty = min(Fraction(7, 20), sum(_penalty_terms, Fraction(0)))
 
     # B-172 / L-062: a categorical MALICE gate must be grounded in a pair the
     # scorer just re-derived from artifact timestamps.  Severity keeps the
@@ -1352,8 +1413,8 @@ def _vigia_score(case: dict) -> dict:
     # expected=UNKNOWN). Gate comparativo: +10 aciertos, 0 regresiones
     # (docs/FASE2_DATASET_CALIBRACION.md, experimento E1).
     # -----------------------------------------------------------------------
-    raw_intent_score = _dround(
-        max(0.0, min(0.99, composite + fracture_malice_boost - fracture_credibility_penalty)),
+    raw_intent_score = _fround(
+        max(Fraction(0, 1), min(Fraction(99, 100), composite + fracture_malice_boost - fracture_credibility_penalty)),
         _DETERMINISTIC_OUTPUT_PREC,
     )
 
@@ -1365,17 +1426,17 @@ def _vigia_score(case: dict) -> dict:
         _SUPPORT_SCORE_TABLE.get(n_artifacts, Fraction(1, 1))  # P0: Fraction lookup, no math.log()
         if n_artifacts > 0 else Fraction(0, 1)
     )
-    final_score   = _dround(raw_intent_score * (0.9 + 0.1 * support_score), _DETERMINISTIC_OUTPUT_PREC)
+    final_score   = _fround(raw_intent_score * (Fraction(9, 10) + Fraction(1, 10) * support_score), _DETERMINISTIC_OUTPUT_PREC)
 
-    mean_effective = _dround(
-        _dsum(e["effective_trust"] for e in effective_trusts) / len(effective_trusts),
+    mean_effective = _fround(
+        sum((e["effective_trust"] for e in effective_trusts), Fraction(0, 1)) / len(effective_trusts),
         _DETERMINISTIC_OUTPUT_PREC,
     )
 
     # Collapsed provenance without fractures → NOISE (inadmissible under Daubert)
     # Collapsed provenance WITH fractures → possible planting → SUSPICION
     provenance_collapsed = (
-        mean_effective < 0.01
+        mean_effective < Fraction(1, 100)
         and not fractures
     )
 
@@ -1384,18 +1445,18 @@ def _vigia_score(case: dict) -> dict:
     # probative strength must leave a reason (CLAUDE.md Refutation Protocol).
     # Record what was capped; surfaced into base_result below. Verdict-neutral.
     _single_artifact_cap = None
-    if n_artifacts < 2 and final_score > 0.65:
+    if n_artifacts < 2 and final_score > Fraction(65, 100):
         _single_artifact_cap = {
-            "pre_cap_score": _dround(final_score, _DETERMINISTIC_OUTPUT_PREC),
+            "pre_cap_score": _to_float(final_score, _DETERMINISTIC_OUTPUT_PREC),
             "capped_to": 0.65,
             "rule": "single-artifact corroboration cap (n_artifacts < 2): a lone "
                     "artifact class cannot sustain a high-confidence intent score",
         }
-        final_score = 0.65
+        final_score = Fraction(65, 100)
 
     if hard_temporal:
         verdict    = "MALICE"
-        confidence = 0.95
+        confidence = Fraction(95, 100)
         reason     = "HARD GATE: EFFECT_BEFORE_CAUSE — physical law violation"
     elif provenance_collapsed:
         # P2-D FIX (Tanda B, PR-B2): antes esta rama emitía NOISE con
@@ -1412,9 +1473,9 @@ def _vigia_score(case: dict) -> dict:
                       "fracturas — cadena de custodia insuficiente para "
                       "afirmar benignidad. Inadmisible bajo Daubert; requiere "
                       "re-adquisición de la evidencia.")
-    elif mean_effective < 0.15 and fractures:
+    elif mean_effective < Fraction(15, 100) and fractures:
         verdict    = "SUSPICION"
-        confidence = _dround(min(0.75, fracture_malice_boost + 0.3), 2)
+        confidence = _fround(min(Fraction(3, 4), fracture_malice_boost + Fraction(3, 10)), 2)
         reason     = f"Broken chain of custody + {len(fractures)} active fracture(s) — deliberate manipulation"
     elif final_score > Fraction(33, 100):
         # Corroboration gate: MALICE requires convergence of heterogeneous evidence.
@@ -1528,32 +1589,32 @@ def _vigia_score(case: dict) -> dict:
         if _branch:
             verdict = "MALICE"
             reason  = (
-                f"Intent score {final_score:.4f} exceeds MALICE threshold — "
+                f"Intent score {float(final_score):.4f} exceeds MALICE threshold — "
                 f"corroboration branch: {_branch} (B-068 gate, R4-3 v2)"
             )
         else:
             verdict = "SUSPICION"
             reason  = (
-                f"Intent score {final_score:.4f} exceeds MALICE threshold but "
+                f"Intent score {float(final_score):.4f} exceeds MALICE threshold but "
                 f"no corroboration branch opens ({_n_domains} domain(s), "
                 f"{len(_hard_types)}/{_n_hard_arts} hard class(es)/artifact(s), "
                 f"{_n_percost} per-cost "
                 f"artifact(s)) — volume within a single soft collection "
                 f"domain does not corroborate MALICE (B-068 gate, R4-3 v2)"
             )
-        confidence = _dround(min(0.95, final_score * 2.0), 2)
+        confidence = _fround(min(Fraction(19, 20), final_score * 2), 2)
     elif final_score > Fraction(10, 100):  # B-076: 18/100 → 10/100 (ground truth)
         verdict    = "SUSPICION"
-        confidence = _dround(final_score * 2.0, 2)
-        reason     = f"Significant signal with structural support (score={final_score:.4f})"
+        confidence = _fround(final_score * 2, 2)
+        reason     = f"Significant signal with structural support (score={float(final_score):.4f})"
     elif final_score > Fraction(8, 100):
         verdict    = "UNKNOWN"
-        confidence = _dround(final_score * 2.0, 2)
-        reason     = f"Anomaly without sufficient structural support (score={final_score:.4f})"
+        confidence = _fround(final_score * 2, 2)
+        reason     = f"Anomaly without sufficient structural support (score={float(final_score):.4f})"
     else:
         verdict    = "NOISE"
-        confidence = _dround(1.0 - final_score, 2)
-        reason     = f"Insufficient evidence of malicious intent (score={final_score:.4f})"
+        confidence = _fround(Fraction(1, 1) - final_score, 2)
+        reason     = f"Insufficient evidence of malicious intent (score={float(final_score):.4f})"
 
     # -----------------------------------------------------------------------
     # Step 4b: Grice testimony gate (B-126, defense in depth)
@@ -1616,7 +1677,7 @@ def _vigia_score(case: dict) -> dict:
 
         if _grice_gate_would_fire and _grice_source == "live_grice":
             verdict = "SUSPICION"
-            confidence = _dround(min(0.65, _grice_deception * 2), 2)
+            confidence = _fround(min(Fraction(13, 20), _to_exact(_grice_deception) * 2), 2)
             reason = (
                 f"Grice testimony gate (B-126): motor NOISE overridden. "
                 f"Testimony-only evidence with low prior_trust, no exculpatory "
@@ -1648,20 +1709,28 @@ def _vigia_score(case: dict) -> dict:
     base_result = {
         "verdict":                      verdict,
         "signal_quality_shadow":        _signal_quality_shadow,
-        "score":                        final_score,
-        "confidence":                   confidence,
+        # OUTPUT BOUNDARY (CLAUDE.md §5.2 / deterministic-core skill): every
+        # field below this point is the single sanctioned Fraction->float
+        # cast for a decision-path value, done via _to_float. Upstream of
+        # here the whole chain (effective/adjusted/composite/raw_intent_score/
+        # final_score/confidence/mean_effective) is exact Fraction arithmetic.
+        "score":                        _to_float(final_score, _DETERMINISTIC_OUTPUT_PREC),
+        "confidence":                   _to_float(confidence, 2),
         "reason":                       reason,
-        "mean_effective_trust":         mean_effective,
-        "composite_base":               _dround(composite, _DETERMINISTIC_OUTPUT_PREC),
+        "mean_effective_trust":         _to_float(mean_effective, _DETERMINISTIC_OUTPUT_PREC),
+        "composite_base":               _to_float(composite, _DETERMINISTIC_OUTPUT_PREC),
         # R4-3: trazabilidad de la saturación por dominio (Daubert).
-        "r43_domain_scores":            r43_domain_scores,
+        "r43_domain_scores":            {
+            _dom: _to_float(_s, _DETERMINISTIC_OUTPUT_PREC)
+            for _dom, _s in r43_domain_scores.items()
+        },
         "r43_active_domains":           sorted(
             _dom for _dom, _s in r43_domain_scores.items()
             if _s > _M2_MIN_SIGNAL_ADJ and _dom != "assurance_context"
         ),
-        "fracture_malice_boost":        _dround(fracture_malice_boost, _DETERMINISTIC_OUTPUT_PREC),
-        "fracture_credibility_penalty": _dround(fracture_credibility_penalty, _DETERMINISTIC_OUTPUT_PREC),
-        "diversity_bonus":              _dround(diversity_bonus, _DETERMINISTIC_OUTPUT_PREC),
+        "fracture_malice_boost":        _to_float(fracture_malice_boost, _DETERMINISTIC_OUTPUT_PREC),
+        "fracture_credibility_penalty": _to_float(fracture_credibility_penalty, _DETERMINISTIC_OUTPUT_PREC),
+        "diversity_bonus":              _to_float(diversity_bonus, _DETERMINISTIC_OUTPUT_PREC),
         "hard_temporal_gate":           hard_temporal,
         "hard_temporal_authority": (
             "validated_artifact_pair"
@@ -1675,7 +1744,14 @@ def _vigia_score(case: dict) -> dict:
         "validated_hard_temporal_pairs": [
             _entry["pair"] for _entry in _validated_hard_temporal_violations
         ],
-        "effective_trusts":             effective_trusts,
+        "effective_trusts":             [
+            {
+                **_et,
+                "effective_trust": _to_float(_et["effective_trust"], _DETERMINISTIC_OUTPUT_PREC),
+                "adjusted_score":  _to_float(_et["adjusted_score"],  _DETERMINISTIC_OUTPUT_PREC),
+            }
+            for _et in effective_trusts
+        ],
         "temporal_violations":          len(violations),
         "statistical_uniformity_authority": (
             "unverified_json_no_verdict_authority"
