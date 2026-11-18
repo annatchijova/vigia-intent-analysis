@@ -233,6 +233,11 @@ Recorded as **L-073**. **Tests:**
 `tests/test_l072_declared_inputs_and_threshold_edge.py::TestL073ThresholdEdgeGrantsTheHigherRung`
 (5 tests).
 
+**Subsequent resolution:** commit `94b55b55` moved the scorer's decision chain,
+including `final_score` and the verdict thresholds, to exact `Fraction`
+arithmetic. The audit finding remains a historical characterization of the old
+implementation; L-073 is resolved in the current scorer.
+
 ---
 
 ## Finding 5 — Exculpatory/Eco "burden of proof" [MECHANISM BACKWARDS, EXPOSURE LARGER → L-072]
@@ -301,10 +306,13 @@ Recorded as **L-072**. **Tests:**
 
 ## Next decision
 
-L-071, L-072, and L-073 are recorded, not fixed — each requires the same
-199-case comparative corpus gate that B-091/B-092 used before touching scorer
-semantics (per `KNOWN_LIMITATIONS.md`'s own precedent: a calibration change
-without that gate trades one uncalibrated behavior for another). L-065's
+L-071 and L-072 remain recorded, not fixed, and require the same 199-case
+comparative corpus gate that B-091/B-092 used before touching scorer semantics
+(per `KNOWN_LIMITATIONS.md`'s own precedent: a calibration change without that
+gate trades one uncalibrated behavior for another). L-073 was subsequently
+resolved by `94b55b55`, which moved the relevant scorer path to exact
+`Fraction` arithmetic. L-065's
 doctrine decision (verify the terminal hash / rename the factor / accept as
-documented) is unchanged by this round. No scorer behavior differs from before
-this audit; only `vigia_sift_bridge.py`'s purgatory sealing changed.
+documented) is unchanged by this round. The scorer change that resolved L-073
+happened after this audit; only `vigia_sift_bridge.py`'s purgatory sealing
+changed during the audit itself.

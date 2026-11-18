@@ -7,9 +7,12 @@ L-072  semantic_role="exculpatory" es entrada DECLARADA con autoridad de
 L-073  el borde de umbral compara un float de _dround contra un Fraction; en
        el punto exacto de grilla la comparación otorga el rung SUPERIOR.
 
-Ambos son tests de CARACTERIZACIÓN: fijan el comportamiento medido. No
-afirman que sea correcto — las entradas L-072/L-073 de KNOWN_LIMITATIONS.md
-documentan la decisión de doctrina pendiente. El scorer NO fue modificado.
+Ambos comenzaron como tests de CARACTERIZACIÓN del comportamiento medido.
+L-072 sigue siendo una cuestión doctrinal abierta. L-073 fue resuelto luego
+en el commit `94b55b55`, que movió el camino de decisión del scorer a
+aritmética exacta con `Fraction`; sus tests quedan como evidencia histórica del
+comportamiento anterior float-versus-`Fraction`. Este módulo de tests no
+modifica el scorer.
 """
 
 import copy

@@ -936,7 +936,7 @@ example (N=1/2) lives in "Accuracy by Mode", not here.*
 | L-050 | Non-finite fail-closed on value/z_score/confidence × 4 impls | ebs_v1.py, signal_contract.py | **RESOLVED** (B-083/B-083b) |
 | L-071 | Cross-domain gate counts domain presence, not mass (1 near-zero artifact pivots SUSPICION→MALICE) | vigia_scorer.py B-068 gate | [OPEN] — calibration doctrine; refinement of the B-092 residual |
 | L-072 | `semantic_role` declared label neutralizes MALICE (37/52 corpus cases, label alone) | vigia_scorer.py D1 block | [OPEN] — doctrine; extends L-054, sibling of L-065/L-070 |
-| L-073 | Threshold compares `_dround` float vs `Fraction`; exact grid point grants higher rung | vigia_scorer.py verdict ladder | [OPEN] — latent, zero corpus incidence |
+| L-073 | Threshold compared `_dround` float vs `Fraction`; exact grid point granted higher rung | vigia_scorer.py verdict ladder | **RESOLVED** (`94b55b55`) |
 | L-067 | §9.4-LIM: SUSPICION doctrinal ceiling for D3-only macOS/mobile (sealed 2026-07-10; renumbered from second L-051 on 2026-07-23) | sift_orchestrator.py verdict_ceiling | Sealed doctrine |
 | L-051 | Formal specification of arbitration contract (Axiom A1) — renumbered from shared L-029 | Scoring/CAIE precedence | [OPEN] — design gap, not a bug |
 | L-032 | Agent fallback FN on raw Windows E01 | VIGIA-MAGNET-2022-WINDOWS | **RESOLVED** (B-032) |
@@ -3514,10 +3514,11 @@ requires the full corpus gate.
 
 ---
 
-## L-073 — Verdict thresholds compare a `_dround` float against a `Fraction`; the exact grid point grants the higher rung [OPEN]
+## L-073 — Verdict thresholds compared a `_dround` float against a `Fraction`; the exact grid point granted the higher rung [RESOLVED]
 
 **Affects:** `vigia_scorer.py::_vigia_score` verdict ladder |
-**Status:** [OPEN] 2026-08-09 — latent edge, **zero corpus incidence measured**.
+**Status:** **RESOLVED** 2026-11-01 in commit `94b55b55` — the latent edge had
+zero corpus incidence, but the scorer was corrected before relying on that absence.
 **Severity:** Low — exactness/boundary, anti-conservative direction
 **Origin:** external audit (DeepSeek). **Direction of the finding was inverted.**
 **Document:** `docs/DEEPSEEK_AUDIT_20260809.md` (Finding 4).
@@ -3552,8 +3553,14 @@ silently zeroed rather than raising. Probed over 80 corpus cases: only `float`
 arguments occur (4449 calls), so the path is currently unreachable — but the guard
 fails silent in a module that uses both `Fraction` and `Decimal`.
 
-**Recommendation (record only):** keep the ladder in exact arithmetic end-to-end
-(compare `Fraction` against `Fraction`), or state the threshold semantics as
-"≥ next grid step" so the emitted rule matches the emitted verdict.
+**Resolution:** commit `94b55b55` moved the scorer's decision chain to exact
+`Fraction` arithmetic. `final_score`, the single-artifact cap, and all four
+verdict thresholds now compare `Fraction` values; `_dround` remains only at
+cosmetic/output boundaries. The targeted regression file passes (`15 passed`).
+
+The prior recommendation to keep the ladder in exact arithmetic is therefore
+implemented. The characterization tests remain as historical evidence for the
+former float-versus-`Fraction` behavior and should not be interpreted as the
+current scorer contract.
 
 ---
