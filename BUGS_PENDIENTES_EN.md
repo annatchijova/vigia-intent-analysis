@@ -1361,3 +1361,49 @@ needed no change: it already converted its input to `Fraction` correctly
   still missing before calling this fully closed.
 
 ---
+
+## B-243 — The phonetic loader mishandles `_meta` and makes `homoglyph_patterns` unreachable
+
+| Field | Value |
+|-------|-------|
+| **Status** | OPEN — documented, no fix applied |
+| **Severity** | P2 — map contract violation and silent loss of homoglyph signals |
+| **Files** | `phonetic_dict.json`, `vigia/phonetic_loader.py` |
+| **Detected in** | Session 2026-11-18. External finding verified against the live files. |
+
+### Observation and contract comparison
+
+The real JSON uses `_meta`, but `_SKIP_SECTIONS` ignores only `_metadata` and
+`homoglyph_patterns`. When the root `phonetic_dict.json` is loaded, the loader
+flattens `_meta` as if it were a pattern section: `version` and `sections` enter
+`PHONETIC_MAP` (`description` is filtered by a separate rule). The observed run
+produces 81 entries instead of the expected 79 phonetic entries, and
+`get_stats()` reports `_meta` as a section.
+
+In addition, `homoglyph_patterns` is included in `_SKIP_SECTIONS`. The `continue`
+runs before the block that builds `HOMOGLYPH_NOTES`, making that block
+unreachable and discarding the homoglyph table from the JSON. The real run leaves
+`HOMOGLYPH_NOTES` empty and reports `get_stats()["homoglyph_notes"] == 0`,
+including the Cyrillic `а` entry.
+
+### Required regression before fixing
+
+Add a test that loads the real JSON and asserts that:
+
+1. `version`, `description`, and `sections` are absent from `PHONETIC_MAP`.
+2. `HOMOGLYPH_NOTES` contains Cyrillic `а` (`U+0430`) and is not empty.
+3. `get_stats()["homoglyph_notes"] > 0`.
+4. `len(PHONETIC_MAP)` matches the expected number of entries from the phonetic
+   sections, excluding metadata and the homoglyph reference table.
+
+### Preserved architectural context
+
+This entry does not propose replacing the existing architecture: `SemioticDetectorV2`
+already produces hard semantic signals; CAIE already models independence,
+provenance, artificial correlation, and unanalyzed evidence;
+`sift_orchestrator` already degrades unanalyzable artifacts to `ABSTAIN`; and the
+bridge already concentrates MCP, sandboxing, telemetry/auditing, Kassandra,
+transport control, and input limits. For the AI fork, CAIE should remain a
+deterministic barrier that can force `ABSTAIN`, not an LLM opinion.
+
+---

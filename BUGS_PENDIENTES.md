@@ -1649,3 +1649,49 @@ cuando `x` ya es `Fraction`).
   antes de considerar esto cerrado del todo.
 
 ---
+
+## B-243 — El loader fonético no respeta `_meta` y vuelve inalcanzable `homoglyph_patterns`
+
+| Campo | Valor |
+|-------|-------|
+| **Estado** | ABIERTO — documentado, sin fix aplicado |
+| **Severidad** | P2 — contrato roto del mapa y pérdida silenciosa de señales de homoglifos |
+| **Archivos** | `phonetic_dict.json`, `vigia/phonetic_loader.py` |
+| **Detectado en** | Sesión 2026-11-18. Hallazgo externo verificado contra los archivos vivos. |
+
+### Observación y contraste con el contrato
+
+El JSON real usa `_meta`, pero `_SKIP_SECTIONS` solo ignora `_metadata` y
+`homoglyph_patterns`. Al cargar `phonetic_dict.json` desde la raíz, el loader
+aplana `_meta` como si fuera una sección de patrones: `version` y `sections`
+terminan en `PHONETIC_MAP` (la clave `description` se filtra por otra regla).
+La corrida observada produce 81 entradas en lugar de las 79 entradas fonéticas
+esperadas y `get_stats()` reporta `_meta` entre las secciones.
+
+Además, `homoglyph_patterns` está incluido en `_SKIP_SECTIONS`. El `continue`
+ocurre antes del bloque que construye `HOMOGLYPH_NOTES`, por lo que ese bloque
+es inalcanzable y la tabla de homoglifos del JSON se pierde. La corrida real
+deja `HOMOGLYPH_NOTES` vacío y `get_stats()["homoglyph_notes"] == 0`, incluida
+la entrada de la `а` cirílica.
+
+### Regresión requerida antes del fix
+
+Agregar un test que cargue el JSON real y compruebe que:
+
+1. `version`, `description` y `sections` no aparecen en `PHONETIC_MAP`.
+2. `HOMOGLYPH_NOTES` contiene la `а` cirílica (`U+0430`) y no está vacío.
+3. `get_stats()["homoglyph_notes"] > 0`.
+4. `len(PHONETIC_MAP)` coincide con el número esperado de entradas de las
+   secciones fonéticas, sin metadatos ni la tabla de referencia de homoglifos.
+
+### Contexto arquitectónico preservado
+
+Este registro no propone reemplazar la arquitectura existente: `SemioticDetectorV2`
+ya produce señales semánticas duras; CAIE ya modela independencia, procedencia,
+correlación artificial y evidencia no analizada; `sift_orchestrator` ya degrada
+artefactos no analizables a `ABSTAIN`; y el bridge ya concentra MCP, sandbox,
+telemetría/auditoría, Kassandra, control de transporte y límites de entrada.
+Para el fork AI, CAIE debe seguir siendo una barrera determinista capaz de
+forzar `ABSTAIN`, no una opinión LLM.
+
+---

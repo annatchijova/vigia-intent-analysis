@@ -18,9 +18,8 @@
   Spanish (voseo, professional, neutral). Everything committed to the repo — code,
   tests, comments, docstrings, documentation, and commit messages — is in English.
 - **No emojis** anywhere in the repository or in generated output.
-- **Commit messages.** No fixed prefix. Write a subject that names what changed and
-  a body that says *why*. (The `POST HACKATHON` prefix used through the submission
-  window was retired on 2026-08-15; historical commits keep it, new ones do not.)
+- **Commit messages.** Write a subject that names what changed and a body that says
+  *why*.
 - **You do not know the repo state until you have read it.** Do not assume paths,
   branch, cleanliness, dependency versions, or that a project-knowledge snapshot
   matches the live tree. Verify, then claim. See §3.
