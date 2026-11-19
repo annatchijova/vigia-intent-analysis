@@ -96,6 +96,19 @@ other under false pretenses.
   whether the deterministic Mode 1 engine stays directly reachable from this
   repository or lives purely under FRACTURE. I'd rather say "undecided" than
   invent an answer for a grant document.
+- Already running, not new, but worth naming explicitly given how central it
+  becomes once the LLM is a protagonist: [Cronos](https://github.com/annatchijova/cronos),
+  a separate MCP server that records tool calls, hypotheses, evidence, and
+  decisions as an agent works, sealed in a SHA-256 hash chain. It's been
+  recording VIGÍA's Claude Code investigations already — this repository
+  carries dozens of `cronos_*.md` trace files as evidence. A sealed verdict
+  says what was decided; Cronos is the independent record of how the agent
+  actually got there, kept separate from the verdict itself.
+- VIGÍA's own adversarial test corpus — the BREAK, KIWI, false-positive and
+  false-negative cases built specifically to try to break the system — is
+  real and already in this repository (`data/cases/`), being consolidated
+  into its own top-level `CORPUS-CASES/` folder so it's easy to find and run
+  independently.
 
 ## The part that matters most to me: not lying by omission
 
@@ -107,10 +120,20 @@ awkward decisions in this document and in the main README:
 
 - I did not invent a "200 independent cases" or "war mode" figure, even
   though it would have made for a cleaner sentence. The real, documented
-  numbers are 158/162 (97.5%) on the label-blind detection corpus and
-  187/199 (94.0%) on the mixed adversarial corpus — both in
-  [`docs/ACCURACY.md`](./ACCURACY.md), both reproducible with the commands in
-  the README.
+  numbers — and which mode they actually belong to, since collapsing that
+  distinction is itself a way to overclaim — are: 158/162 (97.5%) on the
+  label-blind detection corpus and 187/199 (94.0%) on the mixed adversarial
+  corpus, both from the **Python-only agent, zero LLM calls** (Domain B);
+  and a separate **100% of verdicts correct on every investigation run to
+  date**, evaluated per case rather than as a corpus aggregate, from
+  **Claude Code / MCP** (Domain A) — the mode this rewrite actually builds
+  on. If a case's signal falls outside what VIGÍA currently contemplates,
+  the design calls for degrading to `ABSTAIN` instead of guessing, which
+  could later turn out to have been a false negative if left unconfirmed.
+  We have not found such a case yet; that is not the same as a guarantee
+  that none exists. Both figures and the full methodology are in
+  [`docs/ACCURACY.md`](./ACCURACY.md), reproducible with the commands in the
+  README.
 - I did not assert "three hashes match, the fourth differs because of a
   timestamp" as a settled fact, because I have not personally re-verified
   that exact claim against the current code in this session. The four-hash
@@ -167,10 +190,16 @@ whether we're actually measuring *how much* reward hacking happens in agentic
 systems, or only how much of it we're currently capable of recognizing — and
 what that gap implies for any system, including VIGÍA's AI-protagonist
 rewrite, that gives a model more latitude over the course of an
-investigation. I've already tested mitigation techniques informally; this
-research line is where I'm validating them properly, and it directly informs
-how much latitude the new VIGÍA agent architecture should actually give the
-model.
+investigation. I'm naming this research here deliberately, not as an
+incoherent flex for a project that's about to hand a model more latitude —
+it's the opposite: an attempt to actually understand and reduce that risk
+before leaning on the model more, not after. I've already tested mitigation
+techniques informally, and I already have working hypotheses for
+orchestrating multiple agents in a way that reduces error instead of
+compounding it; this research line is where I validate both properly, and it
+directly informs how much latitude the new VIGÍA agent architecture should
+actually give the model, and where Kassandra, the hallucination guard, and
+Cronos fit into bounding it.
 
 ## Why the funding matters
 

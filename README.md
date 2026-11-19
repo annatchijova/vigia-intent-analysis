@@ -2,7 +2,7 @@
 
 [English](./README.md) · [Español](./README_ES.md) · [FRACTURE (the original VIGÍA)](https://github.com/annatchijova/fracture) · Author: Anna Tchijova · License: Apache 2.0
 
-**Index:** [What changed and why](#what-changed-and-why) · [What the new VIGÍA is](#what-the-new-vigía-is) · [Kassandra Protocol & Hallucination Guard](#kassandra-protocol--hallucination-guard) · [Reproduce it yourself](#reproduce-it-yourself) · [Quality signal: the bug registry](#quality-signal-the-bug-registry) · [MCP, API and the ecosystem](#mcp-api-and-the-ecosystem) · [Roadmap](#roadmap) · [Scientific rigor](#scientific-rigor) · [For Mozilla](#for-mozilla)
+**Index:** [What changed and why](#what-changed-and-why) · [What the new VIGÍA is](#what-the-new-vigía-is) · [Kassandra Protocol & Hallucination Guard](#kassandra-protocol--hallucination-guard) · [Reproduce it yourself](#reproduce-it-yourself) · [Quality signal: the bug registry](#quality-signal-the-bug-registry) · [MCP, API and the ecosystem](#mcp-api-and-the-ecosystem) · [Cronos MCP](#cronos-mcp) · [Roadmap](#roadmap) · [Scientific rigor](#scientific-rigor) · [For Mozilla](#for-mozilla)
 
 ---
 
@@ -112,15 +112,34 @@ to pretend otherwise for a grant application.
 ## Reproduce it yourself
 
 I'm not asking anyone to take the numbers on faith. The deterministic core
-this repository inherited from FRACTURE is still here and still verifiable:
+this repository inherited from FRACTURE is still here and still verifiable —
+and I want to be precise about which number belongs to which mode, because
+conflating them is itself a form of overclaiming:
 
-- **158/162 (97.5%)** label-blind on the detection corpus; **187/199 (94.0%)**
-  on the mixed corpus (including 16 adversarial BREAK cases, 7 KIWI, 3 false
-  negatives, 5 false positives) — methodology and the full breakdown in
+- **Python-only agent, 0 LLM calls (Domain B)** — **158/162 (97.5%)**
+  label-blind on the detection corpus; **187/199 (94.0%)** on the mixed
+  corpus (including 16 adversarial BREAK cases, 7 KIWI, 3 false negatives, 5
+  false positives). This is the deterministic scorer running alone, without
+  the agent's reasoning layer.
+- **Claude Code / MCP, LLM-assisted investigation (Domain A)** — **100% of
+  verdicts correct on every investigation run to date**, evaluated per case,
+  not as a corpus-wide figure. This is the mode the AI-protagonist rewrite
+  actually builds on. If a case's signal falls into something VIGÍA doesn't
+  contemplate, the architecture is designed to degrade to `ABSTAIN` rather
+  than guess — which, left unconfirmed, could later turn out to be a false
+  negative. We have not yet found such a case. That is not a guarantee one
+  doesn't exist; it is an honest statement of what has and hasn't been
+  checked so far.
+- Full per-domain methodology and breakdown in
   [`docs/ACCURACY.md`](./docs/ACCURACY.md).
 - Real cases from **Digital Corpora** (M57-Jean, Nitroba, Lone Wolf, Tuck 2019)
   and NPS datasets, documented in
   [`docs/digital_corpora_complete_report.md`](./docs/digital_corpora_complete_report.md).
+- VIGÍA's own adversarial corpus — the BREAK, KIWI, false-positive and
+  false-negative cases built specifically to try to break the system — lives
+  in this repository today under `data/cases/` and is being consolidated
+  into its own top-level folder, `CORPUS-CASES/`, so it stays easy to find
+  and run independently of everything else here.
 - Pick any sealed case and verify it bit-for-bit, independently of VIGÍA's own
   code:
   ```bash
@@ -186,6 +205,27 @@ prematurely.
 
 ---
 
+## Cronos MCP
+
+[Cronos](https://github.com/annatchijova/cronos) is a separate MCP server I
+built as a black-box recorder for agents: it captures tool calls, retrieved
+memories, hypotheses considered and discarded, evidence, and decisions as
+they happen, and seals the resulting trace in a SHA-256 hash chain. It
+already runs alongside VIGÍA's Claude Code investigations today — this
+repository carries dozens of `cronos_*.md` trace files from past sessions as
+proof, not a promise.
+
+It matters more now, not less, as the AI becomes a protagonist instead of a
+narrator called once at the end. A sealed verdict tells you *what* was
+decided; it says nothing about the path the agent actually took to get
+there — which hypotheses it floated and dropped, which tool calls it made
+and in what order, where it changed its mind. Cronos is the independent,
+tamper-evident record of that path, kept separate from the verdict the same
+way Kassandra and the hallucination guard are kept separate from the LLM's
+narration: none of them trust the agent's own summary of itself.
+
+---
+
 ## Roadmap
 
 Explicitly future work, not shipped:
@@ -205,10 +245,17 @@ Splitting into two names doesn't mean splitting from the standard. Both
 **VIGÍA** and **FRACTURE** ship as proper GitHub packages, under the same
 Apache 2.0 license, with their own test suites and bug registries. I'm also
 formalizing (currently in Spanish, English write-up in progress) ongoing
-research into reward hacking as a sociotechnical phenomenon in LLM agents —
-mitigation techniques I've already tested informally and now want to validate
-properly — at
-[reward-hacking-social](https://github.com/annatchijova/reward-hacking-social).
+research into reward hacking as a sociotechnical phenomenon in LLM agents at
+[reward-hacking-social](https://github.com/annatchijova/reward-hacking-social) —
+mitigation techniques I've already tested informally and now want to
+validate properly. I'm naming it here deliberately, not as an incoherent
+flex for a project that's about to give an LLM more latitude: it's the
+opposite, an attempt to actually reduce that risk before leaning on the
+model more. I already have working hypotheses for orchestrating multiple
+agents in a way that reduces error rather than compounding it, and that's
+part of what informs how much latitude the new VIGÍA architecture gives the
+model, and where Kassandra, the hallucination guard, and Cronos sit in that
+design.
 
 ---
 

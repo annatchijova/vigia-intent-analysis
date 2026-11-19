@@ -2,7 +2,7 @@
 
 [English](./README.md) · [Español](./README_ES.md) · [FRACTURE (la VIGÍA original)](https://github.com/annatchijova/fracture) · Autora: Anna Tchijova · Licencia: Apache 2.0
 
-**Índice:** [Qué cambió y por qué](#qué-cambió-y-por-qué) · [Qué es la nueva VIGÍA](#qué-es-la-nueva-vigía) · [Protocolo Kassandra y Hallucination Guard](#protocolo-kassandra-y-hallucination-guard) · [Reproducilo vos misma/o](#reproducilo-vos-mismamo) · [Señal de calidad: el registro de bugs](#señal-de-calidad-el-registro-de-bugs) · [MCP, API y el ecosistema](#mcp-api-y-el-ecosistema) · [Roadmap](#roadmap) · [Rigor científico](#rigor-científico) · [Para Mozilla](#para-mozilla)
+**Índice:** [Qué cambió y por qué](#qué-cambió-y-por-qué) · [Qué es la nueva VIGÍA](#qué-es-la-nueva-vigía) · [Protocolo Kassandra y Hallucination Guard](#protocolo-kassandra-y-hallucination-guard) · [Reproducilo vos misma/o](#reproducilo-vos-mismamo) · [Señal de calidad: el registro de bugs](#señal-de-calidad-el-registro-de-bugs) · [MCP, API y el ecosistema](#mcp-api-y-el-ecosistema) · [MCP Cronos](#mcp-cronos) · [Roadmap](#roadmap) · [Rigor científico](#rigor-científico) · [Para Mozilla](#para-mozilla)
 
 ---
 
@@ -117,15 +117,34 @@ no lo voy a disimular para una postulación a una beca.
 ## Reproducilo vos misma/o
 
 No le pido a nadie que crea las cifras por fe. El núcleo determinista que este
-repositorio heredó de FRACTURE sigue acá y sigue siendo verificable:
+repositorio heredó de FRACTURE sigue acá y sigue siendo verificable — y quiero
+ser precisa sobre a qué modo le corresponde cada número, porque mezclarlos es
+en sí mismo una forma de overclaim:
 
-- **158/162 (97,5%)** ciego a etiquetas en el corpus de detección; **187/199
-  (94,0%)** en el corpus mixto (incluyendo 16 casos adversariales BREAK, 7
-  KIWI, 3 falsos negativos, 5 falsos positivos) — metodología completa en
+- **Agente solo Python, 0 llamadas a LLM (Dominio B)** — **158/162 (97,5%)**
+  ciego a etiquetas en el corpus de detección; **187/199 (94,0%)** en el
+  corpus mixto (incluyendo 16 casos adversariales BREAK, 7 KIWI, 3 falsos
+  negativos, 5 falsos positivos). Esto es el scorer determinista corriendo
+  solo, sin la capa de razonamiento del agente.
+- **Claude Code / MCP, investigación asistida por LLM (Dominio A)** — **100%
+  de veredictos correctos en toda investigación corrida hasta la fecha**,
+  evaluado por caso, no como cifra agregada de corpus. Este es el modo sobre
+  el que realmente se construye la reescritura con IA protagonista. Si la
+  señal de un caso cae en algo que VIGÍA no contempla, la arquitectura está
+  diseñada para degradar a `ABSTAIN` en vez de adivinar — y eso, sin
+  confirmar, podría más adelante resultar un falso negativo. Todavía no
+  encontramos un caso así. Eso no es una garantía de que no exista; es una
+  afirmación honesta de lo que se chequeó hasta ahora y lo que no.
+- Metodología completa y desglose por dominio en
   [`docs/ACCURACY_ES.md`](./docs/ACCURACY_ES.md).
 - Casos reales de **Digital Corpora** (M57-Jean, Nitroba, Lone Wolf, Tuck
   2019) y datasets NPS, documentados en
   [`docs/digital_corpora_complete_report.md`](./docs/digital_corpora_complete_report.md).
+- El corpus adversarial propio de VIGÍA —los casos BREAK, KIWI, de falso
+  positivo y falso negativo construidos específicamente para intentar romper
+  el sistema— vive hoy en este repositorio bajo `data/cases/` y se está
+  consolidando en su propia carpeta de nivel superior, `CORPUS-CASES/`, para
+  que sea fácil de encontrar y correr de forma independiente del resto.
 - Elegí cualquier caso sellado y verificalo bit a bit, de forma independiente
   del código de VIGÍA:
   ```bash
@@ -193,6 +212,28 @@ prematuramente.
 
 ---
 
+## MCP Cronos
+
+[Cronos](https://github.com/annatchijova/cronos) es un servidor MCP aparte
+que construí como grabador de caja negra para agentes: captura llamadas a
+herramientas, memorias recuperadas, hipótesis consideradas y descartadas,
+evidencia y decisiones a medida que ocurren, y sella el trace resultante en
+una cadena de hashes SHA-256. Ya corre junto a las investigaciones de VIGÍA
+en Claude Code hoy — este repositorio trae decenas de archivos
+`cronos_*.md` de sesiones pasadas como prueba, no como promesa.
+
+Importa más ahora, no menos, a medida que la IA pasa a ser protagonista en
+vez de narradora llamada una sola vez al final. Un veredicto sellado te dice
+*qué* se decidió; no dice nada sobre el camino que el agente recorrió
+realmente para llegar ahí —qué hipótesis planteó y descartó, qué llamadas a
+herramientas hizo y en qué orden, dónde cambió de postura—. Cronos es el
+registro independiente y a prueba de alteración de ese camino, mantenido
+separado del veredicto de la misma forma en que Kassandra y el hallucination
+guard se mantienen separados de la narración del LLM: ninguno de los tres
+confía en que el agente resuma honestamente lo que hizo.
+
+---
+
 ## Roadmap
 
 Explícitamente trabajo futuro, no entregado:
@@ -214,9 +255,16 @@ como **FRACTURE** son packages de GitHub propiamente dichos, bajo la misma
 licencia Apache 2.0, con sus propias suites de test y registros de bugs.
 También estoy formalizando (por ahora en español, versión en inglés en
 camino) una investigación en curso sobre reward hacking como fenómeno
-sociotécnico en agentes LLM —técnicas de mitigación que ya probé de forma
-informal y que ahora quiero validar formalmente— en
-[reward-hacking-social](https://github.com/annatchijova/reward-hacking-social).
+sociotécnico en agentes LLM en
+[reward-hacking-social](https://github.com/annatchijova/reward-hacking-social) —
+técnicas de mitigación que ya probé de forma informal y que ahora quiero
+validar formalmente. La nombro acá a propósito, no como una proeza
+incoherente para un proyecto que está a punto de darle más margen a un LLM:
+es justo lo contrario, un intento de reducir ese riesgo antes de apoyarme
+más en el modelo. Ya tengo hipótesis de trabajo para orquestar varios
+agentes de forma que el error se reduzca en vez de acumularse, y eso es
+parte de lo que informa cuánto margen le da la arquitectura nueva de VIGÍA
+al modelo, y dónde se ubican ahí Kassandra, el hallucination guard y Cronos.
 
 ---
 
